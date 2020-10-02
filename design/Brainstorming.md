@@ -11,7 +11,12 @@ There will probably need to be a high-level migration function that consumes a c
 
 1. Creates a new csproj (from a template) in a new location.
     1. The template will include references to analyzers and relevant 3rd-party frameworks.
-1. Copies source and content to the new location (but only source that is used by the project).
+    1. This could maybe be done with try-convert
+1. Copies source and content to the new location?
+    1. Should we copy all files or only those used by the csproj?
+        1. Only copying those that are used means we would lose items like readmes, licenses, or other docs that might not be included in the project.
+        1. But copying all could mean copying bin or obj folders if we're not careful.
+    1. Might actually be best to just back stuff up elsewhere and work in-place.
 1. Updates the template project based on the csproj, web.config, and other files in the source.
 1. Applies code fixes preemptively.
 1. Updates appsettings.json with app settings?
@@ -34,4 +39,10 @@ Migrating ASP.NET apps is different from general migration of .NET Framework pro
 * Guidance on choosing a proper .NET target.
     * This tool is only used for migrating classic ASP.NET MVC and WebAPI apps to ASP.NET Core (targeting .NET Core 5). Questions about which .NET target platform makes sense don't apply here the way they would in a more general purpose migration scenario.
 
+## Similar tools
+
+[try-convert][try-convert] transforms csproj files into new SDK-style projects. This tool will do something similar, but won't be the same as `try-convert` because this tool creates new projects from templates as opposed to just modifying a csproj file in-place. There is enough overlap, though, that this tool is worth looking at to see if we can share any project file processing logic. In fact, with some modifications, try-convert could be used to make some of the needed changes.
+
+
 [MigrationToolBrainstorm]: https://microsoft.sharepoint.com/:w:/t/DevDivCustomerEngagement/EYfzMzbM0gFPix1duQVAqeABCeevgYcJ410l-oJ9FyBDbQ?CID=D8066BED-6437-4546-8894-2ADB0B7E1DE9&wdLOR=c5BB45068-2652-4F70-B312-C05F984224E2 ".NET Core Migration Tooling Brainstorming"
+[try-convert]: https://github.com/dotnet/try-convert
