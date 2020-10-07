@@ -1,13 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30509.190
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3FC16DAB-215C-422B-9130-61D566695463}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMigrator.Console", "src\AspNetMigrator.Console\AspNetMigrator.Console.csproj", "{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.ConsoleApp", "src\AspNetMigrator.Console\AspNetMigrator.ConsoleApp.csproj", "{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMigrator.Engine", "src\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj", "{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Engine", "src\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj", "{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{791D5C15-EC26-497C-95F1-9A7C03BE8FF3}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,9 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -47,8 +50,14 @@ Global
 		{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}.Release|x86.ActiveCfg = Release|Any CPU
 		{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42} = {3FC16DAB-215C-422B-9130-61D566695463}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}
 	EndGlobalSection
 EndGlobal
