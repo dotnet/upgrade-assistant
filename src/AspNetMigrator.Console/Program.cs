@@ -2,17 +2,22 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetMigrator.Engine;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog.Core;
 
 namespace AspNetMigrator.ConsoleApp
 {
     class Program
     {
         static IConfiguration Configuration { get; set; }
+        static IServiceProvider Services { get; set; }
 
         static async Task Main(string[] args)
         {
             Configuration = BuildConfiguration();
+
             ShowHeader();
 
             var options = ParseArgs(args);
@@ -23,13 +28,31 @@ namespace AspNetMigrator.ConsoleApp
             }
             else
             {
-                var logger = new ConsoleLogger(options.Verbose);
-                await MigrateAsync(options.ProjectPath, options.BackupPath, logger);
+                Services = BuildDIContainer(options);
+                if (await MigrateAsync(options.ProjectPath, options.BackupPath))
+                {
+                    Console.WriteLine("Migration succeeded");
+                }
+                else
+                {
+                    Console.WriteLine("Migration failed");
+                }
             }
 
             Console.WriteLine();
             Console.WriteLine("Done");
             Console.WriteLine();
+        }
+
+        private static IServiceProvider BuildDIContainer(MigrateOptions options)
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton<ILogger>(_ => new ConsoleLogger(options.Verbose));
+            services.AddScoped<IProjectConverter, TryConvertProjectConverter>();
+            services.AddScoped<IPackageUpdater, DefaultPackageUpdater>();
+            services.AddScoped<ISourceUpdater, DefaultSourceUpdater>();
+            services.AddScoped<Migrator>();
+            return services.BuildServiceProvider();
         }
 
         private static IConfiguration BuildConfiguration() =>
@@ -140,9 +163,11 @@ namespace AspNetMigrator.ConsoleApp
             return options;
         }
 
-        public static async Task MigrateAsync(string path, string backupPath, Engine.ILogger logger)
+        public static async Task<bool> MigrateAsync(string path, string backupPath)
         {
-
+            using var scope = Services.CreateScope();
+            var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
+            return await migrator.MigrateAsync(path, backupPath);
         }
     }
 }

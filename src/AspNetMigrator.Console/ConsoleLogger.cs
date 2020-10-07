@@ -9,7 +9,8 @@ namespace AspNetMigrator.ConsoleApp
 
         public ConsoleLogger(bool verbose) =>
             Logger = new LoggerConfiguration()
-                .WriteTo.Console(verbose ? LogEventLevel.Debug : LogEventLevel.Information)
+                .MinimumLevel.Verbose()
+                .WriteTo.Console(verbose ? LogEventLevel.Verbose : LogEventLevel.Information)
                 .CreateLogger();
 
         public void Error(string messageTemplate, params object[] propertyValues) => Logger.Error(messageTemplate, propertyValues);

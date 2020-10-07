@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>AspNetMigrator.Engine</RootNamespace>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj" />
+  </ItemGroup>
+
+</Project>
