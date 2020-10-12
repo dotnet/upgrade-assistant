@@ -13,6 +13,8 @@ namespace AspNetMigrator.Engine
     {
         const string PackageConfigFileName = "PackageMap.json";
         const string PackageReferenceType = "PackageReference";
+        const string AnalyzerPackageName = "AspNetMigrator.Analyzers";
+        const string AnalyzerPackageVersion = "1.0.0";
         const string VersionElementName = "Version";
 
         private ILogger Logger { get; }
@@ -91,7 +93,17 @@ namespace AspNetMigrator.Engine
                 }
 
                 // Add reference to ASP.NET Core migration analyzers
-                // TODO
+                if (!project.Items.Any(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase) && AnalyzerPackageName.Equals(i.Include, StringComparison.OrdinalIgnoreCase)))
+                {
+                    Logger.Information("Adding package reference to: {PackageReference}", AnalyzerPackageName);
+                    var analyzerReferenceElement = project.CreateItemElement(PackageReferenceType, AnalyzerPackageName);
+                    packageReferenceItemGroup.AppendChild(analyzerReferenceElement);
+                    analyzerReferenceElement.AddMetadata(VersionElementName, AnalyzerPackageVersion, true);
+                }
+                else
+                {
+                    Logger.Verbose("Analyzer reference already present");
+                }
 
                 project.Save();
             }
