@@ -1,9 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>AspNetMigrator.Engine</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="tools\try-convert.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj" />

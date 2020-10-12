@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine
@@ -13,10 +14,10 @@ namespace AspNetMigrator.Engine
 
         public Migrator(IProjectConverter projectConverter, IPackageUpdater packageUpdater, ISourceUpdater sourceUpdater, ILogger logger)
         {
-            ProjectConverter = projectConverter ?? throw new System.ArgumentNullException(nameof(projectConverter));
-            PackageUpdater = packageUpdater ?? throw new System.ArgumentNullException(nameof(packageUpdater));
-            SourceUpdater = sourceUpdater ?? throw new System.ArgumentNullException(nameof(sourceUpdater));
-            Logger = logger;
+            ProjectConverter = projectConverter ?? throw new ArgumentNullException(nameof(projectConverter));
+            PackageUpdater = packageUpdater ?? throw new ArgumentNullException(nameof(packageUpdater));
+            SourceUpdater = sourceUpdater ?? throw new ArgumentNullException(nameof(sourceUpdater));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<bool> MigrateAsync(string projectPath, string backupPath)
@@ -27,24 +28,55 @@ namespace AspNetMigrator.Engine
                 return false;
             }
 
+            if (!Path.GetExtension(projectPath).Equals(".csproj", StringComparison.OrdinalIgnoreCase))
+            {
+                Logger.Fatal("Project file ({ProjectPath}) is not a C# project", projectPath);
+                return false;
+            }
+
+            // Backup
             var projectName = Path.GetFileName(projectPath);
             Logger.Information("Beginning migration of {ProjectName} (backup path: [{BackupPath}]", projectName, backupPath ?? "N/A");
 
             if (backupPath != null)
             {
-                if (!CreateBackup(Path.GetDirectoryName(projectPath), backupPath))
+                if (CreateBackup(Path.GetDirectoryName(projectPath), backupPath))
                 {
-                    Logger.Fatal("Backup failed");
-                    return false;
+                    Logger.Information("Backup successfully created");
                 }
                 else
                 {
-                    Logger.Information("Backup successfully created");
+                    Logger.Fatal("Backup failed");
+                    return false;
                 }
             }
             else
             {
                 Logger.Information("Skipping backup");
+            }
+
+            // Convert to SDK-style project
+            Logger.Information("Converting csproj to SDK style");
+            if (await ProjectConverter.ConvertAsync(projectPath))
+            {
+                Logger.Information("Project file conversion complete");
+            }
+            else
+            {
+                Logger.Fatal("Failed to convert project file to SDK style");
+                return false;
+            }
+
+            // Update NuGet packages to Core-compatible versions
+            Logger.Information("Updating NuGet references");
+            if (await PackageUpdater.UpdatePackagesAsync(projectPath))
+            {
+                Logger.Information("NuGet packages updated");
+            }
+            else
+            {
+                Logger.Fatal("Failed to update NuGet packages");
+                return false;
             }
 
             Logger.Information("Migration of {ProjectName} complete", projectName);

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog.Core;
 
 namespace AspNetMigrator.ConsoleApp
 {
