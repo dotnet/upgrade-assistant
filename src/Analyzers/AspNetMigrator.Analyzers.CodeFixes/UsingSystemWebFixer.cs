@@ -12,7 +12,7 @@ namespace AspNetMigrator.Analyzers
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM001 CodeFix Provider"), Shared]
     public class UsingSystemWebFixer : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds =>ImmutableArray.Create(UsingSystemWebAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UsingSystemWebAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using AspNetMigrator.MSBuild;
 
 namespace AspNetMigrator.Engine
 {
@@ -67,6 +68,9 @@ namespace AspNetMigrator.Engine
                 return false;
             }
 
+            // Register correct MSBuild for use with SDK-style projects
+            MSBuildHelper.RegisterMSBuildInstance();
+
             // Update NuGet packages to Core-compatible versions
             Logger.Information("Updating NuGet references");
             if (await PackageUpdater.UpdatePackagesAsync(projectPath))
@@ -77,6 +81,17 @@ namespace AspNetMigrator.Engine
             {
                 Logger.Fatal("Failed to update NuGet packages");
                 return false;
+            }
+
+            // Apply source level code fixes
+            Logger.Information("Updating project source");
+            if (await SourceUpdater.UpdateSourceAsync(projectPath))
+            {
+                Logger.Information("Source updated");
+            }
+            else
+            {
+                Logger.Warning("Failed to update project source. Check that NuGet packages restore properly and re-run this tool.");
             }
 
             Logger.Information("Migration of {ProjectName} complete", projectName);

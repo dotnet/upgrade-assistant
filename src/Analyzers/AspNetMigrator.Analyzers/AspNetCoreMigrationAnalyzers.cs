@@ -1,0 +1,11 @@
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace AspNetMigrator.Analyzers
+{
+    public static class AspNetCoreMigrationAnalyzers
+    {
+        public static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
+            new UsingSystemWebAnalyzer());
+    }
+}
