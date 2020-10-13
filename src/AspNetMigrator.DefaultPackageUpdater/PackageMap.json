@@ -50,103 +50,103 @@
     "NetCorePackages": [
       {
         "Name": "Episerver.Admin",
-        "Version": "12.0.0-inte-0121530"
+        "Version": "12.0.0-inte-0122410"
       },
       {
         "Name": "EPiServer.Azure",
-        "Version": "11.0.0-inte-012153"
+        "Version": "11.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.AspNetCore",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.AspNetCore.Hosting",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.AspNetCore.HtmlHelpers",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.AspNetCore.Mvc",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.AspNetCore.Routing",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.AspNetCore.Templating",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.Core",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.CMS.UI",
-        "Version": "12.0.0-inte-0121530"
+        "Version": "12.0.0-inte-0122410"
       },
       {
         "Name": "EPiServer.CMS.UI.AspNetIdentity",
-        "Version": "12.0.0-inte-0121530"
+        "Version": "12.0.0-inte-0122410"
       },
       {
         "Name": "EPiServer.CMS.UI.Core",
-        "Version": "12.0.0-inte-0121530"
+        "Version": "12.0.0-inte-0122410"
       },
       {
         "Name": "EPiServer.CMS.Web",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-0122410"
       },
       {
         "Name": "EPiServer.Commerce",
-        "Version": "14.0.0-inte-012153"
+        "Version": "14.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Commerce.Azure",
-        "Version": "15.0.0-inte-012153"
+        "Version": "15.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Commerce.Core",
-        "Version": "14.0.0-inte-012153"
+        "Version": "14.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Commerce.UI",
-        "Version": "14.0.0-inte-012153"
+        "Version": "14.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Commerce.UI.CustomerService",
-        "Version": "14.0.0-inte-012153"
+        "Version": "14.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Framework",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Framework.AspNetCore",
-        "Version": "12.0.0-inte-012153"
+        "Version": "12.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Personalization.Commerce",
-        "Version": "4.0.0-inte-012153"
+        "Version": "4.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Personalization.Common",
-        "Version": "4.0.0-inte-012153"
+        "Version": "4.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Session",
-        "Version": "2.0.0-inte-012153"
+        "Version": "2.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Tracking.Commerce",
-        "Version": "4.0.0-inte-012153"
+        "Version": "4.0.0-inte-012241"
       },
       {
         "Name": "EPiServer.Tracking.Core",
-        "Version": "2.0.0-inte-012153"
+        "Version": "2.0.0-inte-012241"
       }
     ]
   },
@@ -205,7 +205,7 @@
     "NetFrameworkPackages": [
       {
         "Name": "Newtonsoft.Json",
-        "Version": "8.0.3"
+        "Version": "9.0.1"
       }
     ],
     "NetCorePackages": [
