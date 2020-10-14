@@ -13,7 +13,7 @@ namespace AspNetMigrator.Analyzers
     {
         public const string DiagnosticId = "AM0001";
         private const string Category = "Migration";
-        private static readonly string[] DisallowedNamespaces = new[] { "System.Web", "Owin" };
+        private static readonly string[] DisallowedNamespaces = new[] { "System.Web", "Microsoft.AspNet", "Microsoft.Owin", "Owin" };
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.UsingSystemWebTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.UsingSystemWebMessageFormat), Resources.ResourceManager, typeof(Resources));
@@ -25,8 +25,8 @@ namespace AspNetMigrator.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            //context.EnableConcurrentExecution();
-            //context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
             context.RegisterSyntaxNodeAction(AnalyzeUsingStatements, SyntaxKind.UsingDirective);
         }
