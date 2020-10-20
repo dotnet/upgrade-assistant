@@ -61,6 +61,33 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString.
+        /// </summary>
+        internal static string HtmlStringDescription {
+            get {
+                return ResourceManager.GetString("HtmlStringDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with Microsoft.AspNetCore.Html.HtmlString.
+        /// </summary>
+        internal static string HtmlStringMessageFormat {
+            get {
+                return ResourceManager.GetString("HtmlStringMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString.
+        /// </summary>
+        internal static string HtmlStringTitle {
+            get {
+                return ResourceManager.GetString("HtmlStringTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ASP.NET Core projects should not reference System.Web or OWIN namespaces..
         /// </summary>
         internal static string UsingSystemWebDescription {

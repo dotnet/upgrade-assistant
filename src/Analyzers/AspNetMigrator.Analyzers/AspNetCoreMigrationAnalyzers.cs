@@ -6,6 +6,7 @@ namespace AspNetMigrator.Analyzers
     public static class AspNetCoreMigrationAnalyzers
     {
         public static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
-            new UsingSystemWebAnalyzer());
+            new UsingSystemWebAnalyzer(),
+            new HtmlStringAnalyzer());
     }
 }
