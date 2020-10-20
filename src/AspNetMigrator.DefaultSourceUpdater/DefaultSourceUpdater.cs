@@ -49,54 +49,69 @@ namespace AspNetMigrator.Engine
                 foreach (var diagnostic in diagnostics)
                 {
                     var doc = project.GetDocument(diagnostic.Location.SourceTree);
+                    var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);
 
-                    if (doc is null)
+                    if (updatedSolution is null)
                     {
-                        Logger.Warning("Document not found for diagnostic {DiagnosticId} at {Location}", diagnostic.Id, diagnostic.Location.GetLineSpan().ToString());
-                        continue;
+                        Logger.Warning("Failed to fix diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
                     }
-
-                    var provider = AspNetCoreMigrationCodeFixers.AllCodeFixProviders.FirstOrDefault(p => p.FixableDiagnosticIds.Contains(diagnostic.Id));
-
-                    if (provider is null)
+                    else if (updatedSolution != null && workspace.TryApplyChanges(updatedSolution))
                     {
-                        Logger.Verbose("No code fix provider found for {DiagnosticId}", diagnostic.Id);
-                        continue;
+                        Logger.Information("Fixed diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
+                        diagnosticFixed = true;
+                        fixCount++;
+                        break;
                     }
-
-                    CodeAction fixAction = null;
-                    var context = new CodeFixContext(doc, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
-                    await provider.RegisterCodeFixesAsync(context);
-
-                    if (fixAction is null)
-                    {
-                        Logger.Warning("No code fix found for {DiagnosticId}", diagnostic.Id);
-                        continue;
-                    }
-
-                    var applyOperation = (await fixAction.GetOperationsAsync(CancellationToken.None)).OfType<ApplyChangesOperation>().FirstOrDefault();
-
-                    if (applyOperation is null)
-                    {
-                        Logger.Warning("Code fix could not be applied for {DiagnosticId}", diagnostic.Id);
-                        continue;
-                    }
-
-                    if (!workspace.TryApplyChanges(applyOperation.ChangedSolution))
+                    else
                     {
                         Logger.Warning("Failed to apply changes after fixing {DiagnosticId}", diagnostic.Id);
-                        continue;
                     }
-
-                    Logger.Information("Fixed diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
-                    diagnosticFixed = true;
-                    fixCount++;
-                    break;
                 }
             } while (diagnosticFixed);
 
             Logger.Information("Fixed {FixCount} diagnostics", fixCount);
             return true;
+        }
+
+        public async Task<Solution> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
+        {
+            if (diagnostic is null)
+            {
+                throw new ArgumentNullException(nameof(diagnostic));
+            }
+
+            if (document is null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
+            var provider = AspNetCoreMigrationCodeFixers.AllCodeFixProviders.FirstOrDefault(p => p.FixableDiagnosticIds.Contains(diagnostic.Id));
+
+            if (provider is null)
+            {
+                Logger.Verbose("No code fix provider found for {DiagnosticId}", diagnostic.Id);
+                return null;
+            }
+
+            CodeAction fixAction = null;
+            var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
+            await provider.RegisterCodeFixesAsync(context);
+
+            if (fixAction is null)
+            {
+                Logger.Warning("No code fix found for {DiagnosticId}", diagnostic.Id);
+                return null;
+            }
+
+            var applyOperation = (await fixAction.GetOperationsAsync(CancellationToken.None)).OfType<ApplyChangesOperation>().FirstOrDefault();
+
+            if (applyOperation is null)
+            {
+                Logger.Warning("Code fix could not be applied for {DiagnosticId}", diagnostic.Id);
+                return null;
+            }
+
+            return applyOperation.ChangedSolution;
         }
 
         private async Task<IEnumerable<Diagnostic>> GetFixableDiagnosticAsync(Project project)
