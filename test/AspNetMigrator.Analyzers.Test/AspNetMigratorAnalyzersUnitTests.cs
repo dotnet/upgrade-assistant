@@ -1,73 +1,99 @@
-﻿using Microsoft.CodeAnalysis.Testing;
+﻿using AspNetMigrator.MSBuild;
+using Microsoft.Build.Locator;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
-using VerifyCS = AspNetMigrator.Analyzers.Test.CSharpCodeFixVerifier<
-    AspNetMigrator.Analyzers.UsingSystemWebAnalyzer,
-    AspNetMigrator.Analyzers.UsingSystemWebFixer>;
+using TestProject;
 
 namespace AspNetMigrator.Analyzers.Test
 {
     [TestClass]
     public class AspNetMigratorAnalyzersUnitTest
     {
+        [AssemblyInitialize]
+        public static void Initialize(TestContext _)
+        {
+            MSBuildHelper.RegisterMSBuildInstance();
+        }
+
         //No diagnostics expected to show up
         [TestMethod]
         public async Task NegativeTest()
         {
-            var test = @"";
+            var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new UsingSystemWebAnalyzer(), new HtmlStringAnalyzer());
+            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", analyzers).ConfigureAwait(false);
 
-            await VerifyCS.VerifyAnalyzerAsync(test);
+            Assert.AreEqual(0, diagnostics.Count());
         }
 
-        //Diagnostic and CodeFix both triggered and checked for
         [TestMethod]
-        public async Task PositiveTest()
+        public async Task AM0001()
         {
-            var test = @"
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    {|#0:using System.Web;|}
-    {|#1:using System.Web.Mvc;|}
-    using System.Diagnostics;
-    {|#2:using Owin;|}
+            var diagnosticId = "AM0001";
+            var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new UsingSystemWebAnalyzer());
+            var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.cs", analyzers).ConfigureAwait(false);
 
-    namespace  System.Web.Mvc { public class A { } }
-    namespace  Owin { public class A { } }
-
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {   
-        }
-    }";
-
-            var fixtest = @"
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Diagnostics;
-
-    namespace  System.Web.Mvc { public class A { } }
-    namespace  Owin { public class A { } }
-
-    namespace ConsoleApplication1
-    {
-        class TypeName
-        {   
-        }
-    }";
-
-            var expected = new DiagnosticResult[] {
-                VerifyCS.Diagnostic("AM0001").WithLocation(0).WithArguments("System.Web"),
-                VerifyCS.Diagnostic("AM0001").WithLocation(1).WithArguments("System.Web.Mvc"),
-                VerifyCS.Diagnostic("AM0001").WithLocation(2).WithArguments("Owin")
+            var expectedDiagnostics = new[]
+            {
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(15, 17)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(34, 23)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(59, 37)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(184, 11))
             };
-            await VerifyCS.VerifyCodeFixAsync(test, expected, fixtest);
+
+            AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
+        }
+
+        [TestMethod]
+        public async Task AM0001CodeFix()
+        {
+            var diagnosticId = "AM0001";
+            var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new UsingSystemWebAnalyzer());
+
+            var fixedSource = await TestHelper.FixSourceAsync($"{diagnosticId}.cs", analyzers).ConfigureAwait(false);
+            var expectedSource = await TestHelper.GetSourceAsync($"{diagnosticId}.Fixed.cs").ConfigureAwait(false);
+
+            var expectedText = (await expectedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+            var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+            Assert.AreEqual(expectedText, fixedText);
+        }
+
+        [TestMethod]
+        public async Task AM0002()
+        {
+            var diagnosticId = "AM0002";
+            var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new HtmlStringAnalyzer());
+            var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.cs", analyzers).ConfigureAwait(false);
+
+            var expectedDiagnostics = new[]
+            {
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(121, 11)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(171, 10)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(311, 13)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(363, 13))
+            };
+
+            AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
+        }
+
+        private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, ExpectedDiagnostic[] expectedDiagnostics)
+        {
+            Assert.AreEqual(expectedDiagnostics.Length, diagnostics.Count());
+            var count = 0;
+            foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
+            {
+                Assert.IsTrue(expectedDiagnostics[count++].Equals(d), $"Expected diagnostic {count} to be at {expectedDiagnostics[count - 1].SourceSpan}; actually at {d.Location.SourceSpan}");
+            }
         }
     }
 }
