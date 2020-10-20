@@ -61,6 +61,15 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace with Microsoft.AspNetCore.Html.HtmlString.
+        /// </summary>
+        internal static string HtmlStringTitle {
+            get {
+                return ResourceManager.GetString("HtmlStringTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove using directive.
         /// </summary>
         internal static string UsingSystemWebTitle {

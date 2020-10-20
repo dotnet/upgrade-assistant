@@ -86,6 +86,20 @@ namespace AspNetMigrator.Analyzers.Test
             AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
         }
 
+        [TestMethod]
+        public async Task AM0002CodeFix()
+        {
+            var diagnosticId = "AM0002";
+            var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new HtmlStringAnalyzer());
+
+            var fixedSource = await TestHelper.FixSourceAsync($"{diagnosticId}.cs", analyzers).ConfigureAwait(false);
+            var expectedSource = await TestHelper.GetSourceAsync($"{diagnosticId}.Fixed.cs").ConfigureAwait(false);
+
+            var expectedText = (await expectedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+            var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+            Assert.AreEqual(expectedText, fixedText);
+        }
+
         private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, ExpectedDiagnostic[] expectedDiagnostics)
         {
             Assert.AreEqual(expectedDiagnostics.Length, diagnostics.Count());

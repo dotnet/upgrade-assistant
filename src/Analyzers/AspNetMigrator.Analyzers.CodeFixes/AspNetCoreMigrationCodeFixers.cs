@@ -6,6 +6,7 @@ namespace AspNetMigrator.Analyzers
     public static class AspNetCoreMigrationCodeFixers
     {
         public static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
-            new UsingSystemWebFixer());
+            new UsingSystemWebFixer(),
+            new HtmlStringCodeFixer());
     }
 }
