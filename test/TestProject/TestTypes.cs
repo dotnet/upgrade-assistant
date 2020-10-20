@@ -2,5 +2,6 @@
 {
     public class MvcHtmlString
     {
+        public MvcHtmlString(string s) { }
     }
 }

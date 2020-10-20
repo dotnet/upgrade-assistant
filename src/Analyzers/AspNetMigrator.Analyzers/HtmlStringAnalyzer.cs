@@ -18,7 +18,7 @@ namespace AspNetMigrator.Analyzers
         private static readonly string[] ObsoleteHtmlStringTypes = new[] { "IHtmlString", "MvcHtmlString", "HtmlString" };
 
         // Namespace-qualified types that shouldn't be referenced
-        private static readonly string[] ObsoleteHtmlStringFullTypes = new[] { "System.Web.IHtmlString", "System.Web.MvcHtmlString", "System.Web.HtmlString" };
+        private static readonly string[] ObsoleteHtmlStringFullTypes = new[] { "System.Web.IHtmlString", "System.Web.Mvc.MvcHtmlString", "System.Web.HtmlString" };
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.HtmlStringTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.HtmlStringMessageFormat), Resources.ResourceManager, typeof(Resources));
@@ -47,9 +47,9 @@ namespace AspNetMigrator.Analyzers
                 return;
             }
 
-            // If the identifier resolves to an actual type that isn't prohibited, bail out
-            var typeInfo = context.SemanticModel.GetTypeInfo(identifier);
-            if (typeInfo.Type.TypeKind != TypeKind.Error && !ObsoleteHtmlStringFullTypes.Contains(typeInfo.Type.ToString(), StringComparer.Ordinal))
+            // If the identifier resolves to an actual symbol that isn't prohibited, bail out
+            var symbol = context.SemanticModel.GetSymbolInfo(identifier).Symbol as INamedTypeSymbol;
+            if (symbol != null && !ObsoleteHtmlStringFullTypes.Contains(symbol.ToString(), StringComparer.Ordinal))
             {
                 return;
             }

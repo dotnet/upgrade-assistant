@@ -79,8 +79,10 @@ namespace AspNetMigrator.Analyzers.Test
             {
                 new ExpectedDiagnostic(diagnosticId, new TextSpan(121, 11)),
                 new ExpectedDiagnostic(diagnosticId, new TextSpan(171, 10)),
-                new ExpectedDiagnostic(diagnosticId, new TextSpan(311, 13)),
-                new ExpectedDiagnostic(diagnosticId, new TextSpan(363, 13))
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(307, 10)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(375, 13)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(434, 13)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(486, 13))
             };
 
             AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
