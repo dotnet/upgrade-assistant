@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,14 +29,9 @@ namespace AspNetMigrator.ConsoleApp
             else
             {
                 Services = BuildDIContainer(options);
-                if (await MigrateAsync(options.ProjectPath, options.BackupPath))
-                {
-                    Console.WriteLine("Migration succeeded");
-                }
-                else
-                {
-                    Console.WriteLine("Migration failed");
-                }
+                using var scope = Services.CreateScope();
+                var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
+                await RunMigrationReplAsync(migrator);
             }
 
             Console.WriteLine();
@@ -47,9 +43,11 @@ namespace AspNetMigrator.ConsoleApp
         {
             var services = new ServiceCollection();
             services.AddSingleton<ILogger>(_ => new ConsoleLogger(options.Verbose));
-            services.AddScoped<IProjectConverter, TryConvertProjectConverter>();
-            services.AddScoped<IPackageUpdater, DefaultPackageUpdater>();
-            services.AddScoped<ISourceUpdater, DefaultSourceUpdater>();
+            services.AddSingleton(options);
+            services.AddScoped(sp => new MigrationStep[]
+            {
+                ActivatorUtilities.CreateInstance<BackupStep>(sp)
+            });
             services.AddScoped<Migrator>();
             return services.BuildServiceProvider();
         }
@@ -111,12 +109,10 @@ namespace AspNetMigrator.ConsoleApp
             }
 
             var projectPath = args.Last();
-            var pathDir = Path.GetDirectoryName(Path.GetFullPath(projectPath));
             
             var options = new MigrateOptions
             {
-                ProjectPath = projectPath,
-                BackupPath = $"{Path.TrimEndingDirectorySeparator(pathDir)}.backup"
+                ProjectPath = projectPath
             };
 
             for (var i = 0; i < args.Length - 1; i++)
@@ -133,7 +129,7 @@ namespace AspNetMigrator.ConsoleApp
                     case "--no-backup":
                     case "/n":
                     case "/no-backup":
-                        options.BackupPath = null;
+                        options.SkipBackup = true;
                         break;
                     case "-b":
                     case "--backup-path":
@@ -162,11 +158,94 @@ namespace AspNetMigrator.ConsoleApp
             return options;
         }
 
-        public static async Task<bool> MigrateAsync(string path, string backupPath)
+        public static async Task RunMigrationReplAsync(Migrator migrator)
         {
-            using var scope = Services.CreateScope();
-            var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
-            return await migrator.MigrateAsync(path, backupPath);
+            var done = false;
+            await migrator.InitializeAsync();
+
+            while (!done)
+            {
+                ShowMigraitonSteps(migrator.Steps);
+
+                var command = GetCommand(migrator.GetNextStep(migrator.Steps));
+
+                switch (command)
+                {
+                    case ReplCommand.ApplyNext:
+                        if (!await migrator.ApplyNextStepAsync())
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("No migration step applied");
+                            Console.ResetColor();
+                        }
+                        break;
+                    case ReplCommand.ConfigureLogging:
+                        Console.WriteLine("Logging configuration not yet enabled.");
+                        break;
+                    case ReplCommand.Exit:
+                        done = true;
+                        break;
+                    default:
+                        Console.WriteLine("Unknown command");
+                        break;
+                }
+            }
         }
+
+        private static ReplCommand GetCommand(MigrationStep step)
+        {
+            // TODO - Build this menu dynamically based on available commands
+            Console.WriteLine("Choose action");
+            Console.WriteLine($" 1. Apply next action{ (step is null ? string.Empty : $" ({step.Title})")}");
+            Console.WriteLine(" 2. Configure logging");
+            Console.WriteLine(" 3. Exit");
+            Console.Write("> ");
+
+            return Console.ReadLine().Trim(' ', '.', '\t') switch
+            {
+                "1" => ReplCommand.ApplyNext,
+                "2" => ReplCommand.ConfigureLogging,
+                "3" => ReplCommand.Exit,
+                _ => ReplCommand.Unknown
+            };            
+        }
+
+        private static void ShowMigraitonSteps(IEnumerable<MigrationStep> steps, int offset = 0)
+        {
+            if (steps is null || !steps.Any())
+            {
+                return;
+            }
+
+            Console.ResetColor();
+            Console.WriteLine();
+            Console.WriteLine("Migration Steps");
+            var nextStepFound = false;
+            var count = 1;
+            foreach (var step in steps)
+            {
+                // Write indent (if any) and item number
+                Console.Write($"{new string(' ', offset * 2)}{count}. ");
+                Console.ForegroundColor = GetColorForStep(step, Console.ForegroundColor, nextStepFound);
+                if (Console.ForegroundColor == ConsoleColor.Cyan)
+                {
+                    nextStepFound = true;
+                }
+                Console.WriteLine(step.Title);
+                Console.ResetColor();
+
+                ShowMigraitonSteps(step.SubSteps, offset + 1);
+            }
+            Console.WriteLine();
+        }
+
+        private static ConsoleColor GetColorForStep(MigrationStep step, ConsoleColor defaultColor, bool nextStepFound) =>
+            step.Status switch
+            {
+                MigrationStepStatus.Complete => ConsoleColor.Green,
+                MigrationStepStatus.Failed => ConsoleColor.Red,
+                MigrationStepStatus.Incomplete when !nextStepFound => ConsoleColor.Cyan,
+                _ => defaultColor
+            };
     }
 }

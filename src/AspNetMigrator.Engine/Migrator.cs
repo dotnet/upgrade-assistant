@@ -1,5 +1,6 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using AspNetMigrator.MSBuild;
 
@@ -7,135 +8,116 @@ namespace AspNetMigrator.Engine
 {
     public class Migrator
     {
-        private IProjectConverter ProjectConverter { get; }
-        private IPackageUpdater PackageUpdater { get; }
-        private ISourceUpdater SourceUpdater { get; }
+        private bool _initialized;
+        private readonly ImmutableArray<MigrationStep> _steps;
+
+        public IEnumerable<MigrationStep> Steps => _initialized ? _steps : throw new InvalidOperationException("Migrator must be initialized prior top use");
         private ILogger Logger { get; }
 
 
-        public Migrator(IProjectConverter projectConverter, IPackageUpdater packageUpdater, ISourceUpdater sourceUpdater, ILogger logger)
+        public Migrator(MigrationStep[] steps, ILogger logger)
         {
-            ProjectConverter = projectConverter ?? throw new ArgumentNullException(nameof(projectConverter));
-            PackageUpdater = packageUpdater ?? throw new ArgumentNullException(nameof(packageUpdater));
-            SourceUpdater = sourceUpdater ?? throw new ArgumentNullException(nameof(sourceUpdater));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            if (steps is null)
+            {
+                throw new ArgumentNullException(nameof(steps));
+            }
+
+            _steps = ImmutableArray.Create(steps);
+            _initialized = false;
+            Logger = logger ?? new NullLogger();
         }
 
-        public async Task<bool> MigrateAsync(string projectPath, string backupPath)
+        public async Task InitializeAsync()
         {
-            if (!File.Exists(projectPath))
-            {
-                Logger.Fatal("Project file does not exist: {ProjectPath}", projectPath);
-                return false;
-            }
-
-            if (!Path.GetExtension(projectPath).Equals(".csproj", StringComparison.OrdinalIgnoreCase))
-            {
-                Logger.Fatal("Project file ({ProjectPath}) is not a C# project", projectPath);
-                return false;
-            }
-
-            // Backup
-            var projectName = Path.GetFileName(projectPath);
-            Logger.Information("Beginning migration of {ProjectName} (backup path: [{BackupPath}]", projectName, backupPath ?? "N/A");
-
-            if (backupPath != null)
-            {
-                if (CreateBackup(Path.GetDirectoryName(projectPath), backupPath))
-                {
-                    Logger.Information("Backup successfully created");
-                }
-                else
-                {
-                    Logger.Fatal("Backup failed");
-                    return false;
-                }
-            }
-            else
-            {
-                Logger.Information("Skipping backup");
-            }
-
-            // Convert to SDK-style project
-            Logger.Information("Converting csproj to SDK style");
-            if (await ProjectConverter.ConvertAsync(projectPath))
-            {
-                Logger.Information("Project file conversion complete");
-            }
-            else
-            {
-                Logger.Fatal("Failed to convert project file to SDK style");
-                return false;
-            }
+            Logger.Verbose("Initializing migrator");
 
             // Register correct MSBuild for use with SDK-style projects
-            MSBuildHelper.RegisterMSBuildInstance();
+            var msBuildPath = MSBuildHelper.RegisterMSBuildInstance();
+            Logger.Verbose("MSBuild registered from {MSBuildPath}", msBuildPath);
 
-            // Update NuGet packages to Core-compatible versions
-            Logger.Information("Updating NuGet references");
-            if (await PackageUpdater.UpdatePackagesAsync(projectPath))
+            await InitializeNextStepAsync(_steps);
+
+            _initialized = true;
+            Logger.Verbose("Initialization complete");
+        }
+
+        public MigrationStep GetNextStep(IEnumerable<MigrationStep> steps)
+        {
+            if (steps is null)
             {
-                Logger.Information("NuGet packages updated");
+                return null;
             }
-            else
+
+            foreach (var step in steps)
             {
-                Logger.Fatal("Failed to update NuGet packages");
+                if (step.Status == MigrationStepStatus.Incomplete || step.Status == MigrationStepStatus.Failed)
+                {
+                    var nextSubStep = GetNextStep(step.SubSteps);
+                    return nextSubStep ?? step;
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<bool> ApplyNextStepAsync()
+        {
+            Logger.Verbose("Applying next migration step");
+
+            var nextStep = GetNextStep(Steps);
+            if (nextStep is null)
+            {
+                Logger.Information("No next migration step found");
                 return false;
             }
 
-            // Apply source level code fixes
-            Logger.Information("Updating project source");
-            if (await SourceUpdater.UpdateSourceAsync(projectPath))
+            Logger.Information("Applying migration step {StepTitle}", nextStep.Title);
+            var success = await nextStep.ApplyAsync();
+
+            if (success)
             {
-                Logger.Information("Source updated");
-            }
-            else
-            {
-                Logger.Warning("Failed to update project source. Check that NuGet packages restore properly and re-run this tool.");
-            }
-
-            Logger.Information("Migration of {ProjectName} complete", projectName);
-
-            return true;
-        }
-
-        private bool CreateBackup(string projectDir, string backupPath)
-        {
-            Logger.Information("Backing up {ProjectPath} to {BackupPath}", projectDir, backupPath);
-            try
-            {
-                Directory.CreateDirectory(backupPath);
-                if (!Directory.Exists(backupPath))
-                {
-                    Logger.Error("Backup directory ({BackupPath}) not created", backupPath);
-                    return false;
-                }
-
-                CopyDirectory(projectDir, backupPath);
-                Logger.Information("Project backed up to {BackupPath}", backupPath);
+                Logger.Information("Migration step {StepTitle} applied successfully", nextStep.Title);
+                await InitializeNextStepAsync(Steps);
                 return true;
             }
-            catch (IOException exc)
+            else
             {
-                Logger.Error("Unexpected exception while creating backup: {Exception}", exc);
+                Logger.Warning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", nextStep.Title, nextStep.Status, nextStep.StatusDetails);
                 return false;
             }
         }
 
-        private void CopyDirectory(string sourceDir, string destinationDir)
+        private async Task InitializeNextStepAsync(IEnumerable<MigrationStep> steps)
         {
-            Directory.CreateDirectory(destinationDir);
-            var directoryInfo = new DirectoryInfo(sourceDir);
-            foreach (var file in directoryInfo.GetFiles("*", SearchOption.TopDirectoryOnly))
+            if (steps is null)
             {
-                var dest = Path.Combine(destinationDir, file.Name);
-                File.Copy(file.FullName, dest, true);
-                Logger.Verbose("Copied {SourceFile} to {DestinationFile}", file.FullName, dest);
+                return;
             }
 
-            foreach (var dir in directoryInfo.GetDirectories())
+            // Iterate steps, initializing any that are uninitialized until we come to an incomplete or failed step
+            foreach (var step in steps)
             {
-                CopyDirectory(dir.FullName, Path.Combine(destinationDir, dir.Name));
+                if (step.Status == MigrationStepStatus.Unknown)
+                {
+                    Logger.Verbose("Initializing migration step {StepTitle}", step.Title);
+                    await step.InitializeAsync().ConfigureAwait(false);
+                    if (step.Status == MigrationStepStatus.Unknown)
+                    {
+                        Logger.Error("Migration step initialization failed for step {StepTitle}", step.Title);
+                        throw new InvalidOperationException($"Step must not have unknown status after initialization. Step: {step.Title}");
+                    }
+                    else
+                    {
+                        Logger.Verbose("Step {StepTitle} initialized", step.Title);
+                    }
+                }
+
+                if (step.Status == MigrationStepStatus.Incomplete || step.Status == MigrationStepStatus.Failed)
+                {
+                    // If the step is not complete, we initialize sub-steps and then halt initialization
+                    await InitializeNextStepAsync(step.SubSteps);
+                    break;
+                }
             }
         }
     }

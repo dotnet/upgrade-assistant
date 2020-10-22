@@ -8,7 +8,7 @@ namespace AspNetMigrator.MSBuild
 {
     public static class MSBuildHelper
     {
-        public static void RegisterMSBuildInstance()
+        public static string RegisterMSBuildInstance()
         {
             // TODO : Harden this and allow MSBuild location to be read from env vars.
             //var msBuildPath = Path.Combine(Environment.GetEnvironmentVariable("VSINSTALLDIR"), "MSBuild", "Current", "Bin");
@@ -48,6 +48,8 @@ namespace AspNetMigrator.MSBuild
                 // TODO : Log missing assembly
                 return null;
             };
+
+            return msBuildInstance.MSBuildPath;
         }
     }
 }

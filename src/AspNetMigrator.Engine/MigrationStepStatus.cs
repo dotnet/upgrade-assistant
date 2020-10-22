@@ -1,0 +1,10 @@
+﻿namespace AspNetMigrator.Engine
+{
+    public enum MigrationStepStatus
+    {
+        Unknown,
+        Incomplete,
+        Complete,
+        Failed
+    }
+}
