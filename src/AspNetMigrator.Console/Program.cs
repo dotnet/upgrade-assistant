@@ -180,7 +180,10 @@ namespace AspNetMigrator.ConsoleApp
                         }
                         break;
                     case ReplCommand.ConfigureLogging:
-                        Console.WriteLine("Logging configuration not yet enabled.");
+                        Console.WriteLine("Logging configuration not yet implemented.");
+                        break;
+                    case ReplCommand.SeeStepDetails:
+                        Console.WriteLine("Step details not yet implemented.");
                         break;
                     case ReplCommand.Exit:
                         done = true;
@@ -198,14 +201,16 @@ namespace AspNetMigrator.ConsoleApp
             Console.WriteLine("Choose action");
             Console.WriteLine($" 1. Apply next action{ (step is null ? string.Empty : $" ({step.Title})")}");
             Console.WriteLine(" 2. Configure logging");
-            Console.WriteLine(" 3. Exit");
+            Console.WriteLine(" 3. See more step details");
+            Console.WriteLine(" 4. Exit");
             Console.Write("> ");
 
             return Console.ReadLine().Trim(' ', '.', '\t') switch
             {
                 "1" => ReplCommand.ApplyNext,
                 "2" => ReplCommand.ConfigureLogging,
-                "3" => ReplCommand.Exit,
+                "3" => ReplCommand.SeeStepDetails,
+                "4" => ReplCommand.Exit,
                 _ => ReplCommand.Unknown
             };            
         }
