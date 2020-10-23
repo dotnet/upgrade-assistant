@@ -46,7 +46,8 @@ namespace AspNetMigrator.ConsoleApp
             services.AddSingleton(options);
             services.AddScoped(sp => new MigrationStep[]
             {
-                ActivatorUtilities.CreateInstance<BackupStep>(sp)
+                ActivatorUtilities.CreateInstance<BackupStep>(sp),
+                ActivatorUtilities.CreateInstance<TryConvertProjectConverterStep>(sp),
             });
             services.AddScoped<Migrator>();
             return services.BuildServiceProvider();
@@ -230,27 +231,43 @@ namespace AspNetMigrator.ConsoleApp
             foreach (var step in steps)
             {
                 // Write indent (if any) and item number
-                Console.Write($"{new string(' ', offset * 2)}{count}. ");
-                Console.ForegroundColor = GetColorForStep(step, Console.ForegroundColor, nextStepFound);
-                if (Console.ForegroundColor == ConsoleColor.Cyan)
-                {
-                    nextStepFound = true;
-                }
-                Console.WriteLine(step.Title);
-                Console.ResetColor();
+                Console.Write($"{new string(' ', offset * 2)}{count++}. ");
+                nextStepFound = WriteStepStatus(step, Console.ForegroundColor, nextStepFound);
 
                 ShowMigraitonSteps(step.SubSteps, offset + 1);
             }
             Console.WriteLine();
         }
 
-        private static ConsoleColor GetColorForStep(MigrationStep step, ConsoleColor defaultColor, bool nextStepFound) =>
-            step.Status switch
+        private static bool WriteStepStatus(MigrationStep step, ConsoleColor defaultColor, bool nextStepFound)
+        {
+            if (!nextStepFound)
             {
-                MigrationStepStatus.Complete => ConsoleColor.Green,
-                MigrationStepStatus.Failed => ConsoleColor.Red,
-                MigrationStepStatus.Incomplete when !nextStepFound => ConsoleColor.Cyan,
-                _ => defaultColor
-            };
+                switch (step.Status)
+                {
+                    case MigrationStepStatus.Complete:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("[Complete] ");
+                        break;
+                    case MigrationStepStatus.Failed:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("[Failed] ");
+                        nextStepFound = true;
+                        break;
+                    case MigrationStepStatus.Incomplete:
+                        if (!nextStepFound)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.Write("[Current step] ");
+                            nextStepFound = true;
+                        }
+                        break;
+                }
+            }
+
+            Console.ResetColor();
+            Console.WriteLine(step.Title);
+            return nextStepFound;
+        }
     }
 }
