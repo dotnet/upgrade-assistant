@@ -75,11 +75,7 @@ namespace AspNetMigrator.Engine
             try
             {
                 var project = ProjectRootElement.Open(Options.ProjectPath);
-                if (project is null)
-                {
-                    Logger.Error("Failed to open project {ProjectPath}", Options.ProjectPath);
-                    return Task.FromResult((MigrationStepStatus.Failed, $"Failed to open project {Options.ProjectPath}"));
-                }
+                project.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
 
                 // SDK-style projects should reference the Microsoft.NET.Sdk SDK
                 if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))

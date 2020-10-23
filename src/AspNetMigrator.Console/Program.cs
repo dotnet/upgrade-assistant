@@ -44,10 +44,12 @@ namespace AspNetMigrator.ConsoleApp
             var services = new ServiceCollection();
             services.AddSingleton<ILogger>(_ => new ConsoleLogger(options.Verbose));
             services.AddSingleton(options);
+            services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
             services.AddScoped(sp => new MigrationStep[]
             {
                 ActivatorUtilities.CreateInstance<BackupStep>(sp),
                 ActivatorUtilities.CreateInstance<TryConvertProjectConverterStep>(sp),
+                ActivatorUtilities.CreateInstance<PackageUpdaterStep>(sp)
             });
             services.AddScoped<Migrator>();
             return services.BuildServiceProvider();
