@@ -114,8 +114,7 @@ namespace AspNetMigrator.Engine
 
                 if (step.Status == MigrationStepStatus.Incomplete || step.Status == MigrationStepStatus.Failed)
                 {
-                    // If the step is not complete, we initialize sub-steps and then halt initialization
-                    await InitializeNextStepAsync(step.SubSteps);
+                    // If the step is not complete, halt initialization
                     break;
                 }
             }

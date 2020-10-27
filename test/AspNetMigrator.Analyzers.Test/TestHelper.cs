@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Engine;
+using AspNetMigrator.Analyzers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
 
@@ -58,8 +61,6 @@ namespace TestProject
 
             using var workspace = MSBuildWorkspace.Create();
             var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
-
-            var sourceFixer = new DefaultSourceUpdater(new NullLogger());
             var projectId = project.Id;
 
             var diagnosticFixed = false;
@@ -73,7 +74,7 @@ namespace TestProject
                 foreach (var diagnostic in diagnostics)
                 {
                     var doc = project.GetDocument(diagnostic.Location.SourceTree);
-                    var fixedSolution = await sourceFixer.TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);
+                    var fixedSolution = await TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);
                     if (fixedSolution != null)
                     {
                         solution = fixedSolution;
@@ -85,6 +86,44 @@ namespace TestProject
 
             project = solution.GetProject(projectId);
             return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath)));
+        }
+
+        private static async Task<Solution> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
+        {
+            if (diagnostic is null)
+            {
+                throw new ArgumentNullException(nameof(diagnostic));
+            }
+
+            if (document is null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
+            var provider = AspNetCoreMigrationCodeFixers.AllCodeFixProviders.FirstOrDefault(p => p.FixableDiagnosticIds.Contains(diagnostic.Id));
+
+            if (provider is null)
+            {
+                return null;
+            }
+
+            CodeAction fixAction = null;
+            var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
+            await provider.RegisterCodeFixesAsync(context);
+
+            if (fixAction is null)
+            {
+                return null;
+            }
+
+            var applyOperation = (await fixAction.GetOperationsAsync(CancellationToken.None)).OfType<ApplyChangesOperation>().FirstOrDefault();
+
+            if (applyOperation is null)
+            {
+                return null;
+            }
+
+            return applyOperation.ChangedSolution;
         }
     }
 }

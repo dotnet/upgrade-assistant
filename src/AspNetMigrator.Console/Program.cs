@@ -49,7 +49,8 @@ namespace AspNetMigrator.ConsoleApp
             {
                 ActivatorUtilities.CreateInstance<BackupStep>(sp),
                 ActivatorUtilities.CreateInstance<TryConvertProjectConverterStep>(sp),
-                ActivatorUtilities.CreateInstance<PackageUpdaterStep>(sp)
+                ActivatorUtilities.CreateInstance<PackageUpdaterStep>(sp),
+                ActivatorUtilities.CreateInstance<SourceUpdaterStep>(sp)
             });
             services.AddScoped<Migrator>();
             return services.BuildServiceProvider();
@@ -226,10 +227,15 @@ namespace AspNetMigrator.ConsoleApp
             }
 
             Console.ResetColor();
-            Console.WriteLine();
-            Console.WriteLine("Migration Steps");
             var nextStepFound = false;
             var count = 1;
+
+            if (offset == 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Migration Steps");
+            }
+
             foreach (var step in steps)
             {
                 // Write indent (if any) and item number
