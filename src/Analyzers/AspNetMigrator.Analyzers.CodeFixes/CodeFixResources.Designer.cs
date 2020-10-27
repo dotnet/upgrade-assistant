@@ -70,6 +70,15 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace with ASP.NET Core result type.
+        /// </summary>
+        internal static string ResultTypeTitle {
+            get {
+                return ResourceManager.GetString("ResultTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove using directive.
         /// </summary>
         internal static string UsingSystemWebTitle {

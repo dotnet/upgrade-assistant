@@ -120,6 +120,9 @@
   <data name="HtmlStringTitle" xml:space="preserve">
     <value>Replace with Microsoft.AspNetCore.Html.HtmlString</value>
   </data>
+  <data name="ResultTypeTitle" xml:space="preserve">
+    <value>Replace with ASP.NET Core result type</value>
+  </data>
   <data name="UsingSystemWebTitle" xml:space="preserve">
     <value>Remove using directive</value>
     <comment>The title of the code fix.</comment>

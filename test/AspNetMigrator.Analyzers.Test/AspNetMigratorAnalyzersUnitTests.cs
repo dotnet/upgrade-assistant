@@ -102,6 +102,42 @@ namespace AspNetMigrator.Analyzers.Test
             Assert.AreEqual(expectedText, fixedText);
         }
 
+        [TestMethod]
+        public async Task AM0003()
+        {
+            var diagnosticId = "AM0003";
+            var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new ResultTypeAnalyzer());
+            var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.cs", analyzers).ConfigureAwait(false);
+
+            var expectedDiagnostics = new[]
+            {
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(248, 10)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(339, 14)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(375, 14)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(416, 12)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(485, 12)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(521, 10)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(556, 14)),
+                new ExpectedDiagnostic(diagnosticId, new TextSpan(605, 18))
+            };
+
+            AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
+        }
+
+        [TestMethod]
+        public async Task AM0003CodeFix()
+        {
+            var diagnosticId = "AM0003";
+            var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new ResultTypeAnalyzer());
+
+            var fixedSource = await TestHelper.FixSourceAsync($"{diagnosticId}.cs", analyzers).ConfigureAwait(false);
+            var expectedSource = await TestHelper.GetSourceAsync($"{diagnosticId}.Fixed.cs").ConfigureAwait(false);
+
+            var expectedText = (await expectedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+            var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+            Assert.AreEqual(expectedText, fixedText);
+        }
+
         private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, ExpectedDiagnostic[] expectedDiagnostics)
         {
             Assert.AreEqual(expectedDiagnostics.Length, diagnostics.Count());

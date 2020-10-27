@@ -7,6 +7,7 @@ namespace AspNetMigrator.Analyzers
     {
         public static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new UsingSystemWebAnalyzer(),
-            new HtmlStringAnalyzer());
+            new HtmlStringAnalyzer(),
+            new ResultTypeAnalyzer());
     }
 }

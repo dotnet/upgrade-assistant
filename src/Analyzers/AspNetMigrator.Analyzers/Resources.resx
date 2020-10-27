@@ -126,6 +126,15 @@
   <data name="HtmlStringTitle" xml:space="preserve">
     <value>HtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
   </data>
+  <data name="ResultTypeDescription" xml:space="preserve">
+    <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core</value>
+  </data>
+  <data name="ResultTypeMessageFormat" xml:space="preserve">
+    <value>Identifier '{0}' should be replaced with '{1}'</value>
+  </data>
+  <data name="ResultTypeTitle" xml:space="preserve">
+    <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace</value>
+  </data>
   <data name="UsingSystemWebDescription" xml:space="preserve">
     <value>ASP.NET Core projects should not reference System.Web or OWIN namespaces.</value>
     <comment>An optional longer localizable description of the diagnostic.</comment>

@@ -88,6 +88,33 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core.
+        /// </summary>
+        internal static string ResultTypeDescription {
+            get {
+                return ResourceManager.GetString("ResultTypeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
+        /// </summary>
+        internal static string ResultTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("ResultTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace.
+        /// </summary>
+        internal static string ResultTypeTitle {
+            get {
+                return ResourceManager.GetString("ResultTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ASP.NET Core projects should not reference System.Web or OWIN namespaces..
         /// </summary>
         internal static string UsingSystemWebDescription {

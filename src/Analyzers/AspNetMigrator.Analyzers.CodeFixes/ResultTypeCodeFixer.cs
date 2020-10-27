@@ -13,13 +13,12 @@ using Microsoft.CodeAnalysis.Simplification;
 
 namespace AspNetMigrator.Analyzers
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM002 CodeFix Provider")]
-    public class HtmlStringCodeFixer : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM003 CodeFix Provider")]
+    public class ResultTypeCodeFixer : CodeFixProvider
     {
-        private const string AspNetCoreHtmlNamespaceName = "Microsoft.AspNetCore.Html";
-        private const string HtmlStringIdentifier = "HtmlString";
+        private const string AspNetCoreMvcNamespaceName = "Microsoft.AspNetCore.Mvc";
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HtmlStringAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(ResultTypeAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -39,17 +38,25 @@ namespace AspNetMigrator.Analyzers
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    CodeFixResources.HtmlStringTitle,
-                    cancellationToken => ReplaceWithHtmlStringAsync(context.Document, node, cancellationToken),
+                    CodeFixResources.ResultTypeTitle,
+                    cancellationToken => UpdateResultTypeAsync(context.Document, node, cancellationToken),
                     nameof(CodeFixResources.HtmlStringTitle)),
                 context.Diagnostics);
         }
 
-        private async Task<Document> ReplaceWithHtmlStringAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private async Task<Document> UpdateResultTypeAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
 
             if (!(node is NameSyntax name))
+            {
+                return document;
+            }
+
+            // Get the identifier used and its replacement type
+            var identifierName = name.ToString();
+            var newIdentifier = ResultTypeAnalyzer.MovedResultTypes[identifierName];
+            if (newIdentifier is null)
             {
                 return document;
             }
@@ -60,8 +67,8 @@ namespace AspNetMigrator.Analyzers
                 name = name.Parent as NameSyntax;
             }
 
-            // Update to HtmlString
-            var updatedName = SyntaxFactory.QualifiedName(SyntaxFactory.ParseName(AspNetCoreHtmlNamespaceName), SyntaxFactory.IdentifierName(HtmlStringIdentifier))
+            // Update to ASP.NET Core result type
+            var updatedName = SyntaxFactory.ParseName(newIdentifier)
                 .WithTriviaFrom(name)
                 .WithAdditionalAnnotations(Simplifier.Annotation);
 
@@ -71,9 +78,9 @@ namespace AspNetMigrator.Analyzers
             documentRoot = documentRoot.ReplaceNode(name, updatedName);
 
             // Add using declation if needed
-            if (!documentRoot.Usings.Any(u => u.Name.ToString().Equals(AspNetCoreHtmlNamespaceName, StringComparison.Ordinal)))
+            if (!documentRoot.Usings.Any(u => u.Name.ToString().Equals(AspNetCoreMvcNamespaceName, StringComparison.Ordinal)))
             {
-                documentRoot =  documentRoot.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(AspNetCoreHtmlNamespaceName)));
+                documentRoot = documentRoot.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(AspNetCoreMvcNamespaceName)));
             }
 
             editor.ReplaceNode(editor.OriginalRoot, documentRoot);
