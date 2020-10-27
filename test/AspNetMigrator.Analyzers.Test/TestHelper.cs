@@ -20,7 +20,7 @@ namespace TestProject
         // TODO : Make this configurable so the test can pass from other working dirs
         const string TestProjectPath = @"..\..\..\..\TestProject\TestProject.csproj";
 
-        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, ImmutableArray<DiagnosticAnalyzer> analyzers)
+        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, string diagnosticId)
         {
             if (documentPath is null)
             {
@@ -29,15 +29,17 @@ namespace TestProject
 
             using var workspace = MSBuildWorkspace.Create();
             var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
-            return await GetDiagnosticsFromProjectAsync(project, documentPath, analyzers).ConfigureAwait(false);
+            return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticId).ConfigureAwait(false);
         }
 
-        private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, ImmutableArray<DiagnosticAnalyzer> analyzers)
+        private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, string diagnosticId)
         {
             var compilation = (await project.GetCompilationAsync().ConfigureAwait(false))
-                            .WithAnalyzers(analyzers);
+                            .WithAnalyzers(AspNetCoreMigrationAnalyzers.AllAnalyzers);
 
-            return (await compilation.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false)).Where(d => d.Location.IsInSource && documentPath.Equals(Path.GetFileName(d.Location.GetLineSpan().Path), StringComparison.Ordinal));
+            return (await compilation.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false))
+                .Where(d => d.Location.IsInSource && documentPath.Equals(Path.GetFileName(d.Location.GetLineSpan().Path), StringComparison.Ordinal))
+                .Where(d => diagnosticId is null || d.Id.Equals(diagnosticId, StringComparison.Ordinal));
         }
 
         public static async Task<Document> GetSourceAsync(string documentPath)
@@ -52,7 +54,7 @@ namespace TestProject
             return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath)));
         }
 
-        public static async Task<Document> FixSourceAsync(string documentPath, ImmutableArray<DiagnosticAnalyzer> analyzers)
+        public static async Task<Document> FixSourceAsync(string documentPath, string diagnosticId)
         {
             if (documentPath is null)
             {
@@ -69,7 +71,7 @@ namespace TestProject
             {
                 diagnosticFixed = false;
                 project = solution.GetProject(projectId);
-                var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, analyzers).ConfigureAwait(false);
+                var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticId).ConfigureAwait(false);
 
                 foreach (var diagnostic in diagnostics)
                 {
