@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -35,7 +36,11 @@ namespace AspNetMigrator.Engine
             _fixProvider = fixProvider;
             _sourceUpdater = (ParentStep = parentStep) as SourceUpdaterStep;
 
-            Title = $"Apply fix for {DiagnosticId}";
+            // Get titles for all the diagnostics this step can fix
+            var diagnostics = AspNetCoreMigrationAnalyzers.AllAnalyzers.SelectMany(a => a.SupportedDiagnostics).Distinct();
+            var diagnosticTitles = _fixProvider.FixableDiagnosticIds.Select(i => diagnostics.FirstOrDefault(d => d.Id.Equals(i))?.Title).Where(t => t != null);
+
+            Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
             Description = $"Update source files in {options.ProjectPath} to automatically fix migration analyzer {DiagnosticId}";
         }
 
