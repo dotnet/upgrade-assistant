@@ -1,32 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AspNetMigrator.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ResultTypeAnalyzer : DiagnosticAnalyzer
+    public class ResultTypeAnalyzer : IdentifierMigrationAnalyzer
     {
         public const string DiagnosticId = "AM0003";
         private const string Category = "Migration";
-        private const string OldNamespace = "System.Web.Mvc";
 
-        public static readonly Dictionary<string, string> MovedResultTypes = new Dictionary<string, string> 
+        public override IEnumerable<IdentifierMapping> IdentifierMappings => new[]
         {
-            { "ActionResult", "Microsoft.AspNetCore.Mvc.ActionResult" },
-            { "ContentResult", "Microsoft.AspNetCore.Mvc.ContentResult" },
-            { "FileResult", "Microsoft.AspNetCore.Mvc.FileResult" },
-            { "HttpNotFoundResult", "Microsoft.AspNetCore.Mvc.NotFoundResult" },
-            { "HttpStatusCodeResult", "Microsoft.AspNetCore.Mvc.StatusCodeResult" },
-            { "HttpUnauthorizedResult", "Microsoft.AspNetCore.Mvc.UnauthorizedResult" },
-            { "RedirectResult", "Microsoft.AspNetCore.Mvc.RedirectResult" },
-            { "PartialViewResult", "Microsoft.AspNetCore.Mvc.PartialViewResult" },
-            { "ViewResult", "Microsoft.AspNetCore.Mvc.ViewResult" }
+            new IdentifierMapping("System.Web.Mvc.ActionResult", "Microsoft.AspNetCore.Mvc.ActionResult"),
+            new IdentifierMapping("System.Web.Mvc.ContentResult", "Microsoft.AspNetCore.Mvc.ContentResult"),
+            new IdentifierMapping("System.Web.Mvc.FileResult", "Microsoft.AspNetCore.Mvc.FileResult"),
+            new IdentifierMapping("System.Web.Mvc.HttpNotFoundResult", "Microsoft.AspNetCore.Mvc.NotFoundResult"),
+            new IdentifierMapping("System.Web.Mvc.HttpStatusCodeResult", "Microsoft.AspNetCore.Mvc.StatusCodeResult"),
+            new IdentifierMapping("System.Web.Mvc.HttpUnauthorizedResult", "Microsoft.AspNetCore.Mvc.UnauthorizedResult"),
+            new IdentifierMapping("System.Web.Mvc.RedirectResult", "Microsoft.AspNetCore.Mvc.RedirectResult"),
+            new IdentifierMapping("System.Web.Mvc.PartialViewResult", "Microsoft.AspNetCore.Mvc.PartialViewResult"),
+            new IdentifierMapping("System.Web.Mvc.ViewResult", "Microsoft.AspNetCore.Mvc.ViewResult")
         };
 
 
@@ -38,34 +33,6 @@ namespace AspNetMigrator.Analyzers
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
-        public override void Initialize(AnalysisContext context)
-        {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
-
-            context.RegisterSyntaxNodeAction(AnalyzeIdentifiers, SyntaxKind.IdentifierName);
-        }
-
-        private void AnalyzeIdentifiers(SyntaxNodeAnalysisContext context)
-        {
-            var identifier = context.Node as IdentifierNameSyntax;
-            var name = identifier?.Identifier.ValueText;
-
-            // If the node isn't an identifier or isn't one of the indicated HtmlString types, bail out
-            if (name is null || !MovedResultTypes.Keys.Contains(name, StringComparer.Ordinal))
-            {
-                return;
-            }
-
-            // If the identifier resolves to an actual symbol that isn't in the old namespace, bail out
-            var symbol = context.SemanticModel.GetSymbolInfo(identifier).Symbol as INamedTypeSymbol;
-            if (symbol != null && !symbol.ToString().Contains(OldNamespace))
-            {
-                return;
-            }
-
-            var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), name, MovedResultTypes[name]);
-            context.ReportDiagnostic(diagnostic);
-        }
+        protected override Diagnostic CreateDiagnostic(Location location, ImmutableDictionary<string, string> properties, params object[] messageArgs) => Diagnostic.Create(Rule, location, properties, messageArgs);
     }
 }
