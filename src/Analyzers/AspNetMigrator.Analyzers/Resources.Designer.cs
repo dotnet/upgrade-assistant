@@ -61,6 +61,33 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core.
+        /// </summary>
+        internal static string FilterDescription {
+            get {
+                return ResourceManager.GetString("FilterDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
+        /// </summary>
+        internal static string FilterMessageFormat {
+            get {
+                return ResourceManager.GetString("FilterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter types should be used from the Microsoft.AspNetCore.Mvc.Filters namespace.
+        /// </summary>
+        internal static string FilterTitle {
+            get {
+                return ResourceManager.GetString("FilterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString.
         /// </summary>
         internal static string HtmlStringDescription {

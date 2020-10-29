@@ -51,6 +51,22 @@ namespace AspNetMigrator.Analyzers.Test
                     new ExpectedDiagnostic("AM0003", new TextSpan(605, 18))
                 }
             },
+            {
+                "AM0004",
+                new[]
+                {
+                    new ExpectedDiagnostic("AM0004", new TextSpan(105, 13)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(164, 21)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(314, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(380, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(412, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(443, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(567, 21)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(644, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(794, 13)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(869, 21))
+                }
+            },
         };
 
         [AssemblyInitialize]
@@ -63,7 +79,10 @@ namespace AspNetMigrator.Analyzers.Test
         [TestMethod]
         public async Task NegativeTest()
         {
-            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", null).ConfigureAwait(false);
+            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", AspNetCoreMigrationAnalyzers.AllAnalyzers
+                .SelectMany(a => a.SupportedDiagnostics)
+                .Select(d => d.Id)
+                .ToArray()).ConfigureAwait(false);
 
             Assert.AreEqual(0, diagnostics.Count());
         }
@@ -71,6 +90,7 @@ namespace AspNetMigrator.Analyzers.Test
         [DataRow("AM0001")]
         [DataRow("AM0002")]
         [DataRow("AM0003")]
+        [DataRow("AM0004")]
         [DataTestMethod]
         public async Task MigrationAnalyzers(string diagnosticId)
         {

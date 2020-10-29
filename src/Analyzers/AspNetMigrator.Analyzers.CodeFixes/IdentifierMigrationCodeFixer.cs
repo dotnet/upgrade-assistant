@@ -50,7 +50,17 @@ namespace AspNetMigrator.Analyzers
         {
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
 
-            if (!(node is NameSyntax name))
+            var name = node switch
+            {
+                // The most common case is that the node is an IdentifierName
+                NameSyntax n => n,
+
+                // In some cases (when the node is a SimpleBaseType, for example) we need to get the name from a child node
+                SyntaxNode x => x.DescendantNodesAndSelf().FirstOrDefault(n => n is NameSyntax) as NameSyntax
+            };
+
+            // If we can't find a name, bail out
+            if (name is null)
             {
                 return document;
             }

@@ -15,7 +15,7 @@ namespace AspNetMigrator.Analyzers
         {
             new IdentifierMapping("System.Web.HtmlString", "Microsoft.AspNetCore.Html.HtmlString"),
             new IdentifierMapping("System.Web.IHtmlString", "Microsoft.AspNetCore.Html.HtmlString"),
-            new IdentifierMapping("System.Web.MvcHtmlString", "Microsoft.AspNetCore.Html.HtmlString")
+            new IdentifierMapping("System.Web.Mvc.MvcHtmlString", "Microsoft.AspNetCore.Html.HtmlString")
         };
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.HtmlStringTitle), Resources.ResourceManager, typeof(Resources));

@@ -3,14 +3,13 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
 using System.Collections.Immutable;
-using System.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspNetMigrator.Analyzers
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM001 CodeFix Provider")]
-    public class UsingSystemWebFixer : CodeFixProvider
+    public class UsingSystemWebCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UsingSystemWebAnalyzer.DiagnosticId);
 

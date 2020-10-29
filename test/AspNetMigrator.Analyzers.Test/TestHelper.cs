@@ -20,7 +20,7 @@ namespace TestProject
         // TODO : Make this configurable so the test can pass from other working dirs
         const string TestProjectPath = @"..\..\..\..\TestProject\TestProject.csproj";
 
-        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, string diagnosticId)
+        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
         {
             if (documentPath is null)
             {
@@ -29,17 +29,18 @@ namespace TestProject
 
             using var workspace = MSBuildWorkspace.Create();
             var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
-            return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticId).ConfigureAwait(false);
+            return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
 
-        private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, string diagnosticId)
+        private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, params string[] diagnosticIds)
         {
+            var analyzersToUse = AspNetCoreMigrationAnalyzers.AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
             var compilation = (await project.GetCompilationAsync().ConfigureAwait(false))
-                            .WithAnalyzers(AspNetCoreMigrationAnalyzers.AllAnalyzers);
+                            .WithAnalyzers(ImmutableArray.Create(analyzersToUse.ToArray()));
 
             return (await compilation.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false))
                 .Where(d => d.Location.IsInSource && documentPath.Equals(Path.GetFileName(d.Location.GetLineSpan().Path), StringComparison.Ordinal))
-                .Where(d => diagnosticId is null || d.Id.Equals(diagnosticId, StringComparison.Ordinal));
+                .Where(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal));
         }
 
         public static async Task<Document> GetSourceAsync(string documentPath)

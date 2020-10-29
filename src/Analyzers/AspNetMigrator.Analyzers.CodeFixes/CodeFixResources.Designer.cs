@@ -61,6 +61,15 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace with ASP.NET Core filter type.
+        /// </summary>
+        internal static string FilterTitle {
+            get {
+                return ResourceManager.GetString("FilterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with Microsoft.AspNetCore.Html.HtmlString.
         /// </summary>
         internal static string HtmlStringTitle {
