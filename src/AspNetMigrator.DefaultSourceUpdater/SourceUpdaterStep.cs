@@ -41,7 +41,7 @@ namespace AspNetMigrator.Engine
                 return (MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found");
             }
 
-            Logger.Information("Opening project {ProjectPath}", Options.ProjectPath);
+            Logger.Verbose("Opening project {ProjectPath}", Options.ProjectPath);
             _workspace = MSBuildWorkspace.Create();
             var project = await _workspace.OpenProjectAsync(Options.ProjectPath).ConfigureAwait(false);
             _projectId = project.Id;

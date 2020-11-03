@@ -25,6 +25,7 @@
     <ProjectReference Include="..\AspNetMigrator.TryConvertProjectConverter\AspNetMigrator.TryConvertProjectConverter.csproj" />
     <ProjectReference Include="..\AspNetMigrator.DefaultPackageUpdater\AspNetMigrator.DefaultPackageUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.DefaultSourceUpdater\AspNetMigrator.DefaultSourceUpdater.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.StartupUpdater\AspNetMigrator.StartupUpdater.csproj" />
   </ItemGroup>
 
 </Project>

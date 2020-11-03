@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
+using AspNetMigrator.StartupUpdater;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -50,6 +51,7 @@ namespace AspNetMigrator.ConsoleApp
                 ActivatorUtilities.CreateInstance<BackupStep>(sp),
                 ActivatorUtilities.CreateInstance<TryConvertProjectConverterStep>(sp),
                 ActivatorUtilities.CreateInstance<PackageUpdaterStep>(sp),
+                ActivatorUtilities.CreateInstance<StartupUpdaterStep>(sp),
                 ActivatorUtilities.CreateInstance<SourceUpdaterStep>(sp)
             });
             services.AddScoped<Migrator>();
