@@ -20,6 +20,7 @@ namespace AspNetMigrator.Engine
         }
 
         public string Name { get; set; }
+
         public string Version { get; set; }
 
         public bool HasWildcardVersion => Version.Equals("*", StringComparison.OrdinalIgnoreCase);
@@ -31,7 +32,7 @@ namespace AspNetMigrator.Engine
                 return null;
             }
 
-            return System.Version.TryParse(Version, out var parsedVersion) ? parsedVersion : new Version(0,0,0,0);
+            return System.Version.TryParse(Version, out var parsedVersion) ? parsedVersion : new Version(0, 0, 0, 0);
         }
 
         public override bool Equals(object obj)

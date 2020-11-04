@@ -8,7 +8,9 @@ namespace AspNetMigrator.Engine
     public abstract class MigrationStep
     {
         protected ILogger Logger { get; }
+
         protected MigrateOptions Options { get; }
+
         protected bool Initialized => Status != MigrationStepStatus.Unknown;
 
         public MigrationStep(MigrateOptions options, ILogger logger)
@@ -17,18 +19,22 @@ namespace AspNetMigrator.Engine
             {
                 throw new ArgumentException("Invalid migration options");
             }
-           
+
             Options = options;
             Logger = logger ?? new NullLogger();
             Status = MigrationStepStatus.Unknown;
         }
 
         public virtual string Title { get; protected set; }
+
         public virtual string Description { get; protected set; }
+
         public virtual MigrationStep ParentStep { get; protected set; }
+
         public virtual IEnumerable<MigrationStep> SubSteps { get; protected set; } = Enumerable.Empty<MigrationStep>();
 
         public MigrationStepStatus Status { get; private set; }
+
         public string StatusDetails { get; private set; }
 
         /// <summary>

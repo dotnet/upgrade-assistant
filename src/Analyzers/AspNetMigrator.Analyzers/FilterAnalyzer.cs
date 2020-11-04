@@ -22,7 +22,6 @@ namespace AspNetMigrator.Analyzers
             new IdentifierMapping("System.Web.Mvc.IActionFilter", "Microsoft.AspNetCore.Mvc.Filters.IActionFilter")
         };
 
-
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.FilterTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.FilterMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.FilterDescription), Resources.ResourceManager, typeof(Resources));

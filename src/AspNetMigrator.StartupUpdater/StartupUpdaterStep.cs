@@ -17,10 +17,10 @@ namespace AspNetMigrator.StartupUpdater
     /// </summary>
     public class StartupUpdaterStep : MigrationStep
     {
-        const string ManifestResourcePrefix = "AspNetMigrator.StartupUpdater.Templates.";
-        const string RootNamespacePropertyName = "RootNamespace";
-        const string TemplateNamespace = "WebApplication1";
-        const int BufferSize = 65536;
+        private const string ManifestResourcePrefix = "AspNetMigrator.StartupUpdater.Templates.";
+        private const string RootNamespacePropertyName = "RootNamespace";
+        private const string TemplateNamespace = "WebApplication1";
+        private const int BufferSize = 65536;
 
         // Files that should be present and text that's expected to be in them
         private static readonly IEnumerable<ItemSpec> ExpectedFiles = new List<ItemSpec>()
@@ -33,8 +33,19 @@ namespace AspNetMigrator.StartupUpdater
 
         private List<ItemSpec> _filesToAdd;
 
-        public StartupUpdaterStep(MigrateOptions options, ILogger logger) : base(options, logger)
+        public StartupUpdaterStep(MigrateOptions options, ILogger logger)
+            : base(options, logger)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
             Title = $"Update startup code paths";
             Description = $"Add template Program.cs, Startup.cs, and configuration files to {options.ProjectPath}";
         }
@@ -78,6 +89,7 @@ namespace AspNetMigrator.StartupUpdater
                         Logger.Fatal("File resource not found for file {FileName}", file.ItemName);
                         return (MigrationStepStatus.Failed, $"File resource not found for file {file.ItemName}");
                     }
+
                     using var inputStream = new StreamReader(resourceStream);
 
                     // Read the file contents locally to make replacing the template namespace simple.
@@ -94,6 +106,7 @@ namespace AspNetMigrator.StartupUpdater
 
                     Logger.Information("Added {FileName} to the project from template file", file.ItemName);
                 }
+
                 Logger.Information("{FileCount} files added", _filesToAdd.Count);
 
                 project.Save();
@@ -143,7 +156,7 @@ namespace AspNetMigrator.StartupUpdater
         }
 
         /// <summary>
-        /// Determines if a given project element matches an item specification
+        /// Determines if a given project element matches an item specification.
         /// </summary>
         private bool ItemMatches(ItemSpec expectedItem, ProjectItem itemElement)
         {
@@ -181,7 +194,7 @@ namespace AspNetMigrator.StartupUpdater
             }
 
             // The file must include all specified keywords
-            if (!(expectedItem.Keywords is null) && expectedItem.Keywords.Length > 0)
+            if (expectedItem.Keywords.Length > 0)
             {
                 var fileContents = File.ReadAllText(filePath);
                 if (expectedItem.Keywords.Any(k => !fileContents.Contains(k, StringComparison.Ordinal)))
@@ -214,6 +227,7 @@ namespace AspNetMigrator.StartupUpdater
             {
                 item.Include = backupName;
             }
+
             foreach (var item in project.Items.Where(i => i.Update.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
             {
                 item.Update = backupName;

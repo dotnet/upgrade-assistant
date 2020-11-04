@@ -8,15 +8,14 @@ namespace AspNetMigrator.Engine
 {
     public class Migrator
     {
-        private bool _initialized;
         private readonly ImmutableArray<MigrationStep> _steps;
+        private bool _initialized;
 
         public IEnumerable<MigrationStep> Steps => _initialized ? _steps : throw new InvalidOperationException("Migrator must be initialized prior top use");
 
         public MigrationStep NextStep => GetNextStep(Steps);
 
         private ILogger Logger { get; }
-
 
         public Migrator(MigrationStep[] steps, ILogger logger)
         {

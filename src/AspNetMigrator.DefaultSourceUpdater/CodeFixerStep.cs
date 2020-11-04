@@ -20,6 +20,7 @@ namespace AspNetMigrator.Engine
         // This stores a reference to the parent source updater step, which will have all the diagnostics for the project.
         private readonly SourceUpdaterStep _sourceUpdater;
         private readonly CodeFixProvider _fixProvider;
+
         private IEnumerable<Diagnostic> Diagnostics => _sourceUpdater.Diagnostics.Where(d => _fixProvider.FixableDiagnosticIds.Contains(d.Id, StringComparer.Ordinal));
 
         public string DiagnosticId =>
@@ -30,10 +31,21 @@ namespace AspNetMigrator.Engine
                 _ => $"[{string.Join(", ", _fixProvider.FixableDiagnosticIds)}]"
             };
 
-        public CodeFixerStep(MigrationStep parentStep, CodeFixProvider fixProvider, MigrateOptions options, ILogger logger) : base(options, logger)
+        public CodeFixerStep(MigrationStep parentStep, CodeFixProvider fixProvider, MigrateOptions options, ILogger logger)
+            : base(options, logger)
         {
-            _fixProvider = fixProvider;
-            _sourceUpdater = (ParentStep = parentStep) as SourceUpdaterStep; // The parent step has the compilation/diagnostics
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
+            _fixProvider = fixProvider ?? throw new ArgumentNullException(nameof(fixProvider));
+            _sourceUpdater = (ParentStep = parentStep) as SourceUpdaterStep ?? throw new ArgumentException(nameof(parentStep)); // The parent step has the compilation/diagnostics
 
             // Get titles for all the diagnostics this step can fix
             var diagnostics = AspNetCoreMigrationAnalyzers.AllAnalyzers.SelectMany(a => a.SupportedDiagnostics).Distinct();

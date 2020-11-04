@@ -7,7 +7,9 @@ namespace AspNetMigrator.Engine
     public class NuGetPackageMap
     {
         public string PackageSetName { get; set; }
+
         public IEnumerable<NuGetReference> NetFrameworkPackages { get; set; }
+
         public IEnumerable<NuGetReference> NetCorePackages { get; set; }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace AspNetMigrator.Engine
             }
 
             // To match, the specified packged has to be the same version as the NetFx package or older
-            if (!Version.TryParse(version, out Version parsedVersion))
+            if (!Version.TryParse(version, out var parsedVersion))
             {
                 // Return false if the version is invalid
                 return false;

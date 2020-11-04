@@ -5,7 +5,9 @@ namespace AspNetMigrator.Analyzers
     public class IdentifierMapping
     {
         public string OldFullName { get; }
+
         public string NewFullName { get; }
+
         public string SimpleName { get; }
 
         public IdentifierMapping(string oldFullname, string newFullName)
@@ -24,7 +26,7 @@ namespace AspNetMigrator.Analyzers
             NewFullName = newFullName;
 
             var finalDotIndex = OldFullName.LastIndexOf('.');
-            SimpleName = (finalDotIndex < 0 ? OldFullName : OldFullName.Substring(finalDotIndex + 1));
+            SimpleName = finalDotIndex < 0 ? OldFullName : OldFullName.Substring(finalDotIndex + 1);
         }
     }
 }

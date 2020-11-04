@@ -3,9 +3,9 @@ using Serilog.Events;
 
 namespace AspNetMigrator.ConsoleApp
 {
-    internal class ConsoleLogger: Engine.ILogger
+    internal class ConsoleLogger : Engine.ILogger
     {
-        ILogger Logger { get; }
+        private ILogger Logger { get; }
 
         public ConsoleLogger(bool verbose) =>
             Logger = new LoggerConfiguration()

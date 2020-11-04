@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AspNetMigrator.ConsoleApp
 {
-    class Program
+    // TODO : Eventually, this may need localized and pull strings from resources, etc.
+    [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "The prototype is not yet localized")]
+    public class Program
     {
-        static IConfiguration Configuration { get; set; }
-        static IServiceProvider Services { get; set; }
+        private static IConfiguration Configuration { get; set; }
 
-        static async Task Main(string[] args)
+        private static IServiceProvider Services { get; set; }
+
+        public static async Task Main(string[] args)
         {
             Configuration = BuildConfiguration();
 
@@ -26,16 +30,11 @@ namespace AspNetMigrator.ConsoleApp
             if (options is null)
             {
                 ShowUsage();
-            }
-            else
-            {
-                Services = BuildDIContainer(options);
-                await RunMigrationReplAsync();
+                return;
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Done");
-            Console.WriteLine();
+            Services = BuildDIContainer(options);
+            await RunMigrationReplAsync();
         }
 
         private static IServiceProvider BuildDIContainer(MigrateOptions options)
@@ -73,7 +72,7 @@ namespace AspNetMigrator.ConsoleApp
 
         private static void ShowUsage()
         {
-            //                 ---------1---------2---------3---------4---------5---------6---------7---------
+            // ................---------1---------2---------3---------4---------5---------6---------7---------
             Console.WriteLine("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to");
             Console.WriteLine("an ASP.NET Core project.");
             Console.WriteLine();
@@ -113,7 +112,6 @@ namespace AspNetMigrator.ConsoleApp
             }
 
             var projectPath = args.Last();
-            
             var options = new MigrateOptions
             {
                 ProjectPath = projectPath
@@ -144,6 +142,7 @@ namespace AspNetMigrator.ConsoleApp
                             Console.WriteLine("ERROR: --backup-path must be followed by a path.");
                             return null;
                         }
+
                         options.BackupPath = args[++i];
                         break;
                     case "-h":
@@ -184,6 +183,7 @@ namespace AspNetMigrator.ConsoleApp
                             Console.WriteLine("No migration step applied");
                             Console.ResetColor();
                         }
+
                         break;
                     case ReplCommand.ConfigureLogging:
                         Console.WriteLine("Logging configuration not yet implemented.");
@@ -212,7 +212,7 @@ namespace AspNetMigrator.ConsoleApp
         {
             // TODO - Build this menu dynamically based on available commands
             Console.WriteLine("Choose action");
-            Console.WriteLine($" 1. Apply next action{ (step is null ? string.Empty : $" ({step.Title})")}");
+            Console.WriteLine($" 1. Apply next action{(step is null ? string.Empty : $" ({step.Title})")}");
             Console.WriteLine(" 2. Configure logging");
             Console.WriteLine(" 3. See more step details");
             Console.WriteLine(" 4. Exit");
@@ -225,7 +225,7 @@ namespace AspNetMigrator.ConsoleApp
                 "3" => ReplCommand.SeeStepDetails,
                 "4" => ReplCommand.Exit,
                 _ => ReplCommand.Unknown
-            };            
+            };
         }
 
         private static void ShowMigraitonSteps(IEnumerable<MigrationStep> steps, int offset = 0)
@@ -258,6 +258,7 @@ namespace AspNetMigrator.ConsoleApp
 
                 ShowMigraitonSteps(step.SubSteps, offset + 1);
             }
+
             Console.WriteLine();
         }
 
@@ -279,8 +280,10 @@ namespace AspNetMigrator.ConsoleApp
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write("[Current step] ");
                     }
+
                     break;
             }
+
             Console.ResetColor();
         }
 
@@ -313,6 +316,7 @@ namespace AspNetMigrator.ConsoleApp
                         break;
                 }
             }
+
             AddWordToRet();
 
             return ret.ToString();
@@ -324,6 +328,7 @@ namespace AspNetMigrator.ConsoleApp
                     ret.AppendLine();
                     index = 0;
                 }
+
                 ret.Append(word);
                 index += word.Length;
                 word = new StringBuilder();

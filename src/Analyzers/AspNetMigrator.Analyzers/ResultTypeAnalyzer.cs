@@ -24,7 +24,6 @@ namespace AspNetMigrator.Analyzers
             new IdentifierMapping("System.Web.Mvc.ViewResult", "Microsoft.AspNetCore.Mvc.ViewResult")
         };
 
-
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ResultTypeTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ResultTypeMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ResultTypeDescription), Resources.ResourceManager, typeof(Resources));

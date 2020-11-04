@@ -1,17 +1,17 @@
-﻿using AspNetMigrator.MSBuild;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetMigrator.MSBuild;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestProject;
 
 namespace AspNetMigrator.Analyzers.Test
 {
     [TestClass]
-    public class AspNetMigratorAnalyzersUnitTest
+    public class AspNetMigratorAnalyzersUnitTests
     {
         private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new Dictionary<string, ExpectedDiagnostic[]>
         {
@@ -70,12 +70,12 @@ namespace AspNetMigrator.Analyzers.Test
         };
 
         [AssemblyInitialize]
-        public static void Initialize(TestContext _)
+        public static void Initialize(TestContext context)
         {
             MSBuildHelper.RegisterMSBuildInstance();
         }
 
-        //No diagnostics expected to show up
+        // No diagnostics expected to show up
         [TestMethod]
         public async Task NegativeTest()
         {
@@ -119,7 +119,7 @@ namespace AspNetMigrator.Analyzers.Test
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
-                Assert.IsTrue(expectedDiagnostics[count++].Equals(d), $"Expected diagnostic {count} to be at {expectedDiagnostics[count - 1].SourceSpan}; actually at {d.Location.SourceSpan}");
+                Assert.IsTrue(expectedDiagnostics[count++].Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics[count - 1].SourceSpan}; actually at {d.Location.SourceSpan}");
             }
         }
     }

@@ -9,13 +9,22 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AspNetMigrator.Analyzers
 {
+    /// <summary>
+    /// Base class analyzer for identifying usage of APIs that should be replaced with other APIs.
+    /// </summary>
     public abstract class IdentifierMigrationAnalyzer : DiagnosticAnalyzer
     {
         public const string NewIdentifierKey = "NewIdentifier";
+
         public abstract IEnumerable<IdentifierMapping> IdentifierMappings { get; }
 
         public override void Initialize(AnalysisContext context)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
@@ -23,7 +32,6 @@ namespace AspNetMigrator.Analyzers
         }
 
         protected abstract Diagnostic CreateDiagnostic(Location location, ImmutableDictionary<string, string> properties, params object[] messageArgs);
-
 
         private void AnalyzeIdentifiers(SyntaxNodeAnalysisContext context)
         {

@@ -12,21 +12,32 @@ using Microsoft.CodeAnalysis.MSBuild;
 namespace AspNetMigrator.Engine
 {
     /// <summary>
-    /// Migration step that updates C# source using Roslyn analyzers and code fixers. 
+    /// Migration step that updates C# source using Roslyn analyzers and code fixers.
     /// Contains sub-steps for different code fixers.
     /// </summary>
     public class SourceUpdaterStep : MigrationStep
     {
-        const string AspNetMigratorAnalyzerPrefix = "AM";
+        private const string AspNetMigratorAnalyzerPrefix = "AM";
         private MSBuildWorkspace _workspace;
         private ProjectId _projectId;
 
         internal IEnumerable<Diagnostic> Diagnostics { get; set; }
+
         internal Project Project => _workspace.CurrentSolution.GetProject(_projectId);
 
-
-        public SourceUpdaterStep(MigrateOptions options, ILogger logger) : base(options, logger)
+        public SourceUpdaterStep(MigrateOptions options, ILogger logger)
+            : base(options, logger)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
             Title = $"Update C# source";
             Description = $"Update source files in {options.ProjectPath} to change ASP.NET references to ASP.NET Core equivalents";
 
@@ -77,7 +88,7 @@ namespace AspNetMigrator.Engine
             Logger.Verbose("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync() => 
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync() =>
             Task.FromResult(Diagnostics.Any() ?
                 (MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
                 (MigrationStepStatus.Complete, null));
@@ -88,9 +99,9 @@ namespace AspNetMigrator.Engine
             {
                 Logger.Verbose("Source successfully updated");
                 await GetDiagnosticsAsync().ConfigureAwait(false);
-                
+
                 // Normally, the migrator will apply steps one at a time
-                // at the user's instruction. In the case of parent and child steps, 
+                // at the user's instruction. In the case of parent and child steps,
                 // the parent has any top-level application done after the children.
                 // In the case of this update step, the parent (this updater) doesn't
                 // need to apply anything. Therefore, automatically apply this updater
@@ -112,7 +123,7 @@ namespace AspNetMigrator.Engine
         }
 
         // TODO
-        private ImmutableArray<AdditionalText> GetAdditionalFiles() => new ImmutableArray<AdditionalText>();
+        private ImmutableArray<AdditionalText> GetAdditionalFiles() => default;
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
         {

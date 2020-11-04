@@ -11,18 +11,29 @@ namespace AspNetMigrator.Engine
 {
     public class PackageUpdaterStep : MigrationStep
     {
-        const string DefaultPackageConfigFileName = "PackageMap.json";
-        const string PackageReferenceType = "PackageReference";
-        const string AnalyzerPackageName = "AspNetMigrator.Analyzers";
-        const string AnalyzerPackageVersion = "1.0.0";
-        const string VersionElementName = "Version";
+        private const string DefaultPackageConfigFileName = "PackageMap.json";
+        private const string PackageReferenceType = "PackageReference";
+        private const string AnalyzerPackageName = "AspNetMigrator.Analyzers";
+        private const string AnalyzerPackageVersion = "1.0.0";
+        private const string VersionElementName = "Version";
 
         public string PackageMapPath { get; }
 
         private IEnumerable<NuGetPackageMap> _packageMaps;
 
-        public PackageUpdaterStep(MigrateOptions options, PackageUpdaterOptions updaterOptions, ILogger logger) : base(options, logger)
+        public PackageUpdaterStep(MigrateOptions options, PackageUpdaterOptions updaterOptions, ILogger logger)
+            : base(options, logger)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
             var mapPath = updaterOptions?.PackageMapPath ?? DefaultPackageConfigFileName;
 
             PackageMapPath = Path.IsPathFullyQualified(mapPath) ?
@@ -137,6 +148,7 @@ namespace AspNetMigrator.Engine
             {
                 _packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config).ConfigureAwait(false);
             }
+
             Logger.Verbose("Loaded {MapCount} package maps", _packageMaps.Count());
 
             if (!File.Exists(Options.ProjectPath))
@@ -154,7 +166,7 @@ namespace AspNetMigrator.Engine
                 var packageReferences = project.Items
                     .Where(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase)) // All <PackageReferenceElements>
                     .Select(p => (Name: p.Include, Version: (p.Children.FirstOrDefault(c => c.ElementName.Equals(VersionElementName, StringComparison.OrdinalIgnoreCase)) as ProjectMetadataElement)?.Value)); // Select name/version
-                
+
                 // Identify any references that need updated
                 var outdatedPackages = packageReferences.Where(p => _packageMaps.Any(m => m.ContainsReference(p.Name, p.Version)));
 

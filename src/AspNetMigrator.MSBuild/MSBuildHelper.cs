@@ -11,17 +11,15 @@ namespace AspNetMigrator.MSBuild
         public static string RegisterMSBuildInstance()
         {
             // TODO : Harden this and allow MSBuild location to be read from env vars.
-            //var msBuildPath = Path.Combine(Environment.GetEnvironmentVariable("VSINSTALLDIR"), "MSBuild", "Current", "Bin");
-
             var msBuildInstance = MSBuildLocator.QueryVisualStudioInstances().First();
             MSBuildLocator.RegisterInstance(msBuildInstance);
             AssemblyLoadContext.Default.Resolving += (AssemblyLoadContext context, AssemblyName assemblyName) =>
             {
+                // TODO : Harden this and extract the event handler to its own class
                 if (context is null || assemblyName is null)
                 {
                     return null;
                 }
-                // TODO : Harden this and extract the event handler to its own class
 
                 // If the assembly has a culture, check for satellite assemblies
                 if (assemblyName.CultureInfo != null)

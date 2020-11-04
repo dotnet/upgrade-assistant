@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 namespace AspNetMigrator.Analyzers
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM004 CodeFix Provider")]
-    public class FilterCodeFixer : IdentiferMigrationCodeFixer
+    public class FilterCodeFixer : IdentifierMigrationCodeFixer
     {
         public override string CodeFixTitle => CodeFixResources.FilterTitle;
 

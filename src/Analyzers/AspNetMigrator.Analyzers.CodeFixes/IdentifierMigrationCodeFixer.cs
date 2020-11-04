@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Simplification;
 
 namespace AspNetMigrator.Analyzers
 {
-    public abstract class IdentiferMigrationCodeFixer : CodeFixProvider
+    public abstract class IdentifierMigrationCodeFixer : CodeFixProvider
     {
         public abstract string CodeFixTitle { get; }
 
@@ -46,7 +46,7 @@ namespace AspNetMigrator.Analyzers
                 context.Diagnostics);
         }
 
-        private async Task<Document> UpdateResultTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
+        private static async Task<Document> UpdateResultTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
 
@@ -93,6 +93,6 @@ namespace AspNetMigrator.Analyzers
             return editor.GetChangedDocument();
         }
 
-        private string GetNamespace(string newIdentifier) => newIdentifier.Substring(0, newIdentifier.LastIndexOf('.'));
+        private static string GetNamespace(string newIdentifier) => newIdentifier.Substring(0, newIdentifier.LastIndexOf('.'));
     }
 }

@@ -7,13 +7,14 @@ namespace AspNetMigrator.Engine
 {
     public class BackupStep : MigrationStep
     {
-        const string FlagFileName = "migration.backup";
+        private const string FlagFileName = "migration.backup";
 
         private readonly string _backupPath;
         private readonly string _projectDir;
         private readonly bool _skipBackup;
 
-        public BackupStep(MigrateOptions options, ILogger logger) : base(options, logger)
+        public BackupStep(MigrateOptions options, ILogger logger)
+            : base(options, logger)
         {
             _projectDir = Path.GetDirectoryName(options.ProjectPath);
             _skipBackup = options.SkipBackup;
@@ -23,7 +24,7 @@ namespace AspNetMigrator.Engine
             Description = $"Backup {_projectDir} to {_backupPath}";
         }
 
-        protected override Task<(MigrationStepStatus, string)> InitializeImplAsync()
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
         {
             if (_skipBackup)
             {
@@ -42,7 +43,7 @@ namespace AspNetMigrator.Engine
             }
         }
 
-        protected override async Task<(MigrationStepStatus, string)> ApplyImplAsync()
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
         {
             if (_skipBackup)
             {
