@@ -25,13 +25,13 @@ namespace AspNetMigrator.StartupUpdater
         // Files that should be present and text that's expected to be in them
         private static readonly IEnumerable<ItemSpec> ExpectedFiles = new List<ItemSpec>()
         {
-            new ItemSpec("Compile", "Program.cs", new[] { "Main", "Microsoft.AspNetCore.Hosting" }),
-            new ItemSpec("Compile", "Startup.cs", new[] { "Configure", "ConfigureServices" }),
-            new ItemSpec("Content", "appsettings.json", Array.Empty<string>()),
-            new ItemSpec("Content", "appsettings.Development.json", Array.Empty<string>())
+            new ItemSpec("Compile", "Program.cs", false, new[] { "Main", "Microsoft.AspNetCore.Hosting" }),
+            new ItemSpec("Compile", "Startup.cs", false, new[] { "Configure", "ConfigureServices" }),
+            new ItemSpec("Content", "appsettings.json", false, Array.Empty<string>()),
+            new ItemSpec("Content", "appsettings.Development.json", false, Array.Empty<string>())
         };
 
-        private List<ItemSpec> _filesToAdd;
+        private List<ItemSpec> _itemsToAdd;
 
         public StartupUpdaterStep(MigrateOptions options, ILogger logger)
             : base(options, logger)
@@ -67,14 +67,14 @@ namespace AspNetMigrator.StartupUpdater
                 var projectDir = Path.GetDirectoryName(Options.ProjectPath);
                 var resourceAssembly = typeof(StartupUpdaterStep).Assembly;
 
-                // For each file in _filesToAdd, add the file and do a simple replacement of the template namespace
-                // TODO : It will probably worthwhile to make the templating feature more full-featured
+                // For each file in _itemsToAdd, add the file and do a simple replacement of the template namespace
+                // TODO : It will probably worthwhile to make the templating feature more full-featured.
                 //        We could prompt users about whether they need different features in their Startup and
                 //        include/exclude code based on responses.
-                foreach (var file in _filesToAdd)
+                foreach (var item in _itemsToAdd)
                 {
                     // Get the path where the file will be added
-                    var path = Path.Combine(projectDir, file.ItemName);
+                    var path = Path.Combine(projectDir, item.ItemName);
 
                     // If the given file already exists, move it
                     if (File.Exists(path))
@@ -82,12 +82,12 @@ namespace AspNetMigrator.StartupUpdater
                         RenameFile(path, project);
                     }
 
-                    // Copy files and add them to the project
-                    using var resourceStream = resourceAssembly.GetManifestResourceStream($"{ManifestResourcePrefix}{file.ItemName}");
+                    // Place the specified file
+                    using var resourceStream = resourceAssembly.GetManifestResourceStream($"{ManifestResourcePrefix}{item.ItemName}");
                     if (resourceStream is null)
                     {
-                        Logger.Fatal("File resource not found for file {FileName}", file.ItemName);
-                        return (MigrationStepStatus.Failed, $"File resource not found for file {file.ItemName}");
+                        Logger.Fatal("File resource not found for file {ItemName}", item.ItemName);
+                        return (MigrationStepStatus.Failed, $"File resource not found for item {item.ItemName}");
                     }
 
                     using var inputStream = new StreamReader(resourceStream);
@@ -101,17 +101,20 @@ namespace AspNetMigrator.StartupUpdater
                     using var outputStream = new StreamWriter(new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan));
                     await outputStream.WriteAsync(fileContents).ConfigureAwait(false);
 
-                    // Add the new file to the project
-                    project.AddItem(file.ItemType, file.ItemName);
+                    if (item.IncludeExplicitly)
+                    {
+                        // Add the new item to the project if it won't be auto-included
+                        project.AddItem(item.ItemType, item.ItemName);
+                    }
 
-                    Logger.Information("Added {FileName} to the project from template file", file.ItemName);
+                    Logger.Information("Added {ItemName} to the project from template file", item.ItemName);
                 }
 
-                Logger.Information("{FileCount} files added", _filesToAdd.Count);
+                Logger.Information("{ItemCount} items added", _itemsToAdd.Count);
 
                 project.Save();
 
-                return (MigrationStepStatus.Complete, $"{_filesToAdd.Count} expected startup files added");
+                return (MigrationStepStatus.Complete, $"{_itemsToAdd.Count} expected startup files added");
             }
             catch (InvalidProjectFileException)
             {
@@ -135,13 +138,13 @@ namespace AspNetMigrator.StartupUpdater
                 var project = new Project(projectRoot, new Dictionary<string, string>(), null);
 
                 Logger.Verbose("Scanning project for {ExpectedFileCount} expected files", ExpectedFiles.Count());
-                _filesToAdd = new List<ItemSpec>(ExpectedFiles.Where(e => !project.Items.Any(i => ItemMatches(e, i))));
-                Logger.Information("{FilesNeededCount} expected startup files needed", _filesToAdd.Count);
+                _itemsToAdd = new List<ItemSpec>(ExpectedFiles.Where(e => !project.Items.Any(i => ItemMatches(e, i))));
+                Logger.Information("{FilesNeededCount} expected startup files needed", _itemsToAdd.Count);
 
-                if (_filesToAdd.Any())
+                if (_itemsToAdd.Any())
                 {
-                    Logger.Verbose("Needed files: {NeededFiles}", string.Join(", ", _filesToAdd));
-                    return Task.FromResult((MigrationStepStatus.Incomplete, $"{_filesToAdd.Count} expected startup files needed ({string.Join(", ", _filesToAdd)})"));
+                    Logger.Verbose("Needed files: {NeededFiles}", string.Join(", ", _itemsToAdd));
+                    return Task.FromResult((MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected startup files needed ({string.Join(", ", _itemsToAdd.Select(i => i.ItemName))})"));
                 }
                 else
                 {
