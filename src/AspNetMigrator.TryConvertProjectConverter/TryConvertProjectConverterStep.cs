@@ -12,13 +12,13 @@ namespace AspNetMigrator.Engine
         private const string DefaultSDK = "Microsoft.NET.Sdk";
         private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion -p {0}";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
-        private string TryConvertPath { get; } =
+        private static readonly string TryConvertPath =
             Path.Combine(Path.GetDirectoryName(typeof(TryConvertProjectConverterStep).Assembly.Location), "tools", "try-convert.exe");
 
         public TryConvertProjectConverterStep(MigrateOptions options, ILogger logger) : base(options, logger)
         {
             Title = $"Convert project file to SDK style";
-            Description = $"Convert {options.ProjectPath} to and SDK-style project with try-convert";
+            Description = $"Convert {options.ProjectPath} to an SDK-style project with try-convert";
         }
 
         protected async override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
@@ -60,8 +60,8 @@ namespace AspNetMigrator.Engine
 
             if (tryConvertProcess.ExitCode != 0)
             {
-                Logger.Fatal("Conversion with try-convert failed");
-                return (MigrationStepStatus.Failed, "Convesion with try-convert failed");
+                Logger.Fatal("Conversion with try-convert failed (exit code {ExitCode})", tryConvertProcess.ExitCode);
+                return (MigrationStepStatus.Failed, $"Convesion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
             }
             else
             {
@@ -81,7 +81,7 @@ namespace AspNetMigrator.Engine
                 if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Verbose("Project {ProjectPath} not yet converted", Options.ProjectPath);
-                    return Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Incomplete, null));
+                    return Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Incomplete, $"Project {Options.ProjectPath} is not an SDK project. Applying this step will execute the following try-convert command line: {TryConvertPath} {string.Format(TryConvertArgumentsFormat, Options.ProjectPath)}"));
                 }
                 else
                 {

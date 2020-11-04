@@ -38,7 +38,7 @@ namespace AspNetMigrator.Engine
             else
             {
                 Logger.Verbose("Backup migration step initialized as incomplete");
-                return Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Incomplete, null));
+                return Task.FromResult((MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} to {_backupPath} (including subfolders)."));
             }
         }
 

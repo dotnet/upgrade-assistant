@@ -12,6 +12,9 @@ namespace AspNetMigrator.Engine
         private readonly ImmutableArray<MigrationStep> _steps;
 
         public IEnumerable<MigrationStep> Steps => _initialized ? _steps : throw new InvalidOperationException("Migrator must be initialized prior top use");
+
+        public MigrationStep NextStep => GetNextStep(Steps);
+
         private ILogger Logger { get; }
 
 
@@ -41,7 +44,7 @@ namespace AspNetMigrator.Engine
             Logger.Verbose("Initialization complete");
         }
 
-        public MigrationStep GetNextStep(IEnumerable<MigrationStep> steps)
+        private MigrationStep GetNextStep(IEnumerable<MigrationStep> steps)
         {
             if (steps is null)
             {

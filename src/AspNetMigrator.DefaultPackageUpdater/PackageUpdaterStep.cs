@@ -33,6 +33,9 @@ namespace AspNetMigrator.Engine
             Description = $"Update package references in {options.ProjectPath} to work with .NET based on mappings in {PackageMapPath}";
         }
 
+        // TODO : This does not currently update package dependencies, so it's easy to get into a state where package versions conflict.
+        //        This should be updated to more robustly handle dependencies, either by including dependency information in the config (which
+        //        would require a fair bit of work) or by determining dependencies at runtime.
         protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
         {
             if (!File.Exists(PackageMapPath))
@@ -69,12 +72,12 @@ namespace AspNetMigrator.Engine
                             itemGroup.Parent.RemoveChild(itemGroup);
                         }
 
-                        // Include the updated version of removed packages in the list of packages to add references to
+                        // Include the updated versions of removed packages in the list of packages to add references to
                         referencesToAdd.AddRange(map.NetCorePackages);
                     }
                 }
 
-                // Determine where new package references should go
+                // Find a place to add new package references
                 var packageReferenceItemGroup = project.ItemGroups.FirstOrDefault(g => g.Items.Any(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase)));
                 if (packageReferenceItemGroup is null)
                 {
@@ -96,7 +99,7 @@ namespace AspNetMigrator.Engine
                     newItemElement.AddMetadata(VersionElementName, newReference.Version, true);
                 }
 
-                // Add reference to ASP.NET Core migration analyzers
+                // Add reference to ASP.NET Core migration analyzers if needed
                 if (!project.Items.Any(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase) && AnalyzerPackageName.Equals(i.Include, StringComparison.OrdinalIgnoreCase)))
                 {
                     Logger.Information("Adding package reference to: {PackageReference}", AnalyzerPackageName);
@@ -124,13 +127,16 @@ namespace AspNetMigrator.Engine
         {
             if (!File.Exists(PackageMapPath))
             {
-                throw new FileNotFoundException("Package map file not found", PackageMapPath);
+                Logger.Fatal("Package map file {PackageMapPath} not found", PackageMapPath);
+                return (MigrationStepStatus.Failed, $"Package map file {PackageMapPath} not found");
             }
 
             // Initialize package maps from config file
             Logger.Information("Loading package maps from {PackageMapPath}", PackageMapPath);
-            using var config = File.OpenRead(PackageMapPath);
-            _packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config).ConfigureAwait(false);
+            using (var config = File.OpenRead(PackageMapPath))
+            {
+                _packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config).ConfigureAwait(false);
+            }
             Logger.Verbose("Loaded {MapCount} package maps", _packageMaps.Count());
 
             if (!File.Exists(Options.ProjectPath))
@@ -158,6 +164,7 @@ namespace AspNetMigrator.Engine
                     return (MigrationStepStatus.Incomplete, $"{outdatedPackages.Count()} packages need updated");
                 }
 
+                // Check that the analyzer package reference is present
                 if (!packageReferences.Any(p => p.Name.Equals(AnalyzerPackageName)))
                 {
                     Logger.Information("Reference to package {AnalyzerPackageName} needs added", AnalyzerPackageName);

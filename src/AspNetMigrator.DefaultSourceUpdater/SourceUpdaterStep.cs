@@ -30,6 +30,7 @@ namespace AspNetMigrator.Engine
             Title = $"Update C# source";
             Description = $"Update source files in {options.ProjectPath} to change ASP.NET references to ASP.NET Core equivalents";
 
+            // Add sub-steps for each analyzer that will be run
             SubSteps = new List<MigrationStep>(AspNetCoreMigrationCodeFixers.AllCodeFixProviders.Select(fixer => new CodeFixerStep(this, fixer, options, logger)));
         }
 
@@ -56,7 +57,7 @@ namespace AspNetMigrator.Engine
 
             return Diagnostics.Any() ?
                 (MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
-                (MigrationStepStatus.Complete, null);
+                (MigrationStepStatus.Complete, "No migration diagnostics found");
         }
 
         private async Task GetDiagnosticsAsync()
@@ -93,7 +94,9 @@ namespace AspNetMigrator.Engine
                 // the parent has any top-level application done after the children.
                 // In the case of this update step, the parent (this updater) doesn't
                 // need to apply anything. Therefore, automatically apply this updater
-                // if all of its children are complete.
+                // if all of its children are complete. This will avoid the annoying
+                // user experience of having to "apply" an empty change for the parent
+                // source updater step after all children have applied their changes.
                 if (!Diagnostics.Any())
                 {
                     await ApplyAsync().ConfigureAwait(false);
@@ -108,6 +111,7 @@ namespace AspNetMigrator.Engine
             }
         }
 
+        // TODO
         private ImmutableArray<AdditionalText> GetAdditionalFiles() => new ImmutableArray<AdditionalText>();
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)

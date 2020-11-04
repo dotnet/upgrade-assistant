@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using AspNetMigrator.StartupUpdater;
@@ -30,9 +30,7 @@ namespace AspNetMigrator.ConsoleApp
             else
             {
                 Services = BuildDIContainer(options);
-                using var scope = Services.CreateScope();
-                var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
-                await RunMigrationReplAsync(migrator);
+                await RunMigrationReplAsync();
             }
 
             Console.WriteLine();
@@ -164,16 +162,18 @@ namespace AspNetMigrator.ConsoleApp
             return options;
         }
 
-        public static async Task RunMigrationReplAsync(Migrator migrator)
+        public static async Task RunMigrationReplAsync()
         {
             var done = false;
+            using var scope = Services.CreateScope();
+            var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
             await migrator.InitializeAsync();
 
             while (!done)
             {
                 ShowMigraitonSteps(migrator.Steps);
 
-                var command = GetCommand(migrator.GetNextStep(migrator.Steps));
+                var command = GetCommand(migrator.NextStep);
 
                 switch (command)
                 {
@@ -189,7 +189,14 @@ namespace AspNetMigrator.ConsoleApp
                         Console.WriteLine("Logging configuration not yet implemented.");
                         break;
                     case ReplCommand.SeeStepDetails:
-                        Console.WriteLine("Step details not yet implemented.");
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("Current step details");
+                        Console.ResetColor();
+                        Console.WriteLine(WrapString(migrator.NextStep.Description, Console.WindowWidth));
+                        Console.WriteLine();
+                        Console.WriteLine(WrapString(migrator.NextStep.StatusDetails, Console.WindowWidth));
+                        Console.WriteLine();
                         break;
                     case ReplCommand.Exit:
                         done = true;
@@ -242,42 +249,85 @@ namespace AspNetMigrator.ConsoleApp
             {
                 // Write indent (if any) and item number
                 Console.Write($"{new string(' ', offset * 2)}{count++}. ");
-                nextStepFound = WriteStepStatus(step, Console.ForegroundColor, nextStepFound);
+
+                // Write the step title and make a note of whether the step is incomplete
+                // (since that would mean future steps shouldn't show "[Current step]")
+                WriteStepStatus(step, !nextStepFound);
+                Console.WriteLine(step.Title);
+                nextStepFound = step.Status != MigrationStepStatus.Complete;
 
                 ShowMigraitonSteps(step.SubSteps, offset + 1);
             }
             Console.WriteLine();
         }
 
-        private static bool WriteStepStatus(MigrationStep step, ConsoleColor defaultColor, bool nextStepFound)
+        private static void WriteStepStatus(MigrationStep step, bool isNextStep)
         {
-            if (!nextStepFound)
+            switch (step.Status)
             {
-                switch (step.Status)
+                case MigrationStepStatus.Complete:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("[Complete] ");
+                    break;
+                case MigrationStepStatus.Failed:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("[Failed] ");
+                    break;
+                case MigrationStepStatus.Incomplete:
+                    if (isNextStep)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("[Current step] ");
+                    }
+                    break;
+            }
+            Console.ResetColor();
+        }
+
+        private static string WrapString(string input, int lineLength = 80)
+        {
+            var word = new StringBuilder();
+            var ret = new StringBuilder();
+            var index = 0;
+            foreach (var c in input)
+            {
+                switch (c)
                 {
-                    case MigrationStepStatus.Complete:
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.Write("[Complete] ");
+                    case '\n':
+                    case '\r':
+                        AddWordToRet();
+                        ret.Append(c);
+                        index = 0;
                         break;
-                    case MigrationStepStatus.Failed:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write("[Failed] ");
-                        nextStepFound = true;
+                    case '\t':
+                        AddWordToRet();
+                        word.Append("    ");
+                        AddWordToRet();
                         break;
-                    case MigrationStepStatus.Incomplete:
-                        if (!nextStepFound)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.Write("[Current step] ");
-                            nextStepFound = true;
-                        }
+                    case ' ':
+                        word.Append(c);
+                        AddWordToRet();
+                        break;
+                    default:
+                        word.Append(c);
                         break;
                 }
             }
+            AddWordToRet();
 
-            Console.ResetColor();
-            Console.WriteLine(step.Title);
-            return nextStepFound;
+            return ret.ToString();
+
+            void AddWordToRet()
+            {
+                if (index + word.Length >= lineLength)
+                {
+                    ret.AppendLine();
+                    index = 0;
+                }
+                ret.Append(word);
+                index += word.Length;
+                word = new StringBuilder();
+            }
         }
     }
 }

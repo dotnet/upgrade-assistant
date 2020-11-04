@@ -44,8 +44,7 @@ namespace AspNetMigrator.Analyzers
             }
 
             // If the identifier resolves to an actual symbol that isn't the old identifier, bail out
-            var symbol = context.SemanticModel.GetSymbolInfo(identifier).Symbol as INamedTypeSymbol;
-            if (symbol != null && !symbol.ToString().Equals(mapping.OldFullName))
+            if (context.SemanticModel.GetSymbolInfo(identifier).Symbol is INamedTypeSymbol symbol && !symbol.ToString().Equals(mapping.OldFullName))
             {
                 return;
             }
