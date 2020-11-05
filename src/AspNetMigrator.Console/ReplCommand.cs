@@ -4,6 +4,7 @@
     {
         Unknown,
         ApplyNext,
+        SkipNext,
         ConfigureLogging,
         SeeStepDetails,
         Exit

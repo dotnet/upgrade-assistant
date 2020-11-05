@@ -185,18 +185,37 @@ namespace AspNetMigrator.ConsoleApp
                         }
 
                         break;
+                    case ReplCommand.SkipNext:
+                        if (!await migrator.SkipNextStepAsync())
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Skip step failed");
+                            Console.ResetColor();
+                        }
+
+                        break;
                     case ReplCommand.ConfigureLogging:
                         Console.WriteLine("Logging configuration not yet implemented.");
                         break;
                     case ReplCommand.SeeStepDetails:
-                        Console.WriteLine();
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("Current step details");
-                        Console.ResetColor();
-                        Console.WriteLine(WrapString(migrator.NextStep.Description, Console.WindowWidth));
-                        Console.WriteLine();
-                        Console.WriteLine(WrapString(migrator.NextStep.StatusDetails, Console.WindowWidth));
-                        Console.WriteLine();
+                        if (migrator.NextStep is null)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("No current step to get details for");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine("Current step details");
+                            Console.ResetColor();
+                            Console.WriteLine(WrapString(migrator.NextStep.Description, Console.WindowWidth));
+                            Console.WriteLine();
+                            Console.WriteLine(WrapString(migrator.NextStep.StatusDetails, Console.WindowWidth));
+                            Console.WriteLine();
+                        }
+
                         break;
                     case ReplCommand.Exit:
                         done = true;
@@ -211,19 +230,21 @@ namespace AspNetMigrator.ConsoleApp
         private static ReplCommand GetCommand(MigrationStep step)
         {
             // TODO - Build this menu dynamically based on available commands
-            Console.WriteLine("Choose action");
-            Console.WriteLine($" 1. Apply next action{(step is null ? string.Empty : $" ({step.Title})")}");
-            Console.WriteLine(" 2. Configure logging");
-            Console.WriteLine(" 3. See more step details");
-            Console.WriteLine(" 4. Exit");
+            Console.WriteLine("Choose command");
+            Console.WriteLine($" 1. Apply next setp{(step is null ? string.Empty : $" ({step.Title})")}");
+            Console.WriteLine(" 2. Skip next step");
+            Console.WriteLine(" 3. Configure logging");
+            Console.WriteLine(" 4. See more step details");
+            Console.WriteLine(" 5. Exit");
             Console.Write("> ");
 
             return Console.ReadLine().Trim(' ', '.', '\t') switch
             {
                 "1" => ReplCommand.ApplyNext,
-                "2" => ReplCommand.ConfigureLogging,
-                "3" => ReplCommand.SeeStepDetails,
-                "4" => ReplCommand.Exit,
+                "2" => ReplCommand.SkipNext,
+                "3" => ReplCommand.ConfigureLogging,
+                "4" => ReplCommand.SeeStepDetails,
+                "5" => ReplCommand.Exit,
                 _ => ReplCommand.Unknown
             };
         }
@@ -273,6 +294,10 @@ namespace AspNetMigrator.ConsoleApp
                 case MigrationStepStatus.Failed:
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("[Failed] ");
+                    break;
+                case MigrationStepStatus.Skipped:
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.Write("[Skipped] ");
                     break;
                 case MigrationStepStatus.Incomplete:
                     if (isNextStep)

@@ -62,11 +62,37 @@ namespace AspNetMigrator.Engine
             return null;
         }
 
+        public async Task<bool> SkipNextStepAsync()
+        {
+            Logger.Verbose("Skipping next migration step");
+
+            var nextStep = NextStep;
+            if (nextStep is null)
+            {
+                Logger.Information("No next migration step found");
+                return false;
+            }
+
+            Logger.Information("Skipping migration step {StepTitle}", nextStep.Title);
+
+            if (await nextStep.SkipAsync())
+            {
+                Logger.Information("Migration step {StepTitle} skipped", nextStep.Title);
+                await InitializeNextStepAsync(Steps);
+                return true;
+            }
+            else
+            {
+                Logger.Warning("Skipping migration step {StepTitle} failed: {Status}: {StatusDetail}", nextStep.Title, nextStep.Status, nextStep.StatusDetails);
+                return false;
+            }
+        }
+
         public async Task<bool> ApplyNextStepAsync()
         {
             Logger.Verbose("Applying next migration step");
 
-            var nextStep = GetNextStep(Steps);
+            var nextStep = NextStep;
             if (nextStep is null)
             {
                 Logger.Information("No next migration step found");

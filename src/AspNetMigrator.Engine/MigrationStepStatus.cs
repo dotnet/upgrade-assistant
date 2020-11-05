@@ -5,6 +5,7 @@
         Unknown,
         Incomplete,
         Complete,
+        Skipped,
         Failed
     }
 }

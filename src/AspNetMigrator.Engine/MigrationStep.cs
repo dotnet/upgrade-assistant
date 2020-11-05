@@ -50,7 +50,7 @@ namespace AspNetMigrator.Engine
         /// <summary>
         /// Initialize the migration step, including checking whether it is already complete and setting up necessary internal state.
         /// </summary>
-        public async Task InitializeAsync()
+        public virtual async Task InitializeAsync()
         {
             (Status, StatusDetails) = await InitializeImplAsync();
         }
@@ -59,7 +59,7 @@ namespace AspNetMigrator.Engine
         /// Apply migration and update Status as necessary.
         /// </summary>
         /// <returns>True if the migration step was successfully applied or false if migration failed.</returns>
-        public async Task<bool> ApplyAsync()
+        public virtual async Task<bool> ApplyAsync()
         {
             if (!Initialized)
             {
@@ -74,6 +74,19 @@ namespace AspNetMigrator.Engine
             (Status, StatusDetails) = await ApplyImplAsync();
 
             return Status == MigrationStepStatus.Complete;
+        }
+
+        /// <summary>
+        /// Skips a migration step.
+        /// </summary>
+        /// <returns>True if the step was successfully skipped, false otherwise.</returns>
+        public virtual Task<bool> SkipAsync()
+        {
+            // This method doesn't really need to be async or return a bool, as written now.
+            // I've implemented it this way for now, though, to match ApplyAsync in case inheritors
+            // want to change the behavior.
+            (Status, StatusDetails) = (MigrationStepStatus.Skipped, "Step skipped");
+            return Task.FromResult(true);
         }
     }
 }
