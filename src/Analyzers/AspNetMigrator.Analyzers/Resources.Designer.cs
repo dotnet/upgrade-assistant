@@ -115,6 +115,33 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead.
+        /// </summary>
+        internal static string HttpContextCurrentDescription {
+            get {
+                return ResourceManager.GetString("HttpContextCurrentDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead.
+        /// </summary>
+        internal static string HttpContextCurrentMessageFormat {
+            get {
+                return ResourceManager.GetString("HttpContextCurrentMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do not use HttpContext.Current.
+        /// </summary>
+        internal static string HttpContextCurrentTitle {
+            get {
+                return ResourceManager.GetString("HttpContextCurrentTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core.
         /// </summary>
         internal static string ResultTypeDescription {

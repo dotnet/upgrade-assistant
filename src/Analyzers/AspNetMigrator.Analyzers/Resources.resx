@@ -135,6 +135,15 @@
   <data name="HtmlStringTitle" xml:space="preserve">
     <value>HtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
   </data>
+  <data name="HttpContextCurrentDescription" xml:space="preserve">
+    <value>HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead</value>
+  </data>
+  <data name="HttpContextCurrentMessageFormat" xml:space="preserve">
+    <value>HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead</value>
+  </data>
+  <data name="HttpContextCurrentTitle" xml:space="preserve">
+    <value>Do not use HttpContext.Current</value>
+  </data>
   <data name="ResultTypeDescription" xml:space="preserve">
     <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core</value>
   </data>

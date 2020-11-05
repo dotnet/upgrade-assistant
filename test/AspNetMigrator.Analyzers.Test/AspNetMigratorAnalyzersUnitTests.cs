@@ -67,6 +67,16 @@ namespace AspNetMigrator.Analyzers.Test
                     new ExpectedDiagnostic("AM0004", new TextSpan(869, 21))
                 }
             },
+            {
+                "AM0005",
+                new[]
+                {
+                    new ExpectedDiagnostic("AM0005", new TextSpan(241, 19)),
+                    new ExpectedDiagnostic("AM0005", new TextSpan(385, 23)),
+                    new ExpectedDiagnostic("AM0005", new TextSpan(431, 30)),
+                    new ExpectedDiagnostic("AM0005", new TextSpan(494, 19))
+                }
+            },
         };
 
         [AssemblyInitialize]
@@ -91,6 +101,7 @@ namespace AspNetMigrator.Analyzers.Test
         [DataRow("AM0002")]
         [DataRow("AM0003")]
         [DataRow("AM0004")]
+        [DataRow("AM0005")]
         [DataTestMethod]
         public async Task MigrationAnalyzers(string diagnosticId)
         {
