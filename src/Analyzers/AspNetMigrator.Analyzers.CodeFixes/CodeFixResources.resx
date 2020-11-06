@@ -123,6 +123,9 @@
   <data name="HtmlStringTitle" xml:space="preserve">
     <value>Replace with Microsoft.AspNetCore.Html.HtmlString</value>
   </data>
+  <data name="HttpContextCurrentTitle" xml:space="preserve">
+    <value>Replace HttpContext.Current usage with an HttpContextAccessor-based solution</value>
+  </data>
   <data name="ResultTypeTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core result type</value>
   </data>

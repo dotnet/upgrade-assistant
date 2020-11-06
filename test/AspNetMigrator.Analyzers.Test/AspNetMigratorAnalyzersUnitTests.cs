@@ -113,6 +113,8 @@ namespace AspNetMigrator.Analyzers.Test
         [DataRow("AM0001")]
         [DataRow("AM0002")]
         [DataRow("AM0003")]
+        [DataRow("AM0004")]
+        [DataRow("AM0005")]
         [DataTestMethod]
         public async Task MigrationCodeFixer(string diagnosticId)
         {

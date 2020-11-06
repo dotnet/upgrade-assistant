@@ -79,6 +79,15 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace HttpContext.Current usage with an HttpContextAccessor-based solution.
+        /// </summary>
+        internal static string HttpContextCurrentTitle {
+            get {
+                return ResourceManager.GetString("HttpContextCurrentTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with ASP.NET Core result type.
         /// </summary>
         internal static string ResultTypeTitle {

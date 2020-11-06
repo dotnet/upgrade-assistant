@@ -83,10 +83,7 @@ namespace AspNetMigrator.Analyzers
 
             // Add using declation if needed
             var namespaceName = GetNamespace(newIdentifier);
-            if (!documentRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal)))
-            {
-                documentRoot = documentRoot.AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(namespaceName)));
-            }
+            documentRoot = documentRoot.AddUsingIfMissing(namespaceName);
 
             editor.ReplaceNode(editor.OriginalRoot, documentRoot);
 

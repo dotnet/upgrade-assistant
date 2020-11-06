@@ -231,7 +231,7 @@ namespace AspNetMigrator.ConsoleApp
         {
             // TODO - Build this menu dynamically based on available commands
             Console.WriteLine("Choose command");
-            Console.WriteLine($" 1. Apply next setp{(step is null ? string.Empty : $" ({step.Title})")}");
+            Console.WriteLine($" 1. Apply next step{(step is null ? string.Empty : $" ({step.Title})")}");
             Console.WriteLine(" 2. Skip next step");
             Console.WriteLine(" 3. Configure logging");
             Console.WriteLine(" 4. See more step details");
