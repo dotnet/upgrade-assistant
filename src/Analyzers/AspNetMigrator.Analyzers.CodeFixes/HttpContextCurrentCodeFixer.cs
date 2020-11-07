@@ -22,7 +22,7 @@ namespace AspNetMigrator.Analyzers
     {
         private const string HttpContextHelperName = "HttpContextHelper";
         private const string HttpContextHelperResourceName = "AspNetMigrator.Analyzers.Templates.HttpContextHelper.cs";
-        
+
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HttpContextCurrentAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
@@ -50,17 +50,17 @@ namespace AspNetMigrator.Analyzers
                 context.Diagnostics);
         }
 
-        private async Task<Solution> ReplaceHttpContextCurrentAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private static async Task<Solution> ReplaceHttpContextCurrentAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var project = document.Project;
 
             // Ensure HttpContextHelper.cs exists in the project
-            var httpContextHelperClass = await GetHttpContextHelperClass(project);
+            var httpContextHelperClass = await GetHttpContextHelperClassAsync(project).ConfigureAwait(false);
             if (httpContextHelperClass is null)
             {
                 using var sr = new StreamReader(typeof(HttpContextCurrentCodeFixer).Assembly.GetManifestResourceStream(HttpContextHelperResourceName));
                 project = document.Project.AddDocument($"{HttpContextHelperName}.cs", await sr.ReadToEndAsync().ConfigureAwait(false)).Project;
-                httpContextHelperClass = await GetHttpContextHelperClass(project);
+                httpContextHelperClass = await GetHttpContextHelperClassAsync(project).ConfigureAwait(false);
             }
 
             var slnEditor = new SolutionEditor(project.Solution);
@@ -91,7 +91,7 @@ namespace AspNetMigrator.Analyzers
             return slnEditor.GetChangedSolution();
         }
 
-        private static async Task<INamedTypeSymbol> GetHttpContextHelperClass(Project project)
+        private static async Task<INamedTypeSymbol> GetHttpContextHelperClassAsync(Project project)
         {
             foreach (var document in project.Documents)
             {

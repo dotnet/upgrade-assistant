@@ -37,7 +37,7 @@ namespace AspNetMigrator.Engine
             var msBuildPath = MSBuildHelper.RegisterMSBuildInstance();
             Logger.Verbose("MSBuild registered from {MSBuildPath}", msBuildPath);
 
-            await InitializeNextStepAsync(_steps);
+            await InitializeNextStepAsync(_steps).ConfigureAwait(false);
 
             _initialized = true;
             Logger.Verbose("Initialization complete");
@@ -75,10 +75,10 @@ namespace AspNetMigrator.Engine
 
             Logger.Information("Skipping migration step {StepTitle}", nextStep.Title);
 
-            if (await nextStep.SkipAsync())
+            if (await nextStep.SkipAsync().ConfigureAwait(false))
             {
                 Logger.Information("Migration step {StepTitle} skipped", nextStep.Title);
-                await InitializeNextStepAsync(Steps);
+                await InitializeNextStepAsync(Steps).ConfigureAwait(false);
                 return true;
             }
             else
@@ -100,12 +100,12 @@ namespace AspNetMigrator.Engine
             }
 
             Logger.Information("Applying migration step {StepTitle}", nextStep.Title);
-            var success = await nextStep.ApplyAsync();
+            var success = await nextStep.ApplyAsync().ConfigureAwait(false);
 
             if (success)
             {
                 Logger.Information("Migration step {StepTitle} applied successfully", nextStep.Title);
-                await InitializeNextStepAsync(Steps);
+                await InitializeNextStepAsync(Steps).ConfigureAwait(false);
                 return true;
             }
             else

@@ -68,7 +68,7 @@ namespace AspNetMigrator.Engine
             tryConvertProcess.Start();
             tryConvertProcess.BeginOutputReadLine();
             tryConvertProcess.BeginErrorReadLine();
-            await tryConvertProcess.WaitForExitAsync();
+            await tryConvertProcess.WaitForExitAsync().ConfigureAwait(false);
 
             if (tryConvertProcess.ExitCode != 0)
             {

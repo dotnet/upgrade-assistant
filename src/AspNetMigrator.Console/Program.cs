@@ -13,6 +13,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     // TODO : Eventually, this may need localized and pull strings from resources, etc.
     [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "The prototype is not yet localized")]
+    [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class Program
     {
         private static IConfiguration Configuration { get; set; }

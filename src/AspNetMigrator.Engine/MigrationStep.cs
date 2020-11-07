@@ -52,7 +52,7 @@ namespace AspNetMigrator.Engine
         /// </summary>
         public virtual async Task InitializeAsync()
         {
-            (Status, StatusDetails) = await InitializeImplAsync();
+            (Status, StatusDetails) = await InitializeImplAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace AspNetMigrator.Engine
                 return true;
             }
 
-            (Status, StatusDetails) = await ApplyImplAsync();
+            (Status, StatusDetails) = await ApplyImplAsync().ConfigureAwait(false);
 
             return Status == MigrationStepStatus.Complete;
         }

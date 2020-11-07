@@ -67,9 +67,9 @@ namespace AspNetMigrator.Engine
                     return (MigrationStepStatus.Failed, $"Failed to create backup directory {_backupPath}");
                 }
 
-                await CopyDirectoryAsync(_projectDir, _backupPath);
+                await CopyDirectoryAsync(_projectDir, _backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
-                await File.WriteAllTextAsync(Path.Combine(_backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})");
+                await File.WriteAllTextAsync(Path.Combine(_backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})").ConfigureAwait(false);
                 Logger.Information("Project backed up to {BackupPath}", _backupPath);
                 return (MigrationStepStatus.Complete, "Backup completed successfully");
             }
@@ -87,13 +87,13 @@ namespace AspNetMigrator.Engine
             foreach (var file in directoryInfo.GetFiles("*", SearchOption.TopDirectoryOnly))
             {
                 var dest = Path.Combine(destinationDir, file.Name);
-                await CopyFileAsync(file.FullName, dest);
+                await CopyFileAsync(file.FullName, dest).ConfigureAwait(false);
                 Logger.Verbose("Copied {SourceFile} to {DestinationFile}", file.FullName, dest);
             }
 
             foreach (var dir in directoryInfo.GetDirectories())
             {
-                await CopyDirectoryAsync(dir.FullName, Path.Combine(destinationDir, dir.Name));
+                await CopyDirectoryAsync(dir.FullName, Path.Combine(destinationDir, dir.Name)).ConfigureAwait(false);
             }
         }
 

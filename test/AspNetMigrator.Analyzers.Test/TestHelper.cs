@@ -113,14 +113,14 @@ namespace TestProject
 
             CodeAction fixAction = null;
             var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
-            await provider.RegisterCodeFixesAsync(context);
+            await provider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
             if (fixAction is null)
             {
                 return null;
             }
 
-            var applyOperation = (await fixAction.GetOperationsAsync(CancellationToken.None)).OfType<ApplyChangesOperation>().FirstOrDefault();
+            var applyOperation = (await fixAction.GetOperationsAsync(CancellationToken.None).ConfigureAwait(false)).OfType<ApplyChangesOperation>().FirstOrDefault();
 
             if (applyOperation is null)
             {

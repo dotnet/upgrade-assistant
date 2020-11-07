@@ -1,28 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="rules" ToolsVersion="16.0">
   <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+    <Rule Id="CA1008" Action="Warning" />
     <Rule Id="CA1016" Action="None" />
     <Rule Id="CA1030" Action="None" />
     <Rule Id="CA1034" Action="None" />
     <Rule Id="CA1036" Action="None" />
-    <Rule Id="CA1051" Action="None" />
+    <Rule Id="CA1050" Action="Warning" />
     <Rule Id="CA1052" Action="None" />
     <Rule Id="CA1056" Action="None" />
-    <Rule Id="CA1064" Action="None" />
+    <Rule Id="CA1060" Action="Warning" />
     <Rule Id="CA1065" Action="None" />
     <Rule Id="CA1067" Action="None" />
     <Rule Id="CA1707" Action="None" />
     <Rule Id="CA1710" Action="None" />
     <Rule Id="CA1716" Action="None" />
-    <Rule Id="CA1717" Action="None" />
     <Rule Id="CA1721" Action="None" />
     <Rule Id="CA1724" Action="None" />
     <Rule Id="CA1801" Action="None" />
     <Rule Id="CA1812" Action="None" />
     <Rule Id="CA1815" Action="None" />
-    <Rule Id="CA1823" Action="None" />
-    <Rule Id="CA2007" Action="None" />
-    <Rule Id="CA2211" Action="None" />
     <Rule Id="CA2227" Action="None" />
     <Rule Id="CA2237" Action="None" />
   </Rules>
@@ -31,7 +28,6 @@
   </Rules>
   <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
     <Rule Id="CA1304" Action="None" />
-    <Rule Id="CA1307" Action="None" />
     <Rule Id="CA1308" Action="None" />
     <Rule Id="CA1816" Action="None" />
     <Rule Id="CA2208" Action="None" />
