@@ -275,7 +275,7 @@ namespace AspNetMigrator.ConsoleApp
                 // (since that would mean future steps shouldn't show "[Current step]")
                 WriteStepStatus(step, !nextStepFound);
                 Console.WriteLine(step.Title);
-                nextStepFound = step.Status != MigrationStepStatus.Complete;
+                nextStepFound = nextStepFound || (step.Status != MigrationStepStatus.Complete);
 
                 ShowMigraitonSteps(step.SubSteps, offset + 1);
             }
