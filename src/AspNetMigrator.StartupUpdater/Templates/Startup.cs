@@ -33,16 +33,6 @@ namespace WebApplication1
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-
-                // TODO : If using HTTPS
-                // app.UseHsts();
-            }
-
-            // TODO : If using HTTPS
-            // app.UseHttpsRedirection();
 
             app.UseStaticFiles();
             app.UseRouting();
