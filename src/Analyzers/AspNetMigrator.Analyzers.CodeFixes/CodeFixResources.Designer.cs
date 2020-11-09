@@ -88,6 +88,15 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace IsDebuggingEnabled with System.Diagnostics.Debugger.IsAttached.
+        /// </summary>
+        internal static string HttpContextIsDebuggingEnabled {
+            get {
+                return ResourceManager.GetString("HttpContextIsDebuggingEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with ASP.NET Core result type.
         /// </summary>
         internal static string ResultTypeTitle {

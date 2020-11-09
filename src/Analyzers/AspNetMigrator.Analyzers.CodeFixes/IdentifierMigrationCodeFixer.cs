@@ -41,12 +41,12 @@ namespace AspNetMigrator.Analyzers
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixTitle,
-                    cancellationToken => UpdateResultTypeAsync(context.Document, node, diagnostic.Properties[IdentifierMigrationAnalyzer.NewIdentifierKey], cancellationToken),
+                    cancellationToken => UpdateIdentifierTypeAsync(context.Document, node, diagnostic.Properties[IdentifierMigrationAnalyzer.NewIdentifierKey], cancellationToken),
                     CodeFixTitle),
                 context.Diagnostics);
         }
 
-        private static async Task<Document> UpdateResultTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
+        private static async Task<Document> UpdateIdentifierTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
 

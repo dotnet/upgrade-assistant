@@ -142,6 +142,33 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached.
+        /// </summary>
+        internal static string HttpContextDebuggingEnabledDescription {
+            get {
+                return ResourceManager.GetString("HttpContextDebuggingEnabledDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached.
+        /// </summary>
+        internal static string HttpContextDebuggingEnabledMessageFormat {
+            get {
+                return ResourceManager.GetString("HttpContextDebuggingEnabledMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached.
+        /// </summary>
+        internal static string HttpContextDebuggingEnabledTitle {
+            get {
+                return ResourceManager.GetString("HttpContextDebuggingEnabledTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core.
         /// </summary>
         internal static string ResultTypeDescription {

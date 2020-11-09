@@ -10,6 +10,7 @@ namespace AspNetMigrator.Analyzers
             new HtmlStringAnalyzer(),
             new ResultTypeAnalyzer(),
             new FilterAnalyzer(),
-            new HttpContextCurrentAnalyzer());
+            new HttpContextCurrentAnalyzer(),
+            new HttpContextIsDebuggingEnabledAnalyzer());
     }
 }

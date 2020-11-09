@@ -10,6 +10,7 @@ namespace AspNetMigrator.Analyzers
             new HtmlStringCodeFixer(),
             new ResultTypeCodeFixer(),
             new FilterCodeFixer(),
-            new HttpContextCurrentCodeFixer());
+            new HttpContextCurrentCodeFixer(),
+            new HttpContextIsDebuggingEnabledCodeFixer());
     }
 }

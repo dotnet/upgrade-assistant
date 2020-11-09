@@ -8,5 +8,7 @@
         {
             throw new NotImplementedException();
         }
+
+        public bool IsDebuggingEnabled => true;
     }
 }

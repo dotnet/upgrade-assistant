@@ -144,6 +144,15 @@
   <data name="HttpContextCurrentTitle" xml:space="preserve">
     <value>Do not use HttpContext.Current</value>
   </data>
+  <data name="HttpContextDebuggingEnabledDescription" xml:space="preserve">
+    <value>HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached</value>
+  </data>
+  <data name="HttpContextDebuggingEnabledMessageFormat" xml:space="preserve">
+    <value>HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached</value>
+  </data>
+  <data name="HttpContextDebuggingEnabledTitle" xml:space="preserve">
+    <value>HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached</value>
+  </data>
   <data name="ResultTypeDescription" xml:space="preserve">
     <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core</value>
   </data>
