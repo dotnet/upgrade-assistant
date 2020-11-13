@@ -1,6 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Help;
+using System.CommandLine.Invocation;
+using System.CommandLine.IO;
+using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,24 +23,31 @@ namespace AspNetMigrator.ConsoleApp
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class Program
     {
+        private const int DefaultWidth = 80;
+
         private static IConfiguration Configuration { get; set; }
 
         private static IServiceProvider Services { get; set; }
 
-        public static async Task Main(string[] args)
+        public static Task Main(string[] args)
         {
             Configuration = BuildConfiguration();
 
             ShowHeader();
 
-            var options = ParseArgs(args);
+            return new CommandLineBuilder(new RootCommand { Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync) })
+                .AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly())
+                .AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."))
+                .AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"))
+                .AddOption(new Option<DirectoryInfo>(new[] { "--backup-path", "-b" }, "Specifies where the project should be backed up. Defaults to a new directory next to the project's directory."))
+                .UseDefaults()
+                .UseHelpBuilder(b => new HelpWithHeader(b.Console))
+                .Build()
+                .InvokeAsync(args);
+        }
 
-            if (options is null)
-            {
-                ShowUsage();
-                return;
-            }
-
+        private static async Task RunMigrationAsync(MigrateOptions options)
+        {
             Services = BuildDIContainer(options);
             await RunMigrationReplAsync();
         }
@@ -71,95 +85,26 @@ namespace AspNetMigrator.ConsoleApp
             Console.WriteLine();
         }
 
-        private static void ShowUsage()
+        private class HelpWithHeader : HelpBuilder
         {
-            // ................---------1---------2---------3---------4---------5---------6---------7---------
-            Console.WriteLine("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to");
-            Console.WriteLine("an ASP.NET Core project.");
-            Console.WriteLine();
-            Console.WriteLine("No tool can completely automate this process and the project *will*");
-            Console.WriteLine("have build errors after the tool runs and will require significant manual");
-            Console.WriteLine("changes to complete migration.");
-            Console.WriteLine();
-            Console.WriteLine("This tool's purpose is to automate some of the 'routine' migration tasks such");
-            Console.WriteLine("as changing project file formats and updating APIs with near-equivalents in");
-            Console.WriteLine(".NET Core. Analyzers added to the project will highlight the remaining");
-            Console.WriteLine("changes needed after the tool runs.");
-            Console.WriteLine();
-            Console.WriteLine("NOTE: This tool depends on MSBuild, so it should be run from a developer");
-            Console.WriteLine("      command prompt.");
-            Console.WriteLine();
-            Console.WriteLine("Usage:");
-            Console.WriteLine("  AspNetMigrator [options] [Path to project file]");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            Console.WriteLine("  -b, --backup-path <path>       Specifies where the project should be backed");
-            Console.WriteLine("                                 up. Defaults to a new directory next to the");
-            Console.WriteLine("                                 target project's directory.");
-            Console.WriteLine("  -n, --no-backup                Disables backing up the project. This is not");
-            Console.WriteLine("                                 recommended unless the project is in source");
-            Console.WriteLine("                                 control since this tool will make large");
-            Console.WriteLine("                                 changes to both the project and source files");
-            Console.WriteLine("  -d, --diag                     Enables verbose diagnostics.");
-            Console.WriteLine("  -h, --help, -?                 Displays this help message.");
-            Console.WriteLine();
-        }
-
-        private static MigrateOptions ParseArgs(string[] args)
-        {
-            if (args == null || args.Length < 1)
+            public HelpWithHeader(IConsole console)
+                : base(console, maxWidth: DefaultWidth)
             {
-                return null;
             }
 
-            var projectPath = args.Last();
-            var options = new MigrateOptions
+            public override void Write(ICommand command)
             {
-                ProjectPath = projectPath
-            };
+                Console.Out.WriteLine(WrapString("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to an ASP.NET Core project."));
+                Console.Out.WriteLine();
+                Console.Out.WriteLine(WrapString("No tool can completely automate this process and the project *will* have build errors after the tool runs and will require significant manual changes to complete migration."));
+                Console.Out.WriteLine();
+                Console.Out.WriteLine(WrapString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs."));
+                Console.Out.WriteLine();
+                Console.Out.WriteLine(WrapString("NOTE: This tool depends on MSBuild, so it should be run from a developer command prompt."));
+                Console.Out.WriteLine();
 
-            for (var i = 0; i < args.Length - 1; i++)
-            {
-                switch (args[i])
-                {
-                    case "-d":
-                    case "--diag":
-                    case "/d":
-                    case "/diag":
-                        options.Verbose = true;
-                        break;
-                    case "-n":
-                    case "--no-backup":
-                    case "/n":
-                    case "/no-backup":
-                        options.SkipBackup = true;
-                        break;
-                    case "-b":
-                    case "--backup-path":
-                    case "/b":
-                    case "/backup-path":
-                        if (i >= args.Length - 2)
-                        {
-                            Console.WriteLine("ERROR: --backup-path must be followed by a path.");
-                            return null;
-                        }
-
-                        options.BackupPath = args[++i];
-                        break;
-                    case "-h":
-                    case "--help":
-                    case "-?":
-                    case "/h":
-                    case "/help":
-                    case "/?":
-                        return null;
-                    default:
-                        Console.WriteLine($"ERROR: Unknown option: {args[i]}");
-                        return null;
-                }
+                base.Write(command);
             }
-
-            return options;
         }
 
         public static async Task RunMigrationReplAsync()
@@ -313,7 +258,7 @@ namespace AspNetMigrator.ConsoleApp
             Console.ResetColor();
         }
 
-        private static string WrapString(string input, int lineLength = 80)
+        private static string WrapString(string input, int lineLength = DefaultWidth)
         {
             var word = new StringBuilder();
             var ret = new StringBuilder();

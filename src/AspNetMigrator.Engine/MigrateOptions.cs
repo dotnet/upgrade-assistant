@@ -4,7 +4,9 @@ namespace AspNetMigrator.Engine
 {
     public class MigrateOptions
     {
-        public string ProjectPath { get; set; }
+        public FileInfo Project { get; set; }
+
+        public string ProjectPath => Project.FullName;
 
         public string BackupPath { get; set; }
 
