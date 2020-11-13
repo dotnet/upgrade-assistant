@@ -23,11 +23,10 @@ namespace AspNetMigrator.ConsoleApp
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class Program
     {
-        private const int DefaultWidth = 80;
-
         private static IConfiguration Configuration { get; set; }
 
         private static IServiceProvider Services { get; set; }
+
         // the REPL will loop while !_done
         private static bool _done;
 
@@ -90,22 +89,28 @@ namespace AspNetMigrator.ConsoleApp
         private class HelpWithHeader : HelpBuilder
         {
             public HelpWithHeader(IConsole console)
-                : base(console, maxWidth: DefaultWidth)
+                : base(console, maxWidth: 90)
             {
             }
 
             public override void Write(ICommand command)
             {
-                Console.Out.WriteLine(WrapString("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to an ASP.NET Core project."));
-                Console.Out.WriteLine();
-                Console.Out.WriteLine(WrapString("No tool can completely automate this process and the project *will* have build errors after the tool runs and will require significant manual changes to complete migration."));
-                Console.Out.WriteLine();
-                Console.Out.WriteLine(WrapString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs."));
-                Console.Out.WriteLine();
-                Console.Out.WriteLine(WrapString("NOTE: This tool depends on MSBuild, so it should be run from a developer command prompt."));
-                Console.Out.WriteLine();
+                WriteString("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to an ASP.NET Core project.");
+                WriteString("No tool can completely automate this process and the project *will* have build errors after the tool runs and will require significant manual changes to complete migration.");
+                WriteString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
+                WriteString("NOTE: This tool depends on MSBuild, so it should be run from a developer command prompt.");
 
                 base.Write(command);
+            }
+
+            private void WriteString(string input)
+            {
+                foreach (var line in SplitText(input, MaxWidth))
+                {
+                    Console.Out.WriteLine(line);
+                }
+
+                Console.Out.WriteLine();
             }
         }
 
