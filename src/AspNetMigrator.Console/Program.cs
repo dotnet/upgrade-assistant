@@ -9,9 +9,9 @@ using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
+using AspNetMigrator.Engine.GlobalCommands;
 using AspNetMigrator.StartupUpdater;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +28,8 @@ namespace AspNetMigrator.ConsoleApp
         private static IConfiguration Configuration { get; set; }
 
         private static IServiceProvider Services { get; set; }
+        // the REPL will loop while !_done
+        private static bool _done;
 
         public static Task Main(string[] args)
         {
@@ -109,90 +111,53 @@ namespace AspNetMigrator.ConsoleApp
 
         public static async Task RunMigrationReplAsync()
         {
-            var done = false;
             using var scope = Services.CreateScope();
             var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
             await migrator.InitializeAsync();
 
-            while (!done)
+            while (!_done)
             {
                 ShowMigraitonSteps(migrator.Steps);
 
-                var command = GetCommand(migrator.NextStep);
-
-                switch (command)
-                {
-                    case ReplCommand.ApplyNext:
-                        if (!await migrator.ApplyNextStepAsync())
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("No migration step applied");
-                            Console.ResetColor();
-                        }
-
-                        break;
-                    case ReplCommand.SkipNext:
-                        if (!await migrator.SkipNextStepAsync())
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("Skip step failed");
-                            Console.ResetColor();
-                        }
-
-                        break;
-                    case ReplCommand.ConfigureLogging:
-                        Console.WriteLine("Logging configuration not yet implemented.");
-                        break;
-                    case ReplCommand.SeeStepDetails:
-                        if (migrator.NextStep is null)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("No current step to get details for");
-                            Console.ResetColor();
-                        }
-                        else
-                        {
-                            Console.WriteLine();
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine("Current step details");
-                            Console.ResetColor();
-                            Console.WriteLine(WrapString(migrator.NextStep.Description, Console.WindowWidth));
-                            Console.WriteLine();
-                            Console.WriteLine(WrapString(migrator.NextStep.StatusDetails, Console.WindowWidth));
-                            Console.WriteLine();
-                        }
-
-                        break;
-                    case ReplCommand.Exit:
-                        done = true;
-                        break;
-                    default:
-                        Console.WriteLine("Unknown command");
-                        break;
-                }
+                var command = GetCommand(migrator);
+                var commandResultHandler = CommandResultHandlerFactory.GetCommandResult(command?.GetType());
+                var commandResult = await command.ExecuteAsync();
+                commandResultHandler.HandleResult(commandResult);
             }
         }
 
-        private static ReplCommand GetCommand(MigrationStep step)
+        private static void SetProgramIsDone()
         {
-            // TODO - Build this menu dynamically based on available commands
+            _done = true;
+        }
+
+        private static MigrationCommand GetCommand(Migrator migrator)
+        {
+            var listOfCommands = GlobalCommands.GetCommands(migrator, SeeMoreDetailsCommandResultHandler.SendMessageToUserAsync, SetProgramIsDone);
+            if (migrator?.NextStep?.Commands != null)
+            {
+                listOfCommands.InsertRange(0, migrator.NextStep.Commands);
+            }
+
             Console.WriteLine("Choose command");
-            Console.WriteLine($" 1. Apply next step{(step is null ? string.Empty : $" ({step.Title})")}");
-            Console.WriteLine(" 2. Skip next step");
-            Console.WriteLine(" 3. Configure logging");
-            Console.WriteLine(" 4. See more step details");
-            Console.WriteLine(" 5. Exit");
+            for (var i = 0; i < listOfCommands.Count; i++)
+            {
+                Console.WriteLine($" {i + 1}. {listOfCommands[i].CommandText}");
+            }
+
             Console.Write("> ");
 
-            return Console.ReadLine().Trim(' ', '.', '\t') switch
+            var selectedCommandText = Console.ReadLine().Trim(' ', '.', '\t');
+            if (int.TryParse(selectedCommandText, out int selectedCommandIndex))
             {
-                "1" => ReplCommand.ApplyNext,
-                "2" => ReplCommand.SkipNext,
-                "3" => ReplCommand.ConfigureLogging,
-                "4" => ReplCommand.SeeStepDetails,
-                "5" => ReplCommand.Exit,
-                _ => ReplCommand.Unknown
-            };
+                selectedCommandIndex--;
+                if (selectedCommandIndex >= 0 && selectedCommandIndex < listOfCommands.Count)
+                {
+                    return listOfCommands[selectedCommandIndex];
+                }
+            }
+
+            return new UnknownCommand();
         }
 
         private static void ShowMigraitonSteps(IEnumerable<MigrationStep> steps, int offset = 0)
@@ -256,54 +221,6 @@ namespace AspNetMigrator.ConsoleApp
             }
 
             Console.ResetColor();
-        }
-
-        private static string WrapString(string input, int lineLength = DefaultWidth)
-        {
-            var word = new StringBuilder();
-            var ret = new StringBuilder();
-            var index = 0;
-            foreach (var c in input)
-            {
-                switch (c)
-                {
-                    case '\n':
-                    case '\r':
-                        AddWordToRet();
-                        ret.Append(c);
-                        index = 0;
-                        break;
-                    case '\t':
-                        AddWordToRet();
-                        word.Append("    ");
-                        AddWordToRet();
-                        break;
-                    case ' ':
-                        word.Append(c);
-                        AddWordToRet();
-                        break;
-                    default:
-                        word.Append(c);
-                        break;
-                }
-            }
-
-            AddWordToRet();
-
-            return ret.ToString();
-
-            void AddWordToRet()
-            {
-                if (index + word.Length >= lineLength)
-                {
-                    ret.AppendLine();
-                    index = 0;
-                }
-
-                ret.Append(word);
-                index += word.Length;
-                word = new StringBuilder();
-            }
         }
     }
 }

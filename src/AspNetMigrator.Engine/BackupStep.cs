@@ -9,9 +9,10 @@ namespace AspNetMigrator.Engine
     {
         private const string FlagFileName = "migration.backup";
 
-        private readonly string _backupPath;
         private readonly string _projectDir;
         private readonly bool _skipBackup;
+
+        private string _backupPath;
 
         public BackupStep(MigrateOptions options, ILogger logger)
             : base(options, logger)
@@ -22,6 +23,13 @@ namespace AspNetMigrator.Engine
 
             Title = $"Backup project{(_skipBackup ? " [skipped]" : string.Empty)}";
             Description = $"Backup {_projectDir} to {_backupPath}";
+            Commands = new[]
+            {
+                new SetBackupPathCommand(_backupPath, (string newPath) =>
+                {
+                    _backupPath = newPath;
+                })
+            };
         }
 
         protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
@@ -129,5 +137,41 @@ namespace AspNetMigrator.Engine
         }
 
         private static bool IsPathValid(string candidatePath) => !Directory.Exists(candidatePath) || File.Exists(Path.Combine(candidatePath, FlagFileName));
+
+        private class SetBackupPathCommand : MigrationCommand
+        {
+            private readonly string _currentBackupPath;
+            private readonly Action<string> _setBackupPath;
+
+            public SetBackupPathCommand(string currentBackupPath, Action<string> setBackupPath)
+            {
+                _currentBackupPath = currentBackupPath ?? throw new ArgumentNullException(nameof(_currentBackupPath));
+                _setBackupPath = setBackupPath ?? throw new ArgumentNullException(nameof(setBackupPath));
+            }
+
+            // todo - support localization
+            public override string CommandText => "Set path for backup";
+
+            public override Task<bool> ExecuteAsync()
+            {
+//                Console.Write("Current backup path: ");
+//                Console.ForegroundColor = ConsoleColor.Cyan;
+//                Console.WriteLine(currentBackupPath);
+//                Console.ResetColor();
+//#pragma warning disable CA1303 // Do not pass literals as localized parameters
+//                Console.WriteLine("Please specify the new path and then press {enter} to continue");
+//#pragma warning restore CA1303 // Do not pass literals as localized parameters
+
+//                var newPath = Console.ReadLine();
+//                if (string.IsNullOrWhiteSpace(newPath))
+//                {
+//                    newPath = currentBackupPath;
+//                }
+
+//                setBackupPath(newPath);
+
+                return Task.FromResult(false);
+            }
+        }
     }
 }

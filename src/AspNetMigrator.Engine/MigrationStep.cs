@@ -31,6 +31,8 @@ namespace AspNetMigrator.Engine
 
         public virtual MigrationStep ParentStep { get; protected set; }
 
+        public virtual IEnumerable<MigrationCommand> Commands { get; set; }
+
         public virtual IEnumerable<MigrationStep> SubSteps { get; protected set; } = Enumerable.Empty<MigrationStep>();
 
         public MigrationStepStatus Status { get; private set; }
