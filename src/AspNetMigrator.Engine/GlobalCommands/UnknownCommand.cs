@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine.GlobalCommands
@@ -8,7 +9,7 @@ namespace AspNetMigrator.Engine.GlobalCommands
         // todo - support localization
         public override string CommandText => "Unknown command";
 
-        public override Task<bool> ExecuteAsync(Migrator migrator)
+        public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
             return Task.FromResult(true);
         }

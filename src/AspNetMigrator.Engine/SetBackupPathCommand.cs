@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine
@@ -19,7 +20,7 @@ namespace AspNetMigrator.Engine
         // todo - support localization
         public override string CommandText => "Set path for backup";
 
-        public async override Task<bool> ExecuteAsync(Migrator migrator)
+        public async override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
             var newBackupPath = await _collectUserInput(_currentBackupPath).ConfigureAwait(false);
             if (string.IsNullOrWhiteSpace(newBackupPath))

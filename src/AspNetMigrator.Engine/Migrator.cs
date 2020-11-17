@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.MSBuild;
 
 namespace AspNetMigrator.Engine
 {
@@ -29,15 +29,11 @@ namespace AspNetMigrator.Engine
             Logger = logger ?? new NullLogger();
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(IMigrationContext context, CancellationToken token)
         {
             Logger.Verbose("Initializing migrator");
 
-            // Register correct MSBuild for use with SDK-style projects
-            var msBuildPath = MSBuildHelper.RegisterMSBuildInstance();
-            Logger.Verbose("MSBuild registered from {MSBuildPath}", msBuildPath);
-
-            await InitializeNextStepAsync(_steps).ConfigureAwait(false);
+            await InitializeNextStepAsync(_steps, context, token).ConfigureAwait(false);
 
             _initialized = true;
             Logger.Verbose("Initialization complete");
@@ -62,7 +58,7 @@ namespace AspNetMigrator.Engine
             return null;
         }
 
-        public async Task<bool> SkipNextStepAsync()
+        public async Task<bool> SkipNextStepAsync(IMigrationContext context, CancellationToken token)
         {
             Logger.Verbose("Skipping next migration step");
 
@@ -78,7 +74,7 @@ namespace AspNetMigrator.Engine
             if (await nextStep.SkipAsync().ConfigureAwait(false))
             {
                 Logger.Information("Migration step {StepTitle} skipped", nextStep.Title);
-                await InitializeNextStepAsync(Steps).ConfigureAwait(false);
+                await InitializeNextStepAsync(Steps, context, token).ConfigureAwait(false);
                 return true;
             }
             else
@@ -88,7 +84,7 @@ namespace AspNetMigrator.Engine
             }
         }
 
-        public async Task<bool> ApplyNextStepAsync()
+        public async Task<bool> ApplyNextStepAsync(IMigrationContext context, CancellationToken token)
         {
             Logger.Verbose("Applying next migration step");
 
@@ -100,12 +96,12 @@ namespace AspNetMigrator.Engine
             }
 
             Logger.Information("Applying migration step {StepTitle}", nextStep.Title);
-            var success = await nextStep.ApplyAsync().ConfigureAwait(false);
+            var success = await nextStep.ApplyAsync(context, token).ConfigureAwait(false);
 
             if (success)
             {
                 Logger.Information("Migration step {StepTitle} applied successfully", nextStep.Title);
-                await InitializeNextStepAsync(Steps).ConfigureAwait(false);
+                await InitializeNextStepAsync(Steps, context, token).ConfigureAwait(false);
                 return true;
             }
             else
@@ -115,7 +111,7 @@ namespace AspNetMigrator.Engine
             }
         }
 
-        private async Task InitializeNextStepAsync(IEnumerable<MigrationStep> steps)
+        private async Task InitializeNextStepAsync(IEnumerable<MigrationStep> steps, IMigrationContext context, CancellationToken token)
         {
             if (steps is null)
             {
@@ -128,7 +124,7 @@ namespace AspNetMigrator.Engine
                 if (step.Status == MigrationStepStatus.Unknown)
                 {
                     Logger.Verbose("Initializing migration step {StepTitle}", step.Title);
-                    await step.InitializeAsync().ConfigureAwait(false);
+                    await step.InitializeAsync(context, token).ConfigureAwait(false);
                     if (step.Status == MigrationStepStatus.Unknown)
                     {
                         Logger.Error("Migration step initialization failed for step {StepTitle}", step.Title);

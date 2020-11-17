@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Exceptions;
@@ -33,7 +34,7 @@ namespace AspNetMigrator.Engine
             Description = $"Convert {options.ProjectPath} to an SDK-style project with try-convert";
         }
 
-        protected async override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
+        protected async override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (!File.Exists(Options.ProjectPath))
             {
@@ -68,7 +69,7 @@ namespace AspNetMigrator.Engine
             tryConvertProcess.Start();
             tryConvertProcess.BeginOutputReadLine();
             tryConvertProcess.BeginErrorReadLine();
-            await tryConvertProcess.WaitForExitAsync().ConfigureAwait(false);
+            await tryConvertProcess.WaitForExitAsync(token).ConfigureAwait(false);
 
             if (tryConvertProcess.ExitCode != 0)
             {
@@ -82,7 +83,7 @@ namespace AspNetMigrator.Engine
             }
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             try
             {

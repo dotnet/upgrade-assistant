@@ -1,13 +1,43 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Threading;
+using System.Threading.Tasks;
+using AspNetMigrator.Engine;
 using Microsoft.Build.Locator;
 
 namespace AspNetMigrator.MSBuild
 {
-    public static class MSBuildHelper
+    public class MSBuildRegistrationStartup : IMigrationStartup
     {
+        private readonly ILogger _logger;
+
+        public MSBuildRegistrationStartup(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public Task<bool> StartupAsync(CancellationToken token)
+        {
+            // Register correct MSBuild for use with SDK-style projects
+            try
+            {
+                var msBuildPath = RegisterMSBuildInstance();
+                _logger.Information("MSBuild registered from {MSBuildPath}", msBuildPath);
+
+                return Task.FromResult(true);
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
+            {
+                _logger.Error("Unexpected error registering MSBuild {Exception}", e);
+                return Task.FromResult(false);
+            }
+        }
+
         public static string RegisterMSBuildInstance()
         {
             // TODO : Harden this and allow MSBuild location to be read from env vars.

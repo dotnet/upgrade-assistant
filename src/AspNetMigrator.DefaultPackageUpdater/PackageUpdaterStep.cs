@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Exceptions;
@@ -47,7 +48,7 @@ namespace AspNetMigrator.Engine
         // TODO : This does not currently update package dependencies, so it's easy to get into a state where package versions conflict.
         //        This should be updated to more robustly handle dependencies, either by including dependency information in the config (which
         //        would require a fair bit of work) or by determining dependencies at runtime.
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (!File.Exists(PackageMapPath))
             {
@@ -134,7 +135,7 @@ namespace AspNetMigrator.Engine
             }
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (!File.Exists(PackageMapPath))
             {
@@ -146,7 +147,7 @@ namespace AspNetMigrator.Engine
             Logger.Information("Loading package maps from {PackageMapPath}", PackageMapPath);
             using (var config = File.OpenRead(PackageMapPath))
             {
-                _packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config).ConfigureAwait(false);
+                _packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
             }
 
             Logger.Verbose("Loaded {MapCount} package maps", _packageMaps.Count());

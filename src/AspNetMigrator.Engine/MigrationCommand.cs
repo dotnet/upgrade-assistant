@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine
 {
@@ -7,7 +8,7 @@ namespace AspNetMigrator.Engine
         /// <summary>
         /// A command that can be executed.
         /// </summary>
-        public abstract Task<bool> ExecuteAsync(Migrator migrator);
+        public abstract Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token);
 
         /// <summary>
         /// Gets the text displayed to the user from the REPL (e.g. Set Backup Path).

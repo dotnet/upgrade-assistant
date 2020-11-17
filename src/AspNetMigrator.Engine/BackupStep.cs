@@ -39,7 +39,7 @@ namespace AspNetMigrator.Engine
             return _backupPath;
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (_skipBackup)
             {
@@ -58,7 +58,7 @@ namespace AspNetMigrator.Engine
             }
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (_skipBackup)
             {
@@ -84,7 +84,7 @@ namespace AspNetMigrator.Engine
 
                 await CopyDirectoryAsync(_projectDir, _backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
-                await File.WriteAllTextAsync(Path.Combine(_backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})").ConfigureAwait(false);
+                await File.WriteAllTextAsync(Path.Combine(_backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
                 Logger.Information("Project backed up to {BackupPath}", _backupPath);
                 return (MigrationStepStatus.Complete, "Backup completed successfully");
             }

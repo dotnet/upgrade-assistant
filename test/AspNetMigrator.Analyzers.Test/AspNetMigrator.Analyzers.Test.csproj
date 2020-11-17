@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\src\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
     <ProjectReference Include="..\..\src\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\..\src\AspNetMigrator.DefaultSourceUpdater\AspNetMigrator.DefaultSourceUpdater.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
   </ItemGroup>
 
 </Project>

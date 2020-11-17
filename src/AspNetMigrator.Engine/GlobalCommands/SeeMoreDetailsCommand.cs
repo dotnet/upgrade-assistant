@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine.GlobalCommands
@@ -18,8 +19,10 @@ namespace AspNetMigrator.Engine.GlobalCommands
         // todo - support localization
         public override string CommandText => "See more step details";
 
-        public override async Task<bool> ExecuteAsync(Migrator migrator)
+        public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
+            var migrator = context?.Migrator;
+
             if (migrator is null)
             {
                 throw new ArgumentNullException(nameof(migrator));

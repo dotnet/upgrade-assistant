@@ -55,7 +55,7 @@ namespace AspNetMigrator.Engine
             Description = $"Update source files in {options.ProjectPath} to automatically fix migration analyzer {DiagnosticId}";
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             Logger.Verbose("Identified {DiagnosticCount} fixable {DiagnosticId} diagnostics", Diagnostics.Count(), DiagnosticId);
 
@@ -65,7 +65,7 @@ namespace AspNetMigrator.Engine
                 Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Complete, null));
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             // Access Diagnostics.FirstOrDefault each time (instead of iterating through the diagnostics) since
             // the remaining diagnostics change each time one is fixed.
@@ -79,7 +79,7 @@ namespace AspNetMigrator.Engine
                     Logger.Error("Failed to fix diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
                     return (MigrationStepStatus.Failed, $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}");
                 }
-                else if (!await _sourceUpdater.UpdateSolutionAsync(updatedSolution).ConfigureAwait(false))
+                else if (!await _sourceUpdater.UpdateSolutionAsync(updatedSolution, context, token).ConfigureAwait(false))
                 {
                     Logger.Error("Failed to apply changes after fixing {DiagnosticId} to {FilePath}", diagnostic.Id, doc.FilePath);
                     return (MigrationStepStatus.Failed, $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}");

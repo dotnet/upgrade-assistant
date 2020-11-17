@@ -92,7 +92,7 @@ namespace AspNetMigrator.Analyzers.Test
         [AssemblyInitialize]
         public static void Initialize(TestContext context)
         {
-            MSBuildHelper.RegisterMSBuildInstance();
+            MSBuildRegistrationStartup.RegisterMSBuildInstance();
         }
 
         // No diagnostics expected to show up

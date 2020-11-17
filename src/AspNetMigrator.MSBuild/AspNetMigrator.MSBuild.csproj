@@ -6,5 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.2.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.3.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj" />
+  </ItemGroup>
+
 </Project>

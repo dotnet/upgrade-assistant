@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.MSBuild;
 
 namespace AspNetMigrator.Engine
 {
@@ -18,7 +18,7 @@ namespace AspNetMigrator.Engine
     public class SourceUpdaterStep : MigrationStep
     {
         private const string AspNetMigratorAnalyzerPrefix = "AM";
-        private MSBuildWorkspace _workspace;
+        private Workspace _workspace;
         private ProjectId _projectId;
 
         internal IEnumerable<Diagnostic> Diagnostics { get; set; }
@@ -45,8 +45,13 @@ namespace AspNetMigrator.Engine
             SubSteps = new List<MigrationStep>(AspNetCoreMigrationCodeFixers.AllCodeFixProviders.Select(fixer => new CodeFixerStep(this, fixer, options, logger)));
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (!File.Exists(Options.ProjectPath))
             {
                 Logger.Fatal("Project file {ProjectPath} not found", Options.ProjectPath);
@@ -54,16 +59,16 @@ namespace AspNetMigrator.Engine
             }
 
             Logger.Verbose("Opening project {ProjectPath}", Options.ProjectPath);
-            _workspace = MSBuildWorkspace.Create();
-            var project = await _workspace.OpenProjectAsync(Options.ProjectPath).ConfigureAwait(false);
-            _projectId = project.Id;
+
+            _workspace = await context.GetWorkspaceAsync(token).ConfigureAwait(false);
+            _projectId = await context.GetProjectIdAsync(token).ConfigureAwait(false);
 
             await GetDiagnosticsAsync().ConfigureAwait(false);
 
             foreach (var step in SubSteps)
             {
                 // Update substep status based on new diagnostic information
-                await step.InitializeAsync().ConfigureAwait(false);
+                await step.InitializeAsync(context, token).ConfigureAwait(false);
             }
 
             return Diagnostics.Any() ?
@@ -88,12 +93,12 @@ namespace AspNetMigrator.Engine
             Logger.Verbose("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync() =>
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
             Task.FromResult(Diagnostics.Any() ?
                 (MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
                 (MigrationStepStatus.Complete, null));
 
-        internal async Task<bool> UpdateSolutionAsync(Solution updatedSolution)
+        internal async Task<bool> UpdateSolutionAsync(Solution updatedSolution, IMigrationContext context, CancellationToken token)
         {
             if (_workspace.TryApplyChanges(updatedSolution))
             {
@@ -110,7 +115,7 @@ namespace AspNetMigrator.Engine
                 // source updater step after all children have applied their changes.
                 if (!Diagnostics.Any())
                 {
-                    await ApplyAsync().ConfigureAwait(false);
+                    await ApplyAsync(context, token).ConfigureAwait(false);
                 }
 
                 return true;

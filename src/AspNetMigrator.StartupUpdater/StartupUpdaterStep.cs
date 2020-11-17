@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using Microsoft.Build.Construction;
@@ -50,7 +51,7 @@ namespace AspNetMigrator.StartupUpdater
             Description = $"Add template Program.cs, Startup.cs, and configuration files to {options.ProjectPath}";
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync()
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             try
             {
@@ -123,7 +124,7 @@ namespace AspNetMigrator.StartupUpdater
             }
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync()
+        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (!File.Exists(Options.ProjectPath))
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine.GlobalCommands;
 
@@ -47,26 +48,26 @@ namespace AspNetMigrator.Engine
         /// <summary>
         /// Implementers should use this method to initialize Status and any other state needed.
         /// </summary>
-        protected abstract Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync();
+        protected abstract Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token);
 
         /// <summary>
         /// Implementers should use this method to apply the migration step and return updated status and status details.
         /// </summary>
-        protected abstract Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync();
+        protected abstract Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token);
 
         /// <summary>
         /// Initialize the migration step, including checking whether it is already complete and setting up necessary internal state.
         /// </summary>
-        public virtual async Task InitializeAsync()
+        public virtual async Task InitializeAsync(IMigrationContext context, CancellationToken token)
         {
-            (Status, StatusDetails) = await InitializeImplAsync().ConfigureAwait(false);
+            (Status, StatusDetails) = await InitializeImplAsync(context, token).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Apply migration and update Status as necessary.
         /// </summary>
         /// <returns>True if the migration step was successfully applied or false if migration failed.</returns>
-        public virtual async Task<bool> ApplyAsync()
+        public virtual async Task<bool> ApplyAsync(IMigrationContext context, CancellationToken token)
         {
             if (!Initialized)
             {
@@ -78,7 +79,7 @@ namespace AspNetMigrator.Engine
                 return true;
             }
 
-            (Status, StatusDetails) = await ApplyImplAsync().ConfigureAwait(false);
+            (Status, StatusDetails) = await ApplyImplAsync(context, token).ConfigureAwait(false);
 
             return Status == MigrationStepStatus.Complete;
         }

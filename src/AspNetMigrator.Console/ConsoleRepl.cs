@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using AspNetMigrator.Engine.GlobalCommands;
+using AspNetMigrator.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -17,23 +18,55 @@ namespace AspNetMigrator.ConsoleApp
     public class ConsoleRepl : IHostedService
     {
         private readonly IServiceProvider _services;
+        private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
 
         // the REPL will loop while !_done
         private bool _done;
 
-        public ConsoleRepl(IServiceProvider services, IHostApplicationLifetime lifetime)
+        public ConsoleRepl(ILogger logger, IServiceProvider services, IHostApplicationLifetime lifetime)
         {
+            _logger = logger;
             _lifetime = lifetime;
             _services = services;
         }
 
         public async Task StartAsync(CancellationToken token)
         {
+            if (await RunStartupTasks(token))
+            {
+                await RunRepl(token);
+            }
+            else
+            {
+                _logger.Error("Error encountered while starting migration");
+            }
+
+            _lifetime.StopApplication();
+        }
+
+        private async Task<bool> RunStartupTasks(CancellationToken token)
+        {
+            var startupTasks = _services.GetRequiredService<IEnumerable<IMigrationStartup>>()
+                         .Select(m => m.StartupAsync(token));
+            var completion = await Task.WhenAll(startupTasks);
+
+            return completion.All(t => t);
+        }
+
+        private async Task RunRepl(CancellationToken token)
+        {
             using var scope = _services.CreateScope();
+            var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
             var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
             var handlerFactory = scope.ServiceProvider.GetRequiredService<CommandResultHandlerFactory>();
-            await migrator.InitializeAsync();
+
+            using var context = new MSBuildWorkspaceMigrationContext(options.ProjectPath)
+            {
+                Migrator = migrator,
+            };
+
+            await migrator.InitializeAsync(context, token);
 
             while (!_done)
             {
@@ -41,7 +74,7 @@ namespace AspNetMigrator.ConsoleApp
 
                 var command = GetCommand(migrator);
                 var commandResultHandler = handlerFactory.GetHandler(command?.GetType());
-                var commandResult = await command.ExecuteAsync(migrator);
+                var commandResult = await command.ExecuteAsync(context, token);
                 commandResultHandler.HandleResult(commandResult);
             }
 
@@ -71,7 +104,14 @@ namespace AspNetMigrator.ConsoleApp
 
             Console.Write("> ");
 
-            var selectedCommandText = Console.ReadLine().Trim(' ', '.', '\t');
+            var result = Console.ReadLine();
+
+            if (result is null)
+            {
+                return new ExitCommand(SetProgramIsDone);
+            }
+
+            var selectedCommandText = result.Trim(' ', '.', '\t');
             if (int.TryParse(selectedCommandText, out int selectedCommandIndex))
             {
                 selectedCommandIndex--;

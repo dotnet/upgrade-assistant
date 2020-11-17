@@ -8,6 +8,7 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
+using AspNetMigrator.MSBuild;
 using AspNetMigrator.StartupUpdater;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,6 +51,9 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<ICommandResultHandler, SetBackupPathCommandResultHandler>();
                     services.AddScoped<ICommandResultHandler, UnknownCommandResultHandler>();
                     services.AddScoped<ICommandResultHandler, ExitCommandResultHandler>();
+
+                    // Add up start up initializer
+                    services.AddTransient<IMigrationStartup, MSBuildRegistrationStartup>();
 
                     // Add steps
                     services.AddScoped<BackupStep>(); // used by SetBackupPathCommandResultHandler

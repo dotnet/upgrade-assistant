@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine.GlobalCommands
@@ -8,14 +9,16 @@ namespace AspNetMigrator.Engine.GlobalCommands
         // todo - support localization
         public override string CommandText => "Skip next step";
 
-        public override async Task<bool> ExecuteAsync(Migrator migrator)
+        public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
-            if (migrator is null)
+            if (context is null)
             {
-                throw new ArgumentNullException(nameof(migrator));
+                throw new ArgumentNullException(nameof(context));
             }
 
-            return migrator != null && !await migrator.SkipNextStepAsync().ConfigureAwait(false);
+            var migrator = context.Migrator;
+
+            return migrator != null && !await migrator.SkipNextStepAsync(context, token).ConfigureAwait(false);
         }
     }
 }
