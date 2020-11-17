@@ -18,7 +18,7 @@ namespace TestProject
     {
         // Path relative from .\bin\debug\net5.0
         // TODO : Make this configurable so the test can pass from other working dirs
-        private const string TestProjectPath = @"..\..\..\..\TestProject\TestProject.csproj";
+        internal const string TestProjectPath = @"..\..\..\..\TestProject\TestProject.csproj";
 
         public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
         {

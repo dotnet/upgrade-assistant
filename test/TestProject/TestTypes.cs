@@ -4,4 +4,6 @@
     {
         public MvcHtmlString(string s) { }
     }
+
+    public class ResultExecutingContext { }
 }

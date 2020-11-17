@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TestProject.TestClasses
@@ -13,7 +12,7 @@ namespace TestProject.TestClasses
 
         public void OnResultExecuting(ResultExecutingContext filterContext)
         {
-            ResultExecutingContext x = (ResultExecutingContext)new ResultExecutingContext();
+            ResultExecutingContext x = (ResultExecutingContext)new TestProject.MyNamespace.ResultExecutingContext();
             throw new NotImplementedException();
         }
     }

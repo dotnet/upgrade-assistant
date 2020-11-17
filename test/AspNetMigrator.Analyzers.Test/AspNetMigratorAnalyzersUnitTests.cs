@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AspNetMigrator.MSBuild;
+using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -55,16 +58,15 @@ namespace AspNetMigrator.Analyzers.Test
                 "AM0004",
                 new[]
                 {
-                    new ExpectedDiagnostic("AM0004", new TextSpan(105, 13)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(164, 21)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(314, 22)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(380, 22)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(412, 22)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(443, 22)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(567, 21)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(644, 22)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(794, 13)),
-                    new ExpectedDiagnostic("AM0004", new TextSpan(869, 21))
+                    new ExpectedDiagnostic("AM0004", new TextSpan(97, 13)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(171, 21)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(336, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(402, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(434, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(624, 21)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(716, 22)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(866, 13)),
+                    new ExpectedDiagnostic("AM0004", new TextSpan(941, 21))
                 }
             },
             {
@@ -92,7 +94,23 @@ namespace AspNetMigrator.Analyzers.Test
         [AssemblyInitialize]
         public static void Initialize(TestContext context)
         {
+            // Register MSBuild
             MSBuildRegistrationStartup.RegisterMSBuildInstance();
+
+            // Make sure the TestProject's dependencies are restored
+            RestoreTestProjectPackages();
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)] // MSBuild resolver must be registered before this is JIT'd
+        private static void RestoreTestProjectPackages()
+        {
+            var testProject = new ProjectInstance(TestHelper.TestProjectPath);
+            var restoreRequest = new BuildRequestData(testProject, new[] { "Restore" });
+            var restoreResult = BuildManager.DefaultBuildManager.Build(new BuildParameters(), restoreRequest);
+            if (restoreResult.OverallResult != BuildResultCode.Success)
+            {
+                throw new InvalidOperationException("TestProject restore failed", restoreResult.Exception);
+            }
         }
 
         // No diagnostics expected to show up

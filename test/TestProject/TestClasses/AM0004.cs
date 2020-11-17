@@ -1,25 +1,24 @@
 ﻿using System;
-using System.Web.Mvc;
 
 namespace TestProject.TestClasses
 {
-    public class AM0004A : IResultFilter
+    public class AM0004A : System.Web.Mvc.IResultFilter
     {
-        public void OnResultExecuted(ResultExecutedContext filterContext)
+        public void OnResultExecuted(System.Web.Mvc.ResultExecutedContext filterContext)
         {
             throw new NotImplementedException();
         }
 
-        public void OnResultExecuting(ResultExecutingContext filterContext)
+        public void OnResultExecuting(System.Web.Mvc.ResultExecutingContext filterContext)
         {
-            Foo.ResultExecutingContext x = (Foo.ResultExecutingContext)new Bar.ResultExecutingContext();
+            Foo.ResultExecutingContext x = (Foo.ResultExecutingContext)new TestProject.MyNamespace.ResultExecutingContext();
             throw new NotImplementedException();
         }
     }
 
-    public class AM0004B : ActionFilterAttribute
+    public class AM0004B : System.Web.Mvc.ActionFilterAttribute
     {
-        public override void OnActionExecuting(ActionExecutingContext context)
+        public override void OnActionExecuting(System.Web.Mvc.ActionExecutingContext context)
         {
             Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext a = null;
             var x = this as IActionFilter;
