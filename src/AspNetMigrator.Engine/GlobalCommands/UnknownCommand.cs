@@ -8,7 +8,7 @@ namespace AspNetMigrator.Engine.GlobalCommands
         // todo - support localization
         public override string CommandText => "Unknown command";
 
-        public override Task<bool> ExecuteAsync()
+        public override Task<bool> ExecuteAsync(Migrator migrator)
         {
             return Task.FromResult(true);
         }

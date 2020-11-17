@@ -6,24 +6,19 @@ namespace AspNetMigrator.Engine.GlobalCommands
 {
     public static class GlobalCommands
     {
-        public static List<MigrationCommand> GetCommands(Migrator migrator, Func<UserMessage, Task> sendMessageToUser, Action exitAction = null)
+        public static List<MigrationCommand> GetCommands(Func<List<UserMessage>, Task> sendMessageToUser, Action exitAction = null)
         {
-            if (migrator is null)
-            {
-                throw new ArgumentNullException(nameof(migrator));
-            }
-
             if (exitAction is null)
             {
                 exitAction = DefaultExitAction;
             }
 
             var listOfCommands = new List<MigrationCommand>();
-            listOfCommands.Add(new ApplyNextCommand(migrator));
-            listOfCommands.Add(new SkipNextCommand(migrator));
+            listOfCommands.Add(new SkipNextCommand());
             listOfCommands.Add(new ConfigureLoggingCommand());
-            listOfCommands.Add(new SeeMoreDetailsCommand(migrator, sendMessageToUser));
+            listOfCommands.Add(new SeeMoreDetailsCommand(sendMessageToUser));
             listOfCommands.Add(new ExitCommand(exitAction));
+
             return listOfCommands;
         }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine.GlobalCommands
 {
@@ -8,7 +7,7 @@ namespace AspNetMigrator.Engine.GlobalCommands
         // todo - support localization
         public override string CommandText => "Configure logging";
 
-        public override Task<bool> ExecuteAsync()
+        public override Task<bool> ExecuteAsync(Migrator migrator)
         {
             return Task.FromResult(false);
         }

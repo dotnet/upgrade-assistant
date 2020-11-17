@@ -1,39 +1,51 @@
 ﻿using System;
-using AspNetMigrator.Engine.GlobalCommands;
+using System.Collections.Generic;
 
 namespace AspNetMigrator.ConsoleApp
 {
-    public static class CommandResultHandlerFactory
+    public class CommandResultHandlerFactory
     {
-        public static CommandResultHandler GetCommandResult(Type command)
-        {
-            if (command == null)
-                throw new ArgumentNullException(nameof(command));
+        private readonly Dictionary<Type, ICommandResultHandler> _handlerMap;
+        private readonly ICommandResultHandler _defaultHandler;
 
-            if (typeof(ApplyNextCommand) == command.GetType())
+        public CommandResultHandlerFactory(IEnumerable<ICommandResultHandler> commandResultHandlers, ICommandResultHandler defaultCommandResultHandler)
+        {
+            if (commandResultHandlers is null)
             {
-                return new ApplyNextCommandResultHandler();
+                throw new ArgumentNullException(nameof(commandResultHandlers));
             }
-            else if (typeof(ConfigureLoggingCommand) == command.GetType())
+
+            _defaultHandler = defaultCommandResultHandler;
+            _handlerMap = CreateHandlerMap(commandResultHandlers);
+        }
+
+        private static Dictionary<Type, ICommandResultHandler> CreateHandlerMap(IEnumerable<ICommandResultHandler> commandResultHandlers)
+        {
+            var map = new Dictionary<Type, ICommandResultHandler>();
+            foreach (var handler in commandResultHandlers)
             {
-                return new ConfigureLoggingCommandResultHandler();
+                var commandType = handler.GetTypeOfCommand();
+                if (map.ContainsKey(commandType))
+                {
+                    throw new InvalidOperationException($"The type {commandType.Name} has already been registered.");
+                }
+                else
+                {
+                    map.Add(commandType, handler);
+                }
             }
-            else if (typeof(SeeMoreDetailsCommand) == command.GetType())
+
+            return map;
+        }
+
+        public ICommandResultHandler GetHandler(Type typeOfCommand)
+        {
+            if (_handlerMap.ContainsKey(typeOfCommand))
             {
-                return new SeeMoreDetailsCommandResultHandler();
+                return _handlerMap[typeOfCommand];
             }
-            else if (typeof(SkipNextCommand) == command.GetType())
-            {
-                return new SkipNextCommandResultHandler();
-            }
-            else if (typeof(SetBackupPathCommandResultHandler) == command.GetType())
-            {
-                return new SetBackupPathCommandResultHandler();
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(command));
-            }
+
+            return _defaultHandler;
         }
     }
 }

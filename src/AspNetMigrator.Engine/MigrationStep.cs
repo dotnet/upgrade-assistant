@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetMigrator.Engine.GlobalCommands;
 
 namespace AspNetMigrator.Engine
 {
@@ -23,6 +24,10 @@ namespace AspNetMigrator.Engine
             Options = options;
             Logger = logger ?? new NullLogger();
             Status = MigrationStepStatus.Unknown;
+            Commands = new List<MigrationCommand>
+            {
+                new ApplyNextCommand(new Lazy<string>(() => Title))
+            };
         }
 
         public virtual string Title { get; protected set; }
@@ -31,7 +36,7 @@ namespace AspNetMigrator.Engine
 
         public virtual MigrationStep ParentStep { get; protected set; }
 
-        public virtual IEnumerable<MigrationCommand> Commands { get; set; }
+        public virtual List<MigrationCommand> Commands { get; set; }
 
         public virtual IEnumerable<MigrationStep> SubSteps { get; protected set; } = Enumerable.Empty<MigrationStep>();
 

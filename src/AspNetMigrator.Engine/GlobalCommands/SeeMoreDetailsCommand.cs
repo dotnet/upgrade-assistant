@@ -1,81 +1,75 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine.GlobalCommands
 {
-    public enum UserMessageCategory
-    {
-        None, // console default color
-        Info, // cyan
-        Warning // yellow
-    }
-
-    public class UserMessage
-    {
-        public string Message { get; set; }
-
-        public UserMessageCategory Category { get; set; }
-    }
-
     public class SeeMoreDetailsCommand : MigrationCommand
     {
-        private readonly Func<UserMessage, Task> _sendMessageToUserAsync;
-        private readonly Migrator _migrator;
+        private readonly Func<List<UserMessage>, Task> _sendMessageToUserAsync;
 
         // todo - support localization
-        public SeeMoreDetailsCommand(Migrator migrator, Func<UserMessage, Task> sendMessageToUserAsync)
+        public SeeMoreDetailsCommand(Func<List<UserMessage>, Task> sendMessageToUserAsync)
         {
             // todo - something that handles a list of UserMessages
-            _migrator = migrator ?? throw new ArgumentNullException(nameof(migrator));
             _sendMessageToUserAsync = sendMessageToUserAsync ?? throw new ArgumentNullException(nameof(sendMessageToUserAsync));
         }
 
         // todo - support localization
         public override string CommandText => "See more step details";
 
-        public override async Task<bool> ExecuteAsync()
+        public override async Task<bool> ExecuteAsync(Migrator migrator)
         {
+            if (migrator is null)
+            {
+                throw new ArgumentNullException(nameof(migrator));
+            }
+
+            var listOfMessages = new List<UserMessage>();
+
             // try
             // {
-                if (_migrator.NextStep is null)
+            if (migrator.NextStep is null)
+            {
+                listOfMessages.Add(new UserMessage
                 {
-                    await _sendMessageToUserAsync(new UserMessage
-                    {
-                        Category = UserMessageCategory.Warning,
-                        Message = "No current step to get details for"
-                    }).ConfigureAwait(false);
+                    Category = UserMessageCategory.Warning,
 
-                    return true;
-                }
-                else
+                    // todo - support localization
+                    Message = "No current step to get details for"
+                });
+            }
+            else
+            {
+                listOfMessages.Add(new UserMessage
                 {
-                    await _sendMessageToUserAsync(new UserMessage
-                    {
-                        Category = UserMessageCategory.None,
-                        Message = string.Empty
-                    }).ConfigureAwait(false);
+                    Category = UserMessageCategory.None,
+                    Message = string.Empty
+                });
 
-                    await _sendMessageToUserAsync(new UserMessage
-                    {
-                        Category = UserMessageCategory.Info,
-                        Message = "Current step details"
-                    }).ConfigureAwait(false);
+                listOfMessages.Add(new UserMessage
+                {
+                    Category = UserMessageCategory.Info,
 
-                    await _sendMessageToUserAsync(new UserMessage
-                    {
-                        Category = UserMessageCategory.None,
-                        Message = _migrator.NextStep.Description,
-                    }).ConfigureAwait(false);
+                    // todo - support localization
+                    Message = "Current step details"
+                });
 
-                    await _sendMessageToUserAsync(new UserMessage
-                    {
-                        Category = UserMessageCategory.None,
-                        Message = _migrator.NextStep.StatusDetails,
-                    }).ConfigureAwait(false);
+                listOfMessages.Add(new UserMessage
+                {
+                    Category = UserMessageCategory.None,
+                    Message = migrator.NextStep.Description,
+                });
 
-                    return true;
-                }
+                listOfMessages.Add(new UserMessage
+                {
+                    Category = UserMessageCategory.None,
+                    Message = migrator.NextStep.StatusDetails,
+                });
+            }
+
+            await _sendMessageToUserAsync(listOfMessages).ConfigureAwait(false);
+            return true;
 
             // }
             // catch (Exception ex)
@@ -84,6 +78,5 @@ namespace AspNetMigrator.Engine.GlobalCommands
             //    return false;
             // }
         }
-
     }
 }

@@ -15,7 +15,7 @@ namespace AspNetMigrator.Engine.GlobalCommands
         // todo - support localization
         public override string CommandText => "Exit";
 
-        public override Task<bool> ExecuteAsync()
+        public override Task<bool> ExecuteAsync(Migrator migrator)
         {
             _stopTheProgram();
             return Task.FromResult(true);

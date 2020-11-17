@@ -6,19 +6,24 @@ namespace AspNetMigrator.Engine.GlobalCommands
     // todo - rearrange the usage of the command to remove the dependency on Migrator
     public class ApplyNextCommand : MigrationCommand
     {
-        private readonly Migrator _migrator;
+        private readonly Lazy<string> _stepName;
 
-        public ApplyNextCommand(Migrator migrator)
+        public ApplyNextCommand(Lazy<string> stepName)
         {
-            _migrator = migrator ?? throw new ArgumentNullException(nameof(migrator));
+            _stepName = stepName ?? throw new ArgumentNullException(nameof(stepName));
         }
 
         // todo - support localization
-        public override string CommandText => $"Apply next step {(_migrator?.NextStep is null ? string.Empty : $" ({_migrator.NextStep.Title})")}";
+        public override string CommandText => $"Apply next step {{{_stepName.Value}}}";
 
-        public override async Task<bool> ExecuteAsync()
+        public override async Task<bool> ExecuteAsync(Migrator migrator)
         {
-            return await _migrator.ApplyNextStepAsync().ConfigureAwait(false);
+            if (migrator is null)
+            {
+                throw new ArgumentNullException(nameof(migrator));
+            }
+
+            return await migrator.ApplyNextStepAsync().ConfigureAwait(false);
         }
     }
 }

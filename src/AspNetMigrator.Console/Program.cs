@@ -56,12 +56,23 @@ namespace AspNetMigrator.ConsoleApp
         private static IServiceProvider BuildDIContainer(MigrateOptions options)
         {
             var services = new ServiceCollection();
+            services.AddTransient<ICollectUserInput, CollectBackupPathFromConsole>();
+            services.AddScoped<CommandResultHandlerFactory>();
+            services.AddScoped<ICommandResultHandler, ApplyNextCommandResultHandler>();
+            services.AddScoped<ICommandResultHandler, ConfigureLoggingCommandResultHandler>();
+            services.AddScoped<ICommandResultHandler, SeeMoreDetailsCommandResultHandler>();
+            services.AddScoped<ICommandResultHandler, SkipNextCommandResultHandler>();
+            services.AddScoped<ICommandResultHandler, SetBackupPathCommandResultHandler>();
+            services.AddScoped<ICommandResultHandler, UnknownCommandResultHandler>();
+            services.AddScoped<ICommandResultHandler, ExitCommandResultHandler>();
             services.AddSingleton<ILogger>(_ => new ConsoleLogger(options.Verbose));
             services.AddSingleton(options);
             services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
+
+            services.AddScoped<BackupStep>(); // used by SetBackupPathCommandResultHandler
             services.AddScoped(sp => new MigrationStep[]
             {
-                ActivatorUtilities.CreateInstance<BackupStep>(sp),
+                sp.GetRequiredService<BackupStep>(),
                 ActivatorUtilities.CreateInstance<TryConvertProjectConverterStep>(sp),
                 ActivatorUtilities.CreateInstance<PackageUpdaterStep>(sp),
                 ActivatorUtilities.CreateInstance<StartupUpdaterStep>(sp),
@@ -118,6 +129,7 @@ namespace AspNetMigrator.ConsoleApp
         {
             using var scope = Services.CreateScope();
             var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
+            var handlerFactory = scope.ServiceProvider.GetRequiredService<CommandResultHandlerFactory>();
             await migrator.InitializeAsync();
 
             while (!_done)
@@ -125,8 +137,8 @@ namespace AspNetMigrator.ConsoleApp
                 ShowMigraitonSteps(migrator.Steps);
 
                 var command = GetCommand(migrator);
-                var commandResultHandler = CommandResultHandlerFactory.GetCommandResult(command?.GetType());
-                var commandResult = await command.ExecuteAsync();
+                var commandResultHandler = handlerFactory.GetHandler(command?.GetType());
+                var commandResult = await command.ExecuteAsync(migrator);
                 commandResultHandler.HandleResult(commandResult);
             }
         }
@@ -138,7 +150,7 @@ namespace AspNetMigrator.ConsoleApp
 
         private static MigrationCommand GetCommand(Migrator migrator)
         {
-            var listOfCommands = GlobalCommands.GetCommands(migrator, SeeMoreDetailsCommandResultHandler.SendMessageToUserAsync, SetProgramIsDone);
+            var listOfCommands = GlobalCommands.GetCommands(SeeMoreDetailsCommandResultHandler.SendAllMessagesToUserAsync, SetProgramIsDone);
             if (migrator?.NextStep?.Commands != null)
             {
                 listOfCommands.InsertRange(0, migrator.NextStep.Commands);
