@@ -17,14 +17,14 @@ namespace AspNetMigrator.Engine
 
         private ILogger Logger { get; }
 
-        public Migrator(MigrationStep[] steps, ILogger logger)
+        public Migrator(IEnumerable<MigrationStep> steps, ILogger logger)
         {
             if (steps is null)
             {
                 throw new ArgumentNullException(nameof(steps));
             }
 
-            _steps = ImmutableArray.Create(steps);
+            _steps = steps.ToImmutableArray();
             _initialized = false;
             Logger = logger ?? new NullLogger();
         }

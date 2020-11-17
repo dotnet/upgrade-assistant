@@ -1,39 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.CommandLine.Parsing;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
-using AspNetMigrator.Engine.GlobalCommands;
 using AspNetMigrator.StartupUpdater;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace AspNetMigrator.ConsoleApp
 {
-    // TODO : Eventually, this may need localized and pull strings from resources, etc.
-    [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "The prototype is not yet localized")]
-    [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class Program
     {
-        private static IConfiguration Configuration { get; set; }
-
-        private static IServiceProvider Services { get; set; }
-
-        // the REPL will loop while !_done
-        private static bool _done;
-
         public static Task Main(string[] args)
         {
-            Configuration = BuildConfiguration();
-
             ShowHeader();
 
             return new CommandLineBuilder(new RootCommand { Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync) })
@@ -47,46 +31,39 @@ namespace AspNetMigrator.ConsoleApp
                 .InvokeAsync(args);
         }
 
-        private static async Task RunMigrationAsync(MigrateOptions options)
-        {
-            Services = BuildDIContainer(options);
-            await RunMigrationReplAsync();
-        }
+        private static Task RunMigrationAsync(MigrateOptions options)
+            => Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddHostedService<ConsoleRepl>();
+                    services.AddSingleton<ILogger>(_ => new ConsoleLogger(options.Verbose));
+                    services.AddSingleton(options);
+                    services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
 
-        private static IServiceProvider BuildDIContainer(MigrateOptions options)
-        {
-            var services = new ServiceCollection();
-            services.AddTransient<ICollectUserInput, CollectBackupPathFromConsole>();
-            services.AddScoped<CommandResultHandlerFactory>();
-            services.AddScoped<ICommandResultHandler, ApplyNextCommandResultHandler>();
-            services.AddScoped<ICommandResultHandler, ConfigureLoggingCommandResultHandler>();
-            services.AddScoped<ICommandResultHandler, SeeMoreDetailsCommandResultHandler>();
-            services.AddScoped<ICommandResultHandler, SkipNextCommandResultHandler>();
-            services.AddScoped<ICommandResultHandler, SetBackupPathCommandResultHandler>();
-            services.AddScoped<ICommandResultHandler, UnknownCommandResultHandler>();
-            services.AddScoped<ICommandResultHandler, ExitCommandResultHandler>();
-            services.AddSingleton<ILogger>(_ => new ConsoleLogger(options.Verbose));
-            services.AddSingleton(options);
-            services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
+                    // Add command handlers
+                    services.AddTransient<ICollectUserInput, CollectBackupPathFromConsole>();
+                    services.AddScoped<CommandResultHandlerFactory>();
+                    services.AddScoped<ICommandResultHandler, ApplyNextCommandResultHandler>();
+                    services.AddScoped<ICommandResultHandler, ConfigureLoggingCommandResultHandler>();
+                    services.AddScoped<ICommandResultHandler, SeeMoreDetailsCommandResultHandler>();
+                    services.AddScoped<ICommandResultHandler, SkipNextCommandResultHandler>();
+                    services.AddScoped<ICommandResultHandler, SetBackupPathCommandResultHandler>();
+                    services.AddScoped<ICommandResultHandler, UnknownCommandResultHandler>();
+                    services.AddScoped<ICommandResultHandler, ExitCommandResultHandler>();
 
-            services.AddScoped<BackupStep>(); // used by SetBackupPathCommandResultHandler
-            services.AddScoped(sp => new MigrationStep[]
-            {
-                sp.GetRequiredService<BackupStep>(),
-                ActivatorUtilities.CreateInstance<TryConvertProjectConverterStep>(sp),
-                ActivatorUtilities.CreateInstance<PackageUpdaterStep>(sp),
-                ActivatorUtilities.CreateInstance<StartupUpdaterStep>(sp),
-                ActivatorUtilities.CreateInstance<SourceUpdaterStep>(sp)
-            });
-            services.AddScoped<Migrator>();
-            return services.BuildServiceProvider();
-        }
-
-        private static IConfiguration BuildConfiguration() =>
-            new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .AddEnvironmentVariables()
-            .Build();
+                    // Add steps
+                    services.AddScoped<BackupStep>(); // used by SetBackupPathCommandResultHandler
+                    services.AddScoped<MigrationStep>(ctx => ctx.GetRequiredService<BackupStep>());
+                    services.AddScoped<MigrationStep, TryConvertProjectConverterStep>();
+                    services.AddScoped<MigrationStep, PackageUpdaterStep>();
+                    services.AddScoped<MigrationStep, StartupUpdaterStep>();
+                    services.AddScoped<MigrationStep, SourceUpdaterStep>();
+                    services.AddScoped<Migrator>();
+                })
+                .RunConsoleAsync(options =>
+                {
+                    options.SuppressStatusMessages = true;
+                });
 
         private static void ShowHeader()
         {
@@ -123,121 +100,6 @@ namespace AspNetMigrator.ConsoleApp
 
                 Console.Out.WriteLine();
             }
-        }
-
-        public static async Task RunMigrationReplAsync()
-        {
-            using var scope = Services.CreateScope();
-            var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
-            var handlerFactory = scope.ServiceProvider.GetRequiredService<CommandResultHandlerFactory>();
-            await migrator.InitializeAsync();
-
-            while (!_done)
-            {
-                ShowMigraitonSteps(migrator.Steps);
-
-                var command = GetCommand(migrator);
-                var commandResultHandler = handlerFactory.GetHandler(command?.GetType());
-                var commandResult = await command.ExecuteAsync(migrator);
-                commandResultHandler.HandleResult(commandResult);
-            }
-        }
-
-        private static void SetProgramIsDone()
-        {
-            _done = true;
-        }
-
-        private static MigrationCommand GetCommand(Migrator migrator)
-        {
-            var listOfCommands = GlobalCommands.GetCommands(SeeMoreDetailsCommandResultHandler.SendAllMessagesToUserAsync, SetProgramIsDone);
-            if (migrator?.NextStep?.Commands != null)
-            {
-                listOfCommands.InsertRange(0, migrator.NextStep.Commands);
-            }
-
-            Console.WriteLine("Choose command");
-            for (var i = 0; i < listOfCommands.Count; i++)
-            {
-                Console.WriteLine($" {i + 1}. {listOfCommands[i].CommandText}");
-            }
-
-            Console.Write("> ");
-
-            var selectedCommandText = Console.ReadLine().Trim(' ', '.', '\t');
-            if (int.TryParse(selectedCommandText, out int selectedCommandIndex))
-            {
-                selectedCommandIndex--;
-                if (selectedCommandIndex >= 0 && selectedCommandIndex < listOfCommands.Count)
-                {
-                    return listOfCommands[selectedCommandIndex];
-                }
-            }
-
-            return new UnknownCommand();
-        }
-
-        private static void ShowMigraitonSteps(IEnumerable<MigrationStep> steps, int offset = 0)
-        {
-            if (steps is null || !steps.Any())
-            {
-                return;
-            }
-
-            Console.ResetColor();
-            var nextStepFound = false;
-            var count = 1;
-
-            if (offset == 0)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Migration Steps");
-            }
-
-            foreach (var step in steps)
-            {
-                // Write indent (if any) and item number
-                Console.Write($"{new string(' ', offset * 2)}{count++}. ");
-
-                // Write the step title and make a note of whether the step is incomplete
-                // (since that would mean future steps shouldn't show "[Current step]")
-                WriteStepStatus(step, !nextStepFound);
-                Console.WriteLine(step.Title);
-                nextStepFound = nextStepFound || (step.Status != MigrationStepStatus.Complete);
-
-                ShowMigraitonSteps(step.SubSteps, offset + 1);
-            }
-
-            Console.WriteLine();
-        }
-
-        private static void WriteStepStatus(MigrationStep step, bool isNextStep)
-        {
-            switch (step.Status)
-            {
-                case MigrationStepStatus.Complete:
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write("[Complete] ");
-                    break;
-                case MigrationStepStatus.Failed:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("[Failed] ");
-                    break;
-                case MigrationStepStatus.Skipped:
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.Write("[Skipped] ");
-                    break;
-                case MigrationStepStatus.Incomplete:
-                    if (isNextStep)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("[Current step] ");
-                    }
-
-                    break;
-            }
-
-            Console.ResetColor();
         }
     }
 }
