@@ -128,7 +128,7 @@ namespace AspNetMigrator.Engine
         }
 
         // TODO
-        private ImmutableArray<AdditionalText> GetAdditionalFiles() => default;
+        private static ImmutableArray<AdditionalText> GetAdditionalFiles() => default;
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
         {
