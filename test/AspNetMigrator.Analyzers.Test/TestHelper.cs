@@ -43,7 +43,7 @@ namespace TestProject
                 .Where(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal));
         }
 
-        public static async Task<Document> GetSourceAsync(string documentPath)
+        public static async Task<Document?> GetSourceAsync(string documentPath)
         {
             if (documentPath is null)
             {
@@ -71,12 +71,12 @@ namespace TestProject
             do
             {
                 diagnosticFixed = false;
-                project = solution.GetProject(projectId);
+                project = solution.GetProject(projectId)!;
                 var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticId).ConfigureAwait(false);
 
                 foreach (var diagnostic in diagnostics)
                 {
-                    var doc = project.GetDocument(diagnostic.Location.SourceTree);
+                    var doc = project.GetDocument(diagnostic.Location.SourceTree)!;
                     var fixedSolution = await TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);
                     if (fixedSolution != null)
                     {
@@ -88,11 +88,11 @@ namespace TestProject
             }
             while (diagnosticFixed);
 
-            project = solution.GetProject(projectId);
-            return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath)));
+            project = solution.GetProject(projectId)!;
+            return project.Documents.First(d => documentPath.Equals(Path.GetFileName(d.FilePath)));
         }
 
-        private static async Task<Solution> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
+        private static async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
         {
             if (diagnostic is null)
             {
@@ -111,7 +111,7 @@ namespace TestProject
                 return null;
             }
 
-            CodeAction fixAction = null;
+            CodeAction? fixAction = null;
             var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
             await provider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 

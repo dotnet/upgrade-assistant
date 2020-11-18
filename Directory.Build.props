@@ -4,6 +4,7 @@
     <LangVersion>9.0</LangVersion>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\rules.ruleset</CodeAnalysisRuleSet>
     <WarningLevel>4</WarningLevel>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <!-- Treat warnings as errors in release builds, so that all warnings

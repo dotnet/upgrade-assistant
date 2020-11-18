@@ -151,7 +151,9 @@ namespace AspNetMigrator.Analyzers.Test
             var fixedSource = await TestHelper.FixSourceAsync($"{diagnosticId}.cs", diagnosticId).ConfigureAwait(false);
             var expectedSource = await TestHelper.GetSourceAsync($"{diagnosticId}.Fixed.cs").ConfigureAwait(false);
 
-            var expectedText = (await expectedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+            Assert.IsNotNull(expectedSource);
+
+            var expectedText = (await expectedSource!.GetTextAsync().ConfigureAwait(false)).ToString();
             var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
             Assert.AreEqual(expectedText, fixedText);
         }

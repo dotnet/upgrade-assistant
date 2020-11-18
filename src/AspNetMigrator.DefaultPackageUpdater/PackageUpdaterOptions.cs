@@ -2,6 +2,6 @@
 {
     public class PackageUpdaterOptions
     {
-        public string PackageMapPath { get; set; }
+        public string PackageMapPath { get; set; } = string.Empty;
     }
 }

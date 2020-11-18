@@ -39,7 +39,13 @@ namespace AspNetMigrator.Analyzers
         private void AnalyzeUsingStatements(SyntaxNodeAnalysisContext context)
         {
             var usingDirective = context.Node as UsingDirectiveSyntax;
-            var namespaceName = usingDirective?.Name?.ToString();
+
+            if (usingDirective is null)
+            {
+                return;
+            }
+
+            var namespaceName = usingDirective.Name?.ToString();
 
             if (namespaceName is null)
             {

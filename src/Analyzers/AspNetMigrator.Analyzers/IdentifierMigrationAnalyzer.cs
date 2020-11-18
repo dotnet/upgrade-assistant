@@ -36,7 +36,13 @@ namespace AspNetMigrator.Analyzers
         private void AnalyzeIdentifiers(SyntaxNodeAnalysisContext context)
         {
             var identifier = context.Node as IdentifierNameSyntax;
-            var name = identifier?.Identifier.ValueText;
+
+            if (identifier is null)
+            {
+                return;
+            }
+
+            var name = identifier.Identifier.ValueText;
 
             // If the node isn't an identifier, bail out
             if (name is null)

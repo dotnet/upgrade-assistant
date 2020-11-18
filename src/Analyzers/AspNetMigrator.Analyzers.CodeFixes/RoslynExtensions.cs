@@ -15,10 +15,18 @@ namespace AspNetMigrator.Analyzers
         /// <param name="documentRoot">The document to add the directive to.</param>
         /// <param name="namespaceName">The namespace to reference with the using directive.</param>
         /// <returns>An updated document root with the specific using directive.</returns>
-        public static CompilationUnitSyntax AddUsingIfMissing(this CompilationUnitSyntax documentRoot, string namespaceName) =>
-            documentRoot?.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal)) ?? false ?
-            documentRoot :
-            documentRoot.AddUsings(UsingDirective(ParseName(namespaceName)));
+        public static CompilationUnitSyntax AddUsingIfMissing(this CompilationUnitSyntax documentRoot, string namespaceName)
+        {
+            if (documentRoot is null)
+            {
+                throw new ArgumentNullException(nameof(documentRoot));
+            }
+
+            var anyUsings = documentRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal));
+            var result = anyUsings ? documentRoot : documentRoot.AddUsings(UsingDirective(ParseName(namespaceName)));
+
+            return result;
+        }
 
         /// <summary>
         /// Gets a method declared in a given syntax node.
@@ -27,7 +35,7 @@ namespace AspNetMigrator.Analyzers
         /// <param name="methodName">The name of the method to return.</param>
         /// <param name="requiredParameterTypes">An optional list of parameter types that the method must accept.</param>
         /// <returns>The first method declaration in the syntax node with the given name and parameter types, or null if no such method declaration exists.</returns>
-        public static MethodDeclarationSyntax GetMethodDeclaration(this SyntaxNode node, string methodName, params string[] requiredParameterTypes) =>
+        public static MethodDeclarationSyntax? GetMethodDeclaration(this SyntaxNode node, string methodName, params string[] requiredParameterTypes) =>
             node?.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
                 .FirstOrDefault(m =>

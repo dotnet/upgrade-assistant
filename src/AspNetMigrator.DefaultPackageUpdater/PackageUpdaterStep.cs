@@ -20,7 +20,7 @@ namespace AspNetMigrator.Engine
 
         public string PackageMapPath { get; }
 
-        private IEnumerable<NuGetPackageMap> _packageMaps;
+        private IEnumerable<NuGetPackageMap> _packageMaps = Enumerable.Empty<NuGetPackageMap>();
 
         public PackageUpdaterStep(MigrateOptions options, PackageUpdaterOptions updaterOptions, ILogger logger)
             : base(options, logger)
@@ -39,7 +39,7 @@ namespace AspNetMigrator.Engine
 
             PackageMapPath = Path.IsPathFullyQualified(mapPath) ?
                 mapPath :
-                Path.Combine(Path.GetDirectoryName(typeof(PackageUpdaterStep).Assembly.Location), mapPath);
+                Path.Combine(Path.GetDirectoryName(typeof(PackageUpdaterStep).Assembly.Location)!, mapPath);
 
             Title = $"Update NuGet packages";
             Description = $"Update package references in {options.ProjectPath} to work with .NET based on mappings in {PackageMapPath}";
@@ -147,7 +147,8 @@ namespace AspNetMigrator.Engine
             Logger.Information("Loading package maps from {PackageMapPath}", PackageMapPath);
             using (var config = File.OpenRead(PackageMapPath))
             {
-                _packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
+                var packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
+                _packageMaps = packageMaps!;
             }
 
             Logger.Verbose("Loaded {MapCount} package maps", _packageMaps.Count());

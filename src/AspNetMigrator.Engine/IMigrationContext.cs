@@ -6,7 +6,7 @@ namespace AspNetMigrator.Engine
 {
     public interface IMigrationContext
     {
-        ValueTask<ProjectId> GetProjectIdAsync(CancellationToken token);
+        ValueTask<ProjectId?> GetProjectIdAsync(CancellationToken token);
 
         ValueTask<Workspace> GetWorkspaceAsync(CancellationToken token);
     }

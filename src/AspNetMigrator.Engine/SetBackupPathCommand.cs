@@ -7,10 +7,10 @@ namespace AspNetMigrator.Engine
     public class SetBackupPathCommand : MigrationCommand
     {
         private readonly string _currentBackupPath;
-        private readonly Func<string, Task<string>> _collectUserInput;
+        private readonly Func<string, Task<string?>> _collectUserInput;
         private readonly Action<string> _setBackupPath;
 
-        public SetBackupPathCommand(string currentBackupPath, Func<string, Task<string>> collectUserInput, Action<string> setBackupPath)
+        public SetBackupPathCommand(string currentBackupPath, Func<string, Task<string?>> collectUserInput, Action<string> setBackupPath)
         {
             _collectUserInput = collectUserInput ?? throw new ArgumentNullException(nameof(collectUserInput));
             _currentBackupPath = currentBackupPath ?? throw new ArgumentNullException(nameof(currentBackupPath));

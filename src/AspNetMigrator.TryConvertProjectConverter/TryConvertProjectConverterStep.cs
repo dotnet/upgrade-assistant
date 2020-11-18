@@ -15,7 +15,7 @@ namespace AspNetMigrator.Engine
         private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion -p {0}";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
         private static readonly string TryConvertPath =
-            Path.Combine(Path.GetDirectoryName(typeof(TryConvertProjectConverterStep).Assembly.Location), "tools", "try-convert.exe");
+            Path.Combine(Path.GetDirectoryName(typeof(TryConvertProjectConverterStep).Assembly.Location)!, "tools", "try-convert.exe");
 
         public TryConvertProjectConverterStep(MigrateOptions options, ILogger logger)
             : base(options, logger)

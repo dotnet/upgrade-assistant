@@ -4,11 +4,11 @@ namespace AspNetMigrator.Engine
 {
     public class MigrateOptions
     {
-        public FileInfo Project { get; set; }
+        public FileInfo Project { get; set; } = null!;
 
         public string ProjectPath => Project.FullName;
 
-        public string BackupPath { get; set; }
+        public string? BackupPath { get; set; }
 
         public bool SkipBackup { get; set; }
 

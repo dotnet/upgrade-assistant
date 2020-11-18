@@ -35,11 +35,11 @@ namespace AspNetMigrator.Engine
             };
         }
 
-        public virtual string Title { get; protected set; }
+        public virtual string Title { get; protected set; } = string.Empty;
 
-        public virtual string Description { get; protected set; }
+        public virtual string Description { get; protected set; } = string.Empty;
 
-        public virtual MigrationStep ParentStep { get; protected set; }
+        public virtual MigrationStep? ParentStep { get; protected set; }
 
         public virtual List<MigrationCommand> Commands { get; set; }
 
@@ -54,7 +54,7 @@ namespace AspNetMigrator.Engine
             _ => false,
         };
 
-        public string StatusDetails { get; private set; }
+        public string StatusDetails { get; private set; } = string.Empty;
 
         /// <summary>
         /// Implementers should use this method to initialize Status and any other state needed.

@@ -18,12 +18,12 @@ namespace AspNetMigrator.Engine
     public class SourceUpdaterStep : MigrationStep
     {
         private const string AspNetMigratorAnalyzerPrefix = "AM";
-        private Workspace _workspace;
-        private ProjectId _projectId;
+        private Workspace? _workspace;
+        private ProjectId? _projectId;
 
-        internal IEnumerable<Diagnostic> Diagnostics { get; set; }
+        internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
 
-        internal Project Project => _workspace.CurrentSolution.GetProject(_projectId);
+        internal Project? Project => _workspace?.CurrentSolution.GetProject(_projectId);
 
         public SourceUpdaterStep(MigrateOptions options, ILogger logger)
             : base(options, logger)
@@ -78,7 +78,20 @@ namespace AspNetMigrator.Engine
 
         private async Task GetDiagnosticsAsync()
         {
+            if (_workspace is null)
+            {
+                Logger.Warning("No workspace available.");
+                return;
+            }
+
             var project = _workspace.CurrentSolution.GetProject(_projectId);
+
+            if (project is null)
+            {
+                Logger.Warning("No project available.");
+                return;
+            }
+
             Logger.Verbose("Running ASP.NET Core migration analyzers on {ProjectName}", project.Name);
 
             // Compile with migration analyzers enabled
@@ -96,10 +109,16 @@ namespace AspNetMigrator.Engine
         protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
             Task.FromResult(Diagnostics.Any() ?
                 (MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
-                (MigrationStepStatus.Complete, null));
+                (MigrationStepStatus.Complete, string.Empty));
 
         internal async Task<bool> UpdateSolutionAsync(Solution updatedSolution, IMigrationContext context, CancellationToken token)
         {
+            if (_workspace is null)
+            {
+                Logger.Warning("No workspace is available.");
+                return false;
+            }
+
             if (_workspace.TryApplyChanges(updatedSolution))
             {
                 Logger.Verbose("Source successfully updated");

@@ -5,9 +5,7 @@ namespace AspNetMigrator.Engine
 {
     public class NuGetReference : IEquatable<NuGetReference>
     {
-        public NuGetReference() { }
-
-        public NuGetReference(string name, string version)
+        public NuGetReference(string name, string? version)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Version = version;
@@ -21,11 +19,11 @@ namespace AspNetMigrator.Engine
 
         public string Name { get; set; }
 
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
-        public bool HasWildcardVersion => Version.Equals("*", StringComparison.OrdinalIgnoreCase);
+        public bool HasWildcardVersion => string.Equals(Version, "*", StringComparison.OrdinalIgnoreCase);
 
-        public Version GetVersion()
+        public Version? GetVersion()
         {
             if (HasWildcardVersion)
             {
@@ -35,16 +33,20 @@ namespace AspNetMigrator.Engine
             return System.Version.TryParse(Version, out var parsedVersion) ? parsedVersion : new Version(0, 0, 0, 0);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as NuGetReference);
         }
 
-        public bool Equals(NuGetReference other)
+        public bool Equals(NuGetReference? other)
         {
-            return other != null &&
-                   Name.Equals(other.Name, StringComparison.OrdinalIgnoreCase) &&
-                   Version.Equals(other.Version, StringComparison.OrdinalIgnoreCase);
+            if (other is null)
+            {
+                return false;
+            }
+
+            return string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase) &&
+                   string.Equals(Version, other.Version, StringComparison.OrdinalIgnoreCase);
         }
 
         public override int GetHashCode()

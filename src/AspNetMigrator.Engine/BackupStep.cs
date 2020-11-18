@@ -22,7 +22,7 @@ namespace AspNetMigrator.Engine
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _projectDir = Path.GetDirectoryName(options.ProjectPath);
+            _projectDir = Path.GetDirectoryName(options.ProjectPath)!;
             _skipBackup = options.SkipBackup;
             _backupPath = DetermineBackupPath(options);
 

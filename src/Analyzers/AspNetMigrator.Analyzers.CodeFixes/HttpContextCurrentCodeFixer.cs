@@ -50,7 +50,7 @@ namespace AspNetMigrator.Analyzers
                 context.Diagnostics);
         }
 
-        private static async Task<Solution> ReplaceHttpContextCurrentAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private static async Task<Solution?> ReplaceHttpContextCurrentAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var project = document.Project;
 
@@ -61,6 +61,11 @@ namespace AspNetMigrator.Analyzers
                 using var sr = new StreamReader(typeof(HttpContextCurrentCodeFixer).Assembly.GetManifestResourceStream(HttpContextHelperResourceName));
                 project = document.Project.AddDocument($"{HttpContextHelperName}.cs", await sr.ReadToEndAsync().ConfigureAwait(false)).Project;
                 httpContextHelperClass = await GetHttpContextHelperClassAsync(project).ConfigureAwait(false);
+            }
+
+            if (httpContextHelperClass is null)
+            {
+                return null;
             }
 
             var slnEditor = new SolutionEditor(project.Solution);
@@ -77,10 +82,10 @@ namespace AspNetMigrator.Analyzers
 
             // Update the HttpContext.Current usage to use HttpContextHelper
             var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
-            var docRoot = docEditor.OriginalRoot as CompilationUnitSyntax;
+            var docRoot = (CompilationUnitSyntax)docEditor.OriginalRoot;
 
             // Add a using statement, if necessary
-            docRoot = docRoot.AddUsingIfMissing(httpContextHelperClass.ContainingNamespace.ToString());
+            docRoot = docRoot.AddUsingIfMissing(httpContextHelperClass.ContainingNamespace.ToString())!;
 
             // Update the HttpContext.Current reference
             var replacementSyntax = ParseExpression($"{httpContextHelperClass.Name}.Current")
@@ -91,7 +96,7 @@ namespace AspNetMigrator.Analyzers
             return slnEditor.GetChangedSolution();
         }
 
-        private static async Task<INamedTypeSymbol> GetHttpContextHelperClassAsync(Project project)
+        private static async Task<INamedTypeSymbol?> GetHttpContextHelperClassAsync(Project project)
         {
             foreach (var document in project.Documents)
             {
@@ -119,7 +124,7 @@ namespace AspNetMigrator.Analyzers
 
         private static void InitializeHttpContextHelperInStartup(DocumentEditor editor, INamedTypeSymbol httpContextHelperClass)
         {
-            var documentRoot = editor.OriginalRoot as CompilationUnitSyntax;
+            var documentRoot = (CompilationUnitSyntax)editor.OriginalRoot;
 
             // Add using declarations if needed
             documentRoot = documentRoot
@@ -131,7 +136,7 @@ namespace AspNetMigrator.Analyzers
             var configureServicesMethod = documentRoot.GetMethodDeclaration("ConfigureServices", "IServiceCollection");
             var serviceCollectionParameter = configureServicesMethod?.ParameterList.Parameters.FirstOrDefault(p => p.Type.ToString().Equals("IServiceCollection", StringComparison.Ordinal));
 
-            if (serviceCollectionParameter != null)
+            if (configureServicesMethod != null && serviceCollectionParameter != null)
             {
                 var configureServicesBody = configureServicesMethod.Body;
                 var addHttpContextAccessorStatement = ParseStatement($"{serviceCollectionParameter.Identifier}.AddHttpContextAccessor();")
@@ -148,7 +153,7 @@ namespace AspNetMigrator.Analyzers
             var configureMethod = documentRoot.GetMethodDeclaration("Configure", "IApplicationBuilder");
             var appBuilderParameter = configureMethod?.ParameterList.Parameters.FirstOrDefault(p => p.Type.ToString().Equals("IApplicationBuilder", StringComparison.Ordinal));
 
-            if (appBuilderParameter != null)
+            if (configureMethod != null && appBuilderParameter != null)
             {
                 var configureMethodBody = configureMethod.Body;
                 var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());")

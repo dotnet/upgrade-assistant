@@ -69,6 +69,11 @@ namespace AspNetMigrator.Analyzers
             while (name.Parent is NameSyntax)
             {
                 name = name.Parent as NameSyntax;
+
+                if (name is null)
+                {
+                    return document;
+                }
             }
 
             // Update to new identifier
@@ -79,7 +84,7 @@ namespace AspNetMigrator.Analyzers
             // Work on the document root instead of updating nodes with the editor directly so that
             // additional changes can be made later (adding using statement) if necessary.
             var documentRoot = editor.OriginalRoot as CompilationUnitSyntax;
-            documentRoot = documentRoot.ReplaceNode(name, updatedName);
+            documentRoot = documentRoot.ReplaceNode(name, updatedName)!;
 
             // Add using declation if needed
             var namespaceName = GetNamespace(newIdentifier);

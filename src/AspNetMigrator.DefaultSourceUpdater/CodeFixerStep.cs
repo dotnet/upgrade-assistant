@@ -62,16 +62,21 @@ namespace AspNetMigrator.Engine
             // This migration step is incomplete if any diagnostics it can fix remain
             return Diagnostics.Any() ?
                 Task.FromResult((MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} {DiagnosticId} diagnostics need fixed")) :
-                Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Complete, null));
+                Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Complete, string.Empty));
         }
 
         protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (_sourceUpdater.Project is null)
+            {
+                return (MigrationStepStatus.Failed, "No project available.");
+            }
+
             // Access Diagnostics.FirstOrDefault each time (instead of iterating through the diagnostics) since
             // the remaining diagnostics change each time one is fixed.
             for (var diagnostic = Diagnostics.FirstOrDefault(); diagnostic != null; diagnostic = Diagnostics.FirstOrDefault())
             {
-                var doc = _sourceUpdater.Project.GetDocument(diagnostic.Location.SourceTree);
+                var doc = _sourceUpdater.Project.GetDocument(diagnostic.Location.SourceTree)!;
                 var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);
 
                 if (updatedSolution is null)
@@ -94,7 +99,7 @@ namespace AspNetMigrator.Engine
             return (MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
 
-        private async Task<Solution> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
+        private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
         {
             if (diagnostic is null)
             {
@@ -106,7 +111,7 @@ namespace AspNetMigrator.Engine
                 throw new ArgumentNullException(nameof(document));
             }
 
-            CodeAction fixAction = null;
+            CodeAction? fixAction = null;
             var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
             await _fixProvider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 

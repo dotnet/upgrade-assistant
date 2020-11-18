@@ -28,7 +28,7 @@ namespace AspNetMigrator.ConsoleApp
                     Console.ResetColor(); break;
             }
 
-            Console.WriteLine(WrapString(message?.Message, Console.WindowWidth));
+            Console.WriteLine(WrapString(message.Message, Console.WindowWidth));
             Console.ResetColor();
 
             return Task.CompletedTask;
@@ -38,7 +38,7 @@ namespace AspNetMigrator.ConsoleApp
         {
             if (input is null)
             {
-                return null;
+                return string.Empty;
             }
 
             var word = new StringBuilder();

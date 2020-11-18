@@ -6,11 +6,11 @@ namespace AspNetMigrator.Engine
 {
     public class NuGetPackageMap
     {
-        public string PackageSetName { get; set; }
+        public string PackageSetName { get; set; } = string.Empty;
 
-        public IEnumerable<NuGetReference> NetFrameworkPackages { get; set; }
+        public IEnumerable<NuGetReference> NetFrameworkPackages { get; set; } = Enumerable.Empty<NuGetReference>();
 
-        public IEnumerable<NuGetReference> NetCorePackages { get; set; }
+        public IEnumerable<NuGetReference> NetCorePackages { get; set; } = Enumerable.Empty<NuGetReference>();
 
         /// <summary>
         /// Determines whether a package map's .NET Framework packages include a
@@ -19,7 +19,7 @@ namespace AspNetMigrator.Engine
         /// <param name="name">The package name to look for.</param>
         /// <param name="version">The package version to look for or null to match any version.</param>
         /// <returns>True if the package exists in NetFrameworkPackages with a version equal to or higher the version specified. Otherwise, false.</returns>
-        public bool ContainsReference(string name, string version)
+        public bool ContainsReference(string name, string? version)
         {
             // Check whether any NetFx packages have the right name
             var reference = NetFrameworkPackages.FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
@@ -45,6 +45,11 @@ namespace AspNetMigrator.Engine
             }
 
             var netFxVersion = reference.GetVersion();
+
+            if (netFxVersion is null)
+            {
+                return true;
+            }
 
             if (parsedVersion.Major < netFxVersion.Major)
             {

@@ -32,7 +32,7 @@ namespace AspNetMigrator.StartupUpdater
             new ItemSpec("Content", "appsettings.Development.json", false, Array.Empty<string>())
         };
 
-        private List<ItemSpec> _itemsToAdd;
+        private List<ItemSpec>? _itemsToAdd;
 
         public StartupUpdaterStep(MigrateOptions options, ILogger logger)
             : base(options, logger)
@@ -65,8 +65,13 @@ namespace AspNetMigrator.StartupUpdater
                     rootNamespace = Path.GetFileNameWithoutExtension(Options.ProjectPath);
                 }
 
-                var projectDir = Path.GetDirectoryName(Options.ProjectPath);
+                var projectDir = Path.GetDirectoryName(Options.ProjectPath)!;
                 var resourceAssembly = typeof(StartupUpdaterStep).Assembly;
+
+                if (_itemsToAdd is null)
+                {
+                    throw new InvalidOperationException("Step does not appear initialized");
+                }
 
                 // For each file in _itemsToAdd, add the file and do a simple replacement of the template namespace
                 // TODO : It will probably worthwhile to make the templating feature more full-featured.
@@ -183,7 +188,7 @@ namespace AspNetMigrator.StartupUpdater
                 return false;
             }
 
-            var projectDir = Path.GetDirectoryName(Options.ProjectPath);
+            var projectDir = Path.GetDirectoryName(Options.ProjectPath)!;
             var filePath = Path.IsPathRooted(itemElement.EvaluatedInclude) ?
                 itemElement.EvaluatedInclude :
                 Path.Combine(projectDir, itemElement.EvaluatedInclude);
@@ -237,7 +242,7 @@ namespace AspNetMigrator.StartupUpdater
                 item.Update = backupName;
             }
 
-            File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath), backupName));
+            File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath)!, backupName));
         }
     }
 }

@@ -52,7 +52,7 @@ namespace AspNetMigrator.Analyzers
             var newExpression = SyntaxFactory.ParseExpression(DebuggerIsAttachedSyntax)
                 .WithTriviaFrom(node)
                 .WithAdditionalAnnotations(Simplifier.Annotation);
-            documentRoot = documentRoot.ReplaceNode(node, newExpression);
+            documentRoot = documentRoot.ReplaceNode(node, newExpression)!;
 
             // Add a using statement to System.Diagnostics, if necessary
             documentRoot = documentRoot.AddUsingIfMissing(DiagnosticsNamespace);
