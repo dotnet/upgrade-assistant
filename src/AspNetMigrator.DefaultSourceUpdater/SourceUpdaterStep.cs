@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AspNetMigrator.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
 {
@@ -25,7 +26,7 @@ namespace AspNetMigrator.Engine
 
         internal Project? Project => _workspace?.CurrentSolution.GetProject(_projectId);
 
-        public SourceUpdaterStep(MigrateOptions options, ILogger logger)
+        public SourceUpdaterStep(MigrateOptions options, ILogger<SourceUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -54,11 +55,11 @@ namespace AspNetMigrator.Engine
 
             if (!File.Exists(Options.ProjectPath))
             {
-                Logger.Fatal("Project file {ProjectPath} not found", Options.ProjectPath);
+                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
                 return (MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found");
             }
 
-            Logger.Verbose("Opening project {ProjectPath}", Options.ProjectPath);
+            Logger.LogDebug("Opening project {ProjectPath}", Options.ProjectPath);
 
             _workspace = await context.GetWorkspaceAsync(token).ConfigureAwait(false);
             _projectId = await context.GetProjectIdAsync(token).ConfigureAwait(false);
@@ -80,7 +81,7 @@ namespace AspNetMigrator.Engine
         {
             if (_workspace is null)
             {
-                Logger.Warning("No workspace available.");
+                Logger.LogWarning("No workspace available.");
                 return;
             }
 
@@ -88,11 +89,11 @@ namespace AspNetMigrator.Engine
 
             if (project is null)
             {
-                Logger.Warning("No project available.");
+                Logger.LogWarning("No project available.");
                 return;
             }
 
-            Logger.Verbose("Running ASP.NET Core migration analyzers on {ProjectName}", project.Name);
+            Logger.LogTrace("Running ASP.NET Core migration analyzers on {ProjectName}", project.Name);
 
             // Compile with migration analyzers enabled
             var compilation = (await project.GetCompilationAsync().ConfigureAwait(false))
@@ -103,7 +104,7 @@ namespace AspNetMigrator.Engine
                 .Where(d => d.Location.IsInSource &&
                        d.Id.StartsWith(AspNetMigratorAnalyzerPrefix, StringComparison.Ordinal) &&
                        AspNetCoreMigrationCodeFixers.AllCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
-            Logger.Verbose("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
+            Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
         }
 
         protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
@@ -115,13 +116,13 @@ namespace AspNetMigrator.Engine
         {
             if (_workspace is null)
             {
-                Logger.Warning("No workspace is available.");
+                Logger.LogWarning("No workspace is available.");
                 return false;
             }
 
             if (_workspace.TryApplyChanges(updatedSolution))
             {
-                Logger.Verbose("Source successfully updated");
+                Logger.LogDebug("Source successfully updated");
                 await GetDiagnosticsAsync().ConfigureAwait(false);
 
                 // Normally, the migrator will apply steps one at a time
@@ -141,7 +142,7 @@ namespace AspNetMigrator.Engine
             }
             else
             {
-                Logger.Verbose("Failed to apply changes to source");
+                Logger.LogDebug("Failed to apply changes to source");
                 return false;
             }
         }
@@ -151,7 +152,7 @@ namespace AspNetMigrator.Engine
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
         {
-            Logger.Error("Analyzer error while running analyzer {AnalyzerId}: {Exception}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)), exc);
+            Logger.LogError("Analyzer error while running analyzer {AnalyzerId}: {Exception}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)), exc);
         }
     }
 }

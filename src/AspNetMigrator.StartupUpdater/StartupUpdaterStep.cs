@@ -8,6 +8,7 @@ using AspNetMigrator.Engine;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.StartupUpdater
 {
@@ -34,7 +35,7 @@ namespace AspNetMigrator.StartupUpdater
 
         private List<ItemSpec>? _itemsToAdd;
 
-        public StartupUpdaterStep(MigrateOptions options, ILogger logger)
+        public StartupUpdaterStep(MigrateOptions options, ILogger<StartupUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -92,7 +93,7 @@ namespace AspNetMigrator.StartupUpdater
                     using var resourceStream = resourceAssembly.GetManifestResourceStream($"{ManifestResourcePrefix}{item.ItemName}");
                     if (resourceStream is null)
                     {
-                        Logger.Fatal("File resource not found for file {ItemName}", item.ItemName);
+                        Logger.LogCritical("File resource not found for file {ItemName}", item.ItemName);
                         return (MigrationStepStatus.Failed, $"File resource not found for item {item.ItemName}");
                     }
 
@@ -113,10 +114,10 @@ namespace AspNetMigrator.StartupUpdater
                         project.AddItem(item.ItemType, item.ItemName);
                     }
 
-                    Logger.Information("Added {ItemName} to the project from template file", item.ItemName);
+                    Logger.LogInformation("Added {ItemName} to the project from template file", item.ItemName);
                 }
 
-                Logger.Information("{ItemCount} items added", _itemsToAdd.Count);
+                Logger.LogInformation("{ItemCount} items added", _itemsToAdd.Count);
 
                 project.Save();
 
@@ -124,7 +125,7 @@ namespace AspNetMigrator.StartupUpdater
             }
             catch (InvalidProjectFileException)
             {
-                Logger.Fatal("Invalid project: {ProjectPath}", Options.ProjectPath);
+                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
                 return (MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
             }
         }
@@ -133,7 +134,7 @@ namespace AspNetMigrator.StartupUpdater
         {
             if (!File.Exists(Options.ProjectPath))
             {
-                Logger.Fatal("Project file {ProjectPath} not found", Options.ProjectPath);
+                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
                 return Task.FromResult((MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found"));
             }
 
@@ -143,13 +144,13 @@ namespace AspNetMigrator.StartupUpdater
                 projectRoot.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
                 var project = new Project(projectRoot, new Dictionary<string, string>(), null);
 
-                Logger.Verbose("Scanning project for {ExpectedFileCount} expected files", ExpectedFiles.Count());
+                Logger.LogDebug("Scanning project for {ExpectedFileCount} expected files", ExpectedFiles.Count());
                 _itemsToAdd = new List<ItemSpec>(ExpectedFiles.Where(e => !project.Items.Any(i => ItemMatches(e, i))));
-                Logger.Information("{FilesNeededCount} expected startup files needed", _itemsToAdd.Count);
+                Logger.LogInformation("{FilesNeededCount} expected startup files needed", _itemsToAdd.Count);
 
                 if (_itemsToAdd.Any())
                 {
-                    Logger.Verbose("Needed files: {NeededFiles}", string.Join(", ", _itemsToAdd));
+                    Logger.LogDebug("Needed files: {NeededFiles}", string.Join(", ", _itemsToAdd));
                     return Task.FromResult((MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected startup files needed ({string.Join(", ", _itemsToAdd.Select(i => i.ItemName))})"));
                 }
                 else
@@ -159,7 +160,7 @@ namespace AspNetMigrator.StartupUpdater
             }
             catch (InvalidProjectFileException)
             {
-                Logger.Fatal("Invalid project: {ProjectPath}", Options.ProjectPath);
+                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
                 return Task.FromResult((MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}"));
             }
         }
@@ -193,12 +194,12 @@ namespace AspNetMigrator.StartupUpdater
                 itemElement.EvaluatedInclude :
                 Path.Combine(projectDir, itemElement.EvaluatedInclude);
 
-            Logger.Verbose("Considering {FilePath} for expected file {ExpectedFileName}", filePath, expectedItem.ItemName);
+            Logger.LogDebug("Considering {FilePath} for expected file {ExpectedFileName}", filePath, expectedItem.ItemName);
 
             // The included file must exist
             if (!File.Exists(filePath))
             {
-                Logger.Verbose("File {FilePath} does not exist", filePath);
+                Logger.LogDebug("File {FilePath} does not exist", filePath);
                 return false;
             }
 
@@ -208,12 +209,12 @@ namespace AspNetMigrator.StartupUpdater
                 var fileContents = File.ReadAllText(filePath);
                 if (expectedItem.Keywords.Any(k => !fileContents.Contains(k, StringComparison.Ordinal)))
                 {
-                    Logger.Verbose("File {FilePath} does not contain all necessary keywords to match", filePath);
+                    Logger.LogDebug("File {FilePath} does not contain all necessary keywords to match", filePath);
                     return false;
                 }
             }
 
-            Logger.Verbose("File {FilePath} matches expected file {ExpectedFileName}", filePath, expectedItem.ItemName);
+            Logger.LogDebug("File {FilePath} matches expected file {ExpectedFileName}", filePath, expectedItem.ItemName);
             return true;
         }
 
@@ -227,7 +228,7 @@ namespace AspNetMigrator.StartupUpdater
                 backupName = $"{Path.GetFileNameWithoutExtension(fileName)}.old.{counter++}{Path.GetExtension(fileName)}";
             }
 
-            Logger.Information("File already exists, moving {FileName} to {BackupFileName}", fileName, backupName);
+            Logger.LogInformation("File already exists, moving {FileName} to {BackupFileName}", fileName, backupName);
 
             // Even though the file may not make sense in the migrated project,
             // don't remove the file from the project because the user will probably want to migrate some of the code manually later

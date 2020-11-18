@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
 {
@@ -14,7 +15,7 @@ namespace AspNetMigrator.Engine
 
         private string _backupPath;
 
-        public BackupStep(MigrateOptions options, ILogger logger, ICollectUserInput collectBackupPathFromUser)
+        public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)
             : base(options, logger)
         {
             if (options is null)
@@ -48,17 +49,17 @@ namespace AspNetMigrator.Engine
         {
             if (_skipBackup)
             {
-                Logger.Verbose("Backup migration step initalized as complete (backup skipped)");
+                Logger.LogDebug("Backup migration step initalized as complete (backup skipped)");
                 return Task.FromResult((MigrationStepStatus.Complete, "Backup skipped"));
             }
             else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
             {
-                Logger.Verbose("Backup migration step initalized as complete (already done)");
+                Logger.LogDebug("Backup migration step initalized as complete (already done)");
                 return Task.FromResult((MigrationStepStatus.Complete, "Existing backup found"));
             }
             else
             {
-                Logger.Verbose("Backup migration step initialized as incomplete");
+                Logger.LogDebug("Backup migration step initialized as incomplete");
                 return Task.FromResult((MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} to {_backupPath} (including subfolders)."));
             }
         }
@@ -67,35 +68,35 @@ namespace AspNetMigrator.Engine
         {
             if (_skipBackup)
             {
-                Logger.Information("Skipping backup");
+                Logger.LogInformation("Skipping backup");
                 return (MigrationStepStatus.Complete, "Backup skipped");
             }
 
             if (Status == MigrationStepStatus.Complete)
             {
-                Logger.Information("Backup already exists at {BackupPath}; nothing to do", _backupPath);
+                Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", _backupPath);
                 return (MigrationStepStatus.Complete, "Existing backup found");
             }
 
-            Logger.Information("Backing up {ProjectDir} to {BackupPath}", _projectDir, _backupPath);
+            Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, _backupPath);
             try
             {
                 Directory.CreateDirectory(_backupPath);
                 if (!Directory.Exists(_backupPath))
                 {
-                    Logger.Error("Failed to create backup directory ({BackupPath})", _backupPath);
+                    Logger.LogError("Failed to create backup directory ({BackupPath})", _backupPath);
                     return (MigrationStepStatus.Failed, $"Failed to create backup directory {_backupPath}");
                 }
 
                 await CopyDirectoryAsync(_projectDir, _backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
                 await File.WriteAllTextAsync(Path.Combine(_backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
-                Logger.Information("Project backed up to {BackupPath}", _backupPath);
+                Logger.LogInformation("Project backed up to {BackupPath}", _backupPath);
                 return (MigrationStepStatus.Complete, "Backup completed successfully");
             }
             catch (IOException exc)
             {
-                Logger.Error("Unexpected exception while creating backup: {Exception}", exc);
+                Logger.LogError("Unexpected exception while creating backup: {Exception}", exc);
                 return (MigrationStepStatus.Failed, $"Unexpected exception while creating backup");
             }
         }
@@ -108,7 +109,7 @@ namespace AspNetMigrator.Engine
             {
                 var dest = Path.Combine(destinationDir, file.Name);
                 await CopyFileAsync(file.FullName, dest).ConfigureAwait(false);
-                Logger.Verbose("Copied {SourceFile} to {DestinationFile}", file.FullName, dest);
+                Logger.LogDebug("Copied {SourceFile} to {DestinationFile}", file.FullName, dest);
             }
 
             foreach (var dir in directoryInfo.GetDirectories())
@@ -128,10 +129,10 @@ namespace AspNetMigrator.Engine
 
         private string DetermineBackupPath(MigrateOptions options)
         {
-            Logger.Verbose("Determining backup path");
+            Logger.LogDebug("Determining backup path");
             if (!string.IsNullOrWhiteSpace(options.BackupPath))
             {
-                Logger.Verbose("Using specified path: {BackupPath}", options.BackupPath);
+                Logger.LogDebug("Using specified path: {BackupPath}", options.BackupPath);
                 return options.BackupPath;
             }
 
@@ -140,11 +141,11 @@ namespace AspNetMigrator.Engine
             var iteration = 0;
             while (!IsPathValid(candidatePath))
             {
-                Logger.Verbose("Unable to use backup path {CandidatePath}", candidatePath);
+                Logger.LogDebug("Unable to use backup path {CandidatePath}", candidatePath);
                 candidatePath = $"{candidateBasePath}.{iteration++}";
             }
 
-            Logger.Verbose("Using backup path {BackupPath}", candidatePath);
+            Logger.LogDebug("Using backup path {BackupPath}", candidatePath);
             return candidatePath;
         }
 

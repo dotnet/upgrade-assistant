@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
 {
@@ -17,7 +18,7 @@ namespace AspNetMigrator.Engine
         private static readonly string TryConvertPath =
             Path.Combine(Path.GetDirectoryName(typeof(TryConvertProjectConverterStep).Assembly.Location)!, "tools", "try-convert.exe");
 
-        public TryConvertProjectConverterStep(MigrateOptions options, ILogger logger)
+        public TryConvertProjectConverterStep(MigrateOptions options, ILogger<TryConvertProjectConverterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -38,11 +39,11 @@ namespace AspNetMigrator.Engine
         {
             if (!File.Exists(Options.ProjectPath))
             {
-                Logger.Fatal("Project file {ProjectPath} not found", Options.ProjectPath);
+                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
                 return (MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found");
             }
 
-            Logger.Information("Converting project file format with try-convert");
+            Logger.LogInformation("Converting project file format with try-convert");
             using var tryConvertProcess = new Process
             {
                 StartInfo = new ProcessStartInfo(TryConvertPath, string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Options.ProjectPath))
@@ -73,12 +74,12 @@ namespace AspNetMigrator.Engine
 
             if (tryConvertProcess.ExitCode != 0)
             {
-                Logger.Fatal("Conversion with try-convert failed (exit code {ExitCode})", tryConvertProcess.ExitCode);
+                Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode})", tryConvertProcess.ExitCode);
                 return (MigrationStepStatus.Failed, $"Convesion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
             }
             else
             {
-                Logger.Information("Project file format conversion successful");
+                Logger.LogInformation("Project file format conversion successful");
                 return (MigrationStepStatus.Complete, "Project file converted successfully");
             }
         }
@@ -93,19 +94,19 @@ namespace AspNetMigrator.Engine
                 // SDK-style projects should reference the Microsoft.NET.Sdk SDK
                 if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Verbose("Project {ProjectPath} not yet converted", Options.ProjectPath);
+                    Logger.LogDebug("Project {ProjectPath} not yet converted", Options.ProjectPath);
                     return Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Incomplete,
                         $"Project {Options.ProjectPath} is not an SDK project. Applying this step will execute the following try-convert command line: {TryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Options.ProjectPath)}"));
                 }
                 else
                 {
-                    Logger.Verbose("Project {ProjectPath} already targets SDK {SDK}", Options.ProjectPath, project.Sdk);
+                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", Options.ProjectPath, project.Sdk);
                     return Task.FromResult((MigrationStepStatus.Complete, $"Project already targets {project.Sdk} SDK"));
                 }
             }
             catch (InvalidProjectFileException exc)
             {
-                Logger.Error("Failed to open project {ProjectPath}; Exception: {Exception}", Options.ProjectPath, exc.ToString());
+                Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", Options.ProjectPath, exc.ToString());
                 return Task.FromResult((MigrationStepStatus.Failed, $"Failed to open project {Options.ProjectPath}"));
             }
         }
@@ -114,7 +115,7 @@ namespace AspNetMigrator.Engine
         {
             if (!string.IsNullOrWhiteSpace(e.Data))
             {
-                Logger.Information($"[try-convert] {e.Data}");
+                Logger.LogInformation($"[try-convert] {e.Data}");
             }
         }
 
@@ -122,7 +123,7 @@ namespace AspNetMigrator.Engine
         {
             if (!string.IsNullOrWhiteSpace(e.Data))
             {
-                Logger.Error($"[try-convert] {e.Data}");
+                Logger.LogError($"[try-convert] {e.Data}");
             }
         }
     }

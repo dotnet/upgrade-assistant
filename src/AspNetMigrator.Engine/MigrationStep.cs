@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine.GlobalCommands;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
 {
@@ -90,18 +91,18 @@ namespace AspNetMigrator.Engine
                 return true;
             }
 
-            Logger.Information("Applying migration step {StepTitle}", Title);
+            Logger.LogInformation("Applying migration step {StepTitle}", Title);
 
             (Status, StatusDetails) = await ApplyImplAsync(context, token).ConfigureAwait(false);
 
             if (Status == MigrationStepStatus.Complete)
             {
-                Logger.Information("Migration step {StepTitle} applied successfully", Title);
+                Logger.LogInformation("Migration step {StepTitle} applied successfully", Title);
                 return true;
             }
             else
             {
-                Logger.Warning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", Title, Status, StatusDetails);
+                Logger.LogWarning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", Title, Status, StatusDetails);
                 return false;
             }
         }
@@ -115,9 +116,9 @@ namespace AspNetMigrator.Engine
             // This method doesn't really need to be async or return a bool, as written now.
             // I've implemented it this way for now, though, to match ApplyAsync in case inheritors
             // want to change the behavior.
-            Logger.Information("Skipping migration step {StepTitle}", Title);
+            Logger.LogInformation("Skipping migration step {StepTitle}", Title);
             (Status, StatusDetails) = (MigrationStepStatus.Skipped, "Step skipped");
-            Logger.Information("Migration step {StepTitle} skipped", Title);
+            Logger.LogInformation("Migration step {StepTitle} skipped", Title);
             return Task.FromResult(true);
         }
     }

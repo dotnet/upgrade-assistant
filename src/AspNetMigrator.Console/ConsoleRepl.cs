@@ -6,9 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using AspNetMigrator.Engine.GlobalCommands;
+using AspNetMigrator.Logging;
 using AspNetMigrator.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.ConsoleApp
 {
@@ -24,7 +26,7 @@ namespace AspNetMigrator.ConsoleApp
         // the REPL will loop while !_done
         private bool _done;
 
-        public ConsoleRepl(ILogger logger, IServiceProvider services, IHostApplicationLifetime lifetime)
+        public ConsoleRepl(ILogger<ConsoleRepl> logger, IServiceProvider services, IHostApplicationLifetime lifetime)
         {
             _logger = logger;
             _lifetime = lifetime;
@@ -39,7 +41,7 @@ namespace AspNetMigrator.ConsoleApp
             }
             else
             {
-                _logger.Error("Error encountered while starting migration");
+                _logger.LogError("Error encountered while starting migration");
             }
 
             _lifetime.StopApplication();
@@ -149,7 +151,9 @@ namespace AspNetMigrator.ConsoleApp
                 commands.Add(new SeeMoreDetailsCommand(step, ShowStepStatus));
             }
 
-            commands.Add(new ConfigureLoggingCommand());
+            var logSettings = _services.GetRequiredService(typeof(LogSettings)) as LogSettings;
+            var logger = _services.GetRequiredService(typeof(ILogger<ConfigureConsoleLoggingCommand>)) as ILogger<ConfigureConsoleLoggingCommand>;
+            commands.Add(new ConfigureConsoleLoggingCommand(logSettings, logger));
             commands.Add(new ExitCommand(SetProgramIsDone));
 
             return commands;

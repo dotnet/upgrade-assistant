@@ -8,15 +8,21 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
+using AspNetMigrator.Logging;
 using AspNetMigrator.MSBuild;
 using AspNetMigrator.StartupUpdater;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
+        private static string _logFilePath = "log.txt";
+
         public static Task Main(string[] args)
         {
             ShowHeader();
@@ -33,16 +39,20 @@ namespace AspNetMigrator.ConsoleApp
         }
 
         private static Task RunMigrationAsync(MigrateOptions options)
-            => Host.CreateDefaultBuilder()
+        {
+            var logSettings = new LogSettings();
+
+            var host = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
                     services.AddHostedService<ConsoleRepl>();
-                    services.AddSingleton<ILogger>(_ => new ConsoleLogger(options.Verbose));
+
                     services.AddSingleton(options);
                     services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, CollectBackupPathFromConsole>();
+                    services.AddSingleton(logSettings);
 
                     // Add up start up initializer
                     services.AddTransient<IMigrationStartup, MSBuildRegistrationStartup>();
@@ -56,10 +66,18 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<MigrationStep, SourceUpdaterStep>();
                     services.AddScoped<Migrator>();
                 })
+                .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
+                    .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Conditional(evt => logSettings.IsConsoleEnabled, sink => sink.Console())
+                    .WriteTo.Conditional(evt => logSettings.IsFileEnabled, sink => sink.File(_logFilePath)))
                 .RunConsoleAsync(options =>
                 {
                     options.SuppressStatusMessages = true;
                 });
+
+            return host;
+        }
 
         private static void ShowHeader()
         {

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
 {
@@ -22,7 +23,7 @@ namespace AspNetMigrator.Engine
 
         private IEnumerable<NuGetPackageMap> _packageMaps = Enumerable.Empty<NuGetPackageMap>();
 
-        public PackageUpdaterStep(MigrateOptions options, PackageUpdaterOptions updaterOptions, ILogger logger)
+        public PackageUpdaterStep(MigrateOptions options, PackageUpdaterOptions updaterOptions, ILogger<PackageUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -71,7 +72,7 @@ namespace AspNetMigrator.Engine
 
                     if (map != null)
                     {
-                        Logger.Information("Removing outdated packaged reference (based on package map {PackageMapName}): {PackageReference}", map.PackageSetName, new NuGetReference(packageName, packageVersion));
+                        Logger.LogInformation("Removing outdated packaged reference (based on package map {PackageMapName}): {PackageReference}", map.PackageSetName, new NuGetReference(packageName, packageVersion));
 
                         // The reference should be replaced
                         var itemGroup = reference.Parent;
@@ -80,7 +81,7 @@ namespace AspNetMigrator.Engine
                         if (!itemGroup.Children.Any())
                         {
                             // If no element remain in the item group, remove it
-                            Logger.Verbose("Removing empty ItemGroup");
+                            Logger.LogDebug("Removing empty ItemGroup");
                             itemGroup.Parent.RemoveChild(itemGroup);
                         }
 
@@ -93,19 +94,19 @@ namespace AspNetMigrator.Engine
                 var packageReferenceItemGroup = project.ItemGroups.FirstOrDefault(g => g.Items.Any(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase)));
                 if (packageReferenceItemGroup is null)
                 {
-                    Logger.Verbose("Creating a new ItemGroup for package references");
+                    Logger.LogDebug("Creating a new ItemGroup for package references");
                     packageReferenceItemGroup = project.CreateItemGroupElement();
                     project.AppendChild(packageReferenceItemGroup);
                 }
                 else
                 {
-                    Logger.Verbose("Found ItemGroup for package references");
+                    Logger.LogDebug("Found ItemGroup for package references");
                 }
 
                 // Add replacement packages
                 foreach (var newReference in referencesToAdd.Distinct())
                 {
-                    Logger.Information("Adding package reference to: {PackageReference}", newReference);
+                    Logger.LogInformation("Adding package reference to: {PackageReference}", newReference);
                     var newItemElement = project.CreateItemElement(PackageReferenceType, newReference.Name);
                     packageReferenceItemGroup.AppendChild(newItemElement);
                     newItemElement.AddMetadata(VersionElementName, newReference.Version, true);
@@ -114,14 +115,14 @@ namespace AspNetMigrator.Engine
                 // Add reference to ASP.NET Core migration analyzers if needed
                 if (!project.Items.Any(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase) && AnalyzerPackageName.Equals(i.Include, StringComparison.OrdinalIgnoreCase)))
                 {
-                    Logger.Information("Adding package reference to: {PackageReference}", AnalyzerPackageName);
+                    Logger.LogInformation("Adding package reference to: {PackageReference}", AnalyzerPackageName);
                     var analyzerReferenceElement = project.CreateItemElement(PackageReferenceType, AnalyzerPackageName);
                     packageReferenceItemGroup.AppendChild(analyzerReferenceElement);
                     analyzerReferenceElement.AddMetadata(VersionElementName, AnalyzerPackageVersion, true);
                 }
                 else
                 {
-                    Logger.Verbose("Analyzer reference already present");
+                    Logger.LogDebug("Analyzer reference already present");
                 }
 
                 project.Save();
@@ -130,7 +131,7 @@ namespace AspNetMigrator.Engine
             }
             catch (InvalidProjectFileException)
             {
-                Logger.Fatal("Invalid project: {ProjectPath}", Options.ProjectPath);
+                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
                 return Task.FromResult((MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}"));
             }
         }
@@ -139,23 +140,23 @@ namespace AspNetMigrator.Engine
         {
             if (!File.Exists(PackageMapPath))
             {
-                Logger.Fatal("Package map file {PackageMapPath} not found", PackageMapPath);
+                Logger.LogCritical("Package map file {PackageMapPath} not found", PackageMapPath);
                 return (MigrationStepStatus.Failed, $"Package map file {PackageMapPath} not found");
             }
 
             // Initialize package maps from config file
-            Logger.Information("Loading package maps from {PackageMapPath}", PackageMapPath);
+            Logger.LogInformation("Loading package maps from {PackageMapPath}", PackageMapPath);
             using (var config = File.OpenRead(PackageMapPath))
             {
                 var packageMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
                 _packageMaps = packageMaps!;
             }
 
-            Logger.Verbose("Loaded {MapCount} package maps", _packageMaps.Count());
+            Logger.LogDebug("Loaded {MapCount} package maps", _packageMaps.Count());
 
             if (!File.Exists(Options.ProjectPath))
             {
-                Logger.Fatal("Project file {ProjectPath} not found", Options.ProjectPath);
+                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
                 return (MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found");
             }
 
@@ -174,23 +175,23 @@ namespace AspNetMigrator.Engine
 
                 if (outdatedPackages.Any())
                 {
-                    Logger.Information("Found {PackageCount} outdated package references", outdatedPackages.Count());
+                    Logger.LogInformation("Found {PackageCount} outdated package references", outdatedPackages.Count());
                     return (MigrationStepStatus.Incomplete, $"{outdatedPackages.Count()} packages need updated");
                 }
 
                 // Check that the analyzer package reference is present
                 if (!packageReferences.Any(p => p.Name.Equals(AnalyzerPackageName)))
                 {
-                    Logger.Information("Reference to package {AnalyzerPackageName} needs added", AnalyzerPackageName);
+                    Logger.LogInformation("Reference to package {AnalyzerPackageName} needs added", AnalyzerPackageName);
                     return (MigrationStepStatus.Incomplete, $"Reference to package {AnalyzerPackageName} needed");
                 }
 
-                Logger.Information("No package updates needed");
+                Logger.LogInformation("No package updates needed");
                 return (MigrationStepStatus.Complete, "No package updates needed");
             }
             catch (InvalidProjectFileException)
             {
-                Logger.Fatal("Invalid project: {ProjectPath}", Options.ProjectPath);
+                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
                 return (MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
             }
         }

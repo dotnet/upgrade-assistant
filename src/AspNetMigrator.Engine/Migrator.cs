@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
 {
@@ -13,10 +14,14 @@ namespace AspNetMigrator.Engine
 
         private ILogger Logger { get; }
 
-        public Migrator(IEnumerable<MigrationStep> steps, ILogger logger)
+        public Migrator(IEnumerable<MigrationStep> steps, ILogger<Migrator> logger)
         {
             _steps = steps?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(steps));
-            Logger = logger ?? new NullLogger();
+            Logger = logger;
+            if (logger is null)
+            {
+                Logger = new NullLogger();
+            }
         }
 
         public IEnumerable<MigrationStep> Steps => _steps;
@@ -25,7 +30,7 @@ namespace AspNetMigrator.Engine
         {
             if (_steps.Length == 0)
             {
-                Logger.Error("No steps were registered for migration.");
+                Logger.LogError("No steps were registered for migration.");
                 return AsyncEnumerable.Empty<MigrationStep>();
             }
             else
@@ -47,16 +52,16 @@ namespace AspNetMigrator.Engine
                 {
                     // It is not necessary to iterate through sub-steps because parents steps are
                     // expected to initialize their children during their own initialization
-                    Logger.Verbose("Initializing migration step {StepTitle}", step.Title);
+                    Logger.LogTrace("Initializing migration step {StepTitle}", step.Title);
                     await step.InitializeAsync(context, token).ConfigureAwait(false);
                     if (step.Status == MigrationStepStatus.Unknown)
                     {
-                        Logger.Error("Migration step initialization failed for step {StepTitle}", step.Title);
+                        Logger.LogError("Migration step initialization failed for step {StepTitle}", step.Title);
                         throw new InvalidOperationException($"Step must not have unknown status after initialization. Step: {step.Title}");
                     }
                     else
                     {
-                        Logger.Verbose("Step {StepTitle} initialized", step.Title);
+                        Logger.LogDebug("Step {StepTitle} initialized", step.Title);
                     }
                 }
 

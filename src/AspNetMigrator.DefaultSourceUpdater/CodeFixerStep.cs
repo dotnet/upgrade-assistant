@@ -8,6 +8,7 @@ using AspNetMigrator.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
 {
@@ -57,7 +58,7 @@ namespace AspNetMigrator.Engine
 
         protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
-            Logger.Verbose("Identified {DiagnosticCount} fixable {DiagnosticId} diagnostics", Diagnostics.Count(), DiagnosticId);
+            Logger.LogDebug("Identified {DiagnosticCount} fixable {DiagnosticId} diagnostics", Diagnostics.Count(), DiagnosticId);
 
             // This migration step is incomplete if any diagnostics it can fix remain
             return Diagnostics.Any() ?
@@ -81,21 +82,21 @@ namespace AspNetMigrator.Engine
 
                 if (updatedSolution is null)
                 {
-                    Logger.Error("Failed to fix diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
+                    Logger.LogError("Failed to fix diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
                     return (MigrationStepStatus.Failed, $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}");
                 }
                 else if (!await _sourceUpdater.UpdateSolutionAsync(updatedSolution, context, token).ConfigureAwait(false))
                 {
-                    Logger.Error("Failed to apply changes after fixing {DiagnosticId} to {FilePath}", diagnostic.Id, doc.FilePath);
+                    Logger.LogError("Failed to apply changes after fixing {DiagnosticId} to {FilePath}", diagnostic.Id, doc.FilePath);
                     return (MigrationStepStatus.Failed, $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}");
                 }
                 else
                 {
-                    Logger.Information("Diagnostic {DiagnosticId} fixed in {FilePath}", diagnostic.Id, doc.FilePath);
+                    Logger.LogInformation("Diagnostic {DiagnosticId} fixed in {FilePath}", diagnostic.Id, doc.FilePath);
                 }
             }
 
-            Logger.Verbose("All instances of {DiagnosticId} fixed", DiagnosticId);
+            Logger.LogDebug("All instances of {DiagnosticId} fixed", DiagnosticId);
             return (MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
 
@@ -117,7 +118,7 @@ namespace AspNetMigrator.Engine
 
             if (fixAction is null)
             {
-                Logger.Warning("No code fix found for {DiagnosticId}", diagnostic.Id);
+                Logger.LogWarning("No code fix found for {DiagnosticId}", diagnostic.Id);
                 return null;
             }
 
@@ -125,7 +126,7 @@ namespace AspNetMigrator.Engine
 
             if (applyOperation is null)
             {
-                Logger.Warning("Code fix could not be applied for {DiagnosticId}", diagnostic.Id);
+                Logger.LogWarning("Code fix could not be applied for {DiagnosticId}", diagnostic.Id);
                 return null;
             }
 

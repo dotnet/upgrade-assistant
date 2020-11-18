@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using Microsoft.Build.Locator;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.MSBuild
 {
@@ -14,7 +15,7 @@ namespace AspNetMigrator.MSBuild
     {
         private readonly ILogger _logger;
 
-        public MSBuildRegistrationStartup(ILogger logger)
+        public MSBuildRegistrationStartup(ILogger<MSBuildRegistrationStartup> logger)
         {
             _logger = logger;
         }
@@ -25,7 +26,7 @@ namespace AspNetMigrator.MSBuild
             try
             {
                 var msBuildPath = RegisterMSBuildInstance();
-                _logger.Information("MSBuild registered from {MSBuildPath}", msBuildPath);
+                _logger.LogInformation("MSBuild registered from {MSBuildPath}", msBuildPath);
 
                 return Task.FromResult(true);
             }
@@ -33,7 +34,7 @@ namespace AspNetMigrator.MSBuild
             catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                _logger.Error("Unexpected error registering MSBuild {Exception}", e);
+                _logger.LogError("Unexpected error registering MSBuild {Exception}", e);
                 return Task.FromResult(false);
             }
         }
