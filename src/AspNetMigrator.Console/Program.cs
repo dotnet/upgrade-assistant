@@ -43,14 +43,6 @@ namespace AspNetMigrator.ConsoleApp
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, CollectBackupPathFromConsole>();
-                    services.AddScoped<CommandResultHandlerFactory>();
-                    services.AddScoped<ICommandResultHandler, ApplyNextCommandResultHandler>();
-                    services.AddScoped<ICommandResultHandler, ConfigureLoggingCommandResultHandler>();
-                    services.AddScoped<ICommandResultHandler, SeeMoreDetailsCommandResultHandler>();
-                    services.AddScoped<ICommandResultHandler, SkipNextCommandResultHandler>();
-                    services.AddScoped<ICommandResultHandler, SetBackupPathCommandResultHandler>();
-                    services.AddScoped<ICommandResultHandler, UnknownCommandResultHandler>();
-                    services.AddScoped<ICommandResultHandler, ExitCommandResultHandler>();
 
                     // Add up start up initializer
                     services.AddTransient<IMigrationStartup, MSBuildRegistrationStartup>();

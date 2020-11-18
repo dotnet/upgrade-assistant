@@ -9,37 +9,25 @@ namespace AspNetMigrator.Engine
     public class Migrator
     {
         private readonly ImmutableArray<MigrationStep> _steps;
-        private bool _initialized;
-
-        public IEnumerable<MigrationStep> Steps => _initialized ? _steps : throw new InvalidOperationException("Migrator must be initialized prior top use");
-
-        public MigrationStep NextStep => GetNextStep(Steps);
 
         private ILogger Logger { get; }
 
         public Migrator(IEnumerable<MigrationStep> steps, ILogger logger)
         {
-            if (steps is null)
-            {
-                throw new ArgumentNullException(nameof(steps));
-            }
-
-            _steps = steps.ToImmutableArray();
-            _initialized = false;
+            _steps = steps?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(steps));
             Logger = logger ?? new NullLogger();
         }
 
-        public async Task InitializeAsync(IMigrationContext context, CancellationToken token)
+        public async Task<IEnumerable<MigrationStep>> GetInitializedStepsAsync(IMigrationContext context, CancellationToken token)
         {
-            Logger.Verbose("Initializing migrator");
-
             await InitializeNextStepAsync(_steps, context, token).ConfigureAwait(false);
-
-            _initialized = true;
-            Logger.Verbose("Initialization complete");
+            return _steps;
         }
 
-        private MigrationStep GetNextStep(IEnumerable<MigrationStep> steps)
+        public async Task<MigrationStep> GetNextStepAsync(IMigrationContext context, CancellationToken token) =>
+            GetCurrentStep(await GetInitializedStepsAsync(context, token).ConfigureAwait(false));
+
+        private MigrationStep GetCurrentStep(IEnumerable<MigrationStep> steps)
         {
             if (steps is null)
             {
@@ -50,65 +38,12 @@ namespace AspNetMigrator.Engine
             {
                 if (step.Status == MigrationStepStatus.Incomplete || step.Status == MigrationStepStatus.Failed)
                 {
-                    var nextSubStep = GetNextStep(step.SubSteps);
+                    var nextSubStep = GetCurrentStep(step.SubSteps);
                     return nextSubStep ?? step;
                 }
             }
 
             return null;
-        }
-
-        public async Task<bool> SkipNextStepAsync(IMigrationContext context, CancellationToken token)
-        {
-            Logger.Verbose("Skipping next migration step");
-
-            var nextStep = NextStep;
-            if (nextStep is null)
-            {
-                Logger.Information("No next migration step found");
-                return false;
-            }
-
-            Logger.Information("Skipping migration step {StepTitle}", nextStep.Title);
-
-            if (await nextStep.SkipAsync().ConfigureAwait(false))
-            {
-                Logger.Information("Migration step {StepTitle} skipped", nextStep.Title);
-                await InitializeNextStepAsync(Steps, context, token).ConfigureAwait(false);
-                return true;
-            }
-            else
-            {
-                Logger.Warning("Skipping migration step {StepTitle} failed: {Status}: {StatusDetail}", nextStep.Title, nextStep.Status, nextStep.StatusDetails);
-                return false;
-            }
-        }
-
-        public async Task<bool> ApplyNextStepAsync(IMigrationContext context, CancellationToken token)
-        {
-            Logger.Verbose("Applying next migration step");
-
-            var nextStep = NextStep;
-            if (nextStep is null)
-            {
-                Logger.Information("No next migration step found");
-                return false;
-            }
-
-            Logger.Information("Applying migration step {StepTitle}", nextStep.Title);
-            var success = await nextStep.ApplyAsync(context, token).ConfigureAwait(false);
-
-            if (success)
-            {
-                Logger.Information("Migration step {StepTitle} applied successfully", nextStep.Title);
-                await InitializeNextStepAsync(Steps, context, token).ConfigureAwait(false);
-                return true;
-            }
-            else
-            {
-                Logger.Warning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", nextStep.Title, nextStep.Status, nextStep.StatusDetails);
-                return false;
-            }
         }
 
         private async Task InitializeNextStepAsync(IEnumerable<MigrationStep> steps, IMigrationContext context, CancellationToken token)
@@ -123,6 +58,8 @@ namespace AspNetMigrator.Engine
             {
                 if (step.Status == MigrationStepStatus.Unknown)
                 {
+                    // It is not necessary to iterate through sub-steps because parents steps are
+                    // expected to initialize their children during their own initialization
                     Logger.Verbose("Initializing migration step {StepTitle}", step.Title);
                     await step.InitializeAsync(context, token).ConfigureAwait(false);
                     if (step.Status == MigrationStepStatus.Unknown)

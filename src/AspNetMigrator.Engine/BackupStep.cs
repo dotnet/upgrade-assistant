@@ -17,6 +17,11 @@ namespace AspNetMigrator.Engine
         public BackupStep(MigrateOptions options, ILogger logger, ICollectUserInput collectBackupPathFromUser)
             : base(options, logger)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _projectDir = Path.GetDirectoryName(options.ProjectPath);
             _skipBackup = options.SkipBackup;
             _backupPath = DetermineBackupPath(options);

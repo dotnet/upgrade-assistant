@@ -4,29 +4,21 @@ using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine.GlobalCommands
 {
-    // todo - rearrange the usage of the command to remove the dependency on Migrator
     public class ApplyNextCommand : MigrationCommand
     {
-        private readonly Lazy<string> _stepName;
+        private readonly MigrationStep _step;
 
-        public ApplyNextCommand(Lazy<string> stepName)
+        public ApplyNextCommand(MigrationStep step)
         {
-            _stepName = stepName ?? throw new ArgumentNullException(nameof(stepName));
+            _step = step ?? throw new ArgumentNullException(nameof(step));
         }
 
         // todo - support localization
-        public override string CommandText => $"Apply next step {{{_stepName.Value}}}";
+        public override string CommandText => $"Apply next step ({_step.Title})";
 
         public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
-            var migrator = context?.Migrator;
-
-            if (migrator is null)
-            {
-                throw new ArgumentNullException(nameof(migrator));
-            }
-
-            return await migrator.ApplyNextStepAsync(context, token).ConfigureAwait(false);
+            return await _step.ApplyAsync(context, token).ConfigureAwait(false);
         }
     }
 }

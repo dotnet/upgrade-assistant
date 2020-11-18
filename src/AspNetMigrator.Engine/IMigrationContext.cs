@@ -9,7 +9,5 @@ namespace AspNetMigrator.Engine
         ValueTask<ProjectId> GetProjectIdAsync(CancellationToken token);
 
         ValueTask<Workspace> GetWorkspaceAsync(CancellationToken token);
-
-        Migrator Migrator { get; }
     }
 }

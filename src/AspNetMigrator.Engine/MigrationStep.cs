@@ -27,7 +27,11 @@ namespace AspNetMigrator.Engine
             Status = MigrationStepStatus.Unknown;
             Commands = new List<MigrationCommand>
             {
-                new ApplyNextCommand(new Lazy<string>(() => Title))
+                new ApplyNextCommand(this),
+                new SkipNextCommand(this),
+
+                // TODO: Add this one back once the global commands are moved to the console project
+                // new SeeMoreDetailsCommand(this)
             };
         }
 
@@ -79,21 +83,34 @@ namespace AspNetMigrator.Engine
                 return true;
             }
 
+            Logger.Information("Applying migration step {StepTitle}", Title);
+
             (Status, StatusDetails) = await ApplyImplAsync(context, token).ConfigureAwait(false);
 
-            return Status == MigrationStepStatus.Complete;
+            if (Status == MigrationStepStatus.Complete)
+            {
+                Logger.Information("Migration step {StepTitle} applied successfully", Title);
+                return true;
+            }
+            else
+            {
+                Logger.Warning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", Title, Status, StatusDetails);
+                return false;
+            }
         }
 
         /// <summary>
         /// Skips a migration step.
         /// </summary>
         /// <returns>True if the step was successfully skipped, false otherwise.</returns>
-        public virtual Task<bool> SkipAsync()
+        public virtual Task<bool> SkipAsync(CancellationToken token)
         {
             // This method doesn't really need to be async or return a bool, as written now.
             // I've implemented it this way for now, though, to match ApplyAsync in case inheritors
             // want to change the behavior.
+            Logger.Information("Skipping migration step {StepTitle}", Title);
             (Status, StatusDetails) = (MigrationStepStatus.Skipped, "Step skipped");
+            Logger.Information("Migration step {StepTitle} skipped", Title);
             return Task.FromResult(true);
         }
     }

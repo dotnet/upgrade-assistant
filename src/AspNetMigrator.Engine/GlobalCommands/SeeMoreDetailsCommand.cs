@@ -7,12 +7,12 @@ namespace AspNetMigrator.Engine.GlobalCommands
 {
     public class SeeMoreDetailsCommand : MigrationCommand
     {
-        private readonly Func<List<UserMessage>, Task> _sendMessageToUserAsync;
+        private readonly MigrationStep _step;
+        private readonly Func<UserMessage, Task> _sendMessageToUserAsync;
 
-        // todo - support localization
-        public SeeMoreDetailsCommand(Func<List<UserMessage>, Task> sendMessageToUserAsync)
+        public SeeMoreDetailsCommand(MigrationStep step, Func<UserMessage, Task> sendMessageToUserAsync)
         {
-            // todo - something that handles a list of UserMessages
+            _step = step ?? throw new ArgumentNullException(nameof(step));
             _sendMessageToUserAsync = sendMessageToUserAsync ?? throw new ArgumentNullException(nameof(sendMessageToUserAsync));
         }
 
@@ -21,65 +21,14 @@ namespace AspNetMigrator.Engine.GlobalCommands
 
         public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
-            var migrator = context?.Migrator;
-
-            if (migrator is null)
+            // TODO : In the future, it might be preferable to have a 'step status' object that we pass so that the caller
+            //        can have more control over how title, description, and status details are formatted.
+            await _sendMessageToUserAsync(new UserMessage
             {
-                throw new ArgumentNullException(nameof(migrator));
-            }
-
-            var listOfMessages = new List<UserMessage>();
-
-            // try
-            // {
-            if (migrator.NextStep is null)
-            {
-                listOfMessages.Add(new UserMessage
-                {
-                    Category = UserMessageCategory.Warning,
-
-                    // todo - support localization
-                    Message = "No current step to get details for"
-                });
-            }
-            else
-            {
-                listOfMessages.Add(new UserMessage
-                {
-                    Category = UserMessageCategory.None,
-                    Message = string.Empty
-                });
-
-                listOfMessages.Add(new UserMessage
-                {
-                    Category = UserMessageCategory.Info,
-
-                    // todo - support localization
-                    Message = "Current step details"
-                });
-
-                listOfMessages.Add(new UserMessage
-                {
-                    Category = UserMessageCategory.None,
-                    Message = migrator.NextStep.Description,
-                });
-
-                listOfMessages.Add(new UserMessage
-                {
-                    Category = UserMessageCategory.None,
-                    Message = migrator.NextStep.StatusDetails,
-                });
-            }
-
-            await _sendMessageToUserAsync(listOfMessages).ConfigureAwait(false);
+                Severity = MessageSeverity.Info,
+                Message = $"{_step.Title}\n{_step.Description}\nStatus: {_step.StatusDetails}"
+            }).ConfigureAwait(false);
             return true;
-
-            // }
-            // catch (Exception ex)
-            // {
-            //    // todo - add logger
-            //    return false;
-            // }
         }
     }
 }

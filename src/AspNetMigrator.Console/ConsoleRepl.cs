@@ -59,23 +59,27 @@ namespace AspNetMigrator.ConsoleApp
             using var scope = _services.CreateScope();
             var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
             var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
-            var handlerFactory = scope.ServiceProvider.GetRequiredService<CommandResultHandlerFactory>();
 
-            using var context = new MSBuildWorkspaceMigrationContext(options.ProjectPath)
-            {
-                Migrator = migrator,
-            };
-
-            await migrator.InitializeAsync(context, token);
+            using var context = new MSBuildWorkspaceMigrationContext(options.ProjectPath);
 
             while (!_done)
             {
-                ShowMigrationSteps(migrator.Steps);
+                ShowMigrationSteps(await migrator.GetInitializedStepsAsync(context, token));
 
-                var command = GetCommand(migrator);
-                var commandResultHandler = handlerFactory.GetHandler(command?.GetType());
-                var commandResult = await command.ExecuteAsync(context, token);
-                commandResultHandler.HandleResult(commandResult);
+                var command = GetCommand(await migrator.GetNextStepAsync(context, token));
+
+                // TODO : It might be nice to allow commands to show more details by having a 'status' property
+                //        that can be shown here. Also, commands currently only return bools but, in the future,
+                //        if they return more complex objects, custom handlers could be used to respond to the different
+                //        commands' return values.
+                if (!await command.ExecuteAsync(context, token))
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
+                    Console.WriteLine($"Command ({command.CommandText}) did not succeed");
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
+                    Console.ResetColor();
+                }
             }
 
             _lifetime.StopApplication();
@@ -88,12 +92,12 @@ namespace AspNetMigrator.ConsoleApp
             _done = true;
         }
 
-        private MigrationCommand GetCommand(Migrator migrator)
+        private MigrationCommand GetCommand(MigrationStep step)
         {
-            var listOfCommands = GlobalCommands.GetCommands(SeeMoreDetailsCommandResultHandler.SendAllMessagesToUserAsync, SetProgramIsDone);
-            if (migrator?.NextStep?.Commands != null)
+            var listOfCommands = GetConsoleCommands(step);
+            if (step?.Commands != null)
             {
-                listOfCommands.InsertRange(0, migrator.NextStep.Commands);
+                listOfCommands.InsertRange(0, step.Commands);
             }
 
             Console.WriteLine("Choose command");
@@ -122,6 +126,20 @@ namespace AspNetMigrator.ConsoleApp
             }
 
             return new UnknownCommand();
+        }
+
+        private List<MigrationCommand> GetConsoleCommands(MigrationStep step)
+        {
+            var commands = new List<MigrationCommand>();
+            if (step != null)
+            {
+                commands.Add(new SeeMoreDetailsCommand(step, ShowStepStatus));
+            }
+
+            commands.Add(new ConfigureLoggingCommand());
+            commands.Add(new ExitCommand(SetProgramIsDone));
+
+            return commands;
         }
 
         private static void ShowMigrationSteps(IEnumerable<MigrationStep> steps, int offset = 0)
@@ -156,6 +174,12 @@ namespace AspNetMigrator.ConsoleApp
             }
 
             Console.WriteLine();
+        }
+
+        private static Task ShowStepStatus(UserMessage stepStatus)
+        {
+            Console.WriteLine("Current step details");
+            return ConsoleHelpers.SendMessageToUserAsync(stepStatus);
         }
 
         private static void WriteStepStatus(MigrationStep step, bool isNextStep)
