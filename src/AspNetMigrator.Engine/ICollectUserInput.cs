@@ -4,6 +4,6 @@ namespace AspNetMigrator.Engine
 {
     public interface ICollectUserInput
     {
-        public Task<string?> AskUser(string currentPath);
+        public Task<string?> AskUserAsync(string currentPath);
     }
 }

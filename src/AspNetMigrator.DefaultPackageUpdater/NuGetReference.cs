@@ -5,6 +5,12 @@ namespace AspNetMigrator.Engine
 {
     public class NuGetReference : IEquatable<NuGetReference>
     {
+        // NOTE: This is required for deserialization.
+        public NuGetReference()
+        {
+            Name = string.Empty;
+        }
+
         public NuGetReference(string name, string? version)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));

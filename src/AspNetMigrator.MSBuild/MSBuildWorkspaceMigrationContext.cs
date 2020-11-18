@@ -19,8 +19,6 @@ namespace AspNetMigrator.MSBuild
             _path = path;
         }
 
-        public Migrator Migrator => throw new NotImplementedException();
-
         public void Dispose()
         {
             _workspace?.Dispose();

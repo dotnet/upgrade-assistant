@@ -18,10 +18,6 @@ namespace AspNetMigrator.Engine
         {
             _steps = steps?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(steps));
             Logger = logger;
-            if (logger is null)
-            {
-                Logger = new NullLogger();
-            }
         }
 
         public IEnumerable<MigrationStep> Steps => _steps;

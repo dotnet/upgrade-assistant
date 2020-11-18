@@ -24,7 +24,7 @@ namespace AspNetMigrator.Engine
             }
 
             Options = options;
-            Logger = logger ?? new NullLogger();
+            Logger = logger;
             Status = MigrationStepStatus.Unknown;
             Commands = new List<MigrationCommand>
             {

@@ -6,7 +6,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class CollectBackupPathFromConsole : ICollectUserInput
     {
-        public Task<string?> AskUser(string currentBackupPath)
+        public Task<string?> AskUserAsync(string currentBackupPath)
         {
             // todo - support localization
             Console.WriteLine($"Current backup path: {currentBackupPath}");

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -42,7 +43,8 @@ namespace AspNetMigrator.Logging
                 LogLevel.Warning => LogEventLevel.Warning,
                 LogLevel.Error => LogEventLevel.Error,
                 LogLevel.Critical => LogEventLevel.Fatal,
-                LogLevel.None => LogEventLevel.Fatal
+                LogLevel.None => LogEventLevel.Fatal,
+                _ => throw new NotImplementedException()
             };
 
             if (newLogLevel == LogLevel.None)

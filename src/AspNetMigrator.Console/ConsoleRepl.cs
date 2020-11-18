@@ -151,9 +151,8 @@ namespace AspNetMigrator.ConsoleApp
                 commands.Add(new SeeMoreDetailsCommand(step, ShowStepStatus));
             }
 
-            var logSettings = _services.GetRequiredService(typeof(LogSettings)) as LogSettings;
-            var logger = _services.GetRequiredService(typeof(ILogger<ConfigureConsoleLoggingCommand>)) as ILogger<ConfigureConsoleLoggingCommand>;
-            commands.Add(new ConfigureConsoleLoggingCommand(logSettings, logger));
+            var logSettings = _services.GetRequiredService<LogSettings>();
+            commands.Add(new ConfigureConsoleLoggingCommand(logSettings));
             commands.Add(new ExitCommand(SetProgramIsDone));
 
             return commands;

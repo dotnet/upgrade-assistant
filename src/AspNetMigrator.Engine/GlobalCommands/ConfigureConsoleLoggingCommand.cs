@@ -9,17 +9,16 @@ namespace AspNetMigrator.Engine.GlobalCommands
     public class ConfigureConsoleLoggingCommand : MigrationCommand
     {
         private readonly LogSettings _logSettings;
-        private readonly ILogger _logger;
 
-        public ConfigureConsoleLoggingCommand(LogSettings logSettings, ILogger<ConfigureConsoleLoggingCommand> logger)
+        public ConfigureConsoleLoggingCommand(LogSettings logSettings)
         {
             _logSettings = logSettings ?? throw new ArgumentNullException(nameof(logSettings));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         // todo - support localization
         public override string CommandText => "Configure logging";
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "TODO For later")]
         public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
             Console.WriteLine("Choose your log level:");

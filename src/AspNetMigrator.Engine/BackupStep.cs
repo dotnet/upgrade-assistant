@@ -34,7 +34,7 @@ namespace AspNetMigrator.Engine
                 throw new ArgumentNullException(nameof(collectBackupPathFromUser));
             }
 
-            Commands.Insert(0, new SetBackupPathCommand(_backupPath, collectBackupPathFromUser.AskUser, (string newPath) =>
+            Commands.Insert(0, new SetBackupPathCommand(_backupPath, collectBackupPathFromUser.AskUserAsync, (string newPath) =>
             {
                 _backupPath = newPath;
             }));
