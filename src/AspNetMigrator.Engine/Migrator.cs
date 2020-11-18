@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AspNetMigrator.Engine
 {
@@ -18,44 +19,30 @@ namespace AspNetMigrator.Engine
             Logger = logger ?? new NullLogger();
         }
 
-        public async Task<IEnumerable<MigrationStep>> GetInitializedStepsAsync(IMigrationContext context, CancellationToken token)
+        public IEnumerable<MigrationStep> Steps => _steps;
+
+        public IAsyncEnumerable<MigrationStep> GetAllSteps(IMigrationContext context, CancellationToken token)
         {
-            await InitializeNextStepAsync(_steps, context, token).ConfigureAwait(false);
-            return _steps;
+            if (_steps.Length == 0)
+            {
+                Logger.Error("No steps were registered for migration.");
+                return AsyncEnumerable.Empty<MigrationStep>();
+            }
+            else
+            {
+                return GetStepsInternal(_steps, context, token);
+            }
         }
 
-        public async Task<MigrationStep> GetNextStepAsync(IMigrationContext context, CancellationToken token) =>
-            GetCurrentStep(await GetInitializedStepsAsync(context, token).ConfigureAwait(false));
-
-        private MigrationStep GetCurrentStep(IEnumerable<MigrationStep> steps)
+        private async IAsyncEnumerable<MigrationStep> GetStepsInternal(IEnumerable<MigrationStep> steps, IMigrationContext context, [EnumeratorCancellation] CancellationToken token)
         {
-            if (steps is null)
-            {
-                return null;
-            }
-
             foreach (var step in steps)
             {
-                if (step.Status == MigrationStepStatus.Incomplete || step.Status == MigrationStepStatus.Failed)
+                await foreach (var innerStep in GetStepsInternal(step.SubSteps, context, token))
                 {
-                    var nextSubStep = GetCurrentStep(step.SubSteps);
-                    return nextSubStep ?? step;
+                    yield return innerStep;
                 }
-            }
 
-            return null;
-        }
-
-        private async Task InitializeNextStepAsync(IEnumerable<MigrationStep> steps, IMigrationContext context, CancellationToken token)
-        {
-            if (steps is null)
-            {
-                return;
-            }
-
-            // Iterate steps, initializing any that are uninitialized until we come to an incomplete or failed step
-            foreach (var step in steps)
-            {
                 if (step.Status == MigrationStepStatus.Unknown)
                 {
                     // It is not necessary to iterate through sub-steps because parents steps are
@@ -73,10 +60,9 @@ namespace AspNetMigrator.Engine
                     }
                 }
 
-                if (step.Status == MigrationStepStatus.Incomplete || step.Status == MigrationStepStatus.Failed)
+                if (!step.IsComplete)
                 {
-                    // If the step is not complete, halt initialization
-                    break;
+                    yield return step;
                 }
             }
         }

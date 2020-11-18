@@ -47,6 +47,13 @@ namespace AspNetMigrator.Engine
 
         public MigrationStepStatus Status { get; private set; }
 
+        public bool IsComplete => Status switch
+        {
+            MigrationStepStatus.Complete => true,
+            MigrationStepStatus.Skipped => true,
+            _ => false,
+        };
+
         public string StatusDetails { get; private set; }
 
         /// <summary>

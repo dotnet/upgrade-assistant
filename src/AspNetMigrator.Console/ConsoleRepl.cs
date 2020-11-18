@@ -56,33 +56,46 @@ namespace AspNetMigrator.ConsoleApp
 
         private async Task RunRepl(CancellationToken token)
         {
-            using var scope = _services.CreateScope();
-            var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
-            var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
-
-            using var context = new MSBuildWorkspaceMigrationContext(options.ProjectPath);
-
-            while (!_done)
+            try
             {
-                ShowMigrationSteps(await migrator.GetInitializedStepsAsync(context, token));
+                using var scope = _services.CreateScope();
+                var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
+                var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
 
-                var command = GetCommand(await migrator.GetNextStepAsync(context, token));
+                using var context = new MSBuildWorkspaceMigrationContext(options.ProjectPath);
 
-                // TODO : It might be nice to allow commands to show more details by having a 'status' property
-                //        that can be shown here. Also, commands currently only return bools but, in the future,
-                //        if they return more complex objects, custom handlers could be used to respond to the different
-                //        commands' return values.
-                if (!await command.ExecuteAsync(context, token))
+                await foreach (var step in migrator.GetAllSteps(context, token))
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    while (!step.IsComplete)
+                    {
+                        ShowMigrationSteps(migrator.Steps, step);
+
+                        var command = GetCommand(step);
+
+                        // TODO : It might be nice to allow commands to show more details by having a 'status' property
+                        //        that can be shown here. Also, commands currently only return bools but, in the future,
+                        //        if they return more complex objects, custom handlers could be used to respond to the different
+                        //        commands' return values.
+                        if (!await command.ExecuteAsync(context, token))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
 #pragma warning disable CA1303 // Do not pass literals as localized parameters
-                    Console.WriteLine($"Command ({command.CommandText}) did not succeed");
+                            Console.WriteLine($"Command ({command.CommandText}) did not succeed");
 #pragma warning restore CA1303 // Do not pass literals as localized parameters
-                    Console.ResetColor();
+                            Console.ResetColor();
+                        }
+
+                        if (_done)
+                        {
+                            break;
+                        }
+                    }
                 }
             }
-
-            _lifetime.StopApplication();
+            finally
+            {
+                _lifetime.StopApplication();
+            }
         }
 
         public Task StopAsync(CancellationToken token) => Task.CompletedTask;
@@ -142,7 +155,7 @@ namespace AspNetMigrator.ConsoleApp
             return commands;
         }
 
-        private static void ShowMigrationSteps(IEnumerable<MigrationStep> steps, int offset = 0)
+        private static void ShowMigrationSteps(IEnumerable<MigrationStep> steps, MigrationStep currentStep, int offset = 0)
         {
             if (steps is null || !steps.Any())
             {
@@ -166,11 +179,11 @@ namespace AspNetMigrator.ConsoleApp
 
                 // Write the step title and make a note of whether the step is incomplete
                 // (since that would mean future steps shouldn't show "[Current step]")
-                WriteStepStatus(step, !nextStepFound);
+                WriteStepStatus(step, step == currentStep);
                 Console.WriteLine(step.Title);
                 nextStepFound = nextStepFound || (step.Status != MigrationStepStatus.Complete);
 
-                ShowMigrationSteps(step.SubSteps, offset + 1);
+                ShowMigrationSteps(step.SubSteps, currentStep, offset + 1);
             }
 
             Console.WriteLine();
