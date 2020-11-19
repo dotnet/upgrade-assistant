@@ -11,7 +11,7 @@ namespace AspNetMigrator.MSBuild
     {
         private readonly string _path;
 
-        private Project? _project;
+        private ProjectId? _projectId;
         private Workspace? _workspace;
 
         public MSBuildWorkspaceMigrationContext(string path)
@@ -30,7 +30,14 @@ namespace AspNetMigrator.MSBuild
             // Ensure workspace is available
             await GetWorkspaceAsync(token).ConfigureAwait(false);
 
-            return _project?.Id;
+            return _projectId;
+        }
+
+        public ValueTask SetProjectAsync(ProjectId projectId, CancellationToken token)
+        {
+            _projectId = projectId;
+
+            return ValueTask.CompletedTask;
         }
 
         public async ValueTask<Workspace> GetWorkspaceAsync(CancellationToken token)
@@ -38,7 +45,18 @@ namespace AspNetMigrator.MSBuild
             if (_workspace is null)
             {
                 var workspace = MSBuildWorkspace.Create();
-                _project = await workspace.OpenProjectAsync(_path, cancellationToken: token).ConfigureAwait(false);
+
+                if (_path.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+                {
+                    await workspace.OpenSolutionAsync(_path, cancellationToken: token).ConfigureAwait(false);
+                }
+                else
+                {
+                    var project = await workspace.OpenProjectAsync(_path, cancellationToken: token).ConfigureAwait(false);
+
+                    _projectId = project.Id;
+                }
+
                 _workspace = workspace;
             }
 

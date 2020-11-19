@@ -22,7 +22,9 @@ namespace AspNetMigrator.Engine
 
         public async override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
-            var newBackupPath = await _collectUserInput(_currentBackupPath).ConfigureAwait(false);
+            var prompt = $"Current backup path: {_currentBackupPath}";
+            var newBackupPath = await _collectUserInput(prompt).ConfigureAwait(false);
+
             if (string.IsNullOrWhiteSpace(newBackupPath))
             {
                 newBackupPath = _currentBackupPath;

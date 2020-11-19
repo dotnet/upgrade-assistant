@@ -8,6 +8,16 @@ namespace AspNetMigrator.Engine
     {
         ValueTask<ProjectId?> GetProjectIdAsync(CancellationToken token);
 
+        ValueTask SetProjectAsync(ProjectId projectId, CancellationToken token);
+
         ValueTask<Workspace> GetWorkspaceAsync(CancellationToken token);
+
+        async ValueTask<Project?> GetProjectAsync(CancellationToken token)
+        {
+            var ws = await GetWorkspaceAsync(token).ConfigureAwait(false);
+            var projectId = await GetProjectIdAsync(token).ConfigureAwait(false);
+
+            return ws.CurrentSolution.GetProject(projectId);
+        }
     }
 }

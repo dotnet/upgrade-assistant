@@ -4,14 +4,13 @@ using AspNetMigrator.Engine;
 
 namespace AspNetMigrator.ConsoleApp
 {
-    public class CollectBackupPathFromConsole : ICollectUserInput
+    public class ConsoleCollectUserInput : ICollectUserInput
     {
-        public Task<string?> AskUserAsync(string currentBackupPath)
+        public Task<string?> AskUserAsync(string prompt)
         {
-            // todo - support localization
-            Console.WriteLine($"Current backup path: {currentBackupPath}");
+            Console.WriteLine(prompt);
 #pragma warning disable CA1303 // Do not pass literals as localized parameters
-            Console.WriteLine("Please specify the new path and then press {enter} to continue");
+            Console.Write("> ");
 #pragma warning restore CA1303 // Do not pass literals as localized parameters
 
             return Task.FromResult(Console.ReadLine());

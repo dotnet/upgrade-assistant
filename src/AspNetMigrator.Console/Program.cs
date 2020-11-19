@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using AspNetMigrator.Logging;
 using AspNetMigrator.MSBuild;
+using AspNetMigrator.Solution;
 using AspNetMigrator.StartupUpdater;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,7 +52,7 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
 
                     // Add command handlers
-                    services.AddTransient<ICollectUserInput, CollectBackupPathFromConsole>();
+                    services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
                     services.AddSingleton(logSettings);
 
                     // Add up start up initializer
@@ -60,6 +61,7 @@ namespace AspNetMigrator.ConsoleApp
                     // Add steps
                     services.AddScoped<BackupStep>(); // used by SetBackupPathCommandResultHandler
                     services.AddScoped<MigrationStep>(ctx => ctx.GetRequiredService<BackupStep>());
+                    services.AddScoped<MigrationStep, SolutionMigrationStep>();
                     services.AddScoped<MigrationStep, TryConvertProjectConverterStep>();
                     services.AddScoped<MigrationStep, PackageUpdaterStep>();
                     services.AddScoped<MigrationStep, StartupUpdaterStep>();

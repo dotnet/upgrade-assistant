@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj" />
     <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj" />
     <ProjectReference Include="..\AspNetMigrator.TryConvertProjectConverter\AspNetMigrator.TryConvertProjectConverter.csproj" />
     <ProjectReference Include="..\AspNetMigrator.DefaultPackageUpdater\AspNetMigrator.DefaultPackageUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.DefaultSourceUpdater\AspNetMigrator.DefaultSourceUpdater.csproj" />

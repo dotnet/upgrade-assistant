@@ -37,16 +37,24 @@ namespace AspNetMigrator.Engine
 
         protected async override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
-            if (!File.Exists(Options.ProjectPath))
+            if (context is null)
             {
-                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found");
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+            var projectPath = project?.FilePath;
+
+            if (!File.Exists(projectPath))
+            {
+                Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
+                return (MigrationStepStatus.Failed, $"Project file {projectPath} not found");
             }
 
             Logger.LogInformation("Converting project file format with try-convert");
             using var tryConvertProcess = new Process
             {
-                StartInfo = new ProcessStartInfo(TryConvertPath, string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Options.ProjectPath))
+                StartInfo = new ProcessStartInfo(TryConvertPath, string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath))
                 {
                     CreateNoWindow = true,
                     UseShellExecute = false,

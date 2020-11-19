@@ -70,6 +70,8 @@ namespace AspNetMigrator.ConsoleApp
                 {
                     while (!step.IsComplete)
                     {
+                        token.ThrowIfCancellationRequested();
+
                         ShowMigrationSteps(migrator.Steps, step);
 
                         var command = GetCommand(step);
@@ -93,6 +95,9 @@ namespace AspNetMigrator.ConsoleApp
                         }
                     }
                 }
+            }
+            catch (OperationCanceledException)
+            {
             }
             finally
             {
