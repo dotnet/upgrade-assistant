@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
-using AspNetMigrator.Engine.GlobalCommands;
-using AspNetMigrator.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,16 +17,19 @@ namespace AspNetMigrator.ConsoleApp
     {
         private readonly IServiceProvider _services;
         private readonly ICollectUserInput _input;
+        private readonly CommandProvider _commandProvider;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
 
         public ConsoleRepl(
             ICollectUserInput input,
+            CommandProvider commandProvider,
             ILogger<ConsoleRepl> logger,
             IServiceProvider services,
             IHostApplicationLifetime lifetime)
         {
             _input = input;
+            _commandProvider = commandProvider;
             _logger = logger;
             _lifetime = lifetime;
             _services = services;
@@ -82,7 +83,8 @@ namespace AspNetMigrator.ConsoleApp
 
                     ShowMigrationSteps(migrator.Steps, step);
 
-                    var command = await GetCommandAsync(step, token);
+                    var commands = _commandProvider.GetCommands(step);
+                    var command = await _input.ChooseAsync("Choose command", commands, token);
 
                     // TODO : It might be nice to allow commands to show more details by having a 'status' property
                     //        that can be shown here. Also, commands currently only return bools but, in the future,
@@ -96,25 +98,15 @@ namespace AspNetMigrator.ConsoleApp
                     }
                 }
             }
+
+            ShowMigrationSteps(migrator.Steps);
+
+            _logger.LogInformation("Migration has completed. Please review any changes.");
         }
 
         public Task StopAsync(CancellationToken token) => Task.CompletedTask;
 
-        private Task<MigrationCommand> GetCommandAsync(MigrationStep step, CancellationToken token)
-        {
-            var logSettings = _services.GetRequiredService<LogSettings>();
-            var exit = new ExitCommand(_lifetime.StopApplication);
-            var commands = new List<MigrationCommand>(step.Commands)
-            {
-                new SeeMoreDetailsCommand(step, ShowStepStatus),
-                new ConfigureConsoleLoggingCommand(logSettings),
-                exit
-            };
-
-            return _input.ChooseAsync("Choose command", commands, exit, token);
-        }
-
-        private static void ShowMigrationSteps(IEnumerable<MigrationStep> steps, MigrationStep currentStep, int offset = 0)
+        private static void ShowMigrationSteps(IEnumerable<MigrationStep> steps, MigrationStep? currentStep = null, int offset = 0)
         {
             if (steps is null || !steps.Any())
             {
@@ -146,12 +138,6 @@ namespace AspNetMigrator.ConsoleApp
             }
 
             Console.WriteLine();
-        }
-
-        private static Task ShowStepStatus(UserMessage stepStatus)
-        {
-            Console.WriteLine("Current step details");
-            return ConsoleHelpers.SendMessageToUserAsync(stepStatus);
         }
 
         private static void WriteStepStatus(MigrationStep step, bool isNextStep)

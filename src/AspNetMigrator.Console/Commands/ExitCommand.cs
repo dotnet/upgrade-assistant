@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator.Engine;
 
-namespace AspNetMigrator.Engine.GlobalCommands
+namespace AspNetMigrator.ConsoleApp.Commands
 {
     public class ExitCommand : MigrationCommand
     {

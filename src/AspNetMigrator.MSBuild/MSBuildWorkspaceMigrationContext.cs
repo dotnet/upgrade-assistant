@@ -102,14 +102,8 @@ namespace AspNetMigrator.MSBuild
         private void Workspace_WorkspaceFailed(object? sender, WorkspaceDiagnosticEventArgs e)
         {
             var diagnostic = e.Diagnostic!;
-            var level = diagnostic.Kind switch
-            {
-                WorkspaceDiagnosticKind.Failure => LogLevel.Error,
-                WorkspaceDiagnosticKind.Warning => LogLevel.Warning,
-                _ => LogLevel.Trace,
-            };
 
-            _logger.Log(level, "Error loading in MSBuild workspace {Message}", diagnostic.Message);
+            _logger.LogDebug("[{Level}] Problem loading file in MSBuild workspace {Message}", diagnostic.Kind, diagnostic.Message);
         }
 
         public async IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties([EnumeratorCancellation] CancellationToken token)

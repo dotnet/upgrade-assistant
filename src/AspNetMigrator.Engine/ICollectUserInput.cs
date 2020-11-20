@@ -8,7 +8,7 @@ namespace AspNetMigrator.Engine
     {
         Task<string?> AskUserAsync(string currentPath);
 
-        Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, T defaultResult, CancellationToken token)
+        Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
             where T : MigrationCommand;
     }
 }

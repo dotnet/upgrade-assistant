@@ -26,7 +26,7 @@ namespace AspNetMigrator.ConsoleApp
             return Task.FromResult(Console.ReadLine());
         }
 
-        public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, T defaultResult, CancellationToken token)
+        public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
             where T : MigrationCommand
         {
             if (commands is null)
@@ -53,7 +53,7 @@ namespace AspNetMigrator.ConsoleApp
 
                 if (result is null)
                 {
-                    return Task.FromResult(defaultResult);
+                    throw new OperationCanceledException();
                 }
 
                 var selectedCommandText = result.AsSpan().Trim(" .\t");

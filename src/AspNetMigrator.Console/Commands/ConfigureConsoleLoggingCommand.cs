@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator.Engine;
 using AspNetMigrator.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetMigrator.Engine.GlobalCommands
+namespace AspNetMigrator.ConsoleApp.Commands
 {
     public class ConfigureConsoleLoggingCommand : MigrationCommand
     {

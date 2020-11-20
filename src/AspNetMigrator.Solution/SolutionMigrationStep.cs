@@ -68,40 +68,33 @@ namespace AspNetMigrator.Solution
                 p.ProjectReferences.Select(r => sln.GetProject(r.ProjectId)!));
         }
 
-        private async Task<Project?> GetProject(Workspace ws, CancellationToken token)
+        private async Task<Project> GetProject(Workspace ws, CancellationToken token)
         {
             const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
             var allProjects = ws.CurrentSolution.Projects.OrderBy(p => p.Name).Select(ProjectCommand.Create);
-            var entrypoint = await _input.ChooseAsync(EntrypointQuestion, allProjects, ProjectCommand.Empty, token).ConfigureAwait(false);
-
-            if (entrypoint.Project is null)
-            {
-                return null;
-            }
+            var entrypoint = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
 
             var ordered = GetOrderedProjects(entrypoint.Project).Select(ProjectCommand.Create);
 
-            var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, ProjectCommand.Empty, token).ConfigureAwait(false);
+            var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
             return result.Project;
         }
 
         private class ProjectCommand : MigrationCommand
         {
-            public static ProjectCommand Empty => new ProjectCommand(null);
-
             public static ProjectCommand Create(Project project) => new ProjectCommand(project);
 
-            public ProjectCommand(Project? project)
+            public ProjectCommand(Project project)
             {
                 Project = project;
             }
 
-            public override string CommandText => Project!.Name;
+            public override string CommandText => Project.Name;
 
-            public Project? Project { get; }
+            public Project Project { get; }
 
             public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
                 => Task.FromResult(true);

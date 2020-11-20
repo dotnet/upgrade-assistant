@@ -52,7 +52,7 @@ namespace AspNetMigrator.ConsoleApp
 
         private static Task RunMigrationAsync(MigrateOptions options)
         {
-            var logSettings = new LogSettings();
+            var logSettings = new LogSettings(options.Verbose);
 
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
@@ -66,6 +66,7 @@ namespace AspNetMigrator.ConsoleApp
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
+                    services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
 
                     // Add steps

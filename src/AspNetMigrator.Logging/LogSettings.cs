@@ -7,10 +7,11 @@ namespace AspNetMigrator.Logging
 {
     public class LogSettings
     {
-        public LogSettings()
+        public LogSettings(bool verbose)
         {
             SelectedTarget = LogTarget.Both;
             LoggingLevelSwitch = new LoggingLevelSwitch();
+            SetLogLevel(verbose ? LogLevel.Trace : LogLevel.Information);
         }
 
         public LogTarget SelectedTarget { get; set; }

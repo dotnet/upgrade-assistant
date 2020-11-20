@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Engine.GlobalCommands;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Engine
@@ -26,14 +25,7 @@ namespace AspNetMigrator.Engine
             Options = options;
             Logger = logger;
             Status = MigrationStepStatus.Unknown;
-            Commands = new List<MigrationCommand>
-            {
-                new ApplyNextCommand(this),
-                new SkipNextCommand(this),
-
-                // TODO: Add this one back once the global commands are moved to the console project
-                // new SeeMoreDetailsCommand(this)
-            };
+            Commands = new List<MigrationCommand>();
         }
 
         public virtual string Title { get; protected set; } = string.Empty;
@@ -72,7 +64,21 @@ namespace AspNetMigrator.Engine
         /// </summary>
         public virtual async Task InitializeAsync(IMigrationContext context, CancellationToken token)
         {
-            (Status, StatusDetails) = await InitializeImplAsync(context, token).ConfigureAwait(false);
+            try
+            {
+                (Status, StatusDetails) = await InitializeImplAsync(context, token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
+            {
+                (Status, StatusDetails) = (MigrationStepStatus.Failed, "Unexpected error initializing step.");
+                Logger.LogError(e, "Unexpected error initializing step");
+            }
         }
 
         /// <summary>
@@ -93,16 +99,31 @@ namespace AspNetMigrator.Engine
 
             Logger.LogInformation("Applying migration step {StepTitle}", Title);
 
-            (Status, StatusDetails) = await ApplyImplAsync(context, token).ConfigureAwait(false);
+            try
+            {
+                (Status, StatusDetails) = await ApplyImplAsync(context, token).ConfigureAwait(false);
 
-            if (Status == MigrationStepStatus.Complete)
-            {
-                Logger.LogInformation("Migration step {StepTitle} applied successfully", Title);
-                return true;
+                if (Status == MigrationStepStatus.Complete)
+                {
+                    Logger.LogInformation("Migration step {StepTitle} applied successfully", Title);
+                    return true;
+                }
+                else
+                {
+                    Logger.LogWarning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", Title, Status, StatusDetails);
+                    return false;
+                }
             }
-            else
+            catch (OperationCanceledException)
             {
-                Logger.LogWarning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", Title, Status, StatusDetails);
+                throw;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
+            {
+                (Status, StatusDetails) = (MigrationStepStatus.Failed, "Unexpected error applying step.");
+                Logger.LogError(e, "Unexpected error applying step");
                 return false;
             }
         }
