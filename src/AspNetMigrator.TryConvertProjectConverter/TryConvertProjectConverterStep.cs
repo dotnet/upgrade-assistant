@@ -63,6 +63,11 @@ namespace AspNetMigrator.Engine
                 }
             };
 
+            await foreach (var (name, value) in context.GetWorkspaceProperties(token))
+            {
+                tryConvertProcess.StartInfo.EnvironmentVariables.Add(name, value);
+            }
+
             // Clear some MSBuild env vars that can prevent try-convert from successfully
             // opening non-SDK projects.
             foreach (var envVar in EnvVarsToWitholdFromTryConvert)
@@ -92,30 +97,41 @@ namespace AspNetMigrator.Engine
             }
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+
+            if (projectPath is null)
+            {
+                return (MigrationStepStatus.Failed, "No project specified");
+            }
+
             try
             {
-                var project = ProjectRootElement.Open(Options.ProjectPath);
+                var project = ProjectRootElement.Open(projectPath);
                 project.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
 
                 // SDK-style projects should reference the Microsoft.NET.Sdk SDK
                 if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.LogDebug("Project {ProjectPath} not yet converted", Options.ProjectPath);
-                    return Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Incomplete,
-                        $"Project {Options.ProjectPath} is not an SDK project. Applying this step will execute the following try-convert command line: {TryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Options.ProjectPath)}"));
+                    Logger.LogDebug("Project {ProjectPath} not yet converted", projectPath);
+                    return (MigrationStepStatus.Incomplete, $"Project {projectPath} is not an SDK project. Applying this step will execute the following try-convert command line: {TryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath)}");
                 }
                 else
                 {
-                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", Options.ProjectPath, project.Sdk);
-                    return Task.FromResult((MigrationStepStatus.Complete, $"Project already targets {project.Sdk} SDK"));
+                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectPath, project.Sdk);
+                    return (MigrationStepStatus.Complete, $"Project already targets {project.Sdk} SDK");
                 }
             }
             catch (InvalidProjectFileException exc)
             {
-                Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", Options.ProjectPath, exc.ToString());
-                return Task.FromResult((MigrationStepStatus.Failed, $"Failed to open project {Options.ProjectPath}"));
+                Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectPath, exc.ToString());
+                return (MigrationStepStatus.Failed, $"Failed to open project {projectPath}");
             }
         }
 

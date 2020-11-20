@@ -61,10 +61,9 @@ namespace AspNetMigrator.ConsoleApp
             try
             {
                 using var scope = _services.CreateScope();
+                using var context = scope.ServiceProvider.GetRequiredService<IMigrationContext>();
                 var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
                 var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
-
-                using var context = new MSBuildWorkspaceMigrationContext(options.ProjectPath);
 
                 await foreach (var step in migrator.GetAllSteps(context, token))
                 {

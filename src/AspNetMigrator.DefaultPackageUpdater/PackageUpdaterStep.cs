@@ -49,16 +49,23 @@ namespace AspNetMigrator.Engine
         // TODO : This does not currently update package dependencies, so it's easy to get into a state where package versions conflict.
         //        This should be updated to more robustly handle dependencies, either by including dependency information in the config (which
         //        would require a fair bit of work) or by determining dependencies at runtime.
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (!File.Exists(PackageMapPath))
             {
                 throw new FileNotFoundException("Package map file not found", PackageMapPath);
             }
 
+            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+
             try
             {
-                var project = ProjectRootElement.Open(Options.ProjectPath);
+                var project = ProjectRootElement.Open(projectPath);
                 project.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
 
                 var referencesToAdd = new List<NuGetReference>();
@@ -127,17 +134,22 @@ namespace AspNetMigrator.Engine
 
                 project.Save();
 
-                return Task.FromResult((MigrationStepStatus.Complete, "Packages updated"));
+                return (MigrationStepStatus.Complete, "Packages updated");
             }
             catch (InvalidProjectFileException)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return Task.FromResult((MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}"));
+                Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
+                return (MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
             }
         }
 
         protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (!File.Exists(PackageMapPath))
             {
                 Logger.LogCritical("Package map file {PackageMapPath} not found", PackageMapPath);
@@ -154,15 +166,17 @@ namespace AspNetMigrator.Engine
 
             Logger.LogDebug("Loaded {MapCount} package maps", _packageMaps.Count());
 
-            if (!File.Exists(Options.ProjectPath))
+            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+
+            if (!File.Exists(projectPath))
             {
-                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found");
+                Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
+                return (MigrationStepStatus.Failed, $"Project file {projectPath} not found");
             }
 
             try
             {
-                var project = ProjectRootElement.Open(Options.ProjectPath);
+                var project = ProjectRootElement.Open(projectPath);
                 project.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
 
                 // Query for the project's package references
@@ -191,8 +205,8 @@ namespace AspNetMigrator.Engine
             }
             catch (InvalidProjectFileException)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
+                Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
+                return (MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
             }
         }
     }

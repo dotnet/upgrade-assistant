@@ -9,14 +9,11 @@ using System.IO;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using AspNetMigrator.Logging;
-using AspNetMigrator.MSBuild;
 using AspNetMigrator.Solution;
 using AspNetMigrator.StartupUpdater;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 
 namespace AspNetMigrator.ConsoleApp
 {
@@ -48,15 +45,14 @@ namespace AspNetMigrator.ConsoleApp
                 {
                     services.AddHostedService<ConsoleRepl>();
 
+                    services.AddMsBuild();
+
                     services.AddSingleton(options);
                     services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
                     services.AddSingleton(logSettings);
-
-                    // Add up start up initializer
-                    services.AddTransient<IMigrationStartup, MSBuildRegistrationStartup>();
 
                     // Add steps
                     services.AddScoped<BackupStep>(); // used by SetBackupPathCommandResultHandler

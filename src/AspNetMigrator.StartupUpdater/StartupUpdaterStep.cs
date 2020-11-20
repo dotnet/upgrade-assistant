@@ -54,19 +54,26 @@ namespace AspNetMigrator.StartupUpdater
 
         protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+
             try
             {
-                var project = ProjectRootElement.Open(Options.ProjectPath);
+                var project = ProjectRootElement.Open(projectPath);
                 project.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
 
                 var rootNamespace = project.Properties.FirstOrDefault(p => p.Name.Equals(RootNamespacePropertyName, StringComparison.Ordinal))?.Value;
                 if (rootNamespace is null || rootNamespace.Contains("$"))
                 {
                     // If there is no root namespace property, default to the project file name
-                    rootNamespace = Path.GetFileNameWithoutExtension(Options.ProjectPath);
+                    rootNamespace = Path.GetFileNameWithoutExtension(projectPath);
                 }
 
-                var projectDir = Path.GetDirectoryName(Options.ProjectPath)!;
+                var projectDir = Path.GetDirectoryName(projectPath)!;
                 var resourceAssembly = typeof(StartupUpdaterStep).Assembly;
 
                 if (_itemsToAdd is null)
@@ -125,50 +132,57 @@ namespace AspNetMigrator.StartupUpdater
             }
             catch (InvalidProjectFileException)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
+                Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
+                return (MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
             }
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
-            if (!File.Exists(Options.ProjectPath))
+            if (context is null)
             {
-                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
-                return Task.FromResult((MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found"));
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+
+            if (projectPath is null || !File.Exists(projectPath))
+            {
+                Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
+                return (MigrationStepStatus.Failed, $"Project file {projectPath} not found");
             }
 
             try
             {
-                var projectRoot = ProjectRootElement.Open(Options.ProjectPath);
+                var projectRoot = ProjectRootElement.Open(projectPath);
                 projectRoot.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
                 var project = new Project(projectRoot, new Dictionary<string, string>(), null);
 
                 Logger.LogDebug("Scanning project for {ExpectedFileCount} expected files", ExpectedFiles.Count());
-                _itemsToAdd = new List<ItemSpec>(ExpectedFiles.Where(e => !project.Items.Any(i => ItemMatches(e, i))));
+                _itemsToAdd = new List<ItemSpec>(ExpectedFiles.Where(e => !project.Items.Any(i => ItemMatches(e, i, projectPath))));
                 Logger.LogInformation("{FilesNeededCount} expected startup files needed", _itemsToAdd.Count);
 
                 if (_itemsToAdd.Any())
                 {
                     Logger.LogDebug("Needed files: {NeededFiles}", string.Join(", ", _itemsToAdd));
-                    return Task.FromResult((MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected startup files needed ({string.Join(", ", _itemsToAdd.Select(i => i.ItemName))})"));
+                    return (MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected startup files needed ({string.Join(", ", _itemsToAdd.Select(i => i.ItemName))})");
                 }
                 else
                 {
-                    return Task.FromResult((MigrationStepStatus.Complete, "Expected startup files found"));
+                    return (MigrationStepStatus.Complete, "Expected startup files found");
                 }
             }
             catch (InvalidProjectFileException)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return Task.FromResult((MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}"));
+                Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
+                return (MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
             }
         }
 
         /// <summary>
         /// Determines if a given project element matches an item specification.
         /// </summary>
-        private bool ItemMatches(ItemSpec expectedItem, ProjectItem itemElement)
+        private bool ItemMatches(ItemSpec expectedItem, ProjectItem itemElement, string projectPath)
         {
             // The item type must match
             if (!expectedItem.ItemType.Equals(itemElement.ItemType, StringComparison.OrdinalIgnoreCase))
@@ -189,7 +203,7 @@ namespace AspNetMigrator.StartupUpdater
                 return false;
             }
 
-            var projectDir = Path.GetDirectoryName(Options.ProjectPath)!;
+            var projectDir = Path.GetDirectoryName(projectPath)!;
             var filePath = Path.IsPathRooted(itemElement.EvaluatedInclude) ?
                 itemElement.EvaluatedInclude :
                 Path.Combine(projectDir, itemElement.EvaluatedInclude);

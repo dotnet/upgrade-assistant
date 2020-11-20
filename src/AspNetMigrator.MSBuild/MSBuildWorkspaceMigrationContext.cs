@@ -1,22 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.MSBuild
 {
     public sealed class MSBuildWorkspaceMigrationContext : IMigrationContext, IDisposable
     {
+        private readonly IVisualStudioFinder _vsFinder;
         private readonly string _path;
+        private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
 
         private ProjectId? _projectId;
-        private Workspace? _workspace;
+        private MSBuildWorkspace? _workspace;
 
-        public MSBuildWorkspaceMigrationContext(string path)
+        public MSBuildWorkspaceMigrationContext(
+            MigrateOptions options,
+            IVisualStudioFinder vsFinder,
+            ILogger<MSBuildWorkspaceMigrationContext> logger)
         {
-            _path = path;
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            _vsFinder = vsFinder;
+            _path = options.ProjectPath;
+            _logger = logger;
         }
 
         public void Dispose()
@@ -40,11 +56,31 @@ namespace AspNetMigrator.MSBuild
             return ValueTask.CompletedTask;
         }
 
+        private Dictionary<string, string> CreateProperties()
+        {
+            var properties = new Dictionary<string, string>();
+            var vs = _vsFinder.GetLatestVisualStudioPath();
+
+            if (vs is not null)
+            {
+                properties.Add("VSINSTALLDIR", vs);
+                properties.Add("MSBuildExtensionsPath32", Path.Combine(vs, "MSBuild"));
+            }
+
+            return properties;
+        }
+
         public async ValueTask<Workspace> GetWorkspaceAsync(CancellationToken token)
+            => await GetMsBuildWorkspaceAsync(token).ConfigureAwait(false);
+
+        public async ValueTask<MSBuildWorkspace> GetMsBuildWorkspaceAsync(CancellationToken token)
         {
             if (_workspace is null)
             {
-                var workspace = MSBuildWorkspace.Create();
+                var properties = CreateProperties();
+                var workspace = MSBuildWorkspace.Create(properties);
+
+                workspace.WorkspaceFailed += Workspace_WorkspaceFailed;
 
                 if (_path.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
                 {
@@ -61,6 +97,29 @@ namespace AspNetMigrator.MSBuild
             }
 
             return _workspace;
+        }
+
+        private void Workspace_WorkspaceFailed(object? sender, WorkspaceDiagnosticEventArgs e)
+        {
+            var diagnostic = e.Diagnostic!;
+            var level = diagnostic.Kind switch
+            {
+                WorkspaceDiagnosticKind.Failure => LogLevel.Error,
+                WorkspaceDiagnosticKind.Warning => LogLevel.Warning,
+                _ => LogLevel.Trace,
+            };
+
+            _logger.Log(level, "Error loading in MSBuild workspace {Message}", diagnostic.Message);
+        }
+
+        public async IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties([EnumeratorCancellation] CancellationToken token)
+        {
+            var ws = await GetMsBuildWorkspaceAsync(token).ConfigureAwait(false);
+
+            foreach (var property in ws.Properties)
+            {
+                yield return (property.Key, property.Value);
+            }
         }
     }
 }

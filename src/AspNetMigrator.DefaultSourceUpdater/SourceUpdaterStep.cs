@@ -53,13 +53,15 @@ namespace AspNetMigrator.Engine
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!File.Exists(Options.ProjectPath))
+            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+
+            if (!File.Exists(projectPath))
             {
-                Logger.LogCritical("Project file {ProjectPath} not found", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Project file {Options.ProjectPath} not found");
+                Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
+                return (MigrationStepStatus.Failed, $"Project file {projectPath} not found");
             }
 
-            Logger.LogDebug("Opening project {ProjectPath}", Options.ProjectPath);
+            Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
             _workspace = await context.GetWorkspaceAsync(token).ConfigureAwait(false);
             _projectId = await context.GetProjectIdAsync(token).ConfigureAwait(false);
