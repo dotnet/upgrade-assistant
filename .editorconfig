@@ -220,3 +220,6 @@ dotnet_diagnostic.CA1819.severity = none
 
 # SA1118: Parameters should not span multiple lines
 dotnet_diagnostic.SA1118.severity = none
+
+# CA1303: Do not pass literals as localized parameters
+dotnet_diagnostic.CA1303.severity = none

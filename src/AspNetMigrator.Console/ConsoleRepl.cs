@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using AspNetMigrator.Engine.GlobalCommands;
 using AspNetMigrator.Logging;
-using AspNetMigrator.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,19 +14,21 @@ using Microsoft.Extensions.Logging;
 namespace AspNetMigrator.ConsoleApp
 {
     // TODO : Eventually, this may need localized and pull strings from resources, etc.
-    [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "The prototype is not yet localized")]
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class ConsoleRepl : IHostedService
     {
         private readonly IServiceProvider _services;
+        private readonly ICollectUserInput _input;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
 
-        // the REPL will loop while !_done
-        private bool _done;
-
-        public ConsoleRepl(ILogger<ConsoleRepl> logger, IServiceProvider services, IHostApplicationLifetime lifetime)
+        public ConsoleRepl(
+            ICollectUserInput input,
+            ILogger<ConsoleRepl> logger,
+            IServiceProvider services,
+            IHostApplicationLifetime lifetime)
         {
+            _input = input;
             _logger = logger;
             _lifetime = lifetime;
             _services = services;
@@ -35,65 +36,18 @@ namespace AspNetMigrator.ConsoleApp
 
         public async Task StartAsync(CancellationToken token)
         {
-            if (await RunStartupTasks(token))
-            {
-                await RunRepl(token);
-            }
-            else
-            {
-                _logger.LogError("Error encountered while starting migration");
-            }
-
-            _lifetime.StopApplication();
-        }
-
-        private async Task<bool> RunStartupTasks(CancellationToken token)
-        {
-            var startupTasks = _services.GetRequiredService<IEnumerable<IMigrationStartup>>()
-                         .Select(m => m.StartupAsync(token));
-            var completion = await Task.WhenAll(startupTasks);
-
-            return completion.All(t => t);
-        }
-
-        private async Task RunRepl(CancellationToken token)
-        {
             try
             {
-                using var scope = _services.CreateScope();
-                using var context = scope.ServiceProvider.GetRequiredService<IMigrationContext>();
-                var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
-                var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
-
-                await foreach (var step in migrator.GetAllSteps(context, token))
+                if (await RunStartupTasks(token))
                 {
-                    while (!step.IsComplete)
-                    {
-                        token.ThrowIfCancellationRequested();
-
-                        ShowMigrationSteps(migrator.Steps, step);
-
-                        var command = GetCommand(step);
-
-                        // TODO : It might be nice to allow commands to show more details by having a 'status' property
-                        //        that can be shown here. Also, commands currently only return bools but, in the future,
-                        //        if they return more complex objects, custom handlers could be used to respond to the different
-                        //        commands' return values.
-                        if (!await command.ExecuteAsync(context, token))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-#pragma warning disable CA1303 // Do not pass literals as localized parameters
-                            Console.WriteLine($"Command ({command.CommandText}) did not succeed");
-#pragma warning restore CA1303 // Do not pass literals as localized parameters
-                            Console.ResetColor();
-                        }
-
-                        if (_done)
-                        {
-                            break;
-                        }
-                    }
+                    await RunReplAsync(token);
                 }
+                else
+                {
+                    _logger.LogError("Error encountered while starting migration");
+                }
+
+                _lifetime.StopApplication();
             }
             catch (OperationCanceledException)
             {
@@ -104,62 +58,60 @@ namespace AspNetMigrator.ConsoleApp
             }
         }
 
-        public Task StopAsync(CancellationToken token) => Task.CompletedTask;
-
-        private void SetProgramIsDone()
+        private async Task<bool> RunStartupTasks(CancellationToken token)
         {
-            _done = true;
+            var startupTasks = _services.GetRequiredService<IEnumerable<IMigrationStartup>>()
+                .Select(m => m.StartupAsync(token));
+            var completion = await Task.WhenAll(startupTasks);
+
+            return completion.All(t => t);
         }
 
-        private MigrationCommand GetCommand(MigrationStep step)
+        private async Task RunReplAsync(CancellationToken token)
         {
-            var listOfCommands = GetConsoleCommands(step);
-            if (step?.Commands != null)
+            using var scope = _services.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<IMigrationContext>();
+            var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
+            var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
+
+            await foreach (var step in migrator.GetAllSteps(context, token))
             {
-                listOfCommands.InsertRange(0, step.Commands);
-            }
-
-            Console.WriteLine("Choose command");
-            for (var i = 0; i < listOfCommands.Count; i++)
-            {
-                Console.WriteLine($" {i + 1}. {listOfCommands[i].CommandText}");
-            }
-
-            Console.Write("> ");
-
-            var result = Console.ReadLine();
-
-            if (result is null)
-            {
-                return new ExitCommand(SetProgramIsDone);
-            }
-
-            var selectedCommandText = result.Trim(' ', '.', '\t');
-            if (int.TryParse(selectedCommandText, out int selectedCommandIndex))
-            {
-                selectedCommandIndex--;
-                if (selectedCommandIndex >= 0 && selectedCommandIndex < listOfCommands.Count)
+                while (!step.IsComplete)
                 {
-                    return listOfCommands[selectedCommandIndex];
+                    token.ThrowIfCancellationRequested();
+
+                    ShowMigrationSteps(migrator.Steps, step);
+
+                    var command = await GetCommandAsync(step, token);
+
+                    // TODO : It might be nice to allow commands to show more details by having a 'status' property
+                    //        that can be shown here. Also, commands currently only return bools but, in the future,
+                    //        if they return more complex objects, custom handlers could be used to respond to the different
+                    //        commands' return values.
+                    if (!await command.ExecuteAsync(context, token))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"Command ({command.CommandText}) did not succeed");
+                        Console.ResetColor();
+                    }
                 }
             }
-
-            return new UnknownCommand();
         }
 
-        private List<MigrationCommand> GetConsoleCommands(MigrationStep step)
+        public Task StopAsync(CancellationToken token) => Task.CompletedTask;
+
+        private Task<MigrationCommand> GetCommandAsync(MigrationStep step, CancellationToken token)
         {
-            var commands = new List<MigrationCommand>();
-            if (step != null)
-            {
-                commands.Add(new SeeMoreDetailsCommand(step, ShowStepStatus));
-            }
-
             var logSettings = _services.GetRequiredService<LogSettings>();
-            commands.Add(new ConfigureConsoleLoggingCommand(logSettings));
-            commands.Add(new ExitCommand(SetProgramIsDone));
+            var exit = new ExitCommand(_lifetime.StopApplication);
+            var commands = new List<MigrationCommand>(step.Commands)
+            {
+                new SeeMoreDetailsCommand(step, ShowStepStatus),
+                new ConfigureConsoleLoggingCommand(logSettings),
+                exit
+            };
 
-            return commands;
+            return _input.ChooseAsync("Choose command", commands, exit, token);
         }
 
         private static void ShowMigrationSteps(IEnumerable<MigrationStep> steps, MigrationStep currentStep, int offset = 0)

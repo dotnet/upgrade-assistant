@@ -18,7 +18,6 @@ namespace AspNetMigrator.Engine.GlobalCommands
         // todo - support localization
         public override string CommandText => "Configure logging";
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "TODO For later")]
         public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
             Console.WriteLine("Choose your log level:");

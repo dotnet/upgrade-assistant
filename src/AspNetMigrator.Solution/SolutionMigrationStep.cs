@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
@@ -14,7 +13,7 @@ namespace AspNetMigrator.Solution
     {
         private readonly ICollectUserInput _input;
 
-        public SolutionMigrationStep(MigrateOptions options, ILogger<SolutionMigrationStep> logger, ICollectUserInput input)
+        public SolutionMigrationStep(ICollectUserInput input, MigrateOptions options, ILogger<SolutionMigrationStep> logger)
             : base(options, logger)
         {
             _input = input;
@@ -74,56 +73,38 @@ namespace AspNetMigrator.Solution
             const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            var entrypoint = await RunQuestionAsync(EntrypointQuestion, ws.CurrentSolution.Projects, token).ConfigureAwait(false);
+            var allProjects = ws.CurrentSolution.Projects.OrderBy(p => p.Name).Select(ProjectCommand.Create);
+            var entrypoint = await _input.ChooseAsync(EntrypointQuestion, allProjects, ProjectCommand.Empty, token).ConfigureAwait(false);
 
-            if (entrypoint is null)
+            if (entrypoint.Project is null)
             {
                 return null;
             }
 
-            var ordered = GetOrderedProjects(entrypoint);
+            var ordered = GetOrderedProjects(entrypoint.Project).Select(ProjectCommand.Create);
 
-            return await RunQuestionAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
+            var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, ProjectCommand.Empty, token).ConfigureAwait(false);
+
+            return result.Project;
         }
 
-        private async Task<Project?> RunQuestionAsync(string question, IEnumerable<Project> projects, CancellationToken token)
+        private class ProjectCommand : MigrationCommand
         {
-            var (text, map) = GenerateQuestion(question, projects);
+            public static ProjectCommand Empty => new ProjectCommand(null);
 
-            while (true)
+            public static ProjectCommand Create(Project project) => new ProjectCommand(project);
+
+            public ProjectCommand(Project? project)
             {
-                token.ThrowIfCancellationRequested();
-
-                var input = await _input.AskUserAsync(text).ConfigureAwait(false);
-
-                if (input is null)
-                {
-                    return null;
-                }
-
-                if (map.TryGetValue(input, out var result))
-                {
-                    return result;
-                }
-
-                Logger.LogError("Could not find project with '{ProjectName}'", input);
-            }
-        }
-
-        private static (string Text, Dictionary<string, Project> Map) GenerateQuestion(string text, IEnumerable<Project> projects)
-        {
-            var sb = new StringBuilder();
-            var dict = new Dictionary<string, Project>(StringComparer.OrdinalIgnoreCase);
-
-            sb.AppendLine("Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.");
-
-            foreach (var project in projects)
-            {
-                sb.AppendLine($"- {project.Name}");
-                dict.Add(project.Name, project);
+                Project = project;
             }
 
-            return (sb.ToString(), dict);
+            public override string CommandText => Project!.Name;
+
+            public Project? Project { get; }
+
+            public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+                => Task.FromResult(true);
         }
     }
 }
