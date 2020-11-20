@@ -15,7 +15,26 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
+    version: '3.x'
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
     useGlobalJson: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'Install GitVersion'
+  inputs:
+    command: 'custom'
+    custom: 'tool'
+    arguments: 'install --global GitVersion.Tool --version 5.5.0'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Update Version'
+  inputs:
+    command: 'custom'
+    custom: 'gitversion'
+    arguments: '/output buildserver /nofetch'
 
 - task: DotNetCoreCLI@2
   displayName: "Restore"
@@ -36,3 +55,28 @@ steps:
     command: 'test'
     arguments: '-c $(buildConfiguration)'
     projects: 'AspNetMigrator.sln'
+
+- task: DotNetCoreCLI@2
+  displayName: Create tool package
+  inputs:
+    command: 'pack'
+    packagesToPack: 'src/AspNetMigrator.Console/AspNetMigrator.ConsoleApp.csproj'
+    arguments: '-c $(buildConfiguration)'
+    packDirectory: '$(Build.ArtifactStagingDirectory)/tools'
+    versioningScheme: 'off'
+
+- task: PublishPipelineArtifact@1
+  displayName: Publish CLI tool
+  inputs:
+    targetPath: '$(build.artifactStagingDirectory)/tools'
+    artifact: 'tools'
+    publishLocation: 'pipeline'
+
+- task: DotNetCoreCLI@2
+  displayName: Push CLI tool to feed
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/tools/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'dbd4cae6-653c-44cf-a39a-c77b8fe81583/6c1dcbc7-453e-43cf-9a98-1fc9d119f36d'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

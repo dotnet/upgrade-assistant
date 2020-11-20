@@ -25,7 +25,15 @@ namespace AspNetMigrator.ConsoleApp
         {
             ShowHeader();
 
-            return new CommandLineBuilder(new RootCommand { Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync) })
+            var root = new RootCommand
+            {
+                Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync),
+
+                // Get name from process so that it will show correctly if run as a .NET CLI tool
+                Name = GetProcessName(),
+            };
+
+            return new CommandLineBuilder(root)
                 .AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly())
                 .AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."))
                 .AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"))
@@ -34,6 +42,12 @@ namespace AspNetMigrator.ConsoleApp
                 .UseHelpBuilder(b => new HelpWithHeader(b.Console))
                 .Build()
                 .InvokeAsync(args);
+
+            static string GetProcessName()
+            {
+                using var current = System.Diagnostics.Process.GetCurrentProcess();
+                return current.ProcessName;
+            }
         }
 
         private static Task RunMigrationAsync(MigrateOptions options)
