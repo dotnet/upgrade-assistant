@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AspNetMigrator.ConsoleApp.Commands;
 using AspNetMigrator.Engine;
-using AspNetMigrator.Logging;
 using Microsoft.Extensions.Hosting;
 
 namespace AspNetMigrator.ConsoleApp

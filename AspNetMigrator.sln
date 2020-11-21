@@ -41,9 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.MSBuild", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.StartupUpdater", "src\AspNetMigrator.StartupUpdater\AspNetMigrator.StartupUpdater.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Logging", "src\AspNetMigrator.Logging\AspNetMigrator.Logging.csproj", "{3E9A5015-86E2-4E5C-933F-E6139B45AC14}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMigrator.Solution", "src\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Solution", "src\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -199,18 +197,6 @@ Global
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}.Release|x64.Build.0 = Release|Any CPU
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}.Release|x86.ActiveCfg = Release|Any CPU
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}.Release|x86.Build.0 = Release|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Debug|x64.Build.0 = Debug|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Debug|x86.Build.0 = Debug|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Release|x64.ActiveCfg = Release|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Release|x64.Build.0 = Release|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Release|x86.ActiveCfg = Release|Any CPU
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -229,7 +215,6 @@ Global
 		{EDAC1981-61FC-4030-AA5F-C9A4D054CF00} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{3E9A5015-86E2-4E5C-933F-E6139B45AC14} = {3FC16DAB-215C-422B-9130-61D566695463}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

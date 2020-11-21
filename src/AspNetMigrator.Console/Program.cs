@@ -8,7 +8,6 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
-using AspNetMigrator.Logging;
 using AspNetMigrator.Solution;
 using AspNetMigrator.StartupUpdater;
 using Microsoft.Extensions.DependencyInjection;

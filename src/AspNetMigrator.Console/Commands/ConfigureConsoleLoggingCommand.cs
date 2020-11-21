@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Engine;
-using AspNetMigrator.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.ConsoleApp.Commands
