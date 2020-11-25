@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Exceptions;
@@ -16,6 +17,9 @@ namespace AspNetMigrator.Engine
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
         private static readonly string TryConvertPath =
             Path.Combine(Path.GetDirectoryName(typeof(TryConvertProjectConverterStep).Assembly.Location)!, "tools", "try-convert.exe");
+
+        private bool _errorEncountered;
+        private static string[] _errorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
         public TryConvertProjectConverterStep(MigrateOptions options, ILogger<TryConvertProjectConverterStep> logger)
             : base(options, logger)
@@ -77,6 +81,7 @@ namespace AspNetMigrator.Engine
                 }
             }
 
+            _errorEncountered = false;
             tryConvertProcess.OutputDataReceived += TryConvertOutputReceived;
             tryConvertProcess.ErrorDataReceived += TryConvertErrorReceived;
             tryConvertProcess.Start();
@@ -84,7 +89,7 @@ namespace AspNetMigrator.Engine
             tryConvertProcess.BeginErrorReadLine();
             await tryConvertProcess.WaitForExitAsync(token).ConfigureAwait(false);
 
-            if (tryConvertProcess.ExitCode != 0)
+            if (tryConvertProcess.ExitCode != 0 || _errorEncountered)
             {
                 Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode})", tryConvertProcess.ExitCode);
                 return (MigrationStepStatus.Failed, $"Convesion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
@@ -137,6 +142,7 @@ namespace AspNetMigrator.Engine
         {
             if (!string.IsNullOrWhiteSpace(e.Data))
             {
+                CheckForErrors(e.Data);
                 Logger.LogInformation($"[try-convert] {e.Data}");
             }
         }
@@ -145,7 +151,16 @@ namespace AspNetMigrator.Engine
         {
             if (!string.IsNullOrWhiteSpace(e.Data))
             {
+                CheckForErrors(e.Data);
                 Logger.LogError($"[try-convert] {e.Data}");
+            }
+        }
+
+        private void CheckForErrors(string data)
+        {
+            if (_errorMessages.Any(data.Contains))
+            {
+                _errorEncountered = true;
             }
         }
     }
