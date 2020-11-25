@@ -74,7 +74,7 @@ steps:
 
 - powershell: |
     dotnet tool install -g sleet
-    sleet push $(Build.ArtifactStagingDirectory)/tools/*.nupkg --skip-existing
+    sleet push $(Build.ArtifactStagingDirectory)/tools --skip-existing
   displayName: Push nuget package to Azure storage
   env:
       SLEET_FEED_TYPE: azure
