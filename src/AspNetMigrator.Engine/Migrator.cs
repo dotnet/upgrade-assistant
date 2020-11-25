@@ -37,18 +37,21 @@ namespace AspNetMigrator.Engine
 
         private async IAsyncEnumerable<MigrationStep> GetStepsInternal(IEnumerable<MigrationStep> steps, IMigrationContext context, [EnumeratorCancellation] CancellationToken token)
         {
+            // This iterates through all incomplete steps, returning children before parents but initializing parents before children.
+            // This is intentional because the expectation is that parents are initialized before children, but children are applied before parents.
+            //
+            // For each step, the expected order of operations is:
+            // 1. Initialize the step
+            // 2. Recurse into sub-steps (if needed)
+            // 3. Yield the step if it's not completed, or
+            //    continue iterating with the next step if it is.
             foreach (var step in steps)
             {
-                await foreach (var innerStep in GetStepsInternal(step.SubSteps, context, token))
-                {
-                    yield return innerStep;
-                }
-
                 if (step.Status == MigrationStepStatus.Unknown)
                 {
                     // It is not necessary to iterate through sub-steps because parents steps are
                     // expected to initialize their children during their own initialization
-                    Logger.LogTrace("Initializing migration step {StepTitle}", step.Title);
+                    Logger.LogInformation("Initializing migration step {StepTitle}", step.Title);
                     await step.InitializeAsync(context, token).ConfigureAwait(false);
                     if (step.Status == MigrationStepStatus.Unknown)
                     {
@@ -59,6 +62,11 @@ namespace AspNetMigrator.Engine
                     {
                         Logger.LogDebug("Step {StepTitle} initialized", step.Title);
                     }
+                }
+
+                await foreach (var innerStep in GetStepsInternal(step.SubSteps, context, token))
+                {
+                    yield return innerStep;
                 }
 
                 if (!step.IsComplete)
