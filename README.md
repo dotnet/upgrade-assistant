@@ -13,4 +13,10 @@ This project enables automation of common tasks related to migrating ASP.NET MVC
 
 ## Usage
 
-TBD
+In order to install the tool, you can run the following command:
+
+```
+dotnet tool install -g try-migrate --add-source https://trymigrate.blob.core.windows.net/feed/index.json
+```
+
+If you add the source to [NuGet's configuration](https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior) you may omit the `--add-source` parameter. Only non-prelease will be installed with this command; any prerelease version must be explicitly opted into by adding `--version [desired-version]` to the command.

@@ -27,7 +27,7 @@ steps:
   inputs:
     command: 'custom'
     custom: 'tool'
-    arguments: 'install --global GitVersion.Tool --version 5.5.0'
+    arguments: 'install --global GitVersion.Tool'
 
 - task: DotNetCoreCLI@2
   displayName: 'Update Version'
@@ -72,11 +72,12 @@ steps:
     artifact: 'tools'
     publishLocation: 'pipeline'
 
-- task: DotNetCoreCLI@2
-  displayName: Push CLI tool to feed
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/tools/*.nupkg'
-    nuGetFeedType: 'internal'
-    publishVstsFeed: 'dbd4cae6-653c-44cf-a39a-c77b8fe81583/6c1dcbc7-453e-43cf-9a98-1fc9d119f36d'
+- powershell: |
+    dotnet tool install -g sleet
+    sleet push $(Build.ArtifactStagingDirectory)/tools/*.nupkg --skip-existing
+  displayName: Push nuget package to Azure storage
+  env:
+      SLEET_FEED_TYPE: azure
+      SLEET_FEED_CONTAINER: feed
+      SLEET_FEED_CONNECTIONSTRING: $(SLEET_CONNECTIONSTRING)
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
