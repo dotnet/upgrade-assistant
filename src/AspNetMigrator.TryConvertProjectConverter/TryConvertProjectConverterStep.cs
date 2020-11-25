@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Construction;
 using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
 
@@ -65,7 +64,7 @@ namespace AspNetMigrator.Engine
 
             await foreach (var (name, value) in context.GetWorkspaceProperties(token))
             {
-                tryConvertProcess.StartInfo.EnvironmentVariables.Add(name, value);
+                tryConvertProcess.StartInfo.EnvironmentVariables[name] = value;
             }
 
             // Clear some MSBuild env vars that can prevent try-convert from successfully
@@ -113,8 +112,7 @@ namespace AspNetMigrator.Engine
 
             try
             {
-                var project = ProjectRootElement.Open(projectPath);
-                project.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
+                var project = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
 
                 // SDK-style projects should reference the Microsoft.NET.Sdk SDK
                 if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))

@@ -169,28 +169,13 @@
       },
       {
         "Name": "Antlr3.Runtime",
-        "Verstion": "*"
+        "Version": "*"
       }
     ],
     "NetCorePackages": [
       {
         "Name": "Antlr4",
         "Version": "4.6.6"
-      }
-    ]
-  },
-  {
-    "PackageSetName": "SharpZipLib",
-    "NetFrameworkPackages": [
-      {
-        "Name": "SharpZipLib",
-        "Version": "0.86.0"
-      }
-    ],
-    "NetCorePackages": [
-      {
-        "Name": "SharpZipLib",
-        "Version": "1.3.0"
       }
     ]
   },
@@ -203,51 +188,6 @@
       }
     ],
     "NetCorePackages": []
-  },
-  {
-    "PackageSetName": "Newtonsoft.Json",
-    "NetFrameworkPackages": [
-      {
-        "Name": "Newtonsoft.Json",
-        "Version": "9.0.1"
-      }
-    ],
-    "NetCorePackages": [
-      {
-        "Name": "Newtonsoft.Json",
-        "Version": "12.0.3"
-      }
-    ]
-  },
-  {
-    "PackageSetName": "EntityFramework",
-    "NetFrameworkPackages": [
-      {
-        "Name": "EntityFramework",
-        "Version": "6.2.0"
-      }
-    ],
-    "NetCorePackages": [
-      {
-        "Name": "EntityFramework",
-        "Version": "6.4.4"
-      }
-    ]
-  },
-  {
-    "PackageSetName": "Lucene.Net",
-    "NetFrameworkPackages": [
-      {
-        "Name": "Lucene.Net",
-        "Version": "3.0.3"
-      }
-    ],
-    "NetCorePackages": [
-      {
-        "Name": "Lucene.Net",
-        "Version": "4.8.0-beta00012"
-      }
-    ]
   },
   {
     "PackageSetName": "TPL.Dataflow",

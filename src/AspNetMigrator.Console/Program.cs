@@ -18,7 +18,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
-        private static string _logFilePath = "log.txt";
+        private const string LogFilePath = "log.txt";
 
         public static Task Main(string[] args)
         {
@@ -61,7 +61,8 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddMsBuild();
 
                     services.AddSingleton(options);
-                    services.AddSingleton(new PackageUpdaterOptions { PackageMapPath = "PackageMap.json" });
+                    services.AddSingleton(new PackageUpdaterOptions(new[] { "PackageMap.json" }));
+                    services.AddSingleton<IPackageLoader, PackageLoader>();
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
@@ -82,7 +83,7 @@ namespace AspNetMigrator.ConsoleApp
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
                     .Enrich.FromLogContext()
                     .WriteTo.Conditional(evt => logSettings.IsConsoleEnabled, sink => sink.Console())
-                    .WriteTo.Conditional(evt => logSettings.IsFileEnabled, sink => sink.File(_logFilePath)))
+                    .WriteTo.Conditional(evt => logSettings.IsFileEnabled, sink => sink.File(LogFilePath)))
                 .RunConsoleAsync(options =>
                 {
                     options.SuppressStatusMessages = true;

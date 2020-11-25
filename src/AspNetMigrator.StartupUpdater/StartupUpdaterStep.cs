@@ -154,8 +154,7 @@ namespace AspNetMigrator.StartupUpdater
 
             try
             {
-                var projectRoot = ProjectRootElement.Open(projectPath);
-                projectRoot.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
+                var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
                 var project = new Project(projectRoot, new Dictionary<string, string>(), null);
 
                 Logger.LogDebug("Scanning project for {ExpectedFileCount} expected files", ExpectedFiles.Count());

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Build.Construction;
 using Microsoft.CodeAnalysis;
 
 namespace AspNetMigrator.Engine
@@ -29,6 +30,14 @@ namespace AspNetMigrator.Engine
             var project = await GetProjectAsync(token).ConfigureAwait(false);
 
             return project?.FilePath;
+        }
+
+        async ValueTask<ProjectRootElement> GetProjectRootElementAsync(CancellationToken token)
+        {
+            var projectRoot = ProjectRootElement.Open(await GetProjectPathAsync(token).ConfigureAwait(false));
+            projectRoot.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
+
+            return projectRoot;
         }
     }
 }

@@ -5,9 +5,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AspNetMigrator.MSBuild;
+using Microsoft.Build.Construction;
 using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestProject;
 
@@ -16,7 +18,7 @@ namespace AspNetMigrator.Analyzers.Test
     [TestClass]
     public class AspNetMigratorAnalyzersUnitTests
     {
-        private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new Dictionary<string, ExpectedDiagnostic[]>
+        private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new()
         {
             {
                 "AM0001",
@@ -104,12 +106,10 @@ namespace AspNetMigrator.Analyzers.Test
         [MethodImpl(MethodImplOptions.NoInlining)] // MSBuild resolver must be registered before this is JIT'd
         private static void RestoreTestProjectPackages()
         {
-            var testProject = new ProjectInstance(TestHelper.TestProjectPath);
-            var restoreRequest = new BuildRequestData(testProject, new[] { "Restore" });
-            var restoreResult = BuildManager.DefaultBuildManager.Build(new BuildParameters(), restoreRequest);
-            if (restoreResult.OverallResult != BuildResultCode.Success)
+            var restorer = new MSBuildPackageRestorer(new NullLogger<MSBuildPackageRestorer>());
+            if (restorer.RestorePackages(new ProjectInstance(ProjectRootElement.Open(TestHelper.TestProjectPath))) is null)
             {
-                throw new InvalidOperationException("TestProject restore failed", restoreResult.Exception);
+                throw new InvalidOperationException("TestProject restore failed");
             }
         }
 

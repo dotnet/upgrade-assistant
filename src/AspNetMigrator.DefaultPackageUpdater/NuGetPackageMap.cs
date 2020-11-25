@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NuGet.Versioning;
 
 namespace AspNetMigrator.Engine
 {
@@ -24,7 +25,7 @@ namespace AspNetMigrator.Engine
             // Check whether any NetFx packages have the right name
             var reference = NetFrameworkPackages.FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-            // If not packages matched, return false
+            // If no packages matched, return false
             if (reference is null)
             {
                 return false;
@@ -37,62 +38,15 @@ namespace AspNetMigrator.Engine
                 return true;
             }
 
+            // Return false if the version is invalid
+            if (!NuGetVersion.TryParse(version, out var parsedVersion))
+            {
+                return false;
+            }
+
             // To match, the specified packged has to be the same version as the NetFx package or older
-            if (!Version.TryParse(version, out var parsedVersion))
-            {
-                // Return false if the version is invalid
-                return false;
-            }
-
-            var netFxVersion = reference.GetVersion();
-
-            if (netFxVersion is null)
-            {
-                return true;
-            }
-
-            if (parsedVersion.Major < netFxVersion.Major)
-            {
-                return true;
-            }
-
-            if (parsedVersion.Major > netFxVersion.Major)
-            {
-                return false;
-            }
-
-            if (parsedVersion.Minor < netFxVersion.Minor)
-            {
-                return true;
-            }
-
-            if (parsedVersion.Minor > netFxVersion.Minor)
-            {
-                return false;
-            }
-
-            if (parsedVersion.Build < netFxVersion.Build)
-            {
-                return true;
-            }
-
-            if (parsedVersion.Build > netFxVersion.Build)
-            {
-                return false;
-            }
-
-            if (parsedVersion.Revision < netFxVersion.Revision)
-            {
-                return true;
-            }
-
-            if (parsedVersion.Revision > netFxVersion.Revision)
-            {
-                return false;
-            }
-
-            // Return true if the version match exactly
-            return true;
+            var netFxVersion = reference.GetNuGetVersion();
+            return parsedVersion <= netFxVersion;
         }
     }
 }

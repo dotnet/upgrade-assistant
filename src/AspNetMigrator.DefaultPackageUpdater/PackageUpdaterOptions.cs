@@ -1,7 +1,6 @@
-﻿namespace AspNetMigrator.Engine
+﻿using System.Collections.Generic;
+
+namespace AspNetMigrator.Engine
 {
-    public class PackageUpdaterOptions
-    {
-        public string PackageMapPath { get; set; } = string.Empty;
-    }
+    public record PackageUpdaterOptions(IEnumerable<string> PackageMapPaths);
 }
