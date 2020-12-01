@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AspNetMigrator.Engine
 {
@@ -15,18 +16,22 @@ namespace AspNetMigrator.Engine
         private const string DefaultSDK = "Microsoft.NET.Sdk";
         private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion -p {0}";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
-        private static readonly string TryConvertPath =
-            Path.Combine(Path.GetDirectoryName(typeof(TryConvertProjectConverterStep).Assembly.Location)!, "tools", "try-convert.exe");
-
-        private bool _errorEncountered;
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
-        public TryConvertProjectConverterStep(MigrateOptions options, ILogger<TryConvertProjectConverterStep> logger)
-            : base(options, logger)
+        private readonly string _tryConvertPath;
+        private bool _errorEncountered;
+
+        public TryConvertProjectConverterStep(MigrateOptions migrateOptions, IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
+            : base(migrateOptions, logger)
         {
-            if (options is null)
+            if (migrateOptions is null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(migrateOptions));
+            }
+
+            if (tryConvertOptionsAccessor is null)
+            {
+                throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
             }
 
             if (logger is null)
@@ -35,7 +40,9 @@ namespace AspNetMigrator.Engine
             }
 
             Title = $"Convert project file to SDK style";
-            Description = $"Convert {options.ProjectPath} to an SDK-style project with try-convert";
+            Description = $"Convert {migrateOptions.ProjectPath} to an SDK-style project with try-convert";
+            var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath");
+            _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }
 
         protected async override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
@@ -57,7 +64,7 @@ namespace AspNetMigrator.Engine
             Logger.LogInformation("Converting project file format with try-convert");
             using var tryConvertProcess = new Process
             {
-                StartInfo = new ProcessStartInfo(TryConvertPath, string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath))
+                StartInfo = new ProcessStartInfo(_tryConvertPath, string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath))
                 {
                     CreateNoWindow = true,
                     UseShellExecute = false,
@@ -91,8 +98,8 @@ namespace AspNetMigrator.Engine
 
             if (tryConvertProcess.ExitCode != 0 || _errorEncountered)
             {
-                Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode})", tryConvertProcess.ExitCode);
-                return (MigrationStepStatus.Failed, $"Convesion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
+                Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode}). Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.", tryConvertProcess.ExitCode);
+                return (MigrationStepStatus.Failed, $"Conversion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
             }
             else
             {
@@ -123,7 +130,7 @@ namespace AspNetMigrator.Engine
                 if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.LogDebug("Project {ProjectPath} not yet converted", projectPath);
-                    return (MigrationStepStatus.Incomplete, $"Project {projectPath} is not an SDK project. Applying this step will execute the following try-convert command line: {TryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath)}");
+                    return (MigrationStepStatus.Incomplete, $"Project {projectPath} is not an SDK project. Applying this step will execute the following try-convert command line: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath)}");
                 }
                 else
                 {

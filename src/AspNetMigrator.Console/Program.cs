@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using AspNetMigrator.Engine;
 using AspNetMigrator.Solution;
 using AspNetMigrator.StartupUpdater;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -18,6 +19,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
+        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
         private const string LogFilePath = "log.txt";
 
         public static Task Main(string[] args)
@@ -54,7 +56,7 @@ namespace AspNetMigrator.ConsoleApp
             var logSettings = new LogSettings(options.Verbose);
 
             var host = Host.CreateDefaultBuilder()
-                .ConfigureServices(services =>
+                .ConfigureServices((context, services) =>
                 {
                     services.AddHostedService<ConsoleRepl>();
 
@@ -70,10 +72,9 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddSingleton(logSettings);
 
                     // Add steps
-                    services.AddScoped<BackupStep>(); // used by SetBackupPathCommandResultHandler
-                    services.AddScoped<MigrationStep>(ctx => ctx.GetRequiredService<BackupStep>());
+                    services.AddScoped<MigrationStep, BackupStep>();
                     services.AddScoped<MigrationStep, SolutionMigrationStep>();
-                    services.AddScoped<MigrationStep, TryConvertProjectConverterStep>();
+                    services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
                     services.AddScoped<MigrationStep, PackageUpdaterStep>();
                     services.AddScoped<MigrationStep, StartupUpdaterStep>();
                     services.AddScoped<MigrationStep, SourceUpdaterStep>();
