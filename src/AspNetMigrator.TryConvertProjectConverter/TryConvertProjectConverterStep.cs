@@ -19,7 +19,7 @@ namespace AspNetMigrator.Engine
             Path.Combine(Path.GetDirectoryName(typeof(TryConvertProjectConverterStep).Assembly.Location)!, "tools", "try-convert.exe");
 
         private bool _errorEncountered;
-        private static string[] _errorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
+        private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
         public TryConvertProjectConverterStep(MigrateOptions options, ILogger<TryConvertProjectConverterStep> logger)
             : base(options, logger)
@@ -158,7 +158,7 @@ namespace AspNetMigrator.Engine
 
         private void CheckForErrors(string data)
         {
-            if (_errorMessages.Any(data.Contains))
+            if (ErrorMessages.Any(data.Contains))
             {
                 _errorEncountered = true;
             }

@@ -16,6 +16,7 @@ namespace AspNetMigrator.Engine
     public sealed class PackageLoader : IPackageLoader, IDisposable
     {
         private const string DefaultPackageSource = "https://api.nuget.org/v3/index.json";
+        private const int MaxRetries = 3;
 
         private readonly SourceCacheContext _cache;
         private readonly List<PackageSource> _packageSources;
@@ -99,8 +100,15 @@ namespace AspNetMigrator.Engine
             foreach (var source in _packageSources)
             {
                 var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                var searchResults = await metadata.GetMetadataAsync(packageName, includePrerelease: true, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token).ConfigureAwait(false);
-                versions.AddRange(searchResults.Select(r => r.Identity.Version));
+                try
+                {
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: true, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
+                    versions.AddRange(searchResults.Select(r => r.Identity.Version));
+                }
+                catch (NuGetProtocolException)
+                {
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
+                }
             }
 
             // Filter to only include versions higher than the user's current version and,
@@ -131,6 +139,35 @@ namespace AspNetMigrator.Engine
 
             _logger.LogDebug("Found package sources: {PackageSources}", packageSources);
             return packageSources;
+        }
+
+        private async Task<T> CallWithRetryAsync<T>(Func<Task<T>> func)
+        {
+            for (var i = 0; i < MaxRetries; i++)
+            {
+                try
+                {
+                    var ret = await func.Invoke().ConfigureAwait(false);
+                    return ret;
+                }
+                catch (NuGetProtocolException)
+                {
+                    if (i < MaxRetries - 1)
+                    {
+                        var delay = (int)(1000 * Math.Pow(2, i));
+                        _logger.LogInformation("NuGet operation failed; retrying in {RetryTime} seconds", delay / 1000);
+                        await Task.Delay(delay).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to execute NuGet action after {MaxRetries} attempts", MaxRetries);
+                        throw;
+                    }
+                }
+            }
+
+            // The compiler doesn't believe me that the above code either always returns or always throws
+            throw new InvalidOperationException("This should never be reached; fix the bug in PackageLoader");
         }
 
         public void Dispose()
