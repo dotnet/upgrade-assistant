@@ -78,13 +78,14 @@ namespace AspNetMigrator.Engine
             var restoreOutput = await _packageRestorer.RestorePackagesAsync(context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
             {
-                Logger.LogCritical("Unabled to restore packages for project {ProjectPath}", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Unabled to restore packages for project {Options.ProjectPath}");
+                var path = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+                Logger.LogCritical("Unable to restore packages for project {ProjectPath}", path);
+                return (MigrationStepStatus.Failed, $"Unable to restore packages for project {path}");
             }
 
             // Parse lockfile
             var lockFile = LockFileUtilities.GetLockFile(restoreOutput.LockFilePath, NuGet.Common.NullLogger.Instance);
-            var lockFileTarget = lockFile.Targets.First(t => t.TargetFramework == _targetFramework);
+            var lockFileTarget = lockFile.Targets.First(t => t.TargetFramework.DotNetFrameworkName.Equals(_targetFramework.DotNetFrameworkName, StringComparison.Ordinal));
 
             try
             {
@@ -109,7 +110,7 @@ namespace AspNetMigrator.Engine
                     }
 
                     // If the package is referenced transitively, mark for removal
-                    if (lockFileTarget.Libraries.Any(l => l.Dependencies.Any(d => ReferenceSatisfiesDependency(d, packageReference))))
+                    if (lockFileTarget.Libraries.Any(l => l.Dependencies.Any(d => ReferenceSatisfiesDependency(d, packageReference, true))))
                     {
                         Logger.LogInformation("Marking package {PackageName} for removal because it appears to be a transitive dependency", packageReference.Name);
                         _packagesToRemove.Add(packageReference);
@@ -234,6 +235,9 @@ namespace AspNetMigrator.Engine
 
                 projectRoot.Save();
 
+                // Reload the workspace since, at this point, the project may be different from what was loaded
+                await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+
                 return (MigrationStepStatus.Complete, "Packages updated");
             }
             catch (InvalidProjectFileException)
@@ -322,7 +326,7 @@ namespace AspNetMigrator.Engine
             return packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(_targetFramework, f));
         }
 
-        private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference)
+        private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
             // If the dependency's name doesn't match the reference's name, return false
             if (!dependency.Id.Equals(packageReference.Name, StringComparison.OrdinalIgnoreCase))
@@ -344,6 +348,12 @@ namespace AspNetMigrator.Engine
             }
 
             if (versionRange.HasUpperBound && packageVersion > versionRange.MaxVersion)
+            {
+                return false;
+            }
+
+            // In some cases (looking for transitive dependencies), it's interesting to only match packages that are the minimum version
+            if (minVersionMatchOnly && versionRange.HasLowerBound && packageVersion != versionRange.MinVersion)
             {
                 return false;
             }

@@ -14,7 +14,7 @@ namespace AspNetMigrator.Engine
     public class TryConvertProjectConverterStep : MigrationStep
     {
         private const string DefaultSDK = "Microsoft.NET.Sdk";
-        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion -p {0}";
+        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion -p \"{0}\"";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
@@ -119,6 +119,7 @@ namespace AspNetMigrator.Engine
 
             if (projectPath is null)
             {
+                Logger.LogCritical("No project path specified");
                 return (MigrationStepStatus.Failed, "No project specified");
             }
 

@@ -161,6 +161,42 @@
     "NetCorePackages": []
   },
   {
+    "PackageSetName": "Autofac.Mvc",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Autofac.Mvc5",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "ASP.NET",
+    "NetCorePackages": [],
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.AspNet.SessionState.SessionStateModule",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.TelemetryCorrelation",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.SessionState.SqlSessionStateProviderAsync",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.Mvc",
+        "Version": "*"
+      }
+    ]
+  },
+  {
     "PackageSetName": "Antlr",
     "NetFrameworkPackages": [
       {
@@ -178,6 +214,16 @@
         "Version": "4.6.6"
       }
     ]
+  },
+  {
+    "PackageSetName": "Microsoft.Net.Compilers",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.Net.Compilers",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
   },
   {
     "PackageSetName": "WebGrease",

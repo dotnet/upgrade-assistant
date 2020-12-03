@@ -99,6 +99,13 @@ namespace AspNetMigrator.MSBuild
             return _workspace;
         }
 
+        public void UnloadWorkspace()
+        {
+            _workspace?.CloseSolution();
+            _workspace?.Dispose();
+            _workspace = null;
+        }
+
         private void Workspace_WorkspaceFailed(object? sender, WorkspaceDiagnosticEventArgs e)
         {
             var diagnostic = e.Diagnostic!;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
@@ -16,6 +17,8 @@ namespace AspNetMigrator.Engine
         IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
 
         ValueTask<Workspace> GetWorkspaceAsync(CancellationToken token);
+
+        public void UnloadWorkspace();
 
         async ValueTask<Project?> GetProjectAsync(CancellationToken token)
         {
@@ -38,6 +41,17 @@ namespace AspNetMigrator.Engine
             projectRoot.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
 
             return projectRoot;
+        }
+
+        async ValueTask ReloadWorkspaceAsync(CancellationToken token)
+        {
+            var projectPath = await GetProjectPathAsync(token).ConfigureAwait(false);
+            UnloadWorkspace();
+            var ws = await GetWorkspaceAsync(token).ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(projectPath))
+            {
+                await SetProjectAsync(ws.CurrentSolution.Projects.First(p => projectPath.Equals(p.FilePath, StringComparison.OrdinalIgnoreCase)).Id, token).ConfigureAwait(false);
+            }
         }
     }
 }

@@ -7,6 +7,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
     <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
     <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
   </ItemGroup>

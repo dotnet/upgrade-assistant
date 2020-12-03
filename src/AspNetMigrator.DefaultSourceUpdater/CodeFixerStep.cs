@@ -68,6 +68,11 @@ namespace AspNetMigrator.Engine
 
         protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (_sourceUpdater.Project is null)
             {
                 return (MigrationStepStatus.Failed, "No project available.");
@@ -95,6 +100,10 @@ namespace AspNetMigrator.Engine
                     Logger.LogInformation("Diagnostic {DiagnosticId} fixed in {FilePath}", diagnostic.Id, doc.FilePath);
                 }
             }
+
+            // TEMPORARY WORKAROUND
+            // https://github.com/dotnet/roslyn/issues/36781
+            (await context.GetProjectRootElementAsync(token).ConfigureAwait(false)).WorkAroundRoslynIssue36781();
 
             Logger.LogDebug("All instances of {DiagnosticId} fixed", DiagnosticId);
             return (MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");

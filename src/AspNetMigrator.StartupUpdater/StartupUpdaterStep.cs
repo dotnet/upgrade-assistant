@@ -24,6 +24,13 @@ namespace AspNetMigrator.StartupUpdater
         private const string TemplateNamespace = "WebApplication1";
         private const int BufferSize = 65536;
 
+        // Files that indicate the project is likely a web app rather than a class library or some other project type
+        private static readonly IEnumerable<ItemSpec> WebAppFiles = new List<ItemSpec>()
+        {
+            new ItemSpec("Content", "Global.asax", false, Array.Empty<string>()),
+            new ItemSpec("Content", "Web.config", false, Array.Empty<string>())
+        };
+
         // Files that should be present and text that's expected to be in them
         private static readonly IEnumerable<ItemSpec> ExpectedFiles = new List<ItemSpec>()
         {
@@ -63,10 +70,9 @@ namespace AspNetMigrator.StartupUpdater
 
             try
             {
-                var project = ProjectRootElement.Open(projectPath);
-                project.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
+                var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
 
-                var rootNamespace = project.Properties.FirstOrDefault(p => p.Name.Equals(RootNamespacePropertyName, StringComparison.Ordinal))?.Value;
+                var rootNamespace = projectRoot.Properties.FirstOrDefault(p => p.Name.Equals(RootNamespacePropertyName, StringComparison.Ordinal))?.Value;
                 if (rootNamespace is null || rootNamespace.Contains("$"))
                 {
                     // If there is no root namespace property, default to the project file name
@@ -93,7 +99,7 @@ namespace AspNetMigrator.StartupUpdater
                     // If the given file already exists, move it
                     if (File.Exists(path))
                     {
-                        RenameFile(path, project);
+                        RenameFile(path, projectRoot);
                     }
 
                     // Place the specified file
@@ -118,7 +124,7 @@ namespace AspNetMigrator.StartupUpdater
                     if (item.IncludeExplicitly)
                     {
                         // Add the new item to the project if it won't be auto-included
-                        project.AddItem(item.ItemType, item.ItemName);
+                        projectRoot.AddItem(item.ItemType, item.ItemName);
                     }
 
                     Logger.LogInformation("Added {ItemName} to the project from template file", item.ItemName);
@@ -126,7 +132,10 @@ namespace AspNetMigrator.StartupUpdater
 
                 Logger.LogInformation("{ItemCount} items added", _itemsToAdd.Count);
 
-                project.Save();
+                projectRoot.Save();
+
+                // Reload the workspace since, at this point, the project may be different from what was loaded
+                await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
                 return (MigrationStepStatus.Complete, $"{_itemsToAdd.Count} expected startup files added");
             }
@@ -154,8 +163,18 @@ namespace AspNetMigrator.StartupUpdater
 
             try
             {
-                var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
-                var project = new Project(projectRoot, new Dictionary<string, string>(), null);
+                using var projectCollection = new ProjectCollection();
+                var project = projectCollection.LoadProject(projectPath);
+
+                if (project.Items.Any(i => WebAppFiles.Any(w => ItemMatches(w, i, projectPath))))
+                {
+                    Logger.LogDebug("Project {ProjectPath} appears to be a web app, checking for expected startup files", projectPath);
+                }
+                else
+                {
+                    Logger.LogInformation("Project {ProjectPath} does not appear to be a web app; not adding startup files", projectPath);
+                    return (MigrationStepStatus.Complete, "No expected startup files needed");
+                }
 
                 Logger.LogDebug("Scanning project for {ExpectedFileCount} expected files", ExpectedFiles.Count());
                 _itemsToAdd = new List<ItemSpec>(ExpectedFiles.Where(e => !project.Items.Any(i => ItemMatches(e, i, projectPath))));
@@ -163,7 +182,7 @@ namespace AspNetMigrator.StartupUpdater
 
                 if (_itemsToAdd.Any())
                 {
-                    Logger.LogDebug("Needed files: {NeededFiles}", string.Join(", ", _itemsToAdd));
+                    Logger.LogDebug("Needed files: {NeededFiles}", string.Join(", ", _itemsToAdd.Select(i => i.ItemName)));
                     return (MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected startup files needed ({string.Join(", ", _itemsToAdd.Select(i => i.ItemName))})");
                 }
                 else

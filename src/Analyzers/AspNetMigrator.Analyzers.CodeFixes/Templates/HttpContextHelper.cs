@@ -11,18 +11,19 @@ namespace AlloyTemplates
     /// </summary>
     public static class HttpContextHelper
     {
-        private static IHttpContextAccessor httpContextAccessor;
+        private static IHttpContextAccessor HttpContextAccessor;
 
         /// <summary>
         /// Prepare HttpContextHelper by supplying it with an instance of IHttpContextAccessor.
         /// </summary>
         public static void Initialize(IHttpContextAccessor httpContextAccessor)
         {
+            HttpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
         /// Gets the current HttpContext. Returns null if there is no current HttpContext.
         /// </summary>
-        public static HttpContext Current => httpContextAccessor?.HttpContext;
+        public static HttpContext Current => HttpContextAccessor?.HttpContext;
     }
 }
