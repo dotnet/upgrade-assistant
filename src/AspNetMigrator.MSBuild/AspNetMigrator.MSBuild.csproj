@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

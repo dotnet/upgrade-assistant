@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using AspNetMigrator.Engine;
 using AspNetMigrator.MSBuild;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;

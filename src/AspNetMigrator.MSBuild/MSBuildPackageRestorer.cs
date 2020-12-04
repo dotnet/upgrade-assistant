@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Engine;
 using Microsoft.Build.Execution;
 using Microsoft.Extensions.Logging;
 

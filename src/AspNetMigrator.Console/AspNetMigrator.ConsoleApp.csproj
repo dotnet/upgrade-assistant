@@ -24,12 +24,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.BackupUpdater\AspNetMigrator.BackupUpdater.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj" />
     <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
     <ProjectReference Include="..\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.TryConvertProjectConverter\AspNetMigrator.TryConvertProjectConverter.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.DefaultPackageUpdater\AspNetMigrator.DefaultPackageUpdater.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.DefaultSourceUpdater\AspNetMigrator.DefaultSourceUpdater.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.TryConvertUpdater\AspNetMigrator.TryConvertUpdater.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.StartupUpdater\AspNetMigrator.StartupUpdater.csproj" />
   </ItemGroup>
 

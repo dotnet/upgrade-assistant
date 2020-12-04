@@ -9,30 +9,18 @@ namespace AspNetMigrator
     {
         public LogSettings(bool verbose)
         {
-            SelectedTarget = LogTarget.Both;
+            SelectedTargets = LogTargets.Console | LogTargets.File;
             LoggingLevelSwitch = new LoggingLevelSwitch();
             SetLogLevel(verbose ? LogLevel.Trace : LogLevel.Information);
         }
 
-        public LogTarget SelectedTarget { get; set; }
+        public LogTargets SelectedTargets { get; set; }
 
         public LoggingLevelSwitch LoggingLevelSwitch { get; private set; }
 
-        public bool IsFileEnabled
-        {
-            get
-            {
-                return SelectedTarget == LogTarget.Both || SelectedTarget == LogTarget.File;
-            }
-        }
+        public bool IsFileEnabled => (SelectedTargets & LogTargets.File) == LogTargets.File;
 
-        public bool IsConsoleEnabled
-        {
-            get
-            {
-                return SelectedTarget == LogTarget.Both || SelectedTarget == LogTarget.Console;
-            }
-        }
+        public bool IsConsoleEnabled => (SelectedTargets & LogTargets.Console) == LogTargets.Console;
 
         public void SetLogLevel(LogLevel newLogLevel)
         {
@@ -50,16 +38,27 @@ namespace AspNetMigrator
 
             if (newLogLevel == LogLevel.None)
             {
-                SelectedTarget = LogTarget.None;
+                SelectedTargets = LogTargets.None;
             }
         }
     }
 
-    public enum LogTarget
+    [Flags]
+    public enum LogTargets
     {
-        Console = 0,
-        File = 1,
-        Both = 2,
-        None = 3
+        /// <summary>
+        /// Logs should not be written.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Logs should be written to the conosle.
+        /// </summary>
+        Console = 1,
+
+        /// <summary>
+        /// Logs should be written to a file on disk.
+        /// </summary>
+        File = 2
     }
 }

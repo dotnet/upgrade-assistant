@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Engine;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.ConsoleApp.Commands
@@ -39,19 +38,26 @@ namespace AspNetMigrator.ConsoleApp.Commands
 
                 if (newLogLevel == LogLevel.None)
                 {
-                    _logSettings.SelectedTarget = LogTarget.None;
+                    _logSettings.SelectedTargets = LogTargets.None;
                 }
                 else
                 {
                     Console.WriteLine("Choose where to send log messages:");
-                    Console.WriteLine("0) Console");
-                    Console.WriteLine("1) File");
-                    Console.WriteLine("2) Both");
+                    Console.WriteLine("1) Console");
+                    Console.WriteLine("2) File");
+                    Console.WriteLine("3) Both");
 
                     var selectedTarget = Console.ReadLine();
-                    if (Enum.TryParse<LogTarget>(selectedTarget, out var newTarget))
+
+                    if (int.TryParse(selectedTarget, out var targetInt))
                     {
-                        _logSettings.SelectedTarget = newTarget;
+                        _logSettings.SelectedTargets = targetInt switch
+                        {
+                            1 => LogTargets.Console,
+                            2 => LogTargets.File,
+                            3 => LogTargets.Console | LogTargets.File,
+                            _ => LogTargets.None
+                        };
                     }
                 }
 

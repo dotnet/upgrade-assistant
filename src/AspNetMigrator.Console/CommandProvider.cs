@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AspNetMigrator.Commands;
 using AspNetMigrator.ConsoleApp.Commands;
-using AspNetMigrator.Engine;
 using Microsoft.Extensions.Hosting;
 
 namespace AspNetMigrator.ConsoleApp

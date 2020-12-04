@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Engine;
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.Logging;
 

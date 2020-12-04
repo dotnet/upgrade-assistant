@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>AspNetMigrator.PackageUpdater</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="PackageMap.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="NuGet.ProjectModel" Version="5.8.0" />
+    <PackageReference Include="NuGet.Protocol" Version="5.8.0" />
+  </ItemGroup>
+  
+</Project>

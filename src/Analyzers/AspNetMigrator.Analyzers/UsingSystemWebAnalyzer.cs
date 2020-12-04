@@ -19,7 +19,7 @@ namespace AspNetMigrator.Analyzers
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.UsingSystemWebMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.UsingSystemWebDescription), Resources.ResourceManager, typeof(Resources));
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
@@ -38,9 +38,7 @@ namespace AspNetMigrator.Analyzers
 
         private void AnalyzeUsingStatements(SyntaxNodeAnalysisContext context)
         {
-            var usingDirective = context.Node as UsingDirectiveSyntax;
-
-            if (usingDirective is null)
+            if (context.Node is not UsingDirectiveSyntax usingDirective)
             {
                 return;
             }

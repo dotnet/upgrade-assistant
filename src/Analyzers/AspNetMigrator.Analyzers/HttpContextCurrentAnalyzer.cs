@@ -22,7 +22,7 @@ namespace AspNetMigrator.Analyzers
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.HttpContextCurrentMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.HttpContextCurrentDescription), Resources.ResourceManager, typeof(Resources));
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
@@ -41,7 +41,7 @@ namespace AspNetMigrator.Analyzers
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
         {
-            if (!(context.Node is MemberAccessExpressionSyntax memberAccessExpression))
+            if (context.Node is not MemberAccessExpressionSyntax memberAccessExpression)
             {
                 return;
             }

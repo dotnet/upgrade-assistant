@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3FC16DAB-215
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.ConsoleApp", "src\AspNetMigrator.Console\AspNetMigrator.ConsoleApp.csproj", "{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Engine", "src\AspNetMigrator.Engine\AspNetMigrator.Engine.csproj", "{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Abstractions", "src\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj", "{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{791D5C15-EC26-497C-95F1-9A7C03BE8FF3}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,11 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		rules.ruleset = rules.ruleset
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.TryConvertProjectConverter", "src\AspNetMigrator.TryConvertProjectConverter\AspNetMigrator.TryConvertProjectConverter.csproj", "{9D38A783-B8EE-44C9-825A-DCCCA972FF0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.TryConvertUpdater", "src\AspNetMigrator.TryConvertUpdater\AspNetMigrator.TryConvertUpdater.csproj", "{9D38A783-B8EE-44C9-825A-DCCCA972FF0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.DefaultPackageUpdater", "src\AspNetMigrator.DefaultPackageUpdater\AspNetMigrator.DefaultPackageUpdater.csproj", "{18C0711F-2B26-49D8-89AB-F68499A0EB9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.PackageUpdater", "src\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj", "{18C0711F-2B26-49D8-89AB-F68499A0EB9B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.DefaultSourceUpdater", "src\AspNetMigrator.DefaultSourceUpdater\AspNetMigrator.DefaultSourceUpdater.csproj", "{C04E2349-B339-4AEF-89FB-AD8DCD9B117A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.SourceUpdater", "src\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj", "{C04E2349-B339-4AEF-89FB-AD8DCD9B117A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers", "src\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj", "{7176CD56-0822-410E-9318-C3440D24A0BB}"
 EndProject
@@ -31,17 +31,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers.Package", "src\Analyzers\AspNetMigrator.Analyzers.Package\AspNetMigrator.Analyzers.Package.csproj", "{12080E4D-027D-4880-8A94-AA22DCD15F07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers.Test", "test\AspNetMigrator.Analyzers.Test\AspNetMigrator.Analyzers.Test.csproj", "{517E6A56-5FFA-4FD0-B645-02C295C968C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers.Test", "tests\AspNetMigrator.Analyzers.Test\AspNetMigrator.Analyzers.Test.csproj", "{517E6A56-5FFA-4FD0-B645-02C295C968C3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{2A80B702-C4AB-409F-AFD5-CE7AC809785F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.MSBuild", "src\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj", "{EDAC1981-61FC-4030-AA5F-C9A4D054CF00}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.StartupUpdater", "src\AspNetMigrator.StartupUpdater\AspNetMigrator.StartupUpdater.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Solution", "src\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMigrator.BackupUpdater", "src\AspNetMigrator.BackupUpdater\AspNetMigrator.BackupUpdater.csproj", "{7A96CCA0-4D47-48C6-A889-B560048E0C16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMigrator.Migrator", "src\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj", "{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -197,6 +201,30 @@ Global
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}.Release|x64.Build.0 = Release|Any CPU
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}.Release|x86.ActiveCfg = Release|Any CPU
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}.Release|x86.Build.0 = Release|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Debug|x64.Build.0 = Debug|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Debug|x86.Build.0 = Debug|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Release|x64.ActiveCfg = Release|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Release|x64.Build.0 = Release|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Release|x86.ActiveCfg = Release|Any CPU
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16}.Release|x86.Build.0 = Release|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Debug|x64.Build.0 = Debug|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|x64.ActiveCfg = Release|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|x64.Build.0 = Release|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -215,6 +243,8 @@ Global
 		{EDAC1981-61FC-4030-AA5F-C9A4D054CF00} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB} = {3FC16DAB-215C-422B-9130-61D566695463}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

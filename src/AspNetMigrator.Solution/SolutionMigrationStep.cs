@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Engine;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
@@ -85,7 +84,7 @@ namespace AspNetMigrator.Solution
 
         private class ProjectCommand : MigrationCommand
         {
-            public static ProjectCommand Create(Project project) => new ProjectCommand(project);
+            public static ProjectCommand Create(Project project) => new(project);
 
             public ProjectCommand(Project project)
             {
