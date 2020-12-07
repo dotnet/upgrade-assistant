@@ -27,7 +27,7 @@ namespace AspNetMigrator.BackupUpdater
             _skipBackup = options.SkipBackup;
             _backupPath = DetermineBackupPath(options);
 
-            Title = $"Backup project{(_skipBackup ? " [skipped]" : string.Empty)}";
+            Title = $"Backup project";
             Description = $"Backup {_projectDir} to {_backupPath}";
             if (collectBackupPathFromUser is null)
             {
@@ -50,7 +50,7 @@ namespace AspNetMigrator.BackupUpdater
             if (_skipBackup)
             {
                 Logger.LogDebug("Backup migration step initalized as complete (backup skipped)");
-                return Task.FromResult((MigrationStepStatus.Complete, "Backup skipped"));
+                return Task.FromResult((MigrationStepStatus.Skipped, "Backup skipped"));
             }
             else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
             {
