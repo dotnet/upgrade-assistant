@@ -123,6 +123,12 @@ namespace AspNetMigrator.TryConvertUpdater
                 return (MigrationStepStatus.Failed, "No project specified");
             }
 
+            if (!File.Exists(_tryConvertPath))
+            {
+                Logger.LogCritical("Try-Convert not found");
+                return (MigrationStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
+            }
+
             try
             {
                 var project = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);

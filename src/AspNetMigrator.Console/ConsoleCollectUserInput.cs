@@ -9,20 +9,21 @@ namespace AspNetMigrator.ConsoleApp
     public class ConsoleCollectUserInput : ICollectUserInput
     {
         private const string Prompt = "> ";
-
+        private readonly InputOutputStreams _io;
         private readonly ILogger<ConsoleCollectUserInput> _logger;
 
-        public ConsoleCollectUserInput(ILogger<ConsoleCollectUserInput> logger)
+        public ConsoleCollectUserInput(InputOutputStreams io, ILogger<ConsoleCollectUserInput> logger)
         {
-            _logger = logger;
+            _io = io ?? throw new ArgumentNullException(nameof(io));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public Task<string?> AskUserAsync(string prompt)
         {
-            Console.WriteLine(prompt);
-            Console.Write(Prompt);
+            _io.Output.WriteLine(prompt);
+            _io.Output.Write(Prompt);
 
-            return Task.FromResult(Console.ReadLine());
+            return Task.FromResult(_io.Input.ReadLine());
         }
 
         public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
@@ -35,20 +36,20 @@ namespace AspNetMigrator.ConsoleApp
 
             var listOfCommands = commands as IReadOnlyList<T> ?? new List<T>(commands);
 
-            Console.WriteLine(message);
+            _io.Output.WriteLine(message);
 
             for (var i = 0; i < listOfCommands.Count; i++)
             {
-                Console.WriteLine($" {i + 1}. {listOfCommands[i].CommandText}");
+                _io.Output.WriteLine($" {i + 1}. {listOfCommands[i].CommandText}");
             }
 
             while (true)
             {
                 token.ThrowIfCancellationRequested();
 
-                Console.Write(Prompt);
+                _io.Output.Write(Prompt);
 
-                var result = Console.ReadLine();
+                var result = _io.Input.ReadLine();
 
                 if (result is null)
                 {

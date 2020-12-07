@@ -16,22 +16,25 @@ namespace AspNetMigrator.ConsoleApp
     {
         private readonly IServiceProvider _services;
         private readonly ICollectUserInput _input;
+        private readonly InputOutputStreams _io;
         private readonly CommandProvider _commandProvider;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
 
         public ConsoleRepl(
             ICollectUserInput input,
+            InputOutputStreams io,
             CommandProvider commandProvider,
             ILogger<ConsoleRepl> logger,
             IServiceProvider services,
             IHostApplicationLifetime lifetime)
         {
-            _input = input;
-            _commandProvider = commandProvider;
-            _logger = logger;
-            _lifetime = lifetime;
-            _services = services;
+            _input = input ?? throw new ArgumentNullException(nameof(input));
+            _io = io ?? throw new ArgumentNullException(nameof(io));
+            _commandProvider = commandProvider ?? throw new ArgumentNullException(nameof(commandProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _lifetime = lifetime ?? throw new ArgumentNullException(nameof(lifetime));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
         public async Task StartAsync(CancellationToken token)
@@ -92,7 +95,7 @@ namespace AspNetMigrator.ConsoleApp
                     if (!await command.ExecuteAsync(context, token))
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"Command ({command.CommandText}) did not succeed");
+                        _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
                         Console.ResetColor();
                     }
                 }
@@ -105,7 +108,7 @@ namespace AspNetMigrator.ConsoleApp
 
         public Task StopAsync(CancellationToken token) => Task.CompletedTask;
 
-        private static void ShowMigrationSteps(IEnumerable<MigrationStep> steps, MigrationStep? currentStep = null, int offset = 0)
+        private void ShowMigrationSteps(IEnumerable<MigrationStep> steps, MigrationStep? currentStep = null, int offset = 0)
         {
             if (steps is null || !steps.Any())
             {
@@ -118,48 +121,48 @@ namespace AspNetMigrator.ConsoleApp
 
             if (offset == 0)
             {
-                Console.WriteLine();
-                Console.WriteLine("Migration Steps");
+                _io.Output.WriteLine();
+                _io.Output.WriteLine("Migration Steps");
             }
 
             foreach (var step in steps)
             {
                 // Write indent (if any) and item number
-                Console.Write($"{new string(' ', offset * 2)}{count++}. ");
+                _io.Output.Write($"{new string(' ', offset * 2)}{count++}. ");
 
                 // Write the step title and make a note of whether the step is incomplete
                 // (since that would mean future steps shouldn't show "[Current step]")
                 WriteStepStatus(step, step == currentStep);
-                Console.WriteLine(step.Title);
+                _io.Output.WriteLine(step.Title);
                 nextStepFound = nextStepFound || (step.Status != MigrationStepStatus.Complete);
 
                 ShowMigrationSteps(step.SubSteps, currentStep, offset + 1);
             }
 
-            Console.WriteLine();
+            _io.Output.WriteLine();
         }
 
-        private static void WriteStepStatus(MigrationStep step, bool isNextStep)
+        private void WriteStepStatus(MigrationStep step, bool isNextStep)
         {
             switch (step.Status)
             {
                 case MigrationStepStatus.Complete:
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write("[Complete] ");
+                    _io.Output.Write("[Complete] ");
                     break;
                 case MigrationStepStatus.Failed:
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("[Failed] ");
+                    _io.Output.Write("[Failed] ");
                     break;
                 case MigrationStepStatus.Skipped:
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.Write("[Skipped] ");
+                    _io.Output.Write("[Skipped] ");
                     break;
                 case MigrationStepStatus.Incomplete:
                     if (isNextStep)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("[Current step] ");
+                        _io.Output.Write("[Current step] ");
                     }
 
                     break;

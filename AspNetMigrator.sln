@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMigrator.BackupUpdate
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetMigrator.Migrator", "src\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj", "{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "tests\IntegrationTests\IntegrationTests.csproj", "{7AE37670-7570-4EB1-8E66-94DE225CC63E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -225,6 +227,18 @@ Global
 		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|x64.Build.0 = Release|Any CPU
 		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|x86.ActiveCfg = Release|Any CPU
 		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}.Release|x86.Build.0 = Release|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Debug|x64.Build.0 = Debug|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Debug|x86.Build.0 = Debug|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Release|x64.ActiveCfg = Release|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Release|x64.Build.0 = Release|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Release|x86.ActiveCfg = Release|Any CPU
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -245,6 +259,7 @@ Global
 		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{7A96CCA0-4D47-48C6-A889-B560048E0C16} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

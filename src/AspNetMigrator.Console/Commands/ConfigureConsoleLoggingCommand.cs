@@ -7,10 +7,12 @@ namespace AspNetMigrator.ConsoleApp.Commands
 {
     public class ConfigureConsoleLoggingCommand : MigrationCommand
     {
+        private readonly InputOutputStreams _io;
         private readonly LogSettings _logSettings;
 
-        public ConfigureConsoleLoggingCommand(LogSettings logSettings)
+        public ConfigureConsoleLoggingCommand(InputOutputStreams io, LogSettings logSettings)
         {
+            _io = io ?? throw new ArgumentNullException(nameof(io));
             _logSettings = logSettings ?? throw new ArgumentNullException(nameof(logSettings));
         }
 
@@ -19,17 +21,17 @@ namespace AspNetMigrator.ConsoleApp.Commands
 
         public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
-            Console.WriteLine("Choose your log level:");
-            Console.WriteLine("0) Trace");
-            Console.WriteLine("1) Debug");
-            Console.WriteLine("2) Info");
-            Console.WriteLine("3) Warning");
-            Console.WriteLine("4) Error");
-            Console.WriteLine("5) Critical");
-            Console.WriteLine("6) None");
-            Console.WriteLine();
+            _io.Output.WriteLine("Choose your log level:");
+            _io.Output.WriteLine("0) Trace");
+            _io.Output.WriteLine("1) Debug");
+            _io.Output.WriteLine("2) Info");
+            _io.Output.WriteLine("3) Warning");
+            _io.Output.WriteLine("4) Error");
+            _io.Output.WriteLine("5) Critical");
+            _io.Output.WriteLine("6) None");
+            _io.Output.WriteLine();
 
-            var selectedLogLevel = Console.ReadLine();
+            var selectedLogLevel = _io.Input.ReadLine();
 
             if (Enum.TryParse<LogLevel>(selectedLogLevel, out var newLogLevel))
             {
@@ -42,12 +44,12 @@ namespace AspNetMigrator.ConsoleApp.Commands
                 }
                 else
                 {
-                    Console.WriteLine("Choose where to send log messages:");
-                    Console.WriteLine("1) Console");
-                    Console.WriteLine("2) File");
-                    Console.WriteLine("3) Both");
+                    _io.Output.WriteLine("Choose where to send log messages:");
+                    _io.Output.WriteLine("1) Console");
+                    _io.Output.WriteLine("2) File");
+                    _io.Output.WriteLine("3) Both");
 
-                    var selectedTarget = Console.ReadLine();
+                    var selectedTarget = _io.Input.ReadLine();
 
                     if (int.TryParse(selectedTarget, out var targetInt))
                     {

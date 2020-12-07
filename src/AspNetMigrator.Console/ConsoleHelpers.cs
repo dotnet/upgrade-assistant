@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,8 +9,13 @@ namespace AspNetMigrator.ConsoleApp
     {
         private const int DefaultWidth = 80;
 
-        public static Task SendMessageToUserAsync(UserMessage message)
+        public static Task SendMessageToUserAsync(TextWriter output, UserMessage message)
         {
+            if (output is null)
+            {
+                throw new ArgumentNullException(nameof(output));
+            }
+
             if (message == null)
             {
                 throw new ArgumentNullException(nameof(message));
@@ -27,7 +33,7 @@ namespace AspNetMigrator.ConsoleApp
                     Console.ResetColor(); break;
             }
 
-            Console.WriteLine(WrapString(message.Message, Console.WindowWidth));
+            output.WriteLine(WrapString(message.Message, Console.WindowWidth));
             Console.ResetColor();
 
             return Task.CompletedTask;

@@ -9,16 +9,18 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class CommandProvider
     {
+        private readonly InputOutputStreams _io;
         private readonly LogSettings _logSettings;
         private readonly ExitCommand _exit;
 
-        public CommandProvider(LogSettings logSettings, IHostApplicationLifetime lifetime)
+        public CommandProvider(InputOutputStreams io, LogSettings logSettings, IHostApplicationLifetime lifetime)
         {
             if (lifetime is null)
             {
                 throw new ArgumentNullException(nameof(lifetime));
             }
 
+            _io = io ?? throw new ArgumentNullException(nameof(io));
             _logSettings = logSettings;
 
             _exit = new ExitCommand(lifetime.StopApplication);
@@ -36,15 +38,15 @@ namespace AspNetMigrator.ConsoleApp
                 new ApplyNextCommand(step),
                 new SkipNextCommand(step),
                 new SeeMoreDetailsCommand(step, ShowStepStatus),
-                new ConfigureConsoleLoggingCommand(_logSettings),
+                new ConfigureConsoleLoggingCommand(_io, _logSettings),
                 _exit,
             };
         }
 
-        private static Task ShowStepStatus(UserMessage stepStatus)
+        private Task ShowStepStatus(UserMessage stepStatus)
         {
-            Console.WriteLine("Current step details");
-            return ConsoleHelpers.SendMessageToUserAsync(stepStatus);
+            _io.Output.WriteLine("Current step details");
+            return ConsoleHelpers.SendMessageToUserAsync(_io.Output, stepStatus);
         }
     }
 }

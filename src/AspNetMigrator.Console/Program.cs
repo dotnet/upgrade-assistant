@@ -6,6 +6,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
 using AspNetMigrator.PackageUpdater;
@@ -53,8 +54,15 @@ namespace AspNetMigrator.ConsoleApp
             }
         }
 
-        private static Task RunMigrationAsync(MigrateOptions options)
+        public static Task RunMigrationAsync(MigrateOptions options) => RunMigrationAsync(options, null, CancellationToken.None);
+
+        public static Task RunMigrationAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection>? serviceConfiguration, CancellationToken token)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             var logSettings = new LogSettings(options.Verbose);
 
             var host = Host.CreateDefaultBuilder()
@@ -70,6 +78,7 @@ namespace AspNetMigrator.ConsoleApp
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
+                    services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
 
@@ -81,6 +90,8 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<MigrationStep, StartupUpdaterStep>();
                     services.AddScoped<MigrationStep, SourceUpdaterStep>();
                     services.AddScoped<Migrator>();
+
+                    serviceConfiguration?.Invoke(context, services);
                 })
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
@@ -90,7 +101,7 @@ namespace AspNetMigrator.ConsoleApp
                 .RunConsoleAsync(options =>
                 {
                     options.SuppressStatusMessages = true;
-                });
+                }, token);
 
             return host;
         }
