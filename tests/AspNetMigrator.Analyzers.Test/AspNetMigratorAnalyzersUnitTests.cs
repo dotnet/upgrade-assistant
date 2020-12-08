@@ -94,7 +94,9 @@ namespace AspNetMigrator.Analyzers.Test
         };
 
         [AssemblyInitialize]
+#pragma warning disable IDE0060 // Remove unused parameter (required by MSTest)
         public static void Initialize(TestContext context)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             // Register MSBuild
             MSBuildRegistrationStartup.RegisterMSBuildInstance();

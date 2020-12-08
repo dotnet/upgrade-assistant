@@ -23,7 +23,9 @@ namespace IntegrationTests
         private static readonly string[] DirsToIgnore = new[] { "bin", "obj" };
 
         [AssemblyInitialize]
+#pragma warning disable IDE0060 // Remove unused parameter (required by MSTest)
         public static void InstallTryConvert(TestContext context)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             var tryConvertPath = Environment.ExpandEnvironmentVariables(TryConvertPath);
             if (!File.Exists(tryConvertPath))
@@ -69,8 +71,8 @@ namespace IntegrationTests
 
         private static async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
         {
-            var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p.Substring(expectedDir.Length + 1)).ToArray();
-            var actualFiles = Directory.GetFiles(actualDir, "*", SearchOption.AllDirectories).Select(p => p.Substring(actualDir.Length + 1)).ToArray();
+            var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p[(expectedDir.Length + 1)..]).ToArray();
+            var actualFiles = Directory.GetFiles(actualDir, "*", SearchOption.AllDirectories).Select(p => p[(actualDir.Length + 1)..]).ToArray();
 
             CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
 

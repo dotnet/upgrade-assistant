@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -17,22 +16,14 @@ namespace AspNetMigrator
         public Migrator(IEnumerable<MigrationStep> steps, ILogger<Migrator> logger)
         {
             _steps = steps?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(steps));
-            Logger = logger;
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IEnumerable<MigrationStep> Steps => _steps;
 
         public IAsyncEnumerable<MigrationStep> GetAllSteps(IMigrationContext context, CancellationToken token)
         {
-            if (_steps.Length == 0)
-            {
-                Logger.LogError("No steps were registered for migration.");
-                return AsyncEnumerable.Empty<MigrationStep>();
-            }
-            else
-            {
-                return GetStepsInternal(_steps, context, token);
-            }
+            return GetStepsInternal(_steps, context, token);
         }
 
         private async IAsyncEnumerable<MigrationStep> GetStepsInternal(IEnumerable<MigrationStep> steps, IMigrationContext context, [EnumeratorCancellation] CancellationToken token)

@@ -33,7 +33,7 @@ namespace IntegrationTests
             var project = new FileInfo(inputPath);
             using var cts = new CancellationTokenSource();
 
-            var migrationTask = Program.RunMigrationAsync(new MigrateOptions { SkipBackup = true, Project = project }, (context, services) => RegisterInputOutput(context, services, output, commands), cts.Token);
+            var migrationTask = Program.RunMigrationAsync(new MigrateOptions { SkipBackup = true, Project = project }, (context, services) => RegisterInputOutput(services, output, commands), cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);
@@ -48,7 +48,7 @@ namespace IntegrationTests
             }
         }
 
-        private static void RegisterInputOutput(HostBuilderContext context, IServiceCollection services, TextWriter output, IEnumerable<string> commands)
+        private static void RegisterInputOutput(IServiceCollection services, TextWriter output, IEnumerable<string> commands)
         {
             var servicesToRemove = services.Where(sd => sd.ServiceType.Equals(typeof(InputOutputStreams))).ToArray();
             foreach (var service in servicesToRemove)
