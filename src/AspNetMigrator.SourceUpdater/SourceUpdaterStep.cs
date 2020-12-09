@@ -66,7 +66,7 @@ namespace AspNetMigrator.SourceUpdater
             _workspace = await context.GetWorkspaceAsync(token).ConfigureAwait(false);
             _projectId = await context.GetProjectIdAsync(token).ConfigureAwait(false);
 
-            await GetDiagnosticsAsync().ConfigureAwait(false);
+            await GetDiagnosticsAsync(context, token).ConfigureAwait(false);
 
             foreach (var step in SubSteps)
             {
@@ -79,7 +79,7 @@ namespace AspNetMigrator.SourceUpdater
                 (MigrationStepStatus.Complete, "No migration diagnostics found");
         }
 
-        private async Task GetDiagnosticsAsync()
+        public async Task GetDiagnosticsAsync(IMigrationContext context, CancellationToken token)
         {
             if (_workspace is null)
             {
@@ -98,15 +98,28 @@ namespace AspNetMigrator.SourceUpdater
             Logger.LogTrace("Running ASP.NET Core migration analyzers on {ProjectName}", project.Name);
 
             // Compile with migration analyzers enabled
-            var compilation = (await project.GetCompilationAsync().ConfigureAwait(false))
+            var compilation = (await project.GetCompilationAsync(token).ConfigureAwait(false))
                 .WithAnalyzers(AspNetCoreMigrationAnalyzers.AllAnalyzers, new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
 
             // Find all diagnostics that migration code fixers can address
-            Diagnostics = (await compilation.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false))
+            Diagnostics = (await compilation.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
                 .Where(d => d.Location.IsInSource &&
                        d.Id.StartsWith(AspNetMigratorAnalyzerPrefix, StringComparison.Ordinal) &&
                        AspNetCoreMigrationCodeFixers.AllCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
             Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
+
+            // Normally, the migrator will apply steps one at a time
+            // at the user's instruction. In the case of parent and child steps,
+            // the parent has any top-level application done after the children.
+            // In the case of this update step, the parent (this updater) doesn't
+            // need to apply anything. Therefore, automatically apply this updater
+            // if all of its children are complete. This will avoid the annoying
+            // user experience of having to "apply" an empty change for the parent
+            // source updater step after all children have applied their changes.
+            if (!Diagnostics.Any())
+            {
+                await ApplyAsync(context, token).ConfigureAwait(false);
+            }
         }
 
         protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
@@ -114,7 +127,7 @@ namespace AspNetMigrator.SourceUpdater
                 (MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
                 (MigrationStepStatus.Complete, string.Empty));
 
-        internal async Task<bool> UpdateSolutionAsync(Solution updatedSolution, IMigrationContext context, CancellationToken token)
+        internal bool UpdateSolution(Solution updatedSolution)
         {
             if (_workspace is null)
             {
@@ -125,21 +138,6 @@ namespace AspNetMigrator.SourceUpdater
             if (_workspace.TryApplyChanges(updatedSolution))
             {
                 Logger.LogDebug("Source successfully updated");
-                await GetDiagnosticsAsync().ConfigureAwait(false);
-
-                // Normally, the migrator will apply steps one at a time
-                // at the user's instruction. In the case of parent and child steps,
-                // the parent has any top-level application done after the children.
-                // In the case of this update step, the parent (this updater) doesn't
-                // need to apply anything. Therefore, automatically apply this updater
-                // if all of its children are complete. This will avoid the annoying
-                // user experience of having to "apply" an empty change for the parent
-                // source updater step after all children have applied their changes.
-                if (!Diagnostics.Any())
-                {
-                    await ApplyAsync(context, token).ConfigureAwait(false);
-                }
-
                 return true;
             }
             else
