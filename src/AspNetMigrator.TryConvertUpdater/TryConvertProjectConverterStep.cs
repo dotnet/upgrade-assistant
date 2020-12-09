@@ -41,7 +41,7 @@ namespace AspNetMigrator.TryConvertUpdater
 
             Title = $"Convert project file to SDK style";
             Description = $"Convert {migrateOptions.ProjectPath} to an SDK-style project with try-convert";
-            var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath");
+            var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }
 
@@ -125,7 +125,7 @@ namespace AspNetMigrator.TryConvertUpdater
 
             if (!File.Exists(_tryConvertPath))
             {
-                Logger.LogCritical("Try-Convert not found");
+                Logger.LogCritical("Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
                 return (MigrationStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
             }
 

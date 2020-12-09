@@ -66,6 +66,7 @@ namespace AspNetMigrator.ConsoleApp
             var logSettings = new LogSettings(options.Verbose);
 
             var host = Host.CreateDefaultBuilder()
+                .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureServices((context, services) =>
                 {
                     services.AddHostedService<ConsoleRepl>();
@@ -127,7 +128,6 @@ namespace AspNetMigrator.ConsoleApp
                 WriteString("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to an ASP.NET Core project.");
                 WriteString("No tool can completely automate this process and the project *will* have build errors after the tool runs and will require significant manual changes to complete migration.");
                 WriteString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
-                WriteString("NOTE: This tool depends on MSBuild, so it should be run from a developer command prompt.");
 
                 base.Write(command);
             }

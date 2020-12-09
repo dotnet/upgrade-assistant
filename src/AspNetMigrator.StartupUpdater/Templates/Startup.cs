@@ -1,4 +1,9 @@
-﻿using System;
+﻿// This Startup file is based on ASP.NET Core new project templates and is included
+// as a starting point for DI registration and HTTP request processing pipeline configuration.
+// This file will need updated according to the specific scenario of the application being migrated.
+// For more information on ASP.NET Core startup files, see https://docs.microsoft.com/aspnet/core/fundamentals/startup
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

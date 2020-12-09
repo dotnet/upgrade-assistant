@@ -45,7 +45,7 @@ namespace AspNetMigrator.PackageUpdater
             {
                 _packageMapPaths = updaterOptions.PackageMapPaths.Select(mapPath => Path.IsPathFullyQualified(mapPath)
                     ? mapPath
-                    : Path.Combine(Path.GetDirectoryName(typeof(PackageUpdaterStep).Assembly.Location) ?? string.Empty, mapPath));
+                    : Path.Combine(AppContext.BaseDirectory, mapPath));
             }
             else
             {
