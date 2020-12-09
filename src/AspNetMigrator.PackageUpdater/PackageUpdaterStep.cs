@@ -24,6 +24,7 @@ namespace AspNetMigrator.PackageUpdater
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<string> _packageMapPaths;
+        private readonly bool _logRestoreOutput;
         private readonly NuGetFramework _targetFramework;
         private List<NuGetReference> _packagesToRemove;
         private List<NuGetReference> _packagesToAdd;
@@ -56,6 +57,7 @@ namespace AspNetMigrator.PackageUpdater
             Description = $"Update package references in {options.ProjectPath} to versions compatible with the target framework";
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
+            _logRestoreOutput = updaterOptions?.LogRestoreOutput ?? false;
             _targetFramework = NuGetFramework.Parse(options.TargetFramework);
             _packagesToRemove = new List<NuGetReference>();
             _packagesToAdd = new List<NuGetReference>();
@@ -75,7 +77,7 @@ namespace AspNetMigrator.PackageUpdater
             var packageMaps = await LoadPackageMapsAsync(token).ConfigureAwait(false);
 
             // Restore packages (to produce lockfile)
-            var restoreOutput = await _packageRestorer.RestorePackagesAsync(context, token).ConfigureAwait(false);
+            var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
             {
                 var path = await context.GetProjectPathAsync(token).ConfigureAwait(false);

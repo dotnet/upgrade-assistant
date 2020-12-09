@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace AspNetMigrator.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
+        public async Task<RestoreOutput> RestorePackagesAsync(bool logRestoreOutput, IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -33,19 +34,28 @@ namespace AspNetMigrator.MSBuild
 
             // Create a project instance and run MSBuild /t:Restore
             var project = new ProjectInstance(rootElement);
-            return RestorePackages(project);
+            return RestorePackages(project, logRestoreOutput);
         }
 
-        public RestoreOutput RestorePackages(ProjectInstance project)
+        public RestoreOutput RestorePackages(ProjectInstance project, bool logRestoreOutput)
         {
             if (project is null)
             {
                 throw new ArgumentNullException(nameof(project));
             }
 
+            var buildParameters = new BuildParameters();
+            if (logRestoreOutput)
+            {
+                buildParameters.Loggers = new List<Microsoft.Build.Framework.ILogger>
+                {
+                    new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
+                };
+            }
+
             var restoreRequest = new BuildRequestData(project, new[] { "Restore" });
-            _logger.LogDebug("Restoring NuGet packages for project {ProjectPath}", project.FullPath);
-            var restoreResult = BuildManager.DefaultBuildManager.Build(new BuildParameters(), restoreRequest);
+            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", project.FullPath);
+            var restoreResult = BuildManager.DefaultBuildManager.Build(buildParameters, restoreRequest);
             _logger.LogDebug("MSBuild exited with status {RestoreStatus}", restoreResult.OverallResult);
             if (restoreResult.Exception != null)
             {

@@ -2,5 +2,5 @@
 
 namespace AspNetMigrator.PackageUpdater
 {
-    public record PackageUpdaterOptions(IEnumerable<string> PackageMapPaths);
+    public record PackageUpdaterOptions(IEnumerable<string> PackageMapPaths, bool LogRestoreOutput);
 }

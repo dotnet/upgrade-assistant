@@ -74,7 +74,7 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddMsBuild();
 
                     services.AddSingleton(options);
-                    services.AddSingleton(new PackageUpdaterOptions(new[] { "PackageMap.json" }));
+                    services.AddSingleton(new PackageUpdaterOptions(new[] { "PackageMap.json" }, options.Verbose));
                     services.AddSingleton<IPackageLoader, PackageLoader>();
 
                     // Add command handlers
