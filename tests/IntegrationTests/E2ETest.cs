@@ -74,7 +74,10 @@ namespace IntegrationTests
             var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p[(expectedDir.Length + 1)..]).ToArray();
             var actualFiles = Directory.GetFiles(actualDir, "*", SearchOption.AllDirectories).Select(p => p[(actualDir.Length + 1)..]).ToArray();
 
-            CollectionAssert.AreEquivalent(expectedFiles, actualFiles);
+            CollectionAssert.AreEquivalent(
+                expectedFiles,
+                actualFiles,
+                $"Expected but not actual: {string.Join(", ", expectedFiles.Where(f => !actualFiles.Contains(f)))}\nActual but not expected:{string.Join(", ", actualFiles.Where(f => !expectedFiles.Contains(f)))}");
 
             foreach (var file in expectedFiles)
             {

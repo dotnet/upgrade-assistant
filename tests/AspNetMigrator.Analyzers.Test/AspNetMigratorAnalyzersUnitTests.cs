@@ -119,7 +119,7 @@ namespace AspNetMigrator.Analyzers.Test
         [TestMethod]
         public async Task NegativeTest()
         {
-            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", AspNetCoreMigrationAnalyzers.AllAnalyzers
+            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", TestHelper.AllAnalyzers
                 .SelectMany(a => a.SupportedDiagnostics)
                 .Select(d => d.Id)
                 .ToArray()).ConfigureAwait(false);

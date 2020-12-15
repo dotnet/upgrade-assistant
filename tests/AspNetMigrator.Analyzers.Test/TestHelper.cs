@@ -20,6 +20,22 @@ namespace TestProject
         // TODO : Make this configurable so the test can pass from other working dirs
         internal const string TestProjectPath = @"..\..\..\..\TestAssets\TestProject\TestProject.csproj";
 
+        internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
+            new UsingSystemWebAnalyzer(),
+            new HtmlStringAnalyzer(),
+            new ResultTypeAnalyzer(),
+            new FilterAnalyzer(),
+            new HttpContextCurrentAnalyzer(),
+            new HttpContextIsDebuggingEnabledAnalyzer());
+
+        internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
+            new UsingSystemWebCodeFixer(),
+            new HtmlStringCodeFixer(),
+            new ResultTypeCodeFixer(),
+            new FilterCodeFixer(),
+            new HttpContextCurrentCodeFixer(),
+            new HttpContextIsDebuggingEnabledCodeFixer());
+
         public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
         {
             if (documentPath is null)
@@ -34,7 +50,7 @@ namespace TestProject
 
         private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, params string[] diagnosticIds)
         {
-            var analyzersToUse = AspNetCoreMigrationAnalyzers.AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
+            var analyzersToUse = AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
             var compilation = (await project.GetCompilationAsync().ConfigureAwait(false))
                             .WithAnalyzers(ImmutableArray.Create(analyzersToUse.ToArray()));
 
@@ -104,7 +120,7 @@ namespace TestProject
                 throw new ArgumentNullException(nameof(document));
             }
 
-            var provider = AspNetCoreMigrationCodeFixers.AllCodeFixProviders.FirstOrDefault(p => p.FixableDiagnosticIds.Contains(diagnostic.Id));
+            var provider = AllCodeFixProviders.FirstOrDefault(p => p.FixableDiagnosticIds.Contains(diagnostic.Id));
 
             if (provider is null)
             {

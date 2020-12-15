@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Analyzers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -18,7 +18,9 @@ namespace AspNetMigrator.SourceUpdater
     /// </summary>
     public class SourceUpdaterStep : MigrationStep
     {
-        private const string AspNetMigratorAnalyzerPrefix = "AM";
+        private readonly ImmutableArray<DiagnosticAnalyzer> _allAnalyzers;
+        private readonly ImmutableArray<CodeFixProvider> _allCodeFixProviders;
+
         private Workspace? _workspace;
         private ProjectId? _projectId;
 
@@ -26,12 +28,22 @@ namespace AspNetMigrator.SourceUpdater
 
         internal Project? Project => _workspace?.CurrentSolution.GetProject(_projectId);
 
-        public SourceUpdaterStep(MigrateOptions options, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(MigrateOptions options, IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<SourceUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
+            }
+
+            if (analyzers is null)
+            {
+                throw new ArgumentNullException(nameof(analyzers));
+            }
+
+            if (codeFixProviders is null)
+            {
+                throw new ArgumentNullException(nameof(codeFixProviders));
             }
 
             if (logger is null)
@@ -42,9 +54,16 @@ namespace AspNetMigrator.SourceUpdater
             Title = $"Update C# source";
             Description = $"Update source files in {options.ProjectPath} to change ASP.NET references to ASP.NET Core equivalents";
 
+            _allAnalyzers = ImmutableArray.CreateRange(analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id));
+            _allCodeFixProviders = ImmutableArray.CreateRange(codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First()));
+
             // Add sub-steps for each analyzer that will be run
-            SubSteps = new List<MigrationStep>(AspNetCoreMigrationCodeFixers.AllCodeFixProviders.Select(fixer => new CodeFixerStep(this, fixer, options, logger)));
+            SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, options, logger)));
         }
+
+        // Gets supported diagnostics from analyzers that are fixable by a given code fixer
+        private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
+            _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
         protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -99,13 +118,12 @@ namespace AspNetMigrator.SourceUpdater
 
             // Compile with migration analyzers enabled
             var compilation = (await project.GetCompilationAsync(token).ConfigureAwait(false))
-                .WithAnalyzers(AspNetCoreMigrationAnalyzers.AllAnalyzers, new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
+                .WithAnalyzers(_allAnalyzers, new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
 
             // Find all diagnostics that migration code fixers can address
             Diagnostics = (await compilation.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
                 .Where(d => d.Location.IsInSource &&
-                       d.Id.StartsWith(AspNetMigratorAnalyzerPrefix, StringComparison.Ordinal) &&
-                       AspNetCoreMigrationCodeFixers.AllCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
+                       _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
             Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
 
             // Normally, the migrator will apply steps one at a time

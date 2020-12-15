@@ -13,6 +13,8 @@ using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
 using AspNetMigrator.SourceUpdater;
 using AspNetMigrator.StartupUpdater;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,6 +24,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
+        private const string SourceUpdaterStepOptionsSection = "SourceUpdaterStepOptions";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
         private const string LogFilePath = "log.txt";
 
@@ -67,6 +70,7 @@ namespace AspNetMigrator.ConsoleApp
 
             var host = Host.CreateDefaultBuilder()
                 .UseContentRoot(AppContext.BaseDirectory)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
                     services.AddHostedService<ConsoleRepl>();
@@ -93,6 +97,13 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<Migrator>();
 
                     serviceConfiguration?.Invoke(context, services);
+                })
+                .ConfigureContainer<ContainerBuilder>((context, builder) =>
+                {
+                    var sourceUpdatersPath = context.Configuration.GetSection(SourceUpdaterStepOptionsSection).Get<SourceUpdaterStepOptions>()?.SourceUpdaterPath
+                        ?? throw new ArgumentNullException("Source updaters path must not be null");
+
+                    builder.RegisterModule(new AnalyzersAndCodeFixersModule(sourceUpdatersPath));
                 })
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)

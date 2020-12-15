@@ -17,4 +17,16 @@
     <ProjectReference Include="..\..\src\AspNetMigrator.Console\AspNetMigrator.ConsoleApp.csproj" />
   </ItemGroup>
 
+  <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
+    <PropertyGroup>
+      <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <SourceUpdateFiles Include="$(OutputPath)AspNetMigrator.Analyzers.*" />
+    </ItemGroup>
+
+    <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
+    <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />
+  </Target>
 </Project>

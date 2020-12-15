@@ -12,9 +12,13 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="SourceUpdaters\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
@@ -33,6 +37,24 @@
     <ProjectReference Include="..\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.StartupUpdater\AspNetMigrator.StartupUpdater.csproj" />
+
+    <!-- These projects aren't used directly by this project, but are included here so that they're 
+         sure to be built prior to copying their binary output into this project's 'SourceUpdaters' directory. -->
+    <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
+    <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
   </ItemGroup>
 
+  <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
+  <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
+    <PropertyGroup>
+      <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <SourceUpdateFiles Include="$(OutputPath)AspNetMigrator.Analyzers.*" />
+    </ItemGroup>
+
+    <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
+    <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />
+  </Target>
 </Project>
