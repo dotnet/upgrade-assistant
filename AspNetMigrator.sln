@@ -39,7 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{60D2D4E3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.MSBuild", "src\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj", "{EDAC1981-61FC-4030-AA5F-C9A4D054CF00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.StartupUpdater", "src\AspNetMigrator.StartupUpdater\AspNetMigrator.StartupUpdater.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.TemplateUpdater", "src\AspNetMigrator.TemplateUpdater\AspNetMigrator.TemplateUpdater.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Solution", "src\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
 EndProject

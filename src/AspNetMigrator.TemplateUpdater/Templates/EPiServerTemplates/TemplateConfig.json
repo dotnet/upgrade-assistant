@@ -1,0 +1,26 @@
+{
+  "Replacements": {
+    "WebApplication1": "$(RootNamespace)"
+  },
+  "TemplateItems": [
+    {
+      "Path": "Program.cs",
+      "Type": "Compile",
+      "IncludeExplicitly": false,
+      "Keywords": [
+        "Main",
+        "Microsoft.AspNetCore.Hosting"
+      ]
+    },
+    {
+      "Path": "Startup.cs",
+      "Type": "Compile",
+      "IncludeExplicitly": false,
+      "Keywords": [
+        "Configure",
+        "ConfigureServices"
+      ]
+    }
+  ],
+  "UpdateWebAppsOnly": true
+}

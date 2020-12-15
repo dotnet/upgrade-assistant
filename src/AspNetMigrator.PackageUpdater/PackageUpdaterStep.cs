@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -15,21 +16,32 @@ using NuGet.Versioning;
 
 namespace AspNetMigrator.PackageUpdater
 {
+    /// <summary>
+    /// Migration step that updates NuGet package references
+    /// to better work after migration. Packages references are
+    /// updated if the reference appears to be transitive (with
+    /// SDK style projects, only top-level dependencies are necessary
+    /// in the project file), if the package version doesn't
+    /// target a compatible .NET framework but a newer version does,
+    /// or if the package is explicitly mapped to an updated
+    /// NuGet package in a mapping configuration file.
+    /// </summary>
     public class PackageUpdaterStep : MigrationStep
     {
         private const string AnalyzerPackageName = "AspNetMigrator.Analyzers";
         private const string AnalyzerPackageVersion = "1.0.0";
         private const string PackageReferenceType = "PackageReference";
+        private const string PackageMapExtension = "*.json";
 
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
-        private readonly IEnumerable<string> _packageMapPaths;
+        private readonly string _packageMapSearchPath;
         private readonly bool _logRestoreOutput;
         private readonly NuGetFramework _targetFramework;
         private List<NuGetReference> _packagesToRemove;
         private List<NuGetReference> _packagesToAdd;
 
-        public PackageUpdaterStep(MigrateOptions options, IPackageLoader packageLoader, IPackageRestorer packageRestorer, PackageUpdaterOptions updaterOptions, ILogger<PackageUpdaterStep> logger)
+        public PackageUpdaterStep(MigrateOptions options, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IOptions<PackageUpdaterStepOptions> updaterOptions, ILogger<PackageUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -37,27 +49,24 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(options));
             }
 
+            if (updaterOptions is null)
+            {
+                throw new ArgumentNullException(nameof(updaterOptions));
+            }
+
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
-            }
-
-            if (updaterOptions?.PackageMapPaths != null)
-            {
-                _packageMapPaths = updaterOptions.PackageMapPaths.Select(mapPath => Path.IsPathFullyQualified(mapPath)
-                    ? mapPath
-                    : Path.Combine(AppContext.BaseDirectory, mapPath));
-            }
-            else
-            {
-                _packageMapPaths = Enumerable.Empty<string>();
             }
 
             Title = $"Update NuGet packages";
             Description = $"Update package references in {options.ProjectPath} to versions compatible with the target framework";
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
-            _logRestoreOutput = updaterOptions?.LogRestoreOutput ?? false;
+            _packageMapSearchPath = Path.IsPathFullyQualified(updaterOptions.Value.PackageMapPath ?? string.Empty)
+                ? updaterOptions.Value.PackageMapPath!
+                : Path.Combine(AppContext.BaseDirectory, updaterOptions.Value.PackageMapPath ?? string.Empty);
+            _logRestoreOutput = updaterOptions.Value.LogRestoreOutput;
             _targetFramework = NuGetFramework.Parse(options.TargetFramework);
             _packagesToRemove = new List<NuGetReference>();
             _packagesToAdd = new List<NuGetReference>();
@@ -291,27 +300,38 @@ namespace AspNetMigrator.PackageUpdater
         {
             var maps = new List<NuGetPackageMap>();
 
-            foreach (var mapPath in _packageMapPaths)
+            if (Directory.Exists(_packageMapSearchPath))
             {
-                token.ThrowIfCancellationRequested();
+                var mapPaths = Directory.GetFiles(_packageMapSearchPath, PackageMapExtension, SearchOption.AllDirectories);
 
-                if (!File.Exists(mapPath))
+                foreach (var mapPath in mapPaths)
                 {
-                    Logger.LogError("Package map file {PackageMapPath} not found", mapPath);
-                }
-                else
-                {
-                    Logger.LogDebug("Loading package maps from {PackageMapPath}", mapPath);
-                    using var config = File.OpenRead(mapPath);
-                    var newMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
-                    if (newMaps != null)
+                    token.ThrowIfCancellationRequested();
+
+                    try
                     {
-                        maps.AddRange(newMaps);
+                        using var config = File.OpenRead(mapPath);
+                        var newMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
+                        if (newMaps != null)
+                        {
+                            maps.AddRange(newMaps);
+                            Logger.LogDebug("Loaded {MapCount} package maps from {PackageMapPath}", newMaps.Count(), mapPath);
+                        }
+                    }
+                    catch (JsonException exc)
+                    {
+                        Logger.LogDebug(exc, "File {PackageMapPath} is not a valid package map file", mapPath);
                     }
                 }
+
+                Logger.LogDebug("Loaded {MapCount} package maps", maps.Count);
+            }
+            else
+            {
+                Logger.LogError("Package map search path ({PackageMapSearchPath}) not found", _packageMapSearchPath);
+                throw new InvalidOperationException($"Package map search path ({_packageMapSearchPath}) not found");
             }
 
-            Logger.LogDebug("Loaded {MapCount} package maps", maps.Count);
             return maps;
         }
 

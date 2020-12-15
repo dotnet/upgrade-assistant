@@ -12,7 +12,6 @@ using AspNetMigrator.BackupUpdater;
 using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
 using AspNetMigrator.SourceUpdater;
-using AspNetMigrator.StartupUpdater;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +23,8 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
+        private const string PackageUpdaterStepOptionsSection = "PackageUpdaterStepOptions";
+        private const string TemplateInserterStepOptionsSection = "TemplateInserterStepOptions";
         private const string SourceUpdaterStepOptionsSection = "SourceUpdaterStepOptions";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
         private const string LogFilePath = "log.txt";
@@ -78,7 +79,6 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddMsBuild();
 
                     services.AddSingleton(options);
-                    services.AddSingleton(new PackageUpdaterOptions(new[] { "PackageMap.json" }, options.Verbose));
                     services.AddSingleton<IPackageLoader, PackageLoader>();
 
                     // Add command handlers
@@ -91,8 +91,8 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<MigrationStep, BackupStep>();
                     services.AddScoped<MigrationStep, SolutionMigrationStep>();
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-                    services.AddScoped<MigrationStep, PackageUpdaterStep>();
-                    services.AddScoped<MigrationStep, StartupUpdaterStep>();
+                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
+                    services.AddTemplateInserterStep().Bind(context.Configuration.GetSection(TemplateInserterStepOptionsSection));
                     services.AddScoped<MigrationStep, SourceUpdaterStep>();
                     services.AddScoped<Migrator>();
 

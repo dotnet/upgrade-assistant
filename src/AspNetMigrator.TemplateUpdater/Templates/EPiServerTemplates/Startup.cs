@@ -1,4 +1,4 @@
-// This Startup file is based on EPiServer templates and is included
+﻿// This Startup file is based on EPiServer templates and is included
 // as a starting point for DI registration and HTTP request processing pipeline configuration.
 // This file will need updated according to the specific scenario of the application being migrated.
 // For more information on ASP.NET Core startup files, see https://docs.microsoft.com/aspnet/core/fundamentals/startup
@@ -18,7 +18,7 @@ using EPiServer.Framework.Web.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
-namespace TemplateMvc
+namespace WebApplication1
 {
     public class Startup
     {

@@ -1,0 +1,102 @@
+﻿[
+  {
+    "PackageSetName": "StructureMap.Web",
+    "NetFrameworkPackages": [
+      {
+        "Name": "structuremap.web",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "Autofac.Mvc",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Autofac.Mvc5",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "ASP.NET",
+    "NetCorePackages": [],
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.AspNet.SessionState.SessionStateModule",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.TelemetryCorrelation",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.SessionState.SqlSessionStateProviderAsync",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.Mvc",
+        "Version": "*"
+      }
+    ]
+  },
+  {
+    "PackageSetName": "Antlr",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Antlr",
+        "Version": "*"
+      },
+      {
+        "Name": "Antlr3.Runtime",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "Antlr4",
+        "Version": "4.6.6"
+      }
+    ]
+  },
+  {
+    "PackageSetName": "Microsoft.Net.Compilers",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.Net.Compilers",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "WebGrease",
+    "NetFrameworkPackages": [
+      {
+        "Name": "WebGrease",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "TPL.Dataflow",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.Tpl.Dataflow",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "System.Threading.Tasks.Dataflow",
+        "Version": "4.11.1"
+      }
+    ]
+  }
+]

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using AspNetMigrator;
 using AspNetMigrator.ConsoleApp;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace IntegrationTests
 {

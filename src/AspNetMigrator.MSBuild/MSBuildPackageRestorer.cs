@@ -66,7 +66,7 @@ namespace AspNetMigrator.MSBuild
             // Check for the lock file's existence rather than success since a bad NuGet reference won't
             // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
             var lockFilePath = Path.Combine(project.GetPropertyValue("MSBuildProjectExtensionsPath"), LockFileName);
-            if (!Path.IsPathRooted(lockFilePath))
+            if (!Path.IsPathFullyQualified(lockFilePath))
             {
                 lockFilePath = Path.Combine(project.Directory, lockFilePath);
             }

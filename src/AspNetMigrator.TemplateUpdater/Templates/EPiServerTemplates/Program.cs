@@ -1,4 +1,4 @@
-// This application entry point is based on EPiServer templates and is included
+﻿// This application entry point is based on EPiServer templates and is included
 // as a starting point for app host configuration.
 // This file may need updated according to the specific scenario of the application being migrated.
 // For more information on ASP.NET Core hosting, see https://docs.microsoft.com/aspnet/core/fundamentals/host/web-host
@@ -13,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace TemplateMvc
+namespace WebApplication1
 {
     public class Program
     {
