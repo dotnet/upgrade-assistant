@@ -65,8 +65,17 @@ steps:
     packDirectory: '$(Build.ArtifactStagingDirectory)/tools'
     versioningScheme: 'off'
 
+- task: DotNetCoreCLI@2
+  displayName: Create analyzer package
+  inputs:
+    command: 'pack'
+    packagesToPack: 'src/Analyzers/AspNetMigrator.Analyzers.Package/AspNetMigrator.Analyzers.Package.csproj'
+    arguments: '-c $(buildConfiguration)'
+    packDirectory: '$(Build.ArtifactStagingDirectory)/tools'
+    versioningScheme: 'off'    
+
 - task: PublishPipelineArtifact@1
-  displayName: Publish CLI tool
+  displayName: Publish packages
   inputs:
     targetPath: '$(build.artifactStagingDirectory)/tools'
     artifact: 'tools'

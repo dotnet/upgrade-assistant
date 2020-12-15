@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator;
 using AspNetMigrator.ConsoleApp;
+using AspNetMigrator.PackageUpdater;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationTests
@@ -32,7 +33,7 @@ namespace IntegrationTests
             var project = new FileInfo(inputPath);
             using var cts = new CancellationTokenSource();
 
-            var migrationTask = Program.RunMigrationAsync(new MigrateOptions { SkipBackup = true, Project = project }, (context, services) => RegisterInputOutput(services, output, commands), cts.Token);
+            var migrationTask = Program.RunMigrationAsync(new MigrateOptions { SkipBackup = true, Project = project }, (context, services) => RegisterTestServices(services, output, commands), cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);
@@ -47,7 +48,7 @@ namespace IntegrationTests
             }
         }
 
-        private static void RegisterInputOutput(IServiceCollection services, TextWriter output, IEnumerable<string> commands)
+        private static void RegisterTestServices(IServiceCollection services, TextWriter output, IEnumerable<string> commands)
         {
             var servicesToRemove = services.Where(sd => sd.ServiceType.Equals(typeof(InputOutputStreams))).ToArray();
             foreach (var service in servicesToRemove)
@@ -56,6 +57,13 @@ namespace IntegrationTests
             }
 
             services.AddSingleton(new InputOutputStreams(new StringReader(string.Join('\n', commands)), output));
+            services.AddOptions<PackageUpdaterStepOptions>().Configure(o =>
+            {
+                o.LogRestoreOutput = false;
+                o.PackageMapPath = "PackageMaps";
+                o.MigrationAnalyzersPackageSource = "https://doesnotexist.net/index.json";
+                o.MigrationAnalyzersPackageVersion = "1.0.0";
+            });
         }
     }
 }

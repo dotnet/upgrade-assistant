@@ -22,6 +22,8 @@ namespace AspNetMigrator.PackageUpdater
         private readonly List<PackageSource> _packageSources;
         private readonly ILogger _logger;
 
+        public IEnumerable<string> PackageSources => _packageSources.Select(s => s.Source);
+
         public PackageLoader(MigrateOptions options, ILogger<PackageLoader> logger)
         {
             if (options is null)
@@ -120,6 +122,37 @@ namespace AspNetMigrator.PackageUpdater
 
             _logger.LogDebug("Found versions for package {PackageName}: {PackageVersions}", packageName, versionsToReturn);
             return versionsToReturn.OrderBy(v => v);
+        }
+
+        public async Task<NuGetVersion?> GetLatestVersionAsync(string packageName, bool includePreRelease, string[]? packageSources, CancellationToken token)
+        {
+            NuGetVersion? highestVersion = null;
+
+            // Query each package source for listed versions of the given package name
+            foreach (var source in packageSources?.Select(p => new PackageSource(p)) ?? _packageSources)
+            {
+                var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
+                try
+                {
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: includePreRelease, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
+                    var highestVersionResult = searchResults.Select(r => r.Identity.Version).Max(v => v);
+                    if (highestVersionResult is null)
+                    {
+                        continue;
+                    }
+
+                    if (highestVersion is null || highestVersionResult > highestVersion)
+                    {
+                        highestVersion = highestVersionResult;
+                    }
+                }
+                catch (NuGetProtocolException)
+                {
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
+                }
+            }
+
+            return highestVersion;
         }
 
         private List<PackageSource> GetPackageSources(string? projectDir)

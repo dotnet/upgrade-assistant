@@ -36,7 +36,6 @@
     <ProjectReference Include="..\AspNetMigrator.TryConvertUpdater\AspNetMigrator.TryConvertUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.StartupUpdater\AspNetMigrator.StartupUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.TemplateUpdater\AspNetMigrator.TemplateUpdater.csproj" />
 
     <!-- These projects aren't used directly by this project, but are included here so that they're 

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -29,10 +30,11 @@ namespace AspNetMigrator.PackageUpdater
     public class PackageUpdaterStep : MigrationStep
     {
         private const string AnalyzerPackageName = "AspNetMigrator.Analyzers";
-        private const string AnalyzerPackageVersion = "1.0.0";
         private const string PackageReferenceType = "PackageReference";
         private const string PackageMapExtension = "*.json";
 
+        private readonly string? _analyzerPackageSource;
+        private readonly string? _analyzerPackageVersion;
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
         private readonly string _packageMapSearchPath;
@@ -66,6 +68,8 @@ namespace AspNetMigrator.PackageUpdater
             _packageMapSearchPath = Path.IsPathFullyQualified(updaterOptions.Value.PackageMapPath ?? string.Empty)
                 ? updaterOptions.Value.PackageMapPath!
                 : Path.Combine(AppContext.BaseDirectory, updaterOptions.Value.PackageMapPath ?? string.Empty);
+            _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
+            _analyzerPackageVersion = updaterOptions.Value.MigrationAnalyzersPackageVersion;
             _logRestoreOutput = updaterOptions.Value.LogRestoreOutput;
             _targetFramework = NuGetFramework.Parse(options.TargetFramework);
             _packagesToRemove = new List<NuGetReference>();
@@ -165,8 +169,21 @@ namespace AspNetMigrator.PackageUpdater
                 // If the project doesn't include a reference to the analyzer package, mark it for addition
                 if (!packageReferences.Any(r => AnalyzerPackageName.Equals(r.Include, StringComparison.OrdinalIgnoreCase)))
                 {
-                    Logger.LogInformation("Reference to analyzer package ({AnalyzerPackageName}) needs added", AnalyzerPackageName);
-                    _packagesToAdd.Add(new NuGetReference(AnalyzerPackageName, AnalyzerPackageVersion));
+                    // Use the analyzer package version from configuration if specified, otherwise get the latest version.
+                    // When looking for the latest analyzer version, use the analyzer package source from configuration
+                    // if one is specified, otherwise just use the package sources from the project being analyzed.
+                    var analyzerPackageVersion = _analyzerPackageVersion is not null
+                        ? NuGetVersion.Parse(_analyzerPackageVersion)
+                        : await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, true, _analyzerPackageSource is null ? null : new[] { _analyzerPackageSource }, token).ConfigureAwait(false);
+                    if (analyzerPackageVersion is not null)
+                    {
+                        Logger.LogInformation("Reference to analyzer package ({AnalyzerPackageName}, version {AnalyzerPackageVersion}) needs added", AnalyzerPackageName, analyzerPackageVersion);
+                        _packagesToAdd.Add(new NuGetReference(AnalyzerPackageName, analyzerPackageVersion.ToString()));
+                    }
+                    else
+                    {
+                        Logger.LogWarning("Analyzer NuGet package reference cannot be added because the package cannot be found");
+                    }
                 }
                 else
                 {
@@ -209,10 +226,22 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
+            var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
+
+            // TODO : Temporary workaround until the migration analyzers are available on NuGet.org
+            // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
+            if (_analyzerPackageSource is not null && !_packageLoader.PackageSources.Contains(_analyzerPackageSource))
+            {
+                // Get or create a local NuGet.config file
+                var localNuGetSettings = new Settings(projectRoot.DirectoryPath);
+
+                // Add the analyzer package's source to the config file's sources
+                localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("migrationAnalyzerSource", _analyzerPackageSource));
+                localNuGetSettings.SaveToDisk();
+            }
+
             try
             {
-                var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
-
                 // Check each reference to see if it's one that should be removed
                 foreach (var referenceItem in projectRoot.GetAllPackageReferences())
                 {

@@ -9,15 +9,14 @@
 
   <PropertyGroup>
     <PackageId>AspNetMigrator.Analyzers</PackageId>
-    <PackageVersion>1.0.0.0</PackageVersion>
     <Authors>mikerou</Authors>
     <PackageLicenseUrl>https://dotnetcst.visualstudio.com/_git/AspNetMigrator?path=%2FLICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://dotnetcst.visualstudio.com/DefaultCollection/AspNetMigrator/_git/AspNetMigrator</PackageProjectUrl>
     <RepositoryUrl>https://dotnetcst.visualstudio.com/DefaultCollection/AspNetMigrator/_git/AspNetMigrator</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>AspNetMigrator.Analyzers</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-    <Copyright>Copyright</Copyright>
+    <PackageReleaseNotes>Initial ASP.NET migration analyzers</PackageReleaseNotes>
+    <Copyright>&#169; Microsoft Corporation. All rights reserved.</Copyright>
     <PackageTags>AspNetMigrator.Analyzers, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
 
