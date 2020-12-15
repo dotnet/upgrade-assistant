@@ -41,6 +41,8 @@ namespace AspNetMigrator.ConsoleApp
         {
             try
             {
+                _logger.LogInformation("Configuration loaded from context base directory: {BaseDirectory}", AppContext.BaseDirectory);
+
                 if (await RunStartupTasks(token))
                 {
                     await RunReplAsync(token);
