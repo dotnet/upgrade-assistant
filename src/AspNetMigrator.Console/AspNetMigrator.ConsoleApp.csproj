@@ -57,4 +57,15 @@
     <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
     <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />
   </Target>
+
+  <Target Name="IncludeSourceUpdatersInPublish" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <SourceUpdaterFiles Include="$(OutputPath)SourceUpdaters\**" />
+      <ResolvedFileToPublish Include="@(SourceUpdaterFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>SourceUpdaters\%(SourceUpdaterFiles.Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>    
+  </Target>
+
 </Project>
