@@ -54,17 +54,17 @@ namespace AspNetMigrator.SourceUpdater
             Description = $"Update source files in {options.ProjectPath} to automatically fix migration analyzer {DiagnosticId}";
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             Logger.LogDebug("Identified {DiagnosticCount} fixable {DiagnosticId} diagnostics", Diagnostics.Count(), DiagnosticId);
 
             // This migration step is incomplete if any diagnostics it can fix remain
             return Diagnostics.Any() ?
-                Task.FromResult((MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} {DiagnosticId} diagnostics need fixed")) :
-                Task.FromResult<(MigrationStepStatus, string)>((MigrationStepStatus.Complete, string.Empty));
+                Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} {DiagnosticId} diagnostics need fixed", BuildBreakRisk.Low)) :
+                Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, string.Empty, BuildBreakRisk.None));
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -73,7 +73,7 @@ namespace AspNetMigrator.SourceUpdater
 
             if (_sourceUpdater.Project is null)
             {
-                return (MigrationStepStatus.Failed, "No project available.");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "No project available.");
             }
 
             // Regenerating diagnostics is slow for large projects, but is necessary in between fixing multiple diagnostics
@@ -90,12 +90,12 @@ namespace AspNetMigrator.SourceUpdater
                     if (updatedSolution is null)
                     {
                         Logger.LogError("Failed to fix diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
-                        return (MigrationStepStatus.Failed, $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}");
+                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}");
                     }
                     else if (!_sourceUpdater.UpdateSolution(updatedSolution))
                     {
                         Logger.LogError("Failed to apply changes after fixing {DiagnosticId} to {FilePath}", diagnostic.Id, doc.FilePath);
-                        return (MigrationStepStatus.Failed, $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}");
+                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}");
                     }
                     else
                     {
@@ -112,7 +112,7 @@ namespace AspNetMigrator.SourceUpdater
             (await context.GetProjectRootElementAsync(token).ConfigureAwait(false)).WorkAroundRoslynIssue36781();
 
             Logger.LogDebug("All instances of {DiagnosticId} fixed", DiagnosticId);
-            return (MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
+            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
 
         private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)

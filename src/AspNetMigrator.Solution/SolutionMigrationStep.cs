@@ -19,7 +19,7 @@ namespace AspNetMigrator.Solution
             Title = "Identify solution conversion order";
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -30,15 +30,15 @@ namespace AspNetMigrator.Solution
 
             if (projectId is null)
             {
-                return (MigrationStepStatus.Incomplete, "No project is currently selected.");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
             else
             {
-                return (MigrationStepStatus.Complete, "Project is already selected.");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
             }
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -50,12 +50,12 @@ namespace AspNetMigrator.Solution
 
             if (selectedProject is null)
             {
-                return (MigrationStepStatus.Failed, "No project was selected.");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "No project was selected.");
             }
             else
             {
                 await context.SetProjectAsync(selectedProject.Id, token).ConfigureAwait(false);
-                return (MigrationStepStatus.Complete, $"Project {selectedProject.Name} was selected.");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.Name} was selected.");
             }
         }
 

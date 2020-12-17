@@ -36,6 +36,7 @@ namespace AspNetMigrator.Test
             Assert.AreEqual(MigrationStepStatus.Unknown, step.Status);
             await step.InitializeAsync(context, CancellationToken.None).ConfigureAwait(false);
             Assert.AreEqual(MigrationStepStatus.Incomplete, step.Status);
+            Assert.AreEqual(BuildBreakRisk.Low, step.Risk);
 
             // Apply command
             Assert.AreEqual(0, step.ApplicationCount);
@@ -45,6 +46,7 @@ namespace AspNetMigrator.Test
             Assert.AreEqual($"Apply next step ({stepTitle})", command.CommandText);
             Assert.AreEqual(1, step.ApplicationCount);
             Assert.AreEqual(MigrationStepStatus.Complete, step.Status);
+            Assert.AreEqual(BuildBreakRisk.Low, step.Risk);
             Assert.AreEqual(step.AppliedMessage, step.StatusDetails);
 
             // Confirm steps are only applied once
@@ -70,6 +72,7 @@ namespace AspNetMigrator.Test
             Assert.AreEqual($"Apply next step ({stepTitle})", command.CommandText);
             Assert.AreEqual(0, step.ApplicationCount);
             Assert.AreEqual(MigrationStepStatus.Failed, step.Status);
+            Assert.AreEqual(BuildBreakRisk.Unknown, step.Risk);
             Assert.AreEqual(step.InitializedMessage, step.StatusDetails);
         }
 
@@ -85,6 +88,7 @@ namespace AspNetMigrator.Test
             Assert.AreEqual(MigrationStepStatus.Unknown, step.Status);
             await step.InitializeAsync(context, CancellationToken.None).ConfigureAwait(false);
             Assert.AreEqual(MigrationStepStatus.Incomplete, step.Status);
+            Assert.AreEqual(BuildBreakRisk.Low, step.Risk);
 
             // Apply command
             Assert.IsTrue(await command.ExecuteAsync(context, CancellationToken.None).ConfigureAwait(false));
@@ -93,6 +97,7 @@ namespace AspNetMigrator.Test
             Assert.AreEqual($"Skip next step ({stepTitle})", command.CommandText);
             Assert.AreEqual(0, step.ApplicationCount);
             Assert.AreEqual(MigrationStepStatus.Skipped, step.Status);
+            Assert.AreEqual(BuildBreakRisk.Low, step.Risk);
             Assert.AreEqual("Step skipped", step.StatusDetails);
         }
 

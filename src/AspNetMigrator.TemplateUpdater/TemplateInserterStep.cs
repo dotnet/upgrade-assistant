@@ -62,7 +62,7 @@ namespace AspNetMigrator.TemplateUpdater
             Description = $"Add template files (for startup code paths, for example) to {options.ProjectPath} based on template files described in: {string.Join(", ", _templateConfigFiles)}";
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -74,7 +74,7 @@ namespace AspNetMigrator.TemplateUpdater
             if (projectPath is null || !File.Exists(projectPath))
             {
                 Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
-                return (MigrationStepStatus.Failed, $"Project file {projectPath} not found");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found", BuildBreakRisk.Unknown);
             }
 
             try
@@ -128,21 +128,21 @@ namespace AspNetMigrator.TemplateUpdater
                 if (_itemsToAdd.Any())
                 {
                     Logger.LogDebug("Needed items: {NeededFiles}", string.Join(", ", _itemsToAdd.Keys));
-                    return (MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected template items needed ({string.Join(", ", _itemsToAdd.Keys)})");
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected template items needed ({string.Join(", ", _itemsToAdd.Keys)})", BuildBreakRisk.Medium);
                 }
                 else
                 {
-                    return (MigrationStepStatus.Complete, "All expected template items found");
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "All expected template items found", BuildBreakRisk.None);
                 }
             }
             catch (InvalidProjectFileException)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
-                return (MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {projectPath}", BuildBreakRisk.Unknown);
             }
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -181,7 +181,7 @@ namespace AspNetMigrator.TemplateUpdater
                     catch (IOException exc)
                     {
                         Logger.LogCritical(exc, "Template file not found: {TemplateItemPath}", item.TemplateFilePath);
-                        return (MigrationStepStatus.Failed, $"Template file not found: {item.TemplateFilePath}");
+                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Template file not found: {item.TemplateFilePath}");
                     }
 
                     if (item.IncludeExplicitly)
@@ -199,12 +199,12 @@ namespace AspNetMigrator.TemplateUpdater
                 await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
                 Logger.LogInformation("{ItemCount} template items added", _itemsToAdd.Count);
-                return (MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
             }
             catch (InvalidProjectFileException)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
-                return (MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
             }
         }
 

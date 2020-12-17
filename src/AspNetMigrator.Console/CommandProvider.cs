@@ -43,10 +43,32 @@ namespace AspNetMigrator.ConsoleApp
             };
         }
 
-        private Task ShowStepStatus(UserMessage stepStatus)
+        private Task ShowStepStatus(MigrationStep step)
         {
-            _io.Output.WriteLine("Current step details");
-            return ConsoleHelpers.SendMessageToUserAsync(_io.Output, stepStatus);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            _io.Output.WriteLine(new string('-', step.Title.Length));
+            _io.Output.WriteLine($"{step.Title}");
+            _io.Output.WriteLine(new string('-', step.Title.Length));
+            Console.ResetColor();
+            _io.Output.WriteLine(ConsoleHelpers.WrapString(step.Description, Console.WindowWidth));
+            WriteWithColor("  Status              ", ConsoleColor.DarkYellow);
+            _io.Output.Write(": ");
+            _io.Output.WriteLine($"{step.Status}");
+            WriteWithColor("  Risk to break build ", ConsoleColor.DarkYellow);
+            _io.Output.Write(": ");
+            _io.Output.WriteLine($"{step.Risk}");
+            WriteWithColor("  Details             ", ConsoleColor.DarkYellow);
+            _io.Output.Write(": ");
+            _io.Output.WriteLine(ConsoleHelpers.WrapString($"{step.StatusDetails}", Console.WindowWidth, "  Details             : ".Length));
+
+            return Task.CompletedTask;
+        }
+
+        private void WriteWithColor(string msg, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            _io.Output.Write(msg);
+            Console.ResetColor();
         }
     }
 }

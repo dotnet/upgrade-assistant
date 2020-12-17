@@ -18,10 +18,10 @@ namespace AspNetMigrator.TestHelpers
         {
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token) =>
-            Task.FromResult((MigrationStepStatus.Skipped, InitializedMessage));
+        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token) =>
+            Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Skipped, InitializedMessage, BuildBreakRisk.None));
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
-            Task.FromResult((MigrationStepStatus.Skipped, AppliedMessage));
+        protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
+            Task.FromResult(new MigrationStepApplyResult(MigrationStepStatus.Skipped, AppliedMessage));
     }
 }

@@ -65,7 +65,7 @@ namespace AspNetMigrator.SourceUpdater
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -77,7 +77,7 @@ namespace AspNetMigrator.SourceUpdater
             if (!File.Exists(projectPath))
             {
                 Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
-                return (MigrationStepStatus.Failed, $"Project file {projectPath} not found");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found", BuildBreakRisk.Unknown);
             }
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
@@ -94,8 +94,8 @@ namespace AspNetMigrator.SourceUpdater
             }
 
             return Diagnostics.Any() ?
-                (MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
-                (MigrationStepStatus.Complete, "No migration diagnostics found");
+                new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed", BuildBreakRisk.None) :
+                new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No migration diagnostics found", BuildBreakRisk.None);
         }
 
         public async Task GetDiagnosticsAsync(IMigrationContext context, CancellationToken token)
@@ -140,10 +140,10 @@ namespace AspNetMigrator.SourceUpdater
             }
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
+        protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
             Task.FromResult(Diagnostics.Any() ?
-                (MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
-                (MigrationStepStatus.Complete, string.Empty));
+                new MigrationStepApplyResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
+                new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty));
 
         internal bool UpdateSolution(Solution updatedSolution)
         {

@@ -45,7 +45,7 @@ namespace AspNetMigrator.TryConvertUpdater
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }
 
-        protected async override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected async override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -58,7 +58,7 @@ namespace AspNetMigrator.TryConvertUpdater
             if (!File.Exists(projectPath))
             {
                 Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
-                return (MigrationStepStatus.Failed, $"Project file {projectPath} not found");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found");
             }
 
             Logger.LogInformation("Converting project file format with try-convert");
@@ -99,16 +99,16 @@ namespace AspNetMigrator.TryConvertUpdater
             if (tryConvertProcess.ExitCode != 0 || _errorEncountered)
             {
                 Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode}). Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.", tryConvertProcess.ExitCode);
-                return (MigrationStepStatus.Failed, $"Conversion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Conversion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
             }
             else
             {
-                Logger.LogInformation("Project file format conversion successful");
-                return (MigrationStepStatus.Complete, "Project file converted successfully");
+                Logger.LogInformation("Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Project file converted successfully");
             }
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -120,13 +120,13 @@ namespace AspNetMigrator.TryConvertUpdater
             if (projectPath is null)
             {
                 Logger.LogCritical("No project path specified");
-                return (MigrationStepStatus.Failed, "No project specified");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "No project specified", BuildBreakRisk.Unknown);
             }
 
             if (!File.Exists(_tryConvertPath))
             {
                 Logger.LogCritical("Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
-                return (MigrationStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert", BuildBreakRisk.Unknown);
             }
 
             try
@@ -137,18 +137,18 @@ namespace AspNetMigrator.TryConvertUpdater
                 if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.LogDebug("Project {ProjectPath} not yet converted", projectPath);
-                    return (MigrationStepStatus.Incomplete, $"Project {projectPath} is not an SDK project. Applying this step will execute the following try-convert command line: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath)}");
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"Project {projectPath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project and retarget it to .NET Core/Standard: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath)}", BuildBreakRisk.High);
                 }
                 else
                 {
                     Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectPath, project.Sdk);
-                    return (MigrationStepStatus.Complete, $"Project already targets {project.Sdk} SDK");
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {project.Sdk} SDK", BuildBreakRisk.None);
                 }
             }
             catch (InvalidProjectFileException exc)
             {
                 Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectPath, exc.ToString());
-                return (MigrationStepStatus.Failed, $"Failed to open project {projectPath}");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Failed to open project {projectPath}", BuildBreakRisk.Unknown);
             }
         }
 

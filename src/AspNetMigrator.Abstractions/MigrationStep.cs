@@ -25,6 +25,8 @@ namespace AspNetMigrator
             Options = options;
             Logger = logger;
             Status = MigrationStepStatus.Unknown;
+            StatusDetails = string.Empty;
+            Risk = BuildBreakRisk.Unknown;
             Commands = new List<MigrationCommand>();
         }
 
@@ -40,6 +42,8 @@ namespace AspNetMigrator
 
         public MigrationStepStatus Status { get; private set; }
 
+        public BuildBreakRisk Risk { get; set; }
+
         public bool IsComplete => Status switch
         {
             MigrationStepStatus.Complete => true,
@@ -47,17 +51,17 @@ namespace AspNetMigrator
             _ => false,
         };
 
-        public string StatusDetails { get; private set; } = string.Empty;
+        public string StatusDetails { get; private set; }
 
         /// <summary>
         /// Implementers should use this method to initialize Status and any other state needed.
         /// </summary>
-        protected abstract Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token);
+        protected abstract Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token);
 
         /// <summary>
         /// Implementers should use this method to apply the migration step and return updated status and status details.
         /// </summary>
-        protected abstract Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token);
+        protected abstract Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token);
 
         /// <summary>
         /// Initialize the migration step, including checking whether it is already complete and setting up necessary internal state.
@@ -66,7 +70,7 @@ namespace AspNetMigrator
         {
             try
             {
-                (Status, StatusDetails) = await InitializeImplAsync(context, token).ConfigureAwait(false);
+                (Status, StatusDetails, Risk) = await InitializeImplAsync(context, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {

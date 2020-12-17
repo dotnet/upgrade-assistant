@@ -76,13 +76,14 @@ namespace AspNetMigrator.PackageUpdater
             _packagesToAdd = new List<NuGetReference>();
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
+            var possibleBreakingChanges = false;
             _packagesToRemove = new List<NuGetReference>();
             _packagesToAdd = new List<NuGetReference>();
 
@@ -95,7 +96,7 @@ namespace AspNetMigrator.PackageUpdater
             {
                 var path = await context.GetProjectPathAsync(token).ConfigureAwait(false);
                 Logger.LogCritical("Unable to restore packages for project {ProjectPath}", path);
-                return (MigrationStepStatus.Failed, $"Unable to restore packages for project {path}");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Unable to restore packages for project {path}", BuildBreakRisk.Unknown);
             }
 
             // Parse lockfile
@@ -133,13 +134,17 @@ namespace AspNetMigrator.PackageUpdater
                     }
 
                     // If the package is in a package map, mark for removal and add appropriate packages for addition
-                    var map = packageMaps.FirstOrDefault(m => m.ContainsReference(packageReference.Name, packageReference.Version));
-                    if (map != null)
+                    var maps = packageMaps.Where(m => m.ContainsReference(packageReference.Name, packageReference.Version));
+                    foreach (var map in maps)
                     {
-                        Logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration", packageReference.Name);
-                        _packagesToRemove.Add(packageReference);
-                        _packagesToAdd.AddRange(map.NetCorePackages);
-                        continue;
+                        if (map != null)
+                        {
+                            possibleBreakingChanges = true;
+                            Logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
+                            _packagesToRemove.Add(packageReference);
+                            _packagesToAdd.AddRange(map.NetCorePackages);
+                            continue;
+                        }
                     }
 
                     // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
@@ -159,6 +164,15 @@ namespace AspNetMigrator.PackageUpdater
                         else
                         {
                             Logger.LogInformation("Marking package {NuGetPackage} for removal because it doesn't support the target framework but a newer version ({Version}) does", packageReference, updatedReference.Version);
+                            var newMajorVersion = updatedReference.GetNuGetVersion()?.Major;
+                            var oldMajorVersion = packageReference.GetNuGetVersion()?.Major;
+
+                            if (newMajorVersion != oldMajorVersion)
+                            {
+                                Logger.LogWarning("Package {NuGetPackage} has been upgraded across major versions ({OldVersion} -> {NewVersion}) which may introduce breaking changes", packageReference.Name, oldMajorVersion, newMajorVersion);
+                                possibleBreakingChanges = true;
+                            }
+
                             _packagesToRemove.Add(packageReference);
                             _packagesToAdd.Add(updatedReference);
                             continue;
@@ -193,7 +207,7 @@ namespace AspNetMigrator.PackageUpdater
             catch (InvalidProjectFileException)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}", BuildBreakRisk.Unknown);
             }
 
             _packagesToAdd = _packagesToAdd.Distinct().ToList();
@@ -201,7 +215,7 @@ namespace AspNetMigrator.PackageUpdater
             if (_packagesToRemove.Count == 0 && _packagesToAdd.Count == 0)
             {
                 Logger.LogInformation("No package updates needed");
-                return (MigrationStepStatus.Complete, "No package updates needed");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
             }
             else
             {
@@ -215,11 +229,11 @@ namespace AspNetMigrator.PackageUpdater
                     Logger.LogInformation($"Packages to be addded:\n{string.Join('\n', _packagesToAdd)}");
                 }
 
-                return (MigrationStepStatus.Incomplete, $"{_packagesToRemove.Count} packages need removed and {_packagesToAdd.Count} packages need added");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{_packagesToRemove.Count} packages need removed and {_packagesToAdd.Count} packages need added", possibleBreakingChanges ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
             }
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -278,12 +292,12 @@ namespace AspNetMigrator.PackageUpdater
                 // Reload the workspace since, at this point, the project may be different from what was loaded
                 await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-                return (MigrationStepStatus.Complete, "Packages updated");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Packages updated");
             }
             catch (InvalidProjectFileException)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return (MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
             }
         }
 

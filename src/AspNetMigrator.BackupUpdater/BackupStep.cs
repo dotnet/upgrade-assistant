@@ -45,37 +45,37 @@ namespace AspNetMigrator.BackupUpdater
             return _backupPath;
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (_skipBackup)
             {
                 Logger.LogDebug("Backup migration step initalized as complete (backup skipped)");
-                return Task.FromResult((MigrationStepStatus.Skipped, "Backup skipped"));
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
             else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
             {
                 Logger.LogDebug("Backup migration step initalized as complete (already done)");
-                return Task.FromResult((MigrationStepStatus.Complete, "Existing backup found"));
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
             }
             else
             {
                 Logger.LogDebug("Backup migration step initialized as incomplete");
-                return Task.FromResult((MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} to {_backupPath} (including subfolders)."));
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} to {_backupPath} (including subfolders).", BuildBreakRisk.None));
             }
         }
 
-        protected override async Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (_skipBackup)
             {
                 Logger.LogInformation("Skipping backup");
-                return (MigrationStepStatus.Complete, "Backup skipped");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Backup skipped");
             }
 
             if (Status == MigrationStepStatus.Complete)
             {
                 Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", _backupPath);
-                return (MigrationStepStatus.Complete, "Existing backup found");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Existing backup found");
             }
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, _backupPath);
@@ -85,19 +85,19 @@ namespace AspNetMigrator.BackupUpdater
                 if (!Directory.Exists(_backupPath))
                 {
                     Logger.LogError("Failed to create backup directory ({BackupPath})", _backupPath);
-                    return (MigrationStepStatus.Failed, $"Failed to create backup directory {_backupPath}");
+                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to create backup directory {_backupPath}");
                 }
 
                 await CopyDirectoryAsync(_projectDir, _backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
                 await File.WriteAllTextAsync(Path.Combine(_backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
                 Logger.LogInformation("Project backed up to {BackupPath}", _backupPath);
-                return (MigrationStepStatus.Complete, "Backup completed successfully");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Backup completed successfully");
             }
             catch (IOException exc)
             {
                 Logger.LogError("Unexpected exception while creating backup: {Exception}", exc);
-                return (MigrationStepStatus.Failed, $"Unexpected exception while creating backup");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Unexpected exception while creating backup");
             }
         }
 

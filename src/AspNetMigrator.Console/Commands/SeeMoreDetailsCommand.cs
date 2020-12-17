@@ -7,12 +7,12 @@ namespace AspNetMigrator.ConsoleApp.Commands
     public class SeeMoreDetailsCommand : MigrationCommand
     {
         private readonly MigrationStep _step;
-        private readonly Func<UserMessage, Task> _sendMessageToUserAsync;
+        private readonly Func<MigrationStep, Task> _showDetails;
 
-        public SeeMoreDetailsCommand(MigrationStep step, Func<UserMessage, Task> sendMessageToUserAsync)
+        public SeeMoreDetailsCommand(MigrationStep step, Func<MigrationStep, Task> showDetails)
         {
             _step = step ?? throw new ArgumentNullException(nameof(step));
-            _sendMessageToUserAsync = sendMessageToUserAsync ?? throw new ArgumentNullException(nameof(sendMessageToUserAsync));
+            _showDetails = showDetails ?? throw new ArgumentNullException(nameof(showDetails));
         }
 
         // todo - support localization
@@ -20,13 +20,7 @@ namespace AspNetMigrator.ConsoleApp.Commands
 
         public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
-            // TODO : In the future, it might be preferable to have a 'step status' object that we pass so that the caller
-            //        can have more control over how title, description, and status details are formatted.
-            await _sendMessageToUserAsync(new UserMessage
-            {
-                Severity = MessageSeverity.Info,
-                Message = $"{_step.Title}\n{_step.Description}\nStatus: {_step.StatusDetails}"
-            }).ConfigureAwait(false);
+            await _showDetails(_step).ConfigureAwait(false);
             return true;
         }
     }

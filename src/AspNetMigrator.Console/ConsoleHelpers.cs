@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace AspNetMigrator.ConsoleApp
 {
@@ -9,37 +6,7 @@ namespace AspNetMigrator.ConsoleApp
     {
         private const int DefaultWidth = 80;
 
-        public static Task SendMessageToUserAsync(TextWriter output, UserMessage message)
-        {
-            if (output is null)
-            {
-                throw new ArgumentNullException(nameof(output));
-            }
-
-            if (message == null)
-            {
-                throw new ArgumentNullException(nameof(message));
-            }
-
-            switch (message.Severity)
-            {
-                case MessageSeverity.Info:
-                    Console.ForegroundColor = ConsoleColor.Cyan; break;
-                case MessageSeverity.Warning:
-                    Console.ForegroundColor = ConsoleColor.Yellow; break;
-                case MessageSeverity.Error:
-                    Console.ForegroundColor = ConsoleColor.Red; break;
-                default:
-                    Console.ResetColor(); break;
-            }
-
-            output.WriteLine(WrapString(message.Message, Console.WindowWidth));
-            Console.ResetColor();
-
-            return Task.CompletedTask;
-        }
-
-        public static string WrapString(string input, int lineLength = DefaultWidth)
+        public static string WrapString(string input, int lineLength = DefaultWidth, int offset = 0)
         {
             if (input is null)
             {
@@ -48,7 +15,7 @@ namespace AspNetMigrator.ConsoleApp
 
             var word = new StringBuilder();
             var ret = new StringBuilder();
-            var index = 0;
+            var index = offset;
             foreach (var c in input)
             {
                 switch (c)
@@ -57,7 +24,8 @@ namespace AspNetMigrator.ConsoleApp
                     case '\r':
                         AddWordToRet();
                         ret.Append(c);
-                        index = 0;
+                        index = offset;
+                        ret.Append(' ', offset);
                         break;
                     case '\t':
                         AddWordToRet();
@@ -76,14 +44,15 @@ namespace AspNetMigrator.ConsoleApp
 
             AddWordToRet();
 
-            return ret.ToString();
+            return ret.ToString().TrimEnd();
 
             void AddWordToRet()
             {
                 if (index + word.Length >= lineLength)
                 {
                     ret.AppendLine();
-                    index = 0;
+                    index = offset;
+                    ret.Append(' ', offset);
                 }
 
                 ret.Append(word);

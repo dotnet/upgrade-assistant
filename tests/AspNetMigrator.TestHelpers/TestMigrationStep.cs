@@ -31,13 +31,13 @@ namespace AspNetMigrator.TestHelpers
 
         public virtual string InitializedMessage => "Test migration step incomplete";
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             ApplicationCount++;
-            return Task.FromResult((MigrationStepStatus.Complete, AppliedMessage));
+            return Task.FromResult(new MigrationStepApplyResult(MigrationStepStatus.Complete, AppliedMessage));
         }
 
-        protected override Task<(MigrationStepStatus Status, string StatusDetails)> InitializeImplAsync(IMigrationContext context, CancellationToken token) =>
-            Task.FromResult((MigrationStepStatus.Incomplete, InitializedMessage));
+        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token) =>
+            Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, InitializedMessage, BuildBreakRisk.Low));
     }
 }
