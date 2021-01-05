@@ -12,7 +12,6 @@ using EPiServer.Data;
 using EPiServer.DependencyInjection;
 using System.IO;
 using EPiServer.Cms.UI.AspNetIdentity;
-using AlloyMvcTemplates.Extensions;
 using EPiServer.Web.Routing;
 using EPiServer.Framework.Web.Resources;
 using Microsoft.Extensions.Configuration;
@@ -62,7 +61,6 @@ namespace TemplateMvc
             }
 
             services.AddMvc().AddRazorRuntimeCompilation();
-            services.AddAlloy();
             services.AddCms();
 
             services.ConfigureApplicationCookie(options =>
