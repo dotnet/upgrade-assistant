@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -55,7 +56,7 @@ namespace AspNetMigrator.Analyzers
                 NameSyntax n => n,
 
                 // In some cases (when the node is a SimpleBaseType, for example) we need to get the name from a child node
-                SyntaxNode x => x.DescendantNodesAndSelf().FirstOrDefault(n => n is NameSyntax) as NameSyntax
+                SyntaxNode x => x.DescendantNodesAndSelf().FirstOrDefault(n => n is NameSyntax)
             };
 
             // If we can't find a name, bail out
@@ -64,21 +65,40 @@ namespace AspNetMigrator.Analyzers
                 return document;
             }
 
+            // Update to new identifier
+            SyntaxNode updatedName = SyntaxFactory.ParseName(newIdentifier)
+                .WithTriviaFrom(name)
+                .WithAdditionalAnnotations(Simplifier.Annotation);
+
             // Make sure the name syntax node includes the whole name in case it is qualified
-            while (name.Parent is NameSyntax)
+            if (name.Parent is NameSyntax)
             {
-                name = name.Parent as NameSyntax;
+                while (name.Parent is NameSyntax)
+                {
+                    name = name.Parent;
+
+                    if (name is null)
+                    {
+                        return document;
+                    }
+                }
+            }
+
+            // In some cases (accessing a static member), the name may be part of a member access expression chain
+            // instead of a qualified name. If that's the case, update the name and updatedName accordingly.
+            else if (name.Parent is MemberAccessExpressionSyntax m && m.Name.ToString().Equals(name.ToString(), StringComparison.Ordinal))
+            {
+                name = name.Parent;
 
                 if (name is null)
                 {
                     return document;
                 }
-            }
 
-            // Update to new identifier
-            var updatedName = SyntaxFactory.ParseName(newIdentifier)
-                .WithTriviaFrom(name)
-                .WithAdditionalAnnotations(Simplifier.Annotation);
+                updatedName = SyntaxFactory.ParseExpression(newIdentifier)
+                    .WithTriviaFrom(name)
+                    .WithAdditionalAnnotations(Simplifier.Annotation);
+            }
 
             // Work on the document root instead of updating nodes with the editor directly so that
             // additional changes can be made later (adding using statement) if necessary.

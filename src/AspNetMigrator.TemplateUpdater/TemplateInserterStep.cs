@@ -22,7 +22,7 @@ namespace AspNetMigrator.TemplateUpdater
     public class TemplateInserterStep : MigrationStep
     {
         private const int BufferSize = 65536;
-        private static readonly Regex PropertyRegex = new Regex(@"^\$\((.*)\)$");
+        private static readonly Regex PropertyRegex = new(@"^\$\((.*)\)$");
 
         // Files that indicate the project is likely a web app rather than a class library or some other project type
         private static readonly ItemSpec[] WebAppFiles = new[]

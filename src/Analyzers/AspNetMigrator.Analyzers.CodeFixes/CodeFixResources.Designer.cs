@@ -61,11 +61,38 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove [AllowHtml] attribute.
+        /// </summary>
+        internal static string AllowHtmlAttributeTitle {
+            get {
+                return ResourceManager.GetString("AllowHtmlAttributeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with ASP.NET Core filter type.
         /// </summary>
         internal static string FilterTitle {
             get {
                 return ResourceManager.GetString("FilterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace with Microsoft.AspNetCore.Mvc.Razor.HelperResult.
+        /// </summary>
+        internal static string HelperResultTitle {
+            get {
+                return ResourceManager.GetString("HelperResultTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace with ASP.NET Core HTML helper type.
+        /// </summary>
+        internal static string HtmlHelperTitle {
+            get {
+                return ResourceManager.GetString("HtmlHelperTitle", resourceCulture);
             }
         }
         
@@ -102,6 +129,15 @@ namespace AspNetMigrator.Analyzers {
         internal static string ResultTypeTitle {
             get {
                 return ResourceManager.GetString("ResultTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace with ASP.NET Core URL helper type.
+        /// </summary>
+        internal static string UrlHelperTitle {
+            get {
+                return ResourceManager.GetString("UrlHelperTitle", resourceCulture);
             }
         }
         

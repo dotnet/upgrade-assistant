@@ -11,7 +11,7 @@ namespace AspNetMigrator.Analyzers
         public const string DiagnosticId = "AM0002";
         private const string Category = "Migration";
 
-        public override IEnumerable<IdentifierMapping> IdentifierMappings => new[]
+        public override IEnumerable<IdentifierMapping> IdentifierMappings { get; } = new[]
         {
             new IdentifierMapping("System.Web.HtmlString", "Microsoft.AspNetCore.Html.HtmlString"),
             new IdentifierMapping("System.Web.IHtmlString", "Microsoft.AspNetCore.Html.HtmlString"),

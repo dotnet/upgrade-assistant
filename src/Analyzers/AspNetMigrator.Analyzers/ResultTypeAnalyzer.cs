@@ -11,7 +11,7 @@ namespace AspNetMigrator.Analyzers
         public const string DiagnosticId = "AM0003";
         private const string Category = "Migration";
 
-        public override IEnumerable<IdentifierMapping> IdentifierMappings => new[]
+        public override IEnumerable<IdentifierMapping> IdentifierMappings { get; } = new[]
         {
             new IdentifierMapping("System.Web.Mvc.ActionResult", "Microsoft.AspNetCore.Mvc.ActionResult"),
             new IdentifierMapping("System.Web.Mvc.ContentResult", "Microsoft.AspNetCore.Mvc.ContentResult"),

@@ -117,8 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllowHtmlAttributeTitle" xml:space="preserve">
+    <value>Remove [AllowHtml] attribute</value>
+  </data>
   <data name="FilterTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core filter type</value>
+  </data>
+  <data name="HelperResultTitle" xml:space="preserve">
+    <value>Replace with Microsoft.AspNetCore.Mvc.Razor.HelperResult</value>
+  </data>
+  <data name="HtmlHelperTitle" xml:space="preserve">
+    <value>Replace with ASP.NET Core HTML helper type</value>
   </data>
   <data name="HtmlStringTitle" xml:space="preserve">
     <value>Replace with Microsoft.AspNetCore.Html.HtmlString</value>
@@ -131,6 +140,9 @@
   </data>
   <data name="ResultTypeTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core result type</value>
+  </data>
+  <data name="UrlHelperTitle" xml:space="preserve">
+    <value>Replace with ASP.NET Core URL helper type</value>
   </data>
   <data name="UsingSystemWebTitle" xml:space="preserve">
     <value>Remove using directive</value>

@@ -26,7 +26,11 @@ namespace TestProject
             new ResultTypeAnalyzer(),
             new FilterAnalyzer(),
             new HttpContextCurrentAnalyzer(),
-            new HttpContextIsDebuggingEnabledAnalyzer());
+            new HttpContextIsDebuggingEnabledAnalyzer(),
+            new HtmlHelperAnalyzer(),
+            new UrlHelperAnalyzer(),
+            new HelperResultAnalyzer(),
+            new AllowHtmlAttributeAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new UsingSystemWebCodeFixer(),
@@ -34,7 +38,11 @@ namespace TestProject
             new ResultTypeCodeFixer(),
             new FilterCodeFixer(),
             new HttpContextCurrentCodeFixer(),
-            new HttpContextIsDebuggingEnabledCodeFixer());
+            new HttpContextIsDebuggingEnabledCodeFixer(),
+            new HtmlHelperCodeFixer(),
+            new UrlHelperCodeFixer(),
+            new HelperResultCodeFixer(),
+            new AllowHtmlAttributeCodeFixer());
 
         public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
         {

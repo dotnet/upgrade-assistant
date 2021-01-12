@@ -1,4 +1,6 @@
-﻿namespace TestProject.MyNamespace
+﻿using System;
+
+namespace TestProject.MyNamespace
 {
     public class MvcHtmlString
     {
@@ -6,4 +8,11 @@
     }
 
     public class ResultExecutingContext { }
+
+    public class HtmlHelper { }
+
+    public class UrlHelper { }
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class AllowHtmlAttribute : Attribute { }
 }

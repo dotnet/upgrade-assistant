@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AllowHtmlAttributeDescription" xml:space="preserve">
+    <value>[AllowHtmlAttrubute] should be removed</value>
+  </data>
+  <data name="AllowHtmlAttributeMessageFormat" xml:space="preserve">
+    <value>Attribute '{0}' should be removed</value>
+  </data>
+  <data name="AllowHtmlAttributeTitle" xml:space="preserve">
+    <value>[AllowHtmlAttrubute] should be removed</value>
+  </data>
   <data name="FilterDescription" xml:space="preserve">
     <value>Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core</value>
   </data>
@@ -125,6 +134,24 @@
   </data>
   <data name="FilterTitle" xml:space="preserve">
     <value>Filter types should be used from the Microsoft.AspNetCore.Mvc.Filters namespace</value>
+  </data>
+  <data name="HelperResultDescription" xml:space="preserve">
+    <value>HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult</value>
+  </data>
+  <data name="HelperResultMessageFormat" xml:space="preserve">
+    <value>Identifier '{0}' should be replaced with '{1}'</value>
+  </data>
+  <data name="HelperResultTitle" xml:space="preserve">
+    <value>HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult</value>
+  </data>
+  <data name="HtmlHelperDescription" xml:space="preserve">
+    <value>HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper</value>
+  </data>
+  <data name="HtmlHelperMessageFormat" xml:space="preserve">
+    <value>Identifier '{0}' should be replaced with '{1}'</value>
+  </data>
+  <data name="HtmlHelperTitle" xml:space="preserve">
+    <value>HtmlHelper should be replaced with IHtmlHelper</value>
   </data>
   <data name="HtmlStringDescription" xml:space="preserve">
     <value>HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
@@ -161,6 +188,15 @@
   </data>
   <data name="ResultTypeTitle" xml:space="preserve">
     <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace</value>
+  </data>
+  <data name="UrlHelperDescription" xml:space="preserve">
+    <value>UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper</value>
+  </data>
+  <data name="UrlHelperMessageFormat" xml:space="preserve">
+    <value>Identifier '{0}' should be replaced with '{1}'</value>
+  </data>
+  <data name="UrlHelperTitle" xml:space="preserve">
+    <value>UrlHelper should be replaced with IUrlHelper</value>
   </data>
   <data name="UsingSystemWebDescription" xml:space="preserve">
     <value>ASP.NET Core projects should not reference System.Web or OWIN namespaces.</value>

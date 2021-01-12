@@ -91,6 +91,54 @@ namespace AspNetMigrator.Analyzers.Test
                     new ExpectedDiagnostic("AM0006", new TextSpan(499, 42))
                 }
             },
+            {
+                "AM0007",
+                new[]
+                {
+                    new ExpectedDiagnostic("AM0007", new TextSpan(131, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(314, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(377, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(417, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(597, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(617, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(675, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(735, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(826, 10)),
+                    new ExpectedDiagnostic("AM0007", new TextSpan(871, 10)),
+                }
+            },
+            {
+                "AM0008",
+                new[]
+                {
+                    new ExpectedDiagnostic("AM0008", new TextSpan(79, 9)),
+                    new ExpectedDiagnostic("AM0008", new TextSpan(112, 9)),
+                    new ExpectedDiagnostic("AM0008", new TextSpan(150, 9)),
+                    new ExpectedDiagnostic("AM0008", new TextSpan(191, 9)),
+                    new ExpectedDiagnostic("AM0008", new TextSpan(287, 9)),
+                    new ExpectedDiagnostic("AM0008", new TextSpan(331, 9)),
+                }
+            },
+            {
+                "AM0009",
+                new[]
+                {
+                    new ExpectedDiagnostic("AM0009", new TextSpan(102, 12)),
+                    new ExpectedDiagnostic("AM0009", new TextSpan(143, 12)),
+                    new ExpectedDiagnostic("AM0009", new TextSpan(216, 12)),
+                    new ExpectedDiagnostic("AM0009", new TextSpan(243, 12)),
+                    new ExpectedDiagnostic("AM0009", new TextSpan(311, 12)),
+                }
+            },
+            {
+                "AM0010",
+                new[]
+                {
+                    new ExpectedDiagnostic("AM0010", new TextSpan(150, 9)),
+                    new ExpectedDiagnostic("AM0010", new TextSpan(240, 18)),
+                    new ExpectedDiagnostic("AM0010", new TextSpan(344, 13)),
+                }
+            },
         };
 
         [AssemblyInitialize]
@@ -133,6 +181,10 @@ namespace AspNetMigrator.Analyzers.Test
         [DataRow("AM0004")]
         [DataRow("AM0005")]
         [DataRow("AM0006")]
+        [DataRow("AM0007")]
+        [DataRow("AM0008")]
+        [DataRow("AM0009")]
+        [DataRow("AM0010")]
         [DataTestMethod]
         public async Task MigrationAnalyzers(string diagnosticId)
         {
@@ -147,6 +199,10 @@ namespace AspNetMigrator.Analyzers.Test
         [DataRow("AM0004")]
         [DataRow("AM0005")]
         [DataRow("AM0006")]
+        [DataRow("AM0007")]
+        [DataRow("AM0008")]
+        [DataRow("AM0009")]
+        [DataRow("AM0010")]
         [DataTestMethod]
         public async Task MigrationCodeFixer(string diagnosticId)
         {

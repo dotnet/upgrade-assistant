@@ -61,6 +61,33 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [AllowHtmlAttrubute] should be removed.
+        /// </summary>
+        internal static string AllowHtmlAttributeDescription {
+            get {
+                return ResourceManager.GetString("AllowHtmlAttributeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attribute &apos;{0}&apos; should be removed.
+        /// </summary>
+        internal static string AllowHtmlAttributeMessageFormat {
+            get {
+                return ResourceManager.GetString("AllowHtmlAttributeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [AllowHtmlAttrubute] should be removed.
+        /// </summary>
+        internal static string AllowHtmlAttributeTitle {
+            get {
+                return ResourceManager.GetString("AllowHtmlAttributeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core.
         /// </summary>
         internal static string FilterDescription {
@@ -84,6 +111,60 @@ namespace AspNetMigrator.Analyzers {
         internal static string FilterTitle {
             get {
                 return ResourceManager.GetString("FilterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult.
+        /// </summary>
+        internal static string HelperResultDescription {
+            get {
+                return ResourceManager.GetString("HelperResultDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
+        /// </summary>
+        internal static string HelperResultMessageFormat {
+            get {
+                return ResourceManager.GetString("HelperResultMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult.
+        /// </summary>
+        internal static string HelperResultTitle {
+            get {
+                return ResourceManager.GetString("HelperResultTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper.
+        /// </summary>
+        internal static string HtmlHelperDescription {
+            get {
+                return ResourceManager.GetString("HtmlHelperDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
+        /// </summary>
+        internal static string HtmlHelperMessageFormat {
+            get {
+                return ResourceManager.GetString("HtmlHelperMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HtmlHelper should be replaced with IHtmlHelper.
+        /// </summary>
+        internal static string HtmlHelperTitle {
+            get {
+                return ResourceManager.GetString("HtmlHelperTitle", resourceCulture);
             }
         }
         
@@ -192,6 +273,33 @@ namespace AspNetMigrator.Analyzers {
         internal static string ResultTypeTitle {
             get {
                 return ResourceManager.GetString("ResultTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper.
+        /// </summary>
+        internal static string UrlHelperDescription {
+            get {
+                return ResourceManager.GetString("UrlHelperDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
+        /// </summary>
+        internal static string UrlHelperMessageFormat {
+            get {
+                return ResourceManager.GetString("UrlHelperMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UrlHelper should be replaced with IUrlHelper.
+        /// </summary>
+        internal static string UrlHelperTitle {
+            get {
+                return ResourceManager.GetString("UrlHelperTitle", resourceCulture);
             }
         }
         
