@@ -34,13 +34,22 @@ namespace AspNetMigrator.ConsoleApp
                 throw new ArgumentNullException(nameof(commands));
             }
 
-            var listOfCommands = commands as IReadOnlyList<T> ?? new List<T>(commands);
-
             _io.Output.WriteLine(message);
 
-            for (var i = 0; i < listOfCommands.Count; i++)
+            var possible = new Dictionary<int, T>();
+
+            foreach (var command in commands)
             {
-                _io.Output.WriteLine($" {i + 1}. {listOfCommands[i].CommandText}");
+                if (command.IsEnabled)
+                {
+                    var index = possible.Count + 1;
+                    _io.Output.WriteLine($" {index,3}. {command.CommandText}");
+                    possible.Add(index, command);
+                }
+                else
+                {
+                    _io.Output.WriteLine($"   {command.CommandText}");
+                }
             }
 
             while (true)
@@ -60,10 +69,9 @@ namespace AspNetMigrator.ConsoleApp
 
                 if (int.TryParse(selectedCommandText, out var selectedCommandIndex))
                 {
-                    selectedCommandIndex--;
-                    if (selectedCommandIndex >= 0 && selectedCommandIndex < listOfCommands.Count)
+                    if (possible.TryGetValue(selectedCommandIndex, out var selected))
                     {
-                        return Task.FromResult(listOfCommands[selectedCommandIndex]);
+                        return Task.FromResult(selected);
                     }
                 }
 

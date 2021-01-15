@@ -78,34 +78,52 @@ namespace AspNetMigrator.ConsoleApp
             using var context = scope.ServiceProvider.GetRequiredService<IMigrationContext>();
             var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
             var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
+            var stateManager = scope.ServiceProvider.GetRequiredService<IMigrationStateManager>();
 
-            await foreach (var step in migrator.GetAllSteps(context, token))
+            await stateManager.LoadStateAsync(context, token);
+
+            try
             {
-                while (!step.IsComplete)
+                await foreach (var step in migrator.GetAllSteps(context, token))
                 {
-                    token.ThrowIfCancellationRequested();
-
-                    ShowMigrationSteps(migrator.Steps, step);
-
-                    var commands = _commandProvider.GetCommands(step);
-                    var command = await _input.ChooseAsync("Choose command", commands, token);
-
-                    // TODO : It might be nice to allow commands to show more details by having a 'status' property
-                    //        that can be shown here. Also, commands currently only return bools but, in the future,
-                    //        if they return more complex objects, custom handlers could be used to respond to the different
-                    //        commands' return values.
-                    if (!await command.ExecuteAsync(context, token))
+                    while (!step.IsComplete)
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
-                        Console.ResetColor();
+                        token.ThrowIfCancellationRequested();
+
+                        ShowMigrationSteps(migrator.Steps, step);
+
+                        var commands = _commandProvider.GetCommands(step);
+                        var command = await _input.ChooseAsync("Choose command", commands, token);
+
+                        // TODO : It might be nice to allow commands to show more details by having a 'status' property
+                        //        that can be shown here. Also, commands currently only return bools but, in the future,
+                        //        if they return more complex objects, custom handlers could be used to respond to the different
+                        //        commands' return values.
+                        if (!await command.ExecuteAsync(context, token))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
+                            Console.ResetColor();
+                        }
                     }
                 }
+
+                ShowMigrationSteps(migrator.Steps);
+
+                await MarkProjectCompletedAsync(stateManager, context, token);
+
+                _logger.LogInformation("Migration has completed. Please review any changes.");
             }
+            finally
+            {
+                // Do not pass the same token as it may have been canceled and we still need to persist this.
+                await stateManager.SaveStateAsync(context, default);
+            }
+        }
 
-            ShowMigrationSteps(migrator.Steps);
-
-            _logger.LogInformation("Migration has completed. Please review any changes.");
+        private static async ValueTask MarkProjectCompletedAsync(IMigrationStateManager stateManager, IMigrationContext context, CancellationToken token)
+        {
+            await context.SetProjectAsync(null, token);
         }
 
         public Task StopAsync(CancellationToken token) => Task.CompletedTask;

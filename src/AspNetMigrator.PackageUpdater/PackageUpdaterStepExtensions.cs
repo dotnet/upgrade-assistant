@@ -8,6 +8,7 @@ namespace AspNetMigrator
     {
         public static OptionsBuilder<PackageUpdaterStepOptions> AddPackageUpdaterStep(this IServiceCollection services)
         {
+            services.AddSingleton<ITargetFrameworkIdentifier, TargetFrameworkIdentifier>();
             services.AddScoped<MigrationStep, PackageUpdaterStep>();
             return services.AddOptions<PackageUpdaterStepOptions>();
         }

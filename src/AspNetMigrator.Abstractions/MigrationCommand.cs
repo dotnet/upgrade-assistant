@@ -14,5 +14,7 @@ namespace AspNetMigrator
         /// Gets the text displayed to the user from the REPL (e.g. Set Backup Path).
         /// </summary>
         public abstract string CommandText { get; }
+
+        public bool IsEnabled { get; init; } = true;
     }
 }

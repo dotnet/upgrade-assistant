@@ -40,6 +40,8 @@ namespace AspNetMigrator.MSBuild
             _workspace = null;
         }
 
+        public ICollection<string> CompletedProjects { get; set; } = Array.Empty<string>();
+
         public async ValueTask<ProjectId?> GetProjectIdAsync(CancellationToken token)
         {
             // Ensure workspace is available
@@ -48,7 +50,7 @@ namespace AspNetMigrator.MSBuild
             return _projectId;
         }
 
-        public ValueTask SetProjectAsync(ProjectId projectId, CancellationToken token)
+        public ValueTask SetProjectAsync(ProjectId? projectId, CancellationToken token)
         {
             _projectId = projectId;
 

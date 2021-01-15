@@ -12,7 +12,7 @@ namespace AspNetMigrator
     {
         ValueTask<ProjectId?> GetProjectIdAsync(CancellationToken token);
 
-        ValueTask SetProjectAsync(ProjectId projectId, CancellationToken token);
+        ValueTask SetProjectAsync(ProjectId? projectId, CancellationToken token);
 
         IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
 

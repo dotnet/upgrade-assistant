@@ -74,6 +74,7 @@ namespace AspNetMigrator.ConsoleApp
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
+                    services.AddSingleton<IMigrationStateManager, FileMigrationStateFactory>();
                     services.AddHostedService<ConsoleRepl>();
 
                     services.AddMsBuild();

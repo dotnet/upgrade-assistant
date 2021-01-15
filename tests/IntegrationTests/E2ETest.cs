@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,11 @@ namespace IntegrationTests
         private const string TryConvertPath = @"%USERPROFILE%\.dotnet\tools\try-convert.exe";
 
         private static readonly string[] DirsToIgnore = new[] { "bin", "obj" };
+
+        private readonly HashSet<string> _ignoredFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".aspnetmigrator"
+        };
 
         [AssemblyInitialize]
 #pragma warning disable IDE0060 // Remove unused parameter (required by MSTest)
@@ -69,10 +75,12 @@ namespace IntegrationTests
             }
         }
 
-        private static async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
+        private async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
         {
             var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p[(expectedDir.Length + 1)..]).ToArray();
-            var actualFiles = Directory.GetFiles(actualDir, "*", SearchOption.AllDirectories).Select(p => p[(actualDir.Length + 1)..]).ToArray();
+            var actualFiles = Directory.GetFiles(actualDir, "*", SearchOption.AllDirectories).Select(p => p[(actualDir.Length + 1)..])
+                .Where(t => !_ignoredFiles.Contains(Path.GetFileName(t)))
+                .ToArray();
 
             CollectionAssert.AreEquivalent(
                 expectedFiles,
