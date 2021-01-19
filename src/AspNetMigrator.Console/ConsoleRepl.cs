@@ -109,6 +109,7 @@ namespace AspNetMigrator.ConsoleApp
                 }
 
                 ShowMigrationSteps(migrator.Steps);
+                _io.Output.WriteLine();
 
                 // Once a project has completed, we can remove it from the context.
                 context.SetProject(null);
@@ -144,18 +145,16 @@ namespace AspNetMigrator.ConsoleApp
             foreach (var step in steps)
             {
                 // Write indent (if any) and item number
-                _io.Output.Write($"{new string(' ', offset * 2)}{count++}. ");
+                _io.Output.Write($"{new string(' ', offset * 4)}{count++}. ");
 
                 // Write the step title and make a note of whether the step is incomplete
-                // (since that would mean future steps shouldn't show "[Current step]")
+                // (since that would mean future steps shouldn't show "[Next step]")
                 WriteStepStatus(step, step == currentStep);
                 _io.Output.WriteLine(step.Title);
                 nextStepFound = nextStepFound || (step.Status != MigrationStepStatus.Complete);
 
                 ShowMigrationSteps(step.SubSteps, currentStep, offset + 1);
             }
-
-            _io.Output.WriteLine();
         }
 
         private void WriteStepStatus(MigrationStep step, bool isNextStep)
@@ -178,7 +177,7 @@ namespace AspNetMigrator.ConsoleApp
                     if (isNextStep)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        _io.Output.Write("[Current step] ");
+                        _io.Output.Write("[Next step] ");
                     }
 
                     break;

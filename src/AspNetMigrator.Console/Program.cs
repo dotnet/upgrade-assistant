@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
+using AspNetMigrator.ConfigUpdater;
 using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
 using AspNetMigrator.SourceUpdater;
@@ -23,9 +24,10 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
+        private const string ConfigUpdaterStepOptionsSection = "ConfigUpdaterStepOptions";
         private const string PackageUpdaterStepOptionsSection = "PackageUpdaterStepOptions";
-        private const string TemplateInserterStepOptionsSection = "TemplateInserterStepOptions";
         private const string SourceUpdaterStepOptionsSection = "SourceUpdaterStepOptions";
+        private const string TemplateInserterStepOptionsSection = "TemplateInserterStepOptions";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
         private const string LogFilePath = "log.txt";
 
@@ -94,6 +96,7 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
                     services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
                     services.AddTemplateInserterStep().Bind(context.Configuration.GetSection(TemplateInserterStepOptionsSection));
+                    services.AddConfigUpdaterStep().Bind(context.Configuration.GetSection(ConfigUpdaterStepOptionsSection));
                     services.AddScoped<MigrationStep, SourceUpdaterStep>();
                     services.AddScoped<Migrator>();
 
@@ -103,8 +106,11 @@ namespace AspNetMigrator.ConsoleApp
                 {
                     var sourceUpdatersPath = context.Configuration.GetSection(SourceUpdaterStepOptionsSection).Get<SourceUpdaterStepOptions>()?.SourceUpdaterPath
                         ?? throw new ArgumentNullException("Source updaters path must not be null");
-
                     builder.RegisterModule(new AnalyzersAndCodeFixersModule(sourceUpdatersPath));
+
+                    var configUpdatersPath = context.Configuration.GetSection(ConfigUpdaterStepOptionsSection).Get<ConfigUpdaterStepOptions>()?.ConfigUpdaterPath
+                        ?? throw new ArgumentNullException("Config updaters path must not be null");
+                    builder.RegisterModule(new ConfigUpdatersModule(configUpdatersPath));
                 })
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)

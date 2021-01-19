@@ -121,19 +121,6 @@ namespace AspNetMigrator.SourceUpdater
                 .Where(d => d.Location.IsInSource &&
                        _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
             Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
-
-            // Normally, the migrator will apply steps one at a time
-            // at the user's instruction. In the case of parent and child steps,
-            // the parent has any top-level application done after the children.
-            // In the case of this update step, the parent (this updater) doesn't
-            // need to apply anything. Therefore, automatically apply this updater
-            // if all of its children are complete. This will avoid the annoying
-            // user experience of having to "apply" an empty change for the parent
-            // source updater step after all children have applied their changes.
-            if (!Diagnostics.Any())
-            {
-                await ApplyAsync(context, token).ConfigureAwait(false);
-            }
         }
 
         protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>

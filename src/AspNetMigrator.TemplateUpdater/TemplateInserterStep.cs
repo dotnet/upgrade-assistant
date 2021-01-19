@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,13 +23,17 @@ namespace AspNetMigrator.TemplateUpdater
     public class TemplateInserterStep : MigrationStep
     {
         private const int BufferSize = 65536;
-        private static readonly Regex PropertyRegex = new(@"^\$\((.*)\)$");
+        private static readonly Regex PropertyRegex = new(@"^\$\((.*)\)$", RegexOptions.Compiled);
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            Converters = { new JsonStringProjectItemTypeConverter() }
+        };
 
         // Files that indicate the project is likely a web app rather than a class library or some other project type
         private static readonly ItemSpec[] WebAppFiles = new[]
         {
-            new ItemSpec("Content", "Global.asax", false, Array.Empty<string>()),
-            new ItemSpec("Content", "Web.config", false, Array.Empty<string>())
+            new ItemSpec(ProjectItemType.Content, "Global.asax", Array.Empty<string>()),
+            new ItemSpec(ProjectItemType.Content, "Web.config",  Array.Empty<string>())
         };
 
         private readonly IEnumerable<string> _templateConfigFiles;
@@ -149,63 +154,59 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
-            var projectDir = Path.GetDirectoryName(projectPath) ?? string.Empty;
-
-            try
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+            if (project?.Directory is null)
             {
-                var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
+                Logger.LogError("No project path found");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"No project path found");
+            }
 
-                // For each item to be added, make necessary replacements and then add the item to the project
-                foreach (var item in _itemsToAdd.Values)
+            var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
+
+            // For each item to be added, make necessary replacements and then add the item to the project
+            foreach (var item in _itemsToAdd.Values)
+            {
+                var filePath = Path.Combine(project.Directory, item.Path);
+
+                // If the file already exists, move it
+                if (File.Exists(filePath))
                 {
-                    var filePath = Path.Combine(projectDir, item.Path);
-
-                    // If the file already exists, move it
-                    if (File.Exists(filePath))
-                    {
-                        RenameFile(filePath, projectRoot);
-                    }
-
-                    // Get the contents of the template file
-                    try
-                    {
-                        var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectRoot.FullPath);
-#pragma warning disable CA2000 // Dispose objects before losing scope
-                        using var templateStream = File.Open(item.TemplateFilePath, FileMode.Open, FileAccess.Read);
-                        using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
-#pragma warning restore CA2000 // Dispose objects before losing scope
-
-                        await StreamHelpers.CopyStreamWithTokenReplacementAsync(templateStream, outputStream, tokenReplacements).ConfigureAwait(false);
-                    }
-                    catch (IOException exc)
-                    {
-                        Logger.LogCritical(exc, "Template file not found: {TemplateItemPath}", item.TemplateFilePath);
-                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Template file not found: {item.TemplateFilePath}");
-                    }
-
-                    if (item.IncludeExplicitly)
-                    {
-                        // Add the new item to the project if it won't be auto-included
-                        projectRoot.AddItem(item.Type, item.Path);
-                    }
-
-                    Logger.LogInformation("Added {ItemName} to the project from template file", item.Path);
+                    RenameFile(filePath, projectRoot);
                 }
 
-                projectRoot.Save();
+                // Get the contents of the template file
+                try
+                {
+                    var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectRoot.FullPath);
+#pragma warning disable CA2000 // Dispose objects before losing scope
+                    using var templateStream = File.Open(item.TemplateFilePath, FileMode.Open, FileAccess.Read);
+                    using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
-                // Reload the workspace since, at this point, the project may be different from what was loaded
-                await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+                    await StreamHelpers.CopyStreamWithTokenReplacementAsync(templateStream, outputStream, tokenReplacements).ConfigureAwait(false);
+                }
+                catch (IOException exc)
+                {
+                    Logger.LogCritical(exc, "Template file not found: {TemplateItemPath}", item.TemplateFilePath);
+                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Template file not found: {item.TemplateFilePath}");
+                }
 
-                Logger.LogInformation("{ItemCount} template items added", _itemsToAdd.Count);
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
+                if (!project.ContainsItem(item.Path, item.Type, token))
+                {
+                    // Add the new item to the project if it wasn't auto-included
+                    projectRoot.AddItem(item.Type.Name, item.Path);
+                }
+
+                Logger.LogInformation("Added {ItemName} to the project from template file", item.Path);
             }
-            catch (InvalidProjectFileException)
-            {
-                Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {projectPath}");
-            }
+
+            projectRoot.Save();
+
+            // Reload the workspace since, at this point, the project may be different from what was loaded
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+
+            Logger.LogInformation("{ItemCount} template items added", _itemsToAdd.Count);
+            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
         }
 
         private Dictionary<string, string> ResolveTokenReplacements(IEnumerable<KeyValuePair<string, string>>? replacements, string projectPath)
@@ -266,10 +267,10 @@ namespace AspNetMigrator.TemplateUpdater
         /// <summary>
         /// Determines if a given project element matches an item specification.
         /// </summary>
-        private bool ItemMatches(ItemSpec expectedItem, ProjectItem itemElement, string projectPath)
+        private bool ItemMatches(ItemSpec expectedItem, Microsoft.Build.Evaluation.ProjectItem itemElement, string projectPath)
         {
             // The item type must match
-            if (!expectedItem.Type.Equals(itemElement.ItemType, StringComparison.OrdinalIgnoreCase))
+            if (!expectedItem.Type.Name.Equals(itemElement.ItemType, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -302,7 +303,7 @@ namespace AspNetMigrator.TemplateUpdater
             }
 
             // The file must include all specified keywords
-            if (expectedItem.Keywords.Length > 0)
+            if (expectedItem.Keywords.Any())
             {
                 var fileContents = File.ReadAllText(filePath);
                 if (expectedItem.Keywords.Any(k => !fileContents.Contains(k, StringComparison.Ordinal)))
@@ -333,7 +334,7 @@ namespace AspNetMigrator.TemplateUpdater
             try
             {
                 using var config = File.OpenRead(path);
-                return await JsonSerializer.DeserializeAsync<TemplateConfiguration>(config, cancellationToken: token).ConfigureAwait(false);
+                return await JsonSerializer.DeserializeAsync<TemplateConfiguration>(config, JsonOptions, cancellationToken: token).ConfigureAwait(false);
             }
             catch (JsonException)
             {

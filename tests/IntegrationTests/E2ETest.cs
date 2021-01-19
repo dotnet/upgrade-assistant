@@ -23,7 +23,7 @@ namespace IntegrationTests
 
         private static readonly string[] DirsToIgnore = new[] { "bin", "obj" };
 
-        private readonly HashSet<string> _ignoredFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private readonly HashSet<string> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase)
         {
             ".aspnetmigrator"
         };

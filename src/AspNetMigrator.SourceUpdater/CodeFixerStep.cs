@@ -105,6 +105,19 @@ namespace AspNetMigrator.SourceUpdater
 
                 // Re-build and get an updated list of diagnostics
                 await _sourceUpdater.GetDiagnosticsAsync(context, token).ConfigureAwait(false);
+
+                // Normally, the migrator will apply steps one at a time
+                // at the user's instruction. In the case of parent and child steps,
+                // the parent has any top-level application done after the children.
+                // In the case of this source update steps, the parent (this step's parent)
+                // doesn't need to apply anything. Therefore, automatically apply the
+                // paraent step if all diagnostics are addressed. This will avoid the annoying
+                // user experience of having to "apply" an empty change for the parent
+                // source updater step after all children have applied their changes.
+                if (!_sourceUpdater.Diagnostics.Any())
+                {
+                    await _sourceUpdater.ApplyAsync(context, token).ConfigureAwait(false);
+                }
             }
 
             // TEMPORARY WORKAROUND

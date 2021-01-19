@@ -4,6 +4,7 @@
     <Rule Id="CA1008" Action="Warning" />
     <Rule Id="CA1016" Action="None" />
     <Rule Id="CA1030" Action="None" />
+    <Rule Id="CA1031" Action="None" />
     <Rule Id="CA1034" Action="None" />
     <Rule Id="CA1036" Action="None" />
     <Rule Id="CA1050" Action="Warning" />
@@ -22,9 +23,6 @@
     <Rule Id="CA1815" Action="None" />
     <Rule Id="CA2227" Action="None" />
     <Rule Id="CA2237" Action="None" />
-  </Rules>
-  <Rules AnalyzerId="Microsoft.CodeQuality.CSharp.Analyzers" RuleNamespace="Microsoft.CodeQuality.CSharp.Analyzers">
-    <Rule Id="CA1032" Action="None" />
   </Rules>
   <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
     <Rule Id="CA1304" Action="None" />
@@ -62,6 +60,7 @@
     <Rule Id="SA1502" Action="None" />
     <Rule Id="SA1503" Action="None" />
     <Rule Id="SA1600" Action="None" />
+    <Rule Id="SA1602" Action="None" />
     <Rule Id="SA1611" Action="None" />
     <Rule Id="SA1615" Action="None" />
     <Rule Id="SA1633" Action="None" />

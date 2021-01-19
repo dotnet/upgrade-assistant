@@ -11,7 +11,7 @@ namespace AspNetMigrator.TemplateUpdater
     internal record RuntimeItemSpec : ItemSpec
     {
         public RuntimeItemSpec(ItemSpec baseItem, string templateFilePath, Dictionary<string, string> replacements)
-            : base(baseItem.Type, baseItem.Path, baseItem.IncludeExplicitly, baseItem.Keywords.ToArray())
+            : base(baseItem.Type, baseItem.Path, baseItem.Keywords.ToArray())
         {
             TemplateFilePath = templateFilePath;
             Replacements = ImmutableDictionary.CreateRange(replacements);
