@@ -33,9 +33,9 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectId = await context.GetProjectIdAsync(token).ConfigureAwait(false);
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
 
-            if (projectId is null)
+            if (project is null)
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
@@ -52,8 +52,7 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var ws = await context.GetWorkspaceAsync(token).ConfigureAwait(false);
-            var selectedProject = await GetProject(ws, IsCompleted, token).ConfigureAwait(false);
+            var selectedProject = await GetProject(context, IsCompleted, token).ConfigureAwait(false);
 
             if (selectedProject is null)
             {
@@ -61,45 +60,37 @@ namespace AspNetMigrator.Solution
             }
             else
             {
-                await context.SetProjectAsync(selectedProject.Id, token).ConfigureAwait(false);
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.Name} was selected.");
+                context.SetProject(selectedProject);
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }
 
-        private static IEnumerable<Project> GetOrderedProjects(Project entrypoint)
+        private bool IsCompleted(IProject project)
         {
-            var sln = entrypoint.Solution;
-
-            return entrypoint.PostOrderTraversal(p =>
-                p.ProjectReferences.Select(r => sln.GetProject(r.ProjectId)!));
-        }
-
-        private bool IsCompleted(Project project)
-        {
-            if (project.FilePath is not null)
+            if (project.GetRoslynProject().FilePath is string path)
             {
-                using var projectFile = File.OpenRead(project.FilePath);
+                using var projectFile = File.OpenRead(path);
                 return _tfm.IsCoreCompatible(projectFile);
             }
 
             return false;
         }
 
-        private async Task<Project> GetProject(Workspace ws, Func<Project, bool> isProjectCompleted, CancellationToken token)
+        private async Task<IProject> GetProject(IMigrationContext context, Func<IProject, bool> isProjectCompleted, CancellationToken token)
         {
             const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            var allProjects = ws.CurrentSolution.Projects.OrderBy(p => p.Name).Select(ProjectCommand.Create);
+            var allProjects = await context.GetProjects(token).OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToListAsync(cancellationToken: token).ConfigureAwait(false);
             var entrypoint = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
 
-            var ordered = GetOrderedProjects(entrypoint.Project).Select(CreateProjectCommand);
+            var ordered = entrypoint.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
             return result.Project;
 
-            ProjectCommand CreateProjectCommand(Project project)
+            ProjectCommand CreateProjectCommand(IProject project)
             {
                 return new ProjectCommand(project, isProjectCompleted(project));
             }
@@ -107,18 +98,18 @@ namespace AspNetMigrator.Solution
 
         private class ProjectCommand : MigrationCommand
         {
-            public static ProjectCommand Create(Project project) => new ProjectCommand(project, false);
+            public static ProjectCommand Create(IProject project) => new ProjectCommand(project, false);
 
-            public ProjectCommand(Project project, bool isCompleted)
+            public ProjectCommand(IProject project, bool isCompleted)
             {
                 IsEnabled = !isCompleted;
 
                 Project = project;
             }
 
-            public override string CommandText => IsEnabled ? Project.Name : $"[Completed] {Project.Name}";
+            public override string CommandText => IsEnabled ? Project.GetRoslynProject().Name : $"[Completed] {Project.GetRoslynProject().Name}";
 
-            public Project Project { get; }
+            public IProject Project { get; }
 
             public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
                 => Task.FromResult(true);

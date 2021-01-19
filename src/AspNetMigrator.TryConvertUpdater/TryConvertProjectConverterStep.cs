@@ -53,7 +53,7 @@ namespace AspNetMigrator.TryConvertUpdater
             }
 
             var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-            var projectPath = project?.FilePath;
+            var projectPath = project?.GetRoslynProject().FilePath;
 
             if (!File.Exists(projectPath))
             {

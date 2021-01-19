@@ -84,7 +84,7 @@ namespace AspNetMigrator.SourceUpdater
                 // Iterate through the first diagnostic from each document
                 foreach (var diagnostic in Diagnostics.GroupBy(d => d.Location.SourceTree.FilePath).Select(g => g.First()))
                 {
-                    var doc = _sourceUpdater.Project.GetDocument(diagnostic.Location.SourceTree)!;
+                    var doc = _sourceUpdater.Project.GetRoslynProject().GetDocument(diagnostic.Location.SourceTree)!;
                     var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);
 
                     if (updatedSolution is null)
@@ -92,7 +92,7 @@ namespace AspNetMigrator.SourceUpdater
                         Logger.LogError("Failed to fix diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
                         return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}");
                     }
-                    else if (!_sourceUpdater.UpdateSolution(updatedSolution))
+                    else if (!context.UpdateSolution(updatedSolution))
                     {
                         Logger.LogError("Failed to apply changes after fixing {DiagnosticId} to {FilePath}", diagnostic.Id, doc.FilePath);
                         return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}");

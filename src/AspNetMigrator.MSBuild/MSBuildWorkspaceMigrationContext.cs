@@ -42,6 +42,16 @@ namespace AspNetMigrator.MSBuild
 
         public ICollection<string> CompletedProjects { get; set; } = Array.Empty<string>();
 
+        public async IAsyncEnumerable<IProject> GetProjects([EnumeratorCancellation] CancellationToken token)
+        {
+            var ws = await GetWorkspaceAsync(token).ConfigureAwait(false);
+
+            foreach (var projectId in ws.CurrentSolution.ProjectIds)
+            {
+                yield return new MSBuildProject(ws, projectId);
+            }
+        }
+
         public async ValueTask<ProjectId?> GetProjectIdAsync(CancellationToken token)
         {
             // Ensure workspace is available
@@ -50,11 +60,9 @@ namespace AspNetMigrator.MSBuild
             return _projectId;
         }
 
-        public ValueTask SetProjectAsync(ProjectId? projectId, CancellationToken token)
+        public void SetProject(IProject? projectId)
         {
-            _projectId = projectId;
-
-            return ValueTask.CompletedTask;
+            _projectId = projectId?.GetRoslynProject().Id;
         }
 
         private Dictionary<string, string> CreateProperties()
@@ -107,6 +115,34 @@ namespace AspNetMigrator.MSBuild
             _workspace = null;
         }
 
+        public async ValueTask ReloadWorkspaceAsync(CancellationToken token)
+        {
+            var current = await GetProjectAsync(token).ConfigureAwait(false);
+
+            if (current is null)
+            {
+                return;
+            }
+
+            var projectPath = current.GetRoslynProject().FilePath;
+
+            UnloadWorkspace();
+
+            if (string.IsNullOrWhiteSpace(projectPath))
+            {
+                return;
+            }
+
+            await foreach (var project in GetProjects(token))
+            {
+                if (string.Equals(project.GetRoslynProject().FilePath, projectPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    SetProject(project);
+                    return;
+                }
+            }
+        }
+
         private void Workspace_WorkspaceFailed(object? sender, WorkspaceDiagnosticEventArgs e)
         {
             var diagnostic = e.Diagnostic!;
@@ -121,6 +157,48 @@ namespace AspNetMigrator.MSBuild
             foreach (var property in ws.Properties)
             {
                 yield return (property.Key, property.Value);
+            }
+        }
+
+        public async ValueTask<IProject?> GetProjectAsync(CancellationToken token)
+        {
+            if (_projectId is null)
+            {
+                return null;
+            }
+
+            var ws = await GetWorkspaceAsync(token).ConfigureAwait(false);
+
+            if (ws is not null)
+            {
+                var project = ws.CurrentSolution.GetProject(_projectId);
+
+                if (project is not null)
+                {
+                    return new MSBuildProject(ws, _projectId);
+                }
+            }
+
+            return null;
+        }
+
+        public bool UpdateSolution(Solution updatedSolution)
+        {
+            if (_workspace is null)
+            {
+                _logger.LogWarning("Cannot update solution if no workspace is loaded.");
+                return false;
+            }
+
+            if (_workspace.TryApplyChanges(updatedSolution))
+            {
+                _logger.LogDebug("Source successfully updated");
+                return true;
+            }
+            else
+            {
+                _logger.LogDebug("Failed to apply changes to source");
+                return false;
             }
         }
     }

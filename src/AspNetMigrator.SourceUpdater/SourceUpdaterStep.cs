@@ -21,12 +21,9 @@ namespace AspNetMigrator.SourceUpdater
         private readonly ImmutableArray<DiagnosticAnalyzer> _allAnalyzers;
         private readonly ImmutableArray<CodeFixProvider> _allCodeFixProviders;
 
-        private Workspace? _workspace;
-        private ProjectId? _projectId;
+        internal IProject? Project { get; private set; }
 
         internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
-
-        internal Project? Project => _workspace?.CurrentSolution.GetProject(_projectId);
 
         public SourceUpdaterStep(MigrateOptions options, IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<SourceUpdaterStep> logger)
             : base(options, logger)
@@ -82,8 +79,7 @@ namespace AspNetMigrator.SourceUpdater
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
-            _workspace = await context.GetWorkspaceAsync(token).ConfigureAwait(false);
-            _projectId = await context.GetProjectIdAsync(token).ConfigureAwait(false);
+            Project = await context.GetProjectAsync(token).ConfigureAwait(false);
 
             await GetDiagnosticsAsync(context, token).ConfigureAwait(false);
 
@@ -100,13 +96,13 @@ namespace AspNetMigrator.SourceUpdater
 
         public async Task GetDiagnosticsAsync(IMigrationContext context, CancellationToken token)
         {
-            if (_workspace is null)
+            if (Project is null)
             {
-                Logger.LogWarning("No workspace available.");
+                Logger.LogWarning("No project available.");
                 return;
             }
 
-            var project = _workspace.CurrentSolution.GetProject(_projectId);
+            var project = Project.GetRoslynProject();
 
             if (project is null)
             {
@@ -144,26 +140,6 @@ namespace AspNetMigrator.SourceUpdater
             Task.FromResult(Diagnostics.Any() ?
                 new MigrationStepApplyResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
                 new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty));
-
-        internal bool UpdateSolution(Solution updatedSolution)
-        {
-            if (_workspace is null)
-            {
-                Logger.LogWarning("No workspace is available.");
-                return false;
-            }
-
-            if (_workspace.TryApplyChanges(updatedSolution))
-            {
-                Logger.LogDebug("Source successfully updated");
-                return true;
-            }
-            else
-            {
-                Logger.LogDebug("Failed to apply changes to source");
-                return false;
-            }
-        }
 
         // TODO
         private static ImmutableArray<AdditionalText> GetAdditionalFiles() => default;

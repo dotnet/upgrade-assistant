@@ -110,7 +110,8 @@ namespace AspNetMigrator.ConsoleApp
 
                 ShowMigrationSteps(migrator.Steps);
 
-                await MarkProjectCompletedAsync(stateManager, context, token);
+                // Once a project has completed, we can remove it from the context.
+                context.SetProject(null);
 
                 _logger.LogInformation("Migration has completed. Please review any changes.");
             }
@@ -119,11 +120,6 @@ namespace AspNetMigrator.ConsoleApp
                 // Do not pass the same token as it may have been canceled and we still need to persist this.
                 await stateManager.SaveStateAsync(context, default);
             }
-        }
-
-        private static async ValueTask MarkProjectCompletedAsync(IMigrationStateManager stateManager, IMigrationContext context, CancellationToken token)
-        {
-            await context.SetProjectAsync(null, token);
         }
 
         public Task StopAsync(CancellationToken token) => Task.CompletedTask;

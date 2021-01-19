@@ -36,12 +36,11 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = await GetStateAsync(token).ConfigureAwait(false);
 
-            var ws = await context.GetWorkspaceAsync(token).ConfigureAwait(false);
-            var project = ws.CurrentSolution.Projects.FirstOrDefault(p => p.Name == state.CurrentProject);
+            var project = await context.GetProjects(token).FirstOrDefaultAsync(p => p.GetRoslynProject().Name == state.CurrentProject, token).ConfigureAwait(false);
 
             if (project is not null)
             {
-                await context.SetProjectAsync(project.Id, token).ConfigureAwait(false);
+                context.SetProject(project);
             }
         }
 
@@ -89,7 +88,7 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = new MigrationState
             {
-                CurrentProject = project?.Name,
+                CurrentProject = project?.GetRoslynProject().Name,
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
