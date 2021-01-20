@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Build.Construction;
 using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -99,10 +100,6 @@ namespace AspNetMigrator.PackageUpdater
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Unable to restore packages for project {path}", BuildBreakRisk.Unknown);
             }
 
-            // Parse lockfile
-            var lockFile = LockFileUtilities.GetLockFile(restoreOutput.LockFilePath, NuGet.Common.NullLogger.Instance);
-            var lockFileTarget = lockFile.Targets.First(t => t.TargetFramework.DotNetFrameworkName.Equals(_targetFramework.DotNetFrameworkName, StringComparison.Ordinal));
-
             try
             {
                 // Iterate through all package references in the project file
@@ -126,6 +123,7 @@ namespace AspNetMigrator.PackageUpdater
                     }
 
                     // If the package is referenced transitively, mark for removal
+                    var lockFileTarget = GetLockFileTarget(restoreOutput.LockFilePath);
                     if (lockFileTarget.Libraries.Any(l => l.Dependencies.Any(d => ReferenceSatisfiesDependency(d, packageReference, true))))
                     {
                         Logger.LogInformation("Marking package {PackageName} for removal because it appears to be a transitive dependency", packageReference.Name);
@@ -289,6 +287,8 @@ namespace AspNetMigrator.PackageUpdater
 
                 projectRoot.Save();
 
+                await RemoveTransitiveDependenciesAsync(context, token).ConfigureAwait(false);
+
                 // Reload the workspace since, at this point, the project may be different from what was loaded
                 await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
@@ -298,6 +298,49 @@ namespace AspNetMigrator.PackageUpdater
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
                 return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
+            }
+        }
+
+        private async Task RemoveTransitiveDependenciesAsync(IMigrationContext context, CancellationToken token)
+        {
+            // After updating package versions and applying package maps, there may be more transitive dependencies that need removed.
+            // Do a second scan for transitive dependencies and remove any that are found.
+            Logger.LogDebug("Restoring updated packages");
+            var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
+            var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
+            if (restoreOutput.LockFilePath is null)
+            {
+                Logger.LogWarning("Unable to restore packages for project {ProjectPath}", projectRoot.FullPath);
+            }
+            else
+            {
+                var lockFileTarget = GetLockFileTarget(restoreOutput.LockFilePath);
+                var packageReferences = projectRoot.GetAllPackageReferences();
+                var transitiveDependencies = new List<ProjectItemElement>();
+                foreach (var reference in packageReferences)
+                {
+                    if (reference is null)
+                    {
+                        continue;
+                    }
+
+                    var packageReference = reference.AsNuGetReference();
+                    if (lockFileTarget.Libraries.Any(l => l.Dependencies.Any(d => ReferenceSatisfiesDependency(d, packageReference, true))))
+                    {
+                        Logger.LogInformation("Removing {PackageName} because, after package updates, it is included transitively", packageReference.Name);
+                        transitiveDependencies.Add(reference);
+                    }
+                }
+
+                if (transitiveDependencies.Any())
+                {
+                    foreach (var reference in transitiveDependencies)
+                    {
+                        reference.RemoveElement();
+                    }
+
+                    projectRoot.Save();
+                }
             }
         }
 
@@ -426,5 +469,9 @@ namespace AspNetMigrator.PackageUpdater
             // Otherwise, return true
             return true;
         }
+
+        private LockFileTarget GetLockFileTarget(string lockFilePath) =>
+            LockFileUtilities.GetLockFile(lockFilePath, NuGet.Common.NullLogger.Instance)
+                .Targets.First(t => t.TargetFramework.DotNetFrameworkName.Equals(_targetFramework.DotNetFrameworkName, StringComparison.Ordinal));
     }
 }

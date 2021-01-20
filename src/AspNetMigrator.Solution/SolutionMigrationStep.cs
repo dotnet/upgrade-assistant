@@ -37,6 +37,19 @@ namespace AspNetMigrator.Solution
 
             if (project is null)
             {
+                if (await context.GetProjects(token).CountAsync(token).ConfigureAwait(false) == 1)
+                {
+                    var onlyProject = await context.GetProjects(token).SingleAsync(token).ConfigureAwait(false);
+
+                    if (onlyProject is not null)
+                    {
+                        Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project", onlyProject.FilePath);
+                        context.SetProject(onlyProject);
+
+                        return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+                    }
+                }
+
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
             else

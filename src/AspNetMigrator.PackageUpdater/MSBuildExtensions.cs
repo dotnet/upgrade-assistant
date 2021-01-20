@@ -13,12 +13,8 @@ namespace AspNetMigrator.PackageUpdater
         public static NuGetReference AsNuGetReference(this ProjectItemElement item)
         {
             var packageName = item.Include;
-            var packageVersion = (item.Children.FirstOrDefault(c => c.ElementName.Equals(VersionElementName, StringComparison.OrdinalIgnoreCase)) as ProjectMetadataElement)?.Value;
-
-            if (packageVersion is null)
-            {
-                throw new ArgumentException("Cannot convert a PackageReference without a version attribute");
-            }
+            var packageVersion = (item.Children.FirstOrDefault(c => c.ElementName.Equals(VersionElementName, StringComparison.OrdinalIgnoreCase)) as ProjectMetadataElement)?.Value
+                ?? "0.0.0"; // Package references without versions will resolve to the lowest stable version
 
             return new NuGetReference(packageName, packageVersion);
         }
