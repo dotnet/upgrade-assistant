@@ -35,11 +35,11 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = await GetStateAsync(token).ConfigureAwait(false);
 
-            var project = await context.GetProjects(token).FirstOrDefaultAsync(p => p.GetRoslynProject().Name == state.CurrentProject, token).ConfigureAwait(false);
+            var project = context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == state.CurrentProject);
 
             if (project is not null)
             {
-                context.SetProject(project);
+                context.Project = project;
             }
         }
 
@@ -83,15 +83,15 @@ namespace AspNetMigrator.ConsoleApp
             using var stream = File.OpenWrite(_path);
             stream.SetLength(0);
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
             var state = new MigrationState
             {
-                CurrentProject = project?.GetRoslynProject().Name,
+                CurrentProject = NormalizePath(context.Project?.FilePath),
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
         }
+
+        private static string NormalizePath(string? path) => path is null ? string.Empty : Path.GetFileName(path);
 
         private class MigrationState
         {

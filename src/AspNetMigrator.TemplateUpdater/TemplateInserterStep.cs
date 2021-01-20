@@ -74,13 +74,7 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var current = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (current is null)
-            {
-                Logger.LogCritical("No project specified");
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"No project specified", BuildBreakRisk.Unknown);
-            }
+            var current = context.Project.Required();
 
             try
             {
@@ -154,13 +148,7 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-            if (project?.Directory is null)
-            {
-                Logger.LogError("No project path found");
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"No project path found");
-            }
-
+            var project = context.Project.Required();
             var projectFile = project.GetFile();
 
             // For each item to be added, make necessary replacements and then add the item to the project

@@ -120,16 +120,11 @@ namespace AspNetMigrator.SourceUpdater
                 }
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+            var file = context.Project.Required().GetFile();
 
-            if (project is not null)
-            {
-                var file = project.GetFile();
+            file.Simplify();
 
-                file.Simplify();
-
-                await file.SaveAsync(token).ConfigureAwait(false);
-            }
+            await file.SaveAsync(token).ConfigureAwait(false);
 
             Logger.LogDebug("All instances of {DiagnosticId} fixed", DiagnosticId);
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");

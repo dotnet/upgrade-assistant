@@ -8,13 +8,11 @@ namespace AspNetMigrator
 {
     public interface IMigrationContext : IDisposable
     {
-        ValueTask<IProject?> GetProjectAsync(CancellationToken token);
+        IProject? Project { get; set; }
 
-        IAsyncEnumerable<IProject> GetProjects(CancellationToken token);
+        IEnumerable<IProject> Projects { get; }
 
         bool UpdateSolution(Solution updatedSolution);
-
-        void SetProject(IProject? project);
 
         IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
 

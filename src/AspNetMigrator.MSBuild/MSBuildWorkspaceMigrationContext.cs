@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.Extensions.Logging;
@@ -42,28 +41,27 @@ namespace AspNetMigrator.MSBuild
             _workspace = null;
         }
 
-        public ICollection<string> CompletedProjects { get; set; } = Array.Empty<string>();
-
-        public async IAsyncEnumerable<IProject> GetProjects([EnumeratorCancellation] CancellationToken token)
+        public IEnumerable<IProject> Projects
         {
-            var ws = await GetWorkspaceAsync(token).ConfigureAwait(false);
-
-            foreach (var project in ws.CurrentSolution.Projects)
+            get
             {
-                if (project.FilePath is null)
+                if (_workspace is null)
                 {
-                    _logger.LogWarning("Found a project with no file path {Project}", project);
+                    throw new InvalidOperationException("Context has not been initialized");
                 }
-                else
+
+                foreach (var project in _workspace.CurrentSolution.Projects)
                 {
-                    yield return new MSBuildProject(ws, project.FilePath, _logger);
+                    if (project.FilePath is null)
+                    {
+                        _logger.LogWarning("Found a project with no file path {Project}", project);
+                    }
+                    else
+                    {
+                        yield return new MSBuildProject(_workspace, project.FilePath, _logger);
+                    }
                 }
             }
-        }
-
-        public void SetProject(IProject? projectId)
-        {
-            _projectPath = projectId?.FilePath;
         }
 
         private Dictionary<string, string> CreateProperties()
@@ -80,10 +78,10 @@ namespace AspNetMigrator.MSBuild
             return properties;
         }
 
-        public async ValueTask<Workspace> GetWorkspaceAsync(CancellationToken token)
+        public async ValueTask<Workspace> InitializeWorkspace(CancellationToken token)
             => await GetMsBuildWorkspaceAsync(token).ConfigureAwait(false);
 
-        public async ValueTask<MSBuildWorkspace> GetMsBuildWorkspaceAsync(CancellationToken token)
+        private async ValueTask<MSBuildWorkspace> GetMsBuildWorkspaceAsync(CancellationToken token)
         {
             if (_workspace is null)
             {
@@ -120,16 +118,18 @@ namespace AspNetMigrator.MSBuild
         {
             UnloadWorkspace();
 
+            await InitializeWorkspace(token).ConfigureAwait(false);
+
             if (string.IsNullOrWhiteSpace(_projectPath))
             {
                 return;
             }
 
-            await foreach (var project in GetProjects(token))
+            foreach (var project in Projects)
             {
                 if (string.Equals(project.FilePath, _projectPath, StringComparison.OrdinalIgnoreCase))
                 {
-                    SetProject(project);
+                    Project = project;
                     return;
                 }
             }
@@ -152,21 +152,27 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
-        public async ValueTask<IProject?> GetProjectAsync(CancellationToken token)
+        public IProject? Project
         {
-            if (_projectPath is null)
+            get
             {
-                return null;
+                if (_workspace is null)
+                {
+                    throw new InvalidOperationException("Workspace has not been initialized");
+                }
+
+                if (_projectPath is null)
+                {
+                    return null;
+                }
+
+                return new MSBuildProject(_workspace, _projectPath, _logger);
             }
 
-            var ws = await GetWorkspaceAsync(token).ConfigureAwait(false);
-
-            if (ws is not null)
+            set
             {
-                return new MSBuildProject(ws, _projectPath, _logger);
+                _projectPath = value?.FilePath;
             }
-
-            return null;
         }
 
         public bool UpdateSolution(Solution updatedSolution)

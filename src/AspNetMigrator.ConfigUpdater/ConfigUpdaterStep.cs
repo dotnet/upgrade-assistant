@@ -54,12 +54,7 @@ namespace AspNetMigrator.ConfigUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-            if (project is null)
-            {
-                Logger.LogError("No project loaded");
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "No project loaded", Risk);
-            }
+            var project = context.Project.Required();
 
             var configPaths = _configFilePaths.Select(p => Path.Combine(project.Directory ?? string.Empty, p)).Where(p => File.Exists(p));
             Logger.LogDebug("Loading config files: {ConfigFiles}", string.Join(", ", configPaths));

@@ -92,8 +92,8 @@ namespace AspNetMigrator.PackageUpdater
             var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
             {
-                var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-                var path = project!.FilePath;
+                var project = context.Project.Required();
+                var path = project.FilePath;
                 Logger.LogCritical("Unable to restore packages for project {ProjectPath}", path);
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Unable to restore packages for project {path}", BuildBreakRisk.Unknown);
             }
@@ -102,7 +102,7 @@ namespace AspNetMigrator.PackageUpdater
             {
                 // Iterate through all package references in the project file
                 // TODO : Parallelize
-                var projectRoot = await context.GetProjectAsync(token).ConfigureAwait(false);
+                var projectRoot = context.Project;
 
                 if (projectRoot is null)
                 {
@@ -241,12 +241,7 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (project is null)
-            {
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "No project available.");
-            }
+            var project = context.Project.Required();
 
             // TODO : Temporary workaround until the migration analyzers are available on NuGet.org
             // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
@@ -289,12 +284,7 @@ namespace AspNetMigrator.PackageUpdater
             // Do a second scan for transitive dependencies and remove any that are found.
             Logger.LogDebug("Restoring updated packages");
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (project is null)
-            {
-                throw new InvalidOperationException();
-            }
+            var project = context.Project.Required();
 
             var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)

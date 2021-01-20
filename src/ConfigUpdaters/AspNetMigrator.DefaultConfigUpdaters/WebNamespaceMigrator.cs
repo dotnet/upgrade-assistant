@@ -55,12 +55,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
 
             try
             {
-                var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-                if (project is null)
-                {
-                    _logger.LogError("No project loaded");
-                    return false;
-                }
+                var project = context.Project.Required();
 
                 var viewImportsContents = new List<string>(_viewImportsPath is null
                     ? new[] { string.Empty, ViewImportsInitialContent }
@@ -124,12 +119,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
 
             _logger.LogDebug("Found {NamespaceCount} namespaces imported into web pages in config files", namespaces.Count);
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (project is null)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
+            var project = context.Project.Required();
 
             var alreadyImportedNamespaces = new List<string>();
             _viewImportsPath = project.FindFiles(ProjectItemType.Content, ViewImportsRelativePath).FirstOrDefault();

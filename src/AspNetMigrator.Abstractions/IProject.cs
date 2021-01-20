@@ -5,7 +5,7 @@ namespace AspNetMigrator
 {
     public interface IProject
     {
-        string? Directory { get; }
+        string Directory { get; }
 
         string FilePath { get; }
 

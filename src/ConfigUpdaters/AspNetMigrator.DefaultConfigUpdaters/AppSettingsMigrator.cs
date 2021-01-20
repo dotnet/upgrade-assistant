@@ -44,12 +44,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-            if (project is null)
-            {
-                _logger.LogError("No project loaded");
-                return false;
-            }
+            var project = context.Project.Required();
 
             // Determine where appsettings.json should live
             var appSettingsPath = Path.Combine(project.Directory ?? string.Empty, AppSettingsJsonFileName);
@@ -115,7 +110,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
             return true;
         }
 
-        public async Task<bool> IsApplicableAsync(IMigrationContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IMigrationContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
             if (context is null)
             {
@@ -145,12 +140,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
                 }
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (project is null)
-            {
-                throw new InvalidOperationException();
-            }
+            var project = context.Project.Required();
 
             var jsonConfigFiles = project.FindFiles(ProjectItemType.Content, AppSettingsFileRegex)
                 .Select(f => new AppSettingsFile(f))
@@ -171,7 +161,9 @@ namespace AspNetMigrator.DefaultConfigUpdaters
 
             _logger.LogInformation("Found {AppSettingCount} app settings for migration: {AppSettingNames}", _appSettingsToMigrate.Count, string.Join(", ", _appSettingsToMigrate.Keys));
 
-            return _appSettingsToMigrate.Count > 0;
+            var result = _appSettingsToMigrate.Count > 0;
+
+            return Task.FromResult(result);
         }
     }
 }

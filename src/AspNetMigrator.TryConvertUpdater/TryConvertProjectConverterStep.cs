@@ -51,8 +51,7 @@ namespace AspNetMigrator.TryConvertUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-            var projectPath = project?.GetRoslynProject().FilePath;
+            var projectPath = context.Project.Required().FilePath;
 
             if (!File.Exists(projectPath))
             {
@@ -107,20 +106,17 @@ namespace AspNetMigrator.TryConvertUpdater
             }
         }
 
-        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+            => Task.FromResult(InitializeImpl(context));
+
+        private MigrationStepInitializeResult InitializeImpl(IMigrationContext context)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (project is null)
-            {
-                Logger.LogCritical("No project specified");
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "No project specified", BuildBreakRisk.Unknown);
-            }
+            var project = context.Project.Required();
 
             if (!File.Exists(_tryConvertPath))
             {

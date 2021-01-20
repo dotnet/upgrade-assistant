@@ -69,13 +69,7 @@ namespace AspNetMigrator.SourceUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            Project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (Project is null)
-            {
-                Logger.LogCritical("No project specified");
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"No project specified", BuildBreakRisk.Unknown);
-            }
+            Project = context.Project.Required();
 
             var projectPath = Project.FilePath;
 

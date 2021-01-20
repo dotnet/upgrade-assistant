@@ -75,7 +75,8 @@ namespace AspNetMigrator.ConsoleApp
         private async Task RunReplAsync(CancellationToken token)
         {
             using var scope = _services.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<IMigrationContext>();
+            var contextFactory = scope.ServiceProvider.GetRequiredService<IMigrationContextFactory>();
+            var context = await contextFactory.CreateContext(token);
             var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
             var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
             var stateManager = scope.ServiceProvider.GetRequiredService<IMigrationStateManager>();
@@ -112,7 +113,7 @@ namespace AspNetMigrator.ConsoleApp
                 _io.Output.WriteLine();
 
                 // Once a project has completed, we can remove it from the context.
-                context.SetProject(null);
+                context.Project = null;
 
                 _logger.LogInformation("Migration has completed. Please review any changes.");
             }

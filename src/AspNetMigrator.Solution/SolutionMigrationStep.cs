@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Solution
@@ -26,28 +24,28 @@ namespace AspNetMigrator.Solution
             Title = "Identify solution conversion order";
         }
 
-        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+            => Task.FromResult(InitializeImpl(context));
+
+        private MigrationStepInitializeResult InitializeImpl(IMigrationContext context)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
-
-            if (project is null)
+            if (context.Project is null)
             {
-                if (await context.GetProjects(token).CountAsync(token).ConfigureAwait(false) == 1)
+                var projects = context.Projects.ToList();
+
+                if (projects.Count == 1)
                 {
-                    var onlyProject = await context.GetProjects(token).SingleAsync(token).ConfigureAwait(false);
+                    var onlyProject = projects[0];
 
-                    if (onlyProject is not null)
-                    {
-                        Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project", onlyProject.FilePath);
-                        context.SetProject(onlyProject);
+                    Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project", onlyProject.FilePath);
+                    context.Project = onlyProject;
 
-                        return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
-                    }
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
                 }
 
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
@@ -73,7 +71,7 @@ namespace AspNetMigrator.Solution
             }
             else
             {
-                context.SetProject(selectedProject);
+                context.Project = selectedProject;
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }
@@ -94,7 +92,7 @@ namespace AspNetMigrator.Solution
             const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            var allProjects = await context.GetProjects(token).OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToListAsync(cancellationToken: token).ConfigureAwait(false);
+            var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();
             var entrypoint = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
 
             var ordered = entrypoint.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);

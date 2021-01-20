@@ -18,20 +18,22 @@ namespace AspNetMigrator.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<RestoreOutput> RestorePackagesAsync(bool logRestoreOutput, IMigrationContext context, CancellationToken token)
+        public Task<RestoreOutput> RestorePackagesAsync(bool logRestoreOutput, IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (await context.GetProjectAsync(token).ConfigureAwait(false) is not MSBuildProject project)
+            if (context.Project is not MSBuildProject project)
             {
                 throw new ArgumentException("Migration context must include a valid project before restoring packages");
             }
 
             // Create a project instance and run MSBuild /t:Restore
-            return RestorePackages(new ProjectInstance(project.GetFile().ProjectRoot), logRestoreOutput);
+            var result = RestorePackages(new ProjectInstance(project.GetFile().ProjectRoot), logRestoreOutput);
+
+            return Task.FromResult(result);
         }
 
         public RestoreOutput RestorePackages(ProjectInstance project, bool logRestoreOutput)
