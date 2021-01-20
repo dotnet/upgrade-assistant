@@ -25,16 +25,13 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var rootElement = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
-
-            if (rootElement is null)
+            if (await context.GetProjectAsync(token).ConfigureAwait(false) is not MSBuildProject project)
             {
                 throw new ArgumentException("Migration context must include a valid project before restoring packages");
             }
 
             // Create a project instance and run MSBuild /t:Restore
-            var project = new ProjectInstance(rootElement);
-            return RestorePackages(project, logRestoreOutput);
+            return RestorePackages(new ProjectInstance(project.GetFile().ProjectRoot), logRestoreOutput);
         }
 
         public RestoreOutput RestorePackages(ProjectInstance project, bool logRestoreOutput)

@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Construction;
-using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Configuration;
@@ -31,7 +29,6 @@ namespace AspNetMigrator.PackageUpdater
     public class PackageUpdaterStep : MigrationStep
     {
         private const string AnalyzerPackageName = "AspNetMigrator.Analyzers";
-        private const string PackageReferenceType = "PackageReference";
         private const string PackageMapExtension = "*.json";
 
         private readonly string? _analyzerPackageSource;
@@ -95,7 +92,8 @@ namespace AspNetMigrator.PackageUpdater
             var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
             {
-                var path = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+                var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+                var path = project!.FilePath;
                 Logger.LogCritical("Unable to restore packages for project {ProjectPath}", path);
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Unable to restore packages for project {path}", BuildBreakRisk.Unknown);
             }
@@ -104,16 +102,21 @@ namespace AspNetMigrator.PackageUpdater
             {
                 // Iterate through all package references in the project file
                 // TODO : Parallelize
-                var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
-                var packageReferences = projectRoot.GetAllPackageReferences();
-                foreach (var reference in packageReferences)
-                {
-                    var packageReference = reference.AsNuGetReference();
+                var projectRoot = await context.GetProjectAsync(token).ConfigureAwait(false);
 
+                if (projectRoot is null)
+                {
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "No project available", BuildBreakRisk.None);
+                }
+
+                var packageReferences = projectRoot.PackageReferences;
+
+                foreach (var packageReference in packageReferences)
+                {
                     // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
                     var highestVersion = packageReferences
-                        .Where(r => r.Include.Equals(packageReference.Name, StringComparison.OrdinalIgnoreCase))
-                        .Select(r => r.AsNuGetReference().GetNuGetVersion())
+                        .Where(r => r.Name.Equals(packageReference.Name, StringComparison.OrdinalIgnoreCase))
+                        .Select(r => r.GetNuGetVersion())
                         .Max();
                     if (highestVersion > packageReference.GetNuGetVersion())
                     {
@@ -179,7 +182,7 @@ namespace AspNetMigrator.PackageUpdater
                 }
 
                 // If the project doesn't include a reference to the analyzer package, mark it for addition
-                if (!packageReferences.Any(r => AnalyzerPackageName.Equals(r.Include, StringComparison.OrdinalIgnoreCase)))
+                if (!packageReferences.Any(r => AnalyzerPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     // Use the analyzer package version from configuration if specified, otherwise get the latest version.
                     // When looking for the latest analyzer version, use the analyzer package source from configuration
@@ -202,7 +205,7 @@ namespace AspNetMigrator.PackageUpdater
                     Logger.LogDebug("Reference to analyzer package ({AnalyzerPackageName}) already exists", AnalyzerPackageName);
                 }
             }
-            catch (InvalidProjectFileException)
+            catch (Exception)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}", BuildBreakRisk.Unknown);
@@ -238,14 +241,19 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+
+            if (project is null)
+            {
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "No project available.");
+            }
 
             // TODO : Temporary workaround until the migration analyzers are available on NuGet.org
             // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
             if (_analyzerPackageSource is not null && !_packageLoader.PackageSources.Contains(_analyzerPackageSource))
             {
                 // Get or create a local NuGet.config file
-                var localNuGetSettings = new Settings(projectRoot.DirectoryPath);
+                var localNuGetSettings = new Settings(Path.GetDirectoryName(project.GetRoslynProject().FilePath));
 
                 // Add the analyzer package's source to the config file's sources
                 localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("migrationAnalyzerSource", _analyzerPackageSource));
@@ -254,38 +262,12 @@ namespace AspNetMigrator.PackageUpdater
 
             try
             {
-                // Check each reference to see if it's one that should be removed
-                foreach (var referenceItem in projectRoot.GetAllPackageReferences())
-                {
-                    var reference = referenceItem.AsNuGetReference();
-                    if (_packagesToRemove.Contains(reference))
-                    {
-                        Logger.LogInformation("Removing outdated packaged reference: {PackageReference}", reference);
-                        referenceItem.RemoveElement();
-                    }
-                }
+                var projectFile = project.GetFile();
 
-                // Find a place to add new package references
-                var packageReferenceItemGroup = projectRoot.ItemGroups.FirstOrDefault(g => g.Items.Any(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase)));
-                if (packageReferenceItemGroup is null)
-                {
-                    Logger.LogDebug("Creating a new ItemGroup for package references");
-                    packageReferenceItemGroup = projectRoot.CreateItemGroupElement();
-                    projectRoot.AppendChild(packageReferenceItemGroup);
-                }
-                else
-                {
-                    Logger.LogDebug("Found ItemGroup for package references");
-                }
+                projectFile.RemovePackages(_packagesToRemove);
+                projectFile.AddPackages(_packagesToAdd.Distinct());
 
-                // Add replacement packages
-                foreach (var newReference in _packagesToAdd.Distinct())
-                {
-                    Logger.LogInformation("Adding package reference to: {PackageReference}", newReference);
-                    projectRoot.AddPackageReference(packageReferenceItemGroup, newReference);
-                }
-
-                projectRoot.Save();
+                await projectFile.SaveAsync(token).ConfigureAwait(false);
 
                 await RemoveTransitiveDependenciesAsync(context, token).ConfigureAwait(false);
 
@@ -294,7 +276,7 @@ namespace AspNetMigrator.PackageUpdater
 
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Packages updated");
             }
-            catch (InvalidProjectFileException)
+            catch (Exception)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
                 return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
@@ -306,40 +288,42 @@ namespace AspNetMigrator.PackageUpdater
             // After updating package versions and applying package maps, there may be more transitive dependencies that need removed.
             // Do a second scan for transitive dependencies and remove any that are found.
             Logger.LogDebug("Restoring updated packages");
-            var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
+
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+
+            if (project is null)
+            {
+                throw new InvalidOperationException();
+            }
+
             var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
             {
-                Logger.LogWarning("Unable to restore packages for project {ProjectPath}", projectRoot.FullPath);
+                Logger.LogWarning("Unable to restore packages for project {ProjectPath}", project.FilePath);
             }
             else
             {
                 var lockFileTarget = GetLockFileTarget(restoreOutput.LockFilePath);
-                var packageReferences = projectRoot.GetAllPackageReferences();
-                var transitiveDependencies = new List<ProjectItemElement>();
+
+                var packageReferences = project.PackageReferences;
+                var transitiveDependencies = new List<NuGetReference>();
+
                 foreach (var reference in packageReferences)
                 {
-                    if (reference is null)
+                    if (lockFileTarget.Libraries.Any(l => l.Dependencies.Any(d => ReferenceSatisfiesDependency(d, reference, true))))
                     {
-                        continue;
-                    }
-
-                    var packageReference = reference.AsNuGetReference();
-                    if (lockFileTarget.Libraries.Any(l => l.Dependencies.Any(d => ReferenceSatisfiesDependency(d, packageReference, true))))
-                    {
-                        Logger.LogInformation("Removing {PackageName} because, after package updates, it is included transitively", packageReference.Name);
+                        Logger.LogInformation("Removing {PackageName} because, after package updates, it is included transitively", reference.Name);
                         transitiveDependencies.Add(reference);
                     }
                 }
 
                 if (transitiveDependencies.Any())
                 {
-                    foreach (var reference in transitiveDependencies)
-                    {
-                        reference.RemoveElement();
-                    }
+                    var file = project.GetFile();
 
-                    projectRoot.Save();
+                    file.RemovePackages(transitiveDependencies);
+
+                    await file.SaveAsync(token).ConfigureAwait(false);
                 }
             }
         }

@@ -223,3 +223,6 @@ dotnet_diagnostic.SA1118.severity = none
 
 # CA1303: Do not pass literals as localized parameters
 dotnet_diagnostic.CA1303.severity = none
+
+# CA2225: Operator overloads have named alternatives
+dotnet_diagnostic.CA2225.severity = none

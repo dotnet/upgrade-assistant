@@ -5,10 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using System.Xml.XPath;
 using AspNetMigrator.ConfigUpdater;
-using Microsoft.Build.Evaluation;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.DefaultConfigUpdaters
@@ -19,7 +17,6 @@ namespace AspNetMigrator.DefaultConfigUpdaters
         private const string AddElementName = "add";
         private const string NamespaceAttributeName = "namespace";
         private const string ViewImportsRelativePath = @"Views\_ViewImports.cshtml";
-        private const string ContentItemType = "Content";
         private const string ViewImportsInitialContent = "@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers";
         private const string RazorUsingPrefix = "@using ";
 
@@ -127,22 +124,23 @@ namespace AspNetMigrator.DefaultConfigUpdaters
 
             _logger.LogDebug("Found {NamespaceCount} namespaces imported into web pages in config files", namespaces.Count);
 
-            // Look for a _ViewImports.cstml to see whether any of the namespaces are already imported
-            using var projectCollection = new ProjectCollection();
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+
+            if (project is null)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
             var alreadyImportedNamespaces = new List<string>();
-            var project = projectCollection.LoadProject(await context.GetProjectPathAsync(token).ConfigureAwait(false));
-            var viewImports = project.Items.Where(i => i.ItemType.Equals(ContentItemType) && i.EvaluatedInclude.EndsWith(ViewImportsRelativePath, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-            if (viewImports is null)
+            _viewImportsPath = project.FindFiles(ProjectItemType.Content, ViewImportsRelativePath).FirstOrDefault();
+
+            // Look for a _ViewImports.cstml to see whether any of the namespaces are already imported
+            if (_viewImportsPath is null)
             {
                 _logger.LogDebug("No _ViewImports.cshtml found in project");
-                _viewImportsPath = null;
             }
             else
             {
-                _viewImportsPath = Path.IsPathFullyQualified(viewImports.EvaluatedInclude)
-                    ? viewImports.EvaluatedInclude
-                    : Path.Combine(Path.GetDirectoryName(project.FullPath) ?? string.Empty, viewImports.EvaluatedInclude);
-
                 alreadyImportedNamespaces.AddRange((await File.ReadAllLinesAsync(_viewImportsPath, token).ConfigureAwait(false))
                     .Select(line => line.Trim())
                     .Where(line => line.StartsWith(RazorUsingPrefix, StringComparison.Ordinal))

@@ -7,10 +7,8 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using System.Xml.XPath;
 using AspNetMigrator.ConfigUpdater;
-using Microsoft.Build.Evaluation;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.DefaultConfigUpdaters
@@ -71,44 +69,47 @@ namespace AspNetMigrator.DefaultConfigUpdaters
             // Write an updated appsettings.json file including the previous properties and new ones for the new app settings properties
             using var fs = new FileStream(appSettingsPath, FileMode.Create, FileAccess.Write);
             using var jsonWriter = new Utf8JsonWriter(fs, new JsonWriterOptions { Indented = true });
-            jsonWriter.WriteStartObject();
-            foreach (var property in existingProperties)
             {
-                property.WriteTo(jsonWriter);
-            }
+                jsonWriter.WriteStartObject();
+                foreach (var property in existingProperties)
+                {
+                    property.WriteTo(jsonWriter);
+                }
 
-            foreach (var setting in _appSettingsToMigrate)
-            {
-                if (bool.TryParse(setting.Value, out var boolValue))
+                foreach (var setting in _appSettingsToMigrate)
                 {
-                    jsonWriter.WriteBoolean(setting.Key, boolValue);
+                    if (bool.TryParse(setting.Value, out var boolValue))
+                    {
+                        jsonWriter.WriteBoolean(setting.Key, boolValue);
+                    }
+                    else if (long.TryParse(setting.Value, out var longValue))
+                    {
+                        jsonWriter.WriteNumber(setting.Key, longValue);
+                    }
+                    else if (double.TryParse(setting.Value, out var doubleValue))
+                    {
+                        jsonWriter.WriteNumber(setting.Key, doubleValue);
+                    }
+                    else
+                    {
+                        jsonWriter.WriteString(setting.Key, setting.Value);
+                    }
                 }
-                else if (long.TryParse(setting.Value, out var longValue))
-                {
-                    jsonWriter.WriteNumber(setting.Key, longValue);
-                }
-                else if (double.TryParse(setting.Value, out var doubleValue))
-                {
-                    jsonWriter.WriteNumber(setting.Key, doubleValue);
-                }
-                else
-                {
-                    jsonWriter.WriteString(setting.Key, setting.Value);
-                }
-            }
 
-            jsonWriter.WriteEndObject();
+                jsonWriter.WriteEndObject();
+            }
 
             // Make sure the project is reloaded in case the appsettings.json file was added in this apply step
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
             // Confirm that the appsettings.json file is included in the project. In rare cases (auto-include disabled),
             // it may be necessary to add it explicitly
-            if (project.ContainsItem(appSettingsPath, ProjectItemType.Content, token))
+            var file = project.GetFile();
+
+            if (!file.ContainsItem(appSettingsPath, ProjectItemType.Content, token))
             {
-                var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
-                projectRoot.AddItem(ProjectItemType.Content.Name, appSettingsPath);
-                projectRoot.Save();
+                file.AddItem(ProjectItemType.Content.Name, appSettingsPath);
+                await file.SaveAsync(token).ConfigureAwait(false);
             }
 
             return true;
@@ -144,14 +145,21 @@ namespace AspNetMigrator.DefaultConfigUpdaters
                 }
             }
 
-            // Check for existing appSettings.json files for app settings
-            using var projectCollection = new ProjectCollection();
-            var project = projectCollection.LoadProject(await context.GetProjectPathAsync(token).ConfigureAwait(false));
-            var jsonConfigFiles = await GetAppSettingsConfigFilesAsync(project, token).ConfigureAwait(false);
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
 
+            if (project is null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            var jsonConfigFiles = project.FindFiles(ProjectItemType.Content, AppSettingsFileRegex)
+                .Select(f => new AppSettingsFile(f))
+                .ToList();
+
+            // Check for existing appSettings.json files for app settings
             foreach (var setting in appSettings)
             {
-                if (!jsonConfigFiles.Values.Any(s => ConfigFileContainsElement(s, setting.Key)))
+                if (!jsonConfigFiles.Any(s => !string.IsNullOrEmpty(s.Configuration[setting.Key])))
                 {
                     _appSettingsToMigrate.Add(setting.Key, setting.Value);
                 }
@@ -164,36 +172,6 @@ namespace AspNetMigrator.DefaultConfigUpdaters
             _logger.LogInformation("Found {AppSettingCount} app settings for migration: {AppSettingNames}", _appSettingsToMigrate.Count, string.Join(", ", _appSettingsToMigrate.Keys));
 
             return _appSettingsToMigrate.Count > 0;
-        }
-
-        private static bool ConfigFileContainsElement(JsonDocument doc, string elementName) =>
-            doc.RootElement.EnumerateObject().Any(p => p.Name.Equals(elementName, StringComparison.OrdinalIgnoreCase));
-
-        private static async Task<Dictionary<string, JsonDocument>> GetAppSettingsConfigFilesAsync(Project project, CancellationToken token)
-        {
-            var ret = new Dictionary<string, JsonDocument>();
-            foreach (var configFile in project.Items.Where(i => i.ItemType.Equals(ProjectItemType.Content.Name, StringComparison.OrdinalIgnoreCase) && AppSettingsFileRegex.IsMatch(Path.GetFileName(i.EvaluatedInclude))))
-            {
-                var projectDir = Path.GetDirectoryName(project.FullPath)!;
-                var filePath = Path.IsPathFullyQualified(configFile.EvaluatedInclude) ?
-                    configFile.EvaluatedInclude :
-                    Path.Combine(projectDir, configFile.EvaluatedInclude);
-
-                if (!File.Exists(filePath) || ret.ContainsKey(filePath))
-                {
-                    continue;
-                }
-
-                var jsonOptions = new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = true,
-                    CommentHandling = JsonCommentHandling.Skip
-                };
-                using var fs = File.OpenRead(filePath);
-                ret.Add(filePath, await JsonDocument.ParseAsync(fs, jsonOptions, token).ConfigureAwait(false));
-            }
-
-            return ret;
         }
     }
 }

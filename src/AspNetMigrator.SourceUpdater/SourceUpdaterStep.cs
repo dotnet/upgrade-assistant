@@ -69,17 +69,17 @@ namespace AspNetMigrator.SourceUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+            Project = await context.GetProjectAsync(token).ConfigureAwait(false);
 
-            if (!File.Exists(projectPath))
+            if (Project is null)
             {
-                Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found", BuildBreakRisk.Unknown);
+                Logger.LogCritical("No project specified");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"No project specified", BuildBreakRisk.Unknown);
             }
 
-            Logger.LogDebug("Opening project {ProjectPath}", projectPath);
+            var projectPath = Project.FilePath;
 
-            Project = await context.GetProjectAsync(token).ConfigureAwait(false);
+            Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
             await GetDiagnosticsAsync(context, token).ConfigureAwait(false);
 

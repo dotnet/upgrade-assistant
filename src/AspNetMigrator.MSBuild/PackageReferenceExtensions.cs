@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Build.Construction;
 
-namespace AspNetMigrator.PackageUpdater
+namespace AspNetMigrator.MSBuild
 {
-    internal static class MSBuildExtensions
+    internal static class PackageReferenceExtensions
     {
         private const string PackageReferenceType = "PackageReference";
         private const string VersionElementName = "Version";
@@ -19,6 +19,17 @@ namespace AspNetMigrator.PackageUpdater
             return new NuGetReference(packageName, packageVersion);
         }
 
+        public static void RemovePackage(this ProjectRootElement projectRoot, NuGetReference package)
+        {
+            var element = projectRoot.GetAllPackageReferences()
+                .FirstOrDefault(p => package.Equals(p.AsNuGetReference()));
+
+            if (element is not null)
+            {
+                element.RemoveElement();
+            }
+        }
+
         public static void AddPackageReference(this ProjectRootElement projectRoot, ProjectItemGroupElement itemGroup, NuGetReference packageReference)
         {
             var newItemElement = projectRoot.CreateItemElement(PackageReferenceType, packageReference.Name);
@@ -26,7 +37,8 @@ namespace AspNetMigrator.PackageUpdater
             newItemElement.AddMetadata(VersionElementName, packageReference.Version, true);
         }
 
-        public static IEnumerable<ProjectItemElement> GetAllPackageReferences(this ProjectRootElement projectRoot) => projectRoot.Items.Where(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase));
+        public static IEnumerable<ProjectItemElement> GetAllPackageReferences(this ProjectRootElement projectRoot)
+            => projectRoot.Items.Where(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase));
 
         public static void RemoveElement(this ProjectElement element)
         {

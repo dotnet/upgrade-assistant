@@ -120,9 +120,16 @@ namespace AspNetMigrator.SourceUpdater
                 }
             }
 
-            // TEMPORARY WORKAROUND
-            // https://github.com/dotnet/roslyn/issues/36781
-            (await context.GetProjectRootElementAsync(token).ConfigureAwait(false)).WorkAroundRoslynIssue36781();
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
+
+            if (project is not null)
+            {
+                var file = project.GetFile();
+
+                file.Simplify();
+
+                await file.SaveAsync(token).ConfigureAwait(false);
+            }
 
             Logger.LogDebug("All instances of {DiagnosticId} fixed", DiagnosticId);
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");

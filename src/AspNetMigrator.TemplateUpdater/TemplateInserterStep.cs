@@ -74,18 +74,18 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+            var current = await context.GetProjectAsync(token).ConfigureAwait(false);
 
-            if (projectPath is null || !File.Exists(projectPath))
+            if (current is null)
             {
-                Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found", BuildBreakRisk.Unknown);
+                Logger.LogCritical("No project specified");
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"No project specified", BuildBreakRisk.Unknown);
             }
 
             try
             {
                 using var projectCollection = new ProjectCollection();
-                var project = projectCollection.LoadProject(projectPath);
+                var project = projectCollection.LoadProject(current.FilePath);
 
                 var isWebApp = IsWebApp(project);
 
@@ -142,8 +142,8 @@ namespace AspNetMigrator.TemplateUpdater
             }
             catch (InvalidProjectFileException)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", projectPath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {projectPath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical("Invalid project: {ProjectPath}", current.FilePath);
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {current.FilePath}", BuildBreakRisk.Unknown);
             }
         }
 
@@ -161,7 +161,7 @@ namespace AspNetMigrator.TemplateUpdater
                 return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"No project path found");
             }
 
-            var projectRoot = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
+            var projectFile = project.GetFile();
 
             // For each item to be added, make necessary replacements and then add the item to the project
             foreach (var item in _itemsToAdd.Values)
@@ -171,13 +171,13 @@ namespace AspNetMigrator.TemplateUpdater
                 // If the file already exists, move it
                 if (File.Exists(filePath))
                 {
-                    RenameFile(filePath, projectRoot);
+                    projectFile.RenameFile(filePath);
                 }
 
                 // Get the contents of the template file
                 try
                 {
-                    var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectRoot.FullPath);
+                    var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectFile.FilePath);
 #pragma warning disable CA2000 // Dispose objects before losing scope
                     using var templateStream = File.Open(item.TemplateFilePath, FileMode.Open, FileAccess.Read);
                     using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
@@ -191,16 +191,16 @@ namespace AspNetMigrator.TemplateUpdater
                     return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Template file not found: {item.TemplateFilePath}");
                 }
 
-                if (!project.ContainsItem(item.Path, item.Type, token))
+                if (!projectFile.ContainsItem(item.Path, item.Type, token))
                 {
                     // Add the new item to the project if it wasn't auto-included
-                    projectRoot.AddItem(item.Type.Name, item.Path);
+                    projectFile.AddItem(item.Type.Name, item.Path);
                 }
 
                 Logger.LogInformation("Added {ItemName} to the project from template file", item.Path);
             }
 
-            projectRoot.Save();
+            await projectFile.SaveAsync(token).ConfigureAwait(false);
 
             // Reload the workspace since, at this point, the project may be different from what was loaded
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
@@ -341,34 +341,6 @@ namespace AspNetMigrator.TemplateUpdater
                 Logger.LogError("Error deserializing template configuration file: {TemplateConfigPath}", path);
                 return null;
             }
-        }
-
-        private void RenameFile(string filePath, ProjectRootElement project)
-        {
-            var fileName = Path.GetFileName(filePath);
-            var backupName = $"{Path.GetFileNameWithoutExtension(fileName)}.old{Path.GetExtension(fileName)}";
-            var counter = 0;
-            while (File.Exists(backupName))
-            {
-                backupName = $"{Path.GetFileNameWithoutExtension(fileName)}.old.{counter++}{Path.GetExtension(fileName)}";
-            }
-
-            Logger.LogInformation("File already exists, moving {FileName} to {BackupFileName}", fileName, backupName);
-
-            // Even though the file may not make sense in the migrated project,
-            // don't remove the file from the project because the user will probably want to migrate some of the code manually later
-            // so it's useful to leave it in the project so that the migration need is clearly visible.
-            foreach (var item in project.Items.Where(i => i.Include.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
-            {
-                item.Include = backupName;
-            }
-
-            foreach (var item in project.Items.Where(i => i.Update.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
-            {
-                item.Update = backupName;
-            }
-
-            File.Move(filePath, Path.Combine(Path.GetDirectoryName(filePath)!, backupName));
         }
     }
 }

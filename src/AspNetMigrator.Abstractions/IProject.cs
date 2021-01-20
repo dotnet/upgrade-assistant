@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 
 namespace AspNetMigrator
@@ -8,12 +7,16 @@ namespace AspNetMigrator
     {
         string? Directory { get; }
 
-        string? FilePath { get; }
+        string FilePath { get; }
 
         Project GetRoslynProject();
 
         IEnumerable<IProject> ProjectReferences { get; }
 
-        bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token);
+        IEnumerable<NuGetReference> PackageReferences { get; }
+
+        IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher);
+
+        IProjectFile GetFile();
     }
 }

@@ -18,7 +18,7 @@ namespace AspNetMigrator.MSBuild
         private readonly string _path;
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
 
-        private ProjectId? _projectId;
+        private string? _projectPath;
         private MSBuildWorkspace? _workspace;
 
         public MSBuildWorkspaceMigrationContext(
@@ -48,23 +48,22 @@ namespace AspNetMigrator.MSBuild
         {
             var ws = await GetWorkspaceAsync(token).ConfigureAwait(false);
 
-            foreach (var projectId in ws.CurrentSolution.ProjectIds)
+            foreach (var project in ws.CurrentSolution.Projects)
             {
-                yield return new MSBuildProject(ws, projectId);
+                if (project.FilePath is null)
+                {
+                    _logger.LogWarning("Found a project with no file path {Project}", project);
+                }
+                else
+                {
+                    yield return new MSBuildProject(ws, project.FilePath, _logger);
+                }
             }
-        }
-
-        public async ValueTask<ProjectId?> GetProjectIdAsync(CancellationToken token)
-        {
-            // Ensure workspace is available
-            await GetWorkspaceAsync(token).ConfigureAwait(false);
-
-            return _projectId;
         }
 
         public void SetProject(IProject? projectId)
         {
-            _projectId = projectId?.GetRoslynProject().Id;
+            _projectPath = projectId?.FilePath;
         }
 
         private Dictionary<string, string> CreateProperties()
@@ -101,7 +100,7 @@ namespace AspNetMigrator.MSBuild
                 {
                     var project = await workspace.OpenProjectAsync(_path, cancellationToken: token).ConfigureAwait(false);
 
-                    _projectId = project.Id;
+                    _projectPath = project.FilePath;
                 }
 
                 _workspace = workspace;
@@ -119,25 +118,16 @@ namespace AspNetMigrator.MSBuild
 
         public async ValueTask ReloadWorkspaceAsync(CancellationToken token)
         {
-            var current = await GetProjectAsync(token).ConfigureAwait(false);
-
-            if (current is null)
-            {
-                return;
-            }
-
-            var projectPath = current.GetRoslynProject().FilePath;
-
             UnloadWorkspace();
 
-            if (string.IsNullOrWhiteSpace(projectPath))
+            if (string.IsNullOrWhiteSpace(_projectPath))
             {
                 return;
             }
 
             await foreach (var project in GetProjects(token))
             {
-                if (string.Equals(project.GetRoslynProject().FilePath, projectPath, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(project.FilePath, _projectPath, StringComparison.OrdinalIgnoreCase))
                 {
                     SetProject(project);
                     return;
@@ -164,7 +154,7 @@ namespace AspNetMigrator.MSBuild
 
         public async ValueTask<IProject?> GetProjectAsync(CancellationToken token)
         {
-            if (_projectId is null)
+            if (_projectPath is null)
             {
                 return null;
             }
@@ -173,12 +163,7 @@ namespace AspNetMigrator.MSBuild
 
             if (ws is not null)
             {
-                var project = ws.CurrentSolution.GetProject(_projectId);
-
-                if (project is not null)
-                {
-                    return new MSBuildProject(ws, _projectId);
-                }
+                return new MSBuildProject(ws, _projectPath, _logger);
             }
 
             return null;

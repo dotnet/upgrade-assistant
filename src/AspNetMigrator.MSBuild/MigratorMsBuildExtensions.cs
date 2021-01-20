@@ -27,7 +27,7 @@ namespace AspNetMigrator
         // since Roslyn always adds an explicit include regardless of whether the new file
         // would be picked up by a globbing pattern. Until that is fixed, this workaround
         // cleans up extra explicit include items that duplicate globbing patterns.
-        public static void WorkAroundRoslynIssue36781(this ProjectRootElement rootElement)
+        internal static void WorkAroundRoslynIssue36781(this ProjectRootElement rootElement)
         {
             if (rootElement is null)
             {

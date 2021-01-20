@@ -13,7 +13,6 @@ namespace AspNetMigrator.TryConvertUpdater
 {
     public class TryConvertProjectConverterStep : MigrationStep
     {
-        private const string DefaultSDK = "Microsoft.NET.Sdk";
         private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion -p \"{0}\"";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
@@ -115,11 +114,11 @@ namespace AspNetMigrator.TryConvertUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = await context.GetProjectPathAsync(token).ConfigureAwait(false);
+            var project = await context.GetProjectAsync(token).ConfigureAwait(false);
 
-            if (projectPath is null)
+            if (project is null)
             {
-                Logger.LogCritical("No project path specified");
+                Logger.LogCritical("No project specified");
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "No project specified", BuildBreakRisk.Unknown);
             }
 
@@ -129,26 +128,26 @@ namespace AspNetMigrator.TryConvertUpdater
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert", BuildBreakRisk.Unknown);
             }
 
+            var projectFile = project.GetFile();
+
             try
             {
-                var project = await context.GetProjectRootElementAsync(token).ConfigureAwait(false);
-
                 // SDK-style projects should reference the Microsoft.NET.Sdk SDK
-                if (project.Sdk is null || !project.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase))
+                if (!projectFile.IsSdk)
                 {
-                    Logger.LogDebug("Project {ProjectPath} not yet converted", projectPath);
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"Project {projectPath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project and retarget it to .NET Core/Standard: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath)}", BuildBreakRisk.High);
+                    Logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project and retarget it to .NET Core/Standard: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectFile.FilePath)}", BuildBreakRisk.High);
                 }
                 else
                 {
-                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectPath, project.Sdk);
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {project.Sdk} SDK", BuildBreakRisk.None);
+                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.TargetSdk);
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {projectFile.TargetSdk} SDK", BuildBreakRisk.None);
                 }
             }
             catch (InvalidProjectFileException exc)
             {
-                Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectPath, exc.ToString());
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Failed to open project {projectPath}", BuildBreakRisk.Unknown);
+                Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectFile.FilePath, exc.ToString());
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
             }
         }
 
