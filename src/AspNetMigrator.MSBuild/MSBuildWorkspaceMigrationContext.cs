@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -11,14 +10,29 @@ using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.MSBuild
 {
-    public sealed class MSBuildWorkspaceMigrationContext : IMigrationContext, IDisposable
+    internal sealed class MSBuildWorkspaceMigrationContext : IMigrationContext, IDisposable
     {
         private readonly IVisualStudioFinder _vsFinder;
         private readonly string _path;
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
+        private readonly Dictionary<string, MSBuildProject> _projectCache;
 
         private string? _projectPath;
+
         private MSBuildWorkspace? _workspace;
+
+        public MSBuildWorkspace Workspace
+        {
+            get
+            {
+                if (_workspace is null)
+                {
+                    throw new InvalidOperationException("No workspace available.");
+                }
+
+                return _workspace;
+            }
+        }
 
         public MSBuildWorkspaceMigrationContext(
             MigrateOptions options,
@@ -30,6 +44,7 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
+            _projectCache = new Dictionary<string, MSBuildProject>(StringComparer.OrdinalIgnoreCase);
             _vsFinder = vsFinder;
             _path = options.ProjectPath;
             _logger = logger;
@@ -39,6 +54,20 @@ namespace AspNetMigrator.MSBuild
         {
             _workspace?.Dispose();
             _workspace = null;
+        }
+
+        public MSBuildProject GetOrAddProject(string path)
+        {
+            if (_projectCache.TryGetValue(path, out var cached))
+            {
+                return cached;
+            }
+
+            var created = new MSBuildProject(this, path, _logger);
+
+            _projectCache.Add(path, created);
+
+            return created;
         }
 
         public IEnumerable<IProject> Projects
@@ -58,7 +87,7 @@ namespace AspNetMigrator.MSBuild
                     }
                     else
                     {
-                        yield return new MSBuildProject(_workspace, project.FilePath, _logger);
+                        yield return GetOrAddProject(project.FilePath);
                     }
                 }
             }
@@ -166,7 +195,7 @@ namespace AspNetMigrator.MSBuild
                     return null;
                 }
 
-                return new MSBuildProject(_workspace, _projectPath, _logger);
+                return GetOrAddProject(_projectPath);
             }
 
             set

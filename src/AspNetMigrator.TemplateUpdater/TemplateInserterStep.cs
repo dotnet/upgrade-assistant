@@ -190,9 +190,6 @@ namespace AspNetMigrator.TemplateUpdater
 
             await projectFile.SaveAsync(token).ConfigureAwait(false);
 
-            // Reload the workspace since, at this point, the project may be different from what was loaded
-            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
-
             Logger.LogInformation("{ItemCount} template items added", _itemsToAdd.Count);
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
         }

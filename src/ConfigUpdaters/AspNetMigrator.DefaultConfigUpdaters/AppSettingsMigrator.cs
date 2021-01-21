@@ -94,9 +94,6 @@ namespace AspNetMigrator.DefaultConfigUpdaters
                 jsonWriter.WriteEndObject();
             }
 
-            // Make sure the project is reloaded in case the appsettings.json file was added in this apply step
-            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
-
             // Confirm that the appsettings.json file is included in the project. In rare cases (auto-include disabled),
             // it may be necessary to add it explicitly
             var file = project.GetFile();

@@ -266,9 +266,6 @@ namespace AspNetMigrator.PackageUpdater
 
                 await RemoveTransitiveDependenciesAsync(context, token).ConfigureAwait(false);
 
-                // Reload the workspace since, at this point, the project may be different from what was loaded
-                await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
-
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Packages updated");
             }
             catch (Exception)

@@ -88,7 +88,9 @@ namespace AspNetMigrator.MSBuild
         public ValueTask SaveAsync(CancellationToken token)
         {
             ProjectRoot.Save();
-            return default;
+
+            // Reload the workspace since, at this point, the project may be different from what was loaded
+            return _project.Context.ReloadWorkspaceAsync(token);
         }
 
         public void RemovePackages(IEnumerable<NuGetReference> references)

@@ -117,10 +117,23 @@ namespace AspNetMigrator.SourceUpdater
             Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
         }
 
-        protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
-            Task.FromResult(Diagnostics.Any() ?
-                new MigrationStepApplyResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
-                new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty));
+        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var file = context.Project.Required().GetFile();
+
+            file.Simplify();
+
+            await file.SaveAsync(token).ConfigureAwait(false);
+
+            return Diagnostics.Any() ?
+                    new MigrationStepApplyResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
+                    new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty);
+        }
 
         // TODO
         private static ImmutableArray<AdditionalText> GetAdditionalFiles() => default;

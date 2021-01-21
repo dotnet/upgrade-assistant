@@ -9,30 +9,31 @@ namespace AspNetMigrator.MSBuild
 {
     internal class MSBuildProject : IProject
     {
-        private readonly Workspace _ws;
         private readonly ILogger _logger;
+
+        public MSBuildWorkspaceMigrationContext Context { get; }
 
         public string FilePath { get; }
 
         public string Directory => Path.GetDirectoryName(FilePath)!;
 
-        public MSBuildProject(Workspace ws, string path, ILogger logger)
+        public MSBuildProject(MSBuildWorkspaceMigrationContext context, string path, ILogger logger)
         {
-            _ws = ws;
             FilePath = path;
+            Context = context;
             _logger = logger;
         }
 
         public IEnumerable<IProject> ProjectReferences => GetRoslynProject().ProjectReferences.Select(p =>
         {
-            var project = _ws.CurrentSolution.GetProject(p.ProjectId);
+            var project = Context.Workspace.CurrentSolution.GetProject(p.ProjectId);
 
             if (project?.FilePath is null)
             {
                 throw new InvalidOperationException("Could not find project path for reference");
             }
 
-            return new MSBuildProject(_ws, project.FilePath, _logger);
+            return Context.GetOrAddProject(project.FilePath);
         });
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
@@ -65,6 +66,6 @@ namespace AspNetMigrator.MSBuild
         public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(FilePath);
 
         public Project GetRoslynProject()
-            => _ws.CurrentSolution.Projects.First(p => string.Equals(p.FilePath, FilePath, StringComparison.OrdinalIgnoreCase));
+            => Context.Workspace.CurrentSolution.Projects.First(p => string.Equals(p.FilePath, FilePath, StringComparison.OrdinalIgnoreCase));
     }
 }
