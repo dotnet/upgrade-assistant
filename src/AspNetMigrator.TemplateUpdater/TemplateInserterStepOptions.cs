@@ -2,6 +2,6 @@
 {
     public class TemplateInserterStepOptions
     {
-        public string[]? TemplateConfigFiles { get; set; }
+        public string? TemplatePath { get; set; }
     }
 }

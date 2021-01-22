@@ -19,6 +19,7 @@ namespace AspNetMigrator.TemplateUpdater
     public class TemplateInserterStep : MigrationStep
     {
         private const int BufferSize = 65536;
+        private const string TemplateConfigFileName = "TemplateConfig.json";
         private static readonly Regex PropertyRegex = new(@"^\$\((.*)\)$", RegexOptions.Compiled);
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -43,16 +44,31 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(options));
             }
 
+            if (templateUpdaterOptions is null)
+            {
+                throw new ArgumentNullException(nameof(templateUpdaterOptions));
+            }
+
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
             _itemsToAdd = new Dictionary<string, RuntimeItemSpec>();
-            _templateConfigFiles = (templateUpdaterOptions?.Value.TemplateConfigFiles ?? Array.Empty<string>())
-                .Select(path => Path.IsPathFullyQualified(path)
-                ? path
-                : Path.Combine(AppContext.BaseDirectory, path));
+            var templatePath = templateUpdaterOptions.Value.TemplatePath
+                ?? throw new ArgumentException("Template inserter options must contain a template path");
+
+            if (!Path.IsPathFullyQualified(templatePath))
+            {
+                templatePath = Path.Combine(AppContext.BaseDirectory, templatePath);
+            }
+
+            _templateConfigFiles = Directory.GetFiles(templatePath, TemplateConfigFileName, new EnumerationOptions
+            {
+                MatchCasing = MatchCasing.CaseInsensitive,
+                RecurseSubdirectories = true,
+                ReturnSpecialDirectories = false
+            });
 
             if (!_templateConfigFiles.Any())
             {
