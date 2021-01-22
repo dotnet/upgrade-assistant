@@ -27,16 +27,16 @@ jobs:
       uses: actions/setup-dotnet@v1.7.2
       with:
         useGlobalJson: true
-    - name: Intall GitVersion
-      run: dotnet tool install --global GitVersion.Tool
-    - name: Update Version
-      run: dotnet tool /output buildserver /nofetch
+    - name: Update version
+      run: |
+        dotnet tool install --global GitVersion.Tool
+        dotnet gitversion /output buildserver /nofetch
     - name: Restore dependencies
-      run: dotnet restore AspNetMigrator.sln
+      run: dotnet restore
     - name: Build
-      run: dotnet build -c ${{ env.buildConfiguration }} AspNetMigrator.sln
+      run: dotnet build --no-restore -c ${{ env.buildConfiguration }}
     - name: Test
-      run: dotnet test -c ${{ env.buildConfiguration }} AspNetMigrator.sln
+      run: dotnet test -c ${{ env.buildConfiguration }}   
     - name: Create tool package
       run: dotnet pack src/AspNetMigrator.Console/AspNetMigrator.ConsoleApp.csproj -c ${{ env.buildConfiguration }} -o $GITHUB_WORKSPACE/tools
     - name: Create analyzer package
@@ -45,4 +45,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: tools
-          path: $GITHUB_WORKSPACE/tools/*
+          path: tools/*
