@@ -8,7 +8,7 @@ on:
 
 env:
   solution: '**/*.sln'
-  buildConfiguration: 'Release'
+  buildConfiguration: Release
 
 jobs:
   build:
@@ -17,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with: 
+        fetch-depth: 0
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
