@@ -1,0 +1,47 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  buildConfiguration: Release
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with: 
+        fetch-depth: 0
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: 3.1.x
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        useGlobalJson: true
+    - name: Update version
+      run: |
+        dotnet tool install --global GitVersion.Tool
+        dotnet gitversion /output buildserver /nofetch
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore -c ${{ env.buildConfiguration }}
+    - name: Test
+      run: dotnet test -c ${{ env.buildConfiguration }}   
+    - name: Create tool package
+      run: dotnet pack src/AspNetMigrator.Console/AspNetMigrator.ConsoleApp.csproj -c ${{ env.buildConfiguration }} -o $GITHUB_WORKSPACE/tools
+    - name: Create analyzer package
+      run: dotnet pack src/Analyzers/AspNetMigrator.Analyzers.Package/AspNetMigrator.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o $GITHUB_WORKSPACE/tools
+    - name: Publish Packages
+      uses: actions/upload-artifact@v2
+      with:
+          name: tools
+          path: tools/*
