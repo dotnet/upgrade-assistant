@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.Extensions.Logging;
@@ -44,16 +45,21 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
+            ProjectCollection = new ProjectCollection();
+
             _projectCache = new Dictionary<string, MSBuildProject>(StringComparer.OrdinalIgnoreCase);
             _vsFinder = vsFinder;
             _path = options.ProjectPath;
             _logger = logger;
         }
 
+        public ProjectCollection ProjectCollection { get; }
+
         public void Dispose()
         {
             _workspace?.Dispose();
             _workspace = null;
+            ProjectCollection.Dispose();
         }
 
         public MSBuildProject GetOrAddProject(string path)

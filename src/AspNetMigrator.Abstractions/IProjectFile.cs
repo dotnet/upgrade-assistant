@@ -25,5 +25,7 @@ namespace AspNetMigrator
         void AddItem(string name, string path);
 
         bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token);
+
+        string GetPropertyValue(string propertyName);
     }
 }

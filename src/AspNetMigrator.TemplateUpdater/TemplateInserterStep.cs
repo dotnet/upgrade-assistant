@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Construction;
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -33,7 +29,7 @@ namespace AspNetMigrator.TemplateUpdater
         private static readonly ItemSpec[] WebAppFiles = new[]
         {
             new ItemSpec(ProjectItemType.Content, "Global.asax", Array.Empty<string>()),
-            new ItemSpec(ProjectItemType.Content, "Web.config",  Array.Empty<string>())
+            new ItemSpec(ProjectItemType.Content, "Web.config", Array.Empty<string>())
         };
 
         private readonly IEnumerable<string> _templateConfigFiles;
@@ -78,10 +74,7 @@ namespace AspNetMigrator.TemplateUpdater
 
             try
             {
-                using var projectCollection = new ProjectCollection();
-                var project = projectCollection.LoadProject(current.FilePath);
-
-                var isWebApp = IsWebApp(project);
+                var isWebApp = IsWebApp(current);
 
                 // Iterate through all config files, adding template files from each to the list of items to add, as appropriate.
                 // Later config files can intentionally overwrite earlier config files' items.
@@ -103,7 +96,9 @@ namespace AspNetMigrator.TemplateUpdater
                     // Check whether the template items are needed in the project or if they already exist
                     foreach (var templateItem in templateConfiguration.TemplateItems!)
                     {
-                        if (project.Items.Any(i => ItemMatches(templateItem, i, project.FullPath)))
+                        var files = current.FindFiles(templateItem.Type, templateItem.Path);
+
+                        if (files.Any(path => ItemMatches(path, templateItem)))
                         {
                             Logger.LogDebug("Not adding template item {TemplateItemPath} because the project already contains a similar item", templateItem.Path);
                         }
@@ -134,7 +129,7 @@ namespace AspNetMigrator.TemplateUpdater
                     return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "All expected template items found", BuildBreakRisk.None);
                 }
             }
-            catch (InvalidProjectFileException)
+            catch (Exception)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", current.FilePath);
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {current.FilePath}", BuildBreakRisk.Unknown);
@@ -165,7 +160,7 @@ namespace AspNetMigrator.TemplateUpdater
                 // Get the contents of the template file
                 try
                 {
-                    var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectFile.FilePath);
+                    var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectFile);
 #pragma warning disable CA2000 // Dispose objects before losing scope
                     using var templateStream = File.Open(item.TemplateFilePath, FileMode.Open, FileAccess.Read);
                     using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
@@ -194,10 +189,8 @@ namespace AspNetMigrator.TemplateUpdater
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
         }
 
-        private Dictionary<string, string> ResolveTokenReplacements(IEnumerable<KeyValuePair<string, string>>? replacements, string projectPath)
+        private Dictionary<string, string> ResolveTokenReplacements(IEnumerable<KeyValuePair<string, string>>? replacements, IProjectFile project)
         {
-            using var projectCollection = new ProjectCollection();
-            var project = projectCollection.LoadProject(projectPath);
             var propertyCache = new Dictionary<string, string?>();
             var ret = new Dictionary<string, string>();
 
@@ -247,37 +240,14 @@ namespace AspNetMigrator.TemplateUpdater
         /// <summary>
         /// Determines if a project is likely to be a web app base on its included items.
         /// </summary>
-        private bool IsWebApp(Project project) => project.Items.Any(i => WebAppFiles.Any(w => ItemMatches(w, i, project.FullPath)));
+        private static bool IsWebApp(IProject p)
+            => WebAppFiles.Any(file => p.FindFiles(file.Type, file.Path).Any());
 
         /// <summary>
         /// Determines if a given project element matches an item specification.
         /// </summary>
-        private bool ItemMatches(ItemSpec expectedItem, Microsoft.Build.Evaluation.ProjectItem itemElement, string projectPath)
+        private bool ItemMatches(string filePath, ItemSpec expectedItem)
         {
-            // The item type must match
-            if (!expectedItem.Type.Name.Equals(itemElement.ItemType, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            // The item must have an include attribute
-            if (string.IsNullOrEmpty(itemElement.EvaluatedInclude))
-            {
-                return false;
-            }
-
-            // The file name must match
-            var fileName = Path.GetFileName(itemElement.EvaluatedInclude);
-            if (!fileName.Equals(expectedItem.Path, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            var projectDir = Path.GetDirectoryName(projectPath)!;
-            var filePath = Path.IsPathFullyQualified(itemElement.EvaluatedInclude) ?
-                itemElement.EvaluatedInclude :
-                Path.Combine(projectDir, itemElement.EvaluatedInclude);
-
             Logger.LogDebug("Considering {FilePath} for expected file {ExpectedFileName}", filePath, expectedItem.Path);
 
             // The included file must exist

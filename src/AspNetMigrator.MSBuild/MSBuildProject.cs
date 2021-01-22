@@ -5,9 +5,11 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
+using Build = Microsoft.Build.Evaluation;
+
 namespace AspNetMigrator.MSBuild
 {
-    internal class MSBuildProject : IProject
+    internal partial class MSBuildProject : IProject
     {
         private readonly ILogger _logger;
 
@@ -36,22 +38,32 @@ namespace AspNetMigrator.MSBuild
             return Context.GetOrAddProject(project.FilePath);
         });
 
+        public Build.Project Project => Context.ProjectCollection.LoadProject(FilePath);
+
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
-            => GetFile().FindFiles(itemType, matcher);
+        {
+            var items = Project.Items
+                .Where<Build.ProjectItem>(i => i.ItemType.Equals(itemType.Name) && matcher.Match(i.EvaluatedInclude));
+
+            foreach (var item in items)
+            {
+                yield return Path.IsPathFullyQualified(item.EvaluatedInclude)
+                    ? item.EvaluatedInclude
+                    : Path.Combine(Path.GetDirectoryName(FilePath) ?? string.Empty, item.EvaluatedInclude);
+            }
+        }
 
         public IEnumerable<NuGetReference> PackageReferences
         {
             get
             {
-                var packages = GetFile().ProjectRoot.GetAllPackageReferences();
+                var packages = ProjectRoot.GetAllPackageReferences();
 
                 return packages.Select(p => p.AsNuGetReference()).ToList();
             }
         }
 
-        IProjectFile IProject.GetFile() => GetFile();
-
-        public MSBuildProjectFile GetFile() => new MSBuildProjectFile(this, _logger);
+        IProjectFile IProject.GetFile() => this;
 
         public override bool Equals(object? obj)
         {

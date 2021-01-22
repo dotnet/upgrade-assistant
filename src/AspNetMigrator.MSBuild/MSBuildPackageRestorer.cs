@@ -31,7 +31,7 @@ namespace AspNetMigrator.MSBuild
             }
 
             // Create a project instance and run MSBuild /t:Restore
-            var result = RestorePackages(new ProjectInstance(project.GetFile().ProjectRoot), logRestoreOutput);
+            var result = RestorePackages(new ProjectInstance(project.ProjectRoot), logRestoreOutput);
 
             return Task.FromResult(result);
         }

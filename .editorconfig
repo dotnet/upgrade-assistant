@@ -226,3 +226,6 @@ dotnet_diagnostic.CA1303.severity = none
 
 # CA2225: Operator overloads have named alternatives
 dotnet_diagnostic.CA2225.severity = none
+
+# CA1601: Partial elements should be documented
+dotnet_diagnostic.CA1601.severity = none

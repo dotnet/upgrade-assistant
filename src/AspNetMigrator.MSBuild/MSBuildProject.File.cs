@@ -5,27 +5,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Construction;
-using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.MSBuild
 {
-    internal class MSBuildProjectFile : IProjectFile
+    internal partial class MSBuildProject : IProjectFile
     {
         private const string DefaultSDK = "Microsoft.NET.Sdk";
 
-        private readonly ILogger _logger;
-        private readonly MSBuildProject _project;
-
-        public MSBuildProjectFile(MSBuildProject project, ILogger logger)
-        {
-            _logger = logger;
-            _project = project;
-            ProjectRoot = GetProjectRootElement(project.FilePath!);
-        }
-
-        public ProjectRootElement ProjectRoot { get; }
+        public ProjectRootElement ProjectRoot => Project.Xml;
 
         public string TargetSdk
         {
@@ -44,8 +33,6 @@ namespace AspNetMigrator.MSBuild
 
         public bool IsSdk =>
             ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase);
-
-        public string FilePath => _project.FilePath;
 
         public void AddPackages(IEnumerable<NuGetReference> references)
         {
@@ -89,13 +76,15 @@ namespace AspNetMigrator.MSBuild
         {
             ProjectRoot.Save();
 
+            Context.ProjectCollection.UnloadProject(Project);
+
             // Reload the workspace since, at this point, the project may be different from what was loaded
-            return _project.Context.ReloadWorkspaceAsync(token);
+            return Context.ReloadWorkspaceAsync(token);
         }
 
         public void RemovePackages(IEnumerable<NuGetReference> references)
         {
-            foreach (var reference in _project.PackageReferences)
+            foreach (var reference in PackageReferences)
             {
                 if (references.Contains(reference))
                 {
@@ -138,33 +127,11 @@ namespace AspNetMigrator.MSBuild
         public void AddItem(string name, string path)
             => ProjectRoot.AddItem(name, path);
 
-        public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
-        {
-            using var projectCollection = new ProjectCollection();
-            var project = projectCollection.LoadProject(FilePath);
-            var items = project.Items
-                .Where(i => i.ItemType.Equals(itemType) && matcher.Match(i.EvaluatedInclude));
-
-            foreach (var item in items)
-            {
-                yield return Path.IsPathFullyQualified(item.EvaluatedInclude)
-                    ? item.EvaluatedInclude
-                    : Path.Combine(Path.GetDirectoryName(project.FullPath) ?? string.Empty, item.EvaluatedInclude);
-            }
-        }
-
         public bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token)
         {
-            using var projectCollection = new Microsoft.Build.Evaluation.ProjectCollection();
-
-            if (FilePath is null || _project.Directory is null)
-            {
-                return false;
-            }
-
-            var targetItemPath = GetPathRelativeToProject(itemName, _project.Directory);
-            var project = projectCollection.LoadProject(FilePath);
-            var candidateItems = project.Items.Where(i => GetPathRelativeToProject(i.EvaluatedInclude, _project.Directory).Equals(targetItemPath, StringComparison.OrdinalIgnoreCase));
+            var targetItemPath = GetPathRelativeToProject(itemName, Directory);
+            var candidateItems = Project.Items
+                .Where(i => GetPathRelativeToProject(i.EvaluatedInclude, Directory).Equals(targetItemPath, StringComparison.OrdinalIgnoreCase));
 
             if (itemType is not null)
             {
@@ -173,6 +140,9 @@ namespace AspNetMigrator.MSBuild
 
             return candidateItems.Any();
         }
+
+        public string GetPropertyValue(string propertyName)
+            => Project.GetPropertyValue(propertyName);
 
         private static string GetPathRelativeToProject(string path, string projectDir) =>
             Path.IsPathFullyQualified(path)
