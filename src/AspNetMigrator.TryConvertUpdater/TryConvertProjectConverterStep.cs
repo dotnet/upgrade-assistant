@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -18,7 +17,6 @@ namespace AspNetMigrator.TryConvertUpdater
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
         private readonly string _tryConvertPath;
-        private bool _errorEncountered;
 
         public TryConvertProjectConverterStep(MigrateOptions migrateOptions, IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
             : base(migrateOptions, logger)
@@ -86,15 +84,17 @@ namespace AspNetMigrator.TryConvertUpdater
                 }
             }
 
-            _errorEncountered = false;
+            var errorEncountered = false;
+
             tryConvertProcess.OutputDataReceived += TryConvertOutputReceived;
             tryConvertProcess.ErrorDataReceived += TryConvertErrorReceived;
             tryConvertProcess.Start();
             tryConvertProcess.BeginOutputReadLine();
             tryConvertProcess.BeginErrorReadLine();
+
             await tryConvertProcess.WaitForExitAsync(token).ConfigureAwait(false);
 
-            if (tryConvertProcess.ExitCode != 0 || _errorEncountered)
+            if (tryConvertProcess.ExitCode != 0 || errorEncountered)
             {
                 Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode}). Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.", tryConvertProcess.ExitCode);
                 return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Conversion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
@@ -103,6 +103,32 @@ namespace AspNetMigrator.TryConvertUpdater
             {
                 Logger.LogInformation("Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.");
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Project file converted successfully");
+            }
+
+            void TryConvertOutputReceived(object sender, DataReceivedEventArgs e)
+            {
+                if (!string.IsNullOrWhiteSpace(e.Data))
+                {
+                    CheckForErrors(e.Data);
+                    Logger.LogInformation($"[try-convert] {e.Data}");
+                }
+            }
+
+            void TryConvertErrorReceived(object sender, DataReceivedEventArgs e)
+            {
+                if (!string.IsNullOrWhiteSpace(e.Data))
+                {
+                    CheckForErrors(e.Data);
+                    Logger.LogError($"[try-convert] {e.Data}");
+                }
+            }
+
+            void CheckForErrors(string data)
+            {
+                if (ErrorMessages.Any(data.Contains))
+                {
+                    errorEncountered = true;
+                }
             }
         }
 
@@ -140,37 +166,11 @@ namespace AspNetMigrator.TryConvertUpdater
                     return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {projectFile.TargetSdk} SDK", BuildBreakRisk.None);
                 }
             }
-            catch (InvalidProjectFileException exc)
+            catch (Exception exc)
             {
                 Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectFile.FilePath, exc.ToString());
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
             }
         }
-
-        private void TryConvertOutputReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (!string.IsNullOrWhiteSpace(e.Data))
-            {
-                CheckForErrors(e.Data);
-                Logger.LogInformation($"[try-convert] {e.Data}");
-            }
-        }
-
-        private void TryConvertErrorReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (!string.IsNullOrWhiteSpace(e.Data))
-            {
-                CheckForErrors(e.Data);
-                Logger.LogError($"[try-convert] {e.Data}");
-            }
-        }
-
-        private void CheckForErrors(string data)
-        {
-            if (ErrorMessages.Any(data.Contains))
-            {
-                _errorEncountered = true;
-            }
-        }
-    }
+      }
 }
