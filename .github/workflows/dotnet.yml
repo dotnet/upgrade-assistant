@@ -23,6 +23,10 @@ jobs:
       uses: actions/setup-dotnet@v1.7.2
       with:
         dotnet-version: 3.1.x
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        useGlobalJson: true
     - name: Intall GitVersion
       run: dotnet tool install --global GitVersion.Tool
     - name: Update Version
