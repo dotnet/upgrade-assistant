@@ -1,0 +1,50 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  solution: '**/*.sln'
+  buildConfiguration: 'Release'
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: 3.x
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        useGlobalJson: true
+    - name: Intall GitVersion
+      run: dotnet tool install --global GitVersion.Tool
+    - name: Update Version
+      run: dotnet tool /output buildserver /nofetch
+    - name: Restore dependencies
+      run: dotnet restore AspNetMigrator.sln
+    - name: Build
+      run: dotnet build -c ${{ env.buildConfiguration }} AspNetMigrator.sln
+    - name: Test
+      run: dotnet test -c ${{ env.buildConfiguration }} AspNetMigrator.sln
+    - name: Create tool package
+      run: dotnet pack src/AspNetMigrator.Console/AspNetMigrator.ConsoleApp.csproj -c ${{ env.buildConfiguration }} -o $GITHUB_WORKSPACE/tools
+    - name: Create analyzer package
+      run: dotnet pack src/Analyzers/AspNetMigrator.Analyzers.Package/AspNetMigrator.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o $GITHUB_WORKSPACE/tools
+    - name: Publish Packages
+      uses: actions/upload-artifact@v2
+      with:
+          name: tools
+          path: $GITHUB_WORKSPACE/tools/*
