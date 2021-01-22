@@ -15,7 +15,7 @@ namespace AspNetMigrator
         {
             services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
             services.AddTransient<IPackageRestorer, MSBuildPackageRestorer>();
-            services.AddTransient<IMigrationStartup, MSBuildRegistrationStartup>();
+            services.AddTransient<MSBuildRegistrationStartup>();
             services.AddSingleton<IMigrationContextFactory, MSBuildMigrationContextFactory>();
 
             // Instantiate the migration context with a func to avoid needing MSBuild types prior to MSBuild registration

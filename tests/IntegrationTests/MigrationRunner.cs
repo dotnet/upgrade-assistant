@@ -33,7 +33,7 @@ namespace IntegrationTests
             var project = new FileInfo(inputPath);
             using var cts = new CancellationTokenSource();
 
-            var migrationTask = Program.RunMigrationAsync(new MigrateOptions { SkipBackup = true, Project = project }, (context, services) => RegisterTestServices(services, output, commands), cts.Token);
+            var migrationTask = Program.RunCommandAsync(new MigrateOptions { SkipBackup = true, Project = project }, (context, services) => RegisterTestServices(services, output, commands), AppCommand.Migrate, cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);

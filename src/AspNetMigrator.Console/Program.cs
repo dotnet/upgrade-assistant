@@ -35,19 +35,34 @@ namespace AspNetMigrator.ConsoleApp
         {
             ShowHeader();
 
-            var root = new RootCommand
+            var migrateCmd = new Command("migrate")
             {
                 Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync),
+            };
 
+            migrateCmd.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
+            migrateCmd.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
+            migrateCmd.AddOption(new Option<DirectoryInfo>(new[] { "--backup-path", "-b" }, "Specifies where the project should be backed up. Defaults to a new directory next to the project's directory."));
+            migrateCmd.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+
+            var analyzeCmd = new Command("analyze")
+            {
+                Handler = CommandHandler.Create<MigrateOptions>(RunAnalysisAsync),
+            };
+
+            analyzeCmd.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
+            analyzeCmd.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+
+            var root = new RootCommand
+            {
                 // Get name from process so that it will show correctly if run as a .NET CLI tool
                 Name = GetProcessName(),
             };
 
+            root.AddCommand(migrateCmd);
+            root.AddCommand(analyzeCmd);
+
             return new CommandLineBuilder(root)
-                .AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly())
-                .AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."))
-                .AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"))
-                .AddOption(new Option<DirectoryInfo>(new[] { "--backup-path", "-b" }, "Specifies where the project should be backed up. Defaults to a new directory next to the project's directory."))
                 .UseDefaults()
                 .UseHelpBuilder(b => new HelpWithHeader(b.Console))
                 .Build()
@@ -60,9 +75,13 @@ namespace AspNetMigrator.ConsoleApp
             }
         }
 
-        public static Task RunMigrationAsync(MigrateOptions options) => RunMigrationAsync(options, null, CancellationToken.None);
+        public static Task RunMigrationAsync(MigrateOptions options)
+            => RunCommandAsync(options, null, AppCommand.Migrate, CancellationToken.None);
 
-        public static Task RunMigrationAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection>? serviceConfiguration, CancellationToken token)
+        public static Task RunAnalysisAsync(MigrateOptions options)
+            => RunCommandAsync(options, null, AppCommand.Analyze, CancellationToken.None);
+
+        public static Task RunCommandAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection>? serviceConfiguration, AppCommand appCommand, CancellationToken token)
         {
             if (options is null)
             {
@@ -76,10 +95,19 @@ namespace AspNetMigrator.ConsoleApp
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
+                    if (appCommand == AppCommand.Migrate)
+                    {
+                        services.AddHostedService<ConsoleMigrate>();
+                    }
+                    else if (appCommand == AppCommand.Analyze)
+                    {
+                        services.AddHostedService<ConsoleAnalyze>();
+                    }
+
                     services.AddSingleton<IMigrationStateManager, FileMigrationStateFactory>();
-                    services.AddHostedService<ConsoleRepl>();
 
                     services.AddMsBuild();
+                    services.AddReports();
 
                     services.AddSingleton(options);
                     services.AddSingleton<IPackageLoader, PackageLoader>();

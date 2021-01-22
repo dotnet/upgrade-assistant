@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.MSBuild
 {
-    public class MSBuildRegistrationStartup : IMigrationStartup
+    public class MSBuildRegistrationStartup
     {
         private readonly ILogger _logger;
 

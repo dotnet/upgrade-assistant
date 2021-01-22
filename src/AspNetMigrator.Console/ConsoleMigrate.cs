@@ -12,7 +12,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     // TODO : Eventually, this may need localized and pull strings from resources, etc.
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
-    public class ConsoleRepl : IHostedService
+    public class ConsoleMigrate : IHostedService
     {
         private readonly IServiceProvider _services;
         private readonly ICollectUserInput _input;
@@ -21,11 +21,11 @@ namespace AspNetMigrator.ConsoleApp
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
 
-        public ConsoleRepl(
+        public ConsoleMigrate(
             ICollectUserInput input,
             InputOutputStreams io,
             CommandProvider commandProvider,
-            ILogger<ConsoleRepl> logger,
+            ILogger<ConsoleMigrate> logger,
             IServiceProvider services,
             IHostApplicationLifetime lifetime)
         {
