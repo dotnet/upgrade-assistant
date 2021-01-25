@@ -40,7 +40,7 @@ namespace AspNetMigrator.Extensions
             return File.OpenRead(filePath);
         }
 
-        public string? GetSetting(string settingName) => _configuration[settingName];
+        public T? GetOptions<T>(string sectionName) => _configuration.GetSection(sectionName).Get<T>();
 
         public IEnumerable<string> ListFiles(string path) => ListFiles(path, "*");
 

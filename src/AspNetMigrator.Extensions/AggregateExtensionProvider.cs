@@ -48,12 +48,13 @@ namespace AspNetMigrator.Extensions
         }
 
         /// <summary>
-        /// Gets a setting value from underlying extension providers.
+        /// Creates an object representing the given config section in extension manifests.
         /// </summary>
-        /// <param name="settingName">The setting to get a value for.</param>
-        /// <returns>The value of the specified setting. If the setting is provided by more than one extension provider, returns the setting from the provider registered last. If no provider provides the setting, returns null.</returns>
-        public string? GetSetting(string settingName) =>
-            ExtensionProviders.Select(p => p.GetSetting(settingName)).Where(s => s is not null).LastOrDefault();
+        /// <typeparam name="T">The type of object to deserialize.</typeparam>
+        /// <param name="sectionName">The name of the section to read from extension manifests.</param>
+        /// <returns>An object representing the specified config section. If more than one extension provider has the indicated config section, the object will come from the last provider registered. If no provider provides the config section, returns null.</returns>
+        public T? GetOptions<T>(string sectionName) =>
+            ExtensionProviders.Select(p => p.GetOptions<T>(sectionName)).Where(o => o is not null).LastOrDefault();
 
         /// <summary>
         /// Returns a list of files present at the specified path from any underlying extension providers.

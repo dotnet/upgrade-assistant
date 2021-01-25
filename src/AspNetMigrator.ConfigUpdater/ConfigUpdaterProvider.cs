@@ -13,8 +13,6 @@ namespace AspNetMigrator.ConfigUpdater
     {
         private const string AssemblySearchPattern = "*.dll";
         private const string ConfigUpdaterOptionsSectionName = "ConfigUpdaterOptions";
-        private const string ConfigFilePathsSettingName = ConfigUpdaterOptionsSectionName + ":ConfigFilePaths";
-        private const string ConfigUpdaterPathSettingName = ConfigUpdaterOptionsSectionName + ":ConfigUpdaterPath";
 
         private readonly AggregateExtensionProvider _extensions;
         private readonly ILogger<ConfigUpdaterProvider> _logger;
@@ -28,7 +26,7 @@ namespace AspNetMigrator.ConfigUpdater
         }
 
         public IEnumerable<string> ConfigFilePaths =>
-            _extensions.GetSetting(ConfigFilePathsSettingName)?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
+            _extensions.GetOptions<ConfigUpdaterOptions>(ConfigUpdaterOptionsSectionName)?.ConfigFilePaths ?? Enumerable.Empty<string>();
 
         public IEnumerable<IConfigUpdater> GetUpdaters()
         {
@@ -38,14 +36,14 @@ namespace AspNetMigrator.ConfigUpdater
             {
                 _logger.LogDebug("Looking for config updates in {Extension}", extension.Name);
 
-                var configUpdaterPath = extension.GetSetting(ConfigUpdaterPathSettingName);
+                var configUpdaterOptions = extension.GetOptions<ConfigUpdaterOptions>(ConfigUpdaterOptionsSectionName);
 
-                if (configUpdaterPath is null)
+                if (configUpdaterOptions?.ConfigUpdaterPath is null)
                 {
                     continue;
                 }
 
-                foreach (var file in extension.ListFiles(configUpdaterPath, AssemblySearchPattern))
+                foreach (var file in extension.ListFiles(configUpdaterOptions.ConfigUpdaterPath, AssemblySearchPattern))
                 {
                     try
                     {

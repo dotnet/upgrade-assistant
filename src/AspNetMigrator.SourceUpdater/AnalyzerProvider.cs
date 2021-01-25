@@ -15,7 +15,6 @@ namespace AspNetMigrator.SourceUpdater
     {
         private const string AssemblySearchPattern = "*.dll";
         private const string SourceUpdaterOptionsSectionName = "SourceUpdaterOptions";
-        private const string SourceUpdaterPathSettingName = SourceUpdaterOptionsSectionName + ":SourceUpdaterPath";
 
         private readonly AggregateExtensionProvider _extensions;
         private readonly ILogger<AnalyzerProvider> _logger;
@@ -36,13 +35,13 @@ namespace AspNetMigrator.SourceUpdater
             {
                 _logger.LogDebug("Looking for analyzers in {Extension}", extension.Name);
 
-                var sourceUpdaterPath = extension.GetSetting(SourceUpdaterPathSettingName);
-                if (sourceUpdaterPath is null)
+                var sourceUpdaterOptions = extension.GetOptions<SourceUpdaterOptions>(SourceUpdaterOptionsSectionName);
+                if (sourceUpdaterOptions?.SourceUpdaterPath is null)
                 {
                     continue;
                 }
 
-                foreach (var file in extension.ListFiles(sourceUpdaterPath, AssemblySearchPattern))
+                foreach (var file in extension.ListFiles(sourceUpdaterOptions.SourceUpdaterPath, AssemblySearchPattern))
                 {
                     try
                     {
@@ -78,13 +77,13 @@ namespace AspNetMigrator.SourceUpdater
             {
                 _logger.LogDebug("Looking for code fix providers in {Extension}", extension.Name);
 
-                var sourceUpdaterPath = extension.GetSetting(SourceUpdaterPathSettingName);
-                if (sourceUpdaterPath is null)
+                var sourceUpdaterOptions = extension.GetOptions<SourceUpdaterOptions>(SourceUpdaterOptionsSectionName);
+                if (sourceUpdaterOptions?.SourceUpdaterPath is null)
                 {
                     continue;
                 }
 
-                foreach (var file in extension.ListFiles(sourceUpdaterPath, AssemblySearchPattern))
+                foreach (var file in extension.ListFiles(sourceUpdaterOptions.SourceUpdaterPath, AssemblySearchPattern))
                 {
                     try
                     {

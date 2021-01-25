@@ -7,7 +7,7 @@ namespace AspNetMigrator.Extensions
     {
         string Name { get; }
 
-        string? GetSetting(string settingName);
+        T? GetOptions<T>(string sectionName);
 
         Stream? GetFile(string path);
 
