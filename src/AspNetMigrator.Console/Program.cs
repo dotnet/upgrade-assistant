@@ -59,8 +59,8 @@ namespace AspNetMigrator.ConsoleApp
                 Name = GetProcessName(),
             };
 
-            root.AddCommand(migrateCmd);
             root.AddCommand(analyzeCmd);
+            root.AddCommand(migrateCmd);
 
             return new CommandLineBuilder(root)
                 .UseDefaults()
