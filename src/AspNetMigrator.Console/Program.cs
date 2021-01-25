@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
 using AspNetMigrator.ConfigUpdater;
+using AspNetMigrator.Extensions;
 using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
 using AspNetMigrator.SourceUpdater;
@@ -111,6 +112,11 @@ namespace AspNetMigrator.ConsoleApp
 
                     services.AddSingleton(options);
                     services.AddSingleton<IPackageLoader, PackageLoader>();
+
+                    // Add extension providers
+                    services.AddSingleton<IExtensionProvider, DefaultExtensionProvider>();
+                    // TODO : Add directory and archive extension providers based on command line arguments (or config values??)
+                    services.AddSingleton<AggregateExtensionProvider>();
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();

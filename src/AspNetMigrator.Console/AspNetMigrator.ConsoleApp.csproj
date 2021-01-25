@@ -48,6 +48,7 @@
     <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\AspNetMigrator.ConfigUpdater\AspNetMigrator.ConfigUpdater.csproj" />
     <ProjectReference Include="..\ConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
   </ItemGroup>
 
   <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
