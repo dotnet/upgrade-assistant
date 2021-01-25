@@ -27,7 +27,6 @@ namespace AspNetMigrator.ConsoleApp
     {
         private const string ConfigUpdaterStepOptionsSection = "ConfigUpdaterStepOptions";
         private const string PackageUpdaterStepOptionsSection = "PackageUpdaterStepOptions";
-        private const string SourceUpdaterStepOptionsSection = "SourceUpdaterStepOptions";
         private const string TemplateInserterStepOptionsSection = "TemplateInserterStepOptions";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
         private const string LogFilePath = "log.txt";
@@ -131,17 +130,13 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
                     services.AddTemplateInserterStep().Bind(context.Configuration.GetSection(TemplateInserterStepOptionsSection));
                     services.AddConfigUpdaterStep().Bind(context.Configuration.GetSection(ConfigUpdaterStepOptionsSection));
-                    services.AddScoped<MigrationStep, SourceUpdaterStep>();
+                    services.AddSourceUpdaterStep();
                     services.AddScoped<Migrator>();
 
                     serviceConfiguration?.Invoke(context, services);
                 })
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
                 {
-                    var sourceUpdatersPath = context.Configuration.GetSection(SourceUpdaterStepOptionsSection).Get<SourceUpdaterStepOptions>()?.SourceUpdaterPath
-                        ?? throw new ArgumentNullException("Source updaters path must not be null");
-                    builder.RegisterModule(new AnalyzersAndCodeFixersModule(sourceUpdatersPath));
-
                     var configUpdatersPath = context.Configuration.GetSection(ConfigUpdaterStepOptionsSection).Get<ConfigUpdaterStepOptions>()?.ConfigUpdaterPath
                         ?? throw new ArgumentNullException("Config updaters path must not be null");
                     builder.RegisterModule(new ConfigUpdatersModule(configUpdatersPath));

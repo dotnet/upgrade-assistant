@@ -11,7 +11,9 @@ namespace AspNetMigrator.Extensions
 
         public DirectoryExtensionProvider(string directory, ILogger<DirectoryExtensionProvider> logger)
             : base(GetConfiguration(directory), logger, directory)
-        { }
+        {
+            Name = $"Extensions from {directory}";
+        }
 
         private static IConfiguration GetConfiguration(string directory)
         {

@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
     <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

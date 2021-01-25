@@ -13,11 +13,19 @@ namespace AspNetMigrator.Extensions
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
 
-        public DefaultExtensionProvider(IConfiguration configuration, ILogger logger, string? baseDirectory)
+        public string Name { get; protected set; }
+
+        public DefaultExtensionProvider(IConfiguration configuration, ILogger<DefaultExtensionProvider> logger)
+            : this(configuration, logger, AppContext.BaseDirectory)
+        { }
+
+        public DefaultExtensionProvider(IConfiguration configuration, ILogger<DefaultExtensionProvider> logger, string baseDirectory)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _baseDirectory = baseDirectory ?? AppContext.BaseDirectory;
+            _baseDirectory = baseDirectory ?? throw new ArgumentNullException(nameof(baseDirectory));
+
+            Name = "Default extensions";
         }
 
         public Stream? GetFile(string path)
@@ -34,7 +42,9 @@ namespace AspNetMigrator.Extensions
 
         public string? GetSetting(string settingName) => _configuration[settingName];
 
-        public IEnumerable<string> ListFiles(string path)
+        public IEnumerable<string> ListFiles(string path) => ListFiles(path, "*");
+
+        public IEnumerable<string> ListFiles(string path, string searchPattern)
         {
             var dirPath = GetAbsolutePath(path);
             if (!Directory.Exists(dirPath))
@@ -43,7 +53,7 @@ namespace AspNetMigrator.Extensions
                 return Enumerable.Empty<string>();
             }
 
-            return Directory.EnumerateFiles(dirPath, "*", new EnumerationOptions { RecurseSubdirectories = true });
+            return Directory.EnumerateFiles(dirPath, searchPattern, new EnumerationOptions { RecurseSubdirectories = true });
         }
 
         protected string GetAbsolutePath(string path) =>

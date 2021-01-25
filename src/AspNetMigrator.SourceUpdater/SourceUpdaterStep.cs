@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +24,7 @@ namespace AspNetMigrator.SourceUpdater
 
         internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
 
-        public SourceUpdaterStep(MigrateOptions options, IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(MigrateOptions options, AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -33,14 +32,9 @@ namespace AspNetMigrator.SourceUpdater
                 throw new ArgumentNullException(nameof(options));
             }
 
-            if (analyzers is null)
+            if (analyzerProvider is null)
             {
-                throw new ArgumentNullException(nameof(analyzers));
-            }
-
-            if (codeFixProviders is null)
-            {
-                throw new ArgumentNullException(nameof(codeFixProviders));
+                throw new ArgumentNullException(nameof(analyzerProvider));
             }
 
             if (logger is null)
@@ -51,8 +45,8 @@ namespace AspNetMigrator.SourceUpdater
             Title = $"Update C# source";
             Description = $"Update source files in {options.ProjectPath} to change ASP.NET references to ASP.NET Core equivalents";
 
-            _allAnalyzers = ImmutableArray.CreateRange(analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id));
-            _allCodeFixProviders = ImmutableArray.CreateRange(codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First()));
+            _allAnalyzers = ImmutableArray.CreateRange(analyzerProvider.GetAnalyzers().OrderBy(a => a.SupportedDiagnostics.First().Id));
+            _allCodeFixProviders = ImmutableArray.CreateRange(analyzerProvider.GetCodeFixProviders().OrderBy(c => c.FixableDiagnosticIds.First()));
 
             // Add sub-steps for each analyzer that will be run
             SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, options, logger)));
