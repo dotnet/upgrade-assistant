@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using AutoMapper;
 
 namespace AspNetMigrator.Extensions
 {
@@ -52,9 +53,50 @@ namespace AspNetMigrator.Extensions
         /// </summary>
         /// <typeparam name="T">The type of object to deserialize.</typeparam>
         /// <param name="sectionName">The name of the section to read from extension manifests.</param>
-        /// <returns>An object representing the specified config section. If more than one extension provider has the indicated config section, the object will come from the last provider registered. If no provider provides the config section, returns null.</returns>
-        public T? GetOptions<T>(string sectionName) =>
-            ExtensionProviders.Select(p => p.GetOptions<T>(sectionName)).Where(o => o is not null).LastOrDefault();
+        /// <returns>An object representing the specified config section. If more than one extension provider has the indicated config section, providers registered later can override some or all of the object's properties. If no provider provides the config section, returns null.</returns>
+        public T? GetOptions<T>(string sectionName)
+        {
+            // Use Automapper here as it's more readable and more performant than
+            // doing the mapping ourselves with reflection
+            var mapper = GetMapper<T>();
+            var optionType = typeof(T);
+            var optionProps = optionType.GetProperties().Where(p => p.CanRead && p.CanWrite);
+            T? options = default;
+
+            foreach (var extension in ExtensionProviders)
+            {
+                var newOptions = extension.GetOptions<T>(sectionName);
+
+                if (newOptions is null)
+                {
+                    // If this extension doesn't provide the option, continue
+                    continue;
+                }
+                else if (options is null)
+                {
+                    // If the option was not previously set, set it now
+                    options = newOptions;
+                }
+                else
+                {
+                    // Update properties that are set in the new options
+                    options = mapper.Map(newOptions, options);
+                }
+            }
+
+            return options;
+        }
+
+        private static Mapper GetMapper<T>()
+        {
+            var mapperConfiguration = new MapperConfiguration(config =>
+            {
+                config.CreateMap<T, T>()
+                    .ForAllMembers(options => options.Condition((s, d, member) => member is not null));
+            });
+            var mapper = new Mapper(mapperConfiguration);
+            return mapper;
+        }
 
         /// <summary>
         /// Returns a list of files present at the specified path from any underlying extension providers.
