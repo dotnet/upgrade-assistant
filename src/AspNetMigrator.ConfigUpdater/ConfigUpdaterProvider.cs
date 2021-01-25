@@ -12,8 +12,9 @@ namespace AspNetMigrator.ConfigUpdater
     public class ConfigUpdaterProvider
     {
         private const string AssemblySearchPattern = "*.dll";
-        private const string ConfigFilePathsSettingName = "ConfigFilePaths";
-        private const string ConfigUpdaterPathSettingName = "ConfigUpdaterPath";
+        private const string ConfigUpdaterOptionsSectionName = "ConfigUpdaterOptions";
+        private const string ConfigFilePathsSettingName = ConfigUpdaterOptionsSectionName + ":ConfigFilePaths";
+        private const string ConfigUpdaterPathSettingName = ConfigUpdaterOptionsSectionName + ":ConfigUpdaterPath";
 
         private readonly AggregateExtensionProvider _extensions;
         private readonly ILogger<ConfigUpdaterProvider> _logger;

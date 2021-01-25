@@ -14,7 +14,8 @@ namespace AspNetMigrator.SourceUpdater
     public class AnalyzerProvider
     {
         private const string AssemblySearchPattern = "*.dll";
-        private const string SourceUpdaterPathSettingName = "SourceUpdaterPath";
+        private const string SourceUpdaterOptionsSectionName = "SourceUpdaterOptions";
+        private const string SourceUpdaterPathSettingName = SourceUpdaterOptionsSectionName + ":SourceUpdaterPath";
 
         private readonly AggregateExtensionProvider _extensions;
         private readonly ILogger<AnalyzerProvider> _logger;
