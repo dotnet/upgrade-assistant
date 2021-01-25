@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AspNetMigrator.SourceUpdater;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace AspNetMigrator.SourceUpdater
+namespace AspNetMigrator
 {
     public static class SourceUpdaterStepExtensions
     {

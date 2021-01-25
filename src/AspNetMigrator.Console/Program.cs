@@ -9,13 +9,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
-using AspNetMigrator.ConfigUpdater;
 using AspNetMigrator.Extensions;
 using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
-using AspNetMigrator.SourceUpdater;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +21,6 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
-        private const string ConfigUpdaterStepOptionsSection = "ConfigUpdaterStepOptions";
         private const string PackageUpdaterStepOptionsSection = "PackageUpdaterStepOptions";
         private const string TemplateInserterStepOptionsSection = "TemplateInserterStepOptions";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
@@ -92,7 +87,6 @@ namespace AspNetMigrator.ConsoleApp
 
             var host = Host.CreateDefaultBuilder()
                 .UseContentRoot(AppContext.BaseDirectory)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
                     if (appCommand == AppCommand.Migrate)
@@ -129,17 +123,11 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
                     services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
                     services.AddTemplateInserterStep().Bind(context.Configuration.GetSection(TemplateInserterStepOptionsSection));
-                    services.AddConfigUpdaterStep().Bind(context.Configuration.GetSection(ConfigUpdaterStepOptionsSection));
+                    services.AddConfigUpdaterStep();
                     services.AddSourceUpdaterStep();
                     services.AddScoped<Migrator>();
 
                     serviceConfiguration?.Invoke(context, services);
-                })
-                .ConfigureContainer<ContainerBuilder>((context, builder) =>
-                {
-                    var configUpdatersPath = context.Configuration.GetSection(ConfigUpdaterStepOptionsSection).Get<ConfigUpdaterStepOptions>()?.ConfigUpdaterPath
-                        ?? throw new ArgumentNullException("Config updaters path must not be null");
-                    builder.RegisterModule(new ConfigUpdatersModule(configUpdatersPath));
                 })
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
