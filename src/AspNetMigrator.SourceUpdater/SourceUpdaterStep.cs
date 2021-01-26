@@ -69,7 +69,7 @@ namespace AspNetMigrator.SourceUpdater
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
-            await GetDiagnosticsAsync(context, token).ConfigureAwait(false);
+            await GetDiagnosticsAsync(token).ConfigureAwait(false);
 
             foreach (var step in SubSteps)
             {
@@ -82,7 +82,7 @@ namespace AspNetMigrator.SourceUpdater
                 new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No migration diagnostics found", BuildBreakRisk.None);
         }
 
-        public async Task GetDiagnosticsAsync(IMigrationContext context, CancellationToken token)
+        public async Task GetDiagnosticsAsync(CancellationToken token)
         {
             if (Project is null)
             {

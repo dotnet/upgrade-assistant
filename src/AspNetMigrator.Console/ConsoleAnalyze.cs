@@ -20,7 +20,6 @@ namespace AspNetMigrator.ConsoleApp
             ILogger<ConsoleAnalyze> logger,
             IMigrationContextFactory factory,
             IReportGenerator reportGenerator,
-            MigrateOptions options,
             IHostApplicationLifetime lifetime)
         {
             _logger = logger;
