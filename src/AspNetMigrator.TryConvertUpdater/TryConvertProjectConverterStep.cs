@@ -94,6 +94,10 @@ namespace AspNetMigrator.TryConvertUpdater
 
             await tryConvertProcess.WaitForExitAsync(token).ConfigureAwait(false);
 
+            // Reload the workspace since an external process worked on and
+            // may have changed the workspace's project.
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+
             if (tryConvertProcess.ExitCode != 0 || errorEncountered)
             {
                 Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode}). Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.", tryConvertProcess.ExitCode);

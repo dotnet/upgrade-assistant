@@ -14,7 +14,24 @@ namespace AspNetMigrator.MSBuild
     {
         private const string DefaultSDK = "Microsoft.NET.Sdk";
 
-        public ProjectRootElement ProjectRoot => Project.Xml;
+        private ProjectRootElement? _projectRoot;
+
+        // Don't get the project root from Project.Xml since some migration
+        // steps may need to work with the project XML while it's not in
+        // a completely loadable state (for example, prior to converting
+        // to a SDK-style  project).
+        public ProjectRootElement ProjectRoot
+        {
+            get
+            {
+                if (_projectRoot is null)
+                {
+                    _projectRoot = ProjectRootElement.Open(FilePath, Context.ProjectCollection);
+                }
+
+                return _projectRoot;
+            }
+        }
 
         public string TargetSdk
         {
@@ -64,19 +81,9 @@ namespace AspNetMigrator.MSBuild
             ProjectRoot.WorkAroundRoslynIssue36781();
         }
 
-        private static ProjectRootElement GetProjectRootElement(string path)
-        {
-            var projectRoot = ProjectRootElement.Open(path);
-            projectRoot.Reload(false); // Reload to make sure we're not seeing an old cached version of the project
-
-            return projectRoot!;
-        }
-
         public ValueTask SaveAsync(CancellationToken token)
         {
             ProjectRoot.Save();
-
-            Context.ProjectCollection.UnloadProject(Project);
 
             // Reload the workspace since, at this point, the project may be different from what was loaded
             return Context.ReloadWorkspaceAsync(token);

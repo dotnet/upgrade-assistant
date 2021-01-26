@@ -15,5 +15,7 @@ namespace AspNetMigrator
         bool UpdateSolution(Solution updatedSolution);
 
         IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
+
+        ValueTask ReloadWorkspaceAsync(CancellationToken token);
     }
 }
