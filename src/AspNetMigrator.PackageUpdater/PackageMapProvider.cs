@@ -34,30 +34,28 @@ namespace AspNetMigrator.PackageUpdater
 
                 var packageMapPath = extension.GetOptions<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)?.PackageMapPath;
 
-                if (packageMapPath is null)
+                if (packageMapPath is not null)
                 {
-                    continue;
-                }
-
-                foreach (var file in extension.ListFiles(packageMapPath, PackageMapExtension))
-                {
-                    try
+                    foreach (var file in extension.ListFiles(packageMapPath, PackageMapExtension))
                     {
-                        using var config = File.OpenRead(file);
-                        var newMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
-                        if (newMaps != null)
+                        try
                         {
-                            maps.AddRange(newMaps);
-                            _logger.LogDebug("Loaded {MapCount} package maps from {PackageMapPath}", newMaps.Count(), file);
+                            using var config = File.OpenRead(file);
+                            var newMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
+                            if (newMaps != null)
+                            {
+                                maps.AddRange(newMaps);
+                                _logger.LogDebug("Loaded {MapCount} package maps from {PackageMapPath}", newMaps.Count(), file);
+                            }
+                        }
+                        catch (JsonException exc)
+                        {
+                            _logger.LogDebug(exc, "File {PackageMapPath} is not a valid package map file", file);
                         }
                     }
-                    catch (JsonException exc)
-                    {
-                        _logger.LogDebug(exc, "File {PackageMapPath} is not a valid package map file", file);
-                    }
                 }
 
-                _logger.LogDebug("Loaded {MapCount} package maps from extension {Extension}", maps.Count, extension.Name);
+                _logger.LogDebug("Finished loading package maps from extension {Extension}", extension.Name);
             }
 
             return maps;
