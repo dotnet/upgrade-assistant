@@ -16,6 +16,6 @@ namespace AspNetMigrator
 
         IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
 
-        public ValueTask ReloadWorkspaceAsync(CancellationToken token);
+        ValueTask ReloadWorkspaceAsync(CancellationToken token);
     }
 }
