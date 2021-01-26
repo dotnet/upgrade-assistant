@@ -21,8 +21,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdaterStepOptions";
-        private const string TemplateInserterStepOptionsSection = "TemplateInserterStepOptions";
+        private const string PackageUpdaterStepOptionsSection = "PackageUpdaterOptions";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
         private const string LogFilePath = "log.txt";
 
@@ -122,7 +121,7 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<MigrationStep, SolutionMigrationStep>();
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
                     services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
-                    services.AddTemplateInserterStep().Bind(context.Configuration.GetSection(TemplateInserterStepOptionsSection));
+                    services.AddTemplateInserterStep();
                     services.AddConfigUpdaterStep();
                     services.AddSourceUpdaterStep();
                     services.AddScoped<Migrator>();
