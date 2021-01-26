@@ -6,11 +6,10 @@ namespace AspNetMigrator
 {
     public static class PackageUpdaterStepExtensions
     {
-        public static OptionsBuilder<PackageUpdaterStepOptions> AddPackageUpdaterStep(this IServiceCollection services)
-        {
-            services.AddSingleton<ITargetFrameworkIdentifier, TargetFrameworkIdentifier>();
-            services.AddScoped<MigrationStep, PackageUpdaterStep>();
-            return services.AddOptions<PackageUpdaterStepOptions>();
-        }
+        public static OptionsBuilder<PackageUpdaterOptions> AddPackageUpdaterStep(this IServiceCollection services) =>
+            services.AddSingleton<PackageMapProvider>()
+                .AddSingleton<ITargetFrameworkIdentifier, TargetFrameworkIdentifier>()
+                .AddScoped<MigrationStep, PackageUpdaterStep>()
+                .AddOptions<PackageUpdaterOptions>();
     }
 }
