@@ -144,6 +144,8 @@ namespace AspNetMigrator.MSBuild
 
         public void UnloadWorkspace()
         {
+            ProjectCollection.UnloadAllProjects();
+            _projectCache.Clear();
             _workspace?.CloseSolution();
             _workspace?.Dispose();
             _workspace = null;
