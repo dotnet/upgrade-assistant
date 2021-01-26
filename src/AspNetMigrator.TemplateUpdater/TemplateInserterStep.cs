@@ -190,13 +190,19 @@ namespace AspNetMigrator.TemplateUpdater
                     return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Template file not found: {item.TemplateFilePath}");
                 }
 
+                Logger.LogInformation("Added {ItemName} from template file", item.Path);
+            }
+
+            // After adding the items on disk, reload the workspace and check whether they were picked up automatically or not
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+            foreach (var item in _itemsToAdd.Values)
+            {
                 if (!projectFile.ContainsItem(item.Path, item.Type, token))
                 {
                     // Add the new item to the project if it wasn't auto-included
                     projectFile.AddItem(item.Type.Name, item.Path);
+                    Logger.LogDebug("Added {ItemName} to project file", item.Path);
                 }
-
-                Logger.LogInformation("Added {ItemName} to the project from template file", item.Path);
             }
 
             await projectFile.SaveAsync(token).ConfigureAwait(false);
