@@ -38,6 +38,7 @@ namespace AspNetMigrator.SourceUpdater
                 var sourceUpdaterOptions = extension.GetOptions<SourceUpdaterOptions>(SourceUpdaterOptionsSectionName);
                 if (sourceUpdaterOptions?.SourceUpdaterPath is null)
                 {
+                    _logger.LogDebug("No source updater section in extension manifest. Finished loading analyzers from {Extension}", extension.Name);
                     continue;
                 }
 
@@ -62,6 +63,8 @@ namespace AspNetMigrator.SourceUpdater
                     {
                     }
                 }
+
+                _logger.LogDebug("Finished loading analyzers from {Extension}", extension.Name);
             }
 
             _logger.LogDebug("Loaded {Count} analyzers", analyzers.Count);
@@ -80,6 +83,7 @@ namespace AspNetMigrator.SourceUpdater
                 var sourceUpdaterOptions = extension.GetOptions<SourceUpdaterOptions>(SourceUpdaterOptionsSectionName);
                 if (sourceUpdaterOptions?.SourceUpdaterPath is null)
                 {
+                    _logger.LogDebug("No source updater section in extension manifest. Finished loading code fix providers from {Extension}", extension.Name);
                     continue;
                 }
 
@@ -104,6 +108,8 @@ namespace AspNetMigrator.SourceUpdater
                     {
                     }
                 }
+
+                _logger.LogDebug("Finished loading code fix providers from {Extension}", extension.Name);
             }
 
             _logger.LogDebug("Loaded {Count} code fix providers", codeFixProviders.Count);

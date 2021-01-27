@@ -34,12 +34,13 @@ namespace AspNetMigrator.ConfigUpdater
 
             foreach (var extension in _extensions.ExtensionProviders)
             {
-                _logger.LogDebug("Looking for config updates in {Extension}", extension.Name);
+                _logger.LogDebug("Looking for config updaters in {Extension}", extension.Name);
 
                 var configUpdaterOptions = extension.GetOptions<ConfigUpdaterOptions>(ConfigUpdaterOptionsSectionName);
 
                 if (configUpdaterOptions?.ConfigUpdaterPath is null)
                 {
+                    _logger.LogDebug("No config updater section in extension manifest. Finished loading config updaters from {Extension}", extension.Name);
                     continue;
                 }
 
@@ -64,6 +65,8 @@ namespace AspNetMigrator.ConfigUpdater
                     {
                     }
                 }
+
+                _logger.LogDebug("Finished loading config updaters from {Extension}", extension.Name);
             }
 
             _logger.LogDebug("Loaded {Count} config updaters", updaters.Count);
