@@ -59,8 +59,6 @@ namespace AspNetMigrator.Extensions
             // Use Automapper here as it's more readable and more performant than
             // doing the mapping ourselves with reflection
             var mapper = GetMapper<T>();
-            var optionType = typeof(T);
-            var optionProps = optionType.GetProperties().Where(p => p.CanRead && p.CanWrite);
             T? options = default;
 
             foreach (var extension in ExtensionProviders)
@@ -92,7 +90,27 @@ namespace AspNetMigrator.Extensions
             var mapperConfiguration = new MapperConfiguration(config =>
             {
                 config.CreateMap<T, T>()
-                    .ForAllMembers(options => options.Condition((s, d, member) => member is not null));
+                    .ForAllMembers(options => options.Condition((src, dest, member) =>
+                    {
+                        // Don't overwrite older options with newer ones
+                        // that are null of empty.
+                        if (member is null)
+                        {
+                            return false;
+                        }
+
+                        if (member is Array a && a.Length == 0)
+                        {
+                            return false;
+                        }
+
+                        if (member is string s && s.Length == 0)
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    }));
             });
             var mapper = new Mapper(mapperConfiguration);
             return mapper;
