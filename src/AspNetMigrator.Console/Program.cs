@@ -21,6 +21,7 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
+        private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
         private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string LogFilePath = "log.txt";
@@ -106,7 +107,13 @@ namespace AspNetMigrator.ConsoleApp
 
                     services.AddSingleton(options);
                     services.AddSingleton<IPackageLoader, PackageLoader>();
-                    services.AddExtensions(options.Extension ?? Enumerable.Empty<string>());
+
+                    // Load extensions that come either from the command line (via -e) or from the environment
+                    // (via the config file or environment variables). Note that command line extensions
+                    // can override configuration ones because they are processed last.
+                    var extensionsFromCommandLine = options.Extension ?? Enumerable.Empty<string>();
+                    var extensionsFromConfig = context.Configuration[UpgradeAssistantExtensionPathsSettingName]?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
+                    services.AddExtensions(extensionsFromConfig.Concat(extensionsFromCommandLine));
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
