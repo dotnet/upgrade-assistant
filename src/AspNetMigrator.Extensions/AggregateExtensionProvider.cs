@@ -4,11 +4,14 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Extensions
 {
     public class AggregateExtensionProvider : IExtensionProvider
     {
+        private readonly ILogger<AggregateExtensionProvider> _logger;
+
         public string Name => $"Aggregate extensions from {ExtensionProviders.Length} underlying providers";
 
         /// <summary>
@@ -16,14 +19,16 @@ namespace AspNetMigrator.Extensions
         /// </summary>
         public ImmutableArray<IExtensionProvider> ExtensionProviders { get; }
 
-        public AggregateExtensionProvider(IEnumerable<IExtensionProvider> extensionProviders)
+        public AggregateExtensionProvider(IEnumerable<IExtensionProvider> extensionProviders, ILogger<AggregateExtensionProvider> logger)
         {
             if (extensionProviders is null)
             {
                  throw new ArgumentNullException(nameof(extensionProviders));
             }
 
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             ExtensionProviders = ImmutableArray.CreateRange(extensionProviders);
+            _logger.LogInformation("Registered {ExtensionCount} extensions:\n\t{ExtensionNames}", ExtensionProviders.Length, string.Join("\n\t", ExtensionProviders.Select(e => e.Name)));
         }
 
         /// <summary>
