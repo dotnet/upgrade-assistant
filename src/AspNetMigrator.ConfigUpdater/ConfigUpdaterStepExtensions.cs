@@ -5,8 +5,11 @@ namespace AspNetMigrator
 {
     public static class ConfigUpdaterStepExtensions
     {
-        public static IServiceCollection AddConfigUpdaterStep(this IServiceCollection services) =>
-            services.AddSingleton<ConfigUpdaterProvider>()
-                .AddScoped<MigrationStep, ConfigUpdaterStep>();
+        public static IServiceCollection AddConfigUpdaterStep(this IServiceCollection services)
+        {
+            services.AddSingleton<ConfigUpdaterProvider>();
+            services.AddScoped<MigrationStep, ConfigUpdaterStep>();
+            return services;
+        }
     }
 }

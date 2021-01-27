@@ -9,6 +9,8 @@ namespace AspNetMigrator.Extensions
     {
         public const string ManifestFileName = "ExtensionManifest.json";
 
+        public override string Name { get; }
+
         public DirectoryExtensionProvider(string directory, ILogger<DirectoryExtensionProvider> logger)
             : base(GetConfiguration(directory), logger, directory)
         {

@@ -10,7 +10,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
-using AspNetMigrator.Extensions;
 using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
@@ -22,8 +21,8 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdaterOptions";
-        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
+        private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
+        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string LogFilePath = "log.txt";
 
         public static Task Main(string[] args)
@@ -48,6 +47,7 @@ namespace AspNetMigrator.ConsoleApp
 
             analyzeCmd.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             analyzeCmd.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+            analyzeCmd.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
 
             var root = new RootCommand
             {
@@ -106,38 +106,7 @@ namespace AspNetMigrator.ConsoleApp
 
                     services.AddSingleton(options);
                     services.AddSingleton<IPackageLoader, PackageLoader>();
-
-                    // Add extension providers
-                    services.AddSingleton<IExtensionProvider, DefaultExtensionProvider>();
-                    foreach (var e in options.Extension ?? Enumerable.Empty<string>())
-                    {
-                        if (string.IsNullOrEmpty(e))
-                        {
-                            continue;
-                        }
-
-                        if (Directory.Exists(e))
-                        {
-                            services.AddSingleton<IExtensionProvider>(sp => ActivatorUtilities.CreateInstance<DirectoryExtensionProvider>(sp, e));
-                        }
-                        else if (File.Exists(e))
-                        {
-                            if (DirectoryExtensionProvider.ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
-                            {
-                                services.AddSingleton<IExtensionProvider>(sp => ActivatorUtilities.CreateInstance<DirectoryExtensionProvider>(sp, Path.GetDirectoryName(e)));
-                            }
-                            else if (Path.GetExtension(e).Equals(".zip", StringComparison.OrdinalIgnoreCase))
-                            {
-                                Console.WriteLine($"ERROR: Archive extensions not yet supported; ignoring extension {e}");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine($"ERROR: Extension {e} not found; ignoring extension {e}");
-                        }
-                    }
-
-                    services.AddSingleton<AggregateExtensionProvider>();
+                    services.AddExtensions(options.Extension ?? Enumerable.Empty<string>());
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();

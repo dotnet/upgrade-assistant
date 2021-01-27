@@ -11,8 +11,8 @@ namespace AspNetMigrator.Extensions
 
         Stream? GetFile(string path);
 
-        IEnumerable<string> ListFiles(string path, string searchPattern);
+        IEnumerable<string> GetFiles(string path, string searchPattern);
 
-        IEnumerable<string> ListFiles(string path);
+        IEnumerable<string> GetFiles(string path);
     }
 }

@@ -5,8 +5,11 @@ namespace AspNetMigrator
 {
     public static class SourceUpdaterStepExtensions
     {
-        public static IServiceCollection AddSourceUpdaterStep(this IServiceCollection services) =>
-            services.AddSingleton<AnalyzerProvider>()
-                .AddScoped<MigrationStep, SourceUpdaterStep>();
+        public static IServiceCollection AddSourceUpdaterStep(this IServiceCollection services)
+        {
+            services.AddSingleton<AnalyzerProvider>();
+            services.AddScoped<MigrationStep, SourceUpdaterStep>();
+            return services;
+        }
     }
 }

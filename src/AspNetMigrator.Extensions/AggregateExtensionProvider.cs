@@ -121,8 +121,8 @@ namespace AspNetMigrator.Extensions
         /// </summary>
         /// <param name="path">The path to look in for files.</param>
         /// <returns>All files in or under the given path from any extension provider.</returns>
-        public IEnumerable<string> ListFiles(string path) =>
-            ExtensionProviders.SelectMany(p => p.ListFiles(path)).Distinct();
+        public IEnumerable<string> GetFiles(string path) =>
+            ExtensionProviders.SelectMany(p => p.GetFiles(path)).Distinct();
 
         /// <summary>
         /// Returns a list of files present at the specified path from any underlying extension providers.
@@ -130,7 +130,7 @@ namespace AspNetMigrator.Extensions
         /// <param name="path">The path to look in for files.</param>
         /// <param name="searchPattern">Search pattern that files should match (supports wildcards like * and ?).</param>
         /// <returns>All files in or under the given path from any extension provider.</returns>
-        public IEnumerable<string> ListFiles(string path, string searchPattern) =>
-            ExtensionProviders.SelectMany(p => p.ListFiles(path, searchPattern)).Distinct();
+        public IEnumerable<string> GetFiles(string path, string searchPattern) =>
+            ExtensionProviders.SelectMany(p => p.GetFiles(path, searchPattern)).Distinct();
     }
 }

@@ -12,7 +12,7 @@ namespace AspNetMigrator.ConfigUpdater
     public class ConfigUpdaterProvider
     {
         private const string AssemblySearchPattern = "*.dll";
-        private const string ConfigUpdaterOptionsSectionName = "ConfigUpdaterOptions";
+        private const string ConfigUpdaterOptionsSectionName = "ConfigUpdater";
 
         private readonly AggregateExtensionProvider _extensions;
         private readonly ILogger<ConfigUpdaterProvider> _logger;
@@ -44,7 +44,7 @@ namespace AspNetMigrator.ConfigUpdater
                     continue;
                 }
 
-                foreach (var file in extension.ListFiles(configUpdaterOptions.ConfigUpdaterPath, AssemblySearchPattern))
+                foreach (var file in extension.GetFiles(configUpdaterOptions.ConfigUpdaterPath, AssemblySearchPattern))
                 {
                     try
                     {

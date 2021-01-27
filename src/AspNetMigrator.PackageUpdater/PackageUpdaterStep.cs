@@ -81,9 +81,6 @@ namespace AspNetMigrator.PackageUpdater
             _packagesToRemove = new List<NuGetReference>();
             _packagesToAdd = new List<NuGetReference>();
 
-            // Read package maps
-            var packageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ConfigureAwait(false);
-
             // Restore packages (to produce lockfile)
             var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
@@ -131,8 +128,9 @@ namespace AspNetMigrator.PackageUpdater
                     }
 
                     // If the package is in a package map, mark for removal and add appropriate packages for addition
-                    var maps = packageMaps.Where(m => m.ContainsReference(packageReference.Name, packageReference.Version));
-                    foreach (var map in maps)
+                    var packageMaps = _packageMapProvider.GetPackageMapsAsync(token)
+                        .Where(m => m.ContainsReference(packageReference.Name, packageReference.Version));
+                    await foreach (var map in packageMaps)
                     {
                         if (map != null)
                         {

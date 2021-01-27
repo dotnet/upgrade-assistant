@@ -14,7 +14,7 @@ namespace AspNetMigrator.SourceUpdater
     public class AnalyzerProvider
     {
         private const string AssemblySearchPattern = "*.dll";
-        private const string SourceUpdaterOptionsSectionName = "SourceUpdaterOptions";
+        private const string SourceUpdaterOptionsSectionName = "SourceUpdater";
 
         private readonly AggregateExtensionProvider _extensions;
         private readonly ILogger<AnalyzerProvider> _logger;
@@ -42,7 +42,7 @@ namespace AspNetMigrator.SourceUpdater
                     continue;
                 }
 
-                foreach (var file in extension.ListFiles(sourceUpdaterOptions.SourceUpdaterPath, AssemblySearchPattern))
+                foreach (var file in extension.GetFiles(sourceUpdaterOptions.SourceUpdaterPath, AssemblySearchPattern))
                 {
                     try
                     {
@@ -87,7 +87,7 @@ namespace AspNetMigrator.SourceUpdater
                     continue;
                 }
 
-                foreach (var file in extension.ListFiles(sourceUpdaterOptions.SourceUpdaterPath, AssemblySearchPattern))
+                foreach (var file in extension.GetFiles(sourceUpdaterOptions.SourceUpdaterPath, AssemblySearchPattern))
                 {
                     try
                     {

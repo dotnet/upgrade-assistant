@@ -13,7 +13,7 @@ namespace AspNetMigrator.TemplateUpdater
     public class TemplateProvider
     {
         private const string TemplateConfigFileName = "TemplateConfig.json";
-        private const string TemplateInserterOptionsSectionName = "TemplateInserterOptions";
+        private const string TemplateInserterOptionsSectionName = "TemplateInserter";
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -106,7 +106,7 @@ namespace AspNetMigrator.TemplateUpdater
 
             var options = extension.GetOptions<TemplateInserterOptions>(TemplateInserterOptionsSectionName);
 
-            return options?.TemplatePath is null ? Enumerable.Empty<string>() : extension.ListFiles(options.TemplatePath, TemplateConfigFileName);
+            return options?.TemplatePath is null ? Enumerable.Empty<string>() : extension.GetFiles(options.TemplatePath, TemplateConfigFileName);
         }
     }
 }

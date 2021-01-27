@@ -13,7 +13,7 @@ namespace AspNetMigrator.Extensions
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
 
-        public string Name { get; protected set; }
+        public virtual string Name => "Default extensions";
 
         public DefaultExtensionProvider(IConfiguration configuration, ILogger<DefaultExtensionProvider> logger)
             : this(configuration, logger, AppContext.BaseDirectory)
@@ -24,8 +24,6 @@ namespace AspNetMigrator.Extensions
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _baseDirectory = baseDirectory ?? throw new ArgumentNullException(nameof(baseDirectory));
-
-            Name = "Default extensions";
         }
 
         public Stream? GetFile(string path)
@@ -42,9 +40,9 @@ namespace AspNetMigrator.Extensions
 
         public T? GetOptions<T>(string sectionName) => _configuration.GetSection(sectionName).Get<T>();
 
-        public IEnumerable<string> ListFiles(string path) => ListFiles(path, "*");
+        public IEnumerable<string> GetFiles(string path) => GetFiles(path, "*");
 
-        public IEnumerable<string> ListFiles(string path, string searchPattern)
+        public IEnumerable<string> GetFiles(string path, string searchPattern)
         {
             var dirPath = GetAbsolutePath(path);
             if (!Directory.Exists(dirPath))
