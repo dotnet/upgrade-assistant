@@ -10,6 +10,8 @@ namespace AspNetMigrator
 
         public string? BackupPath { get; set; }
 
+        public string[]? Extension { get; set; }
+
         public bool SkipBackup { get; set; }
 
         public bool Verbose { get; set; }
