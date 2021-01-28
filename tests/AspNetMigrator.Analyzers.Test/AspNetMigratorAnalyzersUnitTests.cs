@@ -147,7 +147,8 @@ namespace AspNetMigrator.Analyzers.Test
 #pragma warning restore IDE0060 // Remove unused parameter
         {
             // Register MSBuild
-            MSBuildRegistrationStartup.RegisterMSBuildInstance();
+            var msBuildRegistrar = new MSBuildRegistrationStartup(new NullLogger<MSBuildRegistrationStartup>());
+            msBuildRegistrar.RegisterMSBuildInstance();
 
             // Make sure the TestProject's dependencies are restored
             RestoreTestProjectPackages();

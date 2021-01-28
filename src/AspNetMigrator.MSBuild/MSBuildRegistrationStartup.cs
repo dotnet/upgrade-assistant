@@ -13,6 +13,7 @@ namespace AspNetMigrator.MSBuild
     public class MSBuildRegistrationStartup
     {
         private readonly ILogger _logger;
+        private VisualStudioInstance? _msBuildInstance;
 
         public MSBuildRegistrationStartup(ILogger<MSBuildRegistrationStartup> logger)
         {
@@ -38,46 +39,55 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
-        public static string RegisterMSBuildInstance()
+        public string RegisterMSBuildInstance()
         {
-            // TODO : Harden this and allow MSBuild location to be read from env vars.
-            var msBuildInstance = MSBuildLocator.QueryVisualStudioInstances().First();
-            MSBuildLocator.RegisterInstance(msBuildInstance);
-            AssemblyLoadContext.Default.Resolving += (AssemblyLoadContext context, AssemblyName assemblyName) =>
+            if (_msBuildInstance is null)
             {
-                // TODO : Harden this and extract the event handler to its own class
-                if (context is null || assemblyName is null)
-                {
-                    return null;
-                }
+                // TODO : Harden this and allow MSBuild location to be read from env vars.
+                var msBuildInstances = MSBuildLocator.QueryVisualStudioInstances();
+                _logger.LogDebug("Found {Count} candidate MSBuild instances:\n\t{MSBuildInstances}", msBuildInstances.Count(), string.Join("\n\t", msBuildInstances.Select(m => m.MSBuildPath)));
+                _msBuildInstance = msBuildInstances.First();
+                MSBuildLocator.RegisterInstance(_msBuildInstance);
+                AssemblyLoadContext.Default.Resolving += ResolveAssembly;
+            }
 
-                // If the assembly has a culture, check for satellite assemblies
-                if (assemblyName.CultureInfo != null)
-                {
-                    var satellitePath = Path.Combine(msBuildInstance.MSBuildPath, assemblyName.CultureInfo.Name, $"{assemblyName.Name}.dll");
-                    if (File.Exists(satellitePath))
-                    {
-                        return context.LoadFromAssemblyPath(satellitePath);
-                    }
+            return _msBuildInstance.MSBuildPath;
+        }
 
-                    satellitePath = Path.Combine(msBuildInstance.MSBuildPath, assemblyName.CultureInfo.TwoLetterISOLanguageName, $"{assemblyName.Name}.dll");
-                    if (File.Exists(satellitePath))
-                    {
-                        return context.LoadFromAssemblyPath(satellitePath);
-                    }
-                }
-
-                var assemblyPath = Path.Combine(msBuildInstance.MSBuildPath, $"{assemblyName.Name}.dll");
-                if (File.Exists(assemblyPath))
-                {
-                    return context.LoadFromAssemblyPath(assemblyPath);
-                }
-
-                // TODO : Log missing assembly
+        private Assembly? ResolveAssembly(AssemblyLoadContext context, AssemblyName assemblyName)
+        {
+            if (context is null || assemblyName is null || _msBuildInstance is null)
+            {
                 return null;
-            };
+            }
 
-            return msBuildInstance.MSBuildPath;
+            // If the assembly has a culture, check for satellite assemblies
+            if (assemblyName.CultureInfo != null)
+            {
+                var satellitePath = Path.Combine(_msBuildInstance.MSBuildPath, assemblyName.CultureInfo.Name, $"{assemblyName.Name}.dll");
+                if (File.Exists(satellitePath))
+                {
+                    _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
+                    return context.LoadFromAssemblyPath(satellitePath);
+                }
+
+                satellitePath = Path.Combine(_msBuildInstance.MSBuildPath, assemblyName.CultureInfo.TwoLetterISOLanguageName, $"{assemblyName.Name}.dll");
+                if (File.Exists(satellitePath))
+                {
+                    _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
+                    return context.LoadFromAssemblyPath(satellitePath);
+                }
+            }
+
+            var assemblyPath = Path.Combine(_msBuildInstance.MSBuildPath, $"{assemblyName.Name}.dll");
+            if (File.Exists(assemblyPath))
+            {
+                _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, assemblyPath);
+                return context.LoadFromAssemblyPath(assemblyPath);
+            }
+
+            _logger.LogDebug("Unable to resolve assembly {AssemblyName}", assemblyName.FullName);
+            return null;
         }
     }
 }
