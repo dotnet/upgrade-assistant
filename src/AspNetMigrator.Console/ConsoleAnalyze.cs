@@ -62,8 +62,7 @@ namespace AspNetMigrator.ConsoleApp
                 {
                     foreach (var c in row.Data)
                     {
-                        Console.Write(c);
-                        Console.Write("\t");
+                        Console.WriteLine(string.Join("\t", row.Data));
                     }
 
                     Console.WriteLine();
@@ -72,6 +71,7 @@ namespace AspNetMigrator.ConsoleApp
 
             public override void Visit(Divider divider)
             {
+                Console.WriteLine();
             }
 
             public override void Visit(Text text)

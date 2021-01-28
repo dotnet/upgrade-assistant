@@ -12,7 +12,8 @@ namespace AspNetMigrator.Portability.Service
 {
     public class PortabilityService : IPortabilityService
     {
-        private readonly Uri _url = new Uri("https://portability.dot.net/api/fxapi");
+        private static readonly Uri _url = new Uri("/api/fxapi", UriKind.Relative);
+
         private readonly HttpClient _client;
         private readonly ILogger<PortabilityService> _logger;
         private readonly JsonSerializerOptions _options;

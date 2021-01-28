@@ -41,8 +41,8 @@
     <ProjectReference Include="..\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.TemplateUpdater\AspNetMigrator.TemplateUpdater.csproj" />
 
-    <!-- These projects aren't used directly by this project, but are included here so that they're 
-         sure to be built prior to copying their binary output into this project's 'SourceUpdaters' 
+    <!-- These projects aren't used directly by this project, but are included here so that they're
+         sure to be built prior to copying their binary output into this project's 'SourceUpdaters'
          and 'ConfigUpdaters' directories. -->
     <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
     <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
@@ -51,17 +51,13 @@
     <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Portability\" />
-  </ItemGroup>
-
   <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
   <Target Name="MoveUpdatersToUpdatersUpdatersDir" AfterTargets="Build">
     <PropertyGroup>
       <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
       <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
     </PropertyGroup>
-    
+
     <ItemGroup>
       <SourceUpdateFiles Include="$(OutputPath)AspNetMigrator.Analyzers.*" />
       <ConfigUpdateFiles Include="$(OutputPath)AspNetMigrator.DefaultConfigUpdaters.*" />
@@ -87,7 +83,7 @@
         <RelativePath>ConfigUpdaters\%(ConfigUpdaterFiles.Filename)%(Extension)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>
-    </ItemGroup>    
+    </ItemGroup>
   </Target>
 
 </Project>

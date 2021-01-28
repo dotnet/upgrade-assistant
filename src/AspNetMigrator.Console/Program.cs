@@ -101,7 +101,8 @@ namespace AspNetMigrator.ConsoleApp
                         services.AddHostedService<ConsoleAnalyze>();
                     }
 
-                    services.AddPortabilityAnalysis();
+                    services.AddPortabilityAnalysis()
+                        .Bind(context.Configuration.GetSection("Portability"));
 
                     services.AddSingleton<IMigrationStateManager, FileMigrationStateFactory>();
 

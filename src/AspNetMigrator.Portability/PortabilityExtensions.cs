@@ -1,23 +1,27 @@
-﻿using System;
-using AspNetMigrator.Portability;
+﻿using AspNetMigrator.Portability;
 using AspNetMigrator.Portability.Analyzers;
 using AspNetMigrator.Portability.Service;
 using AspNetMigrator.Reporting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace AspNetMigrator
 {
     public static class PortabilityExtensions
     {
-        public static void AddPortabilityAnalysis(this IServiceCollection services)
+        public static OptionsBuilder<PortabilityOptions> AddPortabilityAnalysis(this IServiceCollection services)
         {
             services.AddTransient<IPortabilityAnalyzer, PortabilityServiceAnalyzer>();
-            services.AddHttpClient<PortabilityService>(client =>
+            services.AddHttpClient<PortabilityService>((sp, client) =>
             {
-                client.BaseAddress = new Uri("https://portability.dot.net");
+                var options = sp.GetRequiredService<IOptions<PortabilityOptions>>();
+                client.BaseAddress = options.Value.ServiceEndpoint;
             });
             services.AddSingleton<IPortabilityService>(sp => new MemoryCachingPortabilityService(sp.GetRequiredService<PortabilityService>()));
             services.AddTransient<IPageGenerator, PortabilityAnalysis>();
+
+            return services.AddOptions<PortabilityOptions>()
+                .ValidateDataAnnotations();
         }
     }
 }

@@ -23,7 +23,7 @@ namespace AspNetMigrator.Portability.Service
                 throw new ArgumentNullException(nameof(apis));
             }
 
-            var unknown = new List<string>();
+            var nonCachedApis = new List<string>();
 
             foreach (var api in apis)
             {
@@ -33,11 +33,11 @@ namespace AspNetMigrator.Portability.Service
                 }
                 else
                 {
-                    unknown.Add(api);
+                    nonCachedApis.Add(api);
                 }
             }
 
-            await foreach (var api in _other.GetApiInformation(unknown, token))
+            await foreach (var api in _other.GetApiInformation(nonCachedApis, token))
             {
                 _cache.Add(api.Definition.DocId, api);
                 yield return api;
