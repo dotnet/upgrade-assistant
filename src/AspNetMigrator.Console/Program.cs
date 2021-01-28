@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
 using AspNetMigrator.PackageUpdater;
+using AspNetMigrator.Reporting;
 using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,6 +100,9 @@ namespace AspNetMigrator.ConsoleApp
                     {
                         services.AddHostedService<ConsoleAnalyze>();
                     }
+
+                    services.AddPortabilityAnalysis()
+                        .Bind(context.Configuration.GetSection("Portability"));
 
                     services.AddSingleton<IMigrationStateManager, FileMigrationStateFactory>();
 
