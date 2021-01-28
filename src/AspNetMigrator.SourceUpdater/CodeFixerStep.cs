@@ -104,7 +104,7 @@ namespace AspNetMigrator.SourceUpdater
                 }
 
                 // Re-build and get an updated list of diagnostics
-                await _sourceUpdater.GetDiagnosticsAsync(context, token).ConfigureAwait(false);
+                await _sourceUpdater.GetDiagnosticsAsync(token).ConfigureAwait(false);
 
                 // Normally, the migrator will apply steps one at a time
                 // at the user's instruction. In the case of parent and child steps,

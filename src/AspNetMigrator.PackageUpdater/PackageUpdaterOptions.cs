@@ -1,6 +1,6 @@
 ﻿namespace AspNetMigrator.PackageUpdater
 {
-    public class PackageUpdaterStepOptions
+    public class PackageUpdaterOptions
     {
         public bool LogRestoreOutput { get; set; }
 

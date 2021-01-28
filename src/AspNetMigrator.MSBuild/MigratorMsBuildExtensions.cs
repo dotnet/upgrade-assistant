@@ -19,7 +19,9 @@ namespace AspNetMigrator
             services.AddSingleton<IMigrationContextFactory, MSBuildMigrationContextFactory>();
 
             // Instantiate the migration context with a func to avoid needing MSBuild types prior to MSBuild registration
-            services.AddTransient(sp => ActivatorUtilities.CreateInstance<MSBuildWorkspaceMigrationContext>(sp));
+            services.AddTransient<MSBuildWorkspaceMigrationContext>();
+            services.AddTransient<IMigrationContext>(sp => sp.GetRequiredService<MSBuildWorkspaceMigrationContext>());
+            services.AddTransient<Func<MSBuildWorkspaceMigrationContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceMigrationContext>());
         }
 
         // TEMPORARY WORKAROUND

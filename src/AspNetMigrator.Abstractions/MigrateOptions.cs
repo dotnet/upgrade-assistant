@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace AspNetMigrator
 {
@@ -9,6 +10,8 @@ namespace AspNetMigrator
         public string ProjectPath => Project.FullName;
 
         public string? BackupPath { get; set; }
+
+        public string[] Extension { get; set; } = Array.Empty<string>();
 
         public bool SkipBackup { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace AspNetMigrator.SourceUpdater
 {
-    public class SourceUpdaterStepOptions
+    public class SourceUpdaterOptions
     {
         public string? SourceUpdaterPath { get; set; }
     }

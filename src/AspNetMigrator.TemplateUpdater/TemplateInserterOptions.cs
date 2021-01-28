@@ -1,6 +1,6 @@
 ﻿namespace AspNetMigrator.TemplateUpdater
 {
-    public class TemplateInserterStepOptions
+    public class TemplateInserterOptions
     {
         public string? TemplatePath { get; set; }
     }

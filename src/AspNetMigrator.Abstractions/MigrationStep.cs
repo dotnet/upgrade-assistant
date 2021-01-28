@@ -76,9 +76,7 @@ namespace AspNetMigrator
             {
                 throw;
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
-#pragma warning restore CA1031 // Do not catch general exception types
             {
                 (Status, StatusDetails) = (MigrationStepStatus.Failed, "Unexpected error initializing step.");
                 Logger.LogError(e, "Unexpected error initializing step");
@@ -122,9 +120,7 @@ namespace AspNetMigrator
             {
                 throw;
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
-#pragma warning restore CA1031 // Do not catch general exception types
             {
                 (Status, StatusDetails) = (MigrationStepStatus.Failed, "Unexpected error applying step.");
                 Logger.LogError(e, "Unexpected error applying step");

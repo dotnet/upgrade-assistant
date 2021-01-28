@@ -109,7 +109,7 @@ namespace AspNetMigrator.Solution
 
         private class ProjectCommand : MigrationCommand
         {
-            public static ProjectCommand Create(IProject project) => new ProjectCommand(project, false);
+            public static ProjectCommand Create(IProject project) => new(project, false);
 
             public ProjectCommand(IProject project, bool isCompleted)
             {
