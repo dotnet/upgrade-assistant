@@ -143,6 +143,7 @@ namespace AspNetMigrator.PackageUpdater
                             _packagesToAdd.AddRange(map.NetCorePackages);
                         }
                     }
+
                     if (mapFound)
                     {
                         continue;
