@@ -1,20 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using AspNetMigrator.Extensions;
 
 namespace AspNetMigrator.TemplateUpdater
 {
     /// <summary>
-    /// Internal type that supplements an ItemSpec with replacements relevant to its template configuration
-    /// and the relative path to the template file corresponding to the item.
+    /// Internal type that supplements an ItemSpec with replacements relevant to its template configuration,
+    /// the extension an item comes from, and the relative path to the template file corresponding to the item.
     /// </summary>
     internal record RuntimeItemSpec : ItemSpec
     {
-        public RuntimeItemSpec(ItemSpec baseItem, string templateFilePath, Dictionary<string, string> replacements)
+        public RuntimeItemSpec(ItemSpec baseItem, IExtensionProvider extension, string templateFilePath, Dictionary<string, string> replacements)
             : base(baseItem.Type, baseItem.Path, baseItem.Keywords.ToArray())
         {
-            TemplateFilePath = templateFilePath;
+            Extension = extension;
             Replacements = ImmutableDictionary.CreateRange(replacements);
+            TemplateFilePath = templateFilePath;
         }
 
         /// <summary>
@@ -24,8 +26,13 @@ namespace AspNetMigrator.TemplateUpdater
         public ImmutableDictionary<string, string>? Replacements { get; }
 
         /// <summary>
-        /// Gets the relative path to the template file.
+        /// Gets the relative path of the template file within the extension.
         /// </summary>
         public string TemplateFilePath { get; }
+
+        /// <summary>
+        /// Gets the extension the item comes from.
+        /// </summary>
+        public IExtensionProvider Extension { get; }
     }
 }

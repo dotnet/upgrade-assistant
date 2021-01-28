@@ -57,7 +57,7 @@ namespace IntegrationTests
             }
 
             services.AddSingleton(new InputOutputStreams(new StringReader(string.Join('\n', commands)), output));
-            services.AddOptions<PackageUpdaterStepOptions>().Configure(o =>
+            services.AddOptions<PackageUpdaterOptions>().Configure(o =>
             {
                 o.LogRestoreOutput = false;
                 o.PackageMapPath = "PackageMaps";

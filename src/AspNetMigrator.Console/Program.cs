@@ -6,15 +6,12 @@ using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
-using AspNetMigrator.ConfigUpdater;
 using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
-using AspNetMigrator.SourceUpdater;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,11 +21,9 @@ namespace AspNetMigrator.ConsoleApp
 {
     public class Program
     {
-        private const string ConfigUpdaterStepOptionsSection = "ConfigUpdaterStepOptions";
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdaterStepOptions";
-        private const string SourceUpdaterStepOptionsSection = "SourceUpdaterStepOptions";
-        private const string TemplateInserterStepOptionsSection = "TemplateInserterStepOptions";
-        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverterStepOptions";
+        private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
+        private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
+        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string LogFilePath = "log.txt";
 
         public static Task Main(string[] args)
@@ -43,6 +38,7 @@ namespace AspNetMigrator.ConsoleApp
             migrateCmd.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             migrateCmd.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
             migrateCmd.AddOption(new Option<DirectoryInfo>(new[] { "--backup-path", "-b" }, "Specifies where the project should be backed up. Defaults to a new directory next to the project's directory."));
+            migrateCmd.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
             migrateCmd.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
 
             var analyzeCmd = new Command("analyze")
@@ -52,6 +48,7 @@ namespace AspNetMigrator.ConsoleApp
 
             analyzeCmd.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             analyzeCmd.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+            analyzeCmd.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
 
             var root = new RootCommand
             {
@@ -59,8 +56,8 @@ namespace AspNetMigrator.ConsoleApp
                 Name = GetProcessName(),
             };
 
-            root.AddCommand(migrateCmd);
             root.AddCommand(analyzeCmd);
+            root.AddCommand(migrateCmd);
 
             return new CommandLineBuilder(root)
                 .UseDefaults()
@@ -92,7 +89,6 @@ namespace AspNetMigrator.ConsoleApp
 
             var host = Host.CreateDefaultBuilder()
                 .UseContentRoot(AppContext.BaseDirectory)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
                     if (appCommand == AppCommand.Migrate)
@@ -112,6 +108,8 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddSingleton(options);
                     services.AddSingleton<IPackageLoader, PackageLoader>();
 
+                    services.AddExtensions(context.Configuration[UpgradeAssistantExtensionPathsSettingName], options.Extension);
+
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
@@ -123,22 +121,12 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<MigrationStep, SolutionMigrationStep>();
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
                     services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
-                    services.AddTemplateInserterStep().Bind(context.Configuration.GetSection(TemplateInserterStepOptionsSection));
-                    services.AddConfigUpdaterStep().Bind(context.Configuration.GetSection(ConfigUpdaterStepOptionsSection));
-                    services.AddScoped<MigrationStep, SourceUpdaterStep>();
+                    services.AddTemplateInserterStep();
+                    services.AddConfigUpdaterStep();
+                    services.AddSourceUpdaterStep();
                     services.AddScoped<Migrator>();
 
                     serviceConfiguration?.Invoke(context, services);
-                })
-                .ConfigureContainer<ContainerBuilder>((context, builder) =>
-                {
-                    var sourceUpdatersPath = context.Configuration.GetSection(SourceUpdaterStepOptionsSection).Get<SourceUpdaterStepOptions>()?.SourceUpdaterPath
-                        ?? throw new ArgumentNullException("Source updaters path must not be null");
-                    builder.RegisterModule(new AnalyzersAndCodeFixersModule(sourceUpdatersPath));
-
-                    var configUpdatersPath = context.Configuration.GetSection(ConfigUpdaterStepOptionsSection).Get<ConfigUpdaterStepOptions>()?.ConfigUpdaterPath
-                        ?? throw new ArgumentNullException("Config updaters path must not be null");
-                    builder.RegisterModule(new ConfigUpdatersModule(configUpdatersPath));
                 })
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)

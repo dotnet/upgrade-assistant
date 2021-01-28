@@ -30,9 +30,7 @@ namespace AspNetMigrator.MSBuild
 
                 return Task.FromResult(true);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
-#pragma warning restore CA1031 // Do not catch general exception types
             {
                 _logger.LogError("Unexpected error registering MSBuild {Exception}", e);
                 return Task.FromResult(false);

@@ -37,9 +37,9 @@ namespace AspNetMigrator
             };
 
         public static implicit operator ProjectItemMatcher(Regex regex)
-            => new ProjectItemMatcher(regex);
+            => new(regex);
 
         public static implicit operator ProjectItemMatcher(string str)
-            => new ProjectItemMatcher(str);
+            => new(str);
     }
 }

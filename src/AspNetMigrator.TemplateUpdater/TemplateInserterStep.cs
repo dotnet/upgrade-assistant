@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace AspNetMigrator.TemplateUpdater
 {
@@ -19,12 +17,7 @@ namespace AspNetMigrator.TemplateUpdater
     public class TemplateInserterStep : MigrationStep
     {
         private const int BufferSize = 65536;
-        private const string TemplateConfigFileName = "TemplateConfig.json";
         private static readonly Regex PropertyRegex = new(@"^\$\((.*)\)$", RegexOptions.Compiled);
-        private static readonly JsonSerializerOptions JsonOptions = new()
-        {
-            Converters = { new JsonStringProjectItemTypeConverter() }
-        };
 
         // Files that indicate the project is likely a web app rather than a class library or some other project type
         private static readonly ItemSpec[] WebAppFiles = new[]
@@ -33,10 +26,11 @@ namespace AspNetMigrator.TemplateUpdater
             new ItemSpec(ProjectItemType.Content, "Web.config", Array.Empty<string>())
         };
 
-        private readonly IEnumerable<string> _templateConfigFiles;
-        private readonly Dictionary<string, RuntimeItemSpec> _itemsToAdd;
+        private readonly TemplateProvider _templateProvider;
 
-        public TemplateInserterStep(MigrateOptions options, IOptions<TemplateInserterStepOptions> templateUpdaterOptions, ILogger<TemplateInserterStep> logger)
+        private Dictionary<string, RuntimeItemSpec> _itemsToAdd;
+
+        public TemplateInserterStep(MigrateOptions options, TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -44,39 +38,21 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(options));
             }
 
-            if (templateUpdaterOptions is null)
-            {
-                throw new ArgumentNullException(nameof(templateUpdaterOptions));
-            }
-
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
+            _templateProvider = templateProvider ?? throw new ArgumentNullException(nameof(templateProvider));
             _itemsToAdd = new Dictionary<string, RuntimeItemSpec>();
-            var templatePath = templateUpdaterOptions.Value.TemplatePath
-                ?? throw new ArgumentException("Template inserter options must contain a template path");
 
-            if (!Path.IsPathFullyQualified(templatePath))
-            {
-                templatePath = Path.Combine(AppContext.BaseDirectory, templatePath);
-            }
-
-            _templateConfigFiles = Directory.GetFiles(templatePath, TemplateConfigFileName, new EnumerationOptions
-            {
-                MatchCasing = MatchCasing.CaseInsensitive,
-                RecurseSubdirectories = true,
-                ReturnSpecialDirectories = false
-            });
-
-            if (!_templateConfigFiles.Any())
+            if (!_templateProvider.TemplateConfigFileNames.Any())
             {
                 Logger.LogWarning("No template configuration files provided; no template files will be added to project");
             }
 
             Title = $"Add template files";
-            Description = $"Add template files (for startup code paths, for example) to {options.ProjectPath} based on template files described in: {string.Join(", ", _templateConfigFiles)}";
+            Description = $"Add template files (for startup code paths, for example) to {options.ProjectPath} based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
         }
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
@@ -86,52 +62,13 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var current = context.Project.Required();
+            var project = context.Project.Required();
 
             try
             {
-                var isWebApp = IsWebApp(current);
-
-                // Iterate through all config files, adding template files from each to the list of items to add, as appropriate.
-                // Later config files can intentionally overwrite earlier config files' items.
-                foreach (var templateConfigFile in _templateConfigFiles)
-                {
-                    var basePath = Path.GetDirectoryName(templateConfigFile) ?? string.Empty;
-                    var templateConfiguration = await LoadTemplateConfigurationAsync(templateConfigFile, token).ConfigureAwait(false);
-
-                    // If there was a problem reading the configuration or the configuration only applies to web apps and the
-                    // current project isn't a web app, continue to the next config file.
-                    if (templateConfiguration?.TemplateItems is null || (!isWebApp && templateConfiguration.UpdateWebAppsOnly))
-                    {
-                        Logger.LogDebug("Skipping inapplicable template config file {TemplateConfigFile}", templateConfigFile);
-                        continue;
-                    }
-
-                    Logger.LogDebug("Loaded {ItemCount} template items from template config file {TemplateConfigFile}", templateConfiguration.TemplateItems?.Length ?? 0, templateConfigFile);
-
-                    // Check whether the template items are needed in the project or if they already exist
-                    foreach (var templateItem in templateConfiguration.TemplateItems!)
-                    {
-                        var files = current.FindFiles(templateItem.Type, templateItem.Path);
-
-                        if (files.Any(path => ItemMatches(path, templateItem)))
-                        {
-                            Logger.LogDebug("Not adding template item {TemplateItemPath} because the project already contains a similar item", templateItem.Path);
-                        }
-                        else
-                        {
-                            var templatePath = Path.Combine(basePath, templateItem.Path);
-                            if (!File.Exists(templatePath))
-                            {
-                                Logger.LogError("Template file not found: {TemplateItemPath}", templatePath);
-                                continue;
-                            }
-
-                            Logger.LogDebug("Marking template item {TemplateItemPath} from template configuration {TemplateConfigFile} for addition", templateItem.Path, templateConfigFile);
-                            _itemsToAdd[templateItem.Path] = new RuntimeItemSpec(templateItem, templatePath, templateConfiguration.Replacements ?? new Dictionary<string, string>());
-                        }
-                    }
-                }
+                _itemsToAdd = (await _templateProvider.GetTemplatesAsync(IsWebApp(project), token).ConfigureAwait(false))
+                    .Where(kvp => IsTemplateNeeded(project, kvp.Value))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
                 Logger.LogInformation("{FilesNeededCount} expected template items needed", _itemsToAdd.Count);
 
@@ -147,8 +84,8 @@ namespace AspNetMigrator.TemplateUpdater
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", current.FilePath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {current.FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical("Invalid project: {ProjectPath}", project.FilePath);
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {project.FilePath}", BuildBreakRisk.Unknown);
             }
         }
 
@@ -178,7 +115,13 @@ namespace AspNetMigrator.TemplateUpdater
                 {
                     var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectFile);
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                    using var templateStream = File.Open(item.TemplateFilePath, FileMode.Open, FileAccess.Read);
+                    using var templateStream = item.Extension.GetFile(item.TemplateFilePath);
+                    if (templateStream is null)
+                    {
+                        Logger.LogCritical("Expected template {TemplatePath} not found in extension {Extension}", item.Path, item.Extension.Name);
+                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
+                    }
+
                     using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
@@ -186,11 +129,11 @@ namespace AspNetMigrator.TemplateUpdater
                 }
                 catch (IOException exc)
                 {
-                    Logger.LogCritical(exc, "Template file not found: {TemplateItemPath}", item.TemplateFilePath);
-                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Template file not found: {item.TemplateFilePath}");
+                    Logger.LogCritical(exc, "Expected template {TemplatePath} not found in extension {Extension}", item.Path, item.Extension.Name);
+                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
                 }
 
-                Logger.LogInformation("Added {ItemName} from template file", item.Path);
+                Logger.LogInformation("Added template file {ItemName} from {Extension}", item.Path, item.Extension.Name);
             }
 
             // After adding the items on disk, reload the workspace and check whether they were picked up automatically or not
@@ -211,6 +154,19 @@ namespace AspNetMigrator.TemplateUpdater
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
         }
 
+        private bool IsTemplateNeeded(IProject project, RuntimeItemSpec template)
+        {
+            var candidateMatches = project.FindFiles(template.Type, template.Path);
+
+            if (candidateMatches.Any(path => ItemMatches(path, template)))
+            {
+                Logger.LogDebug("Template {TemplateItemPath} not needed because the project already contains a similar item", template.Path);
+                return false;
+            }
+
+            return true;
+        }
+
         private Dictionary<string, string> ResolveTokenReplacements(IEnumerable<KeyValuePair<string, string>>? replacements, IProjectFile project)
         {
             var propertyCache = new Dictionary<string, string?>();
@@ -226,7 +182,7 @@ namespace AspNetMigrator.TemplateUpdater
                         // If the user specified an MSBuild property as a replacement value ($(...))
                         // then lookup the property value
                         var propertyName = regexMatch.Groups[1].Captures[0].Value;
-                        string? propertyValue = null;
+                        string? propertyValue;
 
                         if (propertyCache.ContainsKey(propertyName))
                         {
@@ -292,32 +248,6 @@ namespace AspNetMigrator.TemplateUpdater
 
             Logger.LogDebug("File {FilePath} matches expected file {ExpectedFileName}", filePath, expectedItem.Path);
             return true;
-        }
-
-        private async Task<TemplateConfiguration?> LoadTemplateConfigurationAsync(string path, CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                Logger.LogError("Invalid template configuration file path: {TemplateConfigPath}", path);
-                return null;
-            }
-
-            if (!File.Exists(path))
-            {
-                Logger.LogError("Template configuration file not found: {TemplateConfigPath}", path);
-                return null;
-            }
-
-            try
-            {
-                using var config = File.OpenRead(path);
-                return await JsonSerializer.DeserializeAsync<TemplateConfiguration>(config, JsonOptions, cancellationToken: token).ConfigureAwait(false);
-            }
-            catch (JsonException)
-            {
-                Logger.LogError("Error deserializing template configuration file: {TemplateConfigPath}", path);
-                return null;
-            }
         }
     }
 }

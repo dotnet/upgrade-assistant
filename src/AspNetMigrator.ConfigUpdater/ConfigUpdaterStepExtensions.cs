@@ -1,15 +1,15 @@
 ﻿using AspNetMigrator.ConfigUpdater;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace AspNetMigrator
 {
     public static class ConfigUpdaterStepExtensions
     {
-        public static OptionsBuilder<ConfigUpdaterStepOptions> AddConfigUpdaterStep(this IServiceCollection services)
+        public static IServiceCollection AddConfigUpdaterStep(this IServiceCollection services)
         {
+            services.AddSingleton<ConfigUpdaterProvider>();
             services.AddScoped<MigrationStep, ConfigUpdaterStep>();
-            return services.AddOptions<ConfigUpdaterStepOptions>();
+            return services;
         }
     }
 }

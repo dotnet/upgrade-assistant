@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace AspNetMigrator.ConfigUpdater
 {
@@ -16,7 +14,7 @@ namespace AspNetMigrator.ConfigUpdater
 
         public ImmutableArray<ConfigFile> ConfigFiles { get; private set; }
 
-        public ConfigUpdaterStep(MigrateOptions options, IEnumerable<IConfigUpdater> configUpdaters, IOptions<ConfigUpdaterStepOptions> updaterOptions, ILogger<ConfigUpdaterStep> logger)
+        public ConfigUpdaterStep(MigrateOptions options, ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -24,14 +22,9 @@ namespace AspNetMigrator.ConfigUpdater
                 throw new ArgumentNullException(nameof(options));
             }
 
-            if (configUpdaters is null)
+            if (configUpdaterProvider is null)
             {
-                throw new ArgumentNullException(nameof(configUpdaters));
-            }
-
-            if (updaterOptions is null)
-            {
-                throw new ArgumentNullException(nameof(updaterOptions));
+                throw new ArgumentNullException(nameof(configUpdaterProvider));
             }
 
             if (logger is null)
@@ -39,12 +32,12 @@ namespace AspNetMigrator.ConfigUpdater
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            _configFilePaths = updaterOptions.Value.ConfigFilePaths ?? Array.Empty<string>();
+            _configFilePaths = configUpdaterProvider.ConfigFilePaths.ToArray();
 
             Title = "Migrate app config files";
             Description = $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
 
-            SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, options, logger)).ToList();
+            SubSteps = configUpdaterProvider.GetUpdaters().Select(u => new ConfigUpdaterSubStep(this, u, options, logger)).ToList();
         }
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)

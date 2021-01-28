@@ -8,10 +8,10 @@
   <ItemGroup>
     <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
     <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="6.1.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.8" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
   </ItemGroup>

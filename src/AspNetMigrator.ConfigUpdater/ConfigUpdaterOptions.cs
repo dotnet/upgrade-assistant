@@ -1,6 +1,6 @@
 ﻿namespace AspNetMigrator.ConfigUpdater
 {
-    public class ConfigUpdaterStepOptions
+    public class ConfigUpdaterOptions
     {
         public string[]? ConfigFilePaths { get; set; }
 
