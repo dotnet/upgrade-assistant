@@ -10,7 +10,7 @@
 
         public abstract void Visit(Section section);
 
-        public void Visit(Page page)
+        public virtual void Visit(Page page)
         {
             if (page is null)
             {
