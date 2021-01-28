@@ -108,12 +108,7 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddSingleton(options);
                     services.AddSingleton<IPackageLoader, PackageLoader>();
 
-                    // Load extensions that come either from the command line (via -e) or from the environment
-                    // (via the config file or environment variables). Note that command line extensions
-                    // can override configuration ones because they are processed last.
-                    var extensionsFromCommandLine = options.Extension ?? Enumerable.Empty<string>();
-                    var extensionsFromConfig = context.Configuration[UpgradeAssistantExtensionPathsSettingName]?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
-                    services.AddExtensions(extensionsFromConfig.Concat(extensionsFromCommandLine));
+                    services.AddExtensions(context.Configuration[UpgradeAssistantExtensionPathsSettingName], options.Extension);
 
                     // Add command handlers
                     services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();

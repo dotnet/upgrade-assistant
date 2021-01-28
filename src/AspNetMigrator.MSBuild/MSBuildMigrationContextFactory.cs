@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.MSBuild
 {
     internal class MSBuildMigrationContextFactory : IMigrationContextFactory
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly Func<MSBuildWorkspaceMigrationContext> _factory;
         private readonly MSBuildRegistrationStartup _registrar;
         private readonly ILogger<MSBuildMigrationContextFactory> _logger;
 
         public MSBuildMigrationContextFactory(
-            IServiceProvider serviceProvider,
+            Func<MSBuildWorkspaceMigrationContext> factory,
             MSBuildRegistrationStartup registrar,
             ILogger<MSBuildMigrationContextFactory> logger)
         {
-            _serviceProvider = serviceProvider;
+            _factory = factory;
             _registrar = registrar;
             _logger = logger;
         }
@@ -27,7 +26,7 @@ namespace AspNetMigrator.MSBuild
             await _registrar.StartupAsync(token).ConfigureAwait(false);
 
             _logger.LogDebug("Generating context");
-            var context = _serviceProvider.GetRequiredService<MSBuildWorkspaceMigrationContext>();
+            var context = _factory();
 
             _logger.LogDebug("Initializing context");
             await context.InitializeWorkspace(token).ConfigureAwait(false);

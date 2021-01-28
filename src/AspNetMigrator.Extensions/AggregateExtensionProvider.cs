@@ -11,6 +11,7 @@ namespace AspNetMigrator.Extensions
     public class AggregateExtensionProvider : IExtensionProvider
     {
         private readonly ILogger<AggregateExtensionProvider> _logger;
+        private readonly Dictionary<Type, Mapper> _optionMappers;
 
         public string Name => $"Aggregate extensions from {ExtensionProviders.Length} underlying providers";
 
@@ -26,6 +27,7 @@ namespace AspNetMigrator.Extensions
                  throw new ArgumentNullException(nameof(extensionProviders));
             }
 
+            _optionMappers = new Dictionary<Type, Mapper>();
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             ExtensionProviders = ImmutableArray.CreateRange(extensionProviders);
             _logger.LogInformation("Registered {ExtensionCount} extensions:\n\t{ExtensionNames}", ExtensionProviders.Length, string.Join("\n\t", ExtensionProviders.Select(e => e.Name)));
@@ -90,35 +92,39 @@ namespace AspNetMigrator.Extensions
             return options;
         }
 
-        private static Mapper GetMapper<T>()
+        private Mapper GetMapper<T>()
         {
-            var mapperConfiguration = new MapperConfiguration(config =>
+            if (!_optionMappers.ContainsKey(typeof(T)))
             {
-                config.CreateMap<T, T>()
-                    .ForAllMembers(options => options.Condition((src, dest, member) =>
-                    {
-                        // Don't overwrite older options with newer ones
-                        // that are null of empty.
-                        if (member is null)
+                var mapperConfiguration = new MapperConfiguration(config =>
+                {
+                    config.CreateMap<T, T>()
+                        .ForAllMembers(options => options.Condition((src, dest, member) =>
                         {
-                            return false;
-                        }
+                            // Don't overwrite older options with newer ones
+                            // that are null of empty.
+                            if (member is null)
+                            {
+                                return false;
+                            }
 
-                        if (member is Array a && a.Length == 0)
-                        {
-                            return false;
-                        }
+                            if (member is Array a && a.Length == 0)
+                            {
+                                return false;
+                            }
 
-                        if (member is string s && s.Length == 0)
-                        {
-                            return false;
-                        }
+                            if (member is string s && s.Length == 0)
+                            {
+                                return false;
+                            }
 
-                        return true;
-                    }));
-            });
-            var mapper = new Mapper(mapperConfiguration);
-            return mapper;
+                            return true;
+                        }));
+                });
+                _optionMappers[typeof(T)] = new Mapper(mapperConfiguration);
+            }
+
+            return _optionMappers[typeof(T)];
         }
 
         /// <summary>
