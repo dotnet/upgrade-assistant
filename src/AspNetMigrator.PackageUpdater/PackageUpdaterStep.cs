@@ -131,16 +131,21 @@ namespace AspNetMigrator.PackageUpdater
                     }
 
                     // If the package is in a package map, mark for removal and add appropriate packages for addition
+                    var mapFound = false;
                     foreach (var map in packageMaps.Where(m => m.ContainsReference(packageReference.Name, packageReference.Version)))
                     {
                         if (map != null)
                         {
+                            mapFound = true;
                             possibleBreakingChanges = true;
                             Logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
                             _packagesToRemove.Add(packageReference);
                             _packagesToAdd.AddRange(map.NetCorePackages);
-                            continue;
                         }
+                    }
+                    if (mapFound)
+                    {
+                        continue;
                     }
 
                     // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
