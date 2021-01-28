@@ -104,6 +104,9 @@ namespace AspNetMigrator.PackageUpdater
 
                 var packageReferences = projectRoot.PackageReferences;
 
+                // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
+                var packageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
+
                 foreach (var packageReference in packageReferences)
                 {
                     // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
@@ -128,9 +131,7 @@ namespace AspNetMigrator.PackageUpdater
                     }
 
                     // If the package is in a package map, mark for removal and add appropriate packages for addition
-                    var packageMaps = _packageMapProvider.GetPackageMapsAsync(token)
-                        .Where(m => m.ContainsReference(packageReference.Name, packageReference.Version));
-                    await foreach (var map in packageMaps)
+                    foreach (var map in packageMaps.Where(m => m.ContainsReference(packageReference.Name, packageReference.Version)))
                     {
                         if (map != null)
                         {
