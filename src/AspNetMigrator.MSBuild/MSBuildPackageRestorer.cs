@@ -18,7 +18,7 @@ namespace AspNetMigrator.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<RestoreOutput> RestorePackagesAsync(bool logRestoreOutput, IMigrationContext context, CancellationToken token)
+        public Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -31,12 +31,12 @@ namespace AspNetMigrator.MSBuild
             }
 
             // Create a project instance and run MSBuild /t:Restore
-            var result = RestorePackages(new ProjectInstance(project.ProjectRoot), logRestoreOutput);
+            var result = RestorePackages(new ProjectInstance(project.ProjectRoot));
 
             return Task.FromResult(result);
         }
 
-        public RestoreOutput RestorePackages(ProjectInstance project, bool logRestoreOutput)
+        public RestoreOutput RestorePackages(ProjectInstance project)
         {
             if (project is null)
             {
@@ -44,13 +44,10 @@ namespace AspNetMigrator.MSBuild
             }
 
             var buildParameters = new BuildParameters();
-            if (logRestoreOutput)
+            buildParameters.Loggers = new List<Microsoft.Build.Framework.ILogger>
             {
-                buildParameters.Loggers = new List<Microsoft.Build.Framework.ILogger>
-                {
-                    new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
-                };
-            }
+                new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
+            };
 
             var restoreRequest = new BuildRequestData(project, new[] { "Restore" });
             _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", project.FullPath);

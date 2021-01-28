@@ -43,11 +43,11 @@ namespace AspNetMigrator.MSBuild
             eventSource.CustomEventRaised += LogInformation;
         }
 
-        private void LogInformation(object sender, BuildEventArgs eventArgs) => _internalLogger.LogInformation($"{MSBuildLogPrefix}{eventArgs.Message}");
+        private void LogInformation(object sender, BuildEventArgs eventArgs) => _internalLogger.LogDebug($"{MSBuildLogPrefix} INF: {eventArgs.Message}");
 
-        private void LogWarning(object sender, BuildEventArgs eventArgs) => _internalLogger.LogWarning($"{MSBuildLogPrefix}{eventArgs.Message}");
+        private void LogWarning(object sender, BuildEventArgs eventArgs) => _internalLogger.LogDebug($"{MSBuildLogPrefix} WRN: {eventArgs.Message}");
 
-        private void LogError(object sender, BuildEventArgs eventArgs) => _internalLogger.LogError($"{MSBuildLogPrefix}{eventArgs.Message}");
+        private void LogError(object sender, BuildEventArgs eventArgs) => _internalLogger.LogDebug($"{MSBuildLogPrefix} ERR: {eventArgs.Message}");
 
         public void Shutdown() { }
     }

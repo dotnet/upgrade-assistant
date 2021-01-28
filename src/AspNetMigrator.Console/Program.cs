@@ -120,7 +120,7 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<MigrationStep, BackupStep>();
                     services.AddScoped<MigrationStep, SolutionMigrationStep>();
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
+                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection));
                     services.AddTemplateInserterStep();
                     services.AddConfigUpdaterStep();
                     services.AddSourceUpdaterStep();

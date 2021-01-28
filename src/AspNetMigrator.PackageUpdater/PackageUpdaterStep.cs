@@ -34,7 +34,6 @@ namespace AspNetMigrator.PackageUpdater
         private readonly PackageMapProvider _packageMapProvider;
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
-        private readonly bool _logRestoreOutput;
         private readonly NuGetFramework _targetFramework;
         private List<NuGetReference> _packagesToRemove;
         private List<NuGetReference> _packagesToAdd;
@@ -64,7 +63,6 @@ namespace AspNetMigrator.PackageUpdater
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
             _analyzerPackageVersion = updaterOptions.Value.MigrationAnalyzersPackageVersion;
-            _logRestoreOutput = updaterOptions.Value.LogRestoreOutput;
             _targetFramework = NuGetFramework.Parse(options.TargetFramework);
             _packagesToRemove = new List<NuGetReference>();
             _packagesToAdd = new List<NuGetReference>();
@@ -82,7 +80,7 @@ namespace AspNetMigrator.PackageUpdater
             _packagesToAdd = new List<NuGetReference>();
 
             // Restore packages (to produce lockfile)
-            var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
+            var restoreOutput = await _packageRestorer.RestorePackagesAsync(context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
             {
                 var project = context.Project.Required();
@@ -284,7 +282,7 @@ namespace AspNetMigrator.PackageUpdater
 
             var project = context.Project.Required();
 
-            var restoreOutput = await _packageRestorer.RestorePackagesAsync(_logRestoreOutput, context, token).ConfigureAwait(false);
+            var restoreOutput = await _packageRestorer.RestorePackagesAsync(context, token).ConfigureAwait(false);
             if (restoreOutput.LockFilePath is null)
             {
                 Logger.LogWarning("Unable to restore packages for project {ProjectPath}", project.FilePath);
