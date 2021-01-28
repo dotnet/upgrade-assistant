@@ -34,6 +34,7 @@
     <ProjectReference Include="..\AspNetMigrator.BackupUpdater\AspNetMigrator.BackupUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj" />
     <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Portability\AspNetMigrator.Portability.csproj" />
     <ProjectReference Include="..\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj" />
     <ProjectReference Include="..\AspNetMigrator.TryConvertUpdater\AspNetMigrator.TryConvertUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj" />
@@ -48,6 +49,10 @@
     <ProjectReference Include="..\AspNetMigrator.ConfigUpdater\AspNetMigrator.ConfigUpdater.csproj" />
     <ProjectReference Include="..\ConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters.csproj" />
     <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Portability\" />
   </ItemGroup>
 
   <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
