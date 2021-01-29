@@ -1,0 +1,51 @@
+name: Publish
+
+on:
+    workflow_run:
+        workflows: ["build"]
+        types:
+          - completed
+        branches:
+          - main
+
+jobs:
+  upload:
+      runs-on: windows-latest
+
+    steps:
+    - name: Download artifact
+      uses: actions/github-script@v3
+      with:
+        script: |
+          # Manually handle this due to https://github.com/actions/download-artifact/issues/60
+          var artifacts = await github.actions.listWorkflowRunArtifacts({
+             owner: context.repo.owner,
+             repo: context.repo.repo,
+             run_id: ${{ github.event.workflow_run.id }},
+          });
+          var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+            return artifact.name == "tools"
+          })[0];
+          var download = await github.actions.downloadArtifact({
+             owner: context.repo.owner,
+             repo: context.repo.repo,
+             artifact_id: matchArtifact.id,
+             archive_format: 'zip',
+          });
+          var fs = require('fs');
+          fs.writeFileSync('${{ github.workspace }}/tools.zip', Buffer.from(download.data));
+    - name: Unzip artifact
+      run: |
+        mkdir -p test/packagename
+        mv rendered.zip test/packagename
+        cd test/packagename
+        unzip rendered.zip
+        rm rendered.zip
+    - name: Install sleet
+      run: dotnet tool install -g sleet
+    - name: Upload tool package
+      run : sleet push $(Build.ArtifactStagingDirectory)/tools --skip-existing
+      env:
+          SLEET_FEED_TYPE: azure
+          SLEET_FEED_CONTAINER: feed
+          SLEET_FEED_CONNECTIONSTRING: ${{ secrets.SLEET_CONNECTIONSTRING }}
