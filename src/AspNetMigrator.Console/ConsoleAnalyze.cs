@@ -42,6 +42,10 @@ namespace AspNetMigrator.ConsoleApp
                     visitor.Visit(page);
                 }
             }
+            catch (MigrationException e)
+            {
+                _logger.LogError("Unexpected error: {Message}", e.Message);
+            }
             catch (OperationCanceledException)
             {
             }
@@ -76,14 +80,20 @@ namespace AspNetMigrator.ConsoleApp
 
             public override void Visit(Page page)
             {
+                Console.WriteLine(new string('-', Console.WindowWidth));
                 Console.WriteLine($"Project: {page.Title}");
-                Console.WriteLine("-------");
+                Console.WriteLine(new string('-', Console.WindowWidth));
+                Console.WriteLine();
                 base.Visit(page);
             }
 
             public override void Visit(Section section)
             {
+                var divider = new string('-', Console.WindowWidth / 2);
+
+                Console.WriteLine(divider);
                 Console.WriteLine($"Section: {section.Header}");
+                Console.WriteLine(divider);
 
                 foreach (var child in section.Content)
                 {

@@ -54,6 +54,10 @@ namespace AspNetMigrator.ConsoleApp
 
                 _lifetime.StopApplication();
             }
+            catch (MigrationException e)
+            {
+                _logger.LogError("Unexpected error: {Message}", e.Message);
+            }
             catch (OperationCanceledException)
             {
             }
