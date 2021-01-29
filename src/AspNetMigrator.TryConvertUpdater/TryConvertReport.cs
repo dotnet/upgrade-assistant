@@ -13,7 +13,7 @@ namespace AspNetMigrator
 
             if (!project.GetFile().IsSdk)
             {
-                content.Add(new Text("Project needs to be updated to new style csproj"));
+                content.Add(new Text("Project needs to be updated to the SDK-style .csproj"));
             }
 
             if (project.PackageReferenceFormat != NugetPackageFormat.PackageReference)
