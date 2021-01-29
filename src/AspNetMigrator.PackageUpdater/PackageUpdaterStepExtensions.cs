@@ -1,4 +1,5 @@
 ﻿using AspNetMigrator.PackageUpdater;
+using AspNetMigrator.PackageUpdater.Analyzers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -8,6 +9,13 @@ namespace AspNetMigrator
     {
         public static OptionsBuilder<PackageUpdaterOptions> AddPackageUpdaterStep(this IServiceCollection services)
         {
+            // Add package analyzers (note that the order matters as the analyzers are run in the order registered)
+            services.AddTransient<IPackageReferencesAnalyzer, DuplicateReferenceAnalyzer>();
+            services.AddTransient<IPackageReferencesAnalyzer, TransitiveReferenceAnalyzer>();
+            services.AddTransient<IPackageReferencesAnalyzer, PackageMapReferenceAnalyzer>();
+            services.AddTransient<IPackageReferencesAnalyzer, TargetCompatibilityReferenceAnalyzer>();
+            services.AddTransient<IPackageReferencesAnalyzer, UpgradeAssistantReferenceAnalyzer>();
+
             services.AddSingleton<PackageMapProvider>();
             services.AddSingleton<ITargetFrameworkIdentifier, TargetFrameworkIdentifier>();
             services.AddScoped<MigrationStep, PackageUpdaterStep>();

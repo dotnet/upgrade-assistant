@@ -43,10 +43,12 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(project));
             }
 
-            var buildParameters = new BuildParameters();
-            buildParameters.Loggers = new List<Microsoft.Build.Framework.ILogger>
+            var buildParameters = new BuildParameters
             {
-                new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
+                Loggers = new List<Microsoft.Build.Framework.ILogger>
+                {
+                    new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
+                }
             };
 
             var restoreRequest = new BuildRequestData(project, new[] { "Restore" });
