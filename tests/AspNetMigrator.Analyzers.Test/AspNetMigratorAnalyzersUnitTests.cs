@@ -158,10 +158,7 @@ namespace AspNetMigrator.Analyzers.Test
         private static void RestoreTestProjectPackages()
         {
             var restorer = new MSBuildPackageRestorer(new NullLogger<MSBuildPackageRestorer>());
-            if (restorer.RestorePackages(new ProjectInstance(ProjectRootElement.Open(TestHelper.TestProjectPath))) is null)
-            {
-                throw new InvalidOperationException("TestProject restore failed");
-            }
+            restorer.RestorePackages(new ProjectInstance(ProjectRootElement.Open(TestHelper.TestProjectPath)));
         }
 
         // No diagnostics expected to show up

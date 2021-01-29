@@ -26,24 +26,7 @@ namespace AspNetMigrator.MSBuild
             }
 
             var projectInstance = new ProjectInstance(context.Project.Required().FilePath);
-
-            var buildParameters = new BuildParameters
-            {
-                Loggers = new List<Microsoft.Build.Framework.ILogger>
-                {
-                    new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
-                }
-            };
-
-            var restoreRequest = new BuildRequestData(projectInstance, new[] { "Restore" });
-            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", projectInstance.FullPath);
-            var restoreResult = BuildManager.DefaultBuildManager.Build(buildParameters, restoreRequest);
-            _logger.LogDebug("MSBuild exited with status {RestoreStatus}", restoreResult.OverallResult);
-            if (restoreResult.Exception != null)
-            {
-                _logger.LogError(restoreResult.Exception, "MSBuild threw an unexpected exception");
-                throw restoreResult.Exception;
-            }
+            RestorePackages(projectInstance);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
@@ -63,6 +46,34 @@ namespace AspNetMigrator.MSBuild
             var nugetCachePath = projectInstance.GetPropertyValue("NuGetPackageRoot");
 
             return new RestoreOutput(File.Exists(lockFilePath) ? lockFilePath : null, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
+        }
+
+        public BuildResult? RestorePackages(ProjectInstance projectInstance)
+        {
+            if (projectInstance is null)
+            {
+                throw new ArgumentNullException(nameof(projectInstance));
+            }
+
+            var buildParameters = new BuildParameters
+            {
+                Loggers = new List<Microsoft.Build.Framework.ILogger>
+                {
+                    new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
+                }
+            };
+
+            var restoreRequest = new BuildRequestData(projectInstance, new[] { "Restore" });
+            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", projectInstance.FullPath);
+            var restoreResult = BuildManager.DefaultBuildManager.Build(buildParameters, restoreRequest);
+            _logger.LogDebug("MSBuild exited with status {RestoreStatus}", restoreResult.OverallResult);
+            if (restoreResult.Exception != null)
+            {
+                _logger.LogError(restoreResult.Exception, "MSBuild threw an unexpected exception");
+                throw restoreResult.Exception;
+            }
+
+            return restoreResult;
         }
     }
 }
