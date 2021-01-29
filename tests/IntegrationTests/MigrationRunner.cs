@@ -59,7 +59,6 @@ namespace IntegrationTests
             services.AddSingleton(new InputOutputStreams(new StringReader(string.Join('\n', commands)), output));
             services.AddOptions<PackageUpdaterOptions>().Configure(o =>
             {
-                o.LogRestoreOutput = false;
                 o.PackageMapPath = "PackageMaps";
                 o.MigrationAnalyzersPackageSource = "https://doesnotexist.net/index.json";
                 o.MigrationAnalyzersPackageVersion = "1.0.0";

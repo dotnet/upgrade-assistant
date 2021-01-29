@@ -6,7 +6,6 @@ using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
@@ -124,7 +123,7 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddScoped<MigrationStep, BackupStep>();
                     services.AddScoped<MigrationStep, SolutionMigrationStep>();
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection)).Configure(o => o.LogRestoreOutput |= options.Verbose);
+                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection));
                     services.AddTemplateInserterStep();
                     services.AddConfigUpdaterStep();
                     services.AddSourceUpdaterStep();

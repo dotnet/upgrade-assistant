@@ -18,42 +18,53 @@ namespace AspNetMigrator.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<RestoreOutput> RestorePackagesAsync(bool logRestoreOutput, IMigrationContext context, CancellationToken token)
+        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.Project is not MSBuildProject project)
+            var projectInstance = new ProjectInstance(context.Project.Required().FilePath);
+            RestorePackages(projectInstance);
+
+            // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
+            // aren't available in a project until after restore is run the first time.
+            // https://github.com/NuGet/Home/issues/9150
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+
+            // Check for the lock file's existence rather than success since a bad NuGet reference won't
+            // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
+            var lockFilePath = Path.Combine(projectInstance.GetPropertyValue("MSBuildProjectExtensionsPath"), LockFileName);
+            if (!Path.IsPathFullyQualified(lockFilePath))
             {
-                throw new ArgumentException("Migration context must include a valid project before restoring packages");
+                lockFilePath = Path.Combine(projectInstance.Directory, lockFilePath);
             }
 
-            // Create a project instance and run MSBuild /t:Restore
-            var result = RestorePackages(new ProjectInstance(project.ProjectRoot), logRestoreOutput);
+            // Get the path used for caching NuGet packages
+            projectInstance = new ProjectInstance(context.Project.Required().FilePath);
+            var nugetCachePath = projectInstance.GetPropertyValue("NuGetPackageRoot");
 
-            return Task.FromResult(result);
+            return new RestoreOutput(File.Exists(lockFilePath) ? lockFilePath : null, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
         }
 
-        public RestoreOutput RestorePackages(ProjectInstance project, bool logRestoreOutput)
+        public BuildResult? RestorePackages(ProjectInstance projectInstance)
         {
-            if (project is null)
+            if (projectInstance is null)
             {
-                throw new ArgumentNullException(nameof(project));
+                throw new ArgumentNullException(nameof(projectInstance));
             }
 
-            var buildParameters = new BuildParameters();
-            if (logRestoreOutput)
+            var buildParameters = new BuildParameters
             {
-                buildParameters.Loggers = new List<Microsoft.Build.Framework.ILogger>
+                Loggers = new List<Microsoft.Build.Framework.ILogger>
                 {
                     new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
-                };
-            }
+                }
+            };
 
-            var restoreRequest = new BuildRequestData(project, new[] { "Restore" });
-            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", project.FullPath);
+            var restoreRequest = new BuildRequestData(projectInstance, new[] { "Restore" });
+            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", projectInstance.FullPath);
             var restoreResult = BuildManager.DefaultBuildManager.Build(buildParameters, restoreRequest);
             _logger.LogDebug("MSBuild exited with status {RestoreStatus}", restoreResult.OverallResult);
             if (restoreResult.Exception != null)
@@ -62,18 +73,7 @@ namespace AspNetMigrator.MSBuild
                 throw restoreResult.Exception;
             }
 
-            // Check for the lock file's existence rather than success since a bad NuGet reference won't
-            // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
-            var lockFilePath = Path.Combine(project.GetPropertyValue("MSBuildProjectExtensionsPath"), LockFileName);
-            if (!Path.IsPathFullyQualified(lockFilePath))
-            {
-                lockFilePath = Path.Combine(project.Directory, lockFilePath);
-            }
-
-            // Get the path used for caching NuGet packages
-            var nugetCachePath = project.GetPropertyValue("NuGetPackageRoot");
-
-            return new RestoreOutput(File.Exists(lockFilePath) ? lockFilePath : null, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
+            return restoreResult;
         }
     }
 }
