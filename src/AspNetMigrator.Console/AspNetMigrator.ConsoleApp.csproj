@@ -34,14 +34,15 @@
     <ProjectReference Include="..\AspNetMigrator.BackupUpdater\AspNetMigrator.BackupUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj" />
     <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Portability\AspNetMigrator.Portability.csproj" />
     <ProjectReference Include="..\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj" />
     <ProjectReference Include="..\AspNetMigrator.TryConvertUpdater\AspNetMigrator.TryConvertUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.TemplateUpdater\AspNetMigrator.TemplateUpdater.csproj" />
 
-    <!-- These projects aren't used directly by this project, but are included here so that they're 
-         sure to be built prior to copying their binary output into this project's 'SourceUpdaters' 
+    <!-- These projects aren't used directly by this project, but are included here so that they're
+         sure to be built prior to copying their binary output into this project's 'SourceUpdaters'
          and 'ConfigUpdaters' directories. -->
     <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
     <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
@@ -56,7 +57,7 @@
       <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
       <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
     </PropertyGroup>
-    
+
     <ItemGroup>
       <SourceUpdateFiles Include="$(OutputPath)AspNetMigrator.Analyzers.*" />
       <ConfigUpdateFiles Include="$(OutputPath)AspNetMigrator.DefaultConfigUpdaters.*" />
@@ -82,7 +83,7 @@
         <RelativePath>ConfigUpdaters\%(ConfigUpdaterFiles.Filename)%(Extension)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>
-    </ItemGroup>    
+    </ItemGroup>
   </Target>
 
 </Project>

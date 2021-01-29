@@ -58,17 +58,35 @@ namespace AspNetMigrator.ConsoleApp
         {
             public override void Visit(Table table)
             {
-                throw new NotImplementedException();
+                foreach (var row in table.Rows)
+                {
+                    foreach (var c in row.Data)
+                    {
+                        Console.WriteLine(string.Join("\t", row.Data));
+                    }
+
+                    Console.WriteLine();
+                }
             }
 
             public override void Visit(Divider divider)
             {
-                throw new NotImplementedException();
+                Console.WriteLine();
             }
 
             public override void Visit(Text text)
             {
                 Console.WriteLine(text.Content);
+            }
+
+            public override void Visit(Section section)
+            {
+                Console.WriteLine($"Section: {section.Header}");
+
+                foreach (var child in section.Content)
+                {
+                    Visit(child);
+                }
             }
         }
     }
