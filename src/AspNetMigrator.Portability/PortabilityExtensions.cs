@@ -18,7 +18,7 @@ namespace AspNetMigrator
                 client.BaseAddress = options.Value.ServiceEndpoint;
             });
             services.AddSingleton<IPortabilityService>(sp => new MemoryCachingPortabilityService(sp.GetRequiredService<PortabilityService>()));
-            services.AddTransient<IPageGenerator, PortabilityAnalysis>();
+            services.AddTransient<ISectionGenerator, PortabilityAnalysis>();
 
             return services.AddOptions<PortabilityOptions>()
                 .ValidateDataAnnotations();
