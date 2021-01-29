@@ -7,14 +7,14 @@ namespace AspNetMigrator.MSBuild
     {
         public static IEnumerable<NuGetReference> GetPackages(string path)
         {
-            var _doc = XDocument.Load(path);
+            var doc = XDocument.Load(path);
 
-            if (_doc.Root is null)
+            if (doc.Root is null)
             {
                 yield break;
             }
 
-            var packages = _doc.Root.Element("packages");
+            var packages = doc.Root.Element("packages");
 
             if (packages is null)
             {
