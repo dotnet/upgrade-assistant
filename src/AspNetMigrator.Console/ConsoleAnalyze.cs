@@ -42,6 +42,9 @@ namespace AspNetMigrator.ConsoleApp
                     visitor.Visit(page);
                 }
             }
+            catch (MigrationException)
+            {
+            }
             catch (OperationCanceledException)
             {
             }

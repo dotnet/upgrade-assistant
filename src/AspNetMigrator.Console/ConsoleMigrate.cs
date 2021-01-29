@@ -54,6 +54,9 @@ namespace AspNetMigrator.ConsoleApp
 
                 _lifetime.StopApplication();
             }
+            catch (MigrationException)
+            {
+            }
             catch (OperationCanceledException)
             {
             }

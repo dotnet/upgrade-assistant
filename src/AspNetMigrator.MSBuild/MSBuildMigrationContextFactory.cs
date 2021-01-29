@@ -23,7 +23,7 @@ namespace AspNetMigrator.MSBuild
 
         public async ValueTask<IMigrationContext> CreateContext(CancellationToken token)
         {
-            await _registrar.StartupAsync(token).ConfigureAwait(false);
+            _registrar.RegisterMSBuildInstance();
 
             _logger.LogDebug("Generating context");
             var context = _factory();

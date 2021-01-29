@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -20,36 +21,46 @@ namespace AspNetMigrator.MSBuild
             _logger = logger;
         }
 
-        public Task<bool> StartupAsync(CancellationToken token)
-        {
-            // Register correct MSBuild for use with SDK-style projects
-            try
-            {
-                var msBuildPath = RegisterMSBuildInstance();
-                _logger.LogInformation("MSBuild registered from {MSBuildPath}", msBuildPath);
-
-                return Task.FromResult(true);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Unexpected error registering MSBuild {Exception}", e);
-                return Task.FromResult(false);
-            }
-        }
-
         public string RegisterMSBuildInstance()
         {
             if (_msBuildInstance is null)
             {
                 // TODO : Harden this and allow MSBuild location to be read from env vars.
-                var msBuildInstances = MSBuildLocator.QueryVisualStudioInstances();
-                _logger.LogDebug("Found {Count} candidate MSBuild instances:\n\t{MSBuildInstances}", msBuildInstances.Count(), string.Join("\n\t", msBuildInstances.Select(m => m.MSBuildPath)));
-                _msBuildInstance = msBuildInstances.First();
-                MSBuildLocator.RegisterInstance(_msBuildInstance);
-                AssemblyLoadContext.Default.Resolving += ResolveAssembly;
+                var msBuildInstances = FilterForBitness(MSBuildLocator.QueryVisualStudioInstances()).ToList();
+
+                if (msBuildInstances.Count == 0)
+                {
+                    var expected = Environment.Is64BitProcess ? "64-bit" : "32-bit";
+                    _logger.LogError($"No supported MSBuild found. Ensure `dotnet --list-sdks` show an install that is {expected}");
+                    throw new MigrationException("MSBuild not found");
+                }
+                else
+                {
+                    _logger.LogDebug("Found {Count} candidate MSBuild instances:\n\t{MSBuildInstances}", msBuildInstances.Count, string.Join("\n\t", msBuildInstances.Select(m => m.MSBuildPath)));
+                    _msBuildInstance = msBuildInstances.First();
+                    MSBuildLocator.RegisterInstance(_msBuildInstance);
+                    AssemblyLoadContext.Default.Resolving += ResolveAssembly;
+                }
             }
 
             return _msBuildInstance.MSBuildPath;
+        }
+
+        private IEnumerable<VisualStudioInstance> FilterForBitness(IEnumerable<VisualStudioInstance> instances)
+        {
+            foreach (var instance in instances)
+            {
+                var is32bit = instance.MSBuildPath.Contains("x86", StringComparison.OrdinalIgnoreCase);
+
+                if (Environment.Is64BitProcess && !is32bit)
+                {
+                    yield return instance;
+                }
+                else
+                {
+                    _logger.LogDebug("Skipping {Path} as it is 32-bit", instance.MSBuildPath);
+                }
+            }
         }
 
         private Assembly? ResolveAssembly(AssemblyLoadContext context, AssemblyName assemblyName)
