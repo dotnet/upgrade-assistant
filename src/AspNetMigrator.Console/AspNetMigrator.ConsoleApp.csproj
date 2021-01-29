@@ -4,8 +4,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>try-migrate</ToolCommandName>
-    <PackageId>try-migrate</PackageId>
+    <ToolCommandName>upgrade-assistant</ToolCommandName>
+    <PackageId>upgrade-assistant</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
