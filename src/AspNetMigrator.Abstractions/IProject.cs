@@ -13,6 +13,8 @@ namespace AspNetMigrator
 
         IEnumerable<IProject> ProjectReferences { get; }
 
+        NugetPackageFormat PackageReferenceFormat { get; }
+
         IEnumerable<NuGetReference> PackageReferences { get; }
 
         IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher);

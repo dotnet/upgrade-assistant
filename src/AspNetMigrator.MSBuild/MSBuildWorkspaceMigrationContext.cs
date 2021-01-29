@@ -45,12 +45,12 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
-            ProjectCollection = new ProjectCollection();
-
             _projectCache = new Dictionary<string, MSBuildProject>(StringComparer.OrdinalIgnoreCase);
             _vsFinder = vsFinder;
             _path = options.ProjectPath;
             _logger = logger;
+
+            ProjectCollection = new ProjectCollection(globalProperties: CreateProperties());
         }
 
         public ProjectCollection ProjectCollection { get; }

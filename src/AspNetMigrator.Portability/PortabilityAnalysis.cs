@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -11,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Portability
 {
-    internal class PortabilityAnalysis : IPageGenerator
+    internal class PortabilityAnalysis : ISectionGenerator
     {
         private readonly IEnumerable<IPortabilityAnalyzer> _analyzers;
         private readonly ILogger<PortabilityAnalysis> _logger;
@@ -22,30 +20,14 @@ namespace AspNetMigrator.Portability
             _logger = logger;
         }
 
-        public async IAsyncEnumerable<Page> GeneratePages(IMigrationContext context, [EnumeratorCancellation] CancellationToken token)
+        public async Task<Section> GenerateContentAsync(IProject project, CancellationToken token)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            var table = await GenerateTable(project.GetRoslynProject(), token).ConfigureAwait(false);
 
-            yield return new Page("Portability analysis")
+            return new Section("Portability Analysis")
             {
-                Content = await GenerateContent(context, token).ToListAsync(token).ConfigureAwait(false)
+                Content = new[] { table }
             };
-        }
-
-        private async IAsyncEnumerable<Content> GenerateContent(IMigrationContext context, [EnumeratorCancellation] CancellationToken token)
-        {
-            foreach (var p in context.Projects)
-            {
-                var table = await GenerateTable(p.GetRoslynProject(), token).ConfigureAwait(false);
-
-                yield return new Section(Path.GetFileName(p.FilePath))
-                {
-                    Content = new[] { table }
-                };
-            }
         }
 
         private async ValueTask<Table> GenerateTable(Project project, CancellationToken token)

@@ -1,26 +1,33 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AspNetMigrator.Reporting
 {
     internal class ReportGenerator : IReportGenerator
     {
-        private readonly IEnumerable<IPageGenerator> _generators;
+        private readonly IEnumerable<ISectionGenerator> _generators;
 
-        public ReportGenerator(IEnumerable<IPageGenerator> generators)
+        public ReportGenerator(IEnumerable<ISectionGenerator> generators)
         {
             _generators = generators;
         }
 
         public async IAsyncEnumerable<Page> Generate(IMigrationContext response, [EnumeratorCancellation] CancellationToken token)
         {
-            foreach (var generator in _generators)
+            foreach (var project in response.Projects)
             {
-                await foreach (var page in generator.GeneratePages(response, token))
+                var sectionTasks = _generators
+                    .Select(generator => generator.GenerateContentAsync(project, token));
+                var sections = await Task.WhenAll(sectionTasks).ConfigureAwait(false);
+
+                yield return new Page(Path.GetFileName(project.FilePath))
                 {
-                    yield return page;
-                }
+                    Content = sections
+                };
             }
         }
     }

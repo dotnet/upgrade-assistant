@@ -53,13 +53,27 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
+        public NugetPackageFormat PackageReferenceFormat
+            => GetPackagesConfigPath() is null ? NugetPackageFormat.PackageReference : NugetPackageFormat.PackageConfig;
+
+        private string? GetPackagesConfigPath() => FindFiles(ProjectItemType.Content, "packages.config").FirstOrDefault();
+
         public IEnumerable<NuGetReference> PackageReferences
         {
             get
             {
-                var packages = ProjectRoot.GetAllPackageReferences();
+                var packagesConfig = GetPackagesConfigPath();
 
-                return packages.Select(p => p.AsNuGetReference()).ToList();
+                if (packagesConfig is null)
+                {
+                    var packages = ProjectRoot.GetAllPackageReferences();
+
+                    return packages.Select(p => p.AsNuGetReference()).ToList();
+                }
+                else
+                {
+                    return PackageConfig.GetPackages(packagesConfig);
+                }
             }
         }
 

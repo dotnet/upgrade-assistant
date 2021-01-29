@@ -60,12 +60,7 @@ namespace AspNetMigrator.ConsoleApp
             {
                 foreach (var row in table.Rows)
                 {
-                    foreach (var c in row.Data)
-                    {
-                        Console.WriteLine(string.Join("\t", row.Data));
-                    }
-
-                    Console.WriteLine();
+                    Console.WriteLine(string.Join("\t", row.Data));
                 }
             }
 
@@ -77,6 +72,13 @@ namespace AspNetMigrator.ConsoleApp
             public override void Visit(Text text)
             {
                 Console.WriteLine(text.Content);
+            }
+
+            public override void Visit(Page page)
+            {
+                Console.WriteLine($"Project: {page.Title}");
+                Console.WriteLine("-------");
+                base.Visit(page);
             }
 
             public override void Visit(Section section)
