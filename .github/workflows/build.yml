@@ -42,5 +42,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: tools
-          path: $GITHUB_WORKSPACE/tools
+          path: tools/*
 
