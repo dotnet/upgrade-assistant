@@ -32,13 +32,8 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             _analyzerPackageVersion = updaterOptions.Value.MigrationAnalyzersPackageVersion;
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IMigrationContext context, IEnumerable<NuGetReference> references, PackageAnalysisState? state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             if (references is null)
             {
                 throw new ArgumentNullException(nameof(references));
@@ -46,7 +41,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 
             if (state is null)
             {
-                state = new PackageAnalysisState(context);
+                throw new ArgumentNullException(nameof(state));
             }
 
             var packageReferences = references.Where(r => !state.PackagesToRemove.Contains(r));

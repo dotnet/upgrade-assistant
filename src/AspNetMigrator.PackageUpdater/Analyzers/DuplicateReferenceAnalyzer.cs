@@ -18,7 +18,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<PackageAnalysisState> AnalyzeAsync(IMigrationContext context, IEnumerable<NuGetReference> references, PackageAnalysisState? state, CancellationToken token)
+        public Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
         {
             if (references is null)
             {
@@ -27,7 +27,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 
             if (state is null)
             {
-                state = new PackageAnalysisState(context);
+                throw new ArgumentNullException(nameof(state));
             }
 
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))

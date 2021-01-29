@@ -26,11 +26,12 @@ namespace AspNetMigrator.PackageUpdater
 
         private readonly string? _analyzerPackageSource;
         private readonly IPackageLoader _packageLoader;
+        private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
 
         private PackageAnalysisState? _analysisState;
 
-        public PackageUpdaterStep(MigrateOptions options, IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,  ILogger<PackageUpdaterStep> logger)
+        public PackageUpdaterStep(MigrateOptions options, IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers, ILogger<PackageUpdaterStep> logger)
             : base(options, logger)
         {
             if (options is null)
@@ -51,6 +52,7 @@ namespace AspNetMigrator.PackageUpdater
             Title = $"Update NuGet packages";
             Description = $"Update package references in {options.ProjectPath} to versions compatible with the target framework";
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
+            _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
             _analysisState = null;
@@ -76,7 +78,7 @@ namespace AspNetMigrator.PackageUpdater
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}", BuildBreakRisk.Unknown);
             }
 
-            if (_analysisState is null || (_analysisState.PackagesToRemove.Count == 0 && _analysisState.PackagesToAdd.Count == 0))
+            if (_analysisState is null || !_analysisState.ChangesRecommended)
             {
                 Logger.LogInformation("No package updates needed");
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
@@ -159,7 +161,7 @@ namespace AspNetMigrator.PackageUpdater
 
         private async Task<bool> RunPackageAnalyzersAsync(IMigrationContext context, CancellationToken token)
         {
-            _analysisState = null;
+            _analysisState = await PackageAnalysisState.CreateAsync(context, _packageRestorer, token).ConfigureAwait(false);
             var projectRoot = context.Project;
 
             if (projectRoot is null)
@@ -174,7 +176,7 @@ namespace AspNetMigrator.PackageUpdater
             foreach (var analyzer in _packageAnalyzers)
             {
                 Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                _analysisState = await analyzer.AnalyzeAsync(context, packageReferences, _analysisState, token).ConfigureAwait(false);
+                _analysisState = await analyzer.AnalyzeAsync(packageReferences, _analysisState, token).ConfigureAwait(false);
                 if (_analysisState.Failed)
                 {
                     Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}", analyzer.Name);

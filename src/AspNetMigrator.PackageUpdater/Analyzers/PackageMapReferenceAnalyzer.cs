@@ -20,7 +20,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IMigrationContext context, IEnumerable<NuGetReference> references, PackageAnalysisState? state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
         {
             if (references is null)
             {
@@ -29,7 +29,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 
             if (state is null)
             {
-                state = new PackageAnalysisState(context);
+                throw new ArgumentNullException(nameof(state));
             }
 
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)

@@ -12,33 +12,26 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 {
     public class TargetCompatibilityReferenceAnalyzer : IPackageReferencesAnalyzer
     {
-        private readonly IPackageRestorer _packageRestorer;
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
         private readonly NuGetFramework _targetFramework;
 
         public string Name => "Target compatibility reference analyzer";
 
-        public TargetCompatibilityReferenceAnalyzer(MigrateOptions options, IPackageRestorer packageRestorer, IPackageLoader packageLoader, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
+        public TargetCompatibilityReferenceAnalyzer(MigrateOptions options, IPackageLoader packageLoader, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _targetFramework = NuGetFramework.Parse(options.TargetFramework);
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IMigrationContext context, IEnumerable<NuGetReference> references, PackageAnalysisState? state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             if (references is null)
             {
                 throw new ArgumentNullException(nameof(references));
@@ -46,13 +39,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 
             if (state is null)
             {
-                state = new PackageAnalysisState(context);
-            }
-
-            if (!await state.EnsurePackagesRestoredAsync(_packageRestorer, token).ConfigureAwait(false))
-            {
-                _logger.LogCritical("Unable to restore packages for project {ProjectPath}", context.Project?.FilePath);
-                return state;
+                throw new ArgumentNullException(nameof(state));
             }
 
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))

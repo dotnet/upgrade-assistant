@@ -7,11 +7,9 @@ namespace AspNetMigrator.PackageUpdater
 {
     public class PackageAnalysisState
     {
-        public IMigrationContext Context { get; }
+        public string LockFilePath { get; private set; } = default!;
 
-        public string? LockFilePath { get; set; }
-
-        public string? PackageCachePath { get; set; }
+        public string PackageCachePath { get; private set; } = default!;
 
         public IList<NuGetReference> PackagesToAdd { get; }
 
@@ -23,26 +21,43 @@ namespace AspNetMigrator.PackageUpdater
 
         public bool ChangesRecommended => PackagesToAdd.Any() || PackagesToRemove.Any();
 
-        public PackageAnalysisState(IMigrationContext context)
+        private PackageAnalysisState()
         {
             PackagesToRemove = new List<NuGetReference>();
             PackagesToAdd = new List<NuGetReference>();
             Failed = false;
             PossibleBreakingChangeRecommended = false;
-            Context = context ?? throw new System.ArgumentNullException(nameof(context));
         }
 
-        public async Task<bool> EnsurePackagesRestoredAsync(IPackageRestorer packageRestorer, CancellationToken token)
+        /// <summary>
+        /// Creates a new analysis state object for a given migration context. This involves restoring packages for the context's current project.
+        /// </summary>
+        /// <param name="context">The migration context to create an analysis state for.</param>
+        /// <param name="packageRestorer">The package restorer to use to restore packages for the context's project and generate a lock file.</param>
+        /// <returns>A new PackageAnalysisState instance for the specified context.</returns>
+        public static async Task<PackageAnalysisState> CreateAsync(IMigrationContext context, IPackageRestorer packageRestorer, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new System.ArgumentNullException(nameof(context));
+            }
+
             if (packageRestorer is null)
             {
                 throw new System.ArgumentNullException(nameof(packageRestorer));
             }
 
+            var ret = new PackageAnalysisState();
+            await ret.PopulatePackageRestoreState(context, packageRestorer, token).ConfigureAwait(false);
+            return ret;
+        }
+
+        private async Task<bool> PopulatePackageRestoreState(IMigrationContext context, IPackageRestorer packageRestorer, CancellationToken token)
+        {
             if (LockFilePath is null || PackageCachePath is null || Failed)
             {
-                var restoreOutput = await packageRestorer.RestorePackagesAsync(Context, token).ConfigureAwait(false);
-                if (restoreOutput.LockFilePath is null)
+                var restoreOutput = await packageRestorer.RestorePackagesAsync(context, token).ConfigureAwait(false);
+                if (restoreOutput.LockFilePath is null || restoreOutput.PackageCachePath is null)
                 {
                     Failed = true;
                     return false;

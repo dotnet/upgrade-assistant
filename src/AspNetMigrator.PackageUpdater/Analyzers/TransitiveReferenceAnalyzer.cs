@@ -13,12 +13,11 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
     public class TransitiveReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private readonly NuGetFramework _targetFramework;
-        private readonly IPackageRestorer _packageRestorer;
         private readonly ILogger<TransitiveReferenceAnalyzer> _logger;
 
         public string Name => "Transitive reference analyzer";
 
-        public TransitiveReferenceAnalyzer(MigrateOptions options, IPackageRestorer packageRestorer, ILogger<TransitiveReferenceAnalyzer> logger)
+        public TransitiveReferenceAnalyzer(MigrateOptions options, ILogger<TransitiveReferenceAnalyzer> logger)
         {
             if (options is null)
             {
@@ -26,17 +25,11 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             }
 
             _targetFramework = NuGetFramework.Parse(options.TargetFramework);
-            _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IMigrationContext context, IEnumerable<NuGetReference> references, PackageAnalysisState? state, CancellationToken token)
+        public Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             if (references is null)
             {
                 throw new ArgumentNullException(nameof(references));
@@ -44,16 +37,10 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 
             if (state is null)
             {
-                state = new PackageAnalysisState(context);
+                throw new ArgumentNullException(nameof(state));
             }
 
-            if (!await state.EnsurePackagesRestoredAsync(_packageRestorer, token).ConfigureAwait(false))
-            {
-                _logger.LogCritical("Unable to restore packages for project {ProjectPath}", context.Project?.FilePath);
-                return state;
-            }
-
-            var lockFileTarget = GetLockFileTarget(state.LockFilePath!);
+            var lockFileTarget = GetLockFileTarget(state.LockFilePath);
 
             // If the package is referenced transitively, mark for removal
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))
@@ -66,7 +53,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
                 }
             }
 
-            return state;
+            return Task.FromResult(state);
         }
 
         private LockFileTarget GetLockFileTarget(string lockFilePath) =>
