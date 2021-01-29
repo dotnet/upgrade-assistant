@@ -85,7 +85,7 @@ namespace AspNetMigrator.PackageUpdater
             {
                 if (_analysisState.PackagesToRemove.Count > 0)
                 {
-                    Logger.LogInformation($"Packages to be removed:\n{string.Join('\n', _analysisState.PackagesToRemove.Distinct().Count())}");
+                    Logger.LogInformation($"Packages to be removed:\n{string.Join('\n', _analysisState.PackagesToRemove.Distinct())}");
                 }
 
                 if (_analysisState.PackagesToAdd.Count > 0)

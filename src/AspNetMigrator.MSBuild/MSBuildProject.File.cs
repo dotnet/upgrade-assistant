@@ -70,6 +70,7 @@ namespace AspNetMigrator.MSBuild
 
             foreach (var reference in references)
             {
+                _logger.LogInformation("Adding package reference: {PackageReference}", reference);
                 ProjectRoot.AddPackageReference(packageReferenceItemGroup, reference);
             }
         }
@@ -83,6 +84,7 @@ namespace AspNetMigrator.MSBuild
 
         public ValueTask SaveAsync(CancellationToken token)
         {
+            _logger.LogDebug("Saving changes to project file");
             ProjectRoot.Save();
 
             // Reload the workspace since, at this point, the project may be different from what was loaded
@@ -95,8 +97,7 @@ namespace AspNetMigrator.MSBuild
             {
                 if (references.Contains(reference))
                 {
-                    _logger.LogInformation("Removing outdated packaged reference: {PackageReference}", reference);
-
+                    _logger.LogInformation("Removing outdated package reference: {PackageReference}", reference);
                     ProjectRoot.RemovePackage(reference);
                 }
             }

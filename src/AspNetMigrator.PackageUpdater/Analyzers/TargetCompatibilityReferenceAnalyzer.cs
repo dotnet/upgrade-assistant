@@ -17,7 +17,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
         private readonly NuGetFramework _targetFramework;
 
-        public string Name => "Duplicate reference analyzer";
+        public string Name => "Target compatibility reference analyzer";
 
         public TargetCompatibilityReferenceAnalyzer(MigrateOptions options, IPackageRestorer packageRestorer, IPackageLoader packageLoader, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {

@@ -17,7 +17,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
         private readonly string? _analyzerPackageSource;
         private readonly string? _analyzerPackageVersion;
 
-        public string Name => "Duplicate reference analyzer";
+        public string Name => "Upgrade assistant reference analyzer";
 
         public UpgradeAssistantReferenceAnalyzer(IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, ILogger<UpgradeAssistantReferenceAnalyzer> logger)
         {

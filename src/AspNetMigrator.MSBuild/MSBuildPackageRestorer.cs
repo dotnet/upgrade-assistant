@@ -18,30 +18,14 @@ namespace AspNetMigrator.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
+        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.Project is not MSBuildProject project)
-            {
-                throw new ArgumentException("Migration context must include a valid project before restoring packages");
-            }
-
-            // Create a project instance and run MSBuild /t:Restore
-            var result = RestorePackages(new ProjectInstance(project.ProjectRoot));
-
-            return Task.FromResult(result);
-        }
-
-        public RestoreOutput RestorePackages(ProjectInstance project)
-        {
-            if (project is null)
-            {
-                throw new ArgumentNullException(nameof(project));
-            }
+            var projectInstance = new ProjectInstance(context.Project.Required().FilePath);
 
             var buildParameters = new BuildParameters
             {
@@ -51,8 +35,8 @@ namespace AspNetMigrator.MSBuild
                 }
             };
 
-            var restoreRequest = new BuildRequestData(project, new[] { "Restore" });
-            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", project.FullPath);
+            var restoreRequest = new BuildRequestData(projectInstance, new[] { "Restore" });
+            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", projectInstance.FullPath);
             var restoreResult = BuildManager.DefaultBuildManager.Build(buildParameters, restoreRequest);
             _logger.LogDebug("MSBuild exited with status {RestoreStatus}", restoreResult.OverallResult);
             if (restoreResult.Exception != null)
@@ -61,16 +45,22 @@ namespace AspNetMigrator.MSBuild
                 throw restoreResult.Exception;
             }
 
+            // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
+            // aren't available in a project until after restore is run the first time.
+            // https://github.com/NuGet/Home/issues/9150
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+
             // Check for the lock file's existence rather than success since a bad NuGet reference won't
             // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
-            var lockFilePath = Path.Combine(project.GetPropertyValue("MSBuildProjectExtensionsPath"), LockFileName);
+            var lockFilePath = Path.Combine(projectInstance.GetPropertyValue("MSBuildProjectExtensionsPath"), LockFileName);
             if (!Path.IsPathFullyQualified(lockFilePath))
             {
-                lockFilePath = Path.Combine(project.Directory, lockFilePath);
+                lockFilePath = Path.Combine(projectInstance.Directory, lockFilePath);
             }
 
             // Get the path used for caching NuGet packages
-            var nugetCachePath = project.GetPropertyValue("NuGetPackageRoot");
+            projectInstance = new ProjectInstance(context.Project.Required().FilePath);
+            var nugetCachePath = projectInstance.GetPropertyValue("NuGetPackageRoot");
 
             return new RestoreOutput(File.Exists(lockFilePath) ? lockFilePath : null, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
         }
