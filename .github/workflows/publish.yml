@@ -10,7 +10,7 @@ on:
 
 jobs:
   upload:
-      runs-on: windows-latest
+    runs-on: windows-latest
 
     steps:
     - name: Download artifact
