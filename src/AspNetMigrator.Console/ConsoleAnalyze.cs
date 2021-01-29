@@ -62,6 +62,12 @@ namespace AspNetMigrator.ConsoleApp
         {
             public override void Visit(Table table)
             {
+                var divider = new string('-', Console.WindowWidth / 2);
+
+                Console.WriteLine(divider);
+                Console.WriteLine(string.Join("\t", table.Headers));
+                Console.WriteLine(divider);
+                Console.WriteLine();
                 foreach (var row in table.Rows)
                 {
                     Console.WriteLine(string.Join("\t", row.Data));
