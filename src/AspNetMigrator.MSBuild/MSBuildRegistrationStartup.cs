@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.Logging;
 
@@ -30,14 +28,18 @@ namespace AspNetMigrator.MSBuild
 
                 if (msBuildInstances.Count == 0)
                 {
-                    var expected = Environment.Is64BitProcess ? "64-bit" : "32-bit";
-                    _logger.LogError($"No supported MSBuild found. Ensure `dotnet --list-sdks` show an install that is {expected}");
+                    _logger.LogError($"No supported MSBuild found. Ensure `dotnet --list-sdks` show an install that is {ExpectedBitness}");
                     throw new MigrationException("MSBuild not found");
                 }
                 else
                 {
-                    _logger.LogDebug("Found {Count} candidate MSBuild instances:\n\t{MSBuildInstances}", msBuildInstances.Count, string.Join("\n\t", msBuildInstances.Select(m => m.MSBuildPath)));
+                    foreach (var instance in msBuildInstances)
+                    {
+                        _logger.LogDebug("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
+                    }
+
                     _msBuildInstance = msBuildInstances.First();
+                    _logger.LogInformation("MSBuild registered from {MSBuildPath}", _msBuildInstance.MSBuildPath);
                     MSBuildLocator.RegisterInstance(_msBuildInstance);
                     AssemblyLoadContext.Default.Resolving += ResolveAssembly;
                 }
@@ -52,16 +54,18 @@ namespace AspNetMigrator.MSBuild
             {
                 var is32bit = instance.MSBuildPath.Contains("x86", StringComparison.OrdinalIgnoreCase);
 
-                if (Environment.Is64BitProcess && !is32bit)
+                if (Environment.Is64BitProcess == !is32bit)
                 {
                     yield return instance;
                 }
                 else
                 {
-                    _logger.LogDebug("Skipping {Path} as it is 32-bit", instance.MSBuildPath);
+                    _logger.LogDebug("Skipping {Path} as it is {Bitness}", instance.MSBuildPath, ExpectedBitness);
                 }
             }
         }
+
+        private static string ExpectedBitness => Environment.Is64BitProcess ? "64-bit" : "32-bit";
 
         private Assembly? ResolveAssembly(AssemblyLoadContext context, AssemblyName assemblyName)
         {
