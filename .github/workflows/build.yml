@@ -35,12 +35,12 @@ jobs:
     - name: Test
       run: dotnet test -c ${{ env.buildConfiguration }}   
     - name: Create tool package
-      run: dotnet pack src/AspNetMigrator.Console/AspNetMigrator.ConsoleApp.csproj -c ${{ env.buildConfiguration }} -o $GITHUB_WORKSPACE/tools
+      run: dotnet pack src/AspNetMigrator.Console/AspNetMigrator.ConsoleApp.csproj -c ${{ env.buildConfiguration }} -o tools/
     - name: Create analyzer package
-      run: dotnet pack src/Analyzers/AspNetMigrator.Analyzers.Package/AspNetMigrator.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o $GITHUB_WORKSPACE/tools
+      run: dotnet pack src/Analyzers/AspNetMigrator.Analyzers.Package/AspNetMigrator.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o tools/
     - name: Publish Packages
       uses: actions/upload-artifact@v2
       with:
           name: tools
-          path: $GITHUB_WORKSPACE/tools
+          path: tools/*
 
