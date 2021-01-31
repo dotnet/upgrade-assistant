@@ -1,27 +1,29 @@
 name: publish
 
 on:
-    workflow_run:
-        workflows: ["build"]
-        types:
-          - completed
-        branches:
-          - main
+  workflow_run:
+    workflows: ["build"]
+    types:
+      - completed
+    branches:	
+      - main
 
 jobs:
   upload:
     runs-on: windows-latest
 
     steps:
+    # Manually handle this due to https://github.com/actions/download-artifact/issues/60
     - name: Download artifact
       uses: actions/github-script@v3
       with:
+        env:
+          RunId: ${{ github.event.workflow_run.id }}
         script: |
-          # Manually handle this due to https://github.com/actions/download-artifact/issues/60
           var artifacts = await github.actions.listWorkflowRunArtifacts({
              owner: context.repo.owner,
              repo: context.repo.repo,
-             run_id: ${{ github.event.workflow_run.id }},
+             run_id: process.env.RunId
           });
           var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
             return artifact.name == "tools"
@@ -30,21 +32,16 @@ jobs:
              owner: context.repo.owner,
              repo: context.repo.repo,
              artifact_id: matchArtifact.id,
-             archive_format: 'zip',
+             archive_format: 'zip'
           });
           var fs = require('fs');
-          fs.writeFileSync('${{ github.workspace }}/tools.zip', Buffer.from(download.data));
+          fs.writeFileSync('tools.zip', Buffer.from(download.data));
     - name: Unzip artifact
-      run: |
-        mkdir -p test/packagename
-        mv rendered.zip test/packagename
-        cd test/packagename
-        unzip rendered.zip
-        rm rendered.zip
+      run: unzip tools.zip
     - name: Install sleet
       run: dotnet tool install -g sleet
     - name: Upload tool package
-      run : sleet push $(Build.ArtifactStagingDirectory)/tools --skip-existing
+      run : sleet push tools --skip-existing
       env:
           SLEET_FEED_TYPE: azure
           SLEET_FEED_CONTAINER: feed
