@@ -41,7 +41,7 @@ jobs:
     - name: Install sleet
       run: dotnet tool install -g sleet
     - name: Upload tool package
-      run : sleet push tools --skip-existing
+      run : sleet push . --skip-existing
       env:
           SLEET_FEED_TYPE: azure
           SLEET_FEED_CONTAINER: feed
