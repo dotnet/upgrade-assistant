@@ -22,26 +22,43 @@ namespace AspNetMigrator.Portability
 
         public async Task<Section> GenerateContentAsync(IProject project, CancellationToken token)
         {
-            var table = await GenerateTable(project.GetRoslynProject(), token).ConfigureAwait(false);
+            var sections = await GenerateSections(project.GetRoslynProject(), token).ConfigureAwait(false);
 
             return new Section("Portability Analysis")
             {
-                Content = new[] { table }
+                Content = sections
             };
         }
 
-        private async ValueTask<Table> GenerateTable(Project project, CancellationToken token)
+        private async ValueTask<List<Section>> GenerateSections(Project project, CancellationToken token)
         {
-            var rows = await GenerateContent(project, token).ToListAsync(token).ConfigureAwait(false);
-
-            return new Table
+            List<Section> sections = new List<Section>();
+            var content = await GenerateContent(project, token).ToListAsync(token).ConfigureAwait(false);
+            var groups = content.GroupBy(r => r.Component);
+            foreach (var group in groups)
             {
-                Headers = new[] { "Type", "Name", "Description" },
-                Rows = rows,
-            };
+                var groupKey = group.Key;
+                Section section = new Section("Component: " + groupKey);
+                List<Row> rowList = new List<Row>();
+                Table table = new Table
+                {
+                    Headers = new[] { "Type", "Name", "Description" },
+                };
+
+                foreach (var groupedItem in group)
+                {
+                    rowList.Add(new Row(new object[] { groupedItem.Type, groupedItem.Name, groupedItem.Description }));
+                }
+
+                table.Rows = rowList;
+                section.Content = new[] { table };
+                sections.Add(section);
+            }
+
+            return sections;
         }
 
-        private async IAsyncEnumerable<Row> GenerateContent(Project project, [EnumeratorCancellation] CancellationToken token)
+        private async IAsyncEnumerable<PortabilityResult> GenerateContent(Project project, [EnumeratorCancellation] CancellationToken token)
         {
             var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
 
@@ -55,7 +72,7 @@ namespace AspNetMigrator.Portability
             {
                 await foreach (var result in analyzer.Analyze(compilation, token))
                 {
-                    yield return new Row(new object[] { result.Type, result.Name, result.Description });
+                    yield return result;
                 }
             }
         }

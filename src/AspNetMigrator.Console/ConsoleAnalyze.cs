@@ -98,7 +98,7 @@ namespace AspNetMigrator.ConsoleApp
                 var divider = new string('-', Console.WindowWidth / 2);
 
                 Console.WriteLine(divider);
-                Console.WriteLine($"Section: {section.Header}");
+                Console.WriteLine(section.Header);
                 Console.WriteLine(divider);
 
                 foreach (var child in section.Content)

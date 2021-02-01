@@ -15,4 +15,10 @@
     <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Config\PortabilityComponentConfiguration.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

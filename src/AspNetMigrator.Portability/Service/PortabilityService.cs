@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
@@ -26,7 +27,6 @@ namespace AspNetMigrator.Portability.Service
             {
                 PropertyNameCaseInsensitive = true,
             };
-
             _options.Converters.Add(new FrameworkNameConverter());
         }
 

@@ -5,16 +5,21 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using AspNetMigrator.Portability.Service;
 using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.Portability.Analyzers
 {
     internal class PortabilityServiceAnalyzer : IPortabilityAnalyzer
     {
         private readonly IPortabilityService _service;
+        private readonly Dictionary<string, string>? _portabilityComponents;
+        private readonly ILogger<PortabilityServiceAnalyzer> _logger;
 
-        public PortabilityServiceAnalyzer(IPortabilityService service)
+        public PortabilityServiceAnalyzer(IPortabilityService service, ILogger<PortabilityServiceAnalyzer> logger)
         {
             _service = service;
+            _logger = logger;
+            _portabilityComponents = PortabilityComponents.GetPortabilityComponentsConfig(logger);
         }
 
         public async IAsyncEnumerable<PortabilityResult> Analyze(Compilation compilation, [EnumeratorCancellation] CancellationToken token)
@@ -29,7 +34,8 @@ namespace AspNetMigrator.Portability.Analyzers
             {
                 if (!api.IsSupported())
                 {
-                    yield return new PortabilityResult(ApiType.Method, api.Definition.FullName, api.RecommendedChanges);
+                    api.Component = GetApiComponent(api.Definition.FullName);
+                    yield return new PortabilityResult(ApiType.Method, api.Definition.FullName, api.RecommendedChanges, api.Component);
                 }
             }
         }
@@ -48,6 +54,20 @@ namespace AspNetMigrator.Portability.Analyzers
                 {
                     yield return s;
                 }
+            }
+        }
+
+        private string GetApiComponent(string apiname)
+        {
+            string apiNamespace = string.Join(".", apiname.Split(".", 3).SkipLast(1));
+            if (_portabilityComponents!.TryGetValue(apiNamespace, out string? component))
+            {
+                return component;
+            }
+            else
+            {
+                _logger.LogWarning("Missing Component details for {apiname} ", apiname);
+                return string.Empty;
             }
         }
     }
