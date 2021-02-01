@@ -16,10 +16,11 @@ namespace AspNetMigrator
         public MigrationStep(ILogger logger)
         {
             Logger = logger;
+            Commands = new List<MigrationCommand>();
+
             Status = MigrationStepStatus.Unknown;
             StatusDetails = string.Empty;
             Risk = BuildBreakRisk.Unknown;
-            Commands = new List<MigrationCommand>();
         }
 
         /// <summary>
@@ -46,6 +47,12 @@ namespace AspNetMigrator
         /// Gets or sets the migration steps that are sub-steps of this migration step. SubSteps are executed as part of executing the parent step.
         /// </summary>
         public virtual IEnumerable<MigrationStep> SubSteps { get; protected set; } = Enumerable.Empty<MigrationStep>();
+
+        /// <summary>
+        /// Gets or sets the full type names of migration steps that must run before this migration step executes. Pre-requisite steps are not children or parents (in that the steps don't contain one another). Instead, these are separate migration steps that must execute before this migration step can execute.
+        /// </summary>
+        /// <remarks>Type names are stored as strings so that migration step assemblies don't need to depend on other steps if the only relationship between them is a pre-req. However, using a migration step without also using its pre-reqs will result in a runtime exception.</remarks>
+        public virtual IEnumerable<string> PreRequisiteSteps { get; protected set; } = Enumerable.Empty<string>();
 
         /// <summary>
         /// Gets the migration step's execution status.
@@ -145,6 +152,18 @@ namespace AspNetMigrator
                 Logger.LogError(e, "Unexpected error applying step");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Resets migration step status as if the step had not yet been initialized or applied. Useful for re-running a migration step when migration context changes.
+        /// </summary>
+        public virtual MigrationStepInitializeResult ResetStatus()
+        {
+            Status = MigrationStepStatus.Unknown;
+            StatusDetails = string.Empty;
+            Risk = BuildBreakRisk.Unknown;
+
+            return new MigrationStepInitializeResult(Status, StatusDetails, Risk);
         }
 
         /// <summary>
