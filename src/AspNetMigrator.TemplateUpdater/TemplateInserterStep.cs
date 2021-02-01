@@ -34,6 +34,15 @@ namespace AspNetMigrator.TemplateUpdater
 
         public override string Title => $"Add template files";
 
+        public override IEnumerable<string> ExecuteAfter => new[]
+        {
+            // Project should be backed up before adding template files
+            "AspNetMigrator.BackupUpdater.BackupStep",
+
+            // Project should be SDK-style before adding template files
+            "AspNetMigrator.TryConvertUpdater.TryConvertProjectConverterStep"
+        };
+
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
             : base(logger)
         {

@@ -49,10 +49,16 @@ namespace AspNetMigrator
         public virtual IEnumerable<MigrationStep> SubSteps { get; protected set; } = Enumerable.Empty<MigrationStep>();
 
         /// <summary>
-        /// Gets or sets the full type names of migration steps that must run before this migration step executes. Pre-requisite steps are not children or parents (in that the steps don't contain one another). Instead, these are separate migration steps that must execute before this migration step can execute.
+        /// Gets the full type names of migration steps that must run before this migration step executes. 'ExecuteAfter' steps are not children or parents (in that the steps don't contain one another). Instead, these are separate migration steps that must execute before this migration step can execute.
         /// </summary>
-        /// <remarks>Type names are stored as strings so that migration step assemblies don't need to depend on other steps if the only relationship between them is a pre-req. However, using a migration step without also using its pre-reqs will result in a runtime exception.</remarks>
-        public virtual IEnumerable<string> PreRequisiteSteps { get; protected set; } = Enumerable.Empty<string>();
+        /// <remarks>Type names are stored as strings so that migration step assemblies don't need to depend on other steps if the only relationship between them is a pre-req. However, using a migration step without also using its ExecuteAfter steps will result in a runtime exception.</remarks>
+        public virtual IEnumerable<string> ExecuteAfter => Enumerable.Empty<string>();
+
+        /// <summary>
+        /// Gets the full type names of migration steps that must not run before this migration step executes. 'ExecuteBefore' steps are not children or parents (in that the steps don't contain one another). Instead, these are separate migration steps that must not execute before this migration step can execute.
+        /// </summary>
+        /// <remarks>Type names are stored as strings so that migration step assemblies don't need to depend on other steps if the only relationship between them is a pre-req. Using a migration step without also using its ExecuteAfter steps is permissible.</remarks>
+        public virtual IEnumerable<string> ExecuteBefore => Enumerable.Empty<string>();
 
         /// <summary>
         /// Gets the migration step's execution status.
@@ -157,7 +163,7 @@ namespace AspNetMigrator
         /// <summary>
         /// Resets migration step status as if the step had not yet been initialized or applied. Useful for re-running a migration step when migration context changes.
         /// </summary>
-        public virtual MigrationStepInitializeResult ResetStatus()
+        public virtual MigrationStepInitializeResult Reset()
         {
             Status = MigrationStepStatus.Unknown;
             StatusDetails = string.Empty;

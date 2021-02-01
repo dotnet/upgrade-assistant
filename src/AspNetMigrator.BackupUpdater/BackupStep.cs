@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,12 @@ namespace AspNetMigrator.BackupUpdater
         public override string Description => $"Backup {_projectDir} to {_backupPath}";
 
         public override string Title => "Backup project";
+
+        public override IEnumerable<string> ExecuteAfter => new[]
+        {
+            // The user should select a specific project before backing up (since changes are only made at the project-level)
+            "AspNetMigrator.Solution.SolutionMigrationStep",
+        };
 
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)
             : base(logger)

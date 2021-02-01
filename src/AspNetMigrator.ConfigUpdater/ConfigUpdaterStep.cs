@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,15 @@ namespace AspNetMigrator.ConfigUpdater
         public override string Description => $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
 
         public override string Title => "Migrate app config files";
+
+        public override IEnumerable<string> ExecuteAfter => new[]
+        {
+            // Project should be backed up before changing things based on config files
+            "AspNetMigrator.BackupUpdater.BackupStep",
+
+            // Template files should be added prior to making config updates (since some IConfigUpdaters may change added templates)
+            "AspNetMigrator.TemplateUpdater.TemplateInserterStep"
+        };
 
         public ConfigUpdaterStep(ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)
             : base(logger)

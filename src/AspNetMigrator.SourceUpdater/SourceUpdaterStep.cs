@@ -28,6 +28,15 @@ namespace AspNetMigrator.SourceUpdater
 
         public override string Title => "Update C# source";
 
+        public override IEnumerable<string> ExecuteAfter => new[]
+        {
+            // Project should be backed up before changing source
+            "AspNetMigrator.BackupUpdater.BackupStep",
+
+            // Template files should be added prior to changing source (since some code fixers will change added templates)
+            "AspNetMigrator.TemplateUpdater.TemplateInserterStep"
+        };
+
         public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
