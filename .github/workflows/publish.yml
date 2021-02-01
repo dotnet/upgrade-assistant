@@ -5,7 +5,7 @@ on:
     workflows: ["build"]
     types:
       - completed
-    branches:	
+    branches:
       - main
 
 jobs:
