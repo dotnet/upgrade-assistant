@@ -9,20 +9,12 @@ namespace AspNetMigrator
 {
     public abstract class MigrationStep
     {
+        private bool Initialized => Status != MigrationStepStatus.Unknown;
+
         protected ILogger Logger { get; }
 
-        protected MigrateOptions Options { get; }
-
-        protected bool Initialized => Status != MigrationStepStatus.Unknown;
-
-        public MigrationStep(MigrateOptions options, ILogger logger)
+        public MigrationStep(ILogger logger)
         {
-            if (options is null || !options.IsValid())
-            {
-                throw new ArgumentException("Invalid migration options");
-            }
-
-            Options = options;
             Logger = logger;
             Status = MigrationStepStatus.Unknown;
             StatusDetails = string.Empty;
@@ -30,27 +22,54 @@ namespace AspNetMigrator
             Commands = new List<MigrationCommand>();
         }
 
+        /// <summary>
+        /// Gets or sets a user-friendly display name for the migration step.
+        /// </summary>
         public virtual string Title { get; protected set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets a user-friendly description of what the migration step does.
+        /// </summary>
         public virtual string Description { get; protected set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets the migration step (if any) that this migration step is a sub-step of.
+        /// </summary>
         public virtual MigrationStep? ParentStep { get; protected set; }
 
+        /// <summary>
+        /// Gets or sets migration step-specific commands that the user can choose from in addition to the migrator's default commands.
+        /// </summary>
         public virtual List<MigrationCommand> Commands { get; set; }
 
+        /// <summary>
+        /// Gets or sets the migration steps that are sub-steps of this migration step. SubSteps are executed as part of executing the parent step.
+        /// </summary>
         public virtual IEnumerable<MigrationStep> SubSteps { get; protected set; } = Enumerable.Empty<MigrationStep>();
 
+        /// <summary>
+        /// Gets the migration step's execution status.
+        /// </summary>
         public MigrationStepStatus Status { get; private set; }
 
-        public BuildBreakRisk Risk { get; set; }
+        /// <summary>
+        /// Gets the risk that executing the migration step will introduce a build break.
+        /// </summary>
+        public BuildBreakRisk Risk { get; private set; }
 
-        public bool IsComplete => Status switch
+        /// <summary>
+        /// Gets a value indicating whether the migration is done (has completed successfully or was skipped).
+        /// </summary>
+        public bool IsDone => Status switch
         {
             MigrationStepStatus.Complete => true,
             MigrationStepStatus.Skipped => true,
             _ => false,
         };
 
+        /// <summary>
+        /// Gets a detailed status message suitable for displaying to the user explaining the migration step's current state.
+        /// </summary>
         public string StatusDetails { get; private set; }
 
         /// <summary>

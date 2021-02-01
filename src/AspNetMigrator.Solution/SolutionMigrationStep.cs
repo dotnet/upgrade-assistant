@@ -14,10 +14,9 @@ namespace AspNetMigrator.Solution
 
         public SolutionMigrationStep(
             ICollectUserInput input,
-            MigrateOptions options,
             ITargetFrameworkIdentifier tfm,
             ILogger<SolutionMigrationStep> logger)
-            : base(options, logger)
+            : base(logger)
         {
             _input = input;
             _tfm = tfm;

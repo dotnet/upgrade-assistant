@@ -31,14 +31,9 @@ namespace AspNetMigrator.PackageUpdater
 
         private PackageAnalysisState? _analysisState;
 
-        public PackageUpdaterStep(MigrateOptions options, IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers, ILogger<PackageUpdaterStep> logger)
-            : base(options, logger)
+        public PackageUpdaterStep(IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers, ILogger<PackageUpdaterStep> logger)
+            : base(logger)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             if (updaterOptions is null)
             {
                 throw new ArgumentNullException(nameof(updaterOptions));
@@ -50,7 +45,7 @@ namespace AspNetMigrator.PackageUpdater
             }
 
             Title = $"Update NuGet packages";
-            Description = $"Update package references in {options.ProjectPath} to versions compatible with the target framework";
+            Description = $"Update package references to versions compatible with the target framework";
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
@@ -74,8 +69,8 @@ namespace AspNetMigrator.PackageUpdater
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.Project.Required().FilePath);
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {context.Project.Required().FilePath}", BuildBreakRisk.Unknown);
             }
 
             if (_analysisState is null || !_analysisState.ChangesRecommended)
@@ -154,8 +149,8 @@ namespace AspNetMigrator.PackageUpdater
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.Project.Required().FilePath);
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {context.Project.Required().FilePath}");
             }
         }
 

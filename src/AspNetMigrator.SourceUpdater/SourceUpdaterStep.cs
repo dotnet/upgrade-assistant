@@ -25,7 +25,7 @@ namespace AspNetMigrator.SourceUpdater
         internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
 
         public SourceUpdaterStep(MigrateOptions options, AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
-            : base(options, logger)
+            : base(logger)
         {
             if (options is null)
             {
@@ -49,7 +49,7 @@ namespace AspNetMigrator.SourceUpdater
             _allCodeFixProviders = ImmutableArray.CreateRange(analyzerProvider.GetCodeFixProviders().OrderBy(c => c.FixableDiagnosticIds.First()));
 
             // Add sub-steps for each analyzer that will be run
-            SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, options, logger)));
+            SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
         }
 
         // Gets supported diagnostics from analyzers that are fixable by a given code fixer

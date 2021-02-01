@@ -16,7 +16,7 @@ namespace AspNetMigrator.BackupUpdater
         private string _backupPath;
 
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)
-            : base(options, logger)
+            : base(logger)
         {
             if (options is null)
             {

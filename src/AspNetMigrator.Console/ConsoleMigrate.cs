@@ -91,7 +91,7 @@ namespace AspNetMigrator.ConsoleApp
             {
                 await foreach (var step in migrator.GetAllSteps(context, token))
                 {
-                    while (!step.IsComplete)
+                    while (!step.IsDone)
                     {
                         token.ThrowIfCancellationRequested();
 

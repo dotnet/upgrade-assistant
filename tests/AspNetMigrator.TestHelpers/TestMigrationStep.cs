@@ -16,9 +16,8 @@ namespace AspNetMigrator.TestHelpers
             string? description = null,
             MigrationStep? parentStep = null,
             IEnumerable<MigrationStep>? subSteps = null,
-            MigrateOptions? options = null,
             ILogger? logger = null)
-            : base(options ?? Defaults.DefaultMigrateOptions, logger ?? new NullLogger<TestMigrationStep>())
+            : base(logger ?? new NullLogger<TestMigrationStep>())
         {
             Title = title;
             Description = description ?? string.Empty;

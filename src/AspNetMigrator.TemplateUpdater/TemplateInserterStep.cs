@@ -30,14 +30,9 @@ namespace AspNetMigrator.TemplateUpdater
 
         private Dictionary<string, RuntimeItemSpec> _itemsToAdd;
 
-        public TemplateInserterStep(MigrateOptions options, TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
-            : base(options, logger)
+        public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
+            : base(logger)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
@@ -52,7 +47,7 @@ namespace AspNetMigrator.TemplateUpdater
             }
 
             Title = $"Add template files";
-            Description = $"Add template files (for startup code paths, for example) to {options.ProjectPath} based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
+            Description = $"Add template files (for startup code paths, for example) based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
         }
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)

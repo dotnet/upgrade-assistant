@@ -13,8 +13,8 @@ namespace AspNetMigrator.TestHelpers
 
         public override string InitializedMessage => SkippedMessage;
 
-        public SkippedTestMigrationStep(string title, string? description = null, MigrationStep? parentStep = null, IEnumerable<MigrationStep>? subSteps = null, MigrateOptions? options = null, ILogger? logger = null)
-            : base(title, description, parentStep, subSteps, options, logger)
+        public SkippedTestMigrationStep(string title, string? description = null, MigrationStep? parentStep = null, IEnumerable<MigrationStep>? subSteps = null, ILogger? logger = null)
+            : base(title, description, parentStep, subSteps, logger)
         {
         }
 

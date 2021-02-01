@@ -60,7 +60,7 @@ namespace AspNetMigrator
                     yield return innerStep;
                 }
 
-                if (!step.IsComplete)
+                if (!step.IsDone)
                 {
                     yield return step;
                 }
