@@ -24,14 +24,13 @@ namespace AspNetMigrator.SourceUpdater
 
         internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
 
-        public SourceUpdaterStep(MigrateOptions options, AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
+        public override string Description => "Update source files to change ASP.NET references to ASP.NET Core equivalents";
+
+        public override string Title => "Update C# source";
+
+        public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             if (analyzerProvider is null)
             {
                 throw new ArgumentNullException(nameof(analyzerProvider));
@@ -41,9 +40,6 @@ namespace AspNetMigrator.SourceUpdater
             {
                 throw new ArgumentNullException(nameof(logger));
             }
-
-            Title = $"Update C# source";
-            Description = $"Update source files in {options.ProjectPath} to change ASP.NET references to ASP.NET Core equivalents";
 
             _allAnalyzers = ImmutableArray.CreateRange(analyzerProvider.GetAnalyzers().OrderBy(a => a.SupportedDiagnostics.First().Id));
             _allCodeFixProviders = ImmutableArray.CreateRange(analyzerProvider.GetCodeFixProviders().OrderBy(c => c.FixableDiagnosticIds.First()));

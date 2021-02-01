@@ -12,6 +12,10 @@ namespace AspNetMigrator.Solution
         private readonly ICollectUserInput _input;
         private readonly ITargetFrameworkIdentifier _tfm;
 
+        public override string Description => string.Empty;
+
+        public override string Title => "Identify solution conversion order";
+
         public SolutionMigrationStep(
             ICollectUserInput input,
             ITargetFrameworkIdentifier tfm,
@@ -20,7 +24,6 @@ namespace AspNetMigrator.Solution
         {
             _input = input;
             _tfm = tfm;
-            Title = "Identify solution conversion order";
         }
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)

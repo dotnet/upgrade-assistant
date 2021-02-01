@@ -23,14 +23,14 @@ namespace AspNetMigrator
         }
 
         /// <summary>
-        /// Gets or sets a user-friendly display name for the migration step.
+        /// Gets a user-friendly display name for the migration step.
         /// </summary>
-        public virtual string Title { get; protected set; } = string.Empty;
+        public abstract string Title { get; }
 
         /// <summary>
-        /// Gets or sets a user-friendly description of what the migration step does.
+        /// Gets a user-friendly description of what the migration step does.
         /// </summary>
-        public virtual string Description { get; protected set; } = string.Empty;
+        public abstract string Description { get; }
 
         /// <summary>
         /// Gets or sets the migration step (if any) that this migration step is a sub-step of.

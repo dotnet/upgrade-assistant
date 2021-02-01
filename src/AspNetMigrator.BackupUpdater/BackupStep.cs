@@ -15,6 +15,10 @@ namespace AspNetMigrator.BackupUpdater
 
         private string _backupPath;
 
+        public override string Description => $"Backup {_projectDir} to {_backupPath}";
+
+        public override string Title => "Backup project";
+
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)
             : base(logger)
         {
@@ -27,8 +31,6 @@ namespace AspNetMigrator.BackupUpdater
             _skipBackup = options.SkipBackup;
             _backupPath = DetermineBackupPath(options);
 
-            Title = $"Backup project";
-            Description = $"Backup {_projectDir} to {_backupPath}";
             if (collectBackupPathFromUser is null)
             {
                 throw new ArgumentNullException(nameof(collectBackupPathFromUser));

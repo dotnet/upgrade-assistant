@@ -30,6 +30,10 @@ namespace AspNetMigrator.TemplateUpdater
 
         private Dictionary<string, RuntimeItemSpec> _itemsToAdd;
 
+        public override string Description => $"Add template files (for startup code paths, for example) based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
+
+        public override string Title => $"Add template files";
+
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
             : base(logger)
         {
@@ -45,9 +49,6 @@ namespace AspNetMigrator.TemplateUpdater
             {
                 Logger.LogWarning("No template configuration files provided; no template files will be added to project");
             }
-
-            Title = $"Add template files";
-            Description = $"Add template files (for startup code paths, for example) based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
         }
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)

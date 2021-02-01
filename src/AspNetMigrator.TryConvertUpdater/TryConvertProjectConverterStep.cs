@@ -18,6 +18,10 @@ namespace AspNetMigrator.TryConvertUpdater
 
         private readonly string _tryConvertPath;
 
+        public override string Description => $"Use the try-convert tool ({_tryConvertPath}) to convert the project file to an SDK-style csproj";
+
+        public override string Title => $"Convert project file to SDK style";
+
         public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
@@ -33,9 +37,6 @@ namespace AspNetMigrator.TryConvertUpdater
 
             var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
-
-            Title = $"Convert project file to SDK style";
-            Description = $"Use the try-convert tool ({_tryConvertPath}) to convert the project file to an SDK-style csproj";
         }
 
         protected async override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)

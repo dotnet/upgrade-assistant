@@ -14,6 +14,10 @@ namespace AspNetMigrator.ConfigUpdater
 
         public ImmutableArray<ConfigFile> ConfigFiles { get; private set; }
 
+        public override string Description => $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
+
+        public override string Title => "Migrate app config files";
+
         public ConfigUpdaterStep(ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
@@ -28,10 +32,6 @@ namespace AspNetMigrator.ConfigUpdater
             }
 
             _configFilePaths = configUpdaterProvider.ConfigFilePaths.ToArray();
-
-            Title = "Migrate app config files";
-            Description = $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
-
             SubSteps = configUpdaterProvider.GetUpdaters().Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 

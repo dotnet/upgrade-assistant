@@ -11,14 +11,15 @@ namespace AspNetMigrator.ConfigUpdater
         private readonly ConfigUpdaterStep _parentStep;
         private readonly IConfigUpdater _configUpdater;
 
+        public override string Description => _configUpdater.Description;
+
+        public override string Title => _configUpdater.Title;
+
         public ConfigUpdaterSubStep(MigrationStep parentStep, IConfigUpdater configUpdater, ILogger logger)
             : base(logger)
         {
             _parentStep = (ParentStep = parentStep) as ConfigUpdaterStep ?? throw new ArgumentNullException(nameof(parentStep));
             _configUpdater = configUpdater ?? throw new ArgumentNullException(nameof(configUpdater));
-
-            Title = configUpdater.Title;
-            Description = configUpdater.Description;
         }
 
         protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)

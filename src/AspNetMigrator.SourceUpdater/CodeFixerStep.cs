@@ -31,6 +31,10 @@ namespace AspNetMigrator.SourceUpdater
                 _ => $"[{string.Join(", ", _fixProvider.FixableDiagnosticIds)}]"
             };
 
+        public override string Description => $"Update source files to automatically fix migration analyzer {DiagnosticId}";
+
+        public override string Title { get; }
+
         public CodeFixerStep(MigrationStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, ILogger logger)
             : base(logger)
         {
@@ -44,9 +48,7 @@ namespace AspNetMigrator.SourceUpdater
 
             // Get titles for all the diagnostics this step can fix
             var diagnosticTitles = _fixProvider.FixableDiagnosticIds.Select(i => diagnostics.FirstOrDefault(d => d.Id.Equals(i))?.Title).Where(t => t != null);
-
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
-            Description = $"Update source files to automatically fix migration analyzer {DiagnosticId}";
         }
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)

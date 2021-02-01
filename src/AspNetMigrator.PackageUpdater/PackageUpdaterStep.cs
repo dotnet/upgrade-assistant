@@ -31,6 +31,10 @@ namespace AspNetMigrator.PackageUpdater
 
         private PackageAnalysisState? _analysisState;
 
+        public override string Description => "Update package references to versions compatible with the target framework";
+
+        public override string Title => "Update NuGet packages";
+
         public PackageUpdaterStep(IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers, ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
@@ -44,8 +48,6 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            Title = $"Update NuGet packages";
-            Description = $"Update package references to versions compatible with the target framework";
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
