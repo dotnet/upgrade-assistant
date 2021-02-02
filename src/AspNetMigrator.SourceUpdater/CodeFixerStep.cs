@@ -31,6 +31,8 @@ namespace AspNetMigrator.SourceUpdater
                 _ => $"[{string.Join(", ", _fixProvider.FixableDiagnosticIds)}]"
             };
 
+        public override string Id => $"{typeof(CodeFixerStep).FullName!}:{DiagnosticId}";
+
         public override string Description => $"Update source files to automatically fix migration analyzer {DiagnosticId}";
 
         public override string Title { get; }

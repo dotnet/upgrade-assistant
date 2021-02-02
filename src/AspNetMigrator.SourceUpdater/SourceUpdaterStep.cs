@@ -24,6 +24,8 @@ namespace AspNetMigrator.SourceUpdater
 
         internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
 
+        public override string Id => typeof(SourceUpdaterStep).FullName!;
+
         public override string Description => "Update source files to change ASP.NET references to ASP.NET Core equivalents";
 
         public override string Title => "Update C# source";

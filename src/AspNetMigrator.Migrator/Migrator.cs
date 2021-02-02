@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -9,21 +8,21 @@ namespace AspNetMigrator
 {
     public class Migrator
     {
-        private readonly ImmutableArray<MigrationStep> _steps;
+        private readonly IMigrationStepOrderer _orderer;
 
         private ILogger Logger { get; }
 
-        public Migrator(IEnumerable<MigrationStep> steps, ILogger<Migrator> logger)
+        public Migrator(IMigrationStepOrderer orderer, ILogger<Migrator> logger)
         {
-            _steps = steps?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(steps));
+            _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public IEnumerable<MigrationStep> Steps => _steps;
+        public IEnumerable<MigrationStep> Steps => _orderer.MigrationSteps;
 
         public IAsyncEnumerable<MigrationStep> GetAllSteps(IMigrationContext context, CancellationToken token)
         {
-            return GetStepsInternal(_steps, context, token);
+            return GetStepsInternal(Steps, context, token);
         }
 
         private async IAsyncEnumerable<MigrationStep> GetStepsInternal(IEnumerable<MigrationStep> steps, IMigrationContext context, [EnumeratorCancellation] CancellationToken token)

@@ -11,6 +11,8 @@ namespace AspNetMigrator.ConfigUpdater
         private readonly ConfigUpdaterStep _parentStep;
         private readonly IConfigUpdater _configUpdater;
 
+        public override string Id => _configUpdater.Id;
+
         public override string Description => _configUpdater.Description;
 
         public override string Title => _configUpdater.Title;

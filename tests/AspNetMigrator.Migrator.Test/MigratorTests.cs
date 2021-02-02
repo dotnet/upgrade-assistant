@@ -16,10 +16,10 @@ namespace AspNetMigrator.Test
         public async Task NegativeTests()
         {
             Assert.ThrowsException<ArgumentNullException>(() => new Migrator(null!, new NullLogger<Migrator>()));
-            Assert.ThrowsException<ArgumentNullException>(() => new Migrator(Enumerable.Empty<MigrationStep>(), null!));
+            Assert.ThrowsException<ArgumentNullException>(() => new Migrator(GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
 
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
-            var migrator = new Migrator(unknownStep, new NullLogger<Migrator>());
+            var migrator = new Migrator(GetOrderer(unknownStep), new NullLogger<Migrator>());
             using var context = new NullMigrationContext();
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await migrator.GetAllSteps(context, CancellationToken.None).FirstAsync().ConfigureAwait(false)).ConfigureAwait(false);
         }
@@ -27,7 +27,7 @@ namespace AspNetMigrator.Test
         [TestMethod]
         public async Task MigratorStepsEnumeration()
         {
-            var migrator = new Migrator(GetMigrationSteps(), new NullLogger<Migrator>());
+            var migrator = new Migrator(GetOrderer(GetMigrationSteps()), new NullLogger<Migrator>());
 
             var expectedTopLevelStepsAndSubSteps = new[]
             {
@@ -60,7 +60,7 @@ namespace AspNetMigrator.Test
         [DataTestMethod]
         public async Task CompletedStepsAreNotEnumerated(MigrationStep[] steps, string[] expectedSteps)
         {
-            var migrator = new Migrator(steps, new NullLogger<Migrator>());
+            var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
             var allSteps = new List<string>();
             using var context = new NullMigrationContext();
             await foreach (var step in migrator.GetAllSteps(context, CancellationToken.None))
@@ -137,5 +137,7 @@ namespace AspNetMigrator.Test
                 new TestMigrationStep("Step 3", subSteps: otherSubsteps)
             };
         }
+
+        private static IMigrationStepOrderer GetOrderer(IEnumerable<MigrationStep> steps) => new MigrationStepOrderer(steps, new NullLogger<MigrationStepOrderer>());
     }
 }

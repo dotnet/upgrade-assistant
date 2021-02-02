@@ -30,6 +30,8 @@ namespace AspNetMigrator.TemplateUpdater
 
         private Dictionary<string, RuntimeItemSpec> _itemsToAdd;
 
+        public override string Id => typeof(TemplateInserterStep).FullName!;
+
         public override string Description => $"Add template files (for startup code paths, for example) based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
 
         public override string Title => $"Add template files";

@@ -11,6 +11,8 @@ namespace AspNetMigrator.TestHelpers
     {
         public int ApplicationCount { get; set; }
 
+        public override string Id => typeof(TestMigrationStep).FullName!;
+
         public override string Description { get; }
 
         public override string Title { get; }

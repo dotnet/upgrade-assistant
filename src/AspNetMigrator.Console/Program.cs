@@ -120,14 +120,16 @@ namespace AspNetMigrator.ConsoleApp
                     services.AddSingleton(logSettings);
 
                     // Add steps
-                    services.AddScoped<MigrationStep, BackupStep>();
-                    services.AddScoped<MigrationStep, SolutionMigrationStep>();
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
                     services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection));
+                    services.AddScoped<MigrationStep, SolutionMigrationStep>();
+                    services.AddScoped<MigrationStep, BackupStep>();
                     services.AddTemplateInserterStep();
                     services.AddConfigUpdaterStep();
                     services.AddSourceUpdaterStep();
+
                     services.AddScoped<Migrator>();
+                    services.AddTransient<IMigrationStepOrderer, MigrationStepOrderer>();
 
                     serviceConfiguration?.Invoke(context, services);
                 })

@@ -12,6 +12,8 @@ namespace AspNetMigrator.Solution
         private readonly ICollectUserInput _input;
         private readonly ITargetFrameworkIdentifier _tfm;
 
+        public override string Id => typeof(SolutionMigrationStep).FullName!;
+
         public override string Description => string.Empty;
 
         public override string Title => "Identify solution conversion order";

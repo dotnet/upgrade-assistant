@@ -24,6 +24,11 @@ namespace AspNetMigrator
         }
 
         /// <summary>
+        /// Gets a string that uniquely identifies this migration step.
+        /// </summary>
+        public abstract string Id { get; }
+
+        /// <summary>
         /// Gets a user-friendly display name for the migration step.
         /// </summary>
         public abstract string Title { get; }

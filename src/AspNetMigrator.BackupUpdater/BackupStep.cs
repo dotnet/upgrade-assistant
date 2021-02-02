@@ -16,6 +16,8 @@ namespace AspNetMigrator.BackupUpdater
 
         private string _backupPath;
 
+        public override string Id => typeof(BackupStep).FullName!;
+
         public override string Description => $"Backup {_projectDir} to {_backupPath}";
 
         public override string Title => "Backup project";

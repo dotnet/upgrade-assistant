@@ -29,6 +29,8 @@ namespace AspNetMigrator.DefaultConfigUpdaters
         private IEnumerable<string> _namespacesToMigrate;
         private string? _viewImportsPath;
 
+        public string Id => typeof(WebNamespaceMigrator).FullName!;
+
         public string Title => "Migrate system.web.webPages.razor/pages/namespaces";
 
         public string Description => "Migrate namespaces which are auto-included for web pages to _ViewImports.cshtml";

@@ -25,6 +25,8 @@ namespace AspNetMigrator.DefaultConfigUpdaters
         private readonly ILogger<AppSettingsMigrator> _logger;
         private readonly Dictionary<string, string> _appSettingsToMigrate;
 
+        public string Id => typeof(AppSettingsMigrator).FullName!;
+
         public string Title => "Migrate appSettings";
 
         public string Description => "Migrate app settings from app.config and web.config files to appsettings.json";

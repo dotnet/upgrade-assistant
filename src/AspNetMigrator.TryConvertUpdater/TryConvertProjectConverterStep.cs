@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -18,9 +19,17 @@ namespace AspNetMigrator.TryConvertUpdater
 
         private readonly string _tryConvertPath;
 
+        public override string Id => typeof(TryConvertProjectConverterStep).FullName!;
+
         public override string Description => $"Use the try-convert tool ({_tryConvertPath}) to convert the project file to an SDK-style csproj";
 
         public override string Title => $"Convert project file to SDK style";
+
+        public override IEnumerable<string> ExecuteAfter => new[]
+        {
+            // Project should be backed up before changing package references
+            "AspNetMigrator.BackupUpdater.BackupStep"
+        };
 
         public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
