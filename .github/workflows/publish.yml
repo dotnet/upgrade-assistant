@@ -7,23 +7,41 @@ on:
       - completed
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Workflow Run Id'
+        required: true
+      reason_to_run:
+        description: 'Reason to run'
+        required: true
 
 jobs:
   upload:
-    runs-on: windows-latest
+    if: github.repository_owner == 'dotnet'
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:5.0
+    env:
+      RUN_ID: ${{ github.event.workflow_run.id }}
 
     steps:
+    - name: Reason
+      if: github.event.inputs.reason_to_run
+      run: echo "${{ github.event.inputs.reason_to_run }}"
+    - name: Set Variable for manual run
+      if: ${{ github.event.inputs.run_id }}
+      run: echo "RUN_ID=${{ github.event.inputs.run_id }}" >> $GITHUB_ENV
+      
     # Manually handle this due to https://github.com/actions/download-artifact/issues/60
     - name: Download artifact
       uses: actions/github-script@v3
-      env:
-        RunId: ${{ github.event.workflow_run.id }}
       with:
         script: |
           var artifacts = await github.actions.listWorkflowRunArtifacts({
              owner: context.repo.owner,
              repo: context.repo.repo,
-             run_id: process.env.RunId
+             run_id: process.env.RUN_ID
           });
           var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
             return artifact.name == "tools"
@@ -37,11 +55,14 @@ jobs:
           var fs = require('fs');
           fs.writeFileSync('tools.zip', Buffer.from(download.data));
     - name: Unzip artifact
-      run: unzip tools.zip
-    - name: Install sleet
-      run: dotnet tool install -g sleet
+      run: |
+        apt-get update && apt-get install -y unzip
+        unzip tools.zip
     - name: Upload tool package
-      run : sleet push . --skip-existing
+      run : |
+        dotnet tool install -g sleet
+        export PATH="$PATH:/github/home/.dotnet/tools"
+        sleet push . --skip-existing
       env:
           SLEET_FEED_TYPE: azure
           SLEET_FEED_CONTAINER: feed
