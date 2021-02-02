@@ -5,6 +5,11 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      reason_to_run:
+        description: 'Reason to run'
+        required: true
 
 env:
   buildConfiguration: Release
@@ -15,6 +20,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Reason
+      if: github.event.inputs.reason_to_run
+      run: echo "${{ github.event.inputs.reason_to_run }}"
     - uses: actions/checkout@v2
       with: 
         fetch-depth: 0
