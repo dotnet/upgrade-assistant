@@ -34,7 +34,11 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.Project is null)
+            if (context.EntryPoint is null)
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
+            }
+            else if (context.Project is null)
             {
                 var projects = context.Projects.ToList();
 
@@ -89,13 +93,10 @@ namespace AspNetMigrator.Solution
 
         private async Task<IProject> GetProject(IMigrationContext context, Func<IProject, bool> isProjectCompleted, CancellationToken token)
         {
-            const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();
-            var entrypoint = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
-
-            var ordered = entrypoint.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            context.EntryPoint = await GetEntrypointAsync(context, token).ConfigureAwait(false);
+            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
@@ -105,6 +106,21 @@ namespace AspNetMigrator.Solution
             {
                 return new ProjectCommand(project, isProjectCompleted(project));
             }
+        }
+
+        private async ValueTask<IProject> GetEntrypointAsync(IMigrationContext context, CancellationToken token)
+        {
+            const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
+
+            if (context.EntryPoint is not null)
+            {
+                return context.EntryPoint;
+            }
+
+            var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();
+            var result = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
+
+            return result.Project;
         }
 
         private class ProjectCommand : MigrationCommand
