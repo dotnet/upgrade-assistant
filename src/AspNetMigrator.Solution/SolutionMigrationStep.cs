@@ -34,6 +34,11 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (context.EntryPoint is not null && context.Project is not null)
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
+            }
+
             var projects = context.Projects.ToList();
 
             if (projects.Count == 1)
