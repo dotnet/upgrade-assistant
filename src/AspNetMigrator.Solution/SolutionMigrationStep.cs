@@ -16,7 +16,7 @@ namespace AspNetMigrator.Solution
 
         public override string Description => string.Empty;
 
-        public override string Title => "Identify solution conversion order";
+        public override string Title => "Choose project to upgrade";
 
         public SolutionMigrationStep(
             ICollectUserInput input,
@@ -31,7 +31,7 @@ namespace AspNetMigrator.Solution
         protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.Project is null;
 
         // This migration step is meant to be run fresh every time a new project needs selected
-        protected override bool ShouldReset(IMigrationContext context) => context?.Project is null;
+        protected override bool ShouldReset(IMigrationContext context) => context?.Project is null && Status == MigrationStepStatus.Complete;
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
             => Task.FromResult(InitializeImpl(context));
