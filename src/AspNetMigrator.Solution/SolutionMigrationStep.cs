@@ -34,20 +34,29 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.Project is null)
+            if (context.EntryPoint is not null && context.Project is not null)
             {
-                var projects = context.Projects.ToList();
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
+            }
 
-                if (projects.Count == 1)
-                {
-                    var onlyProject = projects[0];
+            var projects = context.Projects.ToList();
 
-                    Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project", onlyProject.FilePath);
-                    context.Project = onlyProject;
+            if (projects.Count == 1)
+            {
+                context.EntryPoint = projects[0];
+                context.Project = projects[0];
 
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
-                }
+                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project.FilePath);
 
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+            }
+
+            if (context.EntryPoint is null)
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
+            }
+            else if (context.Project is null)
+            {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
             else
@@ -89,13 +98,10 @@ namespace AspNetMigrator.Solution
 
         private async Task<IProject> GetProject(IMigrationContext context, Func<IProject, bool> isProjectCompleted, CancellationToken token)
         {
-            const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();
-            var entrypoint = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
-
-            var ordered = entrypoint.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            context.EntryPoint = await GetEntrypointAsync(context, token).ConfigureAwait(false);
+            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
@@ -105,6 +111,21 @@ namespace AspNetMigrator.Solution
             {
                 return new ProjectCommand(project, isProjectCompleted(project));
             }
+        }
+
+        private async ValueTask<IProject> GetEntrypointAsync(IMigrationContext context, CancellationToken token)
+        {
+            const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
+
+            if (context.EntryPoint is not null)
+            {
+                return context.EntryPoint;
+            }
+
+            var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();
+            var result = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
+
+            return result.Project;
         }
 
         private class ProjectCommand : MigrationCommand

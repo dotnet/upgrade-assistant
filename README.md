@@ -1,4 +1,4 @@
-# ASP.NET Migrator (aka "try-migrate")
+# Upgrade Assistant
 
 ## Overview
 
@@ -17,7 +17,7 @@ If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fund
 ### Prerequisites
 
 1. This tool uses MSBuild to work with project files. Make sure that a recent version of MSBuild is installed. An easy way to do this is to [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
-1. This migration tool depends on [try-convert](https://github.com/dotnet/try-convert). In order for the tool to run correctly, you must install the try-convert tool for converting project files to the new SDK style. If you already have try-convert installed, you may need to update it instead (since try-migrate depends on version 0.7.157502 or later)
+1. This migration tool depends on [try-convert](https://github.com/dotnet/try-convert). In order for the tool to run correctly, you must install the try-convert tool for converting project files to the new SDK style. If you already have try-convert installed, you may need to update it instead (since upgrade-assistant depends on version 0.7.157502 or later)
     1. To install try-convert: `dotnet tool install -g try-convert`
     1. To update try-convert: `dotnet tool update -g try-convert`
 
@@ -25,8 +25,8 @@ If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fund
 
 There are two ways to install the ASP.NET Migrator tool:
 
-1. The tool can be installed as a .NET CLI tool by running: `dotnet tool install -g try-migrate --add-source https://trymigrate.blob.core.windows.net/feed/index.json`
-    1. This approach makes updating the tool easy (`dotnet tool update -g try-migrate --add-source https://trymigrate.blob.core.windows.net/feed/index.json`)
+1. The tool can be installed as a .NET CLI tool by running: `dotnet tool install -g upgrade-assistant --add-source https://upgradeassistant.blob.core.windows.net/feed/index.json`
+    1. This approach makes updating the tool easy (`dotnet tool update -g upgrade-assistant --add-source https://upgradeassistant.blob.core.windows.net/feed/index.json`)
     1. Note that if you add the source to [NuGet's configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) you may omit the `--add-source` parameter.
     1. Only released versions will be installed with this command; any prerelease version must be explicitly opted into by adding `--version [desired-version]` to the command.
 1. A 64-bit Windows version of the tool can be downloaded [as a binary](https://mikerou.blob.core.windows.net/shared/AspNetMigrator.zip).
@@ -37,15 +37,15 @@ There are two ways to install the ASP.NET Migrator tool:
 
 ### Running the tool
 
-If you installed the tool using the .NET CLI, it can be run by calling `try-migrate`. Otherwise, it can be run by invoking `AspNetMigrate.Console.exe`.
+If you installed the tool using the .NET CLI, it can be run by calling `upgrade-assistant`. Otherwise, it can be run by invoking `AspNetMigrate.Console.exe`.
 
-The usual usage of the tool is: `try-migrate <Path to csproj or sln to migrate>`
+The usual usage of the tool is: `upgrade-assistant <Path to csproj or sln to migrate>`
 
 Full usage information:
 
 ```
 Usage:
-  try-migrate [options] <project>
+  upgrade-assistant [options] <project>
 
 Arguments:
   <project>
@@ -76,13 +76,13 @@ If you're just starting to look at .NET Core and would like to understand more a
 ### Troubleshooting common issues
 
 1. If try-convert fails:
-    1. Check that try-convert is installed (and that it is either located at %USERPROFILE%\.dotnet\tools\try-convert.exe or try-migrate's appsettings.json file has been updated with the correct location).
+    1. Check that try-convert is installed (and that it is either located at %USERPROFILE%\.dotnet\tools\try-convert.exe or upgrade-assistant's appsettings.json file has been updated with the correct location).
     2. Check that try-convert is at least version 0.7.157502 or higher).
-    3. Check whether the input project imports custom props or targets files. Try-convert doesn't support converting projects that import unknown props and targets files. Look at the output from try-migrate and try-convert to see if any unrecognized imports are mentioned.
+    3. Check whether the input project imports custom props or targets files. Try-convert doesn't support converting projects that import unknown props and targets files. Look at the output from upgrade-assistant and try-convert to see if any unrecognized imports are mentioned.
 
 ## Extensibility
 
-ASP.NET Migrator has several extension points that make it easy for users to customize many of the migration steps without having to rebuild the tool. Most of these extension points involve placing binaries or config files in directories next to the tool's location on disk. If you're not sure where the tool is installed (global .NET CLI tools can be hard to find), just run try-migrate against a project and take note of the "context base directory" that's mentioned in the very first logged message. This is the path the tool is running from and the location that all add-on paths are relative to.
+ASP.NET Migrator has several extension points that make it easy for users to customize many of the migration steps without having to rebuild the tool. Most of these extension points involve placing binaries or config files in directories next to the tool's location on disk. If you're not sure where the tool is installed (global .NET CLI tools can be hard to find), just run upgrade-assistant against a project and take note of the "context base directory" that's mentioned in the very first logged message. This is the path the tool is running from and the location that all add-on paths are relative to.
 
 ### Custom source analyzers and code fix providers
 
