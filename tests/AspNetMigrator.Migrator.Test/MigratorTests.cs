@@ -78,6 +78,24 @@ namespace AspNetMigrator.Test
             CollectionAssert.AreEqual(expectedSteps, allSteps);
         }
 
+        [TestMethod]
+        public async Task FailedStepsAreEnumerated()
+        {
+            var steps = new MigrationStep[] { new SkippedTestMigrationStep("Step 1"), new FailedTestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") };
+            var expectedNextStepId = "Step 2";
+
+            var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
+            using var context = new NullMigrationContext();
+            var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+
+            // The failed step is next
+            Assert.AreEqual(expectedNextStepId, nextStep?.Title);
+            Assert.IsFalse(await nextStep!.ApplyAsync(context, CancellationToken.None).ConfigureAwait(false));
+
+            // The failed step is still next after failing again
+            Assert.AreEqual(expectedNextStepId, nextStep?.Title);
+        }
+
         public static IEnumerable<object[]> CompletedStepsAreNotEnumeratedData =>
             new[]
             {
@@ -100,13 +118,6 @@ namespace AspNetMigrator.Test
                 {
                     new[] { new SkippedTestMigrationStep("Step 1"), new TestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") },
                     new[] { "Step 2" }
-                },
-
-                // Failed steps are enumerated
-                new object[]
-                {
-                    new[] { new FailedTestMigrationStep("Step 1"), new SkippedTestMigrationStep("Step 2"), new TestMigrationStep("Step 3") },
-                    new[] { "Step 1", "Step 3" }
                 },
 
                 // Make sure enumerating an empty step list doesn't cause problems

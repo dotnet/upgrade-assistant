@@ -7,6 +7,8 @@ namespace AspNetMigrator.TestHelpers
 {
     public class FailedTestMigrationStep : TestMigrationStep
     {
+        public override string Id => typeof(FailedTestMigrationStep).FullName!;
+
         private const string FailedMessage = "Test migration step completed";
 
         public override string AppliedMessage => FailedMessage;

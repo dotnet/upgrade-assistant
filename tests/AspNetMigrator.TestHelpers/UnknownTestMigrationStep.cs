@@ -7,6 +7,8 @@ namespace AspNetMigrator.TestHelpers
 {
     public class UnknownTestMigrationStep : TestMigrationStep
     {
+        public override string Id => typeof(UnknownTestMigrationStep).FullName!;
+
         private const string UnknownMessage = "Test migration status unknown";
 
         public override string AppliedMessage => UnknownMessage;
@@ -22,6 +24,6 @@ namespace AspNetMigrator.TestHelpers
             Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Unknown, InitializedMessage, BuildBreakRisk.Unknown));
 
         protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token) =>
-            Task.FromResult(new MigrationStepApplyResult(MigrationStepStatus.Unknown, AppliedMessage));
+            Task.FromResult(new MigrationStepApplyResult(MigrationStepStatus.Complete, AppliedMessage));
     }
 }

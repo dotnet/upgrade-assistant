@@ -7,6 +7,8 @@ namespace AspNetMigrator.TestHelpers
 {
     public class SkippedTestMigrationStep : TestMigrationStep
     {
+        public override string Id => typeof(SkippedTestMigrationStep).FullName!;
+
         private const string SkippedMessage = "Test migration step skipped";
 
         public override string AppliedMessage => SkippedMessage;
