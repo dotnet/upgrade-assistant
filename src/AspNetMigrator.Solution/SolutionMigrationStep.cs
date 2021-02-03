@@ -34,24 +34,24 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
+            var projects = context.Projects.ToList();
+
+            if (projects.Count == 1)
+            {
+                context.EntryPoint = projects[0];
+                context.Project = projects[0];
+
+                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project.FilePath);
+
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+            }
+
             if (context.EntryPoint is null)
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
             }
             else if (context.Project is null)
             {
-                var projects = context.Projects.ToList();
-
-                if (projects.Count == 1)
-                {
-                    var onlyProject = projects[0];
-
-                    Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project", onlyProject.FilePath);
-                    context.Project = onlyProject;
-
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
-                }
-
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
             else
