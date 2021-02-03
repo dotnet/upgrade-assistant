@@ -62,6 +62,8 @@ namespace AspNetMigrator.TemplateUpdater
             }
         }
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && _templateProvider.TemplateConfigFileNames.Any();
+
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)

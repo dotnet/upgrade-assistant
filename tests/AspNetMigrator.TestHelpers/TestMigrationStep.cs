@@ -36,6 +36,8 @@ namespace AspNetMigrator.TestHelpers
 
         public virtual string InitializedMessage => "Test migration step incomplete";
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => true;
+
         protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             ApplicationCount++;

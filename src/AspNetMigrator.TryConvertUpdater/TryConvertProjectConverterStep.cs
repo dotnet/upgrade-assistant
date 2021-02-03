@@ -48,6 +48,8 @@ namespace AspNetMigrator.TryConvertUpdater
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
+
         protected async override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)

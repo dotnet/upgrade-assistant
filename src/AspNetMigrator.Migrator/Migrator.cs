@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator
@@ -18,22 +19,54 @@ namespace AspNetMigrator
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public IEnumerable<MigrationStep> Steps => _orderer.MigrationSteps;
+        public IEnumerable<MigrationStep> AllSteps => _orderer.MigrationSteps;
 
-        public IAsyncEnumerable<MigrationStep> GetAllSteps(IMigrationContext context, CancellationToken token)
+        public IEnumerable<MigrationStep> GetStepsForContext(IMigrationContext context) => AllSteps.Where(s => s.IsApplicable(context));
+
+        /// <summary>
+        /// Finds and returns the next applicable and incomplete step for the given migration context.
+        /// </summary>
+        /// <param name="context">The migration context to evaluate migration steps against.</param>
+        /// <returns>The next applicable but incomplete migration step, which should be the next migration step applied.
+        /// Returns null if no migration steps need to be applied.</returns>
+        public async Task<MigrationStep?> GetNextStepAsync(IMigrationContext context, CancellationToken token)
         {
-            return GetStepsInternal(Steps, context, token);
+            var nextStep = await GetNextStepAsyncInternal(GetStepsForContext(context), context, token).ConfigureAwait(false);
+
+            if (nextStep is null && context.Project is not null)
+            {
+                // If no further migration steps are required, then the current project is complete and
+                // can be unset in the context
+                context.Project = null;
+                nextStep = await GetNextStepAsync(context, token).ConfigureAwait(false);
+            }
+
+            if (nextStep is null)
+            {
+                Logger.LogDebug("No applicable incomplete migration steps found");
+            }
+            else
+            {
+                Logger.LogDebug("Identified migration step {MigrationStep} as the next step", nextStep.Id);
+            }
+
+            return nextStep;
         }
 
-        private async IAsyncEnumerable<MigrationStep> GetStepsInternal(IEnumerable<MigrationStep> steps, IMigrationContext context, [EnumeratorCancellation] CancellationToken token)
+        private async Task<MigrationStep?> GetNextStepAsyncInternal(IEnumerable<MigrationStep> steps, IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             // This iterates through all incomplete steps, returning children before parents but initializing parents before children.
             // This is intentional because the expectation is that parents are initialized before children, but children are applied before parents.
             //
             // For each step, the expected order of operations is:
             // 1. Initialize the step
             // 2. Recurse into sub-steps (if needed)
-            // 3. Yield the step if it's not completed, or
+            // 3. Return the step if it's not completed, or
             //    continue iterating with the next step if it is.
             foreach (var step in steps)
             {
@@ -54,16 +87,22 @@ namespace AspNetMigrator
                     }
                 }
 
-                await foreach (var innerStep in GetStepsInternal(step.SubSteps, context, token))
+                if (step.SubSteps.Any())
                 {
-                    yield return innerStep;
+                    var nextSubStep = await GetNextStepAsyncInternal(step.SubSteps, context, token).ConfigureAwait(false);
+                    if (nextSubStep is not null)
+                    {
+                        return nextSubStep;
+                    }
                 }
 
                 if (!step.IsDone)
                 {
-                    yield return step;
+                    return step;
                 }
             }
+
+            return null;
         }
     }
 }

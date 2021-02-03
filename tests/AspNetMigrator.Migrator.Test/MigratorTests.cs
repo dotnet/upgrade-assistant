@@ -21,7 +21,7 @@ namespace AspNetMigrator.Test
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
             var migrator = new Migrator(GetOrderer(unknownStep), new NullLogger<Migrator>());
             using var context = new NullMigrationContext();
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await migrator.GetAllSteps(context, CancellationToken.None).FirstAsync().ConfigureAwait(false)).ConfigureAwait(false);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
         [TestMethod]
@@ -44,12 +44,16 @@ namespace AspNetMigrator.Test
 
             // Get both the steps property and the GetAllSteps enumeration and confirm that both return steps
             // in the expected order
-            var steps = migrator.Steps;
-            var allSteps = new List<string>();
             using var context = new NullMigrationContext();
-            await foreach (var step in migrator.GetAllSteps(context, CancellationToken.None))
+            var steps = migrator.GetStepsForContext(context);
+            var allSteps = new List<string>();
+
+            var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+            while (nextStep is not null)
             {
-                allSteps.Add(step.Title);
+                allSteps.Add(nextStep.Title);
+                await nextStep.ApplyAsync(context, CancellationToken.None).ConfigureAwait(false);
+                nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             }
 
             CollectionAssert.AreEqual(expectedTopLevelStepsAndSubSteps, steps.Select(s => (s.Title, s.SubSteps.Count())).ToArray());
@@ -63,9 +67,12 @@ namespace AspNetMigrator.Test
             var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
             var allSteps = new List<string>();
             using var context = new NullMigrationContext();
-            await foreach (var step in migrator.GetAllSteps(context, CancellationToken.None))
+            var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+            while (nextStep is not null)
             {
-                allSteps.Add(step.Title);
+                allSteps.Add(nextStep.Title);
+                await nextStep.ApplyAsync(context, CancellationToken.None).ConfigureAwait(false);
+                nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             }
 
             CollectionAssert.AreEqual(expectedSteps, allSteps);

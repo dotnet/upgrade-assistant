@@ -28,6 +28,11 @@ namespace AspNetMigrator.Solution
             _tfm = tfm;
         }
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.Project is null;
+
+        // This migration step is meant to be run fresh every time a new project needs selected
+        protected override bool ShouldReset(IMigrationContext context) => context?.Project is null;
+
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
             => Task.FromResult(InitializeImpl(context));
 
@@ -41,6 +46,11 @@ namespace AspNetMigrator.Solution
             if (context.Project is null)
             {
                 var projects = context.Projects.ToList();
+
+                if (projects.All(IsCompleted))
+                {
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
+                }
 
                 if (projects.Count == 1)
                 {

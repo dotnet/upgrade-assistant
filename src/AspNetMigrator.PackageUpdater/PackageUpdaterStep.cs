@@ -66,6 +66,8 @@ namespace AspNetMigrator.PackageUpdater
             _analysisState = null;
         }
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
+
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)

@@ -56,6 +56,8 @@ namespace AspNetMigrator.BackupUpdater
             return _backupPath;
         }
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => true;
+
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (_skipBackup)

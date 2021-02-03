@@ -53,6 +53,8 @@ namespace AspNetMigrator.SourceUpdater
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
         }
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
+
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             Logger.LogDebug("Identified {DiagnosticCount} fixable {DiagnosticId} diagnostics", Diagnostics.Count(), DiagnosticId);

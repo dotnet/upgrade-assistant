@@ -13,10 +13,13 @@ namespace AspNetMigrator
 
         protected ILogger Logger { get; }
 
+        protected string? ProjectInitializedAgainst { get; set; }
+
         public MigrationStep(ILogger logger)
         {
             Logger = logger;
             Commands = new List<MigrationCommand>();
+            ProjectInitializedAgainst = null;
 
             Status = MigrationStepStatus.Unknown;
             StatusDetails = string.Empty;
@@ -91,6 +94,17 @@ namespace AspNetMigrator
         public string StatusDetails { get; private set; }
 
         /// <summary>
+        /// Implementers should use this method to indicate whether the migration step applies to a given migration context.
+        /// Note that applicability is not about whether the step is complete or not (InitializeImplAsync should check that),
+        /// rather it is about whether it would ever make sense to run the migraiton step on the given context or not.
+        /// For example, a migration step that acts at the project level would be inapplicable when a solution is selected
+        /// rather than a project.
+        /// </summary>
+        /// <param name="context">The migration context to evaluate.</param>
+        /// <returns>True if the migration step makes sense to evaluate and display for the given context, false otherwise.</returns>
+        protected abstract bool IsApplicableImpl(IMigrationContext context);
+
+        /// <summary>
         /// Implementers should use this method to initialize Status and any other state needed.
         /// </summary>
         protected abstract Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token);
@@ -105,8 +119,14 @@ namespace AspNetMigrator
         /// </summary>
         public virtual async Task InitializeAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             try
             {
+                ProjectInitializedAgainst = context.Project?.FilePath;
                 (Status, StatusDetails, Risk) = await InitializeImplAsync(context, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
@@ -126,6 +146,11 @@ namespace AspNetMigrator
         /// <returns>True if the migration step was successfully applied or false if migration failed.</returns>
         public virtual async Task<bool> ApplyAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (!Initialized)
             {
                 throw new InvalidOperationException("Migration steps must be initialized before they are applied");
@@ -166,6 +191,60 @@ namespace AspNetMigrator
         }
 
         /// <summary>
+        /// Checks whether the migration step applies to the current migration context and, if it does,
+        /// checks whether the any existing migration step status is still valid or whether the context
+        /// has changed sufficiently that the migration step status should be reset.
+        /// </summary>
+        /// <param name="context">The migration context to evaluate.</param>
+        /// <returns>True if the migration step makes sense to evaluate and display for the given context, false otherwise.</returns>
+        public virtual bool IsApplicable(IMigrationContext context)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var ret = IsApplicableImpl(context);
+
+            // If the migration step applies, but it was previously initialized against a sufficiently different context, reset
+            if (ret && Initialized && ShouldReset(context))
+            {
+                Logger.LogDebug("Resetting migration step {MigrationStep} because migration context has changed significantly since it was initialized", Id);
+                Reset();
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Determines whether the migration context has changed sufficiently since the migration step was initialized
+        /// to warrant resetting the migration step's status.
+        /// </summary>
+        /// <param name="context">The migration context to evaluate.</param>
+        /// <returns>True if the migration step should reset its status, otherwise false.</returns>
+        protected virtual bool ShouldReset(IMigrationContext context)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (!Initialized)
+            {
+                return false;
+            }
+
+            var currentProject = context.Project?.FilePath;
+
+            if (ProjectInitializedAgainst is null)
+            {
+                return currentProject is not null;
+            }
+
+            return !ProjectInitializedAgainst.Equals(currentProject, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Resets migration step status as if the step had not yet been initialized or applied. Useful for re-running a migration step when migration context changes.
         /// </summary>
         public virtual MigrationStepInitializeResult Reset()
@@ -173,6 +252,7 @@ namespace AspNetMigrator
             Status = MigrationStepStatus.Unknown;
             StatusDetails = string.Empty;
             Risk = BuildBreakRisk.Unknown;
+            ProjectInitializedAgainst = null;
 
             return new MigrationStepInitializeResult(Status, StatusDetails, Risk);
         }

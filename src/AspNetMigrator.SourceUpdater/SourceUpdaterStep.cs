@@ -63,6 +63,8 @@ namespace AspNetMigrator.SourceUpdater
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && SubSteps.Any();
+
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)

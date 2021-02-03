@@ -47,6 +47,11 @@ namespace AspNetMigrator.ConfigUpdater
             SubSteps = configUpdaterProvider.GetUpdaters().Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 
+        protected override bool IsApplicableImpl(IMigrationContext context) =>
+            context?.Project is not null &&
+            SubSteps.Any() &&
+            _configFilePaths.Select(p => Path.Combine(context.Project.Directory, p)).Any(f => File.Exists(f));
+
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
