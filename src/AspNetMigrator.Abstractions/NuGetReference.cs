@@ -10,5 +10,7 @@ namespace AspNetMigrator
         {
             return $"{Name}, Version={Version}";
         }
+
+        public string? PrivateAssets { get; set; }
     }
 }

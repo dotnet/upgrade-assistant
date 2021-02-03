@@ -58,7 +58,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
                 if (analyzerPackageVersion is not null)
                 {
                     _logger.LogInformation("Reference to .NET Upgrade Assistant analyzer package ({AnalyzerPackageName}, version {AnalyzerPackageVersion}) needs added", AnalyzerPackageName, analyzerPackageVersion);
-                    state.PackagesToAdd.Add(new NuGetReference(AnalyzerPackageName, analyzerPackageVersion.ToString()));
+                    state.PackagesToAdd.Add(new NuGetReference(AnalyzerPackageName, analyzerPackageVersion.ToString()) { PrivateAssets = "all" });
                 }
                 else
                 {
