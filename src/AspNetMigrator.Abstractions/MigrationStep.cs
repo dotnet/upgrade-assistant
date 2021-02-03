@@ -254,6 +254,11 @@ namespace AspNetMigrator
             Risk = BuildBreakRisk.Unknown;
             ProjectInitializedAgainst = null;
 
+            foreach (var subStep in SubSteps)
+            {
+                subStep.Reset();
+            }
+
             return new MigrationStepInitializeResult(Status, StatusDetails, Risk);
         }
 
