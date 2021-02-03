@@ -22,7 +22,7 @@ namespace AspNetMigrator.ConsoleApp
 
             var projectDirectory = Path.GetDirectoryName(options.ProjectPath)!;
 
-            _path = Path.Combine(projectDirectory, ".aspnetmigrator");
+            _path = Path.Combine(projectDirectory, ".upgrade-assistant");
             _logger = logger;
         }
 
@@ -35,12 +35,11 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = await GetStateAsync(token).ConfigureAwait(false);
 
-            var project = context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == state.CurrentProject);
+            context.EntryPoint = FindProject(state.EntryPoint);
+            context.Project = FindProject(state.CurrentProject);
 
-            if (project is not null)
-            {
-                context.Project = project;
-            }
+            IProject? FindProject(string? path)
+                => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == path);
         }
 
         private async ValueTask<MigrationState> GetStateAsync(CancellationToken token)
@@ -85,6 +84,7 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = new MigrationState
             {
+                EntryPoint = NormalizePath(context.EntryPoint?.FilePath),
                 CurrentProject = NormalizePath(context.Project?.FilePath),
             };
 
@@ -98,6 +98,8 @@ namespace AspNetMigrator.ConsoleApp
             public string Build { get; set; } = Constants.Version;
 
             public string? CurrentProject { get; set; }
+
+            public string? EntryPoint { get; set; }
         }
     }
 }

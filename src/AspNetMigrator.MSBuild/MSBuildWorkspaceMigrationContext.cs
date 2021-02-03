@@ -13,9 +13,9 @@ namespace AspNetMigrator.MSBuild
 {
     internal sealed class MSBuildWorkspaceMigrationContext : IMigrationContext, IDisposable
     {
-        private readonly IVisualStudioFinder _vsFinder;
         private readonly string _path;
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
+        private readonly string? _vsPath;
         private readonly Dictionary<string, MSBuildProject> _projectCache;
 
         private string? _projectPath;
@@ -46,9 +46,17 @@ namespace AspNetMigrator.MSBuild
             }
 
             _projectCache = new Dictionary<string, MSBuildProject>(StringComparer.OrdinalIgnoreCase);
-            _vsFinder = vsFinder;
             _path = options.ProjectPath;
             _logger = logger;
+
+            var vsPath = vsFinder.GetLatestVisualStudioPath();
+
+            if (vsPath is null)
+            {
+                throw new MigrationException("Could not find a Visual Studio install to use for upgrade.");
+            }
+
+            _vsPath = vsPath;
 
             ProjectCollection = new ProjectCollection(globalProperties: CreateProperties());
         }
@@ -76,6 +84,8 @@ namespace AspNetMigrator.MSBuild
             return created;
         }
 
+        public IProject? EntryPoint { get; set; }
+
         public IEnumerable<IProject> Projects
         {
             get
@@ -102,12 +112,11 @@ namespace AspNetMigrator.MSBuild
         private Dictionary<string, string> CreateProperties()
         {
             var properties = new Dictionary<string, string>();
-            var vs = _vsFinder.GetLatestVisualStudioPath();
 
-            if (vs is not null)
+            if (_vsPath is not null)
             {
-                properties.Add("VSINSTALLDIR", vs);
-                properties.Add("MSBuildExtensionsPath32", Path.Combine(vs, "MSBuild"));
+                properties.Add("VSINSTALLDIR", _vsPath);
+                properties.Add("MSBuildExtensionsPath32", Path.Combine(_vsPath, "MSBuild"));
             }
 
             return properties;
@@ -193,11 +202,6 @@ namespace AspNetMigrator.MSBuild
         {
             get
             {
-                if (_workspace is null)
-                {
-                    throw new InvalidOperationException("Workspace has not been initialized");
-                }
-
                 if (_projectPath is null)
                 {
                     return null;
