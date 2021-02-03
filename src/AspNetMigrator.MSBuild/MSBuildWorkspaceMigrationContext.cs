@@ -84,6 +84,8 @@ namespace AspNetMigrator.MSBuild
             return created;
         }
 
+        public IProject? EntryPoint { get; set; }
+
         public IEnumerable<IProject> Projects
         {
             get
@@ -200,11 +202,6 @@ namespace AspNetMigrator.MSBuild
         {
             get
             {
-                if (_workspace is null)
-                {
-                    throw new InvalidOperationException("Workspace has not been initialized");
-                }
-
                 if (_projectPath is null)
                 {
                     return null;

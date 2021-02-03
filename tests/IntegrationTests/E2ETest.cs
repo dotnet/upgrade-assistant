@@ -25,7 +25,7 @@ namespace IntegrationTests
 
         private readonly HashSet<string> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase)
         {
-            ".aspnetmigrator"
+            ".upgrade-assistant"
         };
 
         [AssemblyInitialize]

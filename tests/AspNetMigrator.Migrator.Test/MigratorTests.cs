@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AspNetMigrator.TestHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
 
 namespace AspNetMigrator.Test
 {
@@ -20,7 +21,7 @@ namespace AspNetMigrator.Test
 
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
             var migrator = new Migrator(unknownStep, new NullLogger<Migrator>());
-            using var context = new NullMigrationContext();
+            using var context = Substitute.For<IMigrationContext>();
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await migrator.GetAllSteps(context, CancellationToken.None).FirstAsync().ConfigureAwait(false)).ConfigureAwait(false);
         }
 
@@ -46,7 +47,7 @@ namespace AspNetMigrator.Test
             // in the expected order
             var steps = migrator.Steps;
             var allSteps = new List<string>();
-            using var context = new NullMigrationContext();
+            using var context = Substitute.For<IMigrationContext>();
             await foreach (var step in migrator.GetAllSteps(context, CancellationToken.None))
             {
                 allSteps.Add(step.Title);
@@ -62,7 +63,7 @@ namespace AspNetMigrator.Test
         {
             var migrator = new Migrator(steps, new NullLogger<Migrator>());
             var allSteps = new List<string>();
-            using var context = new NullMigrationContext();
+            using var context = Substitute.For<IMigrationContext>();
             await foreach (var step in migrator.GetAllSteps(context, CancellationToken.None))
             {
                 allSteps.Add(step.Title);
