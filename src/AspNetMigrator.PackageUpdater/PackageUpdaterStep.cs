@@ -37,7 +37,7 @@ namespace AspNetMigrator.PackageUpdater
 
         public override string Title => "Update NuGet packages";
 
-        public override IEnumerable<string> ExecuteAfter => new[]
+        public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
             "AspNetMigrator.BackupUpdater.BackupStep",

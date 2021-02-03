@@ -25,7 +25,7 @@ namespace AspNetMigrator.TryConvertUpdater
 
         public override string Title => $"Convert project file to SDK style";
 
-        public override IEnumerable<string> ExecuteAfter => new[]
+        public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
             "AspNetMigrator.BackupUpdater.BackupStep"

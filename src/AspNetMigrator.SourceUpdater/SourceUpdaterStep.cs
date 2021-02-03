@@ -30,7 +30,7 @@ namespace AspNetMigrator.SourceUpdater
 
         public override string Title => "Update C# source";
 
-        public override IEnumerable<string> ExecuteAfter => new[]
+        public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing source
             "AspNetMigrator.BackupUpdater.BackupStep",

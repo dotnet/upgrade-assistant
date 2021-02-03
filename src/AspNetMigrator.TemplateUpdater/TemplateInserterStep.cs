@@ -36,7 +36,7 @@ namespace AspNetMigrator.TemplateUpdater
 
         public override string Title => $"Add template files";
 
-        public override IEnumerable<string> ExecuteAfter => new[]
+        public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before adding template files
             "AspNetMigrator.BackupUpdater.BackupStep",

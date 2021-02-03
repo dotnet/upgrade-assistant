@@ -21,7 +21,7 @@ namespace AspNetMigrator.ConfigUpdater
 
         public override string Title => "Migrate app config files";
 
-        public override IEnumerable<string> ExecuteAfter => new[]
+        public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing things based on config files
             "AspNetMigrator.BackupUpdater.BackupStep",

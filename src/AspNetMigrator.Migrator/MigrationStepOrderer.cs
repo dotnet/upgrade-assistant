@@ -30,7 +30,7 @@ namespace AspNetMigrator
             _logger.LogDebug("Attempting to add migration step {Id}", step.Id);
 
             // Find a place in the order after all dependencies
-            var dependencies = step.ExecuteAfter.ToList();
+            var dependencies = step.DependsOn.ToList();
             var index = 0;
             for (index = 0; index < _migrationSteps.Count && dependencies.Any(); index++)
             {
@@ -40,7 +40,7 @@ namespace AspNetMigrator
                     dependencies.RemoveAll(d => d.Equals(currentId, StringComparison.Ordinal));
                 }
 
-                if (step.ExecuteBefore.Contains(currentId, StringComparer.Ordinal))
+                if (step.DependencyOf.Contains(currentId, StringComparer.Ordinal))
                 {
                     _logger.LogError("Could not add dependency {MigrationStep} because its dependent step {Dependent} is executed before all of its dependencies are satisfied", step.Id, currentId);
                     return false;
@@ -69,7 +69,7 @@ namespace AspNetMigrator
                 return false;
             }
 
-            var dependents = _migrationSteps.Where(s => s.ExecuteAfter.Contains(stepId, StringComparer.Ordinal)).Select(s => s.Id);
+            var dependents = _migrationSteps.Where(s => s.DependsOn.Contains(stepId, StringComparer.Ordinal)).Select(s => s.Id);
             if (dependents.Any())
             {
                 _logger.LogError("Cannot remove step {MigrationStep} because later steps depend on it: {Dependents}", stepId, string.Join(", ", dependents));
@@ -142,14 +142,14 @@ namespace AspNetMigrator
         }
 
         private static List<MigrationStepDependency> GetDependencies(IEnumerable<MigrationStep> migrationSteps) =>
-            migrationSteps.SelectMany(s => s.ExecuteAfter.Select(d => new MigrationStepDependency(d, s.Id)))
-            .Concat(migrationSteps.SelectMany(s => s.ExecuteBefore.Select(d => new MigrationStepDependency(s.Id, d))))
+            migrationSteps.SelectMany(s => s.DependsOn.Select(d => new MigrationStepDependency(d, s.Id)))
+            .Concat(migrationSteps.SelectMany(s => s.DependencyOf.Select(d => new MigrationStepDependency(s.Id, d))))
             .Distinct()
             .ToList();
 
         private static IEnumerable<MigrationStep> GetStepsWithNoDependencies(List<MigrationStep> steps, List<MigrationStepDependency> dependencies) =>
             steps.Where(s => !dependencies.Any(d => d.Dependent.Equals(s.Id, StringComparison.Ordinal)));
-    }
 
-    internal record MigrationStepDependency(string Dependency, string Dependent);
+        private record MigrationStepDependency(string Dependency, string Dependent);
+    }
 }
