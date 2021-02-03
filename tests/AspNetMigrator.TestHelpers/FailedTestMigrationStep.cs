@@ -7,14 +7,16 @@ namespace AspNetMigrator.TestHelpers
 {
     public class FailedTestMigrationStep : TestMigrationStep
     {
+        public override string Id => typeof(FailedTestMigrationStep).FullName!;
+
         private const string FailedMessage = "Test migration step completed";
 
         public override string AppliedMessage => FailedMessage;
 
         public override string InitializedMessage => FailedMessage;
 
-        public FailedTestMigrationStep(string title, string? description = null, MigrationStep? parentStep = null, IEnumerable<MigrationStep>? subSteps = null, MigrateOptions? options = null, ILogger? logger = null)
-            : base(title, description, parentStep, subSteps, options, logger)
+        public FailedTestMigrationStep(string title, string? description = null, MigrationStep? parentStep = null, IEnumerable<MigrationStep>? subSteps = null, ILogger? logger = null)
+            : base(title, description, parentStep, subSteps, logger)
         {
         }
 

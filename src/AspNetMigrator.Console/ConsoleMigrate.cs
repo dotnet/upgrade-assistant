@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AspNetMigrator.ConsoleApp
 {
-    // TODO : Eventually, this may need localized and pull strings from resources, etc.
+    // TODO : Eventually, this may need to be localized and pull strings from resources, etc.
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class ConsoleMigrate : IHostedService
     {
@@ -89,13 +89,19 @@ namespace AspNetMigrator.ConsoleApp
 
             try
             {
-                await foreach (var step in migrator.GetAllSteps(context, token))
+                // Cache current steps here as defense-in-depth against the possibility
+                // of a bug (or very weird migration step behavior) causing the current step
+                // to reset state after being initialized by GetNextStepAsync
+                var steps = migrator.GetStepsForContext(context);
+                var step = await migrator.GetNextStepAsync(context, token);
+
+                while (step is not null)
                 {
-                    while (!step.IsComplete)
+                    while (!step.IsDone)
                     {
                         token.ThrowIfCancellationRequested();
 
-                        ShowMigrationSteps(migrator.Steps, step);
+                        ShowMigrationSteps(steps, step);
 
                         var commands = _commandProvider.GetCommands(step);
                         var command = await _input.ChooseAsync("Choose command", commands, token);
@@ -111,10 +117,9 @@ namespace AspNetMigrator.ConsoleApp
                             Console.ResetColor();
                         }
                     }
-                }
 
-                ShowMigrationSteps(migrator.Steps);
-                _io.Output.WriteLine();
+                    step = await migrator.GetNextStepAsync(context, token);
+                }
 
                 // Once a project has completed, we can remove it from the context.
                 context.Project = null;

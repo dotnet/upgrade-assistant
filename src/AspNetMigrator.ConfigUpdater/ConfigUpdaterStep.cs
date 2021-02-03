@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -14,14 +15,24 @@ namespace AspNetMigrator.ConfigUpdater
 
         public ImmutableArray<ConfigFile> ConfigFiles { get; private set; }
 
-        public ConfigUpdaterStep(MigrateOptions options, ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)
-            : base(options, logger)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+        public override string Id => typeof(ConfigUpdaterStep).FullName!;
 
+        public override string Description => $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
+
+        public override string Title => "Migrate app config files";
+
+        public override IEnumerable<string> DependsOn { get; } = new[]
+        {
+            // Project should be backed up before changing things based on config files
+            "AspNetMigrator.BackupUpdater.BackupStep",
+
+            // Template files should be added prior to making config updates (since some IConfigUpdaters may change added templates)
+            "AspNetMigrator.TemplateUpdater.TemplateInserterStep"
+        };
+
+        public ConfigUpdaterStep(ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)
+            : base(logger)
+        {
             if (configUpdaterProvider is null)
             {
                 throw new ArgumentNullException(nameof(configUpdaterProvider));
@@ -33,12 +44,13 @@ namespace AspNetMigrator.ConfigUpdater
             }
 
             _configFilePaths = configUpdaterProvider.ConfigFilePaths.ToArray();
-
-            Title = "Migrate app config files";
-            Description = $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
-
-            SubSteps = configUpdaterProvider.GetUpdaters().Select(u => new ConfigUpdaterSubStep(this, u, options, logger)).ToList();
+            SubSteps = configUpdaterProvider.GetUpdaters().Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
+
+        protected override bool IsApplicableImpl(IMigrationContext context) =>
+            context?.Project is not null &&
+            SubSteps.Any() &&
+            _configFilePaths.Select(p => Path.Combine(context.Project.Directory, p)).Any(f => File.Exists(f));
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -59,18 +71,18 @@ namespace AspNetMigrator.ConfigUpdater
                 await step.InitializeAsync(context, token).ConfigureAwait(false);
             }
 
-            var incompleteSubSteps = SubSteps.Count(s => !s.IsComplete);
+            var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
 
             return incompleteSubSteps == 0
                 ? new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No config updaters need applied", BuildBreakRisk.None)
-                : new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{incompleteSubSteps} config updaters need applied", SubSteps.Where(s => !s.IsComplete).Max(s => s.Risk));
+                : new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{incompleteSubSteps} config updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
         }
 
         protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
             // Nothing needs applied here because the actual migration changes are applied by the substeps
             // (which should apply before this step).
-            var incompleteSubSteps = SubSteps.Count(s => !s.IsComplete);
+            var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
 
             return Task.FromResult(incompleteSubSteps == 0
                 ? new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty)

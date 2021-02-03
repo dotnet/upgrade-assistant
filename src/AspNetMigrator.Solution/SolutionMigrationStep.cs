@@ -12,17 +12,26 @@ namespace AspNetMigrator.Solution
         private readonly ICollectUserInput _input;
         private readonly ITargetFrameworkIdentifier _tfm;
 
+        public override string Id => typeof(SolutionMigrationStep).FullName!;
+
+        public override string Description => string.Empty;
+
+        public override string Title => "Choose project to upgrade";
+
         public SolutionMigrationStep(
             ICollectUserInput input,
-            MigrateOptions options,
             ITargetFrameworkIdentifier tfm,
             ILogger<SolutionMigrationStep> logger)
-            : base(options, logger)
+            : base(logger)
         {
             _input = input;
             _tfm = tfm;
-            Title = "Identify solution conversion order";
         }
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.Project is null;
+
+        // This migration step is meant to be run fresh every time a new project needs selected
+        protected override bool ShouldReset(IMigrationContext context) => context?.Project is null && Status == MigrationStepStatus.Complete;
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
             => Task.FromResult(InitializeImpl(context));
@@ -40,6 +49,11 @@ namespace AspNetMigrator.Solution
             }
 
             var projects = context.Projects.ToList();
+
+            if (projects.All(IsCompleted))
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
+            }
 
             if (projects.Count == 1)
             {

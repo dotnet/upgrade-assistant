@@ -31,14 +31,15 @@ namespace AspNetMigrator.SourceUpdater
                 _ => $"[{string.Join(", ", _fixProvider.FixableDiagnosticIds)}]"
             };
 
-        public CodeFixerStep(MigrationStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, MigrateOptions options, ILogger logger)
-            : base(options, logger)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+        public override string Id => $"{typeof(CodeFixerStep).FullName!}:{DiagnosticId}";
 
+        public override string Description => $"Update source files to automatically fix migration analyzer {DiagnosticId}";
+
+        public override string Title { get; }
+
+        public CodeFixerStep(MigrationStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, ILogger logger)
+            : base(logger)
+        {
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
@@ -49,10 +50,10 @@ namespace AspNetMigrator.SourceUpdater
 
             // Get titles for all the diagnostics this step can fix
             var diagnosticTitles = _fixProvider.FixableDiagnosticIds.Select(i => diagnostics.FirstOrDefault(d => d.Id.Equals(i))?.Title).Where(t => t != null);
-
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
-            Description = $"Update source files in {options.ProjectPath} to automatically fix migration analyzer {DiagnosticId}";
         }
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {

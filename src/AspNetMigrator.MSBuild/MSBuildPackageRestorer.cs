@@ -64,7 +64,7 @@ namespace AspNetMigrator.MSBuild
             };
 
             var restoreRequest = new BuildRequestData(projectInstance, new[] { "Restore" });
-            _logger.LogInformation("Restoring NuGet packages for project {ProjectPath}", projectInstance.FullPath);
+            _logger.LogDebug("Restoring NuGet packages for project {ProjectPath}", projectInstance.FullPath);
             var restoreResult = BuildManager.DefaultBuildManager.Build(buildParameters, restoreRequest);
             _logger.LogDebug("MSBuild exited with status {RestoreStatus}", restoreResult.OverallResult);
             if (restoreResult.Exception != null)

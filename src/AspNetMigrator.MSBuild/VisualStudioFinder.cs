@@ -40,7 +40,7 @@ namespace AspNetMigrator.MSBuild
 
             if (Directory.Exists(installation))
             {
-                _logger.LogInformation("Found Visual Studio {VsVersion} at {VsPath}", version, installation);
+                _logger.LogDebug("Found Visual Studio {VsVersion} at {VsPath}", version, installation);
 
                 return installation;
             }

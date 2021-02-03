@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -18,14 +19,21 @@ namespace AspNetMigrator.TryConvertUpdater
 
         private readonly string _tryConvertPath;
 
-        public TryConvertProjectConverterStep(MigrateOptions migrateOptions, IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
-            : base(migrateOptions, logger)
-        {
-            if (migrateOptions is null)
-            {
-                throw new ArgumentNullException(nameof(migrateOptions));
-            }
+        public override string Id => typeof(TryConvertProjectConverterStep).FullName!;
 
+        public override string Description => $"Use the try-convert tool ({_tryConvertPath}) to convert the project file to an SDK-style csproj";
+
+        public override string Title => $"Convert project file to SDK style";
+
+        public override IEnumerable<string> DependsOn { get; } = new[]
+        {
+            // Project should be backed up before changing package references
+            "AspNetMigrator.BackupUpdater.BackupStep"
+        };
+
+        public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
+            : base(logger)
+        {
             if (tryConvertOptionsAccessor is null)
             {
                 throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
@@ -36,11 +44,11 @@ namespace AspNetMigrator.TryConvertUpdater
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            Title = $"Convert project file to SDK style";
-            Description = $"Convert {migrateOptions.ProjectPath} to an SDK-style project with try-convert";
             var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
 
         protected async override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {

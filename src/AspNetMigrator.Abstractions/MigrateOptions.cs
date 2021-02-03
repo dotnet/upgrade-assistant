@@ -9,8 +9,6 @@ namespace AspNetMigrator
 
         public string ProjectPath => Project.FullName;
 
-        public string? BackupPath { get; set; }
-
         public string[] Extension { get; set; } = Array.Empty<string>();
 
         public bool SkipBackup { get; set; }
@@ -19,7 +17,5 @@ namespace AspNetMigrator
 
         // TODO: Allow the user to specify Current or LTS and initialize this with an appropriate string from configuration based on the user's specification
         public string TargetFramework { get; set; } = "net5.0";
-
-        public bool IsValid() => !string.IsNullOrWhiteSpace(ProjectPath) && File.Exists(ProjectPath);
     }
 }

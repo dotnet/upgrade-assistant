@@ -31,14 +31,24 @@ namespace AspNetMigrator.PackageUpdater
 
         private PackageAnalysisState? _analysisState;
 
-        public PackageUpdaterStep(MigrateOptions options, IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers, ILogger<PackageUpdaterStep> logger)
-            : base(options, logger)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+        public override string Id => typeof(PackageUpdaterStep).FullName!;
 
+        public override string Description => "Update package references to versions compatible with the target framework";
+
+        public override string Title => "Update NuGet packages";
+
+        public override IEnumerable<string> DependsOn { get; } = new[]
+        {
+            // Project should be backed up before changing package references
+            "AspNetMigrator.BackupUpdater.BackupStep",
+
+            // Project should be SDK-style before changing package references
+            "AspNetMigrator.TryConvertUpdater.TryConvertProjectConverterStep"
+        };
+
+        public PackageUpdaterStep(IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers, ILogger<PackageUpdaterStep> logger)
+            : base(logger)
+        {
             if (updaterOptions is null)
             {
                 throw new ArgumentNullException(nameof(updaterOptions));
@@ -49,14 +59,14 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            Title = $"Update NuGet packages";
-            Description = $"Update package references in {options.ProjectPath} to versions compatible with the target framework";
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
             _analysisState = null;
         }
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -74,8 +84,8 @@ namespace AspNetMigrator.PackageUpdater
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.Project.Required().FilePath);
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {context.Project.Required().FilePath}", BuildBreakRisk.Unknown);
             }
 
             if (_analysisState is null || !_analysisState.ChangesRecommended)
@@ -154,8 +164,8 @@ namespace AspNetMigrator.PackageUpdater
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", Options.ProjectPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {Options.ProjectPath}");
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.Project.Required().FilePath);
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {context.Project.Required().FilePath}");
             }
         }
 

@@ -35,6 +35,12 @@ namespace AspNetMigrator.MSBuild
             var newItemElement = projectRoot.CreateItemElement(PackageReferenceType, packageReference.Name);
             itemGroup.AppendChild(newItemElement);
             newItemElement.AddMetadata(VersionElementName, packageReference.Version, true);
+
+            if (packageReference.PrivateAssets is not null)
+            {
+                var privateAssetsElement = projectRoot.CreateMetadataElement("PrivateAssets", packageReference.PrivateAssets);
+                newItemElement.AppendChild(privateAssetsElement);
+            }
         }
 
         public static IEnumerable<ProjectItemElement> GetAllPackageReferences(this ProjectRootElement projectRoot)

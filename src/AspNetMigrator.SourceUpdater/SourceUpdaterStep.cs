@@ -24,14 +24,24 @@ namespace AspNetMigrator.SourceUpdater
 
         internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
 
-        public SourceUpdaterStep(MigrateOptions options, AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
-            : base(options, logger)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+        public override string Id => typeof(SourceUpdaterStep).FullName!;
 
+        public override string Description => "Update source files to change ASP.NET references to ASP.NET Core equivalents";
+
+        public override string Title => "Update C# source";
+
+        public override IEnumerable<string> DependsOn { get; } = new[]
+        {
+            // Project should be backed up before changing source
+            "AspNetMigrator.BackupUpdater.BackupStep",
+
+            // Template files should be added prior to changing source (since some code fixers will change added templates)
+            "AspNetMigrator.TemplateUpdater.TemplateInserterStep"
+        };
+
+        public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
+            : base(logger)
+        {
             if (analyzerProvider is null)
             {
                 throw new ArgumentNullException(nameof(analyzerProvider));
@@ -42,19 +52,18 @@ namespace AspNetMigrator.SourceUpdater
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            Title = $"Update C# source";
-            Description = $"Update source files in {options.ProjectPath} to change ASP.NET references to ASP.NET Core equivalents";
-
             _allAnalyzers = ImmutableArray.CreateRange(analyzerProvider.GetAnalyzers().OrderBy(a => a.SupportedDiagnostics.First().Id));
             _allCodeFixProviders = ImmutableArray.CreateRange(analyzerProvider.GetCodeFixProviders().OrderBy(c => c.FixableDiagnosticIds.First()));
 
             // Add sub-steps for each analyzer that will be run
-            SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, options, logger)));
+            SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
         }
 
         // Gets supported diagnostics from analyzers that are fixable by a given code fixer
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && SubSteps.Any();
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {

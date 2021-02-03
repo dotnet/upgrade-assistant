@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,48 +10,61 @@ namespace AspNetMigrator.BackupUpdater
     public class BackupStep : MigrationStep
     {
         private const string FlagFileName = "migration.backup";
-
-        private readonly string _projectDir;
         private readonly bool _skipBackup;
 
-        private string _backupPath;
+        private string? _projectDir;
+        private string? _backupPath;
+
+        public override string Id => typeof(BackupStep).FullName!;
+
+        public override string Description => $"Backup the current project to another directory";
+
+        public override string Title => "Backup project";
+
+        public override IEnumerable<string> DependsOn { get; } = new[]
+        {
+            // The user should select a specific project before backing up (since changes are only made at the project-level)
+            "AspNetMigrator.Solution.SolutionMigrationStep",
+        };
 
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)
-            : base(options, logger)
+            : base(logger)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+            _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));
 
-            _projectDir = Path.GetDirectoryName(options.ProjectPath)!;
-            _skipBackup = options.SkipBackup;
-            _backupPath = DetermineBackupPath(options);
-
-            Title = $"Backup project";
-            Description = $"Backup {_projectDir} to {_backupPath}";
             if (collectBackupPathFromUser is null)
             {
                 throw new ArgumentNullException(nameof(collectBackupPathFromUser));
             }
 
-            Commands.Insert(0, new SetBackupPathCommand(_backupPath, collectBackupPathFromUser.AskUserAsync, (string newPath) =>
+            Commands.Insert(0, new SetBackupPathCommand(() => _backupPath, collectBackupPathFromUser.AskUserAsync, (string? newPath) =>
             {
                 _backupPath = newPath;
             }));
         }
 
-        public string GetBackupPath()
-        {
-            return _backupPath;
-        }
+        // The backup step backs up at the project level, so it doesn't apply if no project is selected
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            _projectDir = context.Project.Required().Directory;
+            _backupPath ??= GetDefaultBackupPath(_projectDir);
+
             if (_skipBackup)
             {
                 Logger.LogDebug("Backup migration step initalized as complete (backup skipped)");
                 return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
+            }
+            else if (_backupPath is null)
+            {
+                Logger.LogDebug("No backup path specified");
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
             }
             else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
             {
@@ -60,7 +74,7 @@ namespace AspNetMigrator.BackupUpdater
             else
             {
                 Logger.LogDebug("Backup migration step initialized as incomplete");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} to {_backupPath} (including subfolders).", BuildBreakRisk.None));
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
             }
         }
 
@@ -69,7 +83,19 @@ namespace AspNetMigrator.BackupUpdater
             if (_skipBackup)
             {
                 Logger.LogInformation("Skipping backup");
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Backup skipped");
+                return new MigrationStepApplyResult(MigrationStepStatus.Skipped, "Backup skipped");
+            }
+
+            if (_backupPath is null)
+            {
+                Logger.LogDebug("No backup path specified");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a backup location");
+            }
+
+            if (_projectDir is null)
+            {
+                Logger.LogDebug("No project specified");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a valid project selected");
             }
 
             if (Status == MigrationStepStatus.Complete)
@@ -127,16 +153,11 @@ namespace AspNetMigrator.BackupUpdater
             await sourceStream.CopyToAsync(destinationStream, bufferSize, CancellationToken.None).ConfigureAwait(false);
         }
 
-        private string DetermineBackupPath(MigrateOptions options)
+        private string GetDefaultBackupPath(string projectDir)
         {
             Logger.LogDebug("Determining backup path");
-            if (!string.IsNullOrWhiteSpace(options.BackupPath))
-            {
-                Logger.LogDebug("Using specified path: {BackupPath}", options.BackupPath);
-                return options.BackupPath;
-            }
 
-            var candidateBasePath = $"{Path.TrimEndingDirectorySeparator(_projectDir)}.backup";
+            var candidateBasePath = $"{Path.TrimEndingDirectorySeparator(projectDir)}.backup";
             var candidatePath = candidateBasePath;
             var iteration = 0;
             while (!IsPathValid(candidatePath))

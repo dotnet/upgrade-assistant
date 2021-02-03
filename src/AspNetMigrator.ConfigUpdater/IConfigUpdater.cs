@@ -6,6 +6,8 @@ namespace AspNetMigrator.ConfigUpdater
 {
     public interface IConfigUpdater
     {
+        string Id { get; }
+
         string Title { get; }
 
         string Description { get; }

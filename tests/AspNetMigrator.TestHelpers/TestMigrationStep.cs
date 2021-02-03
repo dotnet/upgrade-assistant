@@ -11,14 +11,19 @@ namespace AspNetMigrator.TestHelpers
     {
         public int ApplicationCount { get; set; }
 
+        public override string Id => typeof(TestMigrationStep).FullName!;
+
+        public override string Description { get; }
+
+        public override string Title { get; }
+
         public TestMigrationStep(
             string title,
             string? description = null,
             MigrationStep? parentStep = null,
             IEnumerable<MigrationStep>? subSteps = null,
-            MigrateOptions? options = null,
             ILogger? logger = null)
-            : base(options ?? Defaults.DefaultMigrateOptions, logger ?? new NullLogger<TestMigrationStep>())
+            : base(logger ?? new NullLogger<TestMigrationStep>())
         {
             Title = title;
             Description = description ?? string.Empty;
@@ -30,6 +35,8 @@ namespace AspNetMigrator.TestHelpers
         public virtual string AppliedMessage => "Test migration step complete";
 
         public virtual string InitializedMessage => "Test migration step incomplete";
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => true;
 
         protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {

@@ -30,14 +30,24 @@ namespace AspNetMigrator.TemplateUpdater
 
         private Dictionary<string, RuntimeItemSpec> _itemsToAdd;
 
-        public TemplateInserterStep(MigrateOptions options, TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
-            : base(options, logger)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+        public override string Id => typeof(TemplateInserterStep).FullName!;
 
+        public override string Description => $"Add template files (for startup code paths, for example) based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
+
+        public override string Title => $"Add template files";
+
+        public override IEnumerable<string> DependsOn { get; } = new[]
+        {
+            // Project should be backed up before adding template files
+            "AspNetMigrator.BackupUpdater.BackupStep",
+
+            // Project should be SDK-style before adding template files
+            "AspNetMigrator.TryConvertUpdater.TryConvertProjectConverterStep"
+        };
+
+        public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
+            : base(logger)
+        {
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
@@ -50,10 +60,9 @@ namespace AspNetMigrator.TemplateUpdater
             {
                 Logger.LogWarning("No template configuration files provided; no template files will be added to project");
             }
-
-            Title = $"Add template files";
-            Description = $"Add template files (for startup code paths, for example) to {options.ProjectPath} based on template files described in: {string.Join(", ", _templateProvider.TemplateConfigFileNames)}";
         }
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && _templateProvider.TemplateConfigFileNames.Any();
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {

@@ -11,15 +11,20 @@ namespace AspNetMigrator.ConfigUpdater
         private readonly ConfigUpdaterStep _parentStep;
         private readonly IConfigUpdater _configUpdater;
 
-        public ConfigUpdaterSubStep(MigrationStep parentStep, IConfigUpdater configUpdater, MigrateOptions options, ILogger logger)
-            : base(options, logger)
+        public override string Id => _configUpdater.Id;
+
+        public override string Description => _configUpdater.Description;
+
+        public override string Title => _configUpdater.Title;
+
+        public ConfigUpdaterSubStep(MigrationStep parentStep, IConfigUpdater configUpdater, ILogger logger)
+            : base(logger)
         {
             _parentStep = (ParentStep = parentStep) as ConfigUpdaterStep ?? throw new ArgumentNullException(nameof(parentStep));
             _configUpdater = configUpdater ?? throw new ArgumentNullException(nameof(configUpdater));
-
-            Title = configUpdater.Title;
-            Description = configUpdater.Description;
         }
+
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && (_parentStep?.ConfigFiles.Any() ?? false);
 
         protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -52,7 +57,7 @@ namespace AspNetMigrator.ConfigUpdater
             // doesn't need to apply anything.
             // Therefore, automatically apply the parent ConfigUpdaterStep's updater
             // once all its children have been applied.
-            if (_parentStep.SubSteps.All(s => s.IsComplete))
+            if (_parentStep.SubSteps.All(s => s.IsDone))
             {
                 await _parentStep.ApplyAsync(context, token).ConfigureAwait(false);
             }
