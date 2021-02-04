@@ -14,20 +14,13 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
     {
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
-        private readonly NuGetFramework _targetFramework;
 
         public string Name => "Target compatibility reference analyzer";
 
-        public TargetCompatibilityReferenceAnalyzer(MigrateOptions options, IPackageLoader packageLoader, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
+        public TargetCompatibilityReferenceAnalyzer(IPackageLoader packageLoader, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _targetFramework = NuGetFramework.Parse(options.TargetFramework);
         }
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
@@ -42,21 +35,23 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
+            var targetFramework = NuGetFramework.Parse(state.TFM.Name);
+
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
-                if (await DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, token).ConfigureAwait(false))
+                if (await DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, targetFramework, token).ConfigureAwait(false))
                 {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, _targetFramework);
+                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, targetFramework);
                     continue;
                 }
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, state.PackageCachePath!, token).ConfigureAwait(false);
+                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, state.PackageCachePath!, targetFramework, token).ConfigureAwait(false);
                     if (updatedReference == null)
                     {
-                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, _targetFramework);
+                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, targetFramework);
                     }
                     else
                     {
@@ -79,15 +74,15 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             return state;
         }
 
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, CancellationToken token)
+        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, NuGetFramework targetFramework, CancellationToken token)
         {
             var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference.Name, new NuGetVersion(packageReference.GetNuGetVersion()), true, token).ConfigureAwait(false);
             NuGetReference? updatedReference = null;
             foreach (var newerPackage in latestMinorVersions.Select(v => new NuGetReference(packageReference.Name, v.ToString())))
             {
-                if (await DoesPackageSupportTargetFrameworkAsync(newerPackage, packageCachePath, token).ConfigureAwait(false))
+                if (await DoesPackageSupportTargetFrameworkAsync(newerPackage, packageCachePath, targetFramework, token).ConfigureAwait(false))
                 {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, _targetFramework);
+                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, targetFramework);
                     updatedReference = newerPackage;
                     break;
                 }
@@ -96,7 +91,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             return updatedReference;
         }
 
-        private async Task<bool> DoesPackageSupportTargetFrameworkAsync(NuGetReference packageReference, string cachePath, CancellationToken token)
+        private async Task<bool> DoesPackageSupportTargetFrameworkAsync(NuGetReference packageReference, string cachePath, NuGetFramework targetFramework, CancellationToken token)
         {
             using var packageArchive = await _packageLoader.GetPackageArchiveAsync(packageReference, token, cachePath).ConfigureAwait(false);
 
@@ -106,7 +101,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             }
 
             var packageFrameworks = await GetTargetFrameworksAsync(packageArchive, token).ConfigureAwait(false);
-            return packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(_targetFramework, f));
+            return packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(targetFramework, f));
         }
 
         private async Task<IEnumerable<NuGetFramework>> GetTargetFrameworksAsync(PackageArchiveReader packageArchive, CancellationToken token)
