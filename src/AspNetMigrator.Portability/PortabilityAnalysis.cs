@@ -32,26 +32,30 @@ namespace AspNetMigrator.Portability
 
         private async ValueTask<List<Section>> GenerateSections(Project project, CancellationToken token)
         {
-            List<Section> sections = new List<Section>();
+            var sections = new List<Section>();
             var content = await GenerateContent(project, token).ToListAsync(token).ConfigureAwait(false);
             var groups = content.GroupBy(r => r.Component);
             foreach (var group in groups)
             {
                 var groupKey = group.Key;
-                Section section = new Section("Component: " + groupKey);
-                List<Row> rowList = new List<Row>();
-                Table table = new Table
-                {
-                    Headers = new[] { "Type", "Name", "Description" },
-                };
-
+                var rowList = new List<Row>();
                 foreach (var groupedItem in group)
                 {
                     rowList.Add(new Row(new object[] { groupedItem.Type, groupedItem.Name, groupedItem.Description }));
                 }
 
-                table.Rows = rowList;
-                section.Content = new[] { table };
+                var section = new Section("Component: " + groupKey)
+                {
+                    Content = new[]
+                    {
+                        new Table
+                        {
+                            Headers = new[] { "Type", "Name", "Description" },
+                            Rows = rowList,
+                        }
+                    }
+                };
+
                 sections.Add(section);
             }
 

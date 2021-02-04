@@ -22,7 +22,7 @@ namespace AspNetMigrator.Portability
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error Reading Portability Component Config");
-                return null;
+                return new Dictionary<string, string>();
             }
         }
     }
