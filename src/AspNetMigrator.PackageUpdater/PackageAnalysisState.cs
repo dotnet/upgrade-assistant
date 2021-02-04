@@ -7,6 +7,8 @@ namespace AspNetMigrator.PackageUpdater
 {
     public class PackageAnalysisState
     {
+        public TargetFrameworkMoniker TFM { get; init; } = null!;
+
         public string LockFilePath { get; private set; } = default!;
 
         public string PackageCachePath { get; private set; } = default!;
@@ -47,7 +49,11 @@ namespace AspNetMigrator.PackageUpdater
                 throw new System.ArgumentNullException(nameof(packageRestorer));
             }
 
-            var ret = new PackageAnalysisState();
+            var ret = new PackageAnalysisState
+            {
+                TFM = context.Project.Required().TFM,
+            };
+
             await ret.PopulatePackageRestoreState(context, packageRestorer, token).ConfigureAwait(false);
             return ret;
         }
