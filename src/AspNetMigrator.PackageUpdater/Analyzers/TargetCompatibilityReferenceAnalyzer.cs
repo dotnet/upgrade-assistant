@@ -122,6 +122,13 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
             var refs = await packageArchive.GetReferenceItemsAsync(token).ConfigureAwait(false);
             frameworksNames.AddRange(refs.Select(r => r.TargetFramework));
 
+            // If no frameworks are referenced, then assume the package works everywhere (it is likely
+            // a package of analyzers or some other tooling)
+            if (!frameworksNames.Any())
+            {
+                frameworksNames.Add(NuGetFramework.AnyFramework);
+            }
+
             var ret = frameworksNames.Distinct();
             _logger.LogDebug("Found target frameworks for package {NuGetPackage}: {TargetFrameworks}", (await packageArchive.GetIdentityAsync(token).ConfigureAwait(false)).ToString(), ret);
             return ret;
