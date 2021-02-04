@@ -20,9 +20,7 @@ namespace AspNetMigrator.ConsoleApp
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var projectDirectory = Path.GetDirectoryName(options.ProjectPath)!;
-
-            _path = Path.Combine(projectDirectory, ".upgrade-assistant");
+            _path = Path.Combine(options.Project.DirectoryName!, ".upgrade-assistant");
             _logger = logger;
         }
 
