@@ -12,19 +12,12 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 {
     public class TransitiveReferenceAnalyzer : IPackageReferencesAnalyzer
     {
-        private readonly NuGetFramework _targetFramework;
         private readonly ILogger<TransitiveReferenceAnalyzer> _logger;
 
         public string Name => "Transitive reference analyzer";
 
-        public TransitiveReferenceAnalyzer(MigrateOptions options, ILogger<TransitiveReferenceAnalyzer> logger)
+        public TransitiveReferenceAnalyzer(ILogger<TransitiveReferenceAnalyzer> logger)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            _targetFramework = NuGetFramework.Parse(options.TargetFramework);
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -40,7 +33,13 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var lockFileTarget = GetLockFileTarget(state.LockFilePath);
+            var targetFramework = NuGetFramework.Parse(state.TFM.Name);
+
+            _logger.LogDebug("Searching lock file for dependencies for {TFM}", targetFramework.DotNetFrameworkName);
+
+            var lockFileTarget = LockFileUtilities.GetLockFile(state.LockFilePath, NuGet.Common.NullLogger.Instance)
+                .Targets
+                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(targetFramework.DotNetFrameworkName, StringComparison.Ordinal));
 
             // If the package is referenced transitively, mark for removal
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))
@@ -55,10 +54,6 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
 
             return Task.FromResult(state);
         }
-
-        private LockFileTarget GetLockFileTarget(string lockFilePath) =>
-            LockFileUtilities.GetLockFile(lockFilePath, NuGet.Common.NullLogger.Instance)
-                .Targets.First(t => t.TargetFramework.DotNetFrameworkName.Equals(_targetFramework.DotNetFrameworkName, StringComparison.Ordinal));
 
         private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {

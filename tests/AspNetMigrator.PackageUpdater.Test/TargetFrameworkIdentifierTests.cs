@@ -28,15 +28,8 @@ namespace AspNetMigrator.Test
         [DataRow("netcoreapp3.1", "net45", false)]
         public void IsCoreCompatibleSDKTargetFramework(string target, string tfm, bool isCompatible)
         {
-            var xml = $@"<Project Sdk=""Microsoft.NET.Sdk""> 
-  <PropertyGroup>
-    <TargetFramework>{tfm}</TargetFramework>
-  </PropertyGroup>
-</Project>";
-
             var tfmIdentifier = new TargetFrameworkIdentifier(new MigrateOptions { TargetFramework = target });
-            using var stream = CreateStream(xml);
-            var result = tfmIdentifier.IsCoreCompatible(stream);
+            var result = tfmIdentifier.IsCoreCompatible(new[] { new TargetFrameworkMoniker(tfm) });
 
             Assert.AreEqual(isCompatible, result);
         }
@@ -62,15 +55,14 @@ namespace AspNetMigrator.Test
         [DataRow("netcoreapp3.1", "net45", false)]
         public void IsCoreCompatibleSDKTargetFrameworks(string target, string tfm, bool isCompatible)
         {
-            var xml = $@"<Project Sdk=""Microsoft.NET.Sdk""> 
+            var xml = $@"<Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
     <TargetFrameworks>{tfm}</TargetFrameworks>
   </PropertyGroup>
 </Project>";
 
             var tfmIdentifier = new TargetFrameworkIdentifier(new MigrateOptions { TargetFramework = target });
-            using var stream = CreateStream(xml);
-            var result = tfmIdentifier.IsCoreCompatible(stream);
+            var result = tfmIdentifier.IsCoreCompatible(new[] { new TargetFrameworkMoniker(tfm) });
 
             Assert.AreEqual(isCompatible, result);
         }

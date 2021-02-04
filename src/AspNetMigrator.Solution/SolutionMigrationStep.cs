@@ -100,15 +100,7 @@ namespace AspNetMigrator.Solution
         }
 
         private bool IsCompleted(IProject project)
-        {
-            if (project.GetRoslynProject().FilePath is string path)
-            {
-                using var projectFile = File.OpenRead(path);
-                return _tfm.IsCoreCompatible(projectFile);
-            }
-
-            return false;
-        }
+            => project.GetFile().IsSdk && _tfm.IsCoreCompatible(new[] { project.TFM });
 
         private async Task<IProject> GetProject(IMigrationContext context, Func<IProject, bool> isProjectCompleted, CancellationToken token)
         {

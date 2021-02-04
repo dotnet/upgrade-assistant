@@ -77,6 +77,26 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
+        public TargetFrameworkMoniker TFM
+        {
+            get
+            {
+                if (IsSdk)
+                {
+                    // Currently only supporting non-multi-targeting scenarios
+                    var value = ProjectRoot.Properties
+                        .Single(e => e.Name == "TargetFramework")
+                        .Value;
+
+                    return new TargetFrameworkMoniker(value);
+                }
+                else
+                {
+                    throw new NotImplementedException("Only projects using SDK-style is supported at the moment");
+                }
+            }
+        }
+
         IProjectFile IProject.GetFile() => this;
 
         public override bool Equals(object? obj)

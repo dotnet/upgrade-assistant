@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
 
 namespace AspNetMigrator
 {
     public interface ITargetFrameworkIdentifier
     {
-        bool IsCoreCompatible(Stream projectFile);
+        bool IsCoreCompatible(IEnumerable<TargetFrameworkMoniker> tfms);
     }
 }

@@ -17,6 +17,8 @@ namespace AspNetMigrator
 
         IEnumerable<NuGetReference> PackageReferences { get; }
 
+        TargetFrameworkMoniker TFM { get; }
+
         IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher);
 
         IProjectFile GetFile();
