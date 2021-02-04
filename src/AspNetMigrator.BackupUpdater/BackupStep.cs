@@ -127,6 +127,12 @@ namespace AspNetMigrator.BackupUpdater
             }
         }
 
+        public override MigrationStepInitializeResult Reset()
+        {
+            _backupPath = null;
+            return base.Reset();
+        }
+
         private async Task CopyDirectoryAsync(string sourceDir, string destinationDir)
         {
             Directory.CreateDirectory(destinationDir);
