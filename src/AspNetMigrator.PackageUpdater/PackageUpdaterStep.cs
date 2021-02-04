@@ -25,6 +25,7 @@ namespace AspNetMigrator.PackageUpdater
         private const int MaxAnalysisIterations = 3;
 
         private readonly string? _analyzerPackageSource;
+        private readonly MigrateOptions _options;
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
@@ -46,7 +47,13 @@ namespace AspNetMigrator.PackageUpdater
             "AspNetMigrator.TryConvertUpdater.TryConvertProjectConverterStep"
         };
 
-        public PackageUpdaterStep(IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, IPackageRestorer packageRestorer, IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers, ILogger<PackageUpdaterStep> logger)
+        public PackageUpdaterStep(
+            MigrateOptions options,
+            IOptions<PackageUpdaterOptions> updaterOptions,
+            IPackageLoader packageLoader,
+            IPackageRestorer packageRestorer,
+            IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
+            ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
             if (updaterOptions is null)
@@ -59,6 +66,7 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(logger));
             }
 
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
@@ -123,7 +131,7 @@ namespace AspNetMigrator.PackageUpdater
             if (_analyzerPackageSource is not null && !_packageLoader.PackageSources.Contains(_analyzerPackageSource))
             {
                 // Get or create a local NuGet.config file
-                var localNuGetSettings = new Settings(Path.GetDirectoryName(project.GetRoslynProject().FilePath));
+                var localNuGetSettings = new Settings(_options.Project.DirectoryName);
 
                 // Add the analyzer package's source to the config file's sources
                 localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("migrationAnalyzerSource", _analyzerPackageSource));
