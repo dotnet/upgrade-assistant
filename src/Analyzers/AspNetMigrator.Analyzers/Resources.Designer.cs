@@ -304,6 +304,15 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to System.Deployment is not supported on .NET Core.
+        /// </summary>
+        internal static string UsingSystemDeployment {
+            get {
+                return ResourceManager.GetString("UsingSystemDeployment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ASP.NET Core projects should not reference System.Web or OWIN namespaces..
         /// </summary>
         internal static string UsingSystemWebDescription {
