@@ -98,7 +98,7 @@ namespace AspNetMigrator.Solution
         }
 
         private bool IsCompleted(IMigrationContext context, IProject project)
-            => project.GetFile().IsSdk && context.EntryPointTFM is not null && _tfmComparer.IsCompatible(context.EntryPointTFM, project.TFM);
+            => project.GetFile().IsSdk && context.EntryPointTargetTFM is not null && _tfmComparer.IsCompatible(context.EntryPointTargetTFM, project.TFM);
 
         private async Task<IProject> GetProject(IMigrationContext context, Func<IMigrationContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {

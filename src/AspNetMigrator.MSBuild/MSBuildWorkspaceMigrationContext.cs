@@ -86,7 +86,7 @@ namespace AspNetMigrator.MSBuild
 
         public IProject? EntryPoint { get; set; }
 
-        public TargetFrameworkMoniker? EntryPointTFM { get; private set; }
+        public TargetFrameworkMoniker? EntryPointTargetTFM { get; private set; }
 
         public TargetFrameworkMoniker? TargetTFM { get; private set; }
 
@@ -155,7 +155,7 @@ namespace AspNetMigrator.MSBuild
             return _workspace;
         }
 
-        public void UnloadWorkspace()
+        private void UnloadWorkspace()
         {
             ProjectCollection.UnloadAllProjects();
             _projectCache.Clear();
@@ -237,6 +237,34 @@ namespace AspNetMigrator.MSBuild
             {
                 _logger.LogDebug("Failed to apply changes to source");
                 return false;
+            }
+        }
+
+        public async ValueTask SetEntryPoint(IProject? entryPoint)
+        {
+            EntryPoint = entryPoint;
+
+            if (entryPoint is null)
+            {
+                EntryPointTargetTFM = null;
+            }
+            else
+            {
+
+            }
+        }
+
+        public async ValueTask SetProject(IProject? project)
+        {
+            Project = project;
+
+            if (project is null)
+            {
+                TargetTFM = null;
+            }
+            else
+            {
+
             }
         }
     }
