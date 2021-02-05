@@ -86,6 +86,10 @@ namespace AspNetMigrator.MSBuild
 
         public IProject? EntryPoint { get; set; }
 
+        public TargetFrameworkMoniker? EntryPointTFM { get; private set; }
+
+        public TargetFrameworkMoniker? TargetTFM { get; private set; }
+
         public IEnumerable<IProject> Projects
         {
             get

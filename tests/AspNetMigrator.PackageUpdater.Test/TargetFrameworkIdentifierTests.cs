@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AspNetMigrator.Test
@@ -28,8 +29,8 @@ namespace AspNetMigrator.Test
         [DataRow("netcoreapp3.1", "net45", false)]
         public void IsCoreCompatibleSDKTargetFramework(string target, string tfm, bool isCompatible)
         {
-            var tfmIdentifier = new TargetFrameworkIdentifier(new MigrateOptions { TargetFramework = target });
-            var result = tfmIdentifier.IsCoreCompatible(new[] { new TargetFrameworkMoniker(tfm) });
+            var tfmComparer = new TargetFrameworkMonikerComparer(new NullLogger<TargetFrameworkMonikerComparer>());
+            var result = tfmComparer.IsCompatible(new TargetFrameworkMoniker(target), new TargetFrameworkMoniker(tfm));
 
             Assert.AreEqual(isCompatible, result);
         }
@@ -55,18 +56,10 @@ namespace AspNetMigrator.Test
         [DataRow("netcoreapp3.1", "net45", false)]
         public void IsCoreCompatibleSDKTargetFrameworks(string target, string tfm, bool isCompatible)
         {
-            var xml = $@"<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <TargetFrameworks>{tfm}</TargetFrameworks>
-  </PropertyGroup>
-</Project>";
-
-            var tfmIdentifier = new TargetFrameworkIdentifier(new MigrateOptions { TargetFramework = target });
-            var result = tfmIdentifier.IsCoreCompatible(new[] { new TargetFrameworkMoniker(tfm) });
+            var tfmComparer = new TargetFrameworkMonikerComparer(new NullLogger<TargetFrameworkMonikerComparer>());
+            var result = tfmComparer.IsCompatible(new TargetFrameworkMoniker(target), new TargetFrameworkMoniker(tfm));
 
             Assert.AreEqual(isCompatible, result);
         }
-
-        private static Stream CreateStream(string input) => new MemoryStream(Encoding.UTF8.GetBytes(input));
     }
 }

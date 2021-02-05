@@ -10,9 +10,13 @@ namespace AspNetMigrator
     {
         IProject? EntryPoint { get; set; }
 
+        TargetFrameworkMoniker? EntryPointTFM { get; }
+
         IProject? Project { get; set; }
 
         IEnumerable<IProject> Projects { get; }
+
+        TargetFrameworkMoniker? TargetTFM { get; }
 
         bool UpdateSolution(Solution updatedSolution);
 

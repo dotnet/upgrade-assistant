@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +9,7 @@ namespace AspNetMigrator.Solution
     public class SolutionMigrationStep : MigrationStep
     {
         private readonly ICollectUserInput _input;
-        private readonly ITargetFrameworkIdentifier _tfm;
+        private readonly ITargetFrameworkMonikerComparer _tfmComparer;
 
         public override string Id => typeof(SolutionMigrationStep).FullName!;
 
@@ -20,12 +19,12 @@ namespace AspNetMigrator.Solution
 
         public SolutionMigrationStep(
             ICollectUserInput input,
-            ITargetFrameworkIdentifier tfm,
+            ITargetFrameworkMonikerComparer tfmComparer,
             ILogger<SolutionMigrationStep> logger)
             : base(logger)
         {
-            _input = input;
-            _tfm = tfm;
+            _input = input ?? throw new ArgumentNullException(nameof(input));
+            _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
         }
 
         protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.Project is null;
@@ -50,11 +49,6 @@ namespace AspNetMigrator.Solution
 
             var projects = context.Projects.ToList();
 
-            if (projects.All(IsCompleted))
-            {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
-            }
-
             if (projects.Count == 1)
             {
                 context.EntryPoint = projects[0];
@@ -68,6 +62,10 @@ namespace AspNetMigrator.Solution
             if (context.EntryPoint is null)
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
+            }
+            else if (projects.All(p => IsCompleted(context, p)))
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
             }
             else if (context.Project is null)
             {
@@ -99,10 +97,10 @@ namespace AspNetMigrator.Solution
             }
         }
 
-        private bool IsCompleted(IProject project)
-            => project.GetFile().IsSdk && _tfm.IsCoreCompatible(new[] { project.TFM });
+        private bool IsCompleted(IMigrationContext context, IProject project)
+            => project.GetFile().IsSdk && context.EntryPointTFM is not null && _tfmComparer.IsCompatible(context.EntryPointTFM, project.TFM);
 
-        private async Task<IProject> GetProject(IMigrationContext context, Func<IProject, bool> isProjectCompleted, CancellationToken token)
+        private async Task<IProject> GetProject(IMigrationContext context, Func<IMigrationContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
@@ -115,7 +113,7 @@ namespace AspNetMigrator.Solution
 
             ProjectCommand CreateProjectCommand(IProject project)
             {
-                return new ProjectCommand(project, isProjectCompleted(project));
+                return new ProjectCommand(project, isProjectCompleted(context, project));
             }
         }
 
