@@ -32,10 +32,7 @@ namespace AspNetMigrator.Solution
         // This migration step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IMigrationContext context) => context?.Project is null && Status == MigrationStepStatus.Complete;
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
-            => Task.FromResult(InitializeImpl(context));
-
-        private MigrationStepInitializeResult InitializeImpl(IMigrationContext context)
+        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -51,10 +48,10 @@ namespace AspNetMigrator.Solution
 
             if (projects.Count == 1)
             {
-                context.EntryPoint = projects[0];
-                context.Project = projects[0];
+                await context.SetEntryPointAsync(projects[0], token).ConfigureAwait(false);
+                await context.SetProjectAsync(projects[0], token).ConfigureAwait(false);
 
-                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project.FilePath);
+                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project!.FilePath);
 
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
@@ -92,7 +89,7 @@ namespace AspNetMigrator.Solution
             }
             else
             {
-                context.Project = selectedProject;
+                await context.SetProjectAsync(selectedProject, token).ConfigureAwait(false);
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }
@@ -104,8 +101,8 @@ namespace AspNetMigrator.Solution
         {
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            context.EntryPoint = await GetEntrypointAsync(context, token).ConfigureAwait(false);
-            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            await context.SetEntryPointAsync(await GetEntrypointAsync(context, token).ConfigureAwait(false), token).ConfigureAwait(false);
+            var ordered = context.EntryPoint!.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 

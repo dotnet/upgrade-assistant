@@ -10,20 +10,27 @@ namespace AspNetMigrator.MSBuild
 {
     public class MSBuildTargetTFMSelector : ITargetTFMSelector
     {
+        private const string NetStandardTFM = "netstandard2.0";
+        private const string DefaultCurrentTFMBase = "net5.0";
+        private const string DefaultLTSTFMBase = "net5.0";
+
         private readonly ILogger<MSBuildTargetTFMSelector> _logger;
-        private readonly TFMSelectorOptions _selectorOptions;
+        private readonly string _currentTFMBase;
+        private readonly string _ltsTFMBase;
         private readonly UpgradeTarget _upgradeTarget;
 
         public MSBuildTargetTFMSelector(MigrateOptions options, IOptions<TFMSelectorOptions> selectorOptions, ILogger<MSBuildTargetTFMSelector> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _selectorOptions = selectorOptions?.Value ?? throw new ArgumentNullException(nameof(selectorOptions));
+            _currentTFMBase = selectorOptions?.Value.CurrentTFMBase ?? DefaultCurrentTFMBase;
+            _ltsTFMBase = selectorOptions?.Value.LTSTFMBase ?? DefaultLTSTFMBase;
             _upgradeTarget = options?.UpgradeTarget ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public ValueTask<TargetFrameworkMoniker> SelectTFMAsync(IProject project)
+        public async ValueTask<TargetFrameworkMoniker> SelectTFMAsync(IProject project)
         {
-            throw new NotImplementedException();
+            // TODO - Implement this!
+            return new TargetFrameworkMoniker(_currentTFMBase);
         }
     }
 }

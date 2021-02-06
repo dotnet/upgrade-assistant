@@ -24,8 +24,8 @@ namespace AspNetMigrator
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
 
-        ValueTask SetEntryPoint(IProject? entryPoint);
+        ValueTask SetEntryPointAsync(IProject? entryPoint, CancellationToken token);
 
-        ValueTask SetProject(IProject? entryPoint);
+        ValueTask SetProjectAsync(IProject? entryPoint, CancellationToken token);
     }
 }

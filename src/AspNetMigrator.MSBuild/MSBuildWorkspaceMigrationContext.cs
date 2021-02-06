@@ -14,6 +14,7 @@ namespace AspNetMigrator.MSBuild
     internal sealed class MSBuildWorkspaceMigrationContext : IMigrationContext, IDisposable
     {
         private readonly string _path;
+        private readonly ITargetTFMSelector _tfmSelector;
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, MSBuildProject> _projectCache;
@@ -37,6 +38,7 @@ namespace AspNetMigrator.MSBuild
 
         public MSBuildWorkspaceMigrationContext(
             MigrateOptions options,
+            ITargetTFMSelector tfmSelect,
             IVisualStudioFinder vsFinder,
             ILogger<MSBuildWorkspaceMigrationContext> logger)
         {
@@ -47,6 +49,7 @@ namespace AspNetMigrator.MSBuild
 
             _projectCache = new Dictionary<string, MSBuildProject>(StringComparer.OrdinalIgnoreCase);
             _path = options.ProjectPath;
+            _tfmSelector = tfmSelect ?? throw new ArgumentNullException(nameof(tfmSelect));
             _logger = logger;
 
             var vsPath = vsFinder.GetLatestVisualStudioPath();
@@ -240,31 +243,35 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
-        public async ValueTask SetEntryPoint(IProject? entryPoint)
+        public async ValueTask SetEntryPointAsync(IProject? entryPoint, CancellationToken token)
         {
             EntryPoint = entryPoint;
 
             if (entryPoint is null)
             {
                 EntryPointTargetTFM = null;
+                _logger.LogDebug("Clearing context's entry point project");
             }
             else
             {
-
+                EntryPointTargetTFM = await _tfmSelector.SelectTFMAsync(entryPoint).ConfigureAwait(false);
+                _logger.LogDebug("Setting context's entry point project to {Project} (target TFM {TargetTFM})", EntryPoint!.FilePath, EntryPointTargetTFM);
             }
         }
 
-        public async ValueTask SetProject(IProject? project)
+        public async ValueTask SetProjectAsync(IProject? project, CancellationToken token)
         {
             Project = project;
 
             if (project is null)
             {
                 TargetTFM = null;
+                _logger.LogDebug("Clearing context's current project");
             }
             else
             {
-
+                TargetTFM = await _tfmSelector.SelectTFMAsync(project).ConfigureAwait(false);
+                _logger.LogDebug("Setting context's current project to {Project} (target TFM {TargetTFM})", Project!.FilePath, TargetTFM);
             }
         }
     }

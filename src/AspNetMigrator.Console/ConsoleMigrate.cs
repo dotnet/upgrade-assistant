@@ -122,7 +122,7 @@ namespace AspNetMigrator.ConsoleApp
                 }
 
                 // Once a project has completed, we can remove it from the context.
-                context.Project = null;
+                await context.SetProjectAsync(null, token);
 
                 _logger.LogInformation("Migration has completed. Please review any changes.");
             }
