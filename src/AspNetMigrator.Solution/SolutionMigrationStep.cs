@@ -46,6 +46,16 @@ namespace AspNetMigrator.Solution
 
             var projects = context.Projects.ToList();
 
+            if (context.EntryPoint is null)
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
+            }
+
+            if (projects.All(p => IsCompleted(context, p)))
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
+            }
+
             if (projects.Count == 1)
             {
                 await context.SetEntryPointAsync(projects[0], token).ConfigureAwait(false);
@@ -56,15 +66,7 @@ namespace AspNetMigrator.Solution
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
 
-            if (context.EntryPoint is null)
-            {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
-            }
-            else if (projects.All(p => IsCompleted(context, p)))
-            {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
-            }
-            else if (context.Project is null)
+            if (context.Project is null)
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
