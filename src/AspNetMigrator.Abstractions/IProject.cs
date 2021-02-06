@@ -15,9 +15,17 @@ namespace AspNetMigrator
 
         NugetPackageFormat PackageReferenceFormat { get; }
 
+        IEnumerable<Reference> FrameworkReferences { get; }
+
         IEnumerable<NuGetReference> PackageReferences { get; }
 
+        IEnumerable<Reference> References { get; }
+
         TargetFrameworkMoniker TFM { get; }
+
+        ProjectStyle Style { get; }
+
+        ProjectOutputType OutputType { get; }
 
         IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher);
 

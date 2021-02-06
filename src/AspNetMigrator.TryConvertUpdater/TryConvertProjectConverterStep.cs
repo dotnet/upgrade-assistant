@@ -174,8 +174,8 @@ namespace AspNetMigrator.TryConvertUpdater
                 }
                 else
                 {
-                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.TargetSdk);
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {projectFile.TargetSdk} SDK", BuildBreakRisk.None);
+                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.Sdk);
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
                 }
             }
             catch (Exception exc)

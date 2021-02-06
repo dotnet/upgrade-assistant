@@ -40,6 +40,78 @@ namespace AspNetMigrator.MSBuild
 
         public Build.Project Project => Context.ProjectCollection.LoadProject(FilePath);
 
+        public ProjectOutputType OutputType =>
+            ProjectRoot.Properties.FirstOrDefault(p => p.Name.Equals(MSBuildConstants.OutputTypePropertyName, StringComparison.OrdinalIgnoreCase))?.Value switch
+            {
+                MSBuildConstants.LibraryPropertyValue => ProjectOutputType.Library,
+                MSBuildConstants.ExePropertyValue => ProjectOutputType.Exe,
+                MSBuildConstants.WinExePropertyValue => ProjectOutputType.WinExe,
+                null => GetDefaultOutputType(),
+                _ => ProjectOutputType.Other
+            };
+
+        private ProjectOutputType GetDefaultOutputType()
+        {
+            if (IsSdk && MSBuildConstants.SDKsWithExeDefaultOutputType.Contains(Sdk, StringComparer.OrdinalIgnoreCase))
+            {
+                return ProjectOutputType.Exe;
+            }
+
+            return ProjectOutputType.Library;
+        }
+
+        public ProjectStyle Style
+        {
+            get
+            {
+                if (IsSdk)
+                {
+                    if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return ProjectStyle.Web;
+                    }
+
+                    if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
+                        GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                        GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return ProjectStyle.WindowsDesktop;
+                    }
+
+                    var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        return ProjectStyle.Web;
+                    }
+
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        return ProjectStyle.WindowsDesktop;
+                    }
+                }
+                else
+                {
+                    // Check imports and references
+                    var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
+                    var references = References.Select(r => r.Name);
+
+                    if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
+                        references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        return ProjectStyle.Web;
+                    }
+
+                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
+                        references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        return ProjectStyle.WindowsDesktop;
+                    }
+                }
+
+                return ProjectStyle.Default;
+            }
+        }
+
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
         {
             var items = Project.Items
@@ -76,6 +148,12 @@ namespace AspNetMigrator.MSBuild
                 }
             }
         }
+
+        public IEnumerable<Reference> FrameworkReferences =>
+            ProjectRoot.GetAllFrameworkReferences().Select(r => r.AsReference()).ToList();
+
+        public IEnumerable<Reference> References =>
+            ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
         public TargetFrameworkMoniker TFM
         {

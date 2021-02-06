@@ -6,7 +6,7 @@ namespace AspNetMigrator
 {
     public interface IProjectFile
     {
-        string TargetSdk { get; }
+        string Sdk { get; }
 
         public bool IsSdk { get; }
 
