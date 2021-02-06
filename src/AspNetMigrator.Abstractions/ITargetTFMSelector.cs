@@ -9,5 +9,7 @@ namespace AspNetMigrator
     public interface ITargetTFMSelector
     {
         ValueTask<TargetFrameworkMoniker> SelectTFMAsync(IProject project);
+
+        TargetFrameworkMoniker HighestPossibleTFM { get; }
     }
 }

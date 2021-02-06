@@ -13,6 +13,7 @@ namespace AspNetMigrator.MSBuild
         private const string NetStandardTFM = "netstandard2.0";
         private const string DefaultCurrentTFMBase = "net5.0";
         private const string DefaultLTSTFMBase = "net5.0";
+        private const string WindowsSuffix = "-windows";
 
         private readonly ILogger<MSBuildTargetTFMSelector> _logger;
         private readonly string _currentTFMBase;
@@ -26,6 +27,8 @@ namespace AspNetMigrator.MSBuild
             _ltsTFMBase = selectorOptions?.Value.LTSTFMBase ?? DefaultLTSTFMBase;
             _upgradeTarget = options?.UpgradeTarget ?? throw new ArgumentNullException(nameof(options));
         }
+
+        public TargetFrameworkMoniker HighestPossibleTFM => new TargetFrameworkMoniker($"{_currentTFMBase}{WindowsSuffix}");
 
         public async ValueTask<TargetFrameworkMoniker> SelectTFMAsync(IProject project)
         {

@@ -10,6 +10,7 @@ namespace AspNetMigrator.Solution
     {
         private readonly ICollectUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
+        private readonly ITargetTFMSelector _tfmSelector;
 
         public override string Id => typeof(SolutionMigrationStep).FullName!;
 
@@ -20,11 +21,13 @@ namespace AspNetMigrator.Solution
         public SolutionMigrationStep(
             ICollectUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
+            ITargetTFMSelector tfmSelector,
             ILogger<SolutionMigrationStep> logger)
             : base(logger)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
+            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
         }
 
         protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.Project is null;
@@ -46,11 +49,6 @@ namespace AspNetMigrator.Solution
 
             var projects = context.Projects.ToList();
 
-            if (context.EntryPoint is null)
-            {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
-            }
-
             if (projects.All(p => IsCompleted(context, p)))
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
@@ -64,6 +62,11 @@ namespace AspNetMigrator.Solution
                 Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project!.FilePath);
 
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+            }
+
+            if (context.EntryPoint is null)
+            {
+                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
             }
 
             if (context.Project is null)
@@ -97,7 +100,14 @@ namespace AspNetMigrator.Solution
         }
 
         private bool IsCompleted(IMigrationContext context, IProject project)
-            => project.GetFile().IsSdk && context.EntryPointTargetTFM is not null && _tfmComparer.IsCompatible(context.EntryPointTargetTFM, project.TFM);
+        {
+            // If the entry point hasn't been selected yet, it's safe to consider projects complete
+            // if they work against the latest current OS-specific TFM
+            var entryPointTargetTFM = context.EntryPointTargetTFM
+                ?? _tfmSelector.HighestPossibleTFM;
+
+            return project.GetFile().IsSdk && _tfmComparer.IsCompatible(entryPointTargetTFM, project.TFM);
+        }
 
         private async Task<IProject> GetProject(IMigrationContext context, Func<IMigrationContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {
