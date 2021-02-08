@@ -30,10 +30,10 @@ namespace AspNetMigrator.Solution
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.Project is null;
+        protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.CurrentProject is null;
 
         // This migration step is meant to be run fresh every time a new project needs selected
-        protected override bool ShouldReset(IMigrationContext context) => context?.Project is null && Status == MigrationStepStatus.Complete;
+        protected override bool ShouldReset(IMigrationContext context) => context?.CurrentProject is null && Status == MigrationStepStatus.Complete;
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
             => Task.FromResult(InitializeImpl(context));
@@ -45,7 +45,7 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.EntryPoint is not null && context.Project is not null)
+            if (context.EntryPoint is not null && context.CurrentProject is not null)
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
             }
@@ -59,10 +59,10 @@ namespace AspNetMigrator.Solution
 
             if (projects.Count == 1)
             {
-                context.EntryPoint = projects[0];
-                context.Project = projects[0];
+                context.SetEntryPoint(projects[0]);
+                context.SetCurrentProject(projects[0]);
 
-                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project.FilePath);
+                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.CurrentProject!.Project.FilePath);
 
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
@@ -71,7 +71,7 @@ namespace AspNetMigrator.Solution
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
             }
-            else if (context.Project is null)
+            else if (context.CurrentProject is null)
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
@@ -96,7 +96,7 @@ namespace AspNetMigrator.Solution
             }
             else
             {
-                context.Project = selectedProject;
+                context.SetCurrentProject(selectedProject);
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }
@@ -111,11 +111,11 @@ namespace AspNetMigrator.Solution
         // because it should upgrade to the current (or LTS) version of netcore.
         private bool IsCompleted(IMigrationContext context, IProject project)
         {
-            if (context.EntryPointTargetTFM is not null && !project.FilePath.Equals(context.EntryPoint?.FilePath, StringComparison.OrdinalIgnoreCase))
+            if (context.EntryPoint?.TargetTFM is not null && !project.FilePath.Equals(context.EntryPoint?.Project.FilePath, StringComparison.OrdinalIgnoreCase))
             {
                 // Once an entry point is selected, consider dependent projects migrated if they are SDK style
                 // and can be depended on by the entry point.
-                return project.GetFile().IsSdk && _tfmComparer.IsCompatible(context.EntryPointTargetTFM, project.TFM);
+                return project.GetFile().IsSdk && _tfmComparer.IsCompatible(context.EntryPoint!.TargetTFM, project.TFM);
             }
             else
             {
@@ -129,8 +129,8 @@ namespace AspNetMigrator.Solution
         {
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            context.EntryPoint = await GetEntrypointAsync(context, token).ConfigureAwait(false);
-            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            context.SetEntryPoint(await GetEntrypointAsync(context, token).ConfigureAwait(false));
+            var ordered = context.EntryPoint!.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
@@ -148,7 +148,7 @@ namespace AspNetMigrator.Solution
 
             if (context.EntryPoint is not null)
             {
-                return context.EntryPoint;
+                return context.EntryPoint.Project;
             }
 
             var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();

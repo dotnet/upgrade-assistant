@@ -17,7 +17,7 @@ namespace AspNetMigrator.MSBuild
         private readonly ITargetTFMSelector _tfmSelector;
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
         private readonly string? _vsPath;
-        private readonly Dictionary<string, MSBuildProject> _projectCache;
+        private readonly Dictionary<string, UpgradeProjectInfo> _projectCache;
 
         private string? _entryPointPath;
         private string? _projectPath;
@@ -48,7 +48,7 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _projectCache = new Dictionary<string, MSBuildProject>(StringComparer.OrdinalIgnoreCase);
+            _projectCache = new Dictionary<string, UpgradeProjectInfo>(StringComparer.OrdinalIgnoreCase);
             _path = options.ProjectPath;
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _logger = logger;
@@ -74,21 +74,23 @@ namespace AspNetMigrator.MSBuild
             ProjectCollection.Dispose();
         }
 
-        public MSBuildProject GetOrAddProject(string path)
+        public UpgradeProjectInfo GetOrAddProject(string path)
         {
             if (_projectCache.TryGetValue(path, out var cached))
             {
                 return cached;
             }
 
-            var created = new MSBuildProject(this, path, _logger);
+            var project = new MSBuildProject(this, path, _logger);
+            var tfm = _tfmSelector.SelectTFM(project);
+            var created = new UpgradeProjectInfo(project, tfm);
 
             _projectCache.Add(path, created);
 
             return created;
         }
 
-        public IProject? EntryPoint
+        public UpgradeProjectInfo? EntryPoint
         {
             get
             {
@@ -99,27 +101,9 @@ namespace AspNetMigrator.MSBuild
 
                 return GetOrAddProject(_entryPointPath);
             }
-
-            set
-            {
-                _entryPointPath = value?.FilePath;
-
-                if (EntryPoint is null)
-                {
-                    EntryPointTargetTFM = null;
-                    _logger.LogDebug("Clearing context's entry point project");
-                }
-                else
-                {
-                    EntryPointTargetTFM = _tfmSelector.SelectTFM(EntryPoint);
-                    _logger.LogDebug("Setting context's entry point project to {Project} (target TFM {TargetTFM})", EntryPoint.FilePath, EntryPointTargetTFM);
-                }
-            }
         }
 
-        public TargetFrameworkMoniker? EntryPointTargetTFM { get; private set; }
-
-        public TargetFrameworkMoniker? TargetTFM { get; private set; }
+        public void SetEntryPoint(IProject? entryPoint) => _entryPointPath = entryPoint?.FilePath;
 
         public IEnumerable<IProject> Projects
         {
@@ -138,7 +122,7 @@ namespace AspNetMigrator.MSBuild
                     }
                     else
                     {
-                        yield return GetOrAddProject(project.FilePath);
+                        yield return GetOrAddProject(project.FilePath).Project;
                     }
                 }
             }
@@ -210,7 +194,7 @@ namespace AspNetMigrator.MSBuild
             {
                 if (string.Equals(project.FilePath, _projectPath, StringComparison.OrdinalIgnoreCase))
                 {
-                    Project = project;
+                    SetCurrentProject(project);
                     return;
                 }
             }
@@ -233,7 +217,7 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
-        public IProject? Project
+        public UpgradeProjectInfo? CurrentProject
         {
             get
             {
@@ -244,23 +228,9 @@ namespace AspNetMigrator.MSBuild
 
                 return GetOrAddProject(_projectPath);
             }
-
-            set
-            {
-                _projectPath = value?.FilePath;
-
-                if (Project is null)
-                {
-                    TargetTFM = null;
-                    _logger.LogDebug("Clearing context's current project");
-                }
-                else
-                {
-                    TargetTFM = _tfmSelector.SelectTFM(Project);
-                    _logger.LogDebug("Setting context's current project to {Project} (target TFM {TargetTFM})", Project.FilePath, TargetTFM);
-                }
-            }
         }
+
+        public void SetCurrentProject(IProject? project) => _projectPath = project?.FilePath;
 
         public bool UpdateSolution(Solution updatedSolution)
         {

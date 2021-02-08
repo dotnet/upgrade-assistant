@@ -44,23 +44,23 @@ namespace AspNetMigrator.PackageUpdater
         {
             if (context is null)
             {
-                throw new System.ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(context));
             }
 
             if (packageRestorer is null)
             {
-                throw new System.ArgumentNullException(nameof(packageRestorer));
+                throw new ArgumentNullException(nameof(packageRestorer));
             }
 
-            if (context.TargetTFM is null)
+            if (context.CurrentProject is null)
             {
                 throw new InvalidOperationException("Target TFM must be set before analyzing package references");
             }
 
             var ret = new PackageAnalysisState
             {
-                CurrentTFM = context.Project.Required().TFM,
-                TargetTFM = context.TargetTFM
+                CurrentTFM = context.CurrentProject.Required().Project.TFM,
+                TargetTFM = context.CurrentProject.Required().TargetTFM
             };
 
             await ret.PopulatePackageRestoreState(context, packageRestorer, token).ConfigureAwait(false);

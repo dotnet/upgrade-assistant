@@ -8,13 +8,13 @@ namespace AspNetMigrator
 {
     public interface IMigrationContext : IDisposable
     {
-        IProject? EntryPoint { get; set; }
+        UpgradeProjectInfo? EntryPoint { get; }
 
-        TargetFrameworkMoniker? EntryPointTargetTFM { get; }
+        void SetEntryPoint(IProject? entryPoint);
 
-        IProject? Project { get; set; }
+        UpgradeProjectInfo? CurrentProject { get; }
 
-        TargetFrameworkMoniker? TargetTFM { get; }
+        void SetCurrentProject(IProject? project);
 
         IEnumerable<IProject> Projects { get; }
 

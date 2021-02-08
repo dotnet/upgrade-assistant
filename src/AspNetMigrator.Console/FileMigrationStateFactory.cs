@@ -33,8 +33,8 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = await GetStateAsync(token).ConfigureAwait(false);
 
-            context.EntryPoint = FindProject(state.EntryPoint);
-            context.Project = FindProject(state.CurrentProject);
+            context.SetEntryPoint(FindProject(state.EntryPoint));
+            context.SetCurrentProject(FindProject(state.CurrentProject));
 
             IProject? FindProject(string? path)
                 => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == path);
@@ -82,8 +82,8 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = new MigrationState
             {
-                EntryPoint = NormalizePath(context.EntryPoint?.FilePath),
-                CurrentProject = NormalizePath(context.Project?.FilePath),
+                EntryPoint = NormalizePath(context.EntryPoint?.Project.FilePath),
+                CurrentProject = NormalizePath(context.CurrentProject?.Project.FilePath),
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);

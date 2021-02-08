@@ -35,7 +35,7 @@ namespace AspNetMigrator.MSBuild
                 throw new InvalidOperationException("Could not find project path for reference");
             }
 
-            return Context.GetOrAddProject(project.FilePath);
+            return Context.GetOrAddProject(project.FilePath).Project;
         });
 
         public Build.Project Project => Context.ProjectCollection.LoadProject(FilePath);

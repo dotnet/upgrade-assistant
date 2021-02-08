@@ -7,7 +7,7 @@ namespace AspNetMigrator
     {
         private const string NetStandardNamePrefix = "netstandard";
         private const string NetPrefix = "net";
-        private static readonly Regex NetFxVersionRegex = new Regex(@"v(?'major'\d)\.(?'minor'\d)(\.(?'build'\d))?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex NetFxVersionRegex = new(@"v(?'major'\d)\.(?'minor'\d)(\.(?'build'\d))?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public override string ToString() => Name;
 

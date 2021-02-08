@@ -124,7 +124,7 @@ namespace AspNetMigrator
 
             try
             {
-                ProjectInitializedAgainst = context.Project?.FilePath;
+                ProjectInitializedAgainst = context.CurrentProject?.Project.FilePath;
                 (Status, StatusDetails, Risk) = await InitializeImplAsync(context, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
@@ -232,7 +232,7 @@ namespace AspNetMigrator
                 return false;
             }
 
-            var currentProject = context.Project?.FilePath;
+            var currentProject = context.CurrentProject?.Project.FilePath;
 
             if (ProjectInitializedAgainst is null)
             {

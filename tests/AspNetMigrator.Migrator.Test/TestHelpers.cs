@@ -9,7 +9,7 @@ namespace AspNetMigrator.Test
             var context = Substitute.For<IMigrationContext>();
 
             // Clear the project so that test migration steps don't run at both the project and solution level
-            context.Project.Returns((IProject?)null);
+            context.CurrentProject.Returns((UpgradeProjectInfo?)null);
 
             return context;
         }
