@@ -8,11 +8,11 @@ namespace AspNetMigrator
 {
     public interface IMigrationContext : IDisposable
     {
-        IProject? EntryPoint { get; }
+        IProject? EntryPoint { get; set; }
 
         TargetFrameworkMoniker? EntryPointTargetTFM { get; }
 
-        IProject? Project { get; }
+        IProject? Project { get; set; }
 
         TargetFrameworkMoniker? TargetTFM { get; }
 
@@ -23,9 +23,5 @@ namespace AspNetMigrator
         IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
-
-        ValueTask SetEntryPointAsync(IProject? entryPoint, CancellationToken token);
-
-        ValueTask SetProjectAsync(IProject? entryPoint, CancellationToken token);
     }
 }

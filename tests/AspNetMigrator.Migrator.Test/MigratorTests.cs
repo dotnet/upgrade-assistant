@@ -46,9 +46,6 @@ namespace AspNetMigrator.Test
             // in the expected order
             using var context = TestHelpers.GetTestContext();
 
-            // Clear the project so that test migration steps don't run at both the project and solution level
-            await context.SetProjectAsync(null, CancellationToken.None).ConfigureAwait(false);
-
             var steps = migrator.GetStepsForContext(context);
             var allSteps = new List<string>();
 
@@ -71,9 +68,6 @@ namespace AspNetMigrator.Test
             var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
             var allSteps = new List<string>();
             using var context = TestHelpers.GetTestContext();
-
-            // Clear the project so that test migration steps don't run at both the project and solution level
-            await context.SetProjectAsync(null, CancellationToken.None).ConfigureAwait(false);
 
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             while (nextStep is not null)

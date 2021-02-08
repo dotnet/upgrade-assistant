@@ -18,6 +18,7 @@ namespace AspNetMigrator.MSBuild
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, MSBuildProject> _projectCache;
+        private IProject? _entryPoint;
 
         private string? _projectPath;
 
@@ -87,7 +88,24 @@ namespace AspNetMigrator.MSBuild
             return created;
         }
 
-        public IProject? EntryPoint { get; set; }
+        public IProject? EntryPoint
+        {
+            get => _entryPoint;
+            set
+            {
+                _entryPoint = value;
+                if (EntryPoint is null)
+                {
+                    EntryPointTargetTFM = null;
+                    _logger.LogDebug("Clearing context's entry point project");
+                }
+                else
+                {
+                    EntryPointTargetTFM = _tfmSelector.SelectTFM(EntryPoint);
+                    _logger.LogDebug("Setting context's entry point project to {Project} (target TFM {TargetTFM})", EntryPoint.FilePath, EntryPointTargetTFM);
+                }
+            }
+        }
 
         public TargetFrameworkMoniker? EntryPointTargetTFM { get; private set; }
 
@@ -220,6 +238,17 @@ namespace AspNetMigrator.MSBuild
             set
             {
                 _projectPath = value?.FilePath;
+
+                if (Project is null)
+                {
+                    TargetTFM = null;
+                    _logger.LogDebug("Clearing context's current project");
+                }
+                else
+                {
+                    TargetTFM = _tfmSelector.SelectTFM(Project);
+                    _logger.LogDebug("Setting context's current project to {Project} (target TFM {TargetTFM})", Project.FilePath, TargetTFM);
+                }
             }
         }
 
@@ -240,38 +269,6 @@ namespace AspNetMigrator.MSBuild
             {
                 _logger.LogDebug("Failed to apply changes to source");
                 return false;
-            }
-        }
-
-        public async ValueTask SetEntryPointAsync(IProject? entryPoint, CancellationToken token)
-        {
-            EntryPoint = entryPoint;
-
-            if (entryPoint is null)
-            {
-                EntryPointTargetTFM = null;
-                _logger.LogDebug("Clearing context's entry point project");
-            }
-            else
-            {
-                EntryPointTargetTFM = await _tfmSelector.SelectTFMAsync(entryPoint).ConfigureAwait(false);
-                _logger.LogDebug("Setting context's entry point project to {Project} (target TFM {TargetTFM})", EntryPoint!.FilePath, EntryPointTargetTFM);
-            }
-        }
-
-        public async ValueTask SetProjectAsync(IProject? project, CancellationToken token)
-        {
-            Project = project;
-
-            if (project is null)
-            {
-                TargetTFM = null;
-                _logger.LogDebug("Clearing context's current project");
-            }
-            else
-            {
-                TargetTFM = await _tfmSelector.SelectTFMAsync(project).ConfigureAwait(false);
-                _logger.LogDebug("Setting context's current project to {Project} (target TFM {TargetTFM})", Project!.FilePath, TargetTFM);
             }
         }
     }

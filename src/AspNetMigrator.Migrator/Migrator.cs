@@ -38,7 +38,7 @@ namespace AspNetMigrator
                 // If no further migration steps are required, then the current project is complete and
                 // can be unset in the context
                 Logger.LogInformation("Migration complete for project {Project}", context.Project.FilePath);
-                await context.SetProjectAsync(null, token).ConfigureAwait(false);
+                context.Project = null;
                 nextStep = await GetNextStepAsync(context, token).ConfigureAwait(false);
             }
 

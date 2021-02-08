@@ -33,8 +33,8 @@ namespace AspNetMigrator.ConsoleApp
 
             var state = await GetStateAsync(token).ConfigureAwait(false);
 
-            await context.SetEntryPointAsync(FindProject(state.EntryPoint), token).ConfigureAwait(false);
-            await context.SetProjectAsync(FindProject(state.CurrentProject), token).ConfigureAwait(false);
+            context.EntryPoint = FindProject(state.EntryPoint);
+            context.Project = FindProject(state.CurrentProject);
 
             IProject? FindProject(string? path)
                 => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == path);

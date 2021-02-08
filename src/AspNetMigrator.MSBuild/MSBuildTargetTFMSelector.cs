@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,6 +16,8 @@ namespace AspNetMigrator.MSBuild
         private readonly string _ltsTFMBase;
         private readonly UpgradeTarget _upgradeTarget;
 
+        private string AppTFMBase => _upgradeTarget == UpgradeTarget.Current ? _currentTFMBase : _ltsTFMBase;
+
         public MSBuildTargetTFMSelector(MigrateOptions options, IOptions<TFMSelectorOptions> selectorOptions, ITargetFrameworkMonikerComparer tfmComparer, ILogger<MSBuildTargetTFMSelector> logger)
         {
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
@@ -33,10 +31,45 @@ namespace AspNetMigrator.MSBuild
         /// Chooses the most likely target TFM a project should be retargeted to based on its style, output type, dependencies, and
         /// the user's preference of current or LTS.
         /// </summary>
-        public async ValueTask<TargetFrameworkMoniker> SelectTFMAsync(IProject project)
+        public TargetFrameworkMoniker SelectTFM(IProject project)
         {
-            // TODO - Implement this!
-            return new TargetFrameworkMoniker(_currentTFMBase);
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            var tfm = new TargetFrameworkMoniker((project.Style, project.OutputType) switch
+            {
+                (ProjectStyle.WindowsDesktop, _) => $"{AppTFMBase}{WindowsSuffix}",
+                (_, ProjectOutputType.WinExe) => $"{AppTFMBase}{WindowsSuffix}",
+                (_, ProjectOutputType.Exe) => AppTFMBase,
+                (ProjectStyle.Web, _) => AppTFMBase,
+                _ => NetStandardTFM
+            });
+
+            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfm, project.FilePath, project.Style, project.OutputType);
+
+            foreach (var dep in project.ProjectReferences)
+            {
+                if (_tfmComparer.IsCompatible(tfm, dep.TFM))
+                {
+                    continue;
+                }
+
+                if (dep.TFM.IsNetCore || dep.TFM.IsNetStandard)
+                {
+                    tfm = dep.TFM;
+                    _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {Project}", tfm, project.FilePath, dep.FilePath);
+                }
+                else
+                {
+                    _logger.LogWarning("Project {Project} has a dependency {Project} that will be incompatible after migration due to their TFMs ({TFM}->{TFM})", project.FilePath, tfm, dep.FilePath, dep.TFM);
+                }
+            }
+
+            _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
+
+            return tfm;
         }
     }
 }
