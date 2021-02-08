@@ -15,6 +15,10 @@ namespace AspNetMigrator
 
         public bool IsNetCore => Name.StartsWith(NetPrefix, StringComparison.OrdinalIgnoreCase) && Name.Contains('.');
 
+        /// <summary>
+        /// Parses a .NET Framework version string (for example v4.7.2) into
+        /// the equivalent TFM (net472 for that example).
+        /// </summary>
         public static TargetFrameworkMoniker ParseNetFxVersion(string version)
         {
             var match = NetFxVersionRegex.Match(version);

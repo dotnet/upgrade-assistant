@@ -18,8 +18,8 @@ namespace AspNetMigrator.MSBuild
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, MSBuildProject> _projectCache;
-        private IProject? _entryPoint;
 
+        private string? _entryPointPath;
         private string? _projectPath;
 
         private MSBuildWorkspace? _workspace;
@@ -39,7 +39,7 @@ namespace AspNetMigrator.MSBuild
 
         public MSBuildWorkspaceMigrationContext(
             MigrateOptions options,
-            ITargetTFMSelector tfmSelect,
+            ITargetTFMSelector tfmSelector,
             IVisualStudioFinder vsFinder,
             ILogger<MSBuildWorkspaceMigrationContext> logger)
         {
@@ -50,7 +50,7 @@ namespace AspNetMigrator.MSBuild
 
             _projectCache = new Dictionary<string, MSBuildProject>(StringComparer.OrdinalIgnoreCase);
             _path = options.ProjectPath;
-            _tfmSelector = tfmSelect ?? throw new ArgumentNullException(nameof(tfmSelect));
+            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _logger = logger;
 
             var vsPath = vsFinder.GetLatestVisualStudioPath();
@@ -90,10 +90,20 @@ namespace AspNetMigrator.MSBuild
 
         public IProject? EntryPoint
         {
-            get => _entryPoint;
+            get
+            {
+                if (_entryPointPath is null)
+                {
+                    return null;
+                }
+
+                return GetOrAddProject(_entryPointPath);
+            }
+
             set
             {
-                _entryPoint = value;
+                _entryPointPath = value?.FilePath;
+
                 if (EntryPoint is null)
                 {
                     EntryPointTargetTFM = null;

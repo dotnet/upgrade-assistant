@@ -49,6 +49,8 @@ namespace AspNetMigrator.MSBuild
 
             _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfm, project.FilePath, project.Style, project.OutputType);
 
+            // If the project depends on another project with a higher version NetCore or NetStandard TFM,
+            // use that TFM instead.
             foreach (var dep in project.ProjectReferences)
             {
                 if (_tfmComparer.IsCompatible(tfm, dep.TFM))

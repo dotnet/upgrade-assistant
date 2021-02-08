@@ -59,10 +59,10 @@ namespace AspNetMigrator.Solution
 
             if (projects.Count == 1)
             {
-                context.Project = projects[0];
                 context.EntryPoint = projects[0];
+                context.Project = projects[0];
 
-                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project!.FilePath);
+                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.Project.FilePath);
 
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
@@ -71,8 +71,7 @@ namespace AspNetMigrator.Solution
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
             }
-
-            if (context.Project is null)
+            else if (context.Project is null)
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
             }
@@ -131,7 +130,7 @@ namespace AspNetMigrator.Solution
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
             context.EntryPoint = await GetEntrypointAsync(context, token).ConfigureAwait(false);
-            var ordered = context.EntryPoint!.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
@@ -169,6 +168,7 @@ namespace AspNetMigrator.Solution
                 Project = project;
             }
 
+            // Use ANSI escape codes to colorize parts of the output (https://en.wikipedia.org/wiki/ANSI_escape_code)
             public override string CommandText => IsEnabled ? Project.GetRoslynProject().Name : $"\u001b[32m[Completed]\u001b[0m {Project.GetRoslynProject().Name}";
 
             public IProject Project { get; }
