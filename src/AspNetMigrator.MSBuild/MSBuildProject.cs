@@ -60,56 +60,59 @@ namespace AspNetMigrator.MSBuild
             return ProjectOutputType.Library;
         }
 
-        public ProjectStyle Style
+        public ProjectStyle Style => IsSdk
+            ? GetSDKProjectStyle()
+            : GetOldProjectStyle();
+
+        // Gets project style based on SDK, properties, and FrameworkReferences
+        private ProjectStyle GetSDKProjectStyle()
         {
-            get
+            if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
             {
-                if (IsSdk)
-                {
-                    if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return ProjectStyle.Web;
-                    }
-
-                    if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
-                        GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
-                        GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return ProjectStyle.WindowsDesktop;
-                    }
-
-                    var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
-                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        return ProjectStyle.Web;
-                    }
-
-                    if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        return ProjectStyle.WindowsDesktop;
-                    }
-                }
-                else
-                {
-                    // Check imports and references
-                    var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
-                    var references = References.Select(r => r.Name);
-
-                    if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
-                        references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        return ProjectStyle.Web;
-                    }
-
-                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
-                        references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        return ProjectStyle.WindowsDesktop;
-                    }
-                }
-
-                return ProjectStyle.Default;
+                return ProjectStyle.Web;
             }
+
+            if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
+                GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                return ProjectStyle.WindowsDesktop;
+            }
+
+            var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
+            if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+            {
+                return ProjectStyle.Web;
+            }
+
+            if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+            {
+                return ProjectStyle.WindowsDesktop;
+            }
+
+            return ProjectStyle.Default;
+        }
+
+        // Gets project style based on imports and References
+        private ProjectStyle GetOldProjectStyle()
+        {
+            // Check imports and references
+            var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
+            var references = References.Select(r => r.Name);
+
+            if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
+                references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                return ProjectStyle.Web;
+            }
+
+            if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
+                references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                return ProjectStyle.WindowsDesktop;
+            }
+
+            return ProjectStyle.Default;
         }
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)

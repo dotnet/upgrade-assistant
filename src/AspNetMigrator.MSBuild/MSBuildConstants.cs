@@ -1,6 +1,6 @@
 ﻿namespace AspNetMigrator.MSBuild
 {
-    public static class MSBuildConstants
+    internal static class MSBuildConstants
     {
         // Common target imports
         public const string WebApplicationTargets = "Microsoft.WebApplication.targets";
