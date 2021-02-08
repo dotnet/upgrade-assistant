@@ -9,7 +9,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop">
       <!-- This package is mostly COM definitions which can be loaded in .NET 5 runtime just fine -->
       <NoWarn>NU1701</NoWarn>
-      <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
