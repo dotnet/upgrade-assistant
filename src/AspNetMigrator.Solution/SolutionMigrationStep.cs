@@ -167,7 +167,7 @@ namespace AspNetMigrator.Solution
                 Project = project;
             }
 
-            public override string CommandText => IsEnabled ? Project.GetRoslynProject().Name : $"[Completed] {Project.GetRoslynProject().Name}";
+            public override string CommandText => IsEnabled ? Project.GetRoslynProject().Name : $"\u001b[32m[Completed]\u001b[0m {Project.GetRoslynProject().Name}";
 
             public IProject Project { get; }
 
