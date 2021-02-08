@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AspNetMigrator.TestHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 
 namespace AspNetMigrator.Test
 {
@@ -21,7 +20,7 @@ namespace AspNetMigrator.Test
 
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
             var migrator = new Migrator(GetOrderer(unknownStep), new NullLogger<Migrator>());
-            using var context = Substitute.For<IMigrationContext>();
+            using var context = TestHelpers.GetTestContext();
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
@@ -45,7 +44,7 @@ namespace AspNetMigrator.Test
 
             // Get both the steps property and the GetAllSteps enumeration and confirm that both return steps
             // in the expected order
-            using var context = Substitute.For<IMigrationContext>();
+            using var context = TestHelpers.GetTestContext();
 
             // Clear the project so that test migration steps don't run at both the project and solution level
             await context.SetProjectAsync(null, CancellationToken.None).ConfigureAwait(false);
@@ -71,7 +70,7 @@ namespace AspNetMigrator.Test
         {
             var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
             var allSteps = new List<string>();
-            using var context = await GetTestContextAsync().ConfigureAwait(false);
+            using var context = TestHelpers.GetTestContext();
 
             // Clear the project so that test migration steps don't run at both the project and solution level
             await context.SetProjectAsync(null, CancellationToken.None).ConfigureAwait(false);
@@ -94,7 +93,7 @@ namespace AspNetMigrator.Test
             var expectedNextStepId = "Step 2";
 
             var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
-            using var context = await GetTestContextAsync().ConfigureAwait(false);
+            using var context = TestHelpers.GetTestContext();
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
 
             // The failed step is next
@@ -163,16 +162,6 @@ namespace AspNetMigrator.Test
                 new TestMigrationStep("Step 2"),
                 new TestMigrationStep("Step 3", subSteps: otherSubsteps)
             };
-        }
-
-        private static async Task<IMigrationContext> GetTestContextAsync()
-        {
-            var context = Substitute.For<IMigrationContext>();
-
-            // Clear the project so that test migration steps don't run at both the project and solution level
-            await context.SetProjectAsync(null, CancellationToken.None).ConfigureAwait(false);
-
-            return context;
         }
 
         private static IMigrationStepOrderer GetOrderer(IEnumerable<MigrationStep> steps) => new MigrationStepOrderer(steps, new NullLogger<MigrationStepOrderer>());
