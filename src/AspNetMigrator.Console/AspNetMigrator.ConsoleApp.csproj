@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
@@ -7,7 +6,6 @@
     <ToolCommandName>upgrade-assistant</ToolCommandName>
     <PackageId>upgrade-assistant</PackageId>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -19,16 +17,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20371.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="System.CommandLine" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
     <ProjectReference Include="..\AspNetMigrator.BackupUpdater\AspNetMigrator.BackupUpdater.csproj" />
@@ -40,7 +36,6 @@
     <ProjectReference Include="..\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
     <ProjectReference Include="..\AspNetMigrator.TemplateUpdater\AspNetMigrator.TemplateUpdater.csproj" />
-
     <!-- These projects aren't used directly by this project, but are included here so that they're
          sure to be built prior to copying their binary output into this project's 'SourceUpdaters'
          and 'ConfigUpdaters' directories. -->
@@ -50,26 +45,21 @@
     <ProjectReference Include="..\ConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters.csproj" />
     <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
   </ItemGroup>
-
   <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
   <Target Name="MoveUpdatersToUpdatersUpdatersDir" AfterTargets="Build">
     <PropertyGroup>
       <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
       <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
     </PropertyGroup>
-
     <ItemGroup>
       <SourceUpdateFiles Include="$(OutputPath)AspNetMigrator.Analyzers.*" />
       <ConfigUpdateFiles Include="$(OutputPath)AspNetMigrator.DefaultConfigUpdaters.*" />
     </ItemGroup>
-
     <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
     <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />
-
     <Message Importance="normal" Text="Moving config updaters to $(ConfigUpdateFilePath)" />
     <Copy SourceFiles="@(ConfigUpdateFiles)" DestinationFolder="$(ConfigUpdateFilePath)" ContinueOnError="true" />
   </Target>
-
   <Target Name="IncludeUpdatersInPublish" AfterTargets="ComputeFilesToPublish">
     <ItemGroup>
       <SourceUpdaterFiles Include="$(OutputPath)SourceUpdaters\**" />
@@ -77,7 +67,6 @@
         <RelativePath>SourceUpdaters\%(SourceUpdaterFiles.Filename)%(Extension)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>
-
       <ConfigUpdaterFiles Include="$(OutputPath)ConfigUpdaters\**" />
       <ResolvedFileToPublish Include="@(ConfigUpdaterFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>ConfigUpdaters\%(ConfigUpdaterFiles.Filename)%(Extension)</RelativePath>
@@ -85,5 +74,4 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
 </Project>

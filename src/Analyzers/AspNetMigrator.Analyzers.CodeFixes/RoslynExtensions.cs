@@ -40,7 +40,7 @@ namespace AspNetMigrator.Analyzers
                 .OfType<MethodDeclarationSyntax>()
                 .FirstOrDefault(m =>
                     m.Identifier.ToString().Equals(methodName) &&
-                    requiredParameterTypes.All(req => m.ParameterList.Parameters.Any(p => p.Type.ToString().Equals(req, StringComparison.Ordinal))));
+                    requiredParameterTypes.All(req => m.ParameterList.Parameters.Any(p => string.Equals(p.Type?.ToString(), req, StringComparison.Ordinal))));
 
         /// <summary>
         /// Applies whitespace trivia and new line trivia from another statement syntax to this one.

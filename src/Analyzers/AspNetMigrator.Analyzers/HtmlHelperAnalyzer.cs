@@ -72,7 +72,7 @@ namespace AspNetMigrator.Analyzers
             // and other uses, use Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper.
             var replacementType = GetReplacementType(identifier);
 
-            var properties = ImmutableDictionary.Create<string, string>().Add(NewIdentifierKey, replacementType);
+            var properties = ImmutableDictionary.Create<string, string?>().Add(NewIdentifierKey, replacementType);
 
             var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), properties, name, replacementType);
             context.ReportDiagnostic(diagnostic);

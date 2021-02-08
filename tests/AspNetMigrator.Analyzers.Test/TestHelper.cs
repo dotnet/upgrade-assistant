@@ -59,10 +59,17 @@ namespace TestProject
         private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, params string[] diagnosticIds)
         {
             var analyzersToUse = AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
-            var compilation = (await project.GetCompilationAsync().ConfigureAwait(false))
+            var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
+
+            if (compilation is null)
+            {
+                return Enumerable.Empty<Diagnostic>();
+            }
+
+            var compilationWithAnalyzers = compilation
                             .WithAnalyzers(ImmutableArray.Create(analyzersToUse.ToArray()));
 
-            return (await compilation.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false))
+            return (await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false))
                 .Where(d => d.Location.IsInSource && documentPath.Equals(Path.GetFileName(d.Location.GetLineSpan().Path), StringComparison.Ordinal))
                 .Where(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal));
         }
