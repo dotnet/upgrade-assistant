@@ -46,7 +46,10 @@ namespace AspNetMigrator.Portability.Analyzers
 
                 foreach (var s in symbols)
                 {
-                    yield return s;
+                    if (s is not null)
+                    {
+                        yield return s;
+                    }
                 }
             }
         }

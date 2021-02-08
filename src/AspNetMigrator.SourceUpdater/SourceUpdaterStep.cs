@@ -110,14 +110,23 @@ namespace AspNetMigrator.SourceUpdater
             Logger.LogTrace("Running ASP.NET Core migration analyzers on {ProjectName}", project.Name);
 
             // Compile with migration analyzers enabled
-            var compilation = (await project.GetCompilationAsync(token).ConfigureAwait(false))
-                .WithAnalyzers(_allAnalyzers, new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
+            var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
 
-            // Find all diagnostics that migration code fixers can address
-            Diagnostics = (await compilation.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
-                .Where(d => d.Location.IsInSource &&
-                       _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
-            Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
+            if (compilation is null)
+            {
+                Diagnostics = Enumerable.Empty<Diagnostic>();
+            }
+            else
+            {
+                var compilationWithAnalyzer = compilation
+                    .WithAnalyzers(_allAnalyzers, new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
+
+                // Find all diagnostics that migration code fixers can address
+                Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
+                    .Where(d => d.Location.IsInSource &&
+                           _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
+                Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
+            }
         }
 
         protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
