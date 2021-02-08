@@ -170,7 +170,11 @@ namespace AspNetMigrator.MSBuild
                 }
                 else
                 {
-                    throw new NotImplementedException("Only projects using SDK-style is supported at the moment");
+                    var value = ProjectRoot.Properties
+                        .Single(e => e.Name == "TargetFrameworkVersion")
+                        .Value;
+
+                    return TargetFrameworkMoniker.ParseNetFxVersion(value);
                 }
             }
         }

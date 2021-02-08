@@ -59,11 +59,7 @@ namespace AspNetMigrator.MSBuild
                 if (dep.TFM.IsNetCore || dep.TFM.IsNetStandard)
                 {
                     tfm = dep.TFM;
-                    _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {Project}", tfm, project.FilePath, dep.FilePath);
-                }
-                else
-                {
-                    _logger.LogWarning("Project {Project} has a dependency {Project} that will be incompatible after migration due to their TFMs ({TFM}->{TFM})", project.FilePath, tfm, dep.FilePath, dep.TFM);
+                    _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FilePath, dep.FilePath);
                 }
             }
 
