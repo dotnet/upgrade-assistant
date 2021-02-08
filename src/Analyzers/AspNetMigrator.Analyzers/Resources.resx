@@ -198,6 +198,9 @@
   <data name="UrlHelperTitle" xml:space="preserve">
     <value>UrlHelper should be replaced with IUrlHelper</value>
   </data>
+  <data name="UsingSystemDeployment" xml:space="preserve">
+    <value>System.Deployment is not supported on .NET Core</value>
+  </data>
   <data name="UsingSystemWebDescription" xml:space="preserve">
     <value>ASP.NET Core projects should not reference System.Web or OWIN namespaces.</value>
     <comment>An optional longer localizable description of the diagnostic.</comment>
