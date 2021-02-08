@@ -8,8 +8,10 @@ namespace AspNetMigrator
 {
     public interface ITargetTFMSelector
     {
+        /// <summary>
+        /// Chooses the most likely target TFM a project should be retargeted to based on its style, output type, dependencies, and
+        /// the user's preference of current or LTS.
+        /// </summary>
         ValueTask<TargetFrameworkMoniker> SelectTFMAsync(IProject project);
-
-        TargetFrameworkMoniker HighestPossibleTFM { get; }
     }
 }

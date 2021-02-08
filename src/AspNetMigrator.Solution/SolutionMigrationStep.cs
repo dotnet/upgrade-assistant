@@ -49,7 +49,8 @@ namespace AspNetMigrator.Solution
 
             var projects = context.Projects.ToList();
 
-            if (projects.All(p => IsCompleted(context, p)))
+            var projectsCompleted = await Task.WhenAll(projects.Select(p => IsCompletedAsync(context, p))).ConfigureAwait(false);
+            if (projectsCompleted.All(b => b))
             {
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
             }
@@ -86,7 +87,7 @@ namespace AspNetMigrator.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var selectedProject = await GetProject(context, IsCompleted, token).ConfigureAwait(false);
+            var selectedProject = await GetProject(context, IsCompletedAsync, token).ConfigureAwait(false);
 
             if (selectedProject is null)
             {
@@ -99,30 +100,44 @@ namespace AspNetMigrator.Solution
             }
         }
 
-        private bool IsCompleted(IMigrationContext context, IProject project)
+        // This method uses different logic before and after an entry point is selected because older netcore/netstandard versions may
+        // be good enough to count as 'completed' for assemblies that are only dependencies of the entry point, but would not be considered complete
+        // if those assemblies *are* the entry point.
+        //
+        // For example, consider a library that targets netcoreapp3.1. If the entry point is a different project that depends on that one,
+        // then it doesn't need to change since the migrated entry point (likely moving to net5.0 or similar) can continue to consume it.
+        // If, on the other hand, the netcoreapp3.1 project is the primary project being migrated (the entry point), then it is *not* complete
+        // because it should upgrade to the current (or LTS) version of netcore.
+        private async Task<bool> IsCompletedAsync(IMigrationContext context, IProject project)
         {
-            // If the entry point hasn't been selected yet, it's safe to consider projects complete
-            // if they work against the latest current OS-specific TFM
-            var entryPointTargetTFM = context.EntryPointTargetTFM
-                ?? _tfmSelector.HighestPossibleTFM;
-
-            return project.GetFile().IsSdk && _tfmComparer.IsCompatible(entryPointTargetTFM, project.TFM);
+            if (context.EntryPointTargetTFM is not null && !project.FilePath.Equals(context.EntryPoint?.FilePath, StringComparison.OrdinalIgnoreCase))
+            {
+                // Once an entry point is selected, consider dependent projects migrated if they are SDK style
+                // and can be depended on by the entry point.
+                return project.GetFile().IsSdk && _tfmComparer.IsCompatible(context.EntryPointTargetTFM, project.TFM);
+            }
+            else
+            {
+                // If the entry point hasn't been selected yet (or the project being evaluated *is* the entry point),
+                // compare the project's TFM against the TFM it would have if it were the entry point.
+                return project.GetFile().IsSdk && project.TFM.Equals(await _tfmSelector.SelectTFMAsync(project).ConfigureAwait(false));
+            }
         }
 
-        private async Task<IProject> GetProject(IMigrationContext context, Func<IMigrationContext, IProject, bool> isProjectCompleted, CancellationToken token)
+        private async Task<IProject> GetProject(IMigrationContext context, Func<IMigrationContext, IProject, Task<bool>> isProjectCompleted, CancellationToken token)
         {
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
             await context.SetEntryPointAsync(await GetEntrypointAsync(context, token).ConfigureAwait(false), token).ConfigureAwait(false);
-            var ordered = context.EntryPoint!.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            var ordered = await Task.WhenAll(context.EntryPoint!.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommandAsync)).ConfigureAwait(false);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
             return result.Project;
 
-            ProjectCommand CreateProjectCommand(IProject project)
+            async Task<ProjectCommand> CreateProjectCommandAsync(IProject project)
             {
-                return new ProjectCommand(project, isProjectCompleted(context, project));
+                return new ProjectCommand(project, await isProjectCompleted(context, project).ConfigureAwait(false));
             }
         }
 

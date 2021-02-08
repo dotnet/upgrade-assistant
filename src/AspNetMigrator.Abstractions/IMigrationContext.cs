@@ -14,9 +14,9 @@ namespace AspNetMigrator
 
         IProject? Project { get; }
 
-        IEnumerable<IProject> Projects { get; }
-
         TargetFrameworkMoniker? TargetTFM { get; }
+
+        IEnumerable<IProject> Projects { get; }
 
         bool UpdateSolution(Solution updatedSolution);
 
