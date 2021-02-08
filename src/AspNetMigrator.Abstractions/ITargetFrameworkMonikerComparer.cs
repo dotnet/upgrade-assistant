@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace AspNetMigrator
+﻿namespace AspNetMigrator
 {
     public interface ITargetFrameworkMonikerComparer
     {

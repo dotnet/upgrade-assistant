@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.BackupUpdater;
 using AspNetMigrator.PackageUpdater;
-using AspNetMigrator.Reporting;
 using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
