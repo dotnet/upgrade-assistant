@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.TryConvertUpdater
+namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStep : MigrationStep
     {
@@ -188,5 +188,5 @@ namespace AspNetMigrator.TryConvertUpdater
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
             }
         }
-      }
+    }
 }

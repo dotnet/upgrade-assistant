@@ -18,6 +18,7 @@ using Microsoft.UpgradeAssistant.Migrator;
 using Microsoft.UpgradeAssistant.Steps;
 using Microsoft.UpgradeAssistant.Steps.Backup;
 using Microsoft.UpgradeAssistant.Steps.Packages;
+using Microsoft.UpgradeAssistant.Steps.ProjectFormat;
 using Serilog;
 
 namespace Microsoft.UpgradeAssistant.Cli

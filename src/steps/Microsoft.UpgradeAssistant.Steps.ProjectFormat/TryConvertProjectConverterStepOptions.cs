@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.TryConvertUpdater
+﻿namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStepOptions
     {

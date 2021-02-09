@@ -1,10 +1,9 @@
-﻿using AspNetMigrator.TryConvertUpdater;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Reporting;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
 {
     public static class TryConvertProjectConverterStepExtensions
     {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Reporting;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
 {
     internal class TryConvertReport : ISectionGenerator
     {
