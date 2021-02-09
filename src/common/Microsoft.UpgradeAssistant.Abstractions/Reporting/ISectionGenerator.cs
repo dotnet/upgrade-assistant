@@ -1,7 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator;
 
-namespace AspNetMigrator.Reporting
+namespace Microsoft.UpgradeAssistant.Reporting
 {
     public interface ISectionGenerator
     {

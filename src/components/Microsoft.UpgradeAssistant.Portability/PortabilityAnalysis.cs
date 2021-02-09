@@ -3,9 +3,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Reporting;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant.Reporting;
 
 namespace AspNetMigrator.Portability
 {

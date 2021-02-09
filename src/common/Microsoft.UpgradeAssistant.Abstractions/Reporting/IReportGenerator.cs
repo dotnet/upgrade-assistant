@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using AspNetMigrator;
 
-namespace AspNetMigrator.Reporting
+namespace Microsoft.UpgradeAssistant.Reporting
 {
     public interface IReportGenerator
     {

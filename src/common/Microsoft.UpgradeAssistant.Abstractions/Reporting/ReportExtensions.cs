@@ -1,7 +1,7 @@
-﻿using AspNetMigrator.Reporting;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UpgradeAssistant.Reporting;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public static class ReportExtensions
     {

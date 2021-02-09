@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AspNetMigrator.Reporting
+namespace Microsoft.UpgradeAssistant.Reporting
 {
     public record Row(IReadOnlyCollection<object> Data)
     {

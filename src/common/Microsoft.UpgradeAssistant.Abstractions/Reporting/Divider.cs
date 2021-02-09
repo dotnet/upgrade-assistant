@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.Reporting
+﻿namespace Microsoft.UpgradeAssistant.Reporting
 {
     public record Divider : Content
     {

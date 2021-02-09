@@ -4,8 +4,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator;
 
-namespace AspNetMigrator.Reporting
+namespace Microsoft.UpgradeAssistant.Reporting
 {
     internal class ReportGenerator : IReportGenerator
     {

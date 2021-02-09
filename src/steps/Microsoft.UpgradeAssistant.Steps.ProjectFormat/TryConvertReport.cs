@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Reporting;
+using Microsoft.UpgradeAssistant.Reporting;
 
 namespace AspNetMigrator
 {

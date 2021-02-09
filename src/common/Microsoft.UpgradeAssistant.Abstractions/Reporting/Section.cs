@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AspNetMigrator.Reporting
+namespace Microsoft.UpgradeAssistant.Reporting
 {
     public record Section(string Header)
         : Content

@@ -1,9 +1,9 @@
 ﻿using AspNetMigrator.Portability;
 using AspNetMigrator.Portability.Analyzers;
 using AspNetMigrator.Portability.Service;
-using AspNetMigrator.Reporting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.UpgradeAssistant.Reporting;
 
 namespace AspNetMigrator
 {
