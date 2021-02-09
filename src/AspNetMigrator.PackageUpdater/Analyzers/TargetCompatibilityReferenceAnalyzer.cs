@@ -35,7 +35,7 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var targetFramework = NuGetFramework.Parse(state.TFM.Name);
+            var targetFramework = NuGetFramework.Parse(state.TargetTFM.Name);
 
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))
             {

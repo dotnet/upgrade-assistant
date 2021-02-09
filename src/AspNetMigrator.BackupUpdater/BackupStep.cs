@@ -44,7 +44,7 @@ namespace AspNetMigrator.BackupUpdater
         }
 
         // The backup step backs up at the project level, so it doesn't apply if no project is selected
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -53,7 +53,7 @@ namespace AspNetMigrator.BackupUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _projectDir = context.Project.Required().Directory;
+            _projectDir = context.CurrentProject.Required().Project.Directory;
             _backupPath ??= GetDefaultBackupPath(_projectDir);
 
             if (_skipBackup)

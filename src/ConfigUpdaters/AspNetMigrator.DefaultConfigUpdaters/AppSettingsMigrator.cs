@@ -46,7 +46,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
 
             // Determine where appsettings.json should live
             var appSettingsPath = Path.Combine(project.Directory ?? string.Empty, AppSettingsJsonFileName);
@@ -139,7 +139,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
                 }
             }
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
 
             var jsonConfigFiles = project.FindFiles(ProjectItemType.Content, AppSettingsFileRegex)
                 .Select(f => new AppSettingsFile(f))

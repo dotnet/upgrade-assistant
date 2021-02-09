@@ -25,7 +25,7 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectInstance = new ProjectInstance(context.Project.Required().FilePath);
+            var projectInstance = new ProjectInstance(context.CurrentProject.Required().Project.FilePath);
             RestorePackages(projectInstance);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
@@ -42,7 +42,7 @@ namespace AspNetMigrator.MSBuild
             }
 
             // Get the path used for caching NuGet packages
-            projectInstance = new ProjectInstance(context.Project.Required().FilePath);
+            projectInstance = new ProjectInstance(context.CurrentProject.Required().Project.FilePath);
             var nugetCachePath = projectInstance.GetPropertyValue("NuGetPackageRoot");
 
             return new RestoreOutput(File.Exists(lockFilePath) ? lockFilePath : null, Directory.Exists(nugetCachePath) ? nugetCachePath : null);

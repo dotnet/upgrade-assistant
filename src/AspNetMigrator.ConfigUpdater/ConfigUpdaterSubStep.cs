@@ -24,7 +24,7 @@ namespace AspNetMigrator.ConfigUpdater
             _configUpdater = configUpdater ?? throw new ArgumentNullException(nameof(configUpdater));
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && (_parentStep?.ConfigFiles.Any() ?? false);
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null && (_parentStep?.ConfigFiles.Any() ?? false);
 
         protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {

@@ -1,4 +1,5 @@
 <Project>
+  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers">
       <PrivateAssets>All</PrivateAssets>

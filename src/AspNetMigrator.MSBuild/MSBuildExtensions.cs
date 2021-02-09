@@ -5,19 +5,19 @@ using Microsoft.Build.Construction;
 
 namespace AspNetMigrator.MSBuild
 {
-    internal static class PackageReferenceExtensions
+    internal static class MSBuildExtensions
     {
-        private const string PackageReferenceType = "PackageReference";
-        private const string VersionElementName = "Version";
-
         public static NuGetReference AsNuGetReference(this ProjectItemElement item)
         {
             var packageName = item.Include;
-            var packageVersion = (item.Children.FirstOrDefault(c => c.ElementName.Equals(VersionElementName, StringComparison.OrdinalIgnoreCase)) as ProjectMetadataElement)?.Value
+            var packageVersion = (item.Children.FirstOrDefault(c => c.ElementName.Equals(MSBuildConstants.VersionElementName, StringComparison.OrdinalIgnoreCase)) as ProjectMetadataElement)?.Value
                 ?? "0.0.0"; // Package references without versions will resolve to the lowest stable version
 
             return new NuGetReference(packageName, packageVersion);
         }
+
+        public static Reference AsReference(this ProjectItemElement item) =>
+            new(item.Include.Split(',').First());
 
         public static void RemovePackage(this ProjectRootElement projectRoot, NuGetReference package)
         {
@@ -32,9 +32,9 @@ namespace AspNetMigrator.MSBuild
 
         public static void AddPackageReference(this ProjectRootElement projectRoot, ProjectItemGroupElement itemGroup, NuGetReference packageReference)
         {
-            var newItemElement = projectRoot.CreateItemElement(PackageReferenceType, packageReference.Name);
+            var newItemElement = projectRoot.CreateItemElement(MSBuildConstants.PackageReferenceType, packageReference.Name);
             itemGroup.AppendChild(newItemElement);
-            newItemElement.AddMetadata(VersionElementName, packageReference.Version, true);
+            newItemElement.AddMetadata(MSBuildConstants.VersionElementName, packageReference.Version, true);
 
             if (packageReference.PrivateAssets is not null)
             {
@@ -43,8 +43,14 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
+        public static IEnumerable<ProjectItemElement> GetAllReferences(this ProjectRootElement projectRoot)
+            => projectRoot.Items.Where(i => i.ItemType.Equals(MSBuildConstants.ReferenceType, StringComparison.OrdinalIgnoreCase));
+
         public static IEnumerable<ProjectItemElement> GetAllPackageReferences(this ProjectRootElement projectRoot)
-            => projectRoot.Items.Where(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase));
+            => projectRoot.Items.Where(i => i.ItemType.Equals(MSBuildConstants.PackageReferenceType, StringComparison.OrdinalIgnoreCase));
+
+        public static IEnumerable<ProjectItemElement> GetAllFrameworkReferences(this ProjectRootElement projectRoot)
+            => projectRoot.Items.Where(i => i.ItemType.Equals(MSBuildConstants.FrameworkReferenceType, StringComparison.OrdinalIgnoreCase));
 
         public static void RemoveElement(this ProjectElement element)
         {

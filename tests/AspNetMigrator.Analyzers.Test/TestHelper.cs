@@ -18,7 +18,7 @@ namespace TestProject
     {
         // Path relative from .\bin\debug\net5.0
         // TODO : Make this configurable so the test can pass from other working dirs
-        internal const string TestProjectPath = @"..\..\..\..\TestAssets\TestProject\TestProject.csproj";
+        internal const string TestProjectPath = @"..\..\..\..\..\tests\TestAssets\TestProject\TestProject.csproj";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new UsingSystemWebAnalyzer(),

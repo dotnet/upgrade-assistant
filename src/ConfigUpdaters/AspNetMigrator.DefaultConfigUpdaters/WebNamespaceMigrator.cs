@@ -57,7 +57,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
 
             try
             {
-                var project = context.Project.Required();
+                var project = context.CurrentProject.Required().Project;
 
                 var viewImportsContents = new List<string>(_viewImportsPath is null
                     ? new[] { string.Empty, ViewImportsInitialContent }
@@ -121,7 +121,7 @@ namespace AspNetMigrator.DefaultConfigUpdaters
 
             _logger.LogDebug("Found {NamespaceCount} namespaces imported into web pages in config files", namespaces.Count);
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
 
             var alreadyImportedNamespaces = new List<string>();
             _viewImportsPath = project.FindFiles(ProjectItemType.Content, ViewImportsRelativePath).FirstOrDefault();
