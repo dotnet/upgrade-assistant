@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +8,9 @@ namespace AspNetMigrator.PackageUpdater
 {
     public class PackageAnalysisState
     {
-        public TargetFrameworkMoniker TFM { get; init; } = null!;
+        public TargetFrameworkMoniker CurrentTFM { get; init; } = null!;
+
+        public TargetFrameworkMoniker TargetTFM { get; init; } = null!;
 
         public string LockFilePath { get; private set; } = default!;
 
@@ -41,17 +44,23 @@ namespace AspNetMigrator.PackageUpdater
         {
             if (context is null)
             {
-                throw new System.ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(context));
             }
 
             if (packageRestorer is null)
             {
-                throw new System.ArgumentNullException(nameof(packageRestorer));
+                throw new ArgumentNullException(nameof(packageRestorer));
+            }
+
+            if (context.CurrentProject is null)
+            {
+                throw new InvalidOperationException("Target TFM must be set before analyzing package references");
             }
 
             var ret = new PackageAnalysisState
             {
-                TFM = context.Project.Required().TFM,
+                CurrentTFM = context.CurrentProject.Required().Project.TFM,
+                TargetTFM = context.CurrentProject.Required().TargetTFM
             };
 
             await ret.PopulatePackageRestoreState(context, packageRestorer, token).ConfigureAwait(false);

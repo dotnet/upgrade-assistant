@@ -12,8 +12,6 @@ namespace AspNetMigrator.MSBuild
 {
     internal partial class MSBuildProject : IProjectFile
     {
-        private const string DefaultSDK = "Microsoft.NET.Sdk";
-
         private ProjectRootElement? _projectRoot;
 
         // Don't get the project root from Project.Xml since some migration
@@ -33,7 +31,7 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
-        public string TargetSdk
+        public string Sdk
         {
             get
             {
@@ -49,7 +47,7 @@ namespace AspNetMigrator.MSBuild
         }
 
         public bool IsSdk =>
-            ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(DefaultSDK, StringComparison.OrdinalIgnoreCase);
+            ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparison.OrdinalIgnoreCase);
 
         public void AddPackages(IEnumerable<NuGetReference> references)
         {

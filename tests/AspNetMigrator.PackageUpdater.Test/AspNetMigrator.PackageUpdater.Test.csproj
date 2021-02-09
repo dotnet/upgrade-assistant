@@ -10,6 +10,7 @@
     <PackageReference Include="MSTest.TestAdapter" />
     <PackageReference Include="MSTest.TestFramework" />
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Nuget.Frameworks" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj" />

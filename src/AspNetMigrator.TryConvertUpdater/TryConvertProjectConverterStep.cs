@@ -48,7 +48,7 @@ namespace AspNetMigrator.TryConvertUpdater
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
 
         protected async override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -57,7 +57,7 @@ namespace AspNetMigrator.TryConvertUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = context.Project.Required().FilePath;
+            var projectPath = context.CurrentProject.Required().Project.FilePath;
 
             if (!File.Exists(projectPath))
             {
@@ -154,7 +154,7 @@ namespace AspNetMigrator.TryConvertUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
 
             if (!File.Exists(_tryConvertPath))
             {
@@ -170,12 +170,15 @@ namespace AspNetMigrator.TryConvertUpdater
                 if (!projectFile.IsSdk)
                 {
                     Logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project and retarget it to .NET Core/Standard: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectFile.FilePath)}", BuildBreakRisk.High);
+                    return new MigrationStepInitializeResult(
+                        MigrationStepStatus.Incomplete,
+                        $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project and retarget it to .NET Core/Standard: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectFile.FilePath)}",
+                        (project.Components & ProjectComponents.Web) == ProjectComponents.Web ? BuildBreakRisk.High : BuildBreakRisk.Medium);
                 }
                 else
                 {
-                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.TargetSdk);
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {projectFile.TargetSdk} SDK", BuildBreakRisk.None);
+                    Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.Sdk);
+                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
                 }
             }
             catch (Exception exc)

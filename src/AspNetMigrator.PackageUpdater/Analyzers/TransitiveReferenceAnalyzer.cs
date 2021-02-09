@@ -33,13 +33,13 @@ namespace AspNetMigrator.PackageUpdater.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var targetFramework = NuGetFramework.Parse(state.TFM.Name);
+            var tfm = NuGetFramework.Parse(state.CurrentTFM.Name);
 
-            _logger.LogDebug("Searching lock file for dependencies for {TFM}", targetFramework.DotNetFrameworkName);
+            _logger.LogDebug("Searching lock file for dependencies for {TFM}", tfm.DotNetFrameworkName);
 
             var lockFileTarget = LockFileUtilities.GetLockFile(state.LockFilePath, NuGet.Common.NullLogger.Instance)
                 .Targets
-                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(targetFramework.DotNetFrameworkName, StringComparison.Ordinal));
+                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(tfm.DotNetFrameworkName, StringComparison.Ordinal));
 
             // If the package is referenced transitively, mark for removal
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))

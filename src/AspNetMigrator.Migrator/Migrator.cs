@@ -33,12 +33,12 @@ namespace AspNetMigrator
         {
             var nextStep = await GetNextStepAsyncInternal(GetStepsForContext(context), context, token).ConfigureAwait(false);
 
-            if (nextStep is null && context.Project is not null)
+            if (nextStep is null && context.CurrentProject is not null)
             {
                 // If no further migration steps are required, then the current project is complete and
                 // can be unset in the context
-                Logger.LogInformation("Migration complete for project {Project}", context.Project.FilePath);
-                context.Project = null;
+                Logger.LogInformation("Migration complete for project {Project}", context.CurrentProject.Project.FilePath);
+                context.SetCurrentProject(null);
                 nextStep = await GetNextStepAsync(context, token).ConfigureAwait(false);
             }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -74,7 +73,7 @@ namespace AspNetMigrator.PackageUpdater
             _analysisState = null;
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null;
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -92,8 +91,8 @@ namespace AspNetMigrator.PackageUpdater
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.Project.Required().FilePath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {context.Project.Required().FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().Project.FilePath);
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().Project.FilePath}", BuildBreakRisk.Unknown);
             }
 
             if (_analysisState is null || !_analysisState.ChangesRecommended)
@@ -124,7 +123,7 @@ namespace AspNetMigrator.PackageUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
 
             // TODO : Temporary workaround until the migration analyzers are available on NuGet.org
             // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
@@ -172,15 +171,15 @@ namespace AspNetMigrator.PackageUpdater
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.Project.Required().FilePath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {context.Project.Required().FilePath}");
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().Project.FilePath);
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().Project.FilePath}");
             }
         }
 
         private async Task<bool> RunPackageAnalyzersAsync(IMigrationContext context, CancellationToken token)
         {
             _analysisState = await PackageAnalysisState.CreateAsync(context, _packageRestorer, token).ConfigureAwait(false);
-            var projectRoot = context.Project;
+            var projectRoot = context.CurrentProject?.Project;
 
             if (projectRoot is null)
             {

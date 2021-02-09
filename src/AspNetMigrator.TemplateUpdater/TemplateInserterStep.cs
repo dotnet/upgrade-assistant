@@ -62,7 +62,7 @@ namespace AspNetMigrator.TemplateUpdater
             }
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && _templateProvider.TemplateConfigFileNames.Any();
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null && _templateProvider.TemplateConfigFileNames.Any();
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -71,7 +71,7 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
 
             try
             {
@@ -105,7 +105,7 @@ namespace AspNetMigrator.TemplateUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
             var projectFile = project.GetFile();
 
             // For each item to be added, make necessary replacements and then add the item to the project

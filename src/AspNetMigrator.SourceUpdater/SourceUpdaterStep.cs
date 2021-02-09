@@ -63,7 +63,7 @@ namespace AspNetMigrator.SourceUpdater
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.Project is not null && SubSteps.Any();
+        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null && SubSteps.Any();
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -72,7 +72,7 @@ namespace AspNetMigrator.SourceUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            Project = context.Project.Required();
+            Project = context.CurrentProject.Required().Project;
 
             var projectPath = Project.FilePath;
 
@@ -136,7 +136,7 @@ namespace AspNetMigrator.SourceUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var file = context.Project.Required().GetFile();
+            var file = context.CurrentProject.Required().Project.GetFile();
 
             file.Simplify();
 

@@ -17,7 +17,7 @@ namespace AspNetMigrator
             services.AddTransient<IPackageReferencesAnalyzer, UpgradeAssistantReferenceAnalyzer>();
 
             services.AddSingleton<PackageMapProvider>();
-            services.AddSingleton<ITargetFrameworkIdentifier, TargetFrameworkIdentifier>();
+            services.AddSingleton<ITargetFrameworkMonikerComparer, TargetFrameworkMonikerComparer>();
             services.AddScoped<MigrationStep, PackageUpdaterStep>();
             return services.AddOptions<PackageUpdaterOptions>();
         }

@@ -30,6 +30,7 @@
     <PackageVersion Include="MSTest.TestAdapter" Version="2.1.1" />
     <PackageVersion Include="MSTest.TestFramework" Version="2.1.2" />
     <PackageVersion Include="NSubstitute" Version="4.2.2" />
+    <PackageVersion Include="NuGet.Frameworks" Version="5.8.0" />
     <PackageVersion Include="NuGet.ProjectModel" Version="5.8.0" />
     <PackageVersion Include="Serilog" Version="2.10.0" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="3.1.0" />

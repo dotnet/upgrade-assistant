@@ -48,9 +48,9 @@ namespace AspNetMigrator.ConfigUpdater
         }
 
         protected override bool IsApplicableImpl(IMigrationContext context) =>
-            context?.Project is not null &&
+            context?.CurrentProject is not null &&
             SubSteps.Any() &&
-            _configFilePaths.Select(p => Path.Combine(context.Project.Directory, p)).Any(f => File.Exists(f));
+            _configFilePaths.Select(p => Path.Combine(context.CurrentProject.Project.Directory, p)).Any(f => File.Exists(f));
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -59,7 +59,7 @@ namespace AspNetMigrator.ConfigUpdater
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.Project.Required();
+            var project = context.CurrentProject.Required().Project;
 
             var configPaths = _configFilePaths.Select(p => Path.Combine(project.Directory ?? string.Empty, p)).Where(p => File.Exists(p));
             Logger.LogDebug("Loading config files: {ConfigFiles}", string.Join(", ", configPaths));

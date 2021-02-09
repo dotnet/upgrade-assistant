@@ -35,10 +35,88 @@ namespace AspNetMigrator.MSBuild
                 throw new InvalidOperationException("Could not find project path for reference");
             }
 
-            return Context.GetOrAddProject(project.FilePath);
+            return Context.GetOrAddProject(project.FilePath).Project;
         });
 
         public Build.Project Project => Context.ProjectCollection.LoadProject(FilePath);
+
+        public ProjectOutputType OutputType =>
+            ProjectRoot.Properties.FirstOrDefault(p => p.Name.Equals(MSBuildConstants.OutputTypePropertyName, StringComparison.OrdinalIgnoreCase))?.Value switch
+            {
+                MSBuildConstants.LibraryPropertyValue => ProjectOutputType.Library,
+                MSBuildConstants.ExePropertyValue => ProjectOutputType.Exe,
+                MSBuildConstants.WinExePropertyValue => ProjectOutputType.WinExe,
+                null => GetDefaultOutputType(),
+                _ => ProjectOutputType.Other
+            };
+
+        private ProjectOutputType GetDefaultOutputType()
+        {
+            if (IsSdk && MSBuildConstants.SDKsWithExeDefaultOutputType.Contains(Sdk, StringComparer.OrdinalIgnoreCase))
+            {
+                return ProjectOutputType.Exe;
+            }
+
+            return ProjectOutputType.Library;
+        }
+
+        public ProjectComponents Components => IsSdk
+            ? GetSDKProjectComponents()
+            : GetOldProjectComponents();
+
+        // Gets project components based on SDK, properties, and FrameworkReferences
+        private ProjectComponents GetSDKProjectComponents()
+        {
+            var components = ProjectComponents.None;
+            if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
+            {
+                components |= ProjectComponents.Web;
+            }
+
+            if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
+                GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                components |= ProjectComponents.WindowsDesktop;
+            }
+
+            var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
+            if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.Web;
+            }
+
+            if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.WindowsDesktop;
+            }
+
+            return components;
+        }
+
+        // Gets project components based on imports and References
+        private ProjectComponents GetOldProjectComponents()
+        {
+            var components = ProjectComponents.None;
+
+            // Check imports and references
+            var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
+            var references = References.Select(r => r.Name);
+
+            if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
+                references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.Web;
+            }
+
+            if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
+                references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.WindowsDesktop;
+            }
+
+            return components;
+        }
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
         {
@@ -77,6 +155,12 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
+        public IEnumerable<Reference> FrameworkReferences =>
+            ProjectRoot.GetAllFrameworkReferences().Select(r => r.AsReference()).ToList();
+
+        public IEnumerable<Reference> References =>
+            ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
+
         public TargetFrameworkMoniker TFM
         {
             get
@@ -92,7 +176,11 @@ namespace AspNetMigrator.MSBuild
                 }
                 else
                 {
-                    throw new NotImplementedException("Only projects using SDK-style is supported at the moment");
+                    var value = ProjectRoot.Properties
+                        .Single(e => e.Name == "TargetFrameworkVersion")
+                        .Value;
+
+                    return Context.TfmFactory.GetTFMForNetFxVersion(value);
                 }
             }
         }

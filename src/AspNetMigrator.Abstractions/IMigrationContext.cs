@@ -8,9 +8,13 @@ namespace AspNetMigrator
 {
     public interface IMigrationContext : IDisposable
     {
-        IProject? EntryPoint { get; set; }
+        UpgradeProjectInfo? EntryPoint { get; }
 
-        IProject? Project { get; set; }
+        void SetEntryPoint(IProject? entryPoint);
+
+        UpgradeProjectInfo? CurrentProject { get; }
+
+        void SetCurrentProject(IProject? project);
 
         IEnumerable<IProject> Projects { get; }
 

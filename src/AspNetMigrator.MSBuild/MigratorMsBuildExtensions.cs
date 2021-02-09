@@ -22,6 +22,8 @@ namespace AspNetMigrator
             services.AddTransient<MSBuildWorkspaceMigrationContext>();
             services.AddTransient<IMigrationContext>(sp => sp.GetRequiredService<MSBuildWorkspaceMigrationContext>());
             services.AddTransient<Func<MSBuildWorkspaceMigrationContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceMigrationContext>());
+            services.AddTransient<ITargetTFMSelector, MSBuildTargetTFMSelector>();
+            services.AddTransient<ITargetFrameworkMonikerFactory, NuGetTargetFrameworkMonikerFactory>();
         }
 
         // TEMPORARY WORKAROUND
