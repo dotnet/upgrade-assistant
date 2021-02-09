@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Steps.Source;
 
 namespace Microsoft.UpgradeAssistant.Steps

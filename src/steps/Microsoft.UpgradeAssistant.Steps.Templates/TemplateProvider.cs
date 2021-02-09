@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Extensions;
 
 namespace Microsoft.UpgradeAssistant.Steps.Templates

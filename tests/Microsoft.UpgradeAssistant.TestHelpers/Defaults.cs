@@ -1,7 +1,6 @@
 ﻿using System.IO;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.TestHelpers
+namespace Microsoft.UpgradeAssistant
 {
     public static class Defaults
     {

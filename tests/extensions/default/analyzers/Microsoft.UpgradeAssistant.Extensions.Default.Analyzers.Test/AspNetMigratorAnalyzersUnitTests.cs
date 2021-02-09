@@ -8,9 +8,9 @@ using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Test;
 using Microsoft.UpgradeAssistant.MSBuild;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestProject;
 
 namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
 {

@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant;
 
 namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
 {

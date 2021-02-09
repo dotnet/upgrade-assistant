@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.TestHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.UpgradeAssistant;
-using Microsoft.UpgradeAssistant.Migrator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
-namespace AspNetMigrator.Test
+namespace Microsoft.UpgradeAssistant.Migrator.Test
 {
     [TestClass]
     public class MigratorTests

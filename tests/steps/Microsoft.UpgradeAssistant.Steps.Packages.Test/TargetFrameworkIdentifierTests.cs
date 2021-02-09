@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.UpgradeAssistant;
-using Microsoft.UpgradeAssistant.Steps.Packages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace AspNetMigrator.Test
+namespace Microsoft.UpgradeAssistant.Steps.Packages.Test
 {
     [TestClass]
     public class TargetFrameworkIdentifierTests

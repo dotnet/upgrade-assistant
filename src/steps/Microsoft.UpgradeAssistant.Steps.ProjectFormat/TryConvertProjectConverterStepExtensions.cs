@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Reporting;
 
 namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat

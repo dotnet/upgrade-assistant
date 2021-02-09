@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
 
-namespace TestProject
+namespace Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public static class TestHelper
     {

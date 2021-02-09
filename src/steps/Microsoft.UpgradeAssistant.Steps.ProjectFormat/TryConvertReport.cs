@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Reporting;
 
 namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat

@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
 namespace Microsoft.UpgradeAssistant.Steps.Source
 {
