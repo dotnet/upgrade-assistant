@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AspNetMigrator.ConfigUpdater\AspNetMigrator.ConfigUpdater.csproj" />
+    <ProjectReference Include="..\..\AspNetMigrator.ConfigUpdater\Microsoft.UpgradeAssistant.Steps.Configuration.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

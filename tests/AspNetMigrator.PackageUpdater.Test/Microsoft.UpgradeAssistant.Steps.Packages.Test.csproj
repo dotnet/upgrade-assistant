@@ -10,10 +10,10 @@
     <PackageReference Include="MSTest.TestAdapter" />
     <PackageReference Include="MSTest.TestFramework" />
     <PackageReference Include="coverlet.collector" />
-    <PackageReference Include="NSubstitute" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.TestHelpers\AspNetMigrator.TestHelpers.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.Migrator\Microsoft.UpgradeAssistant.Migrator.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.PackageUpdater\Microsoft.UpgradeAssistant.Steps.Packages.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.TestHelpers\Microsoft.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

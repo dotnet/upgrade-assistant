@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -16,7 +16,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>AspNetMigrator.Analyzers</Description>
     <PackageReleaseNotes>Initial ASP.NET migration analyzers</PackageReleaseNotes>
-    <Copyright>&#169; Microsoft Corporation. All rights reserved.</Copyright>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageTags>AspNetMigrator.Analyzers, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
 
@@ -24,8 +24,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Analyzers.CodeFixes\Microsoft.UpgradeAssistant.CSharp.CodeFixes.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Analyzers\Microsoft.UpgradeAssistant.CSharp.Analyzers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,8 +34,8 @@
 
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\AspNetMigrator.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\AspNetMigrator.Analyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.UpgradeAssistant.CSharp.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.UpgradeAssistant.CSharp.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 

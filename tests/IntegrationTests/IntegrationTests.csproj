@@ -10,7 +10,7 @@
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AspNetMigrator.Console\AspNetMigrator.ConsoleApp.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.Console\Microsoft.UpgradeAssistant.Console.csproj" />
   </ItemGroup>
   <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
     <PropertyGroup>

@@ -5,69 +5,84 @@ VisualStudioVersion = 16.0.30509.190
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3FC16DAB-215C-422B-9130-61D566695463}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.ConsoleApp", "src\AspNetMigrator.Console\AspNetMigrator.ConsoleApp.csproj", "{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Console", "src\AspNetMigrator.Console\Microsoft.UpgradeAssistant.Console.csproj", "{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Abstractions", "src\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj", "{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Abstractions", "src\AspNetMigrator.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj", "{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{791D5C15-EC26-497C-95F1-9A7C03BE8FF3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		azure-pipelines.yml = azure-pipelines.yml
+		.github\workflows\build.yml = .github\workflows\build.yml
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
 		Directory.Packages.props = Directory.Packages.props
-		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 		GitVersion.yml = GitVersion.yml
 		LICENSE.txt = LICENSE.txt
+		.github\workflows\publish.yml = .github\workflows\publish.yml
 		README.md = README.md
 		rules.ruleset = rules.ruleset
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.TryConvertUpdater", "src\AspNetMigrator.TryConvertUpdater\AspNetMigrator.TryConvertUpdater.csproj", "{9D38A783-B8EE-44C9-825A-DCCCA972FF0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.ProjectFormat", "src\AspNetMigrator.TryConvertUpdater\Microsoft.UpgradeAssistant.Steps.ProjectFormat.csproj", "{9D38A783-B8EE-44C9-825A-DCCCA972FF0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.PackageUpdater", "src\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj", "{18C0711F-2B26-49D8-89AB-F68499A0EB9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.Packages", "src\AspNetMigrator.PackageUpdater\Microsoft.UpgradeAssistant.Steps.Packages.csproj", "{18C0711F-2B26-49D8-89AB-F68499A0EB9B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.SourceUpdater", "src\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj", "{C04E2349-B339-4AEF-89FB-AD8DCD9B117A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.Source", "src\AspNetMigrator.SourceUpdater\Microsoft.UpgradeAssistant.Steps.Source.csproj", "{C04E2349-B339-4AEF-89FB-AD8DCD9B117A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers", "src\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj", "{7176CD56-0822-410E-9318-C3440D24A0BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.CSharp.Analyzers", "src\Analyzers\AspNetMigrator.Analyzers\Microsoft.UpgradeAssistant.CSharp.Analyzers.csproj", "{7176CD56-0822-410E-9318-C3440D24A0BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers.CodeFixes", "src\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj", "{6D52D932-7890-4269-8F05-FDEA6DE45B42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.CSharp.CodeFixes", "src\Analyzers\AspNetMigrator.Analyzers.CodeFixes\Microsoft.UpgradeAssistant.CSharp.CodeFixes.csproj", "{6D52D932-7890-4269-8F05-FDEA6DE45B42}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers.Package", "src\Analyzers\AspNetMigrator.Analyzers.Package\AspNetMigrator.Analyzers.Package.csproj", "{12080E4D-027D-4880-8A94-AA22DCD15F07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Analyzers.Package", "src\Analyzers\AspNetMigrator.Analyzers.Package\Microsoft.UpgradeAssistant.Analyzers.Package.csproj", "{12080E4D-027D-4880-8A94-AA22DCD15F07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Analyzers.Test", "tests\AspNetMigrator.Analyzers.Test\AspNetMigrator.Analyzers.Test.csproj", "{517E6A56-5FFA-4FD0-B645-02C295C968C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Analyzers.Test", "tests\AspNetMigrator.Analyzers.Test\Microsoft.UpgradeAssistant.Analyzers.Test.csproj", "{517E6A56-5FFA-4FD0-B645-02C295C968C3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{2A80B702-C4AB-409F-AFD5-CE7AC809785F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{2A80B702-C4AB-409F-AFD5-CE7AC809785F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.MSBuild", "src\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj", "{EDAC1981-61FC-4030-AA5F-C9A4D054CF00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.MSBuild", "src\AspNetMigrator.MSBuild\Microsoft.UpgradeAssistant.MSBuild.csproj", "{EDAC1981-61FC-4030-AA5F-C9A4D054CF00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.TemplateUpdater", "src\AspNetMigrator.TemplateUpdater\AspNetMigrator.TemplateUpdater.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.Templates", "src\AspNetMigrator.TemplateUpdater\Microsoft.UpgradeAssistant.Steps.Templates.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Solution", "src\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.Solution", "src\AspNetMigrator.Solution\Microsoft.UpgradeAssistant.Steps.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.BackupUpdater", "src\AspNetMigrator.BackupUpdater\AspNetMigrator.BackupUpdater.csproj", "{7A96CCA0-4D47-48C6-A889-B560048E0C16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.Backup", "src\AspNetMigrator.BackupUpdater\Microsoft.UpgradeAssistant.Steps.Backup.csproj", "{7A96CCA0-4D47-48C6-A889-B560048E0C16}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Migrator", "src\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj", "{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Migrator", "src\AspNetMigrator.Migrator\Microsoft.UpgradeAssistant.Migrator.csproj", "{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Migrator.Test", "tests\AspNetMigrator.Migrator.Test\AspNetMigrator.Migrator.Test.csproj", "{90C3DBB8-97BC-4265-B635-1A512CF32C46}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Migrator.Test", "tests\AspNetMigrator.Migrator.Test\Microsoft.UpgradeAssistant.Migrator.Test.csproj", "{90C3DBB8-97BC-4265-B635-1A512CF32C46}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.TestHelpers", "tests\AspNetMigrator.TestHelpers\AspNetMigrator.TestHelpers.csproj", "{358837A0-FA02-42C5-B1B0-327D7CFDAA76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.TestHelpers", "tests\AspNetMigrator.TestHelpers\Microsoft.UpgradeAssistant.TestHelpers.csproj", "{358837A0-FA02-42C5-B1B0-327D7CFDAA76}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "tests\IntegrationTests\IntegrationTests.csproj", "{7AE37670-7570-4EB1-8E66-94DE225CC63E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.PackageUpdater.Test", "tests\AspNetMigrator.PackageUpdater.Test\AspNetMigrator.PackageUpdater.Test.csproj", "{326A3938-5C0B-4280-9175-7E059679731B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.Packages.Test", "tests\AspNetMigrator.PackageUpdater.Test\Microsoft.UpgradeAssistant.Steps.Packages.Test.csproj", "{326A3938-5C0B-4280-9175-7E059679731B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.ConfigUpdater", "src\AspNetMigrator.ConfigUpdater\AspNetMigrator.ConfigUpdater.csproj", "{9F99DC5B-DAD0-4C43-BFFF-8027E4077334}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Steps.Configuration", "src\AspNetMigrator.ConfigUpdater\Microsoft.UpgradeAssistant.Steps.Configuration.csproj", "{9F99DC5B-DAD0-4C43-BFFF-8027E4077334}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConfigUpdaters", "ConfigUpdaters", "{51A868B3-34BD-4620-9CD8-79109914CC30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Extension.Default.ConfigUpdaters", "src\ConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters\Microsoft.UpgradeAssistant.Extension.Default.ConfigUpdaters.csproj", "{D8806C9D-8C2E-4EF3-8016-F3ED83902493}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.DefaultConfigUpdaters", "src\ConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters.csproj", "{D8806C9D-8C2E-4EF3-8016-F3ED83902493}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Portability", "src\AspNetMigrator.Portability\Microsoft.UpgradeAssistant.Portability.csproj", "{ECB0DA5C-3E0C-4C17-9961-019377CA9C50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Portability", "src\AspNetMigrator.Portability\AspNetMigrator.Portability.csproj", "{ECB0DA5C-3E0C-4C17-9961-019377CA9C50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.UpgradeAssistant.Extensions", "src\AspNetMigrator.Extensions\Microsoft.UpgradeAssistant.Extensions.csproj", "{F3C03589-20A5-4D6E-A2C5-4143A11F03B3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetMigrator.Extensions", "src\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj", "{F3C03589-20A5-4D6E-A2C5-4143A11F03B3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cli", "cli", "{72016889-9414-472E-AC99-17B0876B8F06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{AA22EE67-3BBE-49A2-8868-531FE68FE162}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "steps", "steps", "{76CD255A-B5BB-4CB2-91C4-EDEA98C61289}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Default", "Default", "{4D21C152-7EF3-4248-B424-530F7BE51FD3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{DF2E1ED9-DC44-4DD4-B6A1-165304E88118}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{597F6238-6E57-445B-A9A0-3DEB5BD92471}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "steps", "steps", "{3894BAA2-2EBA-4BE0-AEBF-98410AFD198B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tool", "tool", "{7B2C772E-8C8A-4FB3-AB75-D2179FB53866}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -348,30 +363,37 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{9D38A783-B8EE-44C9-825A-DCCCA972FF0B} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{18C0711F-2B26-49D8-89AB-F68499A0EB9B} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{C04E2349-B339-4AEF-89FB-AD8DCD9B117A} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7} = {72016889-9414-472E-AC99-17B0876B8F06}
+		{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42} = {DF2E1ED9-DC44-4DD4-B6A1-165304E88118}
+		{9D38A783-B8EE-44C9-825A-DCCCA972FF0B} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{18C0711F-2B26-49D8-89AB-F68499A0EB9B} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{C04E2349-B339-4AEF-89FB-AD8DCD9B117A} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
 		{7176CD56-0822-410E-9318-C3440D24A0BB} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
 		{6D52D932-7890-4269-8F05-FDEA6DE45B42} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
 		{12080E4D-027D-4880-8A94-AA22DCD15F07} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
-		{517E6A56-5FFA-4FD0-B645-02C295C968C3} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
+		{517E6A56-5FFA-4FD0-B645-02C295C968C3} = {597F6238-6E57-445B-A9A0-3DEB5BD92471}
 		{2A80B702-C4AB-409F-AFD5-CE7AC809785F} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{EDAC1981-61FC-4030-AA5F-C9A4D054CF00} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{7A96CCA0-4D47-48C6-A889-B560048E0C16} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{90C3DBB8-97BC-4265-B635-1A512CF32C46} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
+		{EDAC1981-61FC-4030-AA5F-C9A4D054CF00} = {72016889-9414-472E-AC99-17B0876B8F06}
+		{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB} = {72016889-9414-472E-AC99-17B0876B8F06}
+		{90C3DBB8-97BC-4265-B635-1A512CF32C46} = {7B2C772E-8C8A-4FB3-AB75-D2179FB53866}
 		{358837A0-FA02-42C5-B1B0-327D7CFDAA76} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
-		{7AE37670-7570-4EB1-8E66-94DE225CC63E} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
-		{326A3938-5C0B-4280-9175-7E059679731B} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
-		{9F99DC5B-DAD0-4C43-BFFF-8027E4077334} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{51A868B3-34BD-4620-9CD8-79109914CC30} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{D8806C9D-8C2E-4EF3-8016-F3ED83902493} = {51A868B3-34BD-4620-9CD8-79109914CC30}
-		{ECB0DA5C-3E0C-4C17-9961-019377CA9C50} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{F3C03589-20A5-4D6E-A2C5-4143A11F03B3} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
+		{7AE37670-7570-4EB1-8E66-94DE225CC63E} = {7B2C772E-8C8A-4FB3-AB75-D2179FB53866}
+		{326A3938-5C0B-4280-9175-7E059679731B} = {3894BAA2-2EBA-4BE0-AEBF-98410AFD198B}
+		{9F99DC5B-DAD0-4C43-BFFF-8027E4077334} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{D8806C9D-8C2E-4EF3-8016-F3ED83902493} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
+		{ECB0DA5C-3E0C-4C17-9961-019377CA9C50} = {72016889-9414-472E-AC99-17B0876B8F06}
+		{F3C03589-20A5-4D6E-A2C5-4143A11F03B3} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
+		{72016889-9414-472E-AC99-17B0876B8F06} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{AA22EE67-3BBE-49A2-8868-531FE68FE162} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{76CD255A-B5BB-4CB2-91C4-EDEA98C61289} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{4D21C152-7EF3-4248-B424-530F7BE51FD3} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
+		{DF2E1ED9-DC44-4DD4-B6A1-165304E88118} = {3FC16DAB-215C-422B-9130-61D566695463}
+		{597F6238-6E57-445B-A9A0-3DEB5BD92471} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
+		{3894BAA2-2EBA-4BE0-AEBF-98410AFD198B} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
+		{7B2C772E-8C8A-4FB3-AB75-D2179FB53866} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}
