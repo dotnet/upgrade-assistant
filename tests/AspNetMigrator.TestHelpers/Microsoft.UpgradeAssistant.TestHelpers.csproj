@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

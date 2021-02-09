@@ -13,7 +13,7 @@
     <PackageReference Include="NSubstitute" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.TestHelpers\AspNetMigrator.TestHelpers.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.Migrator\Microsoft.UpgradeAssistant.Migrator.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.TestHelpers\Microsoft.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

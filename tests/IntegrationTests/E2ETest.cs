@@ -12,9 +12,8 @@ namespace IntegrationTests
     [TestClass]
     public class E2ETest
     {
-        // Path relative from .\bin\debug\net5.0
         // TODO : Make this configurable so the test can pass from other working dirs
-        private const string IntegrationTestAssetsPath = @"..\..\..\..\..\tests\TestAssets\IntegrationScenarios";
+        private const string IntegrationTestAssetsPath = "IntegrationScenarios";
         private const string CommandsFileName = "Commands.txt";
         private const string OriginalProjectSubDir = "Original";
         private const string MigratedProjectSubDir = "Migrated";

@@ -80,6 +80,19 @@ If you're just starting to look at .NET Core and would like to understand more a
     2. Check that try-convert is at least version 0.7.157502 or higher).
     3. Check whether the input project imports custom props or targets files. Try-convert doesn't support converting projects that import unknown props and targets files. Look at the output from upgrade-assistant and try-convert to see if any unrecognized imports are mentioned.
 
+## Solution Structure
+
+The structure of projects in the solution is organized into the following categories:
+
+- *analyzers* These are where custom analyzers are added. Analyzers must be separated by language if they are using language-specific syntax and cannot use any Workspace-related types. Code fixers may use workspace, and are thus kept in their own assemblies. This is because they may be hosted in different environments that may not have all language or workspace support.
+- *cli* This folder is for projects that are required for the CLI implementation of the upgrade assistant.
+- *common* This folder is for common assemblies that extensions are expected to use.
+- *components* This folder is for common assemblies that are not to be used in extensions, but may be used by different implementations of the tool.
+- *extensions* This folder is for extensions that provide additional upgrade knowledge to the tool.
+- *steps* This folder contains projects for the different steps that are used. These should only use the abstraction class and should not depend on each other.
+
+A similar structure is mirrored for the tests to identify where each of the tests will be located.
+
 ## Extensibility
 
 ASP.NET Migrator has several extension points that make it easy for users to customize many of the migration steps without having to rebuild the tool. Most of these extension points involve placing binaries or config files in directories next to the tool's location on disk. If you're not sure where the tool is installed (global .NET CLI tools can be hard to find), just run upgrade-assistant against a project and take note of the "context base directory" that's mentioned in the very first logged message. This is the path the tool is running from and the location that all add-on paths are relative to.

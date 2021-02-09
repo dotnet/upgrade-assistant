@@ -9,8 +9,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Extensions\Microsoft.UpgradeAssistant.Extensions.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!-- NuGet package versions need to match those used by MSBuild, so load them from the local MSBuild install -->

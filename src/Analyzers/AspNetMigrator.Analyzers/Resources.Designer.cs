@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AspNetMigrator.Analyzers {
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace AspNetMigrator.Analyzers {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AspNetMigrator.Analyzers.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

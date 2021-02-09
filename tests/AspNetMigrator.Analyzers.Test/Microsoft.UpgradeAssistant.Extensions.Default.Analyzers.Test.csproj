@@ -16,9 +16,9 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
-    <ProjectReference Include="..\..\src\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
-    <ProjectReference Include="..\..\src\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
-    <ProjectReference Include="..\..\src\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
+    <ProjectReference Include="..\..\src\Analyzers\AspNetMigrator.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\Analyzers\AspNetMigrator.Analyzers.CodeFixes\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.SourceUpdater\Microsoft.UpgradeAssistant.Steps.Source.csproj" />
+    <ProjectReference Include="..\..\src\AspNetMigrator.MSBuild\Microsoft.UpgradeAssistant.MSBuild.csproj" />
   </ItemGroup>
 </Project>

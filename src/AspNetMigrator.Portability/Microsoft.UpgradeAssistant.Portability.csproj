@@ -9,6 +9,6 @@
     <PackageReference Include="System.Reactive" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
 </Project>

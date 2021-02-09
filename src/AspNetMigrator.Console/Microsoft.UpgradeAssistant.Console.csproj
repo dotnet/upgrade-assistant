@@ -26,24 +26,24 @@
     <PackageReference Include="System.CommandLine" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AspNetMigrator.Abstractions\AspNetMigrator.Abstractions.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.BackupUpdater\AspNetMigrator.BackupUpdater.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.Migrator\AspNetMigrator.Migrator.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.MSBuild\AspNetMigrator.MSBuild.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.Portability\AspNetMigrator.Portability.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.Solution\AspNetMigrator.Solution.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.TryConvertUpdater\AspNetMigrator.TryConvertUpdater.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.PackageUpdater\AspNetMigrator.PackageUpdater.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.SourceUpdater\AspNetMigrator.SourceUpdater.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.TemplateUpdater\AspNetMigrator.TemplateUpdater.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.BackupUpdater\Microsoft.UpgradeAssistant.Steps.Backup.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Migrator\Microsoft.UpgradeAssistant.Migrator.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.MSBuild\Microsoft.UpgradeAssistant.MSBuild.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Portability\Microsoft.UpgradeAssistant.Portability.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Solution\Microsoft.UpgradeAssistant.Steps.Solution.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.TryConvertUpdater\Microsoft.UpgradeAssistant.Steps.ProjectFormat.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.PackageUpdater\Microsoft.UpgradeAssistant.Steps.Packages.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.SourceUpdater\Microsoft.UpgradeAssistant.Steps.Source.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.TemplateUpdater\Microsoft.UpgradeAssistant.Steps.Templates.csproj" />
     <!-- These projects aren't used directly by this project, but are included here so that they're
          sure to be built prior to copying their binary output into this project's 'SourceUpdaters'
          and 'ConfigUpdaters' directories. -->
-    <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers\AspNetMigrator.Analyzers.csproj" />
-    <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers.CodeFixes\AspNetMigrator.Analyzers.CodeFixes.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.ConfigUpdater\AspNetMigrator.ConfigUpdater.csproj" />
-    <ProjectReference Include="..\ConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters.csproj" />
-    <ProjectReference Include="..\AspNetMigrator.Extensions\AspNetMigrator.Extensions.csproj" />
+    <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\Analyzers\AspNetMigrator.Analyzers.CodeFixes\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.ConfigUpdater\Microsoft.UpgradeAssistant.Steps.Configuration.csproj" />
+    <ProjectReference Include="..\ConfigUpdaters\AspNetMigrator.DefaultConfigUpdaters\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Extensions\Microsoft.UpgradeAssistant.Extensions.csproj" />
   </ItemGroup>
   <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
   <Target Name="MoveUpdatersToUpdatersUpdatersDir" AfterTargets="Build">
@@ -52,8 +52,9 @@
       <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
     </PropertyGroup>
     <ItemGroup>
-      <SourceUpdateFiles Include="$(OutputPath)AspNetMigrator.Analyzers.*" />
-      <ConfigUpdateFiles Include="$(OutputPath)AspNetMigrator.DefaultConfigUpdaters.*" />
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.*" />
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.*" />
+      <ConfigUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.*" />
     </ItemGroup>
     <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
     <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />

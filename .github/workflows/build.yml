@@ -24,7 +24,7 @@ jobs:
       if: github.event.inputs.reason_to_run
       run: echo "${{ github.event.inputs.reason_to_run }}"
     - uses: actions/checkout@v2
-      with: 
+      with:
         fetch-depth: 0
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v1.7.2
@@ -41,11 +41,11 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c ${{ env.buildConfiguration }}
     - name: Test
-      run: dotnet test -c ${{ env.buildConfiguration }}   
+      run: dotnet test -c ${{ env.buildConfiguration }}
     - name: Create tool package
-      run: dotnet pack src/AspNetMigrator.Console/AspNetMigrator.ConsoleApp.csproj -c ${{ env.buildConfiguration }} -o tools/
+      run: dotnet pack src/AspNetMigrator.Console/Microsoft.UpgradeAssistant.Console.csproj -c ${{ env.buildConfiguration }} -o tools/
     - name: Create analyzer package
-      run: dotnet pack src/Analyzers/AspNetMigrator.Analyzers.Package/AspNetMigrator.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o tools/
+      run: dotnet pack src/Analyzers/AspNetMigrator.Analyzers.Package/Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o tools/
     - name: Publish Packages
       uses: actions/upload-artifact@v2
       with:
