@@ -40,10 +40,10 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "AspNetMigrator.BackupUpdater.BackupStep",
+            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Project should be SDK-style before changing package references
-            "AspNetMigrator.TryConvertUpdater.TryConvertProjectConverterStep"
+            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep"
         };
 
         public PackageUpdaterStep(

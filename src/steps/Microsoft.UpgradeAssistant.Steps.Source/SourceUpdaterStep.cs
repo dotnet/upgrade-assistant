@@ -33,10 +33,10 @@ namespace Microsoft.UpgradeAssistant.Steps.Source
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing source
-            "AspNetMigrator.BackupUpdater.BackupStep",
+            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Template files should be added prior to changing source (since some code fixers will change added templates)
-            "AspNetMigrator.TemplateUpdater.TemplateInserterStep"
+            "Microsoft.UpgradeAssistant.Steps.Templates.TemplateInserterStep"
         };
 
         public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)

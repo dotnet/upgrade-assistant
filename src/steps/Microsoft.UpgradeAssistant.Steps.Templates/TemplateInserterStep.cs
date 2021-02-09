@@ -39,10 +39,10 @@ namespace Microsoft.UpgradeAssistant.Steps.Templates
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before adding template files
-            "AspNetMigrator.BackupUpdater.BackupStep",
+            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Project should be SDK-style before adding template files
-            "AspNetMigrator.TryConvertUpdater.TryConvertProjectConverterStep"
+            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep"
         };
 
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)

@@ -28,7 +28,7 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "AspNetMigrator.BackupUpdater.BackupStep"
+            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep"
         };
 
         public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)

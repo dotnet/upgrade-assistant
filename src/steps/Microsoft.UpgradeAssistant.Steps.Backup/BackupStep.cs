@@ -24,7 +24,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Backup
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // The user should select a specific project before backing up (since changes are only made at the project-level)
-            "AspNetMigrator.Solution.SolutionMigrationStep",
+            "Microsoft.UpgradeAssistant.Steps.Solution.SolutionMigrationStep",
         };
 
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)

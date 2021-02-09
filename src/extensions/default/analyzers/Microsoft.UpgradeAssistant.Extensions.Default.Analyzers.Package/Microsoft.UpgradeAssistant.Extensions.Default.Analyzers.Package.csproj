@@ -6,16 +6,16 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageId>AspNetMigrator.Analyzers</PackageId>
-    <Authors>mikerou</Authors>
-    <PackageLicenseUrl>https://dotnetcst.visualstudio.com/_git/AspNetMigrator?path=%2FLICENSE.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://dotnetcst.visualstudio.com/DefaultCollection/AspNetMigrator/_git/AspNetMigrator</PackageProjectUrl>
-    <RepositoryUrl>https://dotnetcst.visualstudio.com/DefaultCollection/AspNetMigrator/_git/AspNetMigrator</RepositoryUrl>
+    <PackageId>Microsoft.UpgradeAssistant.Extensions.Default.Analyzers</PackageId>
+    <Authors>Microsoft</Authors>
+    <PackageLicenseUrl>https://github.com/dotnet/upgrade-assistant/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dotnet/upgrade-assistant</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnet/upgrade-assistant</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>AspNetMigrator.Analyzers</Description>
+    <Description>Analyzers for Microsoft .NET Upgrade Assistant</Description>
     <PackageReleaseNotes>Initial ASP.NET migration analyzers</PackageReleaseNotes>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
-    <PackageTags>AspNetMigrator.Analyzers, analyzers</PackageTags>
+    <PackageTags>Upgrade, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>

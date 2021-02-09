@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
 {
     [TestClass]
-    public class AspNetMigratorAnalyzersUnitTests
+    public class AspNetAnalyzersUnitTests
     {
         private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new()
         {

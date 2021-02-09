@@ -11,7 +11,8 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {
     public class UpgradeAssistantReferenceAnalyzer : IPackageReferencesAnalyzer
     {
-        private const string AnalyzerPackageName = "AspNetMigrator.Analyzers";
+        private const string AnalyzerPackageName = "Microsoft.UpgradeAssistant.Extensions.Default.Analyzers";
+
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<UpgradeAssistantReferenceAnalyzer> _logger;
         private readonly string? _analyzerPackageSource;

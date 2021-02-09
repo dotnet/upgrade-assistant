@@ -19,7 +19,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
     public class HttpContextCurrentCodeFixer : CodeFixProvider
     {
         private const string HttpContextHelperName = "HttpContextHelper";
-        private const string HttpContextHelperResourceName = "AspNetMigrator.Analyzers.Templates.HttpContextHelper.cs";
+        private const string HttpContextHelperResourceName = "Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.Templates.HttpContextHelper.cs";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HttpContextCurrentAnalyzer.DiagnosticId);
 
