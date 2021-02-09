@@ -101,29 +101,9 @@ namespace AspNetMigrator.Solution
             }
         }
 
-        // This method uses different logic before and after an entry point is selected because older netcore/netstandard versions may
-        // be good enough to count as 'completed' for assemblies that are only dependencies of the entry point, but would not be considered complete
-        // if those assemblies *are* the entry point.
-        //
-        // For example, consider a library that targets netcoreapp3.1. If the entry point is a different project that depends on that one,
-        // then it doesn't need to change since the migrated entry point (likely moving to net5.0 or similar) can continue to consume it.
-        // If, on the other hand, the netcoreapp3.1 project is the primary project being migrated (the entry point), then it is *not* complete
-        // because it should upgrade to the current (or LTS) version of netcore.
-        private bool IsCompleted(IMigrationContext context, IProject project)
-        {
-            if (context.EntryPoint?.TargetTFM is not null && !project.FilePath.Equals(context.EntryPoint?.Project.FilePath, StringComparison.OrdinalIgnoreCase))
-            {
-                // Once an entry point is selected, consider dependent projects migrated if they are SDK style
-                // and can be depended on by the entry point.
-                return project.GetFile().IsSdk && _tfmComparer.IsCompatible(context.EntryPoint!.TargetTFM, project.TFM);
-            }
-            else
-            {
-                // If the entry point hasn't been selected yet (or the project being evaluated *is* the entry point),
-                // compare the project's TFM against the TFM it would have if it were the entry point.
-                return project.GetFile().IsSdk && _tfmComparer.IsCompatible(project.TFM, _tfmSelector.SelectTFM(project));
-            }
-        }
+        // Consider a project completely upgraded if it is SDK-style and has a TFM equal to (or greater then) the expected one
+        private bool IsCompleted(IMigrationContext context, IProject project) =>
+            project.GetFile().IsSdk && _tfmComparer.IsCompatible(project.TFM, _tfmSelector.SelectTFM(project));
 
         private async Task<IProject> GetProject(IMigrationContext context, Func<IMigrationContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {

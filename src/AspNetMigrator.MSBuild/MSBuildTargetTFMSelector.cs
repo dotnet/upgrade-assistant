@@ -40,11 +40,20 @@ namespace AspNetMigrator.MSBuild
 
             var tfm = new TargetFrameworkMoniker((project.Style, project.OutputType) switch
             {
+                // Windows desktop apps should target .NET Core with a -windows suffix
                 (ProjectStyle.WindowsDesktop, _) => $"{AppTFMBase}{WindowsSuffix}",
+
+                // WinExe apps should target .NET Core with a -windows suffix
                 (_, ProjectOutputType.WinExe) => $"{AppTFMBase}{WindowsSuffix}",
+
+                // Exes should target .NET Core
                 (_, ProjectOutputType.Exe) => AppTFMBase,
+
+                // Web projects should target .NET Core
                 (ProjectStyle.Web, _) => AppTFMBase,
-                _ => NetStandardTFM
+
+                // Libraries should target .NET Standard - either the version already used or 2.0
+                _ => GetNetStandardTFM(project)
             });
 
             _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfm, project.FilePath, project.Style, project.OutputType);
@@ -68,6 +77,13 @@ namespace AspNetMigrator.MSBuild
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
 
             return tfm;
+        }
+
+        private static string GetNetStandardTFM(IProject project)
+        {
+            var currentTfm = project.TFM;
+
+            return (currentTfm?.IsNetStandard ?? false) ? currentTfm.Name : NetStandardTFM;
         }
     }
 }
