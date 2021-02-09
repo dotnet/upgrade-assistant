@@ -1,5 +1,32 @@
 <Project>
-  <!-- Common properties regarding language version, CA rulesets, output paths, etc. -->
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <PropertyGroup>
+    <Copyright>$(CopyrightNetFoundation)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DotNetBuildFromSource)' == 'true'">
+    <!--    
+      When building using source-build the process is:
+      - Newtonsoft.Json versions 9.0.1 and 12.0.2 are built by source-build
+      - Version 12.0.2 is written to Version.props
+      - Arcade needs to use 9.0.1 so we need to override Version.props value here
+    -->
+    <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DotNetBuildOffline)' == 'true'">
+    <!--
+      Arcade has a special version prop for CodeAnalysis.CSharp in GenFacades
+      to try to match the version loaded by msbuild.  In the offline build, this
+      is simply the source-built version.
+    -->
+    <MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>$(MicrosoftCodeAnalysisCSharpVersion)</MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>
+  </PropertyGroup>
+ <!-- Common properties regarding language version, CA rulesets, output paths, etc. -->
   <PropertyGroup>
     <LangVersion>9.0</LangVersion>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\rules.ruleset</CodeAnalysisRuleSet>
