@@ -37,9 +37,12 @@ namespace AspNetMigrator.MSBuild
             }
         }
 
+        public ITargetFrameworkMonikerFactory TfmFactory { get; }
+
         public MSBuildWorkspaceMigrationContext(
             MigrateOptions options,
             ITargetTFMSelector tfmSelector,
+            ITargetFrameworkMonikerFactory tfmFactory,
             IVisualStudioFinder vsFinder,
             ILogger<MSBuildWorkspaceMigrationContext> logger)
         {
@@ -51,6 +54,7 @@ namespace AspNetMigrator.MSBuild
             _projectCache = new Dictionary<string, UpgradeProjectInfo>(StringComparer.OrdinalIgnoreCase);
             _path = options.ProjectPath;
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
+            TfmFactory = tfmFactory ?? throw new ArgumentNullException(nameof(tfmFactory));
             _logger = logger;
 
             var vsPath = vsFinder.GetLatestVisualStudioPath();

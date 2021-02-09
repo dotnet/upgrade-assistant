@@ -177,7 +177,7 @@ namespace AspNetMigrator.MSBuild
                         .Single(e => e.Name == "TargetFrameworkVersion")
                         .Value;
 
-                    return TargetFrameworkMoniker.ParseNetFxVersion(value);
+                    return Context.TfmFactory.GetTFMForNetFxVersion(value);
                 }
             }
         }

@@ -13,6 +13,7 @@
       <!-- This package is mostly COM definitions which can be loaded in .NET 5 runtime just fine -->
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
+    <PackageReference Include="NuGet.Frameworks" Version="5.8.0" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>
