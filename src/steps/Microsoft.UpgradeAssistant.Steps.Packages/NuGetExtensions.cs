@@ -1,7 +1,6 @@
-﻿using Microsoft.UpgradeAssistant;
-using NuGet.Versioning;
+﻿using NuGet.Versioning;
 
-namespace AspNetMigrator.PackageUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     internal static class NuGetExtensions
     {

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.PackageUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public interface IPackageReferencesAnalyzer
     {

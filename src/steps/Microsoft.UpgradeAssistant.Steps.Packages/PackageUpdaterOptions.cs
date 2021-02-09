@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.PackageUpdater
+﻿namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public class PackageUpdaterOptions
     {

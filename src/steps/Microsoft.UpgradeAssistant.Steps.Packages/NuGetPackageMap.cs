@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.UpgradeAssistant;
 using NuGet.Versioning;
 
-namespace AspNetMigrator.PackageUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public class NuGetPackageMap
     {

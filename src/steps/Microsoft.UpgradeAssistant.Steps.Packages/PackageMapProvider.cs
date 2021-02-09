@@ -8,7 +8,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant.Extensions;
 
-namespace AspNetMigrator.PackageUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public class PackageMapProvider
     {

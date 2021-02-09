@@ -4,9 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.PackageUpdater.Analyzers
+namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {
     public class DuplicateReferenceAnalyzer : IPackageReferencesAnalyzer
     {

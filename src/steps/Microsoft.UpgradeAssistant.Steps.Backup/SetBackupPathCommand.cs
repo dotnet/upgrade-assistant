@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UpgradeAssistant;
 
 namespace Microsoft.UpgradeAssistant.Steps.Backup
 {

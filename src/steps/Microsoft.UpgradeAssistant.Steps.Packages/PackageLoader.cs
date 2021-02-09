@@ -5,14 +5,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 using NuGet.Configuration;
 using NuGet.Packaging;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
-namespace AspNetMigrator.PackageUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public sealed class PackageLoader : IPackageLoader, IDisposable
     {

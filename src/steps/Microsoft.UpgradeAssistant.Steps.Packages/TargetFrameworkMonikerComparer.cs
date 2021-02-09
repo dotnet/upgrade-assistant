@@ -1,9 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 using NuGet.Frameworks;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public class TargetFrameworkMonikerComparer : ITargetFrameworkMonikerComparer
     {

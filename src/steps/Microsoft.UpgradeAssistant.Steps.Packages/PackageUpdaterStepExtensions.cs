@@ -1,10 +1,9 @@
-﻿using AspNetMigrator.PackageUpdater;
-using AspNetMigrator.PackageUpdater.Analyzers;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant;
+using Microsoft.UpgradeAssistant.Steps.Packages;
+using Microsoft.UpgradeAssistant.Steps.Packages.Analyzers;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps
 {
     public static class PackageUpdaterStepExtensions
     {

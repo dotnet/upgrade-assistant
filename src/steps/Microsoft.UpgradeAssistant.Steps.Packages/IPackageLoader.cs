@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UpgradeAssistant;
 using NuGet.Packaging;
 using NuGet.Versioning;
 
-namespace AspNetMigrator.PackageUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public interface IPackageLoader
     {

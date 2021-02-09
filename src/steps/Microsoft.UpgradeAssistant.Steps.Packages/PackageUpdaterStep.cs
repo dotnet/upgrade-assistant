@@ -5,10 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant;
 using NuGet.Configuration;
 
-namespace AspNetMigrator.PackageUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     /// <summary>
     /// Migration step that updates NuGet package references

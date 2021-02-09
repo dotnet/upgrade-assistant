@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 
-namespace AspNetMigrator.PackageUpdater.Analyzers
+namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {
     public class TransitiveReferenceAnalyzer : IPackageReferencesAnalyzer
     {
