@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AspNetMigrator.TestHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UpgradeAssistant;
+using Microsoft.UpgradeAssistant.Migrator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
@@ -17,11 +18,11 @@ namespace AspNetMigrator.Test
         [TestMethod]
         public async Task NegativeTests()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => new Migrator(null!, new NullLogger<Migrator>()));
-            Assert.ThrowsException<ArgumentNullException>(() => new Migrator(GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
+            Assert.ThrowsException<ArgumentNullException>(() => new MigratorManager(null!, new NullLogger<MigratorManager>()));
+            Assert.ThrowsException<ArgumentNullException>(() => new MigratorManager(GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
 
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
-            var migrator = new Migrator(GetOrderer(unknownStep), new NullLogger<Migrator>());
+            var migrator = new MigratorManager(GetOrderer(unknownStep), new NullLogger<MigratorManager>());
             using var context = Substitute.For<IMigrationContext>();
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
@@ -29,7 +30,7 @@ namespace AspNetMigrator.Test
         [TestMethod]
         public async Task MigratorStepsEnumeration()
         {
-            var migrator = new Migrator(GetOrderer(GetMigrationSteps()), new NullLogger<Migrator>());
+            var migrator = new MigratorManager(GetOrderer(GetMigrationSteps()), new NullLogger<MigratorManager>());
 
             var expectedTopLevelStepsAndSubSteps = new[]
             {
@@ -67,7 +68,7 @@ namespace AspNetMigrator.Test
         [DataTestMethod]
         public async Task CompletedStepsAreNotEnumerated(MigrationStep[] steps, string[] expectedSteps)
         {
-            var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
+            var migrator = new MigratorManager(GetOrderer(steps), new NullLogger<MigratorManager>());
             var allSteps = new List<string>();
             using var context = Substitute.For<IMigrationContext>();
 
@@ -88,7 +89,7 @@ namespace AspNetMigrator.Test
             var steps = new MigrationStep[] { new SkippedTestMigrationStep("Step 1"), new FailedTestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") };
             var expectedNextStepId = "Step 2";
 
-            var migrator = new Migrator(GetOrderer(steps), new NullLogger<Migrator>());
+            var migrator = new MigratorManager(GetOrderer(steps), new NullLogger<MigratorManager>());
             using var context = Substitute.For<IMigrationContext>();
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
 

@@ -8,6 +8,7 @@ using AspNetMigrator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant.Migrator;
 
 namespace Microsoft.UpgradeAssistant.Cli
 {
@@ -83,7 +84,7 @@ namespace Microsoft.UpgradeAssistant.Cli
             var contextFactory = scope.ServiceProvider.GetRequiredService<IMigrationContextFactory>();
             var context = await contextFactory.CreateContext(token);
             var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
-            var migrator = scope.ServiceProvider.GetRequiredService<Migrator>();
+            var migrator = scope.ServiceProvider.GetRequiredService<MigratorManager>();
             var stateManager = scope.ServiceProvider.GetRequiredService<IMigrationStateManager>();
 
             await stateManager.LoadStateAsync(context, token);

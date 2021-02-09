@@ -15,6 +15,7 @@ using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.UpgradeAssistant.Migrator;
 using Microsoft.UpgradeAssistant.Steps;
 using Serilog;
 
@@ -128,7 +129,7 @@ namespace Microsoft.UpgradeAssistant.Cli
                     services.AddConfigUpdaterStep();
                     services.AddSourceUpdaterStep();
 
-                    services.AddScoped<Migrator>();
+                    services.AddScoped<MigratorManager>();
                     services.AddTransient<IMigrationStepOrderer, MigrationStepOrderer>();
 
                     serviceConfiguration?.Invoke(context, services);

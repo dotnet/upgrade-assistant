@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AspNetMigrator.Commands;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UpgradeAssistant.Cli.Commands;
+using Microsoft.UpgradeAssistant.Migrator.Commands;
 
 namespace Microsoft.UpgradeAssistant.Cli
 {

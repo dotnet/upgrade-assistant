@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.Commands
+namespace Microsoft.UpgradeAssistant.Migrator.Commands
 {
     public class ExitCommand : MigrationCommand
     {

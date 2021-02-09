@@ -4,17 +4,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Migrator
 {
-    public class Migrator
+    public class MigratorManager
     {
         private readonly IMigrationStepOrderer _orderer;
 
         private ILogger Logger { get; }
 
-        public Migrator(IMigrationStepOrderer orderer, ILogger<Migrator> logger)
+        public MigratorManager(IMigrationStepOrderer orderer, ILogger<MigratorManager> logger)
         {
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));

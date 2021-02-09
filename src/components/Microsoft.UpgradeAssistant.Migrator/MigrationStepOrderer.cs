@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Migrator
 {
     public class MigrationStepOrderer : IMigrationStepOrderer
     {
