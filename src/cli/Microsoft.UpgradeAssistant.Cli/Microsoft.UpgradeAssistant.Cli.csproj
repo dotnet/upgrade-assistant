@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>upgrade-assistant</ToolCommandName>
+    <PackageId>upgrade-assistant</PackageId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ConfigUpdaters\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SourceUpdaters\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Microsoft.UpgradeAssistant.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Backup\Microsoft.UpgradeAssistant.Steps.Backup.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.Migrator\Microsoft.UpgradeAssistant.Migrator.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.MSBuild\Microsoft.UpgradeAssistant.MSBuild.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.Portability\Microsoft.UpgradeAssistant.Portability.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Solution\Microsoft.UpgradeAssistant.Steps.Solution.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.ProjectFormat\Microsoft.UpgradeAssistant.Steps.ProjectFormat.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Packages\Microsoft.UpgradeAssistant.Steps.Packages.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Source\Microsoft.UpgradeAssistant.Steps.Source.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Templates\Microsoft.UpgradeAssistant.Steps.Templates.csproj" />
+    <!-- These projects aren't used directly by this project, but are included here so that they're
+         sure to be built prior to copying their binary output into this project's 'SourceUpdaters'
+         and 'ConfigUpdaters' directories. -->
+    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Configuration\Microsoft.UpgradeAssistant.Steps.Configuration.csproj" />
+    <ProjectReference Include="..\..\extensions\default\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
+    <ProjectReference Include="..\..\extensions\Microsoft.UpgradeAssistant.Extensions\Microsoft.UpgradeAssistant.Extensions.csproj" />
+  </ItemGroup>
+  <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
+  <Target Name="MoveUpdatersToUpdatersUpdatersDir" AfterTargets="Build">
+    <PropertyGroup>
+      <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
+      <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
+    </PropertyGroup>
+    <ItemGroup>
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.*" />
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.*" />
+      <ConfigUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.*" />
+    </ItemGroup>
+    <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
+    <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />
+    <Message Importance="normal" Text="Moving config updaters to $(ConfigUpdateFilePath)" />
+    <Copy SourceFiles="@(ConfigUpdateFiles)" DestinationFolder="$(ConfigUpdateFilePath)" ContinueOnError="true" />
+  </Target>
+  <Target Name="IncludeUpdatersInPublish" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <SourceUpdaterFiles Include="$(OutputPath)SourceUpdaters\**" />
+      <ResolvedFileToPublish Include="@(SourceUpdaterFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>SourceUpdaters\%(SourceUpdaterFiles.Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+      <ConfigUpdaterFiles Include="$(OutputPath)ConfigUpdaters\**" />
+      <ResolvedFileToPublish Include="@(ConfigUpdaterFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>ConfigUpdaters\%(ConfigUpdaterFiles.Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+</Project>

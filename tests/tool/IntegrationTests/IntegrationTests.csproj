@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="MSTest.TestAdapter" />
+    <PackageReference Include="MSTest.TestFramework" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\TestAssets\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\cli\Microsoft.UpgradeAssistant.Cli\Microsoft.UpgradeAssistant.Cli.csproj" />
+  </ItemGroup>
+  <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
+    <PropertyGroup>
+      <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
+      <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
+    </PropertyGroup>
+    <ItemGroup>
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.*" />
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.*" />
+      <ConfigUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.*" />
+    </ItemGroup>
+    <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
+    <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />
+    <Message Importance="normal" Text="Moving config updaters to $(ConfigUpdateFilePath)" />
+    <Copy SourceFiles="@(ConfigUpdateFiles)" DestinationFolder="$(ConfigUpdateFilePath)" ContinueOnError="true" />
+  </Target>
+</Project>

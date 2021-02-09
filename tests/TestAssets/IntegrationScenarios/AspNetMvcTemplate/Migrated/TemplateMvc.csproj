@@ -38,7 +38,7 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Antlr4" Version="4.6.6" />
-    <PackageReference Include="AspNetMigrator.Analyzers" Version="1.0.0">
+    <PackageReference Include="Microsoft.UpgradeAssistant.Extensions.Default.Analyzers" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
