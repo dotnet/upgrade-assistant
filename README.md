@@ -29,7 +29,7 @@ There are two ways to install the ASP.NET Migrator tool:
     1. This approach makes updating the tool easy (`dotnet tool update -g upgrade-assistant --add-source https://upgradeassistant.blob.core.windows.net/feed/index.json`)
     1. Note that if you add the source to [NuGet's configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) you may omit the `--add-source` parameter.
     1. Only released versions will be installed with this command; any prerelease version must be explicitly opted into by adding `--version [desired-version]` to the command.
-1. A 64-bit Windows version of the tool can be downloaded [as a binary](https://mikerou.blob.core.windows.net/shared/AspNetMigrator.zip).
+1. A 64-bit Windows version of the tool can be downloaded [as a binary](https://mikerou.blob.core.windows.net/shared/UpgradeAssistant.zip).
     1. To install the tool, simply download the zip file and extract it.
     1. This is a simple way to retrieve the tool binaries, but doesn't benefit from the .NET CLI's update infrastructure and the .NET CLI will likely need to be present anyhow to install try-convert (as mentioned in the 'prerequisites' section of these instructions).
 
@@ -37,7 +37,7 @@ There are two ways to install the ASP.NET Migrator tool:
 
 ### Running the tool
 
-If you installed the tool using the .NET CLI, it can be run by calling `upgrade-assistant`. Otherwise, it can be run by invoking `AspNetMigrate.Console.exe`.
+If you installed the tool using the .NET CLI, it can be run by calling `upgrade-assistant`. Otherwise, it can be run by invoking `Microsoft.UpgradeAssistant.Cli.exe`.
 
 The usual usage of the tool is: `upgrade-assistant <Path to csproj or sln to migrate>`
 
@@ -51,16 +51,18 @@ Arguments:
   <project>
 
 Options:
-  --skip-backup                      Disables backing up the project. This is not
-                                     recommended unless the project is in source control
-                                     since this tool will make large changes to both the
-                                     project and source files.
-  -v, --verbose                      Enable verbose diagnostics
-  -b, --backup-path <backup-path>    Specifies where the project should be backed up.
-                                     Defaults to a new directory next to the project's
-                                     directory.
-  --version                          Show version information
-  -?, -h, --help                     Show help and usage information
+  --skip-backup                  Disables backing up the project. This is not
+                                 recommended unless the project is in source control
+                                 since this tool will make large changes to both the
+                                 project and source files.
+  -e, --extension <extension>    Specifies a .NET Upgrade Assistant extension package to
+                                 include. This could be an ExtensionManifest.json file,
+                                 a directory containing an ExtensionManifest.json file,
+                                 or a zip archive containing an extension. This option
+                                 can be specified multiple times.
+  -v, --verbose                  Enable verbose diagnostics
+  --version                      Show version information
+  -?, -h, --help                 Show help and usage information
 ```
 
 ### Determining migration feasibility
