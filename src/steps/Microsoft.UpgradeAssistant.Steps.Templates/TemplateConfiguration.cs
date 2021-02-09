@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AspNetMigrator.TemplateUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Templates
 {
     public class TemplateConfiguration
     {

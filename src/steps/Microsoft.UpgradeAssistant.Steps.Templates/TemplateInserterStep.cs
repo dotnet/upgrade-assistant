@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.TemplateUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Templates
 {
     /// <summary>
     /// A migration step that adds files from templates if they're

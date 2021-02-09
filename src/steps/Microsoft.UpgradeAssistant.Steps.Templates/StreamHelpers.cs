@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AspNetMigrator.TemplateUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Templates
 {
     public static class StreamHelpers
     {

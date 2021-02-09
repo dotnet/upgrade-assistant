@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.UpgradeAssistant.Extensions;
 
-namespace AspNetMigrator.TemplateUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Templates
 {
     /// <summary>
     /// Internal type that supplements an ItemSpec with replacements relevant to its template configuration,

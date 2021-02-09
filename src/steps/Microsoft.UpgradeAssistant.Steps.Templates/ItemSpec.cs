@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.TemplateUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Templates
 {
     /// <summary>
     /// An item to be added to a project.

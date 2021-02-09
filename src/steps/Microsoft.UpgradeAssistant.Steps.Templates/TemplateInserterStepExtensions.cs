@@ -1,8 +1,7 @@
-﻿using AspNetMigrator.TemplateUpdater;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UpgradeAssistant;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UpgradeAssistant.Steps.Templates;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps
 {
     public static class TemplateInserterStepExtensions
     {

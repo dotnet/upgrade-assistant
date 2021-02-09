@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.TemplateUpdater
+﻿namespace Microsoft.UpgradeAssistant.Steps.Templates
 {
     public class TemplateInserterOptions
     {
