@@ -15,7 +15,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\cli\Microsoft.UpgradeAssistant.Console\Microsoft.UpgradeAssistant.Cli.csproj" />
+    <ProjectReference Include="..\..\..\src\cli\Microsoft.UpgradeAssistant.Cli\Microsoft.UpgradeAssistant.Cli.csproj" />
   </ItemGroup>
   <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
     <PropertyGroup>
