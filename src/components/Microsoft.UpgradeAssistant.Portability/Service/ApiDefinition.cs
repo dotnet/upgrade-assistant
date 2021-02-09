@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AspNetMigrator.Portability.Service
+namespace Microsoft.UpgradeAssistant.Portability.Service
 {
     public class ApiDefinition
     {

@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.Portability
+﻿namespace Microsoft.UpgradeAssistant.Portability
 {
     internal enum ApiType
     {

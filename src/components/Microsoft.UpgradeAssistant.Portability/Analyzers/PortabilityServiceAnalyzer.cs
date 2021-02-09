@@ -3,10 +3,10 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using AspNetMigrator.Portability.Service;
 using Microsoft.CodeAnalysis;
+using Microsoft.UpgradeAssistant.Portability.Service;
 
-namespace AspNetMigrator.Portability.Analyzers
+namespace Microsoft.UpgradeAssistant.Portability.Analyzers
 {
     internal class PortabilityServiceAnalyzer : IPortabilityAnalyzer
     {
@@ -41,7 +41,7 @@ namespace AspNetMigrator.Portability.Analyzers
                 var semantic = compilation.GetSemanticModel(tree);
                 var root = await tree.GetRootAsync(token).ConfigureAwait(false);
                 var symbols = root.DescendantNodes(_ => true)
-                    .Where(node => node.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.SimpleMemberAccessExpression))
+                    .Where(node => node.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleMemberAccessExpression))
                     .Select(s => semantic.GetSymbolInfo(s).Symbol);
 
                 foreach (var s in symbols)

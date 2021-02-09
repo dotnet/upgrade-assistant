@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace AspNetMigrator.Portability.Service
+namespace Microsoft.UpgradeAssistant.Portability.Service
 {
     public interface IPortabilityService
     {

@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetMigrator.Portability.Service
+namespace Microsoft.UpgradeAssistant.Portability.Service
 {
     public class PortabilityService : IPortabilityService
     {

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Reporting;
 
-namespace AspNetMigrator.Portability
+namespace Microsoft.UpgradeAssistant.Portability
 {
     internal class PortabilityAnalysis : ISectionGenerator
     {

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UpgradeAssistant.Migrator;
+using Microsoft.UpgradeAssistant.Portability;
 using Microsoft.UpgradeAssistant.Steps;
 using Serilog;
 

@@ -1,11 +1,11 @@
-﻿using AspNetMigrator.Portability;
-using AspNetMigrator.Portability.Analyzers;
-using AspNetMigrator.Portability.Service;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.UpgradeAssistant.Portability;
+using Microsoft.UpgradeAssistant.Portability.Analyzers;
+using Microsoft.UpgradeAssistant.Portability.Service;
 using Microsoft.UpgradeAssistant.Reporting;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public static class PortabilityExtensions
     {

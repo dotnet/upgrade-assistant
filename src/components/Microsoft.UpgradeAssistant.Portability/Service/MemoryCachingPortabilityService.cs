@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace AspNetMigrator.Portability.Service
+namespace Microsoft.UpgradeAssistant.Portability.Service
 {
     public class MemoryCachingPortabilityService : IPortabilityService
     {

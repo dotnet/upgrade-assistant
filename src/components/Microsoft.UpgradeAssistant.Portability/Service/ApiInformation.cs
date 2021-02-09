@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Versioning;
 
-namespace AspNetMigrator.Portability.Service
+namespace Microsoft.UpgradeAssistant.Portability.Service
 {
     public class ApiInformation
     {
