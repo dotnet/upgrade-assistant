@@ -84,7 +84,7 @@ namespace Microsoft.UpgradeAssistant.MSBuild
 
                     // If the install was complete and a valid version, consider it.
                     if (state == InstanceState.Complete ||
-                        state.HasFlag(InstanceState.Registered) && state.HasFlag(InstanceState.NoRebootRequired))
+                        (state.HasFlag(InstanceState.Registered) && state.HasFlag(InstanceState.NoRebootRequired)))
                     {
                         var instanceHasMSBuild = false;
 

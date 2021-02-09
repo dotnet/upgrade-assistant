@@ -49,7 +49,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Templates
 
                     // If there was a problem reading the configuration or the configuration only applies to web apps and the
                     // current project isn't a web app, continue to the next config file.
-                    if (templateConfig?.TemplateItems is null || !isWebApp && templateConfig.UpdateWebAppsOnly)
+                    if (templateConfig?.TemplateItems is null || (!isWebApp && templateConfig.UpdateWebAppsOnly))
                     {
                         _logger.LogDebug("Skipping inapplicable template config file {TemplateConfigFile}", configFile);
                         continue;
