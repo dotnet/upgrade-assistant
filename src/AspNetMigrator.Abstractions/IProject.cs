@@ -23,7 +23,7 @@ namespace AspNetMigrator
 
         TargetFrameworkMoniker TFM { get; }
 
-        ProjectStyle Style { get; }
+        ProjectComponents Components { get; }
 
         ProjectOutputType OutputType { get; }
 

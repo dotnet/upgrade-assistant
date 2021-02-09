@@ -173,7 +173,7 @@ namespace AspNetMigrator.TryConvertUpdater
                     return new MigrationStepInitializeResult(
                         MigrationStepStatus.Incomplete,
                         $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project and retarget it to .NET Core/Standard: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectFile.FilePath)}",
-                        project.Style == ProjectStyle.Web ? BuildBreakRisk.High : BuildBreakRisk.Medium);
+                        (project.Components & ProjectComponents.Web) == ProjectComponents.Web ? BuildBreakRisk.High : BuildBreakRisk.Medium);
                 }
                 else
                 {

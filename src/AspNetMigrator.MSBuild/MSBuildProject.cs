@@ -60,42 +60,45 @@ namespace AspNetMigrator.MSBuild
             return ProjectOutputType.Library;
         }
 
-        public ProjectStyle Style => IsSdk
-            ? GetSDKProjectStyle()
-            : GetOldProjectStyle();
+        public ProjectComponents Components => IsSdk
+            ? GetSDKProjectComponents()
+            : GetOldProjectComponents();
 
-        // Gets project style based on SDK, properties, and FrameworkReferences
-        private ProjectStyle GetSDKProjectStyle()
+        // Gets project components based on SDK, properties, and FrameworkReferences
+        private ProjectComponents GetSDKProjectComponents()
         {
+            var components = ProjectComponents.None;
             if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
             {
-                return ProjectStyle.Web;
+                components |= ProjectComponents.Web;
             }
 
             if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
                 GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
                 GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
             {
-                return ProjectStyle.WindowsDesktop;
+                components |= ProjectComponents.WindowsDesktop;
             }
 
             var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
             if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
             {
-                return ProjectStyle.Web;
+                components |= ProjectComponents.Web;
             }
 
             if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
             {
-                return ProjectStyle.WindowsDesktop;
+                components |= ProjectComponents.WindowsDesktop;
             }
 
-            return ProjectStyle.Default;
+            return components;
         }
 
-        // Gets project style based on imports and References
-        private ProjectStyle GetOldProjectStyle()
+        // Gets project components based on imports and References
+        private ProjectComponents GetOldProjectComponents()
         {
+            var components = ProjectComponents.None;
+
             // Check imports and references
             var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
             var references = References.Select(r => r.Name);
@@ -103,16 +106,16 @@ namespace AspNetMigrator.MSBuild
             if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
                 references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
-                return ProjectStyle.Web;
+                components |= ProjectComponents.Web;
             }
 
             if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
                 references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
-                return ProjectStyle.WindowsDesktop;
+                components |= ProjectComponents.WindowsDesktop;
             }
 
-            return ProjectStyle.Default;
+            return components;
         }
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)

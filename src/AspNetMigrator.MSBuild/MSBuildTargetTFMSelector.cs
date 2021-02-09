@@ -38,28 +38,27 @@ namespace AspNetMigrator.MSBuild
                 throw new ArgumentNullException(nameof(project));
             }
 
-            var tfm = new TargetFrameworkMoniker((project.Style, project.OutputType) switch
+            var tfmName = GetNetStandardTFM(project);
+
+            // Projects with web components or an Exe output type should use app TFMs
+            if ((project.Components & ProjectComponents.Web) == ProjectComponents.Web
+                || project.OutputType == ProjectOutputType.Exe)
             {
-                // Windows desktop apps should target .NET Core with a -windows suffix
-                (ProjectStyle.WindowsDesktop, _) => $"{AppTFMBase}{WindowsSuffix}",
+                tfmName = AppTFMBase;
+            }
 
-                // WinExe apps should target .NET Core with a -windows suffix
-                (_, ProjectOutputType.WinExe) => $"{AppTFMBase}{WindowsSuffix}",
+            // Projects with Windows Desktop components or a WinExe output type should use a -windows suffix
+            if ((project.Components & ProjectComponents.WindowsDesktop) == ProjectComponents.WindowsDesktop
+                || project.OutputType == ProjectOutputType.WinExe)
+            {
+                tfmName = $"{AppTFMBase}{WindowsSuffix}";
+            }
 
-                // Exes should target .NET Core
-                (_, ProjectOutputType.Exe) => AppTFMBase,
-
-                // Web projects should target .NET Core
-                (ProjectStyle.Web, _) => AppTFMBase,
-
-                // Libraries should target .NET Standard - either the version already used or 2.0
-                _ => GetNetStandardTFM(project)
-            });
-
-            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfm, project.FilePath, project.Style, project.OutputType);
+            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FilePath, project.Components, project.OutputType);
 
             // If the project depends on another project with a higher version NetCore or NetStandard TFM,
             // use that TFM instead.
+            var tfm = new TargetFrameworkMoniker(tfmName);
             foreach (var dep in project.ProjectReferences)
             {
                 if (_tfmComparer.IsCompatible(tfm, dep.TFM))
