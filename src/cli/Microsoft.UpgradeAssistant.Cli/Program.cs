@@ -33,33 +33,23 @@ namespace Microsoft.UpgradeAssistant.Cli
         {
             ShowHeader();
 
-            var migrateCmd = new Command("migrate")
-            {
-                Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync),
-            };
-
-            migrateCmd.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
-            migrateCmd.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
-            migrateCmd.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
-            migrateCmd.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
-
-            var analyzeCmd = new Command("analyze")
-            {
-                Handler = CommandHandler.Create<MigrateOptions>(RunAnalysisAsync),
-            };
-
-            analyzeCmd.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
-            analyzeCmd.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
-            analyzeCmd.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
-
             var root = new RootCommand
             {
                 // Get name from process so that it will show correctly if run as a .NET CLI tool
                 Name = GetProcessName(),
             };
 
-            root.AddCommand(analyzeCmd);
+#if ANALYZE_COMMAND
+            var migrateCmd = new Command("migrate");
+            ConfigureMigrateCommand(migrateCmd);
             root.AddCommand(migrateCmd);
+
+            var analyzeCmd = new Command("analyze");
+            ConfigureAnalyzeCommand(analyzeCmd);
+            root.AddCommand(analyzeCmd);
+#else
+            ConfigureMigrateCommand(root);
+#endif
 
             return new CommandLineBuilder(root)
                 .UseDefaults()
@@ -182,6 +172,25 @@ namespace Microsoft.UpgradeAssistant.Cli
 
                 Console.Out.WriteLine();
             }
+        }
+
+        private static void ConfigureMigrateCommand(Command command)
+        {
+            command.Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync);
+
+            command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
+            command.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
+            command.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
+            command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+        }
+
+        private static void ConfigureAnalyzeCommand(Command command)
+        {
+            command.Handler = CommandHandler.Create<MigrateOptions>(RunAnalysisAsync);
+
+            command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
+            command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+            command.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
         }
     }
 }
