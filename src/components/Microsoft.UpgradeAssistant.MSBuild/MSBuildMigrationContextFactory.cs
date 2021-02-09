@@ -2,9 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     internal class MSBuildMigrationContextFactory : IMigrationContextFactory
     {

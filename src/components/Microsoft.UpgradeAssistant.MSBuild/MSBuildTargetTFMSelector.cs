@@ -1,9 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     public class MSBuildTargetTFMSelector : ITargetTFMSelector
     {
@@ -83,7 +82,7 @@ namespace AspNetMigrator.MSBuild
         {
             var currentTfm = project.TFM;
 
-            return (currentTfm?.IsNetStandard ?? false) ? currentTfm.Name : NetStandardTFM;
+            return currentTfm?.IsNetStandard ?? false ? currentTfm.Name : NetStandardTFM;
         }
     }
 }

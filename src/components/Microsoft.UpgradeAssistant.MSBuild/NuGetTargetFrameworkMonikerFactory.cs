@@ -1,8 +1,7 @@
 ﻿using System;
-using Microsoft.UpgradeAssistant;
 using NuGet.Frameworks;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     public class NuGetTargetFrameworkMonikerFactory : ITargetFrameworkMonikerFactory
     {

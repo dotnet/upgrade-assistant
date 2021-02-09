@@ -3,12 +3,12 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using AspNetMigrator.MSBuild;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.UpgradeAssistant.MSBuild;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestProject;
 

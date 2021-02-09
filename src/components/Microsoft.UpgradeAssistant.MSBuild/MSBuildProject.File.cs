@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Build.Construction;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : IProjectFile
     {

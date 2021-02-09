@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     internal static class PackageConfig
     {

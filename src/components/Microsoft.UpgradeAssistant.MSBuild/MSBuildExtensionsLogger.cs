@@ -3,19 +3,19 @@ using Microsoft.Build.Framework;
 using Microsoft.Extensions.Logging;
 using ILogger = Microsoft.Build.Framework.ILogger;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     public class MSBuildExtensionsLogger : ILogger
     {
         private const string MSBuildLogPrefix = "[MSBuild] ";
 
-        private readonly Microsoft.Extensions.Logging.ILogger _internalLogger;
+        private readonly Extensions.Logging.ILogger _internalLogger;
 
         public LoggerVerbosity Verbosity { get; set; }
 
         public string? Parameters { get; set; }
 
-        public MSBuildExtensionsLogger(Microsoft.Extensions.Logging.ILogger internalLogger, LoggerVerbosity verbosity)
+        public MSBuildExtensionsLogger(Extensions.Logging.ILogger internalLogger, LoggerVerbosity verbosity)
         {
             _internalLogger = internalLogger ?? throw new ArgumentNullException(nameof(internalLogger));
             Verbosity = verbosity;

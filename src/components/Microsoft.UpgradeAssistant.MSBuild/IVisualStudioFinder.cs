@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.MSBuild
+﻿namespace Microsoft.UpgradeAssistant.MSBuild
 {
     public interface IVisualStudioFinder
     {

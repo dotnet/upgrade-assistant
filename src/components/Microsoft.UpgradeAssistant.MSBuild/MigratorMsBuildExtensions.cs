@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
-using AspNetMigrator.MSBuild;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UpgradeAssistant;
+using Microsoft.UpgradeAssistant.MSBuild;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public static class MigratorMsBuildExtensions
     {

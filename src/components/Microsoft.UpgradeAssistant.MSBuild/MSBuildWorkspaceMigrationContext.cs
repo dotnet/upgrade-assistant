@@ -8,9 +8,8 @@ using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     internal sealed class MSBuildWorkspaceMigrationContext : IMigrationContext, IDisposable
     {

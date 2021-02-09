@@ -5,9 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Execution;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     public class MSBuildPackageRestorer : IPackageRestorer
     {
@@ -58,9 +57,9 @@ namespace AspNetMigrator.MSBuild
 
             var buildParameters = new BuildParameters
             {
-                Loggers = new List<Microsoft.Build.Framework.ILogger>
+                Loggers = new List<Build.Framework.ILogger>
                 {
-                    new MSBuildExtensionsLogger(_logger, Microsoft.Build.Framework.LoggerVerbosity.Normal)
+                    new MSBuildExtensionsLogger(_logger, Build.Framework.LoggerVerbosity.Normal)
                 }
             };
 

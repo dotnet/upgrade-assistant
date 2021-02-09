@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
-using Build = Microsoft.Build.Evaluation;
 
-namespace AspNetMigrator.MSBuild
+using MBuild = Microsoft.Build.Evaluation;
+
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : IProject
     {
@@ -38,7 +38,7 @@ namespace AspNetMigrator.MSBuild
             return Context.GetOrAddProject(project.FilePath).Project;
         });
 
-        public Build.Project Project => Context.ProjectCollection.LoadProject(FilePath);
+        public MBuild.Project Project => Context.ProjectCollection.LoadProject(FilePath);
 
         public ProjectOutputType OutputType =>
             ProjectRoot.Properties.FirstOrDefault(p => p.Name.Equals(MSBuildConstants.OutputTypePropertyName, StringComparison.OrdinalIgnoreCase))?.Value switch
@@ -121,7 +121,7 @@ namespace AspNetMigrator.MSBuild
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
         {
             var items = Project.Items
-                .Where<Build.ProjectItem>(i => i.ItemType.Equals(itemType.Name) && matcher.Match(i.EvaluatedInclude));
+                .Where<MBuild.ProjectItem>(i => i.ItemType.Equals(itemType.Name) && matcher.Match(i.EvaluatedInclude));
 
             foreach (var item in items)
             {

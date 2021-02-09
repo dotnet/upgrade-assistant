@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.MSBuild
+﻿namespace Microsoft.UpgradeAssistant.MSBuild
 {
     internal static class MSBuildConstants
     {

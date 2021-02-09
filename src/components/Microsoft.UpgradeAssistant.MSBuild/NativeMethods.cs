@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Setup.Configuration;
 
-namespace AspNetMigrator.MSBuild
+namespace Microsoft.UpgradeAssistant.MSBuild
 {
     internal static class NativeMethods
     {
