@@ -7,10 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Steps.Configuration;
 
-namespace AspNetMigrator.DefaultConfigUpdaters
+namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
     public class WebNamespaceMigrator : IConfigUpdater
     {
