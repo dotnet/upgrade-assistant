@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.SourceUpdater
+﻿namespace Microsoft.UpgradeAssistant.Steps.Source
 {
     public class SourceUpdaterOptions
     {

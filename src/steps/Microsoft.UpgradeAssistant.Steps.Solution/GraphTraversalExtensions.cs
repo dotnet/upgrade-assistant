@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps.Solution
 {
     internal static class GraphTraversalExtensions
     {

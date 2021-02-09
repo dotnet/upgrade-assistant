@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.Solution
+namespace Microsoft.UpgradeAssistant.Steps.Solution
 {
     public class SolutionMigrationStep : MigrationStep
     {

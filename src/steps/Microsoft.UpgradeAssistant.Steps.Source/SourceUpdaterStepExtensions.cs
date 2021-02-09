@@ -1,8 +1,8 @@
-﻿using AspNetMigrator.SourceUpdater;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UpgradeAssistant;
+using Microsoft.UpgradeAssistant.Steps.Source;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps
 {
     public static class SourceUpdaterStepExtensions
     {

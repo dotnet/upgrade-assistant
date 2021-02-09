@@ -9,7 +9,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator;
-using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +18,8 @@ using Microsoft.UpgradeAssistant.Steps;
 using Microsoft.UpgradeAssistant.Steps.Backup;
 using Microsoft.UpgradeAssistant.Steps.Packages;
 using Microsoft.UpgradeAssistant.Steps.ProjectFormat;
+using Microsoft.UpgradeAssistant.Steps.Solution;
+using Microsoft.UpgradeAssistant.Steps.Source;
 using Serilog;
 
 namespace Microsoft.UpgradeAssistant.Cli

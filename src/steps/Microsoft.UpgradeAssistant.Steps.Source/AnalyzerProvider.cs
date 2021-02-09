@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant.Extensions;
 
-namespace AspNetMigrator.SourceUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Source
 {
     public class AnalyzerProvider
     {

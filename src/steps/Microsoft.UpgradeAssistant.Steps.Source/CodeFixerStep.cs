@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.SourceUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Source
 {
     /// <summary>
     /// Migration step that addresses a particular migration diagnostic with a Roslyn code fixer.
