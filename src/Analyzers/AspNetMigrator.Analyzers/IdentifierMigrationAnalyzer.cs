@@ -31,7 +31,7 @@ namespace AspNetMigrator.Analyzers
             context.RegisterSyntaxNodeAction(AnalyzeIdentifiers, SyntaxKind.IdentifierName);
         }
 
-        protected abstract Diagnostic CreateDiagnostic(Location location, ImmutableDictionary<string, string> properties, params object[] messageArgs);
+        protected abstract Diagnostic CreateDiagnostic(Location location, ImmutableDictionary<string, string?> properties, params object[] messageArgs);
 
         private void AnalyzeIdentifiers(SyntaxNodeAnalysisContext context)
         {
@@ -61,7 +61,7 @@ namespace AspNetMigrator.Analyzers
                 return;
             }
 
-            var properties = ImmutableDictionary.Create<string, string>().Add(NewIdentifierKey, mapping.NewFullName);
+            var properties = ImmutableDictionary.Create<string, string?>().Add(NewIdentifierKey, mapping.NewFullName);
 
             var diagnostic = CreateDiagnostic(identifier.GetLocation(), properties, name, mapping.NewFullName);
             context.ReportDiagnostic(diagnostic);

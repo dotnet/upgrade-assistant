@@ -27,9 +27,15 @@ namespace AspNetMigrator.Analyzers
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+
+            if (root is null)
+            {
+                return;
+            }
+
             var node = root.FindNode(context.Span);
 
-            if (node == null)
+            if (node is null)
             {
                 return;
             }
@@ -46,7 +52,10 @@ namespace AspNetMigrator.Analyzers
         private static async Task<Document> UpdateMemberAccessAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-            var documentRoot = editor.OriginalRoot as CompilationUnitSyntax;
+            if (editor.OriginalRoot is not CompilationUnitSyntax documentRoot)
+            {
+                return document;
+            }
 
             // Replace the member access expression with Debugger.IsAttached
             var newExpression = SyntaxFactory.ParseExpression(DebuggerIsAttachedSyntax)

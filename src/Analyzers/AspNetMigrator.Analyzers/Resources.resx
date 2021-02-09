@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AllowHtmlAttributeDescription" xml:space="preserve">
-    <value>[AllowHtmlAttrubute] should be removed</value>
+    <value>[AllowHtmlAttrubute] should be removed.</value>
   </data>
   <data name="AllowHtmlAttributeMessageFormat" xml:space="preserve">
     <value>Attribute '{0}' should be removed</value>
@@ -127,7 +127,7 @@
     <value>[AllowHtmlAttrubute] should be removed</value>
   </data>
   <data name="FilterDescription" xml:space="preserve">
-    <value>Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core</value>
+    <value>Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core.</value>
   </data>
   <data name="FilterMessageFormat" xml:space="preserve">
     <value>Identifier '{0}' should be replaced with '{1}'</value>
@@ -136,7 +136,7 @@
     <value>Filter types should be used from the Microsoft.AspNetCore.Mvc.Filters namespace</value>
   </data>
   <data name="HelperResultDescription" xml:space="preserve">
-    <value>HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult</value>
+    <value>HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult.</value>
   </data>
   <data name="HelperResultMessageFormat" xml:space="preserve">
     <value>Identifier '{0}' should be replaced with '{1}'</value>
@@ -145,7 +145,7 @@
     <value>HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult</value>
   </data>
   <data name="HtmlHelperDescription" xml:space="preserve">
-    <value>HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper</value>
+    <value>HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper.</value>
   </data>
   <data name="HtmlHelperMessageFormat" xml:space="preserve">
     <value>Identifier '{0}' should be replaced with '{1}'</value>
@@ -154,7 +154,7 @@
     <value>HtmlHelper should be replaced with IHtmlHelper</value>
   </data>
   <data name="HtmlStringDescription" xml:space="preserve">
-    <value>HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
+    <value>HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString.</value>
   </data>
   <data name="HtmlStringMessageFormat" xml:space="preserve">
     <value>Identifier '{0}' should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
@@ -163,7 +163,7 @@
     <value>HtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
   </data>
   <data name="HttpContextCurrentDescription" xml:space="preserve">
-    <value>HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead</value>
+    <value>HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead.</value>
   </data>
   <data name="HttpContextCurrentMessageFormat" xml:space="preserve">
     <value>HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead</value>
@@ -172,7 +172,7 @@
     <value>Do not use HttpContext.Current</value>
   </data>
   <data name="HttpContextDebuggingEnabledDescription" xml:space="preserve">
-    <value>HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached</value>
+    <value>HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached.</value>
   </data>
   <data name="HttpContextDebuggingEnabledMessageFormat" xml:space="preserve">
     <value>HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached</value>
@@ -181,7 +181,7 @@
     <value>HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached</value>
   </data>
   <data name="ResultTypeDescription" xml:space="preserve">
-    <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core</value>
+    <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core.</value>
   </data>
   <data name="ResultTypeMessageFormat" xml:space="preserve">
     <value>Identifier '{0}' should be replaced with '{1}'</value>
@@ -190,7 +190,7 @@
     <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace</value>
   </data>
   <data name="UrlHelperDescription" xml:space="preserve">
-    <value>UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper</value>
+    <value>UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper.</value>
   </data>
   <data name="UrlHelperMessageFormat" xml:space="preserve">
     <value>Identifier '{0}' should be replaced with '{1}'</value>
@@ -200,6 +200,9 @@
   </data>
   <data name="UsingSystemDeployment" xml:space="preserve">
     <value>System.Deployment is not supported on .NET Core</value>
+  </data>
+  <data name="UsingSystemDeploymentDescription" xml:space="preserve">
+    <value>System.Deployment is not supported on .NET Core.</value>
   </data>
   <data name="UsingSystemWebDescription" xml:space="preserve">
     <value>ASP.NET Core projects should not reference System.Web or OWIN namespaces.</value>

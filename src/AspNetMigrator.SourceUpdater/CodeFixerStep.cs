@@ -83,7 +83,7 @@ namespace AspNetMigrator.SourceUpdater
             while (Diagnostics.Any())
             {
                 // Iterate through the first diagnostic from each document
-                foreach (var diagnostic in Diagnostics.GroupBy(d => d.Location.SourceTree.FilePath).Select(g => g.First()))
+                foreach (var diagnostic in Diagnostics.GroupBy(d => d.Location.SourceTree?.FilePath).Select(g => g.First()))
                 {
                     var doc = _sourceUpdater.Project.GetRoslynProject().GetDocument(diagnostic.Location.SourceTree)!;
                     var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);

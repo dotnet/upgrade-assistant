@@ -61,7 +61,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [AllowHtmlAttrubute] should be removed.
+        ///   Looks up a localized string similar to [AllowHtmlAttrubute] should be removed..
         /// </summary>
         internal static string AllowHtmlAttributeDescription {
             get {
@@ -88,7 +88,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core.
+        ///   Looks up a localized string similar to Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core..
         /// </summary>
         internal static string FilterDescription {
             get {
@@ -115,7 +115,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult.
+        ///   Looks up a localized string similar to HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult..
         /// </summary>
         internal static string HelperResultDescription {
             get {
@@ -142,7 +142,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper.
+        ///   Looks up a localized string similar to HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper..
         /// </summary>
         internal static string HtmlHelperDescription {
             get {
@@ -169,7 +169,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString.
+        ///   Looks up a localized string similar to HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString..
         /// </summary>
         internal static string HtmlStringDescription {
             get {
@@ -196,7 +196,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead.
+        ///   Looks up a localized string similar to HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead..
         /// </summary>
         internal static string HttpContextCurrentDescription {
             get {
@@ -223,7 +223,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached.
+        ///   Looks up a localized string similar to HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached..
         /// </summary>
         internal static string HttpContextDebuggingEnabledDescription {
             get {
@@ -250,7 +250,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core.
+        ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core..
         /// </summary>
         internal static string ResultTypeDescription {
             get {
@@ -277,7 +277,7 @@ namespace AspNetMigrator.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper.
+        ///   Looks up a localized string similar to UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper..
         /// </summary>
         internal static string UrlHelperDescription {
             get {
@@ -309,6 +309,15 @@ namespace AspNetMigrator.Analyzers {
         internal static string UsingSystemDeployment {
             get {
                 return ResourceManager.GetString("UsingSystemDeployment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System.Deployment is not supported on .NET Core..
+        /// </summary>
+        internal static string UsingSystemDeploymentDescription {
+            get {
+                return ResourceManager.GetString("UsingSystemDeploymentDescription", resourceCulture);
             }
         }
         

@@ -5,6 +5,7 @@
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\rules.ruleset</CodeAnalysisRuleSet>
     <WarningLevel>4</WarningLevel>
     <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(GitVersion_AssemblySemVer)' != '' ">

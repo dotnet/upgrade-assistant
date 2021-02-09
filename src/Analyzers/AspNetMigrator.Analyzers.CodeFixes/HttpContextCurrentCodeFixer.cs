@@ -31,9 +31,15 @@ namespace AspNetMigrator.Analyzers
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+
+            if (root is null)
+            {
+                return;
+            }
+
             var node = root.FindNode(context.Span, false, true);
 
-            if (node == null)
+            if (node is null)
             {
                 return;
             }
@@ -47,7 +53,7 @@ namespace AspNetMigrator.Analyzers
                 context.Diagnostics);
         }
 
-        private static async Task<Solution?> ReplaceHttpContextCurrentAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private static async Task<Solution> ReplaceHttpContextCurrentAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var project = document.Project;
 
@@ -62,7 +68,7 @@ namespace AspNetMigrator.Analyzers
 
             if (httpContextHelperClass is null)
             {
-                return null;
+                return document.Project.Solution;
             }
 
             var slnEditor = new SolutionEditor(project.Solution);
@@ -71,7 +77,7 @@ namespace AspNetMigrator.Analyzers
             var startup = project.Documents.FirstOrDefault(d => d.Name.Equals("Startup.cs", StringComparison.OrdinalIgnoreCase));
             if (startup is null)
             {
-                return null;
+                return document.Project.Solution;
             }
 
             var startupDocEditor = await slnEditor.GetDocumentEditorAsync(startup.Id, cancellationToken).ConfigureAwait(false);
@@ -98,6 +104,11 @@ namespace AspNetMigrator.Analyzers
             foreach (var document in project.Documents)
             {
                 var syntaxRoot = await document.GetSyntaxRootAsync().ConfigureAwait(false);
+
+                if (syntaxRoot is null)
+                {
+                    continue;
+                }
 
                 // Find all classes named "HttpContextHelper"
                 var candidateClasses = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>().Where(c => c.Identifier.ToString().Equals(HttpContextHelperName, StringComparison.Ordinal));
@@ -131,11 +142,18 @@ namespace AspNetMigrator.Analyzers
 
             // Add AddHttpContextAccessor call if needed
             var configureServicesMethod = documentRoot.GetMethodDeclaration("ConfigureServices", "IServiceCollection");
-            var serviceCollectionParameter = configureServicesMethod?.ParameterList.Parameters.FirstOrDefault(p => p.Type.ToString().Equals("IServiceCollection", StringComparison.Ordinal));
+            var serviceCollectionParameter = configureServicesMethod?.ParameterList.Parameters
+                .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IServiceCollection", StringComparison.Ordinal));
 
             if (configureServicesMethod != null && serviceCollectionParameter != null)
             {
                 var configureServicesBody = configureServicesMethod.Body;
+
+                if (configureServicesBody is null)
+                {
+                    return;
+                }
+
                 var addHttpContextAccessorStatement = ParseStatement($"{serviceCollectionParameter.Identifier}.AddHttpContextAccessor();")
                     .WithWhitespaceTriviaFrom(configureServicesBody.Statements.First());
 
@@ -148,19 +166,24 @@ namespace AspNetMigrator.Analyzers
 
             // Add Initialize call in Configure method
             var configureMethod = documentRoot.GetMethodDeclaration("Configure", "IApplicationBuilder");
-            var appBuilderParameter = configureMethod?.ParameterList.Parameters.FirstOrDefault(p => p.Type.ToString().Equals("IApplicationBuilder", StringComparison.Ordinal));
+            var appBuilderParameter = configureMethod?.ParameterList.Parameters
+                .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IApplicationBuilder", StringComparison.Ordinal));
 
             if (configureMethod != null && appBuilderParameter != null)
             {
                 var configureMethodBody = configureMethod.Body;
-                var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());")
-                    .WithWhitespaceTriviaFrom(configureMethodBody.Statements.First());
 
-                // Check whether the statement already exists
-                if (!configureMethodBody.Statements.Any(s => initializeStatement.IsEquivalentTo(s)))
+                if (configureMethodBody is not null)
                 {
-                    var updatedMethodBody = configureMethodBody.WithStatements(configureMethodBody.Statements.Insert(0, initializeStatement));
-                    documentRoot = documentRoot.ReplaceNode(configureMethodBody, updatedMethodBody);
+                    var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());")
+                        .WithWhitespaceTriviaFrom(configureMethodBody.Statements.First());
+
+                    // Check whether the statement already exists
+                    if (!configureMethodBody.Statements.Any(s => initializeStatement.IsEquivalentTo(s)))
+                    {
+                        var updatedMethodBody = configureMethodBody.WithStatements(configureMethodBody.Statements.Insert(0, initializeStatement));
+                        documentRoot = documentRoot.ReplaceNode(configureMethodBody, updatedMethodBody);
+                    }
                 }
             }
 
