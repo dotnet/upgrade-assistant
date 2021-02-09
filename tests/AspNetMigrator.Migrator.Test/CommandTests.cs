@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AspNetMigrator.Commands;
 using AspNetMigrator.TestHelpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
 
 namespace AspNetMigrator.Test
 {
@@ -18,7 +19,7 @@ namespace AspNetMigrator.Test
             Assert.ThrowsException<ArgumentNullException>(() => new ExitCommand(null!));
 
             // Applying before intialization throws
-            using var context = TestHelpers.GetTestContext();
+            using var context = Substitute.For<IMigrationContext>();
             var step = new TestMigrationStep(string.Empty);
             var command = new ApplyNextCommand(step);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await command.ExecuteAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
@@ -27,7 +28,7 @@ namespace AspNetMigrator.Test
         [TestMethod]
         public async Task ApplyNextCommandAppliesSteps()
         {
-            using var context = TestHelpers.GetTestContext();
+            using var context = Substitute.For<IMigrationContext>();
             var stepTitle = "Test step!";
             var step = new TestMigrationStep(stepTitle);
             var command = new ApplyNextCommand(step);
@@ -57,7 +58,7 @@ namespace AspNetMigrator.Test
         [TestMethod]
         public async Task FailedStepsAreNotApplied()
         {
-            using var context = TestHelpers.GetTestContext();
+            using var context = Substitute.For<IMigrationContext>();
             var stepTitle = "Failed test step!";
             var step = new FailedTestMigrationStep(stepTitle);
             var command = new ApplyNextCommand(step);
@@ -79,7 +80,7 @@ namespace AspNetMigrator.Test
         [TestMethod]
         public async Task SkipNextCommandSkips()
         {
-            using var context = TestHelpers.GetTestContext();
+            using var context = Substitute.For<IMigrationContext>();
             var stepTitle = "Test step!";
             var step = new TestMigrationStep(stepTitle);
             var command = new SkipNextCommand(step);
@@ -104,7 +105,7 @@ namespace AspNetMigrator.Test
         [TestMethod]
         public async Task ExitCommandExits()
         {
-            using var context = TestHelpers.GetTestContext();
+            using var context = Substitute.For<IMigrationContext>();
             var exitCalled = false;
             var command = new ExitCommand(() => exitCalled = true);
 
