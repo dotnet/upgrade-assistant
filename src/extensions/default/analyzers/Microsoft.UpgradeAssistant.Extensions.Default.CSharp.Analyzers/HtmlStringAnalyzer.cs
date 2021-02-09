@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
-namespace AspNetMigrator.Analyzers
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class HtmlStringAnalyzer : IdentifierMigrationAnalyzer

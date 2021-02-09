@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace AspNetMigrator.Analyzers
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     /// <summary>
     /// Base class analyzer for identifying usage of APIs that should be replaced with other APIs.

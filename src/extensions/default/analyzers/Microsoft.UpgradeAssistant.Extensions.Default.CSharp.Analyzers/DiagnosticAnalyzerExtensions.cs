@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace AspNetMigrator.Analyzers
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     internal static class DiagnosticAnalyzerExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AspNetMigrator.Analyzers
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     public class IdentifierMapping
     {

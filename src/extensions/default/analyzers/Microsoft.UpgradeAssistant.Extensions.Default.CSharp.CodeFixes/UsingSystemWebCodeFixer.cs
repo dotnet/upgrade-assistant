@@ -5,8 +5,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
-namespace AspNetMigrator.Analyzers
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM001 CodeFix Provider")]
     public class UsingSystemWebCodeFixer : CodeFixProvider

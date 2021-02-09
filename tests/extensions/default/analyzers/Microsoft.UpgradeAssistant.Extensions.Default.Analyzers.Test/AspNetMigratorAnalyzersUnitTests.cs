@@ -12,7 +12,7 @@ using Microsoft.UpgradeAssistant.MSBuild;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestProject;
 
-namespace AspNetMigrator.Analyzers.Test
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
 {
     [TestClass]
     public class AspNetMigratorAnalyzersUnitTests

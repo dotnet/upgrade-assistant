@@ -1,8 +1,9 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
-namespace AspNetMigrator.Analyzers
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM009 CodeFix Provider")]
     public class HelperResultCodeFixer : IdentifierMigrationCodeFixer

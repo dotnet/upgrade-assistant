@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AspNetMigrator.Analyzers {
+namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes {
     using System;
     
     

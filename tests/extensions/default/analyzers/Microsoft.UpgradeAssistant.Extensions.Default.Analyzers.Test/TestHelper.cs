@@ -5,12 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
+using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
 
 namespace TestProject
 {
