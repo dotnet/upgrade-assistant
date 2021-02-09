@@ -87,6 +87,7 @@ The structure of projects in the solution is organized into the following catego
 - *analyzers* These are where custom analyzers are added. Analyzers must be separated by language if they are using language-specific syntax and cannot use any Workspace-related types. Code fixers may use workspace, and are thus kept in their own assemblies. This is because they may be hosted in different environments that may not have all language or workspace support.
 - *cli* This folder is for projects that are required for the CLI implementation of the upgrade assistant.
 - *common* This folder is for common assemblies that extensions are expected to use.
+- *components* This folder is for common assemblies that are not to be used in extensions, but may be used by different implementations of the tool.
 - *extensions* This folder is for extensions that provide additional upgrade knowledge to the tool.
 - *steps* This folder contains projects for the different steps that are used. These should only use the abstraction class and should not depend on each other.
 
