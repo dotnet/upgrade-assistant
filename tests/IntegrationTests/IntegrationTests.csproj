@@ -12,14 +12,20 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AspNetMigrator.Console\Microsoft.UpgradeAssistant.Console.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\TestAssets\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
     <PropertyGroup>
       <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
       <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
     </PropertyGroup>
     <ItemGroup>
-      <SourceUpdateFiles Include="$(OutputPath)AspNetMigrator.Analyzers.*" />
-      <ConfigUpdateFiles Include="$(OutputPath)AspNetMigrator.DefaultConfigUpdaters.*" />
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.*" />
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.*" />
+      <ConfigUpdateFiles Include="$(OutputPath)Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.*" />
     </ItemGroup>
     <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
     <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />

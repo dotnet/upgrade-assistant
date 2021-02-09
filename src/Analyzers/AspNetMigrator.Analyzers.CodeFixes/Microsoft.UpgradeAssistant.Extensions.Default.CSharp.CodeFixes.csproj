@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
-    <ProjectReference Include="..\AspNetMigrator.Analyzers\Microsoft.UpgradeAssistant.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\AspNetMigrator.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Templates\*.cs" />

@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.UpgradeAssistant.CSharp.Analyzers;
+using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
 namespace AspNetMigrator.Analyzers
 {
