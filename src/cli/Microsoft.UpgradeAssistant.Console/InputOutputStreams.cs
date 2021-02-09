@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace AspNetMigrator.ConsoleApp
+namespace Microsoft.UpgradeAssistant.Cli
 {
     public record InputOutputStreams(TextReader Input, TextWriter Output);
 }

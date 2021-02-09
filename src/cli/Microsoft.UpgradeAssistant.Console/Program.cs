@@ -8,17 +8,17 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator;
 using AspNetMigrator.BackupUpdater;
 using AspNetMigrator.PackageUpdater;
 using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.UpgradeAssistant;
 using Microsoft.UpgradeAssistant.Steps;
 using Serilog;
 
-namespace AspNetMigrator.ConsoleApp
+namespace Microsoft.UpgradeAssistant.Cli
 {
     public class Program
     {

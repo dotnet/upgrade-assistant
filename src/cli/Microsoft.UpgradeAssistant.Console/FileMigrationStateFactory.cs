@@ -5,9 +5,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.ConsoleApp
+namespace Microsoft.UpgradeAssistant.Cli
 {
     public class FileMigrationStateFactory : IMigrationStateManager
     {

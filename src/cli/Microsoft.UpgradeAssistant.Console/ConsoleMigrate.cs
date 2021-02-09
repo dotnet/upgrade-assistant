@@ -4,12 +4,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.ConsoleApp
+namespace Microsoft.UpgradeAssistant.Cli
 {
     // TODO : Eventually, this may need to be localized and pull strings from resources, etc.
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
@@ -162,7 +162,7 @@ namespace AspNetMigrator.ConsoleApp
                 // (since that would mean future steps shouldn't show "[Next step]")
                 WriteStepStatus(step, step == currentStep);
                 _io.Output.WriteLine(step.Title);
-                nextStepFound = nextStepFound || (step.Status != MigrationStepStatus.Complete);
+                nextStepFound = nextStepFound || step.Status != MigrationStepStatus.Complete;
 
                 ShowMigrationSteps(step.SubSteps, currentStep, offset + 1);
             }

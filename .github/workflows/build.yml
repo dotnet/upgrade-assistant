@@ -43,7 +43,7 @@ jobs:
     - name: Test
       run: dotnet test -c ${{ env.buildConfiguration }}
     - name: Create tool package
-      run: dotnet pack src/AspNetMigrator.Console/Microsoft.UpgradeAssistant.Console.csproj -c ${{ env.buildConfiguration }} -o tools/
+      run: dotnet pack src/AspNetMigrator.Console/Microsoft.UpgradeAssistant.Cli.csproj -c ${{ env.buildConfiguration }} -o tools/
     - name: Create analyzer package
       run: dotnet pack src/Analyzers/AspNetMigrator.Analyzers.Package/Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o tools/
     - name: Publish Packages

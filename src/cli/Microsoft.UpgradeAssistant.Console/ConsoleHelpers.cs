@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace AspNetMigrator.ConsoleApp
+namespace Microsoft.UpgradeAssistant.Cli
 {
     public static class ConsoleHelpers
     {

@@ -10,12 +10,12 @@
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\cli\Microsoft.UpgradeAssistant.Console\Microsoft.UpgradeAssistant.Console.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\TestAssets\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\cli\Microsoft.UpgradeAssistant.Console\Microsoft.UpgradeAssistant.Cli.csproj" />
   </ItemGroup>
   <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
     <PropertyGroup>

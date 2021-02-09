@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace AspNetMigrator.ConsoleApp
+namespace Microsoft.UpgradeAssistant.Cli
 {
     public static class Constants
     {

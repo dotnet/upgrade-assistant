@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.ConsoleApp.Commands
+namespace Microsoft.UpgradeAssistant.Cli.Commands
 {
     public class SeeMoreDetailsCommand : MigrationCommand
     {

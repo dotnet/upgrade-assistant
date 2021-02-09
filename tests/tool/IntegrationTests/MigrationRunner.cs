@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator;
-using AspNetMigrator.ConsoleApp;
 using AspNetMigrator.PackageUpdater;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UpgradeAssistant;
+using Microsoft.UpgradeAssistant.Cli;
 
 namespace IntegrationTests
 {

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AspNetMigrator.Commands;
-using AspNetMigrator.ConsoleApp.Commands;
 using Microsoft.Extensions.Hosting;
-using Microsoft.UpgradeAssistant;
+using Microsoft.UpgradeAssistant.Cli.Commands;
 
-namespace AspNetMigrator.ConsoleApp
+namespace Microsoft.UpgradeAssistant.Cli
 {
     public class CommandProvider
     {

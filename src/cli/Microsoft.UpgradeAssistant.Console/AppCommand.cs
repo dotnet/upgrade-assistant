@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.ConsoleApp
+﻿namespace Microsoft.UpgradeAssistant.Cli
 {
     public enum AppCommand
     {

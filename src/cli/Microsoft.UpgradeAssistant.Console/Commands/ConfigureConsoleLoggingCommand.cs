@@ -2,9 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.ConsoleApp.Commands
+namespace Microsoft.UpgradeAssistant.Cli.Commands
 {
     public class ConfigureConsoleLoggingCommand : MigrationCommand
     {

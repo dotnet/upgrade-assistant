@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.ConsoleApp
+﻿namespace Microsoft.UpgradeAssistant.Cli
 {
     /// <summary>
     /// Gives a suggestion to the calling code about how to format a message displayed to the user.

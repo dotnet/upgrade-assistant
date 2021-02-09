@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Cli
 {
     public class LogSettings
     {
