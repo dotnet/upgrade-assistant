@@ -1,5 +1,6 @@
 ﻿using AspNetMigrator.SourceUpdater;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator
 {

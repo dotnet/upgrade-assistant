@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public readonly struct ProjectItemMatcher
     {

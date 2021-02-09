@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Commands;
 using AspNetMigrator.TestHelpers;
+using Microsoft.UpgradeAssistant;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 

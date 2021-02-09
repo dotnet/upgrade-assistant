@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator
+﻿namespace Microsoft.UpgradeAssistant
 {
     public record UpgradeProjectInfo(IProject Project, TargetFrameworkMoniker TargetTFM);
 }

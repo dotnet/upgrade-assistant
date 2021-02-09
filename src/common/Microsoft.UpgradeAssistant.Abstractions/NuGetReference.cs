@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public record NuGetReference(string Name, string Version)
     {

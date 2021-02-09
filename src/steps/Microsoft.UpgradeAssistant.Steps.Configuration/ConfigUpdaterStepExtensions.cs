@@ -1,5 +1,4 @@
-﻿using AspNetMigrator;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UpgradeAssistant.Steps.Configuration;
 
 namespace Microsoft.UpgradeAssistant.Steps

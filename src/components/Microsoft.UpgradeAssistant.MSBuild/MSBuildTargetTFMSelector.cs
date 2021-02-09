@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.MSBuild
 {

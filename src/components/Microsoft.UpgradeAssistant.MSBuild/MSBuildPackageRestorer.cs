@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Execution;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.MSBuild
 {

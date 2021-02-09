@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.TestHelpers
 {

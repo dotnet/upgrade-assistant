@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator;
 
 namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AspNetMigrator.Commands;
 using AspNetMigrator.ConsoleApp.Commands;
 using Microsoft.Extensions.Hosting;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.ConsoleApp
 {

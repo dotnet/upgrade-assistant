@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public interface IProject
     {

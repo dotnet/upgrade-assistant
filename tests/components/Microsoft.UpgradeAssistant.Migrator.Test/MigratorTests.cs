@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.TestHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.UpgradeAssistant;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     [Flags]
     public enum ProjectComponents

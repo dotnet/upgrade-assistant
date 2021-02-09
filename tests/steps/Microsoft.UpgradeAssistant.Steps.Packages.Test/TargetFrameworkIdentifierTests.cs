@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.UpgradeAssistant;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AspNetMigrator.Test

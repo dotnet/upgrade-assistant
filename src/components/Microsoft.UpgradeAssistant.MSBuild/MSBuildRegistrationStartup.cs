@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.MSBuild
 {

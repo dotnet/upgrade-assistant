@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.MSBuild
 {

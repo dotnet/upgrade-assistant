@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Build.Construction;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.MSBuild
 {

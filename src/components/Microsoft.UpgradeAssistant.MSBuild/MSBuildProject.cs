@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.UpgradeAssistant;
 using Build = Microsoft.Build.Evaluation;
 
 namespace AspNetMigrator.MSBuild

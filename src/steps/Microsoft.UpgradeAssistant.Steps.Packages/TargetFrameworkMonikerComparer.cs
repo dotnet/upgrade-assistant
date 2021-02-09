@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant;
 using NuGet.Frameworks;
 
 namespace AspNetMigrator

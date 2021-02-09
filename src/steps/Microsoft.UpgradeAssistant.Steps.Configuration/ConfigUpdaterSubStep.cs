@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetMigrator;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.UpgradeAssistant.Steps.Configuration

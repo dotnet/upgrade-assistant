@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public interface ICollectUserInput
     {

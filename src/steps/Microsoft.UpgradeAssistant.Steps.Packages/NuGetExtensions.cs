@@ -1,4 +1,5 @@
-﻿using NuGet.Versioning;
+﻿using Microsoft.UpgradeAssistant;
+using NuGet.Versioning;
 
 namespace AspNetMigrator.PackageUpdater
 {

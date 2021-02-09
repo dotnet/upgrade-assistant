@@ -8,6 +8,7 @@ using AspNetMigrator;
 using AspNetMigrator.ConsoleApp;
 using AspNetMigrator.PackageUpdater;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UpgradeAssistant;
 
 namespace IntegrationTests
 {

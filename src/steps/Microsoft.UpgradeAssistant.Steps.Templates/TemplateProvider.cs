@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNetMigrator.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant;
 
 namespace AspNetMigrator.TemplateUpdater
 {

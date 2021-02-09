@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator
+﻿namespace Microsoft.UpgradeAssistant
 {
     public enum MigrationStepStatus
     {

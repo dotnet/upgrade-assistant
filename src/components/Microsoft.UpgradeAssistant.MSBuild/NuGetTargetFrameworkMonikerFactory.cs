@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.UpgradeAssistant;
 using NuGet.Frameworks;
 
 namespace AspNetMigrator.MSBuild

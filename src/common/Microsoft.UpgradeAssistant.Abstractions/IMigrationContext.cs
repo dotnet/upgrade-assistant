@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public interface IMigrationContext : IDisposable
     {

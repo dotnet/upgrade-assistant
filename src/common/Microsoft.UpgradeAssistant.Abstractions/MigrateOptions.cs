@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public class MigrateOptions
     {

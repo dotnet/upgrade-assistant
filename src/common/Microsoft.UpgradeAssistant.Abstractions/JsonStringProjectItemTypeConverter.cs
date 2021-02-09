@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant
 {
     public class JsonStringProjectItemTypeConverter : JsonConverter<ProjectItemType>
     {
