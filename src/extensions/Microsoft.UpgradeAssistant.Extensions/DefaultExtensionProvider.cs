@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetMigrator.Extensions
+namespace Microsoft.UpgradeAssistant.Extensions
 {
     public class DefaultExtensionProvider : IExtensionProvider
     {

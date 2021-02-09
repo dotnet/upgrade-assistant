@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace AspNetMigrator.Extensions
+namespace Microsoft.UpgradeAssistant.Extensions
 {
     public interface IExtensionProvider
     {

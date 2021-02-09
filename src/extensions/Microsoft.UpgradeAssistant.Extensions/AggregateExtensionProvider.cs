@@ -6,7 +6,7 @@ using System.Linq;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetMigrator.Extensions
+namespace Microsoft.UpgradeAssistant.Extensions
 {
     public class AggregateExtensionProvider : IExtensionProvider
     {
@@ -24,7 +24,7 @@ namespace AspNetMigrator.Extensions
         {
             if (extensionProviders is null)
             {
-                 throw new ArgumentNullException(nameof(extensionProviders));
+                throw new ArgumentNullException(nameof(extensionProviders));
             }
 
             _optionMappers = new Dictionary<Type, Mapper>();

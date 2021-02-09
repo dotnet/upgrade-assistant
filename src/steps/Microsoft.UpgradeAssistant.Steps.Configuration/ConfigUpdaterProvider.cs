@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using AspNetMigrator.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant.Extensions;
 
 namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {

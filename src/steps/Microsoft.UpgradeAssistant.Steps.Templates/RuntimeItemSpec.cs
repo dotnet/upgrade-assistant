@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using AspNetMigrator.Extensions;
+using Microsoft.UpgradeAssistant.Extensions;
 
 namespace AspNetMigrator.TemplateUpdater
 {

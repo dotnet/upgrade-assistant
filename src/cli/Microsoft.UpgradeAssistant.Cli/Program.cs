@@ -15,6 +15,7 @@ using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.UpgradeAssistant.Extensions;
 using Microsoft.UpgradeAssistant.Migrator;
 using Microsoft.UpgradeAssistant.Steps;
 using Serilog;

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AspNetMigrator.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Extensions
 {
     public static class ExtensionProviderExtensions
     {
@@ -20,7 +19,7 @@ namespace AspNetMigrator
         public static IServiceCollection AddExtensions(this IServiceCollection services, string? extensionPathString, IEnumerable<string> extensionPaths)
         {
             var pathsFromString = extensionPathString?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
-            return AddExtensions(services, pathsFromString.Concat(extensionPaths));
+            return services.AddExtensions(pathsFromString.Concat(extensionPaths));
         }
 
         /// <summary>
