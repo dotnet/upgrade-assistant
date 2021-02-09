@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.BackupUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Backup
 {
     public class BackupStep : MigrationStep
     {
@@ -38,7 +38,7 @@ namespace AspNetMigrator.BackupUpdater
                 throw new ArgumentNullException(nameof(collectBackupPathFromUser));
             }
 
-            Commands.Insert(0, new SetBackupPathCommand(() => _backupPath, collectBackupPathFromUser.AskUserAsync, (string? newPath) =>
+            Commands.Insert(0, new SetBackupPathCommand(() => _backupPath, collectBackupPathFromUser.AskUserAsync, (newPath) =>
             {
                 _backupPath = newPath;
             }));

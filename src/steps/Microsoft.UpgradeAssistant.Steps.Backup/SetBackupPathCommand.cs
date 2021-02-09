@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UpgradeAssistant;
 
-namespace AspNetMigrator.BackupUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Backup
 {
     public class SetBackupPathCommand : MigrationCommand
     {
