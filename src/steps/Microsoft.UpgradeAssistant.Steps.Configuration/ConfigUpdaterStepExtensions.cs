@@ -1,7 +1,8 @@
-﻿using AspNetMigrator.ConfigUpdater;
+﻿using AspNetMigrator;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UpgradeAssistant.Steps.Configuration;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps
 {
     public static class ConfigUpdaterStepExtensions
     {

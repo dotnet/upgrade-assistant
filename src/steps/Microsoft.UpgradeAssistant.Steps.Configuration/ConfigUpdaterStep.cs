@@ -5,9 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetMigrator.ConfigUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterStep : MigrationStep
     {

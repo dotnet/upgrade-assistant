@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace AspNetMigrator
+namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {
     public class AppSettingsFile
     {

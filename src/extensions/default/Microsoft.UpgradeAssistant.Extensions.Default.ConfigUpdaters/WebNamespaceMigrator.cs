@@ -6,8 +6,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
-using AspNetMigrator.ConfigUpdater;
 using Microsoft.Extensions.Logging;
+using Microsoft.UpgradeAssistant.Steps.Configuration;
 
 namespace AspNetMigrator.DefaultConfigUpdaters
 {

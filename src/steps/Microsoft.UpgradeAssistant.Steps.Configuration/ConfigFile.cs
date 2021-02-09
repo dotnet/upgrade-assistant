@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace AspNetMigrator.ConfigUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigFile
     {

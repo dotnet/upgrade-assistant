@@ -1,4 +1,4 @@
-﻿namespace AspNetMigrator.ConfigUpdater
+﻿namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterOptions
     {

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
+using AspNetMigrator;
 
-namespace AspNetMigrator.ConfigUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {
     public interface IConfigUpdater
     {

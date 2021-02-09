@@ -7,7 +7,7 @@ using AspNetMigrator.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace AspNetMigrator.ConfigUpdater
+namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterProvider
     {

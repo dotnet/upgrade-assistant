@@ -14,6 +14,7 @@ using AspNetMigrator.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.UpgradeAssistant.Steps;
 using Serilog;
 
 namespace AspNetMigrator.ConsoleApp
