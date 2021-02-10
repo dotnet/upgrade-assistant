@@ -2,8 +2,11 @@
 <Project>
   <PropertyGroup>
     <!-- This repo version -->
-    <VersionPrefix>0.2.0</VersionPrefix>
-    <PreReleaseVersionLabel>beta</PreReleaseVersionLabel>
+    <MajorVersion>0</MajorVersion>
+    <MinorVersion>2</MinorVersion>
+    <!-- Build release-only package. -->
+    <PreReleaseVersionLabel />
+    
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
     <!-- Libs -->
