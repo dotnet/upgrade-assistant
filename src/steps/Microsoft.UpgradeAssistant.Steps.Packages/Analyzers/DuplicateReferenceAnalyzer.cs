@@ -18,7 +18,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
+        public Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
         {
             if (references is null)
             {

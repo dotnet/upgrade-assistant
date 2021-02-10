@@ -16,6 +16,6 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages
         /// <param name="references">The NuGet package references to analyze.</param>
         /// <param name="state">The current analysis state which will be updated and returned.</param>
         /// <returns>The analysis state object provided updated based on this analyzer's analysis.</returns>
-        Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token);
+        Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token);
     }
 }

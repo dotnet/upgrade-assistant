@@ -187,7 +187,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages
                 return false;
             }
 
-            var packageReferences = projectRoot.PackageReferences;
+            var packageReferences = new PackageCollection(projectRoot.PackageReferences);
 
             // Iterate through all package references in the project file
             foreach (var analyzer in _packageAnalyzers)

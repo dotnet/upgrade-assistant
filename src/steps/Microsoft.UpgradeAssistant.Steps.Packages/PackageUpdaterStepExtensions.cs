@@ -15,6 +15,7 @@ namespace Microsoft.UpgradeAssistant.Steps
             services.AddTransient<IPackageReferencesAnalyzer, PackageMapReferenceAnalyzer>();
             services.AddTransient<IPackageReferencesAnalyzer, TargetCompatibilityReferenceAnalyzer>();
             services.AddTransient<IPackageReferencesAnalyzer, UpgradeAssistantReferenceAnalyzer>();
+            services.AddTransient<IPackageReferencesAnalyzer, WindowsCompatReferenceAnalyzer>();
 
             services.AddSingleton<PackageMapProvider>();
             services.AddSingleton<ITargetFrameworkMonikerComparer, TargetFrameworkMonikerComparer>();
