@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NuGet.Versioning;
 
 namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {

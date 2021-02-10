@@ -8,17 +8,29 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages
 {
     public class PackageCollection : IEnumerable<NuGetReference>
     {
-        private readonly Dictionary<string, NuGetReference> _packages;
+        public ILookup<string, NuGetReference> Packages { get; }
 
         public PackageCollection(IEnumerable<NuGetReference> packages)
         {
-            _packages = packages.ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
+            // In the rare case a package is referenced more than once, only track the highest version
+            Packages = packages.ToLookup(p => p.Name);
         }
 
         public bool TryGetPackageByName(string packageName, [MaybeNullWhen(false)] out NuGetReference nugetReference)
-            => _packages.TryGetValue(packageName, out nugetReference);
+        {
+            var matches = Packages[packageName].OrderByDescending(p => p.GetNuGetVersion());
 
-        public IEnumerator<NuGetReference> GetEnumerator() => _packages.Values.GetEnumerator();
+            if (!matches.Any())
+            {
+                nugetReference = null;
+                return false;
+            }
+
+            nugetReference = matches.First();
+            return true;
+        }
+
+        public IEnumerator<NuGetReference> GetEnumerator() => Packages.SelectMany(g => g).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

@@ -184,6 +184,7 @@ namespace Microsoft.UpgradeAssistant.Cli
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
         }
 
+#if ANALYZE_COMMAND
         private static void ConfigureAnalyzeCommand(Command command)
         {
             command.Handler = CommandHandler.Create<MigrateOptions>(RunAnalysisAsync);
@@ -192,5 +193,6 @@ namespace Microsoft.UpgradeAssistant.Cli
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
             command.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
         }
+#endif
     }
 }

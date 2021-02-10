@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,18 +29,15 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))
+            // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
+            foreach (var duplicates in references.Packages.Where(g => g.Count() > 1))
             {
-                // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
-                var highestVersion = references
-                    .Where(r => r.Name.Equals(packageReference.Name, StringComparison.OrdinalIgnoreCase))
-                    .Select(r => r.GetNuGetVersion())
-                    .Max();
-                if (highestVersion > packageReference.GetNuGetVersion())
+                var highestVersion = duplicates.Select(p => p.GetNuGetVersion()).Max();
+
+                foreach (var package in duplicates.Where(p => p.GetNuGetVersion() != highestVersion))
                 {
-                    _logger.LogInformation("Marking package {NuGetPackage} for removal because it is referenced elsewhere in the project with a higher version", packageReference);
-                    state.PackagesToRemove.Add(packageReference);
-                    continue;
+                    _logger.LogInformation("Marking package {NuGetPackage} for removal because it is referenced elsewhere in the project with a higher version", package);
+                    state.PackagesToRemove.Add(package);
                 }
             }
 

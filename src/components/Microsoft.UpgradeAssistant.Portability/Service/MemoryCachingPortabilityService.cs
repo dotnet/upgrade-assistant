@@ -8,7 +8,7 @@ namespace Microsoft.UpgradeAssistant.Portability.Service
     public class MemoryCachingPortabilityService : IPortabilityService
     {
         private readonly IPortabilityService _other;
-        private Dictionary<string, ApiInformation> _cache;
+        private readonly Dictionary<string, ApiInformation> _cache;
 
         public MemoryCachingPortabilityService(IPortabilityService other)
         {
