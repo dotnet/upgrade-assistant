@@ -76,7 +76,7 @@ stages:
             value: /p:SignType=$(_SignType)
         strategy:
           matrix:
-           Debug:
+            Debug:
               _BuildConfig: Debug
             Release:
               _BuildConfig: Release
