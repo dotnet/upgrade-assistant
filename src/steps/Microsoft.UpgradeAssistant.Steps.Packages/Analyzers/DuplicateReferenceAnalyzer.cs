@@ -30,11 +30,11 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
-            foreach (var duplicates in references.DuplicatePackages)
+            foreach (var duplicates in references.Packages.Where(g => g.Count() > 1))
             {
-                var highestVersion = duplicates.Value.Select(p => p.GetNuGetVersion()).Max();
+                var highestVersion = duplicates.Select(p => p.GetNuGetVersion()).Max();
 
-                foreach (var package in duplicates.Value.Where(p => p.GetNuGetVersion() != highestVersion))
+                foreach (var package in duplicates.Where(p => p.GetNuGetVersion() != highestVersion))
                 {
                     _logger.LogInformation("Marking package {NuGetPackage} for removal because it is referenced elsewhere in the project with a higher version", package);
                     state.PackagesToRemove.Add(package);
