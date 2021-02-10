@@ -39,7 +39,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: ./cibuild.cmd -c ${{ env.buildConfiguration }} /p:OfficialBuild=true
+      run: ./build.cmd -ci -c ${{ env.buildConfiguration }} /p:OfficialBuild=true
     - name: Test
       run: dotnet test -c ${{ env.buildConfiguration }}
     - name: Publish Packages
