@@ -33,7 +33,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
             _analyzerPackageVersion = updaterOptions.Value.MigrationAnalyzersPackageVersion;
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IEnumerable<NuGetReference> references, PackageAnalysisState state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
         {
             if (references is null)
             {
