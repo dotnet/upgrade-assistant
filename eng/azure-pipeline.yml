@@ -36,7 +36,6 @@ stages:
       enablePublishTestResults: true
       enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
       enableTelemetry: true
-      helixRepo: dotnet/standard
       jobs:
       - job: Windows_NT
         pool:
