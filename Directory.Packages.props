@@ -24,7 +24,6 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="2.3.2262-g94fae01e" />
     <PackageVersion Include="Moq" Version="4.16.0" />
     <PackageVersion Include="MSTest.TestAdapter" Version="2.1.1" />

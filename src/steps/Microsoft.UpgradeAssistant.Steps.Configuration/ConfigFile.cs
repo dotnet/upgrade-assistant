@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Xml.Linq;
 
 namespace Microsoft.UpgradeAssistant.Steps.Configuration
 {
@@ -6,7 +7,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Configuration
     {
         public ConfigFile(string path)
         {
-            Path = path ?? throw new System.ArgumentNullException(nameof(path));
+            Path = path ?? throw new ArgumentNullException(nameof(path));
             Contents = XDocument.Load(path, LoadOptions.SetLineInfo);
         }
 
