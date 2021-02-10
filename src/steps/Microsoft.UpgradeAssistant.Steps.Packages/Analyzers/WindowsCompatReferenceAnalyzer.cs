@@ -40,7 +40,6 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-            // If the package is referenced transitively, mark for removal
             if (state.IsTransitivelyAvailable(new NuGetReference(PackageName, latestVersion.ToString())))
             {
                 _logger.LogInformation("{PackageName} already referenced transitively", PackageName);
