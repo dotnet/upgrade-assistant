@@ -67,7 +67,14 @@ namespace Microsoft.UpgradeAssistant.Cli
 
                 var selectedCommandText = result.AsSpan().Trim(" .\t");
 
-                if (int.TryParse(selectedCommandText, out var selectedCommandIndex))
+                if (selectedCommandText.IsEmpty)
+                {
+                    if (possible.TryGetValue(1, out var defaultSelected))
+                    {
+                        return Task.FromResult(defaultSelected);
+                    }
+                }
+                else if (int.TryParse(selectedCommandText, out var selectedCommandIndex))
                 {
                     if (possible.TryGetValue(selectedCommandIndex, out var selected))
                     {
