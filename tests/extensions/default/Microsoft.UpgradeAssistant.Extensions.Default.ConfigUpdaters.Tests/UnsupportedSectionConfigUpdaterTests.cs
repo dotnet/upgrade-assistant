@@ -77,7 +77,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
 </configuration>";
             var after = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
-    <!-- system.diagnostics section is not supported on .NET 5 -->
+    <!-- system.diagnostics section is not supported on .NET 5 (see https://github.com/dotnet/runtime/issues/23937)-->
     <!--<system.diagnostics />-->
 </configuration>";
 
@@ -89,7 +89,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
             Assert.IsTrue(isApplied);
 
-            Assert.AreEqual(after, GetContents(configFile));
+            AssertConfigEquals(configFile, after);
         }
 
         [TestMethod]
@@ -106,7 +106,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
 </configuration>";
             var after = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
-    <!-- system.diagnostics section is not supported on .NET 5 -->
+    <!-- system.diagnostics section is not supported on .NET 5 (see https://github.com/dotnet/runtime/issues/23937)-->
     <!--<system.diagnostics>
   <child />
 </system.diagnostics>-->
@@ -120,7 +120,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
             Assert.IsTrue(isApplied);
 
-            Assert.AreEqual(after, GetContents(configFile));
+            AssertConfigEquals(configFile, after);
         }
 
         private static ConfigFile CreateFile(string contents)
@@ -132,7 +132,12 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             return new ConfigFile(path);
         }
 
-        private static string GetContents(ConfigFile file)
-            => File.ReadAllText(file.Path);
+        private static void AssertConfigEquals(ConfigFile actualConfig, string expected)
+        {
+            var actual = File.ReadAllText(actualConfig.Path).Replace("\r", string.Empty);
+            expected = expected.Replace("\r", string.Empty);
+
+            Assert.AreEqual(actual, expected);
+        }
     }
 }
