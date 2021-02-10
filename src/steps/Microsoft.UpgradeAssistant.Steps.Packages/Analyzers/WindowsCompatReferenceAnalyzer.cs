@@ -9,43 +9,50 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
     {
         private const string PackageName = "Microsoft.Windows.Compatibility";
 
-        private readonly NuGetVersion _version;
         private readonly ILogger<WindowsCompatReferenceAnalyzer> _logger;
+        private readonly IPackageLoader _loader;
 
-        public WindowsCompatReferenceAnalyzer(ILogger<WindowsCompatReferenceAnalyzer> logger)
+        public WindowsCompatReferenceAnalyzer(ILogger<WindowsCompatReferenceAnalyzer> logger, IPackageLoader loader)
         {
-            _version = NuGetVersion.Parse("5.0.2");
             _logger = logger;
+            _loader = loader;
         }
 
         public string Name => "Windows Compatibility Pack Analyzer";
 
-        public Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
         {
             if (!state.CurrentTFM.IsWindows)
             {
-                return Task.FromResult(state);
+                return state;
+            }
+
+            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, false, null, token);
+
+            if (latestVersion is null)
+            {
+                _logger.LogWarning("Could not find {PackageName}", latestVersion);
+                return state;
             }
 
             if (references.TryGetPackageByName(PackageName, out var existing))
             {
                 var version = existing.GetNuGetVersion();
 
-                if (version >= _version)
+                if (version >= latestVersion)
                 {
-                    _logger.LogInformation("Already contains {PackageName} {Version}", PackageName, version);
-
-                    return Task.FromResult(state);
+                    return state;
                 }
 
                 state.PackagesToRemove.Add(existing);
             }
 
-            _logger.LogInformation("Adding {PackageName} {Version}", PackageName, _version);
+            var versionToAdd = latestVersion.ToNormalizedString();
+            _logger.LogInformation("Adding {PackageName} {Version}", PackageName, versionToAdd);
 
-            state.PackagesToAdd.Add(new NuGetReference(PackageName, _version.OriginalVersion));
+            state.PackagesToAdd.Add(new NuGetReference(PackageName, versionToAdd));
 
-            return Task.FromResult(state);
+            return state;
         }
     }
 }
