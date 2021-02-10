@@ -7,12 +7,6 @@ variables:
     value: true
   - name: _DotNetArtifactsCategory
     value: .NETCore
-  - ${{ if and(eq(variables.PoolProvider, ''), eq(variables['System.TeamProject'], 'public')) }}:
-    - name: PoolProvider
-      value: NetCorePublic-Pool
-  - ${{ if and(ne(variables.PoolProvider, ''), ne(variables['System.TeamProject'], 'public')) }}:
-    - name: PoolProvider
-      value: NetCoreInternal-Pool
 
 trigger:
   batch: true
@@ -39,10 +33,11 @@ stages:
       jobs:
       - job: Windows_NT
         pool:
-          name: ${{ variables.PoolProvider }} # This is a queue-time parameter; Public default is NetCorePublic-Pool; Internal default is NetCoreInternal-Pool
           ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+            name: NetCorePublic-Pool
             queue: buildpool.windows.10.amd64.vs2019.pre.open
           ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+            name: NetCoreInternal-Pool
             queue: buildpool.windows.10.amd64.vs2019
         variables:
         # Enable signing for internal, non-PR builds
