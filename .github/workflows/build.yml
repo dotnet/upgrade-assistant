@@ -39,16 +39,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore -c ${{ env.buildConfiguration }}
+      run: ./cibuild.cmd /p:OfficialBuild=true
     - name: Test
       run: dotnet test -c ${{ env.buildConfiguration }}
-    - name: Create tool package
-      run: dotnet pack src/cli/Microsoft.UpgradeAssistant.Cli/Microsoft.UpgradeAssistant.Cli.csproj -c ${{ env.buildConfiguration }} -o tools/
-    - name: Create analyzer package
-      run: dotnet pack src/extensions/default/analyzers/Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Package/Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Package.csproj -c ${{ env.buildConfiguration }} -o tools/
     - name: Publish Packages
       uses: actions/upload-artifact@v2
       with:
           name: tools
-          path: tools/*
+          path: artifacts/packages/Release/Shipping/*
 
