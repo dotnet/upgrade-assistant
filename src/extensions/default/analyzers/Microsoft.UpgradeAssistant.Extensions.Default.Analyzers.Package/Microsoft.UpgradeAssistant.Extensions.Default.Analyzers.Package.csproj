@@ -2,13 +2,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsPackable>true</IsPackable>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Microsoft.UpgradeAssistant.Extensions.Default.Analyzers</PackageId>
     <Authors>Microsoft</Authors>
-    <PackageLicenseUrl>https://github.com/dotnet/upgrade-assistant/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/dotnet/upgrade-assistant</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dotnet/upgrade-assistant</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
