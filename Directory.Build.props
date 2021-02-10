@@ -35,11 +35,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(GitVersion_AssemblySemVer)' != '' ">
-    <InformationalVersion>$(GitVersion_InformationalVersion)</InformationalVersion>
-    <FileVersion>$(GitVersion_MajorMinorPatch)</FileVersion>
-    <AssemblyVersion>$(GitVersion_AssemblySemVer)</AssemblyVersion>
-    <Version>$(GitVersion_NuGetVersionV2)</Version>
+  <PropertyGroup Condition=" '$(GitVersion_PreReleaseNumber)' != '' ">
+    <OfficialBuildId>$([System.DateTime]::Now.ToString(yyyyMMdd)).$(GitVersion_PreReleaseNumber)</OfficialBuildId>
   </PropertyGroup>
 
   <!-- Treat warnings as errors in release builds, so that all warnings

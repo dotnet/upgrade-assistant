@@ -90,3 +90,5 @@ PublishScripts/
 !.vscode/launch.json
 !.vscode/extensions.json
 launchSettings.json
+
+.packages/
