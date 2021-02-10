@@ -1,6 +1,12 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using NuGet.Frameworks;
+using NuGet.Packaging.Core;
+using NuGet.ProjectModel;
+using NuGet.Versioning;
 
 namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {
@@ -31,6 +37,13 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
             if (latestVersion is null)
             {
                 _logger.LogWarning("Could not find {PackageName}", latestVersion);
+                return state;
+            }
+
+            // If the package is referenced transitively, mark for removal
+            if (state.IsTransitivelyAvailable(new NuGetReference(PackageName, latestVersion.ToString())))
+            {
+                _logger.LogInformation("{PackageName} already referenced transitively", PackageName);
                 return state;
             }
 
