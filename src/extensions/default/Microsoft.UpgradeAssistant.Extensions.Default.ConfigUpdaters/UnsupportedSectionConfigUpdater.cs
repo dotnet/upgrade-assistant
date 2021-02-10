@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,10 +45,10 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             {
                 var updated = false;
 
-                foreach (var section in GetUnsupportedSections(configFile))
+                foreach (var (section, issue) in GetUnsupportedSections(configFile))
                 {
                     section.ReplaceWith(
-                        new XComment($" {section.Name} section is not supported on .NET 5 "),
+                        new XComment($" {section.Name} section is not supported on .NET 5 (see {issue})"),
                         new XComment(section.ToString()));
                     updated = true;
                 }
@@ -61,6 +59,8 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
                     using var writer = XmlWriter.Create(configFile.Path, _settings);
                     configFile.Contents.WriteTo(writer);
+
+                    _logger.LogInformation("Configuration file {Path} has been updated", configFile.Path);
                 }
             }
 
@@ -80,7 +80,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             return Task.FromResult(false);
         }
 
-        private IEnumerable<XElement> GetUnsupportedSections(ConfigFile file)
+        private IEnumerable<(XElement Section, string Issue)> GetUnsupportedSections(ConfigFile file)
         {
             var configuration = file.Contents.Element("configuration");
 
@@ -96,7 +96,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 if (section is not null)
                 {
                     _logger.LogInformation("{SectionName} is not supported in .NET 5. See {IssueLink} for details. For now, it will be disabled.", name, issue);
-                    yield return section;
+                    yield return (section, issue);
                 }
             }
         }
