@@ -12,7 +12,7 @@ namespace Microsoft.UpgradeAssistant.Portability.Service
 {
     public class PortabilityService : IPortabilityService
     {
-        private static readonly Uri _url = new Uri("/api/fxapi", UriKind.Relative);
+        private static readonly Uri Url = new("/api/fxapi", UriKind.Relative);
 
         private readonly HttpClient _client;
         private readonly ILogger<PortabilityService> _logger;
@@ -36,7 +36,7 @@ namespace Microsoft.UpgradeAssistant.Portability.Service
 
             message.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
-            using var response = await _client.PostAsync(_url, message, token).ConfigureAwait(false);
+            using var response = await _client.PostAsync(Url, message, token).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
