@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.UpgradeAssistant.Steps.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using Xunit;
 
 namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
 {
-    [TestClass]
     public class UnsupportedSectionConfigUpdaterTests
     {
-        [TestMethod]
+        [Fact]
         public async Task NoConfig()
         {
             var context = Substitute.For<IMigrationContext>();
@@ -25,13 +18,13 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var updater = new UnsupportedSectionConfigUpdater(logger);
 
             var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create<ConfigFile>(), default);
-            Assert.IsFalse(isAvailable);
+            Assert.False(isAvailable);
 
             var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create<ConfigFile>(), default);
-            Assert.IsFalse(isApplied);
+            Assert.False(isApplied);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SingleConfigNoConfigSection()
         {
             var context = Substitute.For<IMigrationContext>();
@@ -42,13 +35,13 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var configFile = CreateFile(config);
 
             var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsFalse(isAvailable);
+            Assert.False(isAvailable);
 
             var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsFalse(isApplied);
+            Assert.False(isApplied);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SingleConfigHasConfigSection()
         {
             var context = Substitute.For<IMigrationContext>();
@@ -59,13 +52,13 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var configFile = CreateFile(config);
 
             var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsFalse(isAvailable);
+            Assert.False(isAvailable);
 
             var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsFalse(isApplied);
+            Assert.False(isApplied);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SingleConfigHasSystemDiagnosticsSection()
         {
             var context = Substitute.For<IMigrationContext>();
@@ -84,15 +77,15 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var configFile = CreateFile(config);
 
             var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsTrue(isAvailable);
+            Assert.True(isAvailable);
 
             var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsTrue(isApplied);
+            Assert.True(isApplied);
 
             AssertConfigEquals(configFile, after);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SingleConfigHasSystemDiagnosticsSectionWithChildren()
         {
             var context = Substitute.For<IMigrationContext>();
@@ -115,10 +108,10 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var configFile = CreateFile(config);
 
             var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsTrue(isAvailable);
+            Assert.True(isAvailable);
 
             var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
-            Assert.IsTrue(isApplied);
+            Assert.True(isApplied);
 
             AssertConfigEquals(configFile, after);
         }
@@ -137,7 +130,7 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
             var actual = File.ReadAllText(actualConfig.Path).Replace("\r", string.Empty);
             expected = expected.Replace("\r", string.Empty);
 
-            Assert.AreEqual(actual, expected);
+            Assert.Equal(actual, expected);
         }
     }
 }

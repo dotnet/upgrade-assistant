@@ -1,20 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Microsoft.Build.Construction;
-using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Test;
-using Microsoft.UpgradeAssistant.MSBuild;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
 {
-    [TestClass]
+    [Collection(AnalyzerTestCollection.Name)]
     public class AspNetAnalyzersUnitTests
     {
         private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new()
@@ -140,28 +135,8 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
             },
         };
 
-        [AssemblyInitialize]
-#pragma warning disable IDE0060 // Remove unused parameter (required by MSTest)
-        public static void Initialize(TestContext context)
-#pragma warning restore IDE0060 // Remove unused parameter
-        {
-            // Register MSBuild
-            var msBuildRegistrar = new MSBuildRegistrationStartup(new NullLogger<MSBuildRegistrationStartup>());
-            msBuildRegistrar.RegisterMSBuildInstance();
-
-            // Make sure the TestProject's dependencies are restored
-            RestoreTestProjectPackages();
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)] // MSBuild resolver must be registered before this is JIT'd
-        private static void RestoreTestProjectPackages()
-        {
-            var restorer = new MSBuildPackageRestorer(new NullLogger<MSBuildPackageRestorer>());
-            restorer.RestorePackages(new ProjectInstance(ProjectRootElement.Open(TestHelper.TestProjectPath)));
-        }
-
         // No diagnostics expected to show up
-        [TestMethod]
+        [Fact]
         public async Task NegativeTest()
         {
             var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", TestHelper.AllAnalyzers
@@ -169,20 +144,20 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
                 .Select(d => d.Id)
                 .ToArray()).ConfigureAwait(false);
 
-            Assert.AreEqual(0, diagnostics.Count());
+            Assert.Empty(diagnostics);
         }
 
-        [DataRow("AM0001")]
-        [DataRow("AM0002")]
-        [DataRow("AM0003")]
-        [DataRow("AM0004")]
-        [DataRow("AM0005")]
-        [DataRow("AM0006")]
-        [DataRow("AM0007")]
-        [DataRow("AM0008")]
-        [DataRow("AM0009")]
-        [DataRow("AM0010")]
-        [DataTestMethod]
+        [InlineData("AM0001")]
+        [InlineData("AM0002")]
+        [InlineData("AM0003")]
+        [InlineData("AM0004")]
+        [InlineData("AM0005")]
+        [InlineData("AM0006")]
+        [InlineData("AM0007")]
+        [InlineData("AM0008")]
+        [InlineData("AM0009")]
+        [InlineData("AM0010")]
+        [Theory]
         public async Task MigrationAnalyzers(string diagnosticId)
         {
             var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.cs", diagnosticId).ConfigureAwait(false);
@@ -190,36 +165,36 @@ namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
             AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[diagnosticId]);
         }
 
-        [DataRow("AM0001")]
-        [DataRow("AM0002")]
-        [DataRow("AM0003")]
-        [DataRow("AM0004")]
-        [DataRow("AM0005")]
-        [DataRow("AM0006")]
-        [DataRow("AM0007")]
-        [DataRow("AM0008")]
-        [DataRow("AM0009")]
-        [DataRow("AM0010")]
-        [DataTestMethod]
+        [InlineData("AM0001")]
+        [InlineData("AM0002")]
+        [InlineData("AM0003")]
+        [InlineData("AM0004")]
+        [InlineData("AM0005")]
+        [InlineData("AM0006")]
+        [InlineData("AM0007")]
+        [InlineData("AM0008")]
+        [InlineData("AM0009")]
+        [InlineData("AM0010")]
+        [Theory]
         public async Task MigrationCodeFixer(string diagnosticId)
         {
             var fixedSource = await TestHelper.FixSourceAsync($"{diagnosticId}.cs", diagnosticId).ConfigureAwait(false);
             var expectedSource = await TestHelper.GetSourceAsync($"{diagnosticId}.Fixed.cs").ConfigureAwait(false);
 
-            Assert.IsNotNull(expectedSource);
+            Assert.NotNull(expectedSource);
 
             var expectedText = (await expectedSource!.GetTextAsync().ConfigureAwait(false)).ToString();
             var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
-            Assert.AreEqual(expectedText, fixedText);
+            Assert.Equal(expectedText, fixedText);
         }
 
         private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, ExpectedDiagnostic[] expectedDiagnostics)
         {
-            Assert.AreEqual(expectedDiagnostics.Length, diagnostics.Count());
+            Assert.Equal(expectedDiagnostics.Length, diagnostics.Count());
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
-                Assert.IsTrue(expectedDiagnostics[count++].Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics[count - 1].SourceSpan}; actually at {d.Location.SourceSpan}");
+                Assert.True(expectedDiagnostics[count++].Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics[count - 1].SourceSpan}; actually at {d.Location.SourceSpan}");
             }
         }
     }

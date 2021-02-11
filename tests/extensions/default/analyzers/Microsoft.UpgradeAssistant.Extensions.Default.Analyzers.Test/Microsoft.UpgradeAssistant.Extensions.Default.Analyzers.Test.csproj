@@ -3,21 +3,25 @@
     <TargetFramework>net5.0</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MSTest.TestAdapter" />
-    <PackageReference Include="MSTest.TestFramework" />
     <PackageReference Include="Microsoft.CodeAnalysis" />
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\steps\Microsoft.UpgradeAssistant.Steps.Source\Microsoft.UpgradeAssistant.Steps.Source.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\components\Microsoft.UpgradeAssistant.MSBuild\Microsoft.UpgradeAssistant.MSBuild.csproj" />
+    <ProjectReference Include="..\..\..\..\Microsoft.UpgradeAssistant.TestHelpers\Microsoft.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

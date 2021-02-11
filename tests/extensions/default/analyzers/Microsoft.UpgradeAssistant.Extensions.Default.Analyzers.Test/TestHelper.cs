@@ -5,13 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Build.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Microsoft.UpgradeAssistant.MSBuild;
 
 namespace Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
