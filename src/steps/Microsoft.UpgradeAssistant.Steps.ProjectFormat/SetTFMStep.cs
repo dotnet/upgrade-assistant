@@ -9,7 +9,8 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
     {
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            "Microsoft.UpgradeAssistant.Steps.Packages.PackageUpdaterStep"
+            // Project should be SDK-style before changing package references
+            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
         };
 
         public SetTFMStep(ILogger<SetTFMStep> logger)
