@@ -4,27 +4,26 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using Xunit;
 
 namespace Microsoft.UpgradeAssistant.Migrator.Test
 {
-    [TestClass]
     public class MigratorTests
     {
-        [TestMethod]
+        [Fact]
         public async Task NegativeTests()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => new MigratorManager(null!, new NullLogger<MigratorManager>()));
-            Assert.ThrowsException<ArgumentNullException>(() => new MigratorManager(GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
+            Assert.Throws<ArgumentNullException>(() => new MigratorManager(null!, new NullLogger<MigratorManager>()));
+            Assert.Throws<ArgumentNullException>(() => new MigratorManager(GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
 
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
             var migrator = new MigratorManager(GetOrderer(unknownStep), new NullLogger<MigratorManager>());
             using var context = Substitute.For<IMigrationContext>();
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task MigratorStepsEnumeration()
         {
             var migrator = new MigratorManager(GetOrderer(GetMigrationSteps()), new NullLogger<MigratorManager>());
@@ -57,12 +56,12 @@ namespace Microsoft.UpgradeAssistant.Migrator.Test
                 nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             }
 
-            CollectionAssert.AreEqual(expectedTopLevelStepsAndSubSteps, steps.Select(s => (s.Title, s.SubSteps.Count())).ToArray());
-            CollectionAssert.AreEqual(expectAllSteps, allSteps);
+            Assert.Equal(expectedTopLevelStepsAndSubSteps, steps.Select(s => (s.Title, s.SubSteps.Count())).ToArray());
+            Assert.Equal(expectAllSteps, allSteps);
         }
 
-        [DynamicData(nameof(CompletedStepsAreNotEnumeratedData))]
-        [DataTestMethod]
+        [MemberData(nameof(CompletedStepsAreNotEnumeratedData))]
+        [Theory]
         public async Task CompletedStepsAreNotEnumerated(MigrationStep[] steps, string[] expectedSteps)
         {
             var migrator = new MigratorManager(GetOrderer(steps), new NullLogger<MigratorManager>());
@@ -77,10 +76,10 @@ namespace Microsoft.UpgradeAssistant.Migrator.Test
                 nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             }
 
-            CollectionAssert.AreEqual(expectedSteps, allSteps);
+            Assert.Equal(expectedSteps, allSteps);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task FailedStepsAreEnumerated()
         {
             var steps = new MigrationStep[] { new SkippedTestMigrationStep("Step 1"), new FailedTestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") };
@@ -91,11 +90,11 @@ namespace Microsoft.UpgradeAssistant.Migrator.Test
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
 
             // The failed step is next
-            Assert.AreEqual(expectedNextStepId, nextStep?.Title);
-            Assert.IsFalse(await nextStep!.ApplyAsync(context, CancellationToken.None).ConfigureAwait(false));
+            Assert.Equal(expectedNextStepId, nextStep?.Title);
+            Assert.False(await nextStep!.ApplyAsync(context, CancellationToken.None).ConfigureAwait(false));
 
             // The failed step is still next after failing again
-            Assert.AreEqual(expectedNextStepId, nextStep?.Title);
+            Assert.Equal(expectedNextStepId, nextStep?.Title);
         }
 
         public static IEnumerable<object[]> CompletedStepsAreNotEnumeratedData =>

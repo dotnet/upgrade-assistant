@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace IntegrationTests
 {
-    [TestClass]
+    [Collection(IntegrationTestCollection.Name)]
     public class E2ETest
     {
         // TODO : Make this configurable so the test can pass from other working dirs
@@ -18,8 +17,6 @@ namespace IntegrationTests
         private const string OriginalProjectSubDir = "Original";
         private const string MigratedProjectSubDir = "Migrated";
 
-        private const string TryConvertPath = @"%USERPROFILE%\.dotnet\tools\try-convert.exe";
-
         private static readonly string[] DirsToIgnore = new[] { "bin", "obj" };
 
         private readonly HashSet<string> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase)
@@ -27,22 +24,8 @@ namespace IntegrationTests
             ".upgrade-assistant"
         };
 
-        [AssemblyInitialize]
-#pragma warning disable IDE0060 // Remove unused parameter (required by MSTest)
-        public static void InstallTryConvert(TestContext context)
-#pragma warning restore IDE0060 // Remove unused parameter
-        {
-            var tryConvertPath = Environment.ExpandEnvironmentVariables(TryConvertPath);
-            if (!File.Exists(tryConvertPath))
-            {
-                // Attempt to install try-convert
-                var p = Process.Start("dotnet", "tool install -g try-convert");
-                p.WaitForExit();
-            }
-        }
-
-        [DataRow("AspNetMvcTemplate", "TemplateMvc.csproj")]
-        [DataTestMethod]
+        [InlineData("AspNetMvcTemplate", "TemplateMvc.csproj")]
+        [Theory]
         public async Task MigrationTest(string scenarioName, string inputFileName)
         {
             // Create a temporary working directory
@@ -50,7 +33,7 @@ namespace IntegrationTests
             try
             {
                 var dir = Directory.CreateDirectory(workingDir);
-                Assert.IsTrue(dir.Exists);
+                Assert.True(dir.Exists);
 
                 // Copy the scenario files to the temporary directory
                 var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioName);
@@ -81,17 +64,14 @@ namespace IntegrationTests
                 .Where(t => !_ignoredFiles.Contains(Path.GetFileName(t)))
                 .ToArray();
 
-            CollectionAssert.AreEquivalent(
-                expectedFiles,
-                actualFiles,
-                $"Expected but not actual: {string.Join(", ", expectedFiles.Where(f => !actualFiles.Contains(f)))}\nActual but not expected:{string.Join(", ", actualFiles.Where(f => !expectedFiles.Contains(f)))}");
+            Assert.Equal(expectedFiles, actualFiles);
 
             foreach (var file in expectedFiles)
             {
                 var expectedText = $"{file}: {await File.ReadAllTextAsync(Path.Combine(expectedDir, file)).ConfigureAwait(false)}";
                 var actualText = $"{file}: {await File.ReadAllTextAsync(Path.Combine(actualDir, file)).ConfigureAwait(false)}";
 
-                Assert.AreEqual(expectedText, actualText);
+                Assert.Equal(expectedText, actualText);
             }
         }
 
