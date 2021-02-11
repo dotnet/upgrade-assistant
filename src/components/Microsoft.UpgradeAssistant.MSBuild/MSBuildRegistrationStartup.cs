@@ -40,7 +40,7 @@ namespace Microsoft.UpgradeAssistant.MSBuild
 
                     _msBuildInstance = msBuildInstances
                         .OrderByDescending(m => m.Version)
-                        .First(m => !m.MSBuildPath.Contains("preview", StringComparison.OrdinalIgnoreCase));
+                        .First();
                     _logger.LogInformation("MSBuild registered from {MSBuildPath}", _msBuildInstance.MSBuildPath);
 
                     MSBuildLocator.RegisterInstance(_msBuildInstance);
