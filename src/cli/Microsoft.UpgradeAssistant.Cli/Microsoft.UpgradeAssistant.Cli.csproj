@@ -27,12 +27,16 @@
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="System.CommandLine" />
 
-    <!-- Explicitly reference packages that we do *not* want included in our
-         bin folder in case transitive dependencies pull them in. These runtime
+    <!-- Explicitly reference packages that we do *not* want included in output
+         paths in case transitive dependencies pull them in. These runtime
          assets are excluded because they are loaded from the version of MSBuild
-         used by the tool, instead. -->
-    <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
+         used by the tool, instead. They should, therefore, never show up in this
+         tool's output. 
+         
+         These are different from the MSBuild packages listed in
+         Directory.Build.Targets because tests can use these NuGet packages (and 
+         the test harness needs to). However, no project (this one or tests) should
+         use MSBuild runtime assets. -->
     <PackageReference Include="NuGet.Common" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.Configuration" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.DependencyResolver.Core" ExcludeAssets="runtime" />
