@@ -1,6 +1,8 @@
-﻿namespace Microsoft.UpgradeAssistant
+﻿using System.Collections.Generic;
+
+namespace Microsoft.UpgradeAssistant
 {
-    public interface ITargetFrameworkMonikerComparer
+    public interface ITargetFrameworkMonikerComparer : IComparer<TargetFrameworkMoniker>
     {
         /// <summary>
         /// Returns true if another tfm is compatible with a first tfm. For example, IsCompatible(net45, net40) should return true because
