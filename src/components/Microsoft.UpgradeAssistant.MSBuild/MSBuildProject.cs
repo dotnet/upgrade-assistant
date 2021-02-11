@@ -60,62 +60,73 @@ namespace Microsoft.UpgradeAssistant.MSBuild
             return ProjectOutputType.Library;
         }
 
-        public ProjectComponents Components => IsSdk
-            ? GetSDKProjectComponents()
-            : GetOldProjectComponents();
-
-        // Gets project components based on SDK, properties, and FrameworkReferences
-        private ProjectComponents GetSDKProjectComponents()
+        public ProjectComponents Components
         {
-            var components = ProjectComponents.None;
-            if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
+            get
             {
-                components |= ProjectComponents.Web;
+                var components = IsSdk ? GetSDKProjectComponents() : GetOldProjectComponents();
+
+                if (PackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
+                {
+                    components |= ProjectComponents.WinRT;
+                }
+
+                return components;
+
+                // Gets project components based on SDK, properties, and FrameworkReferences
+                ProjectComponents GetSDKProjectComponents()
+                {
+                    var components = ProjectComponents.None;
+                    if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
+                    {
+                        components |= ProjectComponents.Web;
+                    }
+
+                    if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
+                        GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                        GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        components |= ProjectComponents.WindowsDesktop;
+                    }
+
+                    var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.Web;
+                    }
+
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.WindowsDesktop;
+                    }
+
+                    return components;
+                }
+
+                // Gets project components based on imports and References
+                ProjectComponents GetOldProjectComponents()
+                {
+                    var components = ProjectComponents.None;
+
+                    // Check imports and references
+                    var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
+                    var references = References.Select(r => r.Name);
+
+                    if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
+                        references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.Web;
+                    }
+
+                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
+                        references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.WindowsDesktop;
+                    }
+
+                    return components;
+                }
             }
-
-            if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
-                GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
-                GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
-                components |= ProjectComponents.WindowsDesktop;
-            }
-
-            var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
-            if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-            {
-                components |= ProjectComponents.Web;
-            }
-
-            if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-            {
-                components |= ProjectComponents.WindowsDesktop;
-            }
-
-            return components;
-        }
-
-        // Gets project components based on imports and References
-        private ProjectComponents GetOldProjectComponents()
-        {
-            var components = ProjectComponents.None;
-
-            // Check imports and references
-            var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
-            var references = References.Select(r => r.Name);
-
-            if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
-                references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-            {
-                components |= ProjectComponents.Web;
-            }
-
-            if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
-                references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-            {
-                components |= ProjectComponents.WindowsDesktop;
-            }
-
-            return components;
         }
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)

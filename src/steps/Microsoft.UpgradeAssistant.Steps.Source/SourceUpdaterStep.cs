@@ -36,7 +36,10 @@ namespace Microsoft.UpgradeAssistant.Steps.Source
             "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Template files should be added prior to changing source (since some code fixers will change added templates)
-            "Microsoft.UpgradeAssistant.Steps.Templates.TemplateInserterStep"
+            "Microsoft.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
+
+            // Project should have correct TFM
+            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
         public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)

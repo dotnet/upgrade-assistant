@@ -27,5 +27,7 @@ namespace Microsoft.UpgradeAssistant
         bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token);
 
         string GetPropertyValue(string propertyName);
+
+        void SetTFM(TargetFrameworkMoniker targetTFM);
     }
 }

@@ -8,6 +8,7 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
     {
         public static OptionsBuilder<TryConvertProjectConverterStepOptions> AddTryConvertProjectConverterStep(this IServiceCollection services)
         {
+            services.AddScoped<MigrationStep, SetTFMStep>();
             services.AddScoped<MigrationStep, TryConvertProjectConverterStep>();
             services.AddTransient<ISectionGenerator, TryConvertReport>();
 

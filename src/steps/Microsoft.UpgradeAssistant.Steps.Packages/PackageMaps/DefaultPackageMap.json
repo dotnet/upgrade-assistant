@@ -1,5 +1,35 @@
 ﻿[
   {
+    "PackageSetName": "PowerShell",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.PowerShell.5.ReferenceAssemblies",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "PowerShellStandard.Library",
+        "Version": "7.0.0-preview.1"
+      }
+    ]
+  },
+  {
+    "PackageSetName": "Microsoft.Toolkit.Wpf.UI.Controls.WebView",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.Toolkit.Wpf.UI.Controls.WebView",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "Microsoft.Web.WebView2",
+        "Version": "1.0.705.50"
+      }
+    ]
+  },
+  {
     "PackageSetName": "StructureMap.Web",
     "NetFrameworkPackages": [
       {

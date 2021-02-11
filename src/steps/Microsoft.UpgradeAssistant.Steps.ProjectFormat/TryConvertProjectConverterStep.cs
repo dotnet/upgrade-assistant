@@ -13,7 +13,7 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStep : MigrationStep
     {
-        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion -p \"{0}\"";
+        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -p \"{0}\"";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
