@@ -91,6 +91,12 @@ namespace Microsoft.UpgradeAssistant.MSBuild
                 components |= ProjectComponents.WindowsDesktop;
             }
 
+            // TODO: Identify better way to select WinRT
+            if (components.HasFlag(ProjectComponents.WindowsDesktop))
+            {
+                components |= ProjectComponents.WinRT;
+            }
+
             return components;
         }
 
@@ -113,6 +119,12 @@ namespace Microsoft.UpgradeAssistant.MSBuild
                 references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.WindowsDesktop;
+            }
+
+            // TODO: Identify better way to select WinRT
+            if (components.HasFlag(ProjectComponents.WindowsDesktop))
+            {
+                components |= ProjectComponents.WinRT;
             }
 
             return components;

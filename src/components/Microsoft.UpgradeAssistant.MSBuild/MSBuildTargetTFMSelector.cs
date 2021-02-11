@@ -52,6 +52,12 @@ namespace Microsoft.UpgradeAssistant.MSBuild
                 || project.OutputType == ProjectOutputType.WinExe)
             {
                 tfmName = $"{AppTFMBase}{WindowsSuffix}";
+
+                if (project.Components.HasFlag(ProjectComponents.WinRT))
+                {
+                    // TODO: Default to this version to ensure everything is supported.
+                    tfmName += "10.0.19041.0";
+                }
             }
 
             _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FilePath, project.Components, project.OutputType);

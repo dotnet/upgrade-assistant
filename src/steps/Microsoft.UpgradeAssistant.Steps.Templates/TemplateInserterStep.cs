@@ -42,7 +42,10 @@ namespace Microsoft.UpgradeAssistant.Steps.Templates
             "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Project should be SDK-style before adding template files
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep"
+            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+
+            // Project should have correct TFM
+            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)

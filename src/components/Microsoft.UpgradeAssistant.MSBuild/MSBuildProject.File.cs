@@ -49,6 +49,21 @@ namespace Microsoft.UpgradeAssistant.MSBuild
         public bool IsSdk =>
             ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparison.OrdinalIgnoreCase);
 
+        public void UpdateTFM(TargetFrameworkMoniker tfm)
+        {
+            if (IsSdk)
+            {
+                var property = ProjectRoot.Properties
+                    .Single(e => e.Name == "TargetFramework");
+
+                property.Value = tfm.Name;
+            }
+            else
+            {
+                throw new NotImplementedException("Setting a TFM is only supported with SDK style projects");
+            }
+        }
+
         public void AddPackages(IEnumerable<NuGetReference> references)
         {
             const string PackageReferenceType = "PackageReference";
