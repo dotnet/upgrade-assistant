@@ -81,7 +81,8 @@ namespace Microsoft.UpgradeAssistant.MSBuild
 
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
 
-            return tfm;
+            // Ensure we don't downgrade a project
+            return _tfmComparer.Compare(project.TFM, tfm) > 0 ? project.TFM : tfm;
         }
 
         private static string GetNetStandardTFM(IProject project)
