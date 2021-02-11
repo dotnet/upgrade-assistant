@@ -38,8 +38,11 @@ namespace Microsoft.UpgradeAssistant.MSBuild
                         _logger.LogDebug("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
                     }
 
-                    _msBuildInstance = msBuildInstances.First();
+                    _msBuildInstance = msBuildInstances
+                        .OrderByDescending(m => m.Version)
+                        .First(m => !m.MSBuildPath.Contains("preview", StringComparison.OrdinalIgnoreCase));
                     _logger.LogInformation("MSBuild registered from {MSBuildPath}", _msBuildInstance.MSBuildPath);
+
                     MSBuildLocator.RegisterInstance(_msBuildInstance);
                     AssemblyLoadContext.Default.Resolving += ResolveAssembly;
                 }
