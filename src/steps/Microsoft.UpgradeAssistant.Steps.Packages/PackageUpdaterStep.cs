@@ -44,9 +44,6 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages
 
             // Project should be SDK-style before changing package references
             "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
-
-            // Project should have correct TFM
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
         public PackageUpdaterStep(

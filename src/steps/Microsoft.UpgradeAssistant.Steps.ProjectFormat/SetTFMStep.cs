@@ -9,7 +9,7 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
     {
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep"
+            "Microsoft.UpgradeAssistant.Steps.Packages.PackageUpdaterStep"
         };
 
         public SetTFMStep(ILogger<SetTFMStep> logger)
@@ -44,7 +44,7 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
             }
             else
             {
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"TFM needs to be updated to {projectInfo.TargetTFM}", BuildBreakRisk.None));
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"TFM needs to be updated to {projectInfo.TargetTFM}", BuildBreakRisk.High));
             }
         }
 
