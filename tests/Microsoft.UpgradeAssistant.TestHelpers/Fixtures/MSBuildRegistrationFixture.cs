@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.Build.Execution;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UpgradeAssistant.MSBuild;
 
 namespace Microsoft.UpgradeAssistant.Fixtures
