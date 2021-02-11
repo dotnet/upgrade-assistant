@@ -7,6 +7,9 @@ variables:
     value: true
   - name: _DotNetArtifactsCategory
     value: .NETCore
+  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+    - group: AzureDevOps-Artifact-Feeds-Pats
+    - group: UpgradeAssistant_SDL_Settings
 
 trigger:
   batch: true
@@ -51,16 +54,8 @@ stages:
           - name: _BuildArgs
             value: /p:SignType=$(_SignType)
               /p:DotNetSignType=$(_SignType)
-              /p:MicroBuild_SigningEnabled=true 
-              /p:OverridePackageSource=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
               /p:TeamName=$(_TeamName)
-              /p:DotNetPublishBlobFeedKey=$(dotnetfeed-storage-access-key-1)
-              /p:DotNetPublishBlobFeedUrl=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
-              /p:DotNetPublishToBlobFeed=true
               /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
-              /p:DotNetArtifactsCategory=$(_DotNetArtifactsCategory)
-              /p:DotNetSymbolServerTokenMsdl=$(microsoft-symbol-server-pat)
-              /p:DotNetSymbolServerTokenSymWeb=$(symweb-symbol-server-pat)
               /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
           - name: _OfficialBuildIdArgs
         # else
@@ -78,9 +73,38 @@ stages:
         steps:
         - checkout: self
           clean: true
+        - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+          - task: PowerShell@2
+            displayName: Setup Private Feeds Credentials
+            condition: eq(variables['Agent.OS'], 'Windows_NT')
+            inputs:
+              filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
+              arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
+            env:
+              Token: $(dn-bot-dnceng-artifact-feeds-rw)
         - script: eng\common\cibuild.cmd
             -configuration $(_BuildConfig) 
             -prepareMachine
             -warnaserror:0
             $(_BuildArgs)
           displayName: Windows Build / Publish
+
+- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+  - template: eng\common\templates\post-build\post-build.yml
+    parameters:
+      publishingInfraVersion: 3
+      enableSymbolValidation: false
+      enableSourceLinkValidation: false
+      # This is to enable SDL runs part of Post-Build Validation Stage
+      SDLValidationParameters:
+        enable: true
+        params: ' -SourceToolsList @("policheck","credscan")
+        -TsaInstanceURL $(_TsaInstanceURL)
+        -TsaProjectName $(_TsaProjectName)
+        -TsaNotificationEmail $(_TsaNotificationEmail)
+        -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
+        -TsaBugAreaPath $(_TsaBugAreaPath)
+        -TsaIterationPath $(_TsaIterationPath)
+        -TsaRepositoryName "Dotnet-Upgrade-Assistant"
+        -TsaCodebaseName "Dotnet-Upgrade-Assistant"
+        -TsaPublish $True'
