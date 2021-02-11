@@ -7,7 +7,7 @@ using NuGet.ProjectModel;
 
 namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {
-    internal static class DependencyExtensions
+    internal static class TransitiveDependencyExtensions
     {
         public static bool IsTransitivelyAvailable(this PackageAnalysisState state, string packageName)
             => state.ContainsDependency(d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase));
