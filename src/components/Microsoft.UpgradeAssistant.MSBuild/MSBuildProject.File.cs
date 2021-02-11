@@ -49,7 +49,7 @@ namespace Microsoft.UpgradeAssistant.MSBuild
         public bool IsSdk =>
             ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparison.OrdinalIgnoreCase);
 
-        public void UpdateTFM(TargetFrameworkMoniker tfm)
+        public void SetTFM(TargetFrameworkMoniker tfm)
         {
             if (IsSdk)
             {

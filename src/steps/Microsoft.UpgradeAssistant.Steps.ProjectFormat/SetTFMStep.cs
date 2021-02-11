@@ -28,7 +28,7 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
             var projectInfo = context.CurrentProject.Required();
 
             var file = projectInfo.Project.GetFile();
-            file.UpdateTFM(projectInfo.TargetTFM);
+            file.SetTFM(projectInfo.TargetTFM);
             await file.SaveAsync(token);
 
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {projectInfo.TargetTFM}");

@@ -28,6 +28,6 @@ namespace Microsoft.UpgradeAssistant
 
         string GetPropertyValue(string propertyName);
 
-        void UpdateTFM(TargetFrameworkMoniker targetTFM);
+        void SetTFM(TargetFrameworkMoniker targetTFM);
     }
 }
