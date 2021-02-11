@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
@@ -8,14 +11,22 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {
     internal static class DependencyExtensions
     {
+        public static bool IsTransitivelyAvailable(this PackageAnalysisState state, string packageName)
+            => state.GetLibraries()
+                    .Any(l => l.Dependencies.Any(d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase)));
+
         public static bool IsTransitivelyAvailable(this PackageAnalysisState state, NuGetReference nugetReference)
+            => state.GetLibraries()
+                    .Any(l => l.Dependencies.Any(d => d.ReferenceSatisfiesDependency(nugetReference, true)));
+
+        private static IEnumerable<LockFileTargetLibrary> GetLibraries(this PackageAnalysisState state)
         {
             var tfm = NuGetFramework.Parse(state.CurrentTFM.Name);
             var lockFileTarget = LockFileUtilities.GetLockFile(state.LockFilePath, NuGet.Common.NullLogger.Instance)
                 .Targets
                 .First(t => t.TargetFramework.DotNetFrameworkName.Equals(tfm.DotNetFrameworkName, StringComparison.Ordinal));
 
-            return lockFileTarget.Libraries.Any(l => l.Dependencies.Any(d => d.ReferenceSatisfiesDependency(nugetReference, true)));
+            return lockFileTarget.Libraries;
         }
 
         private static bool ReferenceSatisfiesDependency(this PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)

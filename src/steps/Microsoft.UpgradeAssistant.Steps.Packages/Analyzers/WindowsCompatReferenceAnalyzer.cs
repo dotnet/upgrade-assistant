@@ -32,17 +32,17 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
+            if (state.IsTransitivelyAvailable(PackageName))
+            {
+                _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
+                return state;
+            }
+
             var latestVersion = await _loader.GetLatestVersionAsync(PackageName, false, null, token);
 
             if (latestVersion is null)
             {
                 _logger.LogWarning("Could not find {PackageName}", latestVersion);
-                return state;
-            }
-
-            if (state.IsTransitivelyAvailable(new NuGetReference(PackageName, latestVersion.ToString())))
-            {
-                _logger.LogInformation("{PackageName} already referenced transitively", PackageName);
                 return state;
             }
 
