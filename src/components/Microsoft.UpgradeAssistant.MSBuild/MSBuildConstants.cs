@@ -58,5 +58,10 @@
             "PresentationFramework",
             "WindowsBase"
         };
+
+        public static readonly string[] WinRTPackages = new[]
+        {
+            "Microsoft.Windows.SDK.Contracts"
+        };
     }
 }

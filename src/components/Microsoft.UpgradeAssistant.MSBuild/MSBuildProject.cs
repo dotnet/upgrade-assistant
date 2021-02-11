@@ -91,8 +91,7 @@ namespace Microsoft.UpgradeAssistant.MSBuild
                 components |= ProjectComponents.WindowsDesktop;
             }
 
-            // TODO: Identify better way to select WinRT
-            if (components.HasFlag(ProjectComponents.WindowsDesktop))
+            if (PackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.WinRT;
             }
