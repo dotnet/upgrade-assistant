@@ -1,12 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NuGet.Frameworks;
-using NuGet.Packaging.Core;
-using NuGet.ProjectModel;
-using NuGet.Versioning;
 
 namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 {

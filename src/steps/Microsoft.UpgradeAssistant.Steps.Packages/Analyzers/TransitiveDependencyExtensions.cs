@@ -12,7 +12,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
         public static bool IsTransitivelyAvailable(this PackageAnalysisState state, string packageName)
             => state.ContainsDependency(d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase));
 
-        public static bool IsTransitivelyAvailable(this PackageAnalysisState state, NuGetReference nugetReference)
+        public static bool IsTransitiveDependency(this PackageAnalysisState state, NuGetReference nugetReference)
             => state.ContainsDependency(d => d.ReferenceSatisfiesDependency(nugetReference, true));
 
         private static bool ReferenceSatisfiesDependency(this PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
@@ -53,8 +53,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
 
         private static bool ContainsDependency(this PackageAnalysisState state, Func<PackageDependency, bool> filter)
             => state.GetAllDependencies()
-                    .Any(l => l.Dependencies
-                    .Any(d => filter(d)));
+                    .Any(l => l.Dependencies.Any(d => filter(d)));
 
         private static IEnumerable<LockFileTargetLibrary> GetAllDependencies(this PackageAnalysisState state)
         {
