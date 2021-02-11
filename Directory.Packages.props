@@ -4,6 +4,7 @@
     <PackageVersion Include="Automapper" Version="10.1.1" />
     <PackageVersion Include="coverlet.collector" Version="3.0.2" />
     <PackageVersion Include="Microsoft.Build" Version="16.8.0" />
+    <PackageVersion Include="Microsoft.Build.Framework" Version="16.8.0" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.4.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="3.3.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
@@ -27,8 +28,15 @@
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="2.3.2262-g94fae01e" />
     <PackageVersion Include="Moq" Version="4.16.0" />
     <PackageVersion Include="NSubstitute" Version="4.2.2" />
+    <PackageVersion Include="NuGet.Common" Version="5.8.0" />
+    <PackageVersion Include="NuGet.Configuration" Version="5.8.0" />
+    <PackageVersion Include="NuGet.DependencyResolver.Core" Version="5.8.0" />
+    <PackageVersion Include="NuGet.LibraryModel" Version="5.8.0" />
     <PackageVersion Include="NuGet.Frameworks" Version="5.8.0" />
+    <PackageVersion Include="NuGet.Packaging" Version="5.8.0" />
     <PackageVersion Include="NuGet.ProjectModel" Version="5.8.0" />
+    <PackageVersion Include="NuGet.Protocol" Version="5.8.0" />
+    <PackageVersion Include="NuGet.Versioning" Version="5.8.0" />
     <PackageVersion Include="Serilog" Version="2.10.0" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="3.1.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="3.1.1" />

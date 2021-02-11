@@ -26,6 +26,22 @@
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="System.CommandLine" />
+
+    <!-- Explicitly reference packages that we do *not* want included in our
+         bin folder in case transitive dependencies pull them in. These runtime
+         assets are excluded because they are loaded from the version of MSBuild
+         used by the tool, instead. -->
+    <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Common" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Configuration" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.DependencyResolver.Core" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Frameworks" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.LibraryModel" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Packaging" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.ProjectModel" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Protocol" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Versioning" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.UpgradeAssistant.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
