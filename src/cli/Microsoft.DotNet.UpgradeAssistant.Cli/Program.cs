@@ -70,10 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public static Task RunCommandAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection>? serviceConfiguration, AppCommand appCommand, CancellationToken token)
         {
-            if (!Console.IsOutputRedirected)
-            {
-                Console.Clear();
-            }
+            ConsoleUtils.Clear();
 
             ShowHeader();
 

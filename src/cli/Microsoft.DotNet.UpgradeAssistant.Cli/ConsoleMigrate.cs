@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     // TODO : Eventually, this may need to be localized and pull strings from resources, etc.
-    [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class ConsoleMigrate : IHostedService
     {
         private readonly IServiceProvider _services;
@@ -119,7 +117,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         }
                         else if (await _input.WaitToProceedAsync(token))
                         {
-                            Console.Clear();
+                            ConsoleUtils.Clear();
                         }
                         else
                         {
