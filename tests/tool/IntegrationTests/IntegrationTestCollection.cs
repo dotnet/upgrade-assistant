@@ -1,4 +1,4 @@
-﻿using Microsoft.UpgradeAssistant.Fixtures;
+﻿using Microsoft.DotNet.UpgradeAssistant.Fixtures;
 using Xunit;
 
 namespace IntegrationTests
