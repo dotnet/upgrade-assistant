@@ -31,6 +31,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep"
         };
 
+        public override IEnumerable<string> DependencyOf { get; } = new[]
+        {
+            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+        };
+
         public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {

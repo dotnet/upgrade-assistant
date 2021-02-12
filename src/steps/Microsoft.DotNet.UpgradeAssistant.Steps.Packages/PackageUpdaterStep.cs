@@ -49,6 +49,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
+        public override IEnumerable<string> DependencyOf { get; } = new[]
+        {
+            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+        };
+
         public PackageUpdaterStep(
             MigrateOptions options,
             IOptions<PackageUpdaterOptions> updaterOptions,
