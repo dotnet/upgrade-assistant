@@ -131,8 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddConfigUpdaterStep();
                     services.AddSourceUpdaterStep();
 
-                    services.AddScoped<MigratorManager>();
-                    services.AddTransient<IMigrationStepOrderer, MigrationStepOrderer>();
+                    services.AddStepManagement();
 
                     serviceConfiguration?.Invoke(context, services);
                 })

@@ -42,6 +42,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
+        public override IEnumerable<string> DependencyOf { get; } = new[]
+        {
+            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+        };
+
         public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {

@@ -45,8 +45,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
 
             if (nextStep is null)
             {
-                // If no further migration steps are required, then the current project is complete and
-                // can be unset in the context
                 nextStep = await GetNextStepAsync(context, token).ConfigureAwait(false);
             }
 

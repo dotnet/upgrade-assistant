@@ -18,9 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _migrationSteps = Order(migrationSteps);
-
-            _migrationSteps.Add(new NextProjectStep(logger));
-            _migrationSteps.Add(new SolutionCompletedStep(logger));
         }
 
         public bool TryAddStep(MigrationStep step)
