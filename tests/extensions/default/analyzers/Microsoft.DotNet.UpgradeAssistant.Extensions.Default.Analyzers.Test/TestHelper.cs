@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     {
         // Path relative from .\bin\debug\net5.0
         // TODO : Make this configurable so the test can pass from other working dirs
-        internal const string TestProjectPath = @"..\..\..\..\..\tests\TestAssets\TestProject\TestProject.csproj";
+        internal const string TestProjectPath = @"assets\TestProject.csproj";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new UsingSystemWebAnalyzer(),
