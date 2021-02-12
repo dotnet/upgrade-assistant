@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Cli.Commands;
+using Microsoft.DotNet.UpgradeAssistant.Migrator.Commands;
 using Microsoft.Extensions.Hosting;
-using Microsoft.UpgradeAssistant.Cli.Commands;
-using Microsoft.UpgradeAssistant.Migrator.Commands;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class CommandProvider
     {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     internal class WindowsCompatReferenceAnalyzer : IPackageReferencesAnalyzer
     {

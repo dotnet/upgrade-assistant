@@ -2,11 +2,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Reporting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Reporting;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]
     public class ConsoleAnalyze : IHostedService

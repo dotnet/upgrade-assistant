@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class FileMigrationStateFactory : IMigrationStateManager
     {

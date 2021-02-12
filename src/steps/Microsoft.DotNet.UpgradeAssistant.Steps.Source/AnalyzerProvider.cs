@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Extensions;
 
-namespace Microsoft.UpgradeAssistant.Steps.Source
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     public class AnalyzerProvider
     {

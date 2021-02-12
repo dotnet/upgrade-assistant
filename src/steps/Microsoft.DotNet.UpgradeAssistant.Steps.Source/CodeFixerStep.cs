@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Steps.Source
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     /// <summary>
     /// Migration step that addresses a particular migration diagnostic with a Roslyn code fixer.

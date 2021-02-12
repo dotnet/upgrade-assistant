@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IProject
     {

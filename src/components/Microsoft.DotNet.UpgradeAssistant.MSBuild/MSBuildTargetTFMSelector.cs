@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class MSBuildTargetTFMSelector : ITargetTFMSelector
     {

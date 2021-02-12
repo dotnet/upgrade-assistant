@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Microsoft.UpgradeAssistant.Reporting
+namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
     public record Section(string Header)
         : Content

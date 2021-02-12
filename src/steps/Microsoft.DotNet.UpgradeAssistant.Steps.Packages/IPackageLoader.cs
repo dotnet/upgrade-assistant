@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using NuGet.Packaging;
 using NuGet.Versioning;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public interface IPackageLoader
     {

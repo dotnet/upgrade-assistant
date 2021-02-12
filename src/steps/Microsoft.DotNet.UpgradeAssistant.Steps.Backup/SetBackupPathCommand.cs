@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.UpgradeAssistant.Steps.Backup
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 {
     public class SetBackupPathCommand : MigrationCommand
     {

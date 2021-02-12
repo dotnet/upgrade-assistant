@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IMigrationContext : IDisposable
     {

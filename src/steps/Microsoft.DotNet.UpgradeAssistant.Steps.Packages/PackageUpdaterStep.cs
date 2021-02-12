@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Configuration;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     /// <summary>
     /// Migration step that updates NuGet package references
@@ -40,13 +40,13 @@ namespace Microsoft.UpgradeAssistant.Steps.Packages
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Project should be SDK-style before changing package references
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
 
             // Project should have correct TFM
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
         public PackageUpdaterStep(

@@ -10,17 +10,16 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
-using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM005 CodeFix Provider")]
     public class HttpContextCurrentCodeFixer : CodeFixProvider
     {
         private const string HttpContextHelperName = "HttpContextHelper";
-        private const string HttpContextHelperResourceName = "Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.Templates.HttpContextHelper.cs";
+        private const string HttpContextHelperResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.Templates.HttpContextHelper.cs";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HttpContextCurrentAnalyzer.DiagnosticId);
 

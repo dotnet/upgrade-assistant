@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public record InputOutputStreams(TextReader Input, TextWriter Output);
 }

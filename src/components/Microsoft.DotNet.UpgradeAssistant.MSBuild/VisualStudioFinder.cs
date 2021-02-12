@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Setup.Configuration;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     /// <summary>
     ///     Helper class to wrap the Microsoft.VisualStudio.Setup.Configuration.Interop API to query

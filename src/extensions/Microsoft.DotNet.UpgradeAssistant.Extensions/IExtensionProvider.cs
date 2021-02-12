@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Microsoft.UpgradeAssistant.Extensions
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public interface IExtensionProvider
     {

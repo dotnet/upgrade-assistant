@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Extensions
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public class DefaultExtensionProvider : IExtensionProvider
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IMigrationStepOrderer
     {

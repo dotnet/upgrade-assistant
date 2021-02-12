@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant;
+using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UpgradeAssistant;
-using Microsoft.UpgradeAssistant.Cli;
-using Microsoft.UpgradeAssistant.Steps.Packages;
 
 namespace IntegrationTests
 {

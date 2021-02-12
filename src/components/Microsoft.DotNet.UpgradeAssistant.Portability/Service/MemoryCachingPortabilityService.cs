@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Microsoft.UpgradeAssistant.Portability.Service
+namespace Microsoft.DotNet.UpgradeAssistant.Portability.Service
 {
     public class MemoryCachingPortabilityService : IPortabilityService
     {

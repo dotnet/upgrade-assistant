@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Migrator
+namespace Microsoft.DotNet.UpgradeAssistant.Migrator
 {
     public class MigrationStepOrderer : IMigrationStepOrderer
     {

@@ -4,12 +4,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Migrator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Migrator;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     // TODO : Eventually, this may need to be localized and pull strings from resources, etc.
     [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "No sync context in console apps")]

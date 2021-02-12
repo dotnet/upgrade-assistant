@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Setup.Configuration;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal static class NativeMethods
     {

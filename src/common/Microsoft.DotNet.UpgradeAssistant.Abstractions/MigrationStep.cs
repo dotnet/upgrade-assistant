@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public abstract class MigrationStep
     {

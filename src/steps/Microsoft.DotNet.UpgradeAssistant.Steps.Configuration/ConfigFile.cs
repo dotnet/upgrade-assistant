@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Linq;
 
-namespace Microsoft.UpgradeAssistant.Steps.Configuration
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigFile
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Microsoft.UpgradeAssistant.Steps.Solution
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     internal static class GraphTraversalExtensions
     {

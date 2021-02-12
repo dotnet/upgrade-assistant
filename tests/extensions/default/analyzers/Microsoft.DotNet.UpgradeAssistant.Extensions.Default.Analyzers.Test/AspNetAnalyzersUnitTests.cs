@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Microsoft.UpgradeAssistant.Extensions.Default.Analyzers.Test;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test;
 using Xunit;
 
-namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
 {
     [Collection(AnalyzerTestCollection.Name)]
     public class AspNetAnalyzersUnitTests

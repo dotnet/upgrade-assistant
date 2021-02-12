@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UpgradeAssistant.Migrator.Commands;
+using Microsoft.DotNet.UpgradeAssistant.Migrator.Commands;
 using NSubstitute;
 using Xunit;
 
-namespace Microsoft.UpgradeAssistant.Migrator.Test
+namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
 {
     public class CommandTests
     {

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
-using Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
-namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM007 CodeFix Provider")]
     public class HtmlHelperCodeFixer : IdentifierMigrationCodeFixer

@@ -3,14 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class SetTFMStep : MigrationStep
     {
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be SDK-style before changing package references
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
         };
 
         public SetTFMStep(ILogger<SetTFMStep> logger)

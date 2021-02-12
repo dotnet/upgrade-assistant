@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace Microsoft.UpgradeAssistant.Reporting
+namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
     public interface IReportGenerator
     {

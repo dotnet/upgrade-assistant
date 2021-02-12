@@ -8,19 +8,19 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.DotNet.UpgradeAssistant.Migrator;
+using Microsoft.DotNet.UpgradeAssistant.Steps;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Backup;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
+using Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.UpgradeAssistant.Extensions;
-using Microsoft.UpgradeAssistant.Migrator;
-using Microsoft.UpgradeAssistant.Steps;
-using Microsoft.UpgradeAssistant.Steps.Backup;
-using Microsoft.UpgradeAssistant.Steps.Packages;
-using Microsoft.UpgradeAssistant.Steps.ProjectFormat;
-using Microsoft.UpgradeAssistant.Steps.Solution;
 using Serilog;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class Program
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.UpgradeAssistant.Portability.Service
+namespace Microsoft.DotNet.UpgradeAssistant.Portability.Service
 {
     public class ApiDefinition
     {

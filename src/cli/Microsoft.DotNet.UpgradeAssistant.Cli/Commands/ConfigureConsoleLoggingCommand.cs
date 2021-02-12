@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Cli.Commands
+namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 {
     public class ConfigureConsoleLoggingCommand : MigrationCommand
     {

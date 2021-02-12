@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Steps.Configuration
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterStep : MigrationStep
     {
@@ -24,10 +24,10 @@ namespace Microsoft.UpgradeAssistant.Steps.Configuration
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing things based on config files
-            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Template files should be added prior to making config updates (since some IConfigUpdaters may change added templates)
-            "Microsoft.UpgradeAssistant.Steps.Templates.TemplateInserterStep"
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep"
         };
 
         public ConfigUpdaterStep(ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)

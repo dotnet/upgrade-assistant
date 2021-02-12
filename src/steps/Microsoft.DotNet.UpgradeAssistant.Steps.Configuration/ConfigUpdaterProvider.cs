@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Extensions;
 
-namespace Microsoft.UpgradeAssistant.Steps.Configuration
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterProvider
     {

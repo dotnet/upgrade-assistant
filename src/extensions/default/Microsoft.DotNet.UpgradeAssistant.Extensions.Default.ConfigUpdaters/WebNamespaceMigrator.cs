@@ -6,10 +6,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Steps.Configuration;
 
-namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
     public class WebNamespaceMigrator : IConfigUpdater
     {

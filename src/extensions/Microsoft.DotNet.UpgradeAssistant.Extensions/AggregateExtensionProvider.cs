@@ -6,7 +6,7 @@ using System.Linq;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Extensions
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public class AggregateExtensionProvider : IExtensionProvider
     {

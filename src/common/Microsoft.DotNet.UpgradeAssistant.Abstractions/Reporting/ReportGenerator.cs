@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.UpgradeAssistant.Reporting
+namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
     internal class ReportGenerator : IReportGenerator
     {

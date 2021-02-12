@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Microsoft.UpgradeAssistant.Reporting
+namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
     public record Row(IReadOnlyCollection<object> Data)
     {

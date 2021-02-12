@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace Microsoft.UpgradeAssistant.Portability.Service
+namespace Microsoft.DotNet.UpgradeAssistant.Portability.Service
 {
     public interface IPortabilityService
     {

@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Versioning;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     public class UpgradeAssistantReferenceAnalyzer : IPackageReferencesAnalyzer
     {
-        private const string AnalyzerPackageName = "Microsoft.UpgradeAssistant.Extensions.Default.Analyzers";
+        private const string AnalyzerPackageName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers";
 
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<UpgradeAssistantReferenceAnalyzer> _logger;

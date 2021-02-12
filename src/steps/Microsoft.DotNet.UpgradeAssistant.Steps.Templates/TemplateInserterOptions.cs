@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.Steps.Templates
+﻿namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public class TemplateInserterOptions
     {

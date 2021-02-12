@@ -4,9 +4,9 @@ using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.CodeAnalysis;
-using Microsoft.UpgradeAssistant.Portability.Service;
+using Microsoft.DotNet.UpgradeAssistant.Portability.Service;
 
-namespace Microsoft.UpgradeAssistant.Portability.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Portability.Analyzers
 {
     internal class PortabilityServiceAnalyzer : IPortabilityAnalyzer
     {

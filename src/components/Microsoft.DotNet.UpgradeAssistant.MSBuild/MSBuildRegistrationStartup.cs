@@ -7,7 +7,7 @@ using System.Runtime.Loader;
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class MSBuildRegistrationStartup
     {

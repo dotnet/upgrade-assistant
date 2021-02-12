@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public static class ConsoleHelpers
     {

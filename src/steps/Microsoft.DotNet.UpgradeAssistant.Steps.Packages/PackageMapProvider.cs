@@ -5,10 +5,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Extensions;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageMapProvider
     {

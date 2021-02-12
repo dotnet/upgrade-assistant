@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     [Flags]
     public enum ProjectComponents

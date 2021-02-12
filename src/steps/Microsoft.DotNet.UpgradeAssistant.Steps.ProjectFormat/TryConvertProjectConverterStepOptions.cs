@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
+﻿namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStepOptions
     {

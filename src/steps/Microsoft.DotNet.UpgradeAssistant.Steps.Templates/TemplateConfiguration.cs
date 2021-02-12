@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Microsoft.UpgradeAssistant.Steps.Templates
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public class TemplateConfiguration
     {

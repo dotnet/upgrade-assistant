@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.UpgradeAssistant.Steps.Templates
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public static class StreamHelpers
     {

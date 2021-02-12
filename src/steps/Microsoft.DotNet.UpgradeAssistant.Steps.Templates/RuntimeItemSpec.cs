@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.UpgradeAssistant.Extensions;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 
-namespace Microsoft.UpgradeAssistant.Steps.Templates
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     /// <summary>
     /// Internal type that supplements an ItemSpec with replacements relevant to its template configuration,

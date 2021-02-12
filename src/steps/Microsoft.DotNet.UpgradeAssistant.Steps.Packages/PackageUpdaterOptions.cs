@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.Steps.Packages
+﻿namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageUpdaterOptions
     {

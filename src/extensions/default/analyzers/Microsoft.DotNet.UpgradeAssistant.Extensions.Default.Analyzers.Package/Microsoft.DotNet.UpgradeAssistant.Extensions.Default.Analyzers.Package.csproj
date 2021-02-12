@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageId>Microsoft.UpgradeAssistant.Extensions.Default.Analyzers</PackageId>
+    <PackageId>Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers</PackageId>
     <Authors>Microsoft</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/dotnet/upgrade-assistant</PackageProjectUrl>

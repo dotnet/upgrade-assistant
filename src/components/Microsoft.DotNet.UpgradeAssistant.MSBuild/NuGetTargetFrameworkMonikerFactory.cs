@@ -1,7 +1,7 @@
 ﻿using System;
 using NuGet.Frameworks;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class NuGetTargetFrameworkMonikerFactory : ITargetFrameworkMonikerFactory
     {

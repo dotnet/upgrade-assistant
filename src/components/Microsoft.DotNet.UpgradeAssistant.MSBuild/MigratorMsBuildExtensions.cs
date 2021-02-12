@@ -2,10 +2,10 @@
 using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
+using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UpgradeAssistant.MSBuild;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class MigratorMsBuildExtensions
     {

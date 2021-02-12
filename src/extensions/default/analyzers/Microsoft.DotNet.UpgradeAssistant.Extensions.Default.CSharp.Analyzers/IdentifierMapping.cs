@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     public class IdentifierMapping
     {

@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UpgradeAssistant.Steps.Configuration;
+﻿using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.UpgradeAssistant.Steps
+namespace Microsoft.DotNet.UpgradeAssistant.Steps
 {
     public static class ConfigUpdaterStepExtensions
     {

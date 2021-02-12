@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.UpgradeAssistant.Reporting
+namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
     public interface ISectionGenerator
     {

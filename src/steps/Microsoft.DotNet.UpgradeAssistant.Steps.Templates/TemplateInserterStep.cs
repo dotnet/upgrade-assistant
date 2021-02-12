@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Steps.Templates
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     /// <summary>
     /// A migration step that adds files from templates if they're
@@ -39,13 +39,13 @@ namespace Microsoft.UpgradeAssistant.Steps.Templates
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before adding template files
-            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Project should be SDK-style before adding template files
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
 
             // Project should have correct TFM
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)

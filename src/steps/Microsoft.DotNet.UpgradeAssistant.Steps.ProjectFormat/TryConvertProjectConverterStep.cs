@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStep : MigrationStep
     {
@@ -28,7 +28,7 @@ namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep"
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep"
         };
 
         public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)

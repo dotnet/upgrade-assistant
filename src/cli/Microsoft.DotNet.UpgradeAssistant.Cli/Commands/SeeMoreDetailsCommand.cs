@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.UpgradeAssistant.Cli.Commands
+namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 {
     public class SeeMoreDetailsCommand : MigrationCommand
     {

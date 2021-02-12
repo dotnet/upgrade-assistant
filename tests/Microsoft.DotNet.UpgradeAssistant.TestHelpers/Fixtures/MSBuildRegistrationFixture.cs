@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.UpgradeAssistant.MSBuild;
+﻿using Microsoft.DotNet.UpgradeAssistant.MSBuild;
+using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Microsoft.UpgradeAssistant.Fixtures
+namespace Microsoft.DotNet.UpgradeAssistant.Fixtures
 {
     public class MSBuildRegistrationFixture
     {

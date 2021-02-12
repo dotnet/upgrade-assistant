@@ -8,7 +8,7 @@ using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Versioning;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     public class TargetCompatibilityReferenceAnalyzer : IPackageReferencesAnalyzer
     {

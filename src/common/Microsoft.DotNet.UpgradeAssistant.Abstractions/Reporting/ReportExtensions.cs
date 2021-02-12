@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UpgradeAssistant.Reporting;
+﻿using Microsoft.DotNet.UpgradeAssistant.Reporting;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class ReportExtensions
     {

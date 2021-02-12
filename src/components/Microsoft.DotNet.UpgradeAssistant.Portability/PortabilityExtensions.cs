@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.DotNet.UpgradeAssistant.Portability;
+using Microsoft.DotNet.UpgradeAssistant.Portability.Analyzers;
+using Microsoft.DotNet.UpgradeAssistant.Portability.Service;
+using Microsoft.DotNet.UpgradeAssistant.Reporting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant.Portability;
-using Microsoft.UpgradeAssistant.Portability.Analyzers;
-using Microsoft.UpgradeAssistant.Portability.Service;
-using Microsoft.UpgradeAssistant.Reporting;
 
-namespace Microsoft.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class PortabilityExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using NuGet.Versioning;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     internal static class NuGetExtensions
     {

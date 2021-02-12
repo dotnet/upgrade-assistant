@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Microsoft.UpgradeAssistant.Fixtures
+namespace Microsoft.DotNet.UpgradeAssistant.Fixtures
 {
     /// <summary>
     /// Makes sure that try-convert is available on disk for test usage.

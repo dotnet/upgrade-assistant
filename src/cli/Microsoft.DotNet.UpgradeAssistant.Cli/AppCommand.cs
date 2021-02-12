@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.Cli
+﻿namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public enum AppCommand
     {

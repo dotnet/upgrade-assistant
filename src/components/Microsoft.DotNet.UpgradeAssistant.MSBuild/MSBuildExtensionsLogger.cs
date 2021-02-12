@@ -3,7 +3,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Extensions.Logging;
 using ILogger = Microsoft.Build.Framework.ILogger;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class MSBuildExtensionsLogger : ILogger
     {

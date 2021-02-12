@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NuGet.Versioning;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class NuGetPackageMap
     {

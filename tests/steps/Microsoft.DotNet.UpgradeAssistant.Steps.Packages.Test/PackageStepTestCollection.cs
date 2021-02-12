@@ -1,7 +1,7 @@
-﻿using Microsoft.UpgradeAssistant.Fixtures;
+﻿using Microsoft.DotNet.UpgradeAssistant.Fixtures;
 using Xunit;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages.Test
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test
 {
     /// <summary>
     /// Class (which is never instantiated) for collecting package step tests that

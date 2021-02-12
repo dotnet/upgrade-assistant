@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.Portability
+﻿namespace Microsoft.DotNet.UpgradeAssistant.Portability
 {
     internal enum ApiType
     {

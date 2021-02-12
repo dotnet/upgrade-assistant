@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Microsoft.UpgradeAssistant.Portability
+namespace Microsoft.DotNet.UpgradeAssistant.Portability
 {
     public class PortabilityOptions
     {

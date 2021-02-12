@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.Cli
+﻿namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     /// <summary>
     /// Gives a suggestion to the calling code about how to format a message displayed to the user.

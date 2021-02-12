@@ -5,7 +5,7 @@ using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 
-namespace Microsoft.UpgradeAssistant.Steps.Packages.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     internal static class TransitiveDependencyExtensions
     {

@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.Steps.Source
+﻿namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     public class SourceUpdaterOptions
     {

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Steps.Configuration;
 using NSubstitute;
 using Xunit;
 
-namespace Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
 {
     public class UnsupportedSectionConfigUpdaterTests
     {

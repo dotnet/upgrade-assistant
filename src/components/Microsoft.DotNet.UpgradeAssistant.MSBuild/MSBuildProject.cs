@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using MBuild = Microsoft.Build.Evaluation;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : IProject
     {

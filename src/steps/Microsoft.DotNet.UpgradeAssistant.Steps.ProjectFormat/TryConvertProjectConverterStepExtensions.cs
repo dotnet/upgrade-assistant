@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.DotNet.UpgradeAssistant.Reporting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant.Reporting;
 
-namespace Microsoft.UpgradeAssistant.Steps.ProjectFormat
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public static class TryConvertProjectConverterStepExtensions
     {

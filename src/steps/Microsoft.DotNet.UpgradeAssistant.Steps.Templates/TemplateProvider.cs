@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Extensions;
 
-namespace Microsoft.UpgradeAssistant.Steps.Templates
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public class TemplateProvider
     {

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Steps.Backup
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 {
     public class BackupStep : MigrationStep
     {
@@ -24,7 +24,7 @@ namespace Microsoft.UpgradeAssistant.Steps.Backup
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // The user should select a specific project before backing up (since changes are only made at the project-level)
-            "Microsoft.UpgradeAssistant.Steps.Solution.SolutionMigrationStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.SolutionMigrationStep",
         };
 
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)

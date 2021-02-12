@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Microsoft.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public static class Constants
     {

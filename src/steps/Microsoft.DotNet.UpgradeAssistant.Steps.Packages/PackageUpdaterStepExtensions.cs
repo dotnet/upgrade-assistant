@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.UpgradeAssistant.Steps.Packages;
-using Microsoft.UpgradeAssistant.Steps.Packages.Analyzers;
 
-namespace Microsoft.UpgradeAssistant.Steps
+namespace Microsoft.DotNet.UpgradeAssistant.Steps
 {
     public static class PackageUpdaterStepExtensions
     {

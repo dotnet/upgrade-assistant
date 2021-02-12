@@ -4,10 +4,10 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.DotNet.UpgradeAssistant.Reporting;
 using Microsoft.Extensions.Logging;
-using Microsoft.UpgradeAssistant.Reporting;
 
-namespace Microsoft.UpgradeAssistant.Portability
+namespace Microsoft.DotNet.UpgradeAssistant.Portability
 {
     internal class PortabilityAnalysis : ISectionGenerator
     {

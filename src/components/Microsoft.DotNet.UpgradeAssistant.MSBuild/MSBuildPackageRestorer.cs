@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Build.Execution;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class MSBuildPackageRestorer : IPackageRestorer
     {

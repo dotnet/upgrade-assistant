@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.UpgradeAssistant.Extensions
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public static class ExtensionProviderExtensions
     {

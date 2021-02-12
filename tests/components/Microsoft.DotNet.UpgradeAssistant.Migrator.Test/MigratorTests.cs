@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Xunit;
 
-namespace Microsoft.UpgradeAssistant.Migrator.Test
+namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
 {
     public class MigratorTests
     {

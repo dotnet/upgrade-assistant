@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.UpgradeAssistant.Steps.Source
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     /// <summary>
     /// Migration step that updates C# source using Roslyn analyzers and code fixers.
@@ -33,13 +33,13 @@ namespace Microsoft.UpgradeAssistant.Steps.Source
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing source
-            "Microsoft.UpgradeAssistant.Steps.Backup.BackupStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
 
             // Template files should be added prior to changing source (since some code fixers will change added templates)
-            "Microsoft.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
 
             // Project should have correct TFM
-            "Microsoft.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
         public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)

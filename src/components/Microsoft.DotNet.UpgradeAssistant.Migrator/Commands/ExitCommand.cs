@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.UpgradeAssistant.Migrator.Commands
+namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Commands
 {
     public class ExitCommand : MigrationCommand
     {

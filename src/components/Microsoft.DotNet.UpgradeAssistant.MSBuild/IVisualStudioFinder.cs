@@ -1,4 +1,4 @@
-﻿namespace Microsoft.UpgradeAssistant.MSBuild
+﻿namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public interface IVisualStudioFinder
     {
