@@ -6,7 +6,7 @@
     <MinorVersion>2</MinorVersion>
     <!-- Build release-only package. -->
     <PreReleaseVersionLabel />
-    
+    <SkipPackagePublishingVersionChecks>true</SkipPackagePublishingVersionChecks>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
     <!-- Libs -->

@@ -6,7 +6,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <SkipPackagePublishingVersionChecks>true</SkipPackagePublishingVersionChecks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DotNetBuildFromSource)' == 'true'">
