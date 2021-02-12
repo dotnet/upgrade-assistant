@@ -106,7 +106,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddExtensions(context.Configuration[UpgradeAssistantExtensionPathsSettingName], options.Extension);
 
                     // Add command handlers
-                    services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
+                    if (options.NonInteractive)
+                    {
+                        options.SkipBackup = true;
+                        services.AddTransient<ICollectUserInput, NonInteractiveUserInput>();
+                    }
+                    else
+                    {
+                        services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
+                    }
+
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
@@ -182,6 +191,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             command.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
             command.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+            command.AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option") { IsHidden = true });
         }
 
 #if ANALYZE_COMMAND
