@@ -110,7 +110,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     // Add command handlers
                     if (options.NonInteractive)
                     {
-                        options.SkipBackup = true;
                         services.AddTransient<ICollectUserInput, NonInteractiveUserInput>();
                     }
                     else
