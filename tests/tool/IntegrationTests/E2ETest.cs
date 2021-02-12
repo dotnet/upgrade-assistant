@@ -39,11 +39,8 @@ namespace IntegrationTests
                 var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioName);
                 await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
 
-                // Read commands
-                var commands = await File.ReadAllLinesAsync(Path.Combine(scenarioDir, CommandsFileName)).ConfigureAwait(false);
-
                 // Run migration
-                await MigrationRunner.MigrateAsync(Path.Combine(workingDir, inputFileName), Console.Out, commands, 300).ConfigureAwait(false);
+                await MigrationRunner.MigrateAsync(Path.Combine(workingDir, inputFileName), Console.Out, 300).ConfigureAwait(false);
                 CleanupBuildArtifacts(workingDir);
 
                 await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, MigratedProjectSubDir), workingDir).ConfigureAwait(false);
