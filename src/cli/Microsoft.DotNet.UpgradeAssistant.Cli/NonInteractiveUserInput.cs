@@ -16,5 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
             where T : MigrationCommand
             => Task.FromResult(commands.First(c => c.IsEnabled));
+
+        public async Task<bool> WaitToProceedAsync(CancellationToken token)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2), token);
+
+            return true;
+        }
     }
 }
