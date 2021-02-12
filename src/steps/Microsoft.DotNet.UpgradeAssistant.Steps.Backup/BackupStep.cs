@@ -10,7 +10,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
     public class BackupStep : MigrationStep
     {
         private const string FlagFileName = "migration.backup";
+
         private readonly bool _skipBackup;
+        private readonly ICollectUserInput _userInput;
 
         private string? _projectDir;
         private string? _backupPath;
@@ -27,20 +29,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.CurrentProjectSelectionStep",
         };
 
-        public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput collectBackupPathFromUser)
+        public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput userInput)
             : base(logger)
         {
             _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));
-
-            if (collectBackupPathFromUser is null)
-            {
-                throw new ArgumentNullException(nameof(collectBackupPathFromUser));
-            }
-
-            Commands.Insert(0, new SetBackupPathCommand(() => _backupPath, collectBackupPathFromUser.AskUserAsync, (newPath) =>
-            {
-                _backupPath = newPath;
-            }));
+            _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
         }
 
         // The backup step backs up at the project level, so it doesn't apply if no project is selected
@@ -86,7 +79,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new MigrationStepApplyResult(MigrationStepStatus.Skipped, "Backup skipped");
             }
 
-            if (_backupPath is null)
+            var backupPath = await ChooseBackupPath(context, token);
+
+            if (backupPath is null)
             {
                 Logger.LogDebug("No backup path specified");
                 return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a backup location");
@@ -100,24 +95,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             if (Status == MigrationStepStatus.Complete)
             {
-                Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", _backupPath);
+                Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", backupPath);
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Existing backup found");
             }
 
-            Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, _backupPath);
+            Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, backupPath);
             try
             {
-                Directory.CreateDirectory(_backupPath);
-                if (!Directory.Exists(_backupPath))
+                Directory.CreateDirectory(backupPath);
+                if (!Directory.Exists(backupPath))
                 {
-                    Logger.LogError("Failed to create backup directory ({BackupPath})", _backupPath);
-                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to create backup directory {_backupPath}");
+                    Logger.LogError("Failed to create backup directory ({BackupPath})", backupPath);
+                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to create backup directory {backupPath}");
                 }
 
-                await CopyDirectoryAsync(_projectDir, _backupPath).ConfigureAwait(false);
+                await CopyDirectoryAsync(_projectDir, backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
-                await File.WriteAllTextAsync(Path.Combine(_backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
-                Logger.LogInformation("Project backed up to {BackupPath}", _backupPath);
+                await File.WriteAllTextAsync(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
+                Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Backup completed successfully");
             }
             catch (IOException exc)
@@ -131,6 +126,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         {
             _backupPath = null;
             return base.Reset();
+        }
+
+        private async Task<string?> ChooseBackupPath(IMigrationContext context, CancellationToken token)
+        {
+            var customPath = default(string);
+            var commands = new[]
+            {
+                MigrationCommand.Create($"Use default path [{_backupPath}]"),
+                MigrationCommand.Create("Enter custom path", async (ctx, token) =>
+                {
+                    customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:");
+                    return !string.IsNullOrEmpty(customPath);
+                })
+            };
+
+            while (!token.IsCancellationRequested)
+            {
+                var result = await _userInput.ChooseAsync("Please choose a backup path", commands, token);
+
+                if (await result.ExecuteAsync(context, token))
+                {
+                    return customPath ?? _backupPath;
+                }
+            }
+
+            return null;
         }
 
         private async Task CopyDirectoryAsync(string sourceDir, string destinationDir)
@@ -150,13 +171,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
         }
 
-        private static async Task CopyFileAsync(string sourceFile, string destinationFile)
+        private async Task CopyFileAsync(string sourceFile, string destinationFile)
         {
-            var fileOptions = FileOptions.Asynchronous | FileOptions.SequentialScan;
-            var bufferSize = 65536;
-            using var sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize, fileOptions);
-            using var destinationStream = new FileStream(destinationFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, fileOptions);
-            await sourceStream.CopyToAsync(destinationStream, bufferSize, CancellationToken.None).ConfigureAwait(false);
+            try
+            {
+                var fileOptions = FileOptions.Asynchronous | FileOptions.SequentialScan;
+                var bufferSize = 65536;
+                using var sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize, fileOptions);
+                using var destinationStream = new FileStream(destinationFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, fileOptions);
+                await sourceStream.CopyToAsync(destinationStream, bufferSize, CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (IOException e)
+            {
+                Logger.LogWarning("Could not copy file {Path} due to '{Message}'", sourceFile, e.Message);
+            }
         }
 
         private string GetDefaultBackupPath(string projectDir)
