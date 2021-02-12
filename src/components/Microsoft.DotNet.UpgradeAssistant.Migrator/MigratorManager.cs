@@ -41,6 +41,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
                 return null;
             }
 
+            if (steps.All(s => s.IsDone))
+            {
+                Logger.LogDebug("All steps have completed");
+                return null;
+            }
+
             var nextStep = await GetNextStepAsyncInternal(steps, context, token).ConfigureAwait(false);
 
             if (nextStep is null)
