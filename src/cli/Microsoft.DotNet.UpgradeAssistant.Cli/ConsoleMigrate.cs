@@ -102,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     {
                         token.ThrowIfCancellationRequested();
 
-                        ShowMigrationSteps(steps, step);
+                        ShowMigrationSteps(steps, context, step);
 
                         var commands = _commandProvider.GetCommands(step);
                         var command = await _input.ChooseAsync("Choose command", commands, token);
@@ -117,13 +117,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                             _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
                             Console.ResetColor();
                         }
+                        else if (await _input.WaitToProceedAsync(token))
+                        {
+                            Console.Clear();
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Upgrade process was cancelled. Quitting....");
+                            return;
+                        }
                     }
 
                     step = await migrator.GetNextStepAsync(context, token);
                 }
-
-                // Once a project has completed, we can remove it from the context.
-                context.SetCurrentProject(null);
 
                 _logger.LogInformation("Migration has completed. Please review any changes.");
             }
@@ -136,7 +142,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public Task StopAsync(CancellationToken token) => Task.CompletedTask;
 
-        private void ShowMigrationSteps(IEnumerable<MigrationStep> steps, MigrationStep? currentStep = null, int offset = 0)
+        private void ShowMigrationSteps(IEnumerable<MigrationStep> steps, IMigrationContext context, MigrationStep? currentStep = null, int offset = 0)
         {
             if (steps is null || !steps.Any())
             {
@@ -151,6 +157,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 _io.Output.WriteLine();
                 _io.Output.WriteLine("Migration Steps");
+                _io.Output.WriteLine();
+
+                var displayedProjectInfo = false;
+
+                if (context.EntryPoint is not null)
+                {
+                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.Project.FilePath}");
+                    displayedProjectInfo = true;
+                }
+
+                if (context.CurrentProject is not null)
+                {
+                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.Project.FilePath}");
+                    displayedProjectInfo = true;
+                }
+
+                if (displayedProjectInfo)
+                {
+                    _io.Output.WriteLine();
+                }
             }
 
             foreach (var step in steps)
@@ -164,7 +190,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 _io.Output.WriteLine(step.Title);
                 nextStepFound = nextStepFound || step.Status != MigrationStepStatus.Complete;
 
-                ShowMigrationSteps(step.SubSteps, currentStep, offset + 1);
+                ShowMigrationSteps(step.SubSteps, context, currentStep, offset + 1);
             }
         }
 

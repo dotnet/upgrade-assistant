@@ -31,8 +31,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public static Task Main(string[] args)
         {
-            ShowHeader();
-
             var root = new RootCommand
             {
                 // Get name from process so that it will show correctly if run as a .NET CLI tool
@@ -72,6 +70,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public static Task RunCommandAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection>? serviceConfiguration, AppCommand appCommand, CancellationToken token)
         {
+            Console.Clear();
+            ShowHeader();
+
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
@@ -114,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     // Add steps
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
                     services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection));
-                    services.AddScoped<MigrationStep, SolutionMigrationStep>();
+                    services.AddSolutionLevelSteps();
                     services.AddScoped<MigrationStep, BackupStep>();
                     services.AddTemplateInserterStep();
                     services.AddConfigUpdaterStep();
@@ -140,7 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ShowHeader()
         {
-            var title = $"- ASP.NET Core Migrator, v{Constants.Version} -";
+            var title = $"- Microsoft .NET Upgrade Assistant v{Constants.Version} -";
             Console.WriteLine(new string('-', title.Length));
             Console.WriteLine(title);
             Console.WriteLine(new string('-', title.Length));
@@ -156,6 +157,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             public override void Write(ICommand command)
             {
+                ShowHeader();
+
                 WriteString("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to an ASP.NET Core project.");
                 WriteString("No tool can completely automate this process and the project *will* have build errors after the tool runs and will require significant manual changes to complete migration.");
                 WriteString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");

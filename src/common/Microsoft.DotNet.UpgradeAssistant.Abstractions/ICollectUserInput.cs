@@ -10,5 +10,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
             where T : MigrationCommand;
+
+        Task<bool> WaitToProceedAsync(CancellationToken token);
     }
 }
