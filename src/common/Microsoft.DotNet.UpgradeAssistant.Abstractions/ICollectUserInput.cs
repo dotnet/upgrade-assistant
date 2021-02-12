@@ -6,7 +6,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface ICollectUserInput
     {
-        Task<string?> AskUserAsync(string currentPath);
+        Task<string?> AskUserAsync(string prompt);
 
         Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
             where T : MigrationCommand;

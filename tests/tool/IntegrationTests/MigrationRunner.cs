@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant;
@@ -13,7 +11,7 @@ namespace IntegrationTests
 {
     public static class MigrationRunner
     {
-        public static async Task MigrateAsync(string inputPath, TextWriter output, IEnumerable<string> commands, int timeoutSeconds = 300)
+        public static async Task MigrateAsync(string inputPath, TextWriter output, int timeoutSeconds = 300)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -25,15 +23,17 @@ namespace IntegrationTests
                 throw new ArgumentNullException(nameof(output));
             }
 
-            if (commands is null)
-            {
-                throw new ArgumentNullException(nameof(commands));
-            }
-
             var project = new FileInfo(inputPath);
             using var cts = new CancellationTokenSource();
 
-            var migrationTask = Program.RunCommandAsync(new MigrateOptions { SkipBackup = true, Project = project }, (context, services) => RegisterTestServices(services, output, commands), AppCommand.Migrate, cts.Token);
+            var options = new MigrateOptions
+            {
+                SkipBackup = true,
+                Project = project,
+                NonInteractive = true
+            };
+
+            var migrationTask = Program.RunCommandAsync(options, (context, services) => RegisterTestServices(services, output), AppCommand.Migrate, cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);
@@ -48,15 +48,8 @@ namespace IntegrationTests
             }
         }
 
-        private static void RegisterTestServices(IServiceCollection services, TextWriter output, IEnumerable<string> commands)
+        private static void RegisterTestServices(IServiceCollection services, TextWriter output)
         {
-            var servicesToRemove = services.Where(sd => sd.ServiceType.Equals(typeof(InputOutputStreams))).ToArray();
-            foreach (var service in servicesToRemove)
-            {
-                services.Remove(service);
-            }
-
-            services.AddSingleton(new InputOutputStreams(new StringReader(string.Join('\n', commands)), output));
             services.AddOptions<PackageUpdaterOptions>().Configure(o =>
             {
                 o.PackageMapPath = "PackageMaps";
