@@ -3,6 +3,6 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Microsoft.UpgradeAssistant.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\..\common\Microsoft.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
 </Project>

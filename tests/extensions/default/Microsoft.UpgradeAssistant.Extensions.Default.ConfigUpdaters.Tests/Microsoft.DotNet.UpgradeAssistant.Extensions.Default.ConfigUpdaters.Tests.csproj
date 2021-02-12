@@ -11,6 +11,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\extensions\default\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
+    <ProjectReference Include="..\..\..\..\src\extensions\default\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
   </ItemGroup>
 </Project>

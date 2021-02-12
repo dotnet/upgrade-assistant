@@ -18,10 +18,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
-    <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
-    <ProjectReference Include="..\..\..\..\..\src\steps\Microsoft.UpgradeAssistant.Steps.Source\Microsoft.UpgradeAssistant.Steps.Source.csproj" />
-    <ProjectReference Include="..\..\..\..\..\src\components\Microsoft.UpgradeAssistant.MSBuild\Microsoft.UpgradeAssistant.MSBuild.csproj" />
-    <ProjectReference Include="..\..\..\..\Microsoft.UpgradeAssistant.TestHelpers\Microsoft.UpgradeAssistant.TestHelpers.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\steps\Microsoft.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\components\Microsoft.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
+    <ProjectReference Include="..\..\..\..\Microsoft.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

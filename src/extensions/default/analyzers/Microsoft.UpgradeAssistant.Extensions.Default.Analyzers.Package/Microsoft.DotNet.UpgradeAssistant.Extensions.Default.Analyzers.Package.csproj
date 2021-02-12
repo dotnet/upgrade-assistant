@@ -21,16 +21,16 @@
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
-    <ProjectReference Include="..\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
+    <ProjectReference Include="..\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
   </ItemGroup>
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 </Project>

@@ -14,6 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\components\Microsoft.UpgradeAssistant.Migrator\Microsoft.DotNet.UpgradeAssistant.Migrator.csproj" />
     <ProjectReference Include="..\..\..\src\steps\Microsoft.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj" />
-    <ProjectReference Include="..\..\Microsoft.UpgradeAssistant.TestHelpers\Microsoft.UpgradeAssistant.TestHelpers.csproj" />
+    <ProjectReference Include="..\..\Microsoft.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

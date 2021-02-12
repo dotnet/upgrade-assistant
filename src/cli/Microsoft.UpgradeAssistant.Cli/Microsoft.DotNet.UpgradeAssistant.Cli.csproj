@@ -48,24 +48,24 @@
     <PackageReference Include="NuGet.Versioning" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Microsoft.UpgradeAssistant.Abstractions\Microsoft.UpgradeAssistant.Abstractions.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Backup\Microsoft.UpgradeAssistant.Steps.Backup.csproj" />
-    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.Migrator\Microsoft.UpgradeAssistant.Migrator.csproj" />
-    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.MSBuild\Microsoft.UpgradeAssistant.MSBuild.csproj" />
-    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.Portability\Microsoft.UpgradeAssistant.Portability.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Solution\Microsoft.UpgradeAssistant.Steps.Solution.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.ProjectFormat\Microsoft.UpgradeAssistant.Steps.ProjectFormat.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Packages\Microsoft.UpgradeAssistant.Steps.Packages.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Source\Microsoft.UpgradeAssistant.Steps.Source.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Templates\Microsoft.UpgradeAssistant.Steps.Templates.csproj" />
+    <ProjectReference Include="..\..\common\Microsoft.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.Migrator\Microsoft.DotNet.UpgradeAssistant.Migrator.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.UpgradeAssistant.Portability\Microsoft.DotNet.UpgradeAssistant.Portability.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Templates\Microsoft.DotNet.UpgradeAssistant.Steps.Templates.csproj" />
     <!-- These projects aren't used directly by this project, but are included here so that they're
          sure to be built prior to copying their binary output into this project's 'SourceUpdaters'
          and 'ConfigUpdaters' directories. -->
-    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
-    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Configuration\Microsoft.UpgradeAssistant.Steps.Configuration.csproj" />
-    <ProjectReference Include="..\..\extensions\default\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
-    <ProjectReference Include="..\..\extensions\Microsoft.UpgradeAssistant.Extensions\Microsoft.UpgradeAssistant.Extensions.csproj" />
+    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\steps\Microsoft.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj" />
+    <ProjectReference Include="..\..\extensions\default\Microsoft.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
+    <ProjectReference Include="..\..\extensions\Microsoft.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />
   </ItemGroup>
   <!-- Copy analyzers and code fixers into \SourceUpdaters since that's where the app will probe for them. -->
   <Target Name="MoveUpdatersToUpdatersUpdatersDir" AfterTargets="Build">

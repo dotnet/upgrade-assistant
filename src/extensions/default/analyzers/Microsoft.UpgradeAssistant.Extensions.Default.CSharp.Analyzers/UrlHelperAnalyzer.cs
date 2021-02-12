@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
 namespace Microsoft.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
