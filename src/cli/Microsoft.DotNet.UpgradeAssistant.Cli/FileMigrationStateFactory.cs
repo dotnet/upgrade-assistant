@@ -35,6 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             context.SetEntryPoint(FindProject(state.EntryPoint));
             context.SetCurrentProject(FindProject(state.CurrentProject));
+            context.IsComplete = state.IsComplete;
 
             IProject? FindProject(string? path)
                 => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == path);
@@ -84,6 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 EntryPoint = NormalizePath(context.EntryPoint?.Project.FilePath),
                 CurrentProject = NormalizePath(context.CurrentProject?.Project.FilePath),
+                IsComplete = context.IsComplete,
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
@@ -98,6 +100,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             public string? CurrentProject { get; set; }
 
             public string? EntryPoint { get; set; }
+
+            public bool IsComplete { get; set; }
         }
     }
 }

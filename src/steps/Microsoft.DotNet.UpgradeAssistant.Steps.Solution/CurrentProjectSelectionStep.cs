@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,23 +7,28 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
-    public class SolutionMigrationStep : MigrationStep
+    public class CurrentProjectSelectionStep : MigrationStep
     {
         private readonly ICollectUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetTFMSelector _tfmSelector;
 
-        public override string Id => typeof(SolutionMigrationStep).FullName!;
+        public override IEnumerable<string> DependsOn { get; } = new[]
+        {
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.EntrypointSelectionStep"
+        };
+
+        public override string Id => typeof(CurrentProjectSelectionStep).FullName!;
 
         public override string Description => string.Empty;
 
-        public override string Title => "Choose project to upgrade";
+        public override string Title => "Select project to upgrade";
 
-        public SolutionMigrationStep(
+        public CurrentProjectSelectionStep(
             ICollectUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
             ITargetTFMSelector tfmSelector,
-            ILogger<SolutionMigrationStep> logger)
+            ILogger<CurrentProjectSelectionStep> logger)
             : base(logger)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
@@ -30,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context is not null && context.CurrentProject is null;
+        protected override bool IsApplicableImpl(IMigrationContext context) => context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p));
 
         // This migration step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IMigrationContext context) => context?.CurrentProject is null && Status == MigrationStepStatus.Complete;
@@ -45,9 +51,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.EntryPoint is not null && context.CurrentProject is not null)
+            if (context.CurrentProject is not null)
             {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
+                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Current project is already selected.", BuildBreakRisk.None);
             }
 
             var projects = context.Projects.ToList();
@@ -59,26 +65,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (projects.Count == 1)
             {
-                context.SetEntryPoint(projects[0]);
-                context.SetCurrentProject(projects[0]);
+                var project = projects[0];
+                context.SetCurrentProject(project);
 
-                Logger.LogInformation("Solution only contains one project ({Project}), setting it as the current project and entrypoint.", context.CurrentProject!.Project.FilePath);
+                Logger.LogInformation("Setting only project in solution as the current project: {Project}", project.FilePath);
 
                 return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
 
-            if (context.EntryPoint is null)
-            {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
-            }
-            else if (context.CurrentProject is null)
-            {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
-            }
-            else
-            {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
-            }
+            return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
         }
 
         protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
@@ -109,8 +104,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         {
             const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
 
-            context.SetEntryPoint(await GetEntrypointAsync(context, token).ConfigureAwait(false));
-            var ordered = context.EntryPoint!.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            if (context.EntryPoint is null)
+            {
+                throw new InvalidOperationException("Entrypoint must be set before using this step");
+            }
+
+            var ordered = context.EntryPoint.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 
@@ -120,41 +119,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 return new ProjectCommand(project, isProjectCompleted(context, project));
             }
-        }
-
-        private async ValueTask<IProject> GetEntrypointAsync(IMigrationContext context, CancellationToken token)
-        {
-            const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
-
-            if (context.EntryPoint is not null)
-            {
-                return context.EntryPoint.Project;
-            }
-
-            var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();
-            var result = await _input.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
-
-            return result.Project;
-        }
-
-        private class ProjectCommand : MigrationCommand
-        {
-            public static ProjectCommand Create(IProject project) => new(project, false);
-
-            public ProjectCommand(IProject project, bool isCompleted)
-            {
-                IsEnabled = !isCompleted;
-
-                Project = project;
-            }
-
-            // Use ANSI escape codes to colorize parts of the output (https://en.wikipedia.org/wiki/ANSI_escape_code)
-            public override string CommandText => IsEnabled ? Project.GetRoslynProject().Name : $"\u001b[32m[Completed]\u001b[0m {Project.GetRoslynProject().Name}";
-
-            public IProject Project { get; }
-
-            public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
-                => Task.FromResult(true);
         }
     }
 }

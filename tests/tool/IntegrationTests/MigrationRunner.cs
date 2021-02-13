@@ -30,7 +30,8 @@ namespace IntegrationTests
             {
                 SkipBackup = true,
                 Project = project,
-                NonInteractive = true
+                NonInteractive = true,
+                NonInteractiveWait = TimeSpan.Zero,
             };
 
             var migrationTask = Program.RunCommandAsync(options, (context, services) => RegisterTestServices(services, output), AppCommand.Migrate, cts.Token);

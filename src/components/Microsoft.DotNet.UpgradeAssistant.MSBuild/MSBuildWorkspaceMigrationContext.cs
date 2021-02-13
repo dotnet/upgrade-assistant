@@ -39,6 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public ITargetFrameworkMonikerFactory TfmFactory { get; }
 
+        public bool IsComplete { get; set; }
+
         public MSBuildWorkspaceMigrationContext(
             MigrateOptions options,
             ITargetTFMSelector tfmSelector,

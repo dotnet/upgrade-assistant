@@ -8,6 +8,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     internal class NonInteractiveUserInput : ICollectUserInput
     {
+        private readonly TimeSpan _waitPeriod;
+
+        public NonInteractiveUserInput(MigrateOptions options)
+        {
+            _waitPeriod = options.NonInteractiveWait;
+        }
+
         public Task<string?> AskUserAsync(string currentPath)
         {
             throw new NotImplementedException("User input cannot be selected in non-interactive mode");
@@ -19,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public async Task<bool> WaitToProceedAsync(CancellationToken token)
         {
-            await Task.Delay(TimeSpan.FromSeconds(2), token);
+            await Task.Delay(_waitPeriod, token);
 
             return true;
         }

@@ -8,6 +8,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IMigrationContext : IDisposable
     {
+        bool IsComplete { get; set; }
+
         UpgradeProjectInfo? EntryPoint { get; }
 
         void SetEntryPoint(IProject? entryPoint);

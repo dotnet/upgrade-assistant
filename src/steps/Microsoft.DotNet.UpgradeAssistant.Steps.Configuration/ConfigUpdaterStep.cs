@@ -30,6 +30,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep"
         };
 
+        public override IEnumerable<string> DependencyOf { get; } = new[]
+        {
+            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+        };
+
         public ConfigUpdaterStep(ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
