@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     public class CurrentProjectSelectionStep : MigrationStep
     {
-        private readonly ICollectUserInput _input;
+        private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetTFMSelector _tfmSelector;
 
@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         public override string Title => "Select project to upgrade";
 
         public CurrentProjectSelectionStep(
-            ICollectUserInput input,
+            IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
             ITargetTFMSelector tfmSelector,
             ILogger<CurrentProjectSelectionStep> logger)

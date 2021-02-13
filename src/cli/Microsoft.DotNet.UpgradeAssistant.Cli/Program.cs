@@ -110,11 +110,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     // Add command handlers
                     if (options.NonInteractive)
                     {
-                        services.AddTransient<ICollectUserInput, NonInteractiveUserInput>();
+                        services.AddTransient<IUserInput, NonInteractiveUserInput>();
                     }
                     else
                     {
-                        services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
+                        services.AddTransient<IUserInput, ConsoleCollectUserInput>();
                     }
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    internal class NonInteractiveUserInput : ICollectUserInput
+    internal class NonInteractiveUserInput : IUserInput
     {
         private readonly TimeSpan _waitPeriod;
 

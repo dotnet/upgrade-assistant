@@ -7,66 +7,46 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 {
     public class ConfigureConsoleLoggingCommand : MigrationCommand
     {
-        private readonly InputOutputStreams _io;
+        private readonly IUserInput _userInput;
         private readonly LogSettings _logSettings;
 
-        public ConfigureConsoleLoggingCommand(InputOutputStreams io, LogSettings logSettings)
+        public ConfigureConsoleLoggingCommand(IUserInput userInput, LogSettings logSettings)
         {
-            _io = io ?? throw new ArgumentNullException(nameof(io));
+            _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
             _logSettings = logSettings ?? throw new ArgumentNullException(nameof(logSettings));
         }
 
-        // todo - support localization
         public override string CommandText => "Configure logging";
 
-        public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+        public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
         {
-            _io.Output.WriteLine("Choose your log level:");
-            _io.Output.WriteLine("0) Trace");
-            _io.Output.WriteLine("1) Debug");
-            _io.Output.WriteLine("2) Info");
-            _io.Output.WriteLine("3) Warning");
-            _io.Output.WriteLine("4) Error");
-            _io.Output.WriteLine("5) Critical");
-            _io.Output.WriteLine("6) None");
-            _io.Output.WriteLine();
+            var result = await _userInput.ChooseAsync("Choose your log level:", CreateFromEnum<LogLevel>(), token);
+            var newLogLevel = result.Value;
 
-            var selectedLogLevel = _io.Input.ReadLine();
+            // if the choice cannot be parsed then we will not change the setting
+            _logSettings.SetLogLevel(newLogLevel);
 
-            if (Enum.TryParse<LogLevel>(selectedLogLevel, out var newLogLevel))
+            if (newLogLevel == LogLevel.None)
             {
-                // if the choice cannot be parsed then we will not change the setting
-                _logSettings.SetLogLevel(newLogLevel);
+                _logSettings.SelectedTargets = LogTargets.None;
+            }
+            else
+            {
+                var target = LogTargets.None;
 
-                if (newLogLevel == LogLevel.None)
+                var commands = new[]
                 {
-                    _logSettings.SelectedTargets = LogTargets.None;
-                }
-                else
-                {
-                    _io.Output.WriteLine("Choose where to send log messages:");
-                    _io.Output.WriteLine("1) Console");
-                    _io.Output.WriteLine("2) File");
-                    _io.Output.WriteLine("3) Both");
+                    Create("Console", () => target = LogTargets.Console),
+                    Create("File", () => target = LogTargets.File),
+                    Create("Both", () => target = LogTargets.Console | LogTargets.File),
+                };
 
-                    var selectedTarget = _io.Input.ReadLine();
+                await _userInput.ChooseAsync("Choose where to send log messages:", commands, token);
 
-                    if (int.TryParse(selectedTarget, out var targetInt))
-                    {
-                        _logSettings.SelectedTargets = targetInt switch
-                        {
-                            1 => LogTargets.Console,
-                            2 => LogTargets.File,
-                            3 => LogTargets.Console | LogTargets.File,
-                            _ => LogTargets.None
-                        };
-                    }
-                }
-
-                return Task.FromResult(true);
+                _logSettings.SelectedTargets = target;
             }
 
-            return Task.FromResult(false);
+            return true;
         }
     }
 }

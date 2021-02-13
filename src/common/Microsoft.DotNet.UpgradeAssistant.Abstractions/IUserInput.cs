@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface ICollectUserInput
+    public interface IUserInput
     {
         Task<string?> AskUserAsync(string prompt);
 

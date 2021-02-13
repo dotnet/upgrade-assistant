@@ -8,9 +8,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     public class EntrypointSelectionStep : MigrationStep
     {
-        private readonly ICollectUserInput _userInput;
+        private readonly IUserInput _userInput;
 
-        public EntrypointSelectionStep(ICollectUserInput userInput, ILogger<EntrypointSelectionStep> logger)
+        public EntrypointSelectionStep(IUserInput userInput, ILogger<EntrypointSelectionStep> logger)
             : base(logger)
         {
             _userInput = userInput;

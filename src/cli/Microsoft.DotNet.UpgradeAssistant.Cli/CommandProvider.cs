@@ -11,9 +11,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         private readonly InputOutputStreams _io;
         private readonly LogSettings _logSettings;
+        private readonly IUserInput _userInput;
         private readonly ExitCommand _exit;
 
-        public CommandProvider(InputOutputStreams io, LogSettings logSettings, IHostApplicationLifetime lifetime)
+        public CommandProvider(
+            InputOutputStreams io,
+            LogSettings logSettings,
+            IUserInput userInput,
+            IHostApplicationLifetime lifetime)
         {
             if (lifetime is null)
             {
@@ -22,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             _io = io ?? throw new ArgumentNullException(nameof(io));
             _logSettings = logSettings;
-
+            _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
             _exit = new ExitCommand(lifetime.StopApplication);
         }
 
@@ -38,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 new ApplyNextCommand(step),
                 new SkipNextCommand(step),
                 new SeeMoreDetailsCommand(step, ShowStepStatus),
-                new ConfigureConsoleLoggingCommand(_io, _logSettings),
+                new ConfigureConsoleLoggingCommand(_userInput, _logSettings),
                 _exit,
             };
         }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    public class ConsoleCollectUserInput : ICollectUserInput
+    public class ConsoleCollectUserInput : IUserInput
     {
         private const string Prompt = "> ";
         private readonly InputOutputStreams _io;
