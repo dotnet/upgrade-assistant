@@ -101,6 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         token.ThrowIfCancellationRequested();
 
                         ShowMigrationSteps(steps, context, step);
+                        _io.Output.WriteLine();
 
                         var commands = _commandProvider.GetCommands(step);
                         var command = await _input.ChooseAsync("Choose command", commands, token);
