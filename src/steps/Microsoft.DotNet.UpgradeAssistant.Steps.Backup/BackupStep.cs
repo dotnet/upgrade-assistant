@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         private const string FlagFileName = "migration.backup";
 
         private readonly bool _skipBackup;
-        private readonly ICollectUserInput _userInput;
+        private readonly IUserInput _userInput;
 
         private string? _projectDir;
         private string? _backupPath;
@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.CurrentProjectSelectionStep",
         };
 
-        public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, ICollectUserInput userInput)
+        public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, IUserInput userInput)
             : base(logger)
         {
             _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));

@@ -14,14 +14,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     public class ConsoleMigrate : IHostedService
     {
         private readonly IServiceProvider _services;
-        private readonly ICollectUserInput _input;
+        private readonly IUserInput _input;
         private readonly InputOutputStreams _io;
         private readonly CommandProvider _commandProvider;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
 
         public ConsoleMigrate(
-            ICollectUserInput input,
+            IUserInput input,
             InputOutputStreams io,
             CommandProvider commandProvider,
             ILogger<ConsoleMigrate> logger,
@@ -101,6 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         token.ThrowIfCancellationRequested();
 
                         ShowMigrationSteps(steps, context, step);
+                        _io.Output.WriteLine();
 
                         var commands = _commandProvider.GetCommands(step);
                         var command = await _input.ChooseAsync("Choose command", commands, token);
