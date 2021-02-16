@@ -92,7 +92,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
 
         private List<MigrationStep> Order(IEnumerable<MigrationStep> migrationSteps)
         {
-            _logger.LogDebug("Ordering {Count} migration steps", migrationSteps.Count());
+            foreach (var step in migrationSteps)
+            {
+                _logger.LogDebug("Using {Step} migration step", step.Id);
+            }
 
             // Kahn's algorithm
             var orderedSteps = new List<MigrationStep>();

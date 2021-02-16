@@ -31,14 +31,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
         /// Returns null if no migration steps need to be applied.</returns>
         public async Task<MigrationStep?> GetNextStepAsync(IMigrationContext context, CancellationToken token)
         {
-            var nextStep = await GetNextStepAsyncInternal(GetStepsForContext(context), context, token).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
 
-            if (nextStep is null && context.CurrentProject is not null)
+            var steps = GetStepsForContext(context).ToList();
+
+            if (!steps.Any())
             {
-                // If no further migration steps are required, then the current project is complete and
-                // can be unset in the context
-                Logger.LogInformation("Migration complete for project {Project}", context.CurrentProject.Project.FilePath);
-                context.SetCurrentProject(null);
+                Logger.LogDebug("No applicable migration steps found");
+                return null;
+            }
+
+            if (steps.All(s => s.IsDone))
+            {
+                Logger.LogDebug("All steps have completed");
+                return null;
+            }
+
+            var nextStep = await GetNextStepAsyncInternal(steps, context, token).ConfigureAwait(false);
+
+            if (nextStep is null)
+            {
                 nextStep = await GetNextStepAsync(context, token).ConfigureAwait(false);
             }
 
@@ -71,6 +83,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
             //    continue iterating with the next step if it is.
             foreach (var step in steps)
             {
+                token.ThrowIfCancellationRequested();
+
                 if (step.Status == MigrationStepStatus.Unknown)
                 {
                     // It is not necessary to iterate through sub-steps because parents steps are

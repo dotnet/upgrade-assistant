@@ -17,6 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public bool NonInteractive { get; set; }
 
+        public TimeSpan NonInteractiveWait { get; set; } = TimeSpan.FromSeconds(2);
+
         public UpgradeTarget UpgradeTarget { get; set; } = UpgradeTarget.Current;
     }
 }

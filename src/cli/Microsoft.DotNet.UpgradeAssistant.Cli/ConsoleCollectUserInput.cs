@@ -85,5 +85,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 _logger.LogError("Unknown selection: '{Index}'", selectedCommandText.ToString());
             }
         }
+
+        public Task<bool> WaitToProceedAsync(CancellationToken token)
+        {
+            Console.WriteLine("Please press enter to continue...");
+
+            if (Console.ReadLine() is not null)
+            {
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+        }
     }
 }
