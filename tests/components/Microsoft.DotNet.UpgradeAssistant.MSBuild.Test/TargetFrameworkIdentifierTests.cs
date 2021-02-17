@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Test
 {
-    [Collection(PackageStepTestCollection.Name)]
+    [Collection(MSBuildStepTestCollection.Name)]
     public class TargetFrameworkIdentifierTests
     {
         [InlineData("net5.0", "netcoreapp3.1", true)]
@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test
         [Theory]
         public void IsCoreCompatibleSDKTargetFramework(string target, string tfm, bool isCompatible)
         {
-            var tfmComparer = new TargetFrameworkMonikerComparer(new NullLogger<TargetFrameworkMonikerComparer>());
+            var tfmComparer = new NuGetTargetFrameworkMonikerComparer(new NullLogger<NuGetTargetFrameworkMonikerComparer>());
             var result = tfmComparer.IsCompatible(new TargetFrameworkMoniker(target), new TargetFrameworkMoniker(tfm));
 
             Assert.Equal(isCompatible, result);
@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test
         [Theory]
         public void TfmCompare(string target, string tfm, int expected)
         {
-            var tfmComparer = new TargetFrameworkMonikerComparer(new NullLogger<TargetFrameworkMonikerComparer>());
+            var tfmComparer = new NuGetTargetFrameworkMonikerComparer(new NullLogger<NuGetTargetFrameworkMonikerComparer>());
             var result = tfmComparer.Compare(Create(target), Create(tfm));
 
             Assert.Equal(expected, result);

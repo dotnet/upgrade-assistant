@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <ItemGroup>
+    <PackageVersion Include="Autofac" Version="6.1.0" />
+    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageVersion Include="Automapper" Version="10.1.1" />
     <PackageVersion Include="coverlet.collector" Version="3.0.2" />
     <PackageVersion Include="Microsoft.Build" Version="16.8.0" />

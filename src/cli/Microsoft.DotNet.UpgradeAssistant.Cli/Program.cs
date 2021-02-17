@@ -8,6 +8,8 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Migrator;
 using Microsoft.DotNet.UpgradeAssistant.Steps;
@@ -24,7 +26,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class Program
     {
-        private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
         private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string LogFilePath = "log.txt";
@@ -83,6 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             var host = Host.CreateDefaultBuilder()
                 .UseContentRoot(AppContext.BaseDirectory)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
                     if (appCommand == AppCommand.Migrate)
@@ -105,8 +107,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton(options);
                     services.AddSingleton<IPackageLoader, PackageLoader>();
 
-                    services.AddExtensions(context.Configuration[UpgradeAssistantExtensionPathsSettingName], options.Extension);
-
                     // Add command handlers
                     if (options.NonInteractive)
                     {
@@ -120,6 +120,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
+                    services.AddStepManagement();
 
                     // Add steps
                     services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
@@ -139,6 +140,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     .Enrich.FromLogContext()
                     .WriteTo.Conditional(evt => logSettings.IsConsoleEnabled, sink => sink.Console())
                     .WriteTo.Conditional(evt => logSettings.IsFileEnabled, sink => sink.File(LogFilePath)))
+                .ConfigureContainer<ContainerBuilder>((context, builder) =>
+                {
+                    builder.RegisterExtensions(context.Configuration, options.Extension);
+                })
                 .RunConsoleAsync(options =>
                 {
                     options.SuppressStatusMessages = true;

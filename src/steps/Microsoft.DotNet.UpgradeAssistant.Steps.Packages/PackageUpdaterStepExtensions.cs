@@ -18,7 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps
             services.AddTransient<IPackageReferencesAnalyzer, WindowsCompatReferenceAnalyzer>();
 
             services.AddSingleton<PackageMapProvider>();
-            services.AddSingleton<ITargetFrameworkMonikerComparer, TargetFrameworkMonikerComparer>();
             services.AddScoped<MigrationStep, PackageUpdaterStep>();
             return services.AddOptions<PackageUpdaterOptions>();
         }

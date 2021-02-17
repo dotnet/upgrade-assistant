@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             Name = $"Extensions from {directory}";
         }
 
-        private static IConfiguration GetConfiguration(string directory)
+        public static IConfiguration GetConfiguration(string directory)
         {
             if (!Directory.Exists(directory))
             {
