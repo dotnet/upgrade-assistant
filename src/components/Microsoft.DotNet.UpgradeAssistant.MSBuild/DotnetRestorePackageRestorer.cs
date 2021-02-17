@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class DotnetRestorePackageRestorer : IPackageRestorer
     {
-        private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
+        private static readonly string[] EnvVarsToWithold = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
 
         private readonly ILogger<DotnetRestorePackageRestorer> _logger;
 
@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 restoreProcess.StartInfo.EnvironmentVariables[name] = value;
             }
 
-            foreach (var envVar in EnvVarsToWitholdFromTryConvert)
+            foreach (var envVar in EnvVarsToWithold)
             {
                 if (restoreProcess.StartInfo.EnvironmentVariables.ContainsKey(envVar))
                 {
