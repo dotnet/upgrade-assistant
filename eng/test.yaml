@@ -7,6 +7,9 @@ steps:
       $(Build.SourcesDirectory)\Microsoft.DotNet.UpgradeAssistant.sln
     arguments: > 
       --configuration $(_BuildConfig)
+      --logger "trx;LogFilePrefix=TestResults-"
+      --
+      "RunConfiguration.ResultsDirectory=$(Build.ArtifactStagingDirectory)\TestResults"
   condition: succeededOrFailed()
 
 - task: PublishTestResults@2
@@ -14,8 +17,8 @@ steps:
   condition: succeededOrFailed()
   inputs:
     testResultsFormat: VSTest
-    testResultsFiles: '**/*.trx'
+    testResultsFiles: '**/TestResults-*' 
+    searchFolder: $(Build.ArtifactStagingDirectory)\TestResults
     mergeTestResults: true
-    searchFolder: $(system.defaultworkingdirectory)
     testRunTitle: Basic Tests
     configuration: $(_BuildConfig)
