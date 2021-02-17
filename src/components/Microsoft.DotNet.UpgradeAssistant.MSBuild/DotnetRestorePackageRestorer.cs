@@ -29,12 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _logger.LogInformation("Restoring all projects");
 
-            foreach (var project in context.Projects)
-            {
-                _logger.LogTrace("Restoring {FileName}", project.FilePath);
-
-                await RunRestoreAsync(context, project.FilePath, token);
-            }
+            await RunRestoreAsync(context, context.EntryPoint.Required().FilePath, token);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
