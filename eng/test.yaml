@@ -2,14 +2,11 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: Test C# (dotnet test)
   inputs:
-    command: custom
+    command: test
     projects: |
-      $(Build.SourcesDirectory)\Microsoft.DotNet.UpgradeAssistant.sln
-    custom: test
+      $(Build.SourcesDirectory)\tests\*.csproj
     arguments: > 
       --configuration $(_BuildConfig)
-      --no-build
-      --logger trx
   condition: succeededOrFailed()
 
 - task: PublishTestResults@2
