@@ -9,17 +9,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
 {
     public class MigratorManager
     {
+        private readonly IPackageRestorer _restorer;
         private readonly IMigrationStepOrderer _orderer;
 
         private ILogger Logger { get; }
 
-        public MigratorManager(IMigrationStepOrderer orderer, ILogger<MigratorManager> logger)
+        public MigratorManager(IPackageRestorer restorer, IMigrationStepOrderer orderer, ILogger<MigratorManager> logger)
         {
+            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IEnumerable<MigrationStep> AllSteps => _orderer.MigrationSteps;
+
+        public async Task<IEnumerable<MigrationStep>> InitializeAsync(IMigrationContext context, CancellationToken token)
+        {
+            await _restorer.RestoreAllProjectPackagesAsync(context, token);
+
+            return GetStepsForContext(context);
+        }
 
         public IEnumerable<MigrationStep> GetStepsForContext(IMigrationContext context) => AllSteps.Where(s => s.IsApplicable(context));
 

@@ -88,8 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             var project = new MSBuildProject(this, path, _logger);
-            var tfm = _tfmSelector.SelectTFM(project);
-            var created = new UpgradeProjectInfo(project, tfm);
+            var created = new UpgradeProjectInfo(project, _tfmSelector);
 
             _projectCache.Add(path, created);
 

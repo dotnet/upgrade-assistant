@@ -7,15 +7,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class SetTFMStep : MigrationStep
     {
+        private readonly IPackageRestorer _restorer;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be SDK-style before changing package references
             "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
         };
 
-        public SetTFMStep(ILogger<SetTFMStep> logger)
+        public SetTFMStep(IPackageRestorer restorer, ILogger<SetTFMStep> logger)
             : base(logger)
         {
+            _restorer = restorer;
         }
 
         public override string Id => typeof(SetTFMStep).FullName!;
@@ -31,6 +34,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             var file = projectInfo.Project.GetFile();
             file.SetTFM(projectInfo.TargetTFM);
             await file.SaveAsync(token);
+
+            // With an updated TFM, we should restore packages
+            await _restorer.RestoreAllProjectPackagesAsync(context, token);
 
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {projectInfo.TargetTFM}");
         }

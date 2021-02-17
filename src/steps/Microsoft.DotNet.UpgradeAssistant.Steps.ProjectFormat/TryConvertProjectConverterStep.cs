@@ -18,6 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
         private readonly string _tryConvertPath;
+        private readonly IPackageRestorer _restorer;
 
         public override string Id => typeof(TryConvertProjectConverterStep).FullName!;
 
@@ -36,7 +37,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
 
-        public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
+        public TryConvertProjectConverterStep(
+            IPackageRestorer restorer,
+            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor,
+            ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
             if (tryConvertOptionsAccessor is null)
@@ -50,7 +54,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
 
             var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
+
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
+            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
         }
 
         protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
@@ -70,6 +76,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found");
             }
 
+            var result = await RunTryConvertAsync(context, projectPath, token);
+
+            await _restorer.RestoreAllProjectPackagesAsync(context, token);
+
+            return result;
+        }
+
+        private async Task<MigrationStepApplyResult> RunTryConvertAsync(IMigrationContext context, string projectPath, CancellationToken token)
+        {
             Logger.LogInformation("Converting project file format with try-convert");
             using var tryConvertProcess = new Process
             {

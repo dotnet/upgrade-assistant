@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 // Cache current steps here as defense-in-depth against the possibility
                 // of a bug (or very weird migration step behavior) causing the current step
                 // to reset state after being initialized by GetNextStepAsync
-                var steps = migrator.GetStepsForContext(context);
+                var steps = await migrator.InitializeAsync(context, token);
                 var step = await migrator.GetNextStepAsync(context, token);
 
                 while (step is not null)

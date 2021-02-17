@@ -10,12 +10,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class MSBuildPackageRestorer : IPackageRestorer
     {
-        private const string LockFileName = "project.assets.json";
         private readonly ILogger<MSBuildPackageRestorer> _logger;
 
         public MSBuildPackageRestorer(ILogger<MSBuildPackageRestorer> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public async Task RestoreAllProjectPackagesAsync(IMigrationContext context, CancellationToken token)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            _logger.LogInformation("Restoring all projects");
+
+            foreach (var project in context.Projects)
+            {
+                _logger.LogTrace("Restoring {FileName}", project.FilePath);
+
+                var projectInstance = new ProjectInstance(project.FilePath);
+                RestorePackages(projectInstance);
+            }
+
+            // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
+            // aren't available in a project until after restore is run the first time.
+            // https://github.com/NuGet/Home/issues/9150
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
         }
 
         public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
@@ -33,19 +55,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
+            return GetRestoreOutput(context.CurrentProject.Required().Project);
+        }
+
+        private RestoreOutput GetRestoreOutput(IProject project)
+        {
             // Check for the lock file's existence rather than success since a bad NuGet reference won't
             // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
-            var lockFilePath = Path.Combine(projectInstance.GetPropertyValue("MSBuildProjectExtensionsPath"), LockFileName);
-            if (!Path.IsPathFullyQualified(lockFilePath))
-            {
-                lockFilePath = Path.Combine(projectInstance.Directory, lockFilePath);
-            }
+            var lockFilePath = project.LockFilePath;
 
             // Get the path used for caching NuGet packages
-            projectInstance = new ProjectInstance(context.CurrentProject.Required().Project.FilePath);
-            var nugetCachePath = projectInstance.GetPropertyValue("NuGetPackageRoot");
+            var nugetCachePath = project.GetFile().GetPropertyValue("NuGetPackageRoot");
 
-            return new RestoreOutput(File.Exists(lockFilePath) ? lockFilePath : null, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
+            return new RestoreOutput(lockFilePath, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
         }
 
         public BuildResult? RestorePackages(ProjectInstance projectInstance)
@@ -67,6 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger.LogDebug("Restoring NuGet packages for project {ProjectPath}", projectInstance.FullPath);
             var restoreResult = BuildManager.DefaultBuildManager.Build(buildParameters, restoreRequest);
             _logger.LogDebug("MSBuild exited with status {RestoreStatus}", restoreResult.OverallResult);
+
             if (restoreResult.Exception != null)
             {
                 _logger.LogError(restoreResult.Exception, "MSBuild threw an unexpected exception");

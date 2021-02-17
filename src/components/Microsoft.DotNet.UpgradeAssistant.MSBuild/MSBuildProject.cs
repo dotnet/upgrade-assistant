@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
+using NuGet.Frameworks;
+using NuGet.ProjectModel;
 
 using MBuild = Microsoft.Build.Evaluation;
 
@@ -66,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 var components = IsSdk ? GetSDKProjectComponents() : GetOldProjectComponents();
 
-                if (PackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
+                if (TransitivePackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
                 {
                     components |= ProjectComponents.WinRT;
                 }
@@ -143,7 +145,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         public NugetPackageFormat PackageReferenceFormat
-            => GetPackagesConfigPath() is null ? NugetPackageFormat.PackageReference : NugetPackageFormat.PackageConfig;
+        {
+            get
+            {
+                if (GetPackagesConfigPath() is not null)
+                {
+                    return NugetPackageFormat.PackageConfig;
+                }
+                else if (ProjectRoot.GetAllPackageReferences().ToList() is IEnumerable<Build.Construction.ProjectItemElement> list && list.Any())
+                {
+                    return NugetPackageFormat.PackageReference;
+                }
+                else
+                {
+                    return NugetPackageFormat.None;
+                }
+            }
+        }
 
         private string? GetPackagesConfigPath() => FindFiles(ProjectItemType.Content, "packages.config").FirstOrDefault();
 
@@ -163,6 +181,61 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     return PackageConfig.GetPackages(packagesConfig);
                 }
+            }
+        }
+
+        public IEnumerable<NuGetReference> TransitivePackageReferences
+        {
+            get
+            {
+                return PackageReferences.Concat(GetTransitiveDependencies()).Distinct();
+
+                IEnumerable<NuGetReference> GetTransitiveDependencies()
+                {
+                    if (PackageReferenceFormat != NugetPackageFormat.PackageReference)
+                    {
+                        return Enumerable.Empty<NuGetReference>();
+                    }
+
+                    var tfm = NuGetFramework.Parse(TFM.Name);
+                    var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+
+                    if (lockFile is null)
+                    {
+                        throw new ProjectRestoreRequiredException($"Project is not restored: {FilePath}");
+                    }
+
+                    var lockFileTarget = lockFile
+                        .Targets
+                        .FirstOrDefault(t => t.TargetFramework.DotNetFrameworkName.Equals(tfm.DotNetFrameworkName, StringComparison.Ordinal));
+
+                    if (lockFileTarget is null)
+                    {
+                        throw new ProjectRestoreRequiredException($"Could not find {tfm.DotNetFrameworkName} in {LockFilePath} for {FilePath}");
+                    }
+
+                    return lockFileTarget.Libraries.Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
+                }
+            }
+        }
+
+        public string? LockFilePath
+        {
+            get
+            {
+                var lockFilePath = Path.Combine(GetPropertyValue("MSBuildProjectExtensionsPath"), "project.assets.json");
+
+                if (string.IsNullOrEmpty(lockFilePath))
+                {
+                    return null;
+                }
+
+                if (!Path.IsPathFullyQualified(lockFilePath))
+                {
+                    lockFilePath = Path.Combine(Directory, lockFilePath);
+                }
+
+                return lockFilePath;
             }
         }
 
