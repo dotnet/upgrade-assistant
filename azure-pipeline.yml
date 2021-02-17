@@ -30,7 +30,7 @@ stages:
       enableMicrobuild: true
       enablePublishBuildArtifacts: true
       enablePublishBuildAssets: true
-      enablePublishTestResults: true
+      enablePublishTestResults: false
       enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
       enableTelemetry: true
       jobs:
@@ -87,7 +87,9 @@ stages:
             -prepareMachine
             -warnaserror:0
             $(_BuildArgs)
+            /p:Test=false
           displayName: Windows Build / Publish
+        - template: /eng/test.yaml
 
 - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
   - template: eng\common\templates\post-build\post-build.yml

@@ -1,0 +1,30 @@
+steps: 
+- task: DotNetCoreCLI@2
+  displayName: Test C# (dotnet test)
+  inputs:
+    command: custom
+    projects: |
+      $(Build.SourcesDirectory)\Microsoft.DotNet.UpgradeAssistant.sln
+    custom: test
+    arguments: > 
+      --configuration $(_BuildConfig)
+      --no-build
+      --logger "trx;LogFilePrefix=TestResults-"
+      -v normal
+      --
+      "RunConfiguration.ResultsDirectory=$(Build.ArtifactStagingDirectory)\TestResults"
+      RunConfiguration.MapCpuCount=4
+  env:
+    NUGET_PACKAGES: $(Build.SourcesDirectory)/.packages
+  condition: succeededOrFailed()
+
+- task: PublishTestResults@2
+  displayName: Publish Test Results
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/TestResults-*' 
+    searchFolder: $(Build.ArtifactStagingDirectory)\TestResults
+    testRunTitle: Basic Tests
+    mergeTestResults: true
+    configuration: $(_BuildConfig)
