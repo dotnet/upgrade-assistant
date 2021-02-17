@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 }
             };
 
-            await foreach (var (name, value) in context.GetWorkspaceProperties(token))
+            foreach (var (name, value) in context.GlobalProperties)
             {
                 tryConvertProcess.StartInfo.EnvironmentVariables[name] = value;
             }

@@ -68,7 +68,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _vsPath = vsPath;
 
-            ProjectCollection = new ProjectCollection(globalProperties: CreateProperties());
+            GlobalProperties = CreateProperties();
+            ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
         }
 
         public ProjectCollection ProjectCollection { get; }
@@ -212,15 +213,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger.LogDebug("[{Level}] Problem loading file in MSBuild workspace {Message}", diagnostic.Kind, diagnostic.Message);
         }
 
-        public async IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties([EnumeratorCancellation] CancellationToken token)
-        {
-            var ws = await GetMsBuildWorkspaceAsync(token).ConfigureAwait(false);
-
-            foreach (var property in ws.Properties)
-            {
-                yield return (property.Key, property.Value);
-            }
-        }
+        public IDictionary<string, string> GlobalProperties { get; }
 
         public UpgradeProjectInfo? CurrentProject
         {

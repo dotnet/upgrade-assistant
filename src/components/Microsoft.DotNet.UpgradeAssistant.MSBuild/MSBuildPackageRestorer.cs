@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 _logger.LogTrace("Restoring {FileName}", project.FilePath);
 
-                var projectInstance = new ProjectInstance(project.FilePath);
+                var projectInstance = CreateProjectInstance(context, project);
                 RestorePackages(projectInstance);
             }
 
@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectInstance = new ProjectInstance(context.CurrentProject.Required().Project.FilePath);
+            var projectInstance = CreateProjectInstance(context, context.CurrentProject.Required().Project);
             RestorePackages(projectInstance);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
@@ -57,6 +57,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             return GetRestoreOutput(context.CurrentProject.Required().Project);
         }
+
+        private static ProjectInstance CreateProjectInstance(IMigrationContext context, IProject project) => new ProjectInstance(project.FilePath, context.GlobalProperties, toolsVersion: null);
 
         private RestoreOutput GetRestoreOutput(IProject project)
         {

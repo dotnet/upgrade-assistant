@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         bool UpdateSolution(Solution updatedSolution);
 
-        IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
+        IDictionary<string, string> GlobalProperties { get; }
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
     }
