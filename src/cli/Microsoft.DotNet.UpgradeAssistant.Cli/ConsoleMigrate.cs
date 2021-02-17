@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         _io.Output.WriteLine();
 
                         var commands = _commandProvider.GetCommands(step);
-                        var command = await _input.ChooseAsync("Choose command", commands, token);
+                        var command = await _input.ChooseAsync("Choose a command:", commands, token);
 
                         // TODO : It might be nice to allow commands to show more details by having a 'status' property
                         //        that can be shown here. Also, commands currently only return bools but, in the future,
@@ -181,7 +181,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             foreach (var step in steps)
             {
                 // Write indent (if any) and item number
-                _io.Output.Write($"{new string(' ', offset * 4)}{count++}. ");
+                var indexStr = offset % 2 == 0
+                    ? $"{count++}. "
+                    : $"{(char)('a' + (count++ - 1))}. ";
+                _io.Output.Write($"{new string(' ', offset * 4)}{indexStr}");
 
                 // Write the step title and make a note of whether the step is incomplete
                 // (since that would mean future steps shouldn't show "[Next step]")
