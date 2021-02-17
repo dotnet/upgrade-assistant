@@ -24,6 +24,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test
         [InlineData("netcoreapp3.1", "net471", false)]
         [InlineData("netcoreapp3.1", "net47", false)]
         [InlineData("netcoreapp3.1", "net45", false)]
+        [InlineData("net48", "netcoreapp3.1", false)]
+        [InlineData("net471", "netcoreapp3.1", false)]
+        [InlineData("net471", "net5.0", false)]
+        [InlineData("net471", "netstandard2.0", false)]
+        [InlineData("net461", "netstandard2.0", false)]
+        [InlineData("net46", "netstandard2.0", false)]
         [Theory]
         public void IsCoreCompatibleSDKTargetFramework(string target, string tfm, bool isCompatible)
         {
@@ -54,6 +60,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test
         [InlineData("netcoreapp3.1", "net471", -1)]
         [InlineData("netcoreapp3.1", "net47", -1)]
         [InlineData("netcoreapp3.1", "net45", -1)]
+        [InlineData("net48", "netcoreapp3.1", -1)]
+        [InlineData("net471", "netcoreapp3.1", -1)]
+        [InlineData("net471", "net5.0", -1)]
+        [InlineData("net471", "netstandard2.0", -1)]
+        [InlineData("net461", "netstandard2.0", -1)]
+        [InlineData("net46", "netstandard2.0", -1)]
         [Theory]
         public void TfmCompare(string target, string tfm, int expected)
         {
