@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             try
             {
@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
             var projectFile = project.GetFile();
 
             // For each item to be added, make necessary replacements and then add the item to the project

@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             // Determine where appsettings.json should live
             var appSettingsPath = Path.Combine(project.Directory ?? string.Empty, AppSettingsJsonFileName);
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 }
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             var jsonConfigFiles = project.FindFiles(ProjectItemType.Content, AppSettingsFileRegex)
                 .Select(f => new AppSettingsFile(f))
