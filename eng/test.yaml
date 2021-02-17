@@ -9,22 +9,16 @@ steps:
     arguments: > 
       --configuration $(_BuildConfig)
       --no-build
-      --logger "trx;LogFilePrefix=TestResults-"
-      -v normal
-      --
-      "RunConfiguration.ResultsDirectory=$(Build.ArtifactStagingDirectory)\TestResults"
-      RunConfiguration.MapCpuCount=4
-  env:
-    NUGET_PACKAGES: $(Build.SourcesDirectory)/.packages
+      --logger trx
   condition: succeededOrFailed()
 
 - task: PublishTestResults@2
   displayName: Publish Test Results
   condition: succeededOrFailed()
   inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/TestResults-*' 
-    searchFolder: $(Build.ArtifactStagingDirectory)\TestResults
-    testRunTitle: Basic Tests
+    testResultsFormat: VSTest
+    testResultsFiles: '**/*.trx'
     mergeTestResults: true
+    searchFolder: $(system.defaultworkingdirectory)
+    testRunTitle: Basic Tests
     configuration: $(_BuildConfig)
