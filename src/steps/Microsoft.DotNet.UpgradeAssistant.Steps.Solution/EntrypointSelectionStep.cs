@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (context.EntryPoint is not null)
             {
-                return context.EntryPoint.Project;
+                return context.EntryPoint;
             }
 
             var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();

@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new InvalidOperationException("Could not find project path for reference");
             }
 
-            return Context.GetOrAddProject(project.FilePath).Project;
+            return Context.GetOrAddProject(project.FilePath);
         });
 
         public MBuild.Project Project => Context.ProjectCollection.LoadProject(FilePath);

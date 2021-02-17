@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectInstance = CreateProjectInstance(context, context.CurrentProject.Required().Project);
+            var projectInstance = CreateProjectInstance(context, context.CurrentProject.Required());
             RestorePackages(projectInstance);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            return GetRestoreOutput(context.CurrentProject.Required().Project);
+            return GetRestoreOutput(context.CurrentProject.Required());
         }
 
         private static ProjectInstance CreateProjectInstance(IMigrationContext context, IProject project) => new ProjectInstance(project.FilePath, context.GlobalProperties, toolsVersion: null);

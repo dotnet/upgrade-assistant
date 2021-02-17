@@ -38,9 +38,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         /// Creates a new analysis state object for a given migration context. This involves restoring packages for the context's current project.
         /// </summary>
         /// <param name="context">The migration context to create an analysis state for.</param>
+        /// <param name="tfmSelector">Used to identify the final expected TFM.</param>
         /// <param name="packageRestorer">The package restorer to use to restore packages for the context's project and generate a lock file.</param>
         /// <returns>A new PackageAnalysisState instance for the specified context.</returns>
-        public static async Task<PackageAnalysisState> CreateAsync(IMigrationContext context, IPackageRestorer packageRestorer, CancellationToken token)
+        public static async Task<PackageAnalysisState> CreateAsync(IMigrationContext context, ITargetTFMSelector tfmSelector, IPackageRestorer packageRestorer, CancellationToken token)
         {
             if (context is null)
             {
@@ -57,10 +58,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new InvalidOperationException("Target TFM must be set before analyzing package references");
             }
 
+            var project = context.CurrentProject.Required();
+
             var ret = new PackageAnalysisState
             {
-                CurrentTFM = context.CurrentProject.Required().Project.TFM,
-                TargetTFM = context.CurrentProject.Required().TargetTFM
+                CurrentTFM = project.TFM,
+                TargetTFM = tfmSelector.SelectTFM(project)
             };
 
             await ret.PopulatePackageRestoreState(context, packageRestorer, token).ConfigureAwait(false);

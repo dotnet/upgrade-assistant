@@ -162,13 +162,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 if (context.EntryPoint is not null)
                 {
-                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.Project.FilePath}");
+                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.FilePath}");
                     displayedProjectInfo = true;
                 }
 
                 if (context.CurrentProject is not null)
                 {
-                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.Project.FilePath}");
+                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.FilePath}");
                     displayedProjectInfo = true;
                 }
 

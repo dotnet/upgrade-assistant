@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = context.CurrentProject.Required().Project.FilePath;
+            var projectPath = context.CurrentProject.Required().FilePath;
 
             if (!File.Exists(projectPath))
             {
@@ -174,7 +174,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             if (!File.Exists(_tryConvertPath))
             {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
@@ -17,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ITargetTFMSelector _tfmSelector;
         private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
         private readonly string? _vsPath;
-        private readonly Dictionary<string, UpgradeProjectInfo> _projectCache;
+        private readonly Dictionary<string, IProject> _projectCache;
 
         private string? _entryPointPath;
         private string? _projectPath;
@@ -53,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _projectCache = new Dictionary<string, UpgradeProjectInfo>(StringComparer.OrdinalIgnoreCase);
+            _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
             _path = options.ProjectPath;
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             TfmFactory = tfmFactory ?? throw new ArgumentNullException(nameof(tfmFactory));
@@ -81,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ProjectCollection.Dispose();
         }
 
-        public UpgradeProjectInfo GetOrAddProject(string path)
+        public IProject GetOrAddProject(string path)
         {
             if (_projectCache.TryGetValue(path, out var cached))
             {
@@ -89,14 +88,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             var project = new MSBuildProject(this, path, _logger);
-            var created = new UpgradeProjectInfo(project, _tfmSelector);
 
-            _projectCache.Add(path, created);
+            _projectCache.Add(path, project);
 
-            return created;
+            return project;
         }
 
-        public UpgradeProjectInfo? EntryPoint
+        public IProject? EntryPoint
         {
             get
             {
@@ -128,7 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     }
                     else
                     {
-                        yield return GetOrAddProject(project.FilePath).Project;
+                        yield return GetOrAddProject(project.FilePath);
                     }
                 }
             }
@@ -215,7 +213,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IDictionary<string, string> GlobalProperties { get; }
 
-        public UpgradeProjectInfo? CurrentProject
+        public IProject? CurrentProject
         {
             get
             {

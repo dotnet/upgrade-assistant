@@ -10,11 +10,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         bool IsComplete { get; set; }
 
-        UpgradeProjectInfo? EntryPoint { get; }
+        IProject? EntryPoint { get; }
 
         void SetEntryPoint(IProject? entryPoint);
 
-        UpgradeProjectInfo? CurrentProject { get; }
+        IProject? CurrentProject { get; }
 
         void SetCurrentProject(IProject? project);
 

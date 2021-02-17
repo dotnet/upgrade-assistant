@@ -49,14 +49,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
-            await RunRestoreAsync(context, context.CurrentProject.Required().Project.FilePath, token);
+            await RunRestoreAsync(context, context.CurrentProject.Required().FilePath, token);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            return GetRestoreOutput(context.CurrentProject.Required().Project);
+            return GetRestoreOutput(context.CurrentProject.Required());
         }
 
         private RestoreOutput GetRestoreOutput(IProject project)
