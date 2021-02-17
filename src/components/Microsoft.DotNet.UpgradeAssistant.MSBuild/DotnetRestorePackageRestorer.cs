@@ -20,43 +20,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger = logger;
         }
 
-        public async Task RestoreAllProjectPackagesAsync(IMigrationContext context, CancellationToken token)
+        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, IProject project, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _logger.LogInformation("Restoring all projects");
-
-            foreach (var project in context.Projects)
-            {
-                _logger.LogTrace("Restoring {FileName}", project.FilePath);
-
-                await RunRestoreAsync(context, project.FilePath, token);
-            }
-
-            // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
-            // aren't available in a project until after restore is run the first time.
-            // https://github.com/NuGet/Home/issues/9150
-            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
-        }
-
-        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
-        {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            await RunRestoreAsync(context, context.CurrentProject.Required().FilePath, token);
+            await RunRestoreAsync(context, project.FilePath, token);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            return GetRestoreOutput(context.CurrentProject.Required());
+            return GetRestoreOutput(project);
         }
 
         private RestoreOutput GetRestoreOutput(IProject project)

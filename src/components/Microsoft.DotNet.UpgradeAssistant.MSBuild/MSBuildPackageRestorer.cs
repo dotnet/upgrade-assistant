@@ -17,37 +17,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task RestoreAllProjectPackagesAsync(IMigrationContext context, CancellationToken token)
+        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, IProject project, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _logger.LogInformation("Restoring all projects");
-
-            foreach (var project in context.Projects)
-            {
-                _logger.LogTrace("Restoring {FileName}", project.FilePath);
-
-                var projectInstance = CreateProjectInstance(context, project);
-                RestorePackages(projectInstance);
-            }
-
-            // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
-            // aren't available in a project until after restore is run the first time.
-            // https://github.com/NuGet/Home/issues/9150
-            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
-        }
-
-        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, CancellationToken token)
-        {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            var projectInstance = CreateProjectInstance(context, context.CurrentProject.Required());
+            var projectInstance = CreateProjectInstance(context, project);
             RestorePackages(projectInstance);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
@@ -55,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            return GetRestoreOutput(context.CurrentProject.Required());
+            return GetRestoreOutput(project);
         }
 
         private static ProjectInstance CreateProjectInstance(IMigrationContext context, IProject project) => new ProjectInstance(project.FilePath, context.GlobalProperties, toolsVersion: null);

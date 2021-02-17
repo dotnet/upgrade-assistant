@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             await file.SaveAsync(token);
 
             // With an updated TFM, we should restore packages
-            await _restorer.RestoreAllProjectPackagesAsync(context, token);
+            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
 
             return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {targetTfm}");
         }

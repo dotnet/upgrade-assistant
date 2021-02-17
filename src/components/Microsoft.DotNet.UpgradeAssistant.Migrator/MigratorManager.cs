@@ -25,7 +25,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
 
         public async Task<IEnumerable<MigrationStep>> InitializeAsync(IMigrationContext context, CancellationToken token)
         {
-            await _restorer.RestoreAllProjectPackagesAsync(context, token);
+            if (context.EntryPoint is not null)
+            {
+                await _restorer.RestorePackagesAsync(context, context.EntryPoint, token);
+            }
 
             return GetStepsForContext(context);
         }

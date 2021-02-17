@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             var result = await RunTryConvertAsync(context, projectPath, token);
 
-            await _restorer.RestoreAllProjectPackagesAsync(context, token);
+            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
 
             return result;
         }

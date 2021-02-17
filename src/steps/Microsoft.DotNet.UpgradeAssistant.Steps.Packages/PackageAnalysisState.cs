@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             if (LockFilePath is null || PackageCachePath is null || Failed)
             {
-                var restoreOutput = await packageRestorer.RestorePackagesAsync(context, token).ConfigureAwait(false);
+                var restoreOutput = await packageRestorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
                 if (restoreOutput.LockFilePath is null || restoreOutput.PackageCachePath is null)
                 {
                     Failed = true;
