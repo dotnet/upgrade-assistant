@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static void AddMsBuild(this IServiceCollection services)
         {
             services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
-            services.AddTransient<IPackageRestorer, MSBuildPackageRestorer>();
+            services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
             services.AddTransient<MSBuildRegistrationStartup>();
             services.AddSingleton<IMigrationContextFactory, MSBuildMigrationContextFactory>();
 

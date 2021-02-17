@@ -31,14 +31,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             var projectInfo = context.CurrentProject.Required();
 
+            var targetTfm = projectInfo.TargetTFM;
             var file = projectInfo.Project.GetFile();
-            file.SetTFM(projectInfo.TargetTFM);
+
+            file.SetTFM(targetTfm);
+
             await file.SaveAsync(token);
 
             // With an updated TFM, we should restore packages
             await _restorer.RestoreAllProjectPackagesAsync(context, token);
 
-            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {projectInfo.TargetTFM}");
+            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {targetTfm}");
         }
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
