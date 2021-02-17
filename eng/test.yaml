@@ -4,7 +4,7 @@ steps:
   inputs:
     command: test
     projects: |
-      $(Build.SourcesDirectory)\tests\*.csproj
+      $(Build.SourcesDirectory)\Microsoft.DotNet.UpgradeAssistant.sln
     arguments: > 
       --configuration $(_BuildConfig)
   condition: succeededOrFailed()
