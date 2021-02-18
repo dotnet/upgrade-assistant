@@ -19,6 +19,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IEnumerable<NuGetReference> PackageReferences { get; }
 
+        IEnumerable<NuGetReference> TransitivePackageReferences { get; }
+
+        string? LockFilePath { get; }
+
         IEnumerable<Reference> References { get; }
 
         TargetFrameworkMoniker TFM { get; }

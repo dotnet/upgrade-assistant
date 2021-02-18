@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new InvalidOperationException("Entrypoint must be set before using this step");
             }
 
-            var ordered = context.EntryPoint.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 

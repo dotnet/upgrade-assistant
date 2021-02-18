@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             try
             {
-                ProjectInitializedAgainst = context.CurrentProject?.Project.FilePath;
+                ProjectInitializedAgainst = context.CurrentProject?.FilePath;
                 (Status, StatusDetails, Risk) = await InitializeImplAsync(context, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
@@ -232,7 +232,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 return false;
             }
 
-            var currentProject = context.CurrentProject?.Project.FilePath;
+            var currentProject = context.CurrentProject?.FilePath;
 
             if (ProjectInitializedAgainst is null)
             {

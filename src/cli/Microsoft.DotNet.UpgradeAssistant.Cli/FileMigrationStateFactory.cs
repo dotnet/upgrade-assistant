@@ -83,8 +83,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             var state = new MigrationState
             {
-                EntryPoint = NormalizePath(context.EntryPoint?.Project.FilePath),
-                CurrentProject = NormalizePath(context.CurrentProject?.Project.FilePath),
+                EntryPoint = NormalizePath(context.EntryPoint?.FilePath),
+                CurrentProject = NormalizePath(context.CurrentProject?.FilePath),
                 IsComplete = context.IsComplete,
             };
 

@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 // Cache current steps here as defense-in-depth against the possibility
                 // of a bug (or very weird migration step behavior) causing the current step
                 // to reset state after being initialized by GetNextStepAsync
-                var steps = migrator.GetStepsForContext(context);
+                var steps = await migrator.InitializeAsync(context, token);
                 var step = await migrator.GetNextStepAsync(context, token);
 
                 while (step is not null)
@@ -162,13 +162,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 if (context.EntryPoint is not null)
                 {
-                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.Project.FilePath}");
+                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.FilePath}");
                     displayedProjectInfo = true;
                 }
 
                 if (context.CurrentProject is not null)
                 {
-                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.Project.FilePath}");
+                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.FilePath}");
                     displayedProjectInfo = true;
                 }
 

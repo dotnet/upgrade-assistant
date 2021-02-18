@@ -9,6 +9,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public override string ToString() => Name;
 
+        public bool IsFramework => !IsNetStandard && !IsNetCore;
+
         public bool IsNetStandard => Name.StartsWith(NetStandardNamePrefix, StringComparison.OrdinalIgnoreCase);
 
         public bool IsNetCore => Name.StartsWith(NetPrefix, StringComparison.OrdinalIgnoreCase) && Name.Contains('.');

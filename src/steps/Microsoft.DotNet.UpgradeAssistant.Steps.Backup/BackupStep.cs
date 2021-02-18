@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _projectDir = context.CurrentProject.Required().Project.Directory;
+            _projectDir = context.CurrentProject.Required().Directory;
             _backupPath ??= GetDefaultBackupPath(_projectDir);
 
             if (_skipBackup)

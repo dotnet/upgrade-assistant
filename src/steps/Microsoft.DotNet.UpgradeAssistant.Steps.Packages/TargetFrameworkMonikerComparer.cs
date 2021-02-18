@@ -47,6 +47,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return 0;
             }
 
+            if (y.IsNetStandard && x.IsFramework)
+            {
+                return -1;
+            }
+
             var dependentToDependency = DefaultCompatibilityProvider.Instance.IsCompatible(dependent, dependency);
             var dependencyToDependent = DefaultCompatibilityProvider.Instance.IsCompatible(dependency, dependent);
 

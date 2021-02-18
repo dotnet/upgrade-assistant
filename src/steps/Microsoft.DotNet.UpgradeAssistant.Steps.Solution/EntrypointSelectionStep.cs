@@ -8,12 +8,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     public class EntrypointSelectionStep : MigrationStep
     {
+        private readonly IPackageRestorer _restorer;
         private readonly IUserInput _userInput;
 
-        public EntrypointSelectionStep(IUserInput userInput, ILogger<EntrypointSelectionStep> logger)
+        public EntrypointSelectionStep(
+            IPackageRestorer restorer,
+            IUserInput userInput,
+            ILogger<EntrypointSelectionStep> logger)
             : base(logger)
         {
-            _userInput = userInput;
+            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
+            _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
         }
 
         public override string Id => typeof(EntrypointSelectionStep).FullName!;
@@ -38,6 +43,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             else
             {
                 context.SetEntryPoint(selectedProject);
+                await _restorer.RestorePackagesAsync(context, selectedProject, token);
+
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }
@@ -78,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (context.EntryPoint is not null)
             {
-                return context.EntryPoint.Project;
+                return context.EntryPoint;
             }
 
             var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();

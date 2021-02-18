@@ -1,5 +1,14 @@
 ﻿[
   {
+    "PackageSetName": "WindowsContracts",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.Windows.SDK.Contracts",
+        "Version": "*"
+      }
+    ]
+  },
+  {
     "PackageSetName": "PowerShell",
     "NetFrameworkPackages": [
       {
