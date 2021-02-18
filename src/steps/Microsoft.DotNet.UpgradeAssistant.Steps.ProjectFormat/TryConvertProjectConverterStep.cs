@@ -6,13 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStep : MigrationStep
     {
+        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -p \"{0}\"";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
@@ -36,20 +37,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
 
-        public TryConvertProjectConverterStep(IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor, ILogger<TryConvertProjectConverterStep> logger)
+        public TryConvertProjectConverterStep(AggregateExtensionProvider extensionProvider, ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
-            if (tryConvertOptionsAccessor is null)
-            {
-                throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
-            }
-
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
+            var options = extensionProvider.GetOptions<TryConvertProjectConverterStepOptions>(TryConvertProjectConverterStepOptionsSection);
+            var rawPath = options?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }
 

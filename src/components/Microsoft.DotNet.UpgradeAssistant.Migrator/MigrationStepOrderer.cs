@@ -125,9 +125,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
                 // If an input steps aren't ordered, then either their dependencies are missing or there is a cycle
                 foreach (var missingDependency in dependencies)
                 {
-                    if (dependencies.Any(d => d.Dependency.Equals(missingDependency.Dependent, StringComparison.Ordinal)))
+                    if (inputSteps.Any(s => s.Id.Equals(missingDependency.Dependency)))
                     {
-                        _logger.LogCritical("There is a dependency cycle between migration steps {MigrationStep1} and {MigrationStep2}", missingDependency.Dependent, missingDependency.Dependency);
+                        _logger.LogCritical("Migration step {MigrationStep1} cannot run because it's dependency {MigrationStep2} cannot run", missingDependency.Dependent, missingDependency.Dependency);
                     }
                     else
                     {

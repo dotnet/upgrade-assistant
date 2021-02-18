@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
@@ -34,7 +35,7 @@ namespace IntegrationTests
                 NonInteractiveWait = TimeSpan.Zero,
             };
 
-            var migrationTask = Program.RunCommandAsync(options, (context, services) => RegisterTestServices(services, output), AppCommand.Migrate, cts.Token);
+            var migrationTask = Program.RunCommandAsync(options, builder => RegisterTestServices(builder, output), AppCommand.Migrate, cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);
@@ -49,13 +50,13 @@ namespace IntegrationTests
             }
         }
 
-        private static void RegisterTestServices(IServiceCollection services, TextWriter output)
+        private static void RegisterTestServices(ContainerBuilder builder, TextWriter output)
         {
-            services.AddOptions<PackageUpdaterOptions>().Configure(o =>
+            builder.RegisterInstance(new PackageUpdaterOptions
             {
-                o.PackageMapPath = "PackageMaps";
-                o.MigrationAnalyzersPackageSource = "https://doesnotexist.net/index.json";
-                o.MigrationAnalyzersPackageVersion = "1.0.0";
+                PackageMapPath = "PackageMaps",
+                MigrationAnalyzersPackageSource = "https://doesnotexist.net/index.json",
+                MigrationAnalyzersPackageVersion = "1.0.0"
             });
         }
     }

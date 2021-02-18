@@ -11,12 +11,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.DotNet.UpgradeAssistant.Migrator;
-using Microsoft.DotNet.UpgradeAssistant.Steps;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Backup;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
-using Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,8 +21,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class Program
     {
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
-        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string LogFilePath = "log.txt";
 
         public static Task Main(string[] args)
@@ -69,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         public static Task RunAnalysisAsync(MigrateOptions options)
             => RunCommandAsync(options, null, AppCommand.Analyze, CancellationToken.None);
 
-        public static Task RunCommandAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection>? serviceConfiguration, AppCommand appCommand, CancellationToken token)
+        public static Task RunCommandAsync(MigrateOptions options, Action<ContainerBuilder>? builderConfiguration, AppCommand appCommand, CancellationToken token)
         {
             ConsoleUtils.Clear();
 
@@ -121,19 +114,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
                     services.AddStepManagement();
-
-                    // Add steps
-                    services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection));
-                    services.AddSolutionLevelSteps();
-                    services.AddScoped<MigrationStep, BackupStep>();
-                    services.AddTemplateInserterStep();
-                    services.AddConfigUpdaterStep();
-                    services.AddSourceUpdaterStep();
-
-                    services.AddStepManagement();
-
-                    serviceConfiguration?.Invoke(context, services);
                 })
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
@@ -143,6 +123,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 .ConfigureContainer<ContainerBuilder>((context, builder) =>
                 {
                     builder.RegisterExtensions(context.Configuration, options.Extension);
+                    builderConfiguration?.Invoke(builder);
                 })
                 .RunConsoleAsync(options =>
                 {

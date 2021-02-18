@@ -103,10 +103,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
         private IEnumerable<string> GetTemplateConfigFiles(IExtensionProvider extension)
         {
             _logger.LogDebug("Looking for template config files in extension {Extension}", extension.Name);
-
             var options = extension.GetOptions<TemplateInserterOptions>(TemplateInserterOptionsSectionName);
-
-            return options?.TemplatePath is null ? Enumerable.Empty<string>() : extension.GetFiles(options.TemplatePath, TemplateConfigFileName);
+            var configFiles = options?.TemplatePath is null ? Enumerable.Empty<string>() : extension.GetFiles(options.TemplatePath, TemplateConfigFileName);
+            _logger.LogDebug("Found {TemplateCount} template config files in extension {Extension}", configFiles.Count(), extension.Name);
+            return configFiles;
         }
     }
 }

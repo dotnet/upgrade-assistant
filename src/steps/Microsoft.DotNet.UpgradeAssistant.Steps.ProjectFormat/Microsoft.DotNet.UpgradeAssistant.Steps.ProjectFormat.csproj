@@ -4,7 +4,11 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
+    <PackageReference Include="Autofac" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\extensions\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />
   </ItemGroup>
 </Project>

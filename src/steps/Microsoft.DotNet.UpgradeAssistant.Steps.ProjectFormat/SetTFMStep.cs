@@ -13,6 +13,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
         };
 
+        public override IEnumerable<string> DependencyOf { get; } = new[]
+        {
+            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+        };
+
         public SetTFMStep(ILogger<SetTFMStep> logger)
             : base(logger)
         {

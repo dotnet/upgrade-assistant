@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IConfigUpdater
     {

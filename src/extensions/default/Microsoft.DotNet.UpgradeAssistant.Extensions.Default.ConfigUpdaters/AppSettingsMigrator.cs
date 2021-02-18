@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters

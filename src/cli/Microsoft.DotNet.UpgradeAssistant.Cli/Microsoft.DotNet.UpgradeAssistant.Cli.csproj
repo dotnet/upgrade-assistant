@@ -12,12 +12,6 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ConfigUpdaters\readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SourceUpdaters\readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" />
@@ -57,9 +51,6 @@
     
     <!-- These projects aren't used directly by this project, but are included here so that they're
          sure to be built and available as extensions. -->
-    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
-    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
-    <ProjectReference Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
     <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj" />
     <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj" />
     <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj" />
