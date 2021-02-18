@@ -14,14 +14,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     public class ConsoleMigrate : IHostedService
     {
         private readonly IServiceProvider _services;
-        private readonly ICollectUserInput _input;
+        private readonly IUserInput _input;
         private readonly InputOutputStreams _io;
         private readonly CommandProvider _commandProvider;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
 
         public ConsoleMigrate(
-            ICollectUserInput input,
+            IUserInput input,
             InputOutputStreams io,
             CommandProvider commandProvider,
             ILogger<ConsoleMigrate> logger,
@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 // Cache current steps here as defense-in-depth against the possibility
                 // of a bug (or very weird migration step behavior) causing the current step
                 // to reset state after being initialized by GetNextStepAsync
-                var steps = migrator.GetStepsForContext(context);
+                var steps = await migrator.InitializeAsync(context, token);
                 var step = await migrator.GetNextStepAsync(context, token);
 
                 while (step is not null)
@@ -101,9 +101,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         token.ThrowIfCancellationRequested();
 
                         ShowMigrationSteps(steps, context, step);
+                        _io.Output.WriteLine();
 
                         var commands = _commandProvider.GetCommands(step);
-                        var command = await _input.ChooseAsync("Choose command", commands, token);
+                        var command = await _input.ChooseAsync("Choose a command:", commands, token);
 
                         // TODO : It might be nice to allow commands to show more details by having a 'status' property
                         //        that can be shown here. Also, commands currently only return bools but, in the future,
@@ -161,13 +162,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 if (context.EntryPoint is not null)
                 {
-                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.Project.FilePath}");
+                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.FilePath}");
                     displayedProjectInfo = true;
                 }
 
                 if (context.CurrentProject is not null)
                 {
-                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.Project.FilePath}");
+                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.FilePath}");
                     displayedProjectInfo = true;
                 }
 
@@ -180,7 +181,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             foreach (var step in steps)
             {
                 // Write indent (if any) and item number
-                _io.Output.Write($"{new string(' ', offset * 4)}{count++}. ");
+                var indexStr = offset % 2 == 0
+                    ? $"{count++}. "
+                    : $"{(char)('a' + (count++ - 1))}. ";
+                _io.Output.Write($"{new string(' ', offset * 4)}{indexStr}");
 
                 // Write the step title and make a note of whether the step is incomplete
                 // (since that would mean future steps shouldn't show "[Next step]")

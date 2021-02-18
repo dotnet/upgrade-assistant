@@ -10,11 +10,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         bool IsComplete { get; set; }
 
-        UpgradeProjectInfo? EntryPoint { get; }
+        IProject? EntryPoint { get; }
 
         void SetEntryPoint(IProject? entryPoint);
 
-        UpgradeProjectInfo? CurrentProject { get; }
+        IProject? CurrentProject { get; }
 
         void SetCurrentProject(IProject? project);
 
@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         bool UpdateSolution(Solution updatedSolution);
 
-        IAsyncEnumerable<(string Name, string Value)> GetWorkspaceProperties(CancellationToken token);
+        IDictionary<string, string> GlobalProperties { get; }
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,8 +23,24 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static MigrationCommand Create(string text, bool isEnabled = true)
             => Create(text, (_, __) => Task.FromResult(true), isEnabled);
 
+        public static MigrationCommand Create(string text, Action execute, bool isEnabled = true)
+            => new DelegateMigrationCommand(text, (_, __) =>
+            {
+                execute();
+                return Task.FromResult(true);
+            })
+            { IsEnabled = isEnabled };
+
         public static MigrationCommand Create(string text, Func<IMigrationContext, CancellationToken, Task<bool>> execute, bool isEnabled = true)
             => new DelegateMigrationCommand(text, execute) { IsEnabled = isEnabled };
+
+        public static IEnumerable<MigrationCommand<T>> CreateFromEnum<T>()
+            where T : struct, Enum
+            => Enum.GetValues<T>()
+                .Select(t => new EnumMigrationCommand<T>
+                {
+                    Value = t,
+                });
 
         private class DelegateMigrationCommand : MigrationCommand
         {
@@ -39,5 +57,20 @@ namespace Microsoft.DotNet.UpgradeAssistant
             public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
                 => _execute(context, token);
         }
+
+        private class EnumMigrationCommand<TEnum> : MigrationCommand<TEnum>
+            where TEnum : Enum
+        {
+            public override string CommandText => Value.ToString();
+
+            public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+                => Task.FromResult(true);
+        }
+    }
+
+    public abstract class MigrationCommand<T> : MigrationCommand
+        where T : notnull
+    {
+        public T Value { get; init; } = default!;
     }
 }

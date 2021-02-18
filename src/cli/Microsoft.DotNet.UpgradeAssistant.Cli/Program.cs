@@ -103,11 +103,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     // Add command handlers
                     if (options.NonInteractive)
                     {
-                        services.AddTransient<ICollectUserInput, NonInteractiveUserInput>();
+                        services.AddTransient<IUserInput, NonInteractiveUserInput>();
                     }
                     else
                     {
-                        services.AddTransient<ICollectUserInput, ConsoleCollectUserInput>();
+                        services.AddTransient<IUserInput, ConsoleCollectUserInput>();
                     }
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
@@ -180,6 +180,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             command.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
             command.AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option") { IsHidden = true });
+            command.AddOption(new Option<int>(new[] { "--non-interactive-wait" }, "Wait the supplied seconds before moving on to the next option in non-interactive mode.") { IsHidden = true });
         }
 
 #if ANALYZE_COMMAND

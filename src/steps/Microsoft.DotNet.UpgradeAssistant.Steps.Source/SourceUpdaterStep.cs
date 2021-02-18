@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentNullException(nameof(context));
             }
 
-            Project = context.CurrentProject.Required().Project;
+            Project = context.CurrentProject.Required();
 
             var projectPath = Project.FilePath;
 
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var file = context.CurrentProject.Required().Project.GetFile();
+            var file = context.CurrentProject.Required().GetFile();
 
             file.Simplify();
 

@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly string? _analyzerPackageSource;
         private readonly MigrateOptions _options;
+        private readonly ITargetTFMSelector _tfmSelector;
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
@@ -56,6 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         public PackageUpdaterStep(
             MigrateOptions options,
             PackageUpdaterOptions updaterOptions,
+            ITargetTFMSelector tfmSelector,
             IPackageLoader packageLoader,
             IPackageRestorer packageRestorer,
             IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
@@ -73,6 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
@@ -98,8 +101,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().Project.FilePath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().Project.FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
+                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
             }
 
             if (_analysisState is null || !_analysisState.ChangesRecommended)
@@ -130,7 +133,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             // TODO : Temporary workaround until the migration analyzers are available on NuGet.org
             // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
@@ -178,15 +181,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
             catch (Exception)
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().Project.FilePath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().Project.FilePath}");
+                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}");
             }
         }
 
         private async Task<bool> RunPackageAnalyzersAsync(IMigrationContext context, CancellationToken token)
         {
-            _analysisState = await PackageAnalysisState.CreateAsync(context, _packageRestorer, token).ConfigureAwait(false);
-            var projectRoot = context.CurrentProject?.Project;
+            _analysisState = await PackageAnalysisState.CreateAsync(context, _tfmSelector, _packageRestorer, token).ConfigureAwait(false);
+            var projectRoot = context.CurrentProject;
 
             if (projectRoot is null)
             {

@@ -7,6 +7,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class SetTFMStep : MigrationStep
     {
+        private readonly IPackageRestorer _restorer;
+        private readonly ITargetTFMSelector _tfmSelector;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be SDK-style before changing package references
@@ -18,9 +21,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
 
-        public SetTFMStep(ILogger<SetTFMStep> logger)
+        public SetTFMStep(IPackageRestorer restorer, ITargetTFMSelector tfmSelector, ILogger<SetTFMStep> logger)
             : base(logger)
         {
+            _restorer = restorer;
+            _tfmSelector = tfmSelector;
         }
 
         public override string Id => typeof(SetTFMStep).FullName!;
@@ -31,26 +36,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
         {
-            var projectInfo = context.CurrentProject.Required();
+            var project = context.CurrentProject.Required();
 
-            var file = projectInfo.Project.GetFile();
-            file.SetTFM(projectInfo.TargetTFM);
+            var targetTfm = _tfmSelector.SelectTFM(project);
+            var file = project.GetFile();
+
+            file.SetTFM(targetTfm);
+
             await file.SaveAsync(token);
 
-            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {projectInfo.TargetTFM}");
+            // With an updated TFM, we should restore packages
+            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
+
+            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {targetTfm}");
         }
 
         protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
-            var projectInfo = context.CurrentProject.Required();
+            var project = context.CurrentProject.Required();
+            var targetTfm = _tfmSelector.SelectTFM(project);
 
-            if (projectInfo.TargetTFM == projectInfo.Project.TFM)
+            if (targetTfm == project.TFM)
             {
                 return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None));
             }
             else
             {
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"TFM needs to be updated to {projectInfo.TargetTFM}", BuildBreakRisk.High));
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High));
             }
         }
 

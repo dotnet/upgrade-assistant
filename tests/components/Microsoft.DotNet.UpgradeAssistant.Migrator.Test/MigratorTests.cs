@@ -14,11 +14,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
         [Fact]
         public async Task NegativeTests()
         {
-            Assert.Throws<ArgumentNullException>(() => new MigratorManager(null!, new NullLogger<MigratorManager>()));
-            Assert.Throws<ArgumentNullException>(() => new MigratorManager(GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
+            Assert.Throws<ArgumentNullException>(() => new MigratorManager(Substitute.For<IPackageRestorer>(), null!, new NullLogger<MigratorManager>()));
+            Assert.Throws<ArgumentNullException>(() => new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
 
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
-            var migrator = new MigratorManager(GetOrderer(unknownStep), new NullLogger<MigratorManager>());
+            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(unknownStep), new NullLogger<MigratorManager>());
             using var context = Substitute.For<IMigrationContext>();
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
         [Fact]
         public async Task MigratorStepsEnumeration()
         {
-            var migrator = new MigratorManager(GetOrderer(GetMigrationSteps()), new NullLogger<MigratorManager>());
+            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(GetMigrationSteps()), new NullLogger<MigratorManager>());
 
             var expectedTopLevelStepsAndSubSteps = new[]
             {
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
         [Theory]
         public async Task CompletedStepsAreNotEnumerated(MigrationStep[] steps, string[] expectedSteps)
         {
-            var migrator = new MigratorManager(GetOrderer(steps), new NullLogger<MigratorManager>());
+            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(steps), new NullLogger<MigratorManager>());
             var allSteps = new List<string>();
             using var context = Substitute.For<IMigrationContext>();
 
@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
             var steps = new MigrationStep[] { new SkippedTestMigrationStep("Step 1"), new FailedTestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") };
             var expectedNextStepId = "Step 2";
 
-            var migrator = new MigratorManager(GetOrderer(steps), new NullLogger<MigratorManager>());
+            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(steps), new NullLogger<MigratorManager>());
             using var context = Substitute.For<IMigrationContext>();
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
 

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    internal class NonInteractiveUserInput : ICollectUserInput
+    internal class NonInteractiveUserInput : IUserInput
     {
         private readonly TimeSpan _waitPeriod;
 
         public NonInteractiveUserInput(MigrateOptions options)
         {
-            _waitPeriod = options.NonInteractiveWait;
+            _waitPeriod = TimeSpan.FromSeconds(options.NonInteractiveWait);
         }
 
         public Task<string?> AskUserAsync(string currentPath)

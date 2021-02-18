@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     public class CurrentProjectSelectionStep : MigrationStep
     {
-        private readonly ICollectUserInput _input;
+        private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetTFMSelector _tfmSelector;
 
@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         public override string Title => "Select project to upgrade";
 
         public CurrentProjectSelectionStep(
-            ICollectUserInput input,
+            IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
             ITargetTFMSelector tfmSelector,
             ILogger<CurrentProjectSelectionStep> logger)
@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new InvalidOperationException("Entrypoint must be set before using this step");
             }
 
-            var ordered = context.EntryPoint.Project.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
 
             var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
 

@@ -15,7 +15,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
             _showDetails = showDetails ?? throw new ArgumentNullException(nameof(showDetails));
         }
 
-        // todo - support localization
         public override string CommandText => "See more step details";
 
         public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)

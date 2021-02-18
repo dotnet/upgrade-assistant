@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
         protected override bool IsApplicableImpl(IMigrationContext context) =>
             context?.CurrentProject is not null &&
             SubSteps.Any() &&
-            _configFilePaths.Select(p => Path.Combine(context.CurrentProject.Project.Directory, p)).Any(f => File.Exists(f));
+            _configFilePaths.Select(p => Path.Combine(context.CurrentProject.Directory, p)).Any(f => File.Exists(f));
 
         protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
         {
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             var configPaths = _configFilePaths.Select(p => Path.Combine(project.Directory ?? string.Empty, p)).Where(p => File.Exists(p));
             Logger.LogDebug("Loading config files: {ConfigFiles}", string.Join(", ", configPaths));

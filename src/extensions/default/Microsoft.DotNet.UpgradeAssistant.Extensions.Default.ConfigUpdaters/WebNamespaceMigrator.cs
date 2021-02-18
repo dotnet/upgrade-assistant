@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             try
             {
-                var project = context.CurrentProject.Required().Project;
+                var project = context.CurrentProject.Required();
 
                 var viewImportsContents = new List<string>(_viewImportsPath is null
                     ? new[] { string.Empty, ViewImportsInitialContent }
@@ -120,7 +120,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             _logger.LogDebug("Found {NamespaceCount} namespaces imported into web pages in config files", namespaces.Count);
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             var alreadyImportedNamespaces = new List<string>();
             _viewImportsPath = project.FindFiles(ProjectItemType.Content, ViewImportsRelativePath).FirstOrDefault();

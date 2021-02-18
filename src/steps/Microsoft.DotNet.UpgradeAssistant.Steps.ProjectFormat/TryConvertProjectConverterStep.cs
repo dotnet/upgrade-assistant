@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
 
         private readonly string _tryConvertPath;
+        private readonly IPackageRestorer _restorer;
 
         public override string Id => typeof(TryConvertProjectConverterStep).FullName!;
 
@@ -34,8 +35,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
-
-        public TryConvertProjectConverterStep(TryConvertProjectConverterStepOptions options, ILogger<TryConvertProjectConverterStep> logger)
+        public TryConvertProjectConverterStep(
+            IPackageRestorer restorer,
+            TryConvertProjectConverterStepOptions options,
+            ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
             if (logger is null)
@@ -45,6 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             var rawPath = options?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
+            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
         }
 
         protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
@@ -56,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = context.CurrentProject.Required().Project.FilePath;
+            var projectPath = context.CurrentProject.Required().FilePath;
 
             if (!File.Exists(projectPath))
             {
@@ -64,6 +68,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found");
             }
 
+            var result = await RunTryConvertAsync(context, projectPath, token);
+
+            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
+
+            return result;
+        }
+
+        private async Task<MigrationStepApplyResult> RunTryConvertAsync(IMigrationContext context, string projectPath, CancellationToken token)
+        {
             Logger.LogInformation("Converting project file format with try-convert");
             using var tryConvertProcess = new Process
             {
@@ -76,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 }
             };
 
-            await foreach (var (name, value) in context.GetWorkspaceProperties(token))
+            foreach (var (name, value) in context.GlobalProperties)
             {
                 tryConvertProcess.StartInfo.EnvironmentVariables[name] = value;
             }
@@ -153,7 +166,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required().Project;
+            var project = context.CurrentProject.Required();
 
             if (!File.Exists(_tryConvertPath))
             {
