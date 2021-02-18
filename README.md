@@ -19,9 +19,9 @@ When run on a solution, the tool will:
 - Update NuGet package dependencies to versions that are compatible with .NET 5.0
 - Remove transitive NuGet package dependencies that may have been present in packages.config
 - Make simple updates in C# source code to replace patterns that worked in .NET Framework with .NET 5.0 equivalents
-- Add a reference to the Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers package
 - For some app models (like ASP.NET apps), add common template files (like startup.cs) and make simple updates based on recognized web.config or app.config values
 - For projects targeting Windows, add a reference to the Microsoft.Windows.Compatibility package
+- Add references to analyzers that help with migration, such as the Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers package
 
 After running this tool on a solution, the solution will likely not build until the migration is completed manually. Analyzers added to the solution will highlight some of the remaining changes needed after the tool runs.
 
