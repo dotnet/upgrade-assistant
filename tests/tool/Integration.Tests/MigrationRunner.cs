@@ -7,7 +7,7 @@ using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IntegrationTests
+namespace Integration.Tests
 {
     public static class MigrationRunner
     {

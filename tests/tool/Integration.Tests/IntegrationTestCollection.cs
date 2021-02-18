@@ -1,7 +1,7 @@
 ﻿using Microsoft.DotNet.UpgradeAssistant.Fixtures;
 using Xunit;
 
-namespace IntegrationTests
+namespace Integration.Tests
 {
     /// <summary>
     /// Class (which is never instantiated) for collecting integration

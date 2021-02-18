@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package", "src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package.csproj", "{12080E4D-027D-4880-8A94-AA22DCD15F07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test", "tests\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.csproj", "{517E6A56-5FFA-4FD0-B645-02C295C968C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Tests", "tests\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Tests.csproj", "{517E6A56-5FFA-4FD0-B645-02C295C968C3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{2A80B702-C4AB-409F-AFD5-CE7AC809785F}"
 EndProject
@@ -52,13 +52,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Migrator", "src\components\Microsoft.DotNet.UpgradeAssistant.Migrator\Microsoft.DotNet.UpgradeAssistant.Migrator.csproj", "{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Migrator.Test", "tests\components\Microsoft.DotNet.UpgradeAssistant.Migrator.Test\Microsoft.DotNet.UpgradeAssistant.Migrator.Test.csproj", "{90C3DBB8-97BC-4265-B635-1A512CF32C46}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Migrator.Tests", "tests\components\Microsoft.DotNet.UpgradeAssistant.Migrator.Tests\Microsoft.DotNet.UpgradeAssistant.Migrator.Tests.csproj", "{90C3DBB8-97BC-4265-B635-1A512CF32C46}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.TestHelpers", "tests\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj", "{358837A0-FA02-42C5-B1B0-327D7CFDAA76}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "tests\tool\IntegrationTests\IntegrationTests.csproj", "{7AE37670-7570-4EB1-8E66-94DE225CC63E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Integration.Tests", "tests\tool\Integration.Tests\Integration.Tests.csproj", "{7AE37670-7570-4EB1-8E66-94DE225CC63E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test.csproj", "{326A3938-5C0B-4280-9175-7E059679731B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.csproj", "{326A3938-5C0B-4280-9175-7E059679731B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj", "{9F99DC5B-DAD0-4C43-BFFF-8027E4077334}"
 EndProject
