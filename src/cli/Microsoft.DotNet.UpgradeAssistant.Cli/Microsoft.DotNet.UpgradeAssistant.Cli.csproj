@@ -14,7 +14,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
@@ -49,13 +48,7 @@
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Portability\Microsoft.DotNet.UpgradeAssistant.Portability.csproj" />
     <ProjectReference Include="..\..\extensions\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />
     
-    <!-- These projects aren't used directly by this project, but are included here so that they're
-         sure to be built and available as extensions. -->
-    <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Templates\Microsoft.DotNet.UpgradeAssistant.Steps.Templates.csproj" />
+    <!-- This isn't used directly, but needs to be referenced so that the binary is available at runtime to be registered as an extension -->
+    <ProjectReference Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj" />
   </ItemGroup>
 </Project>

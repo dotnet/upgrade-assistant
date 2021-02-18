@@ -13,9 +13,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             builder.RegisterType<PackageUpdaterStep>().As<MigrationStep>().InstancePerLifetimeScope();
             builder.RegisterType<PackageMapProvider>().SingleInstance();
+            builder.RegisterType<PackageLoader>().As<IPackageLoader>().SingleInstance();
             builder.Register(context =>
             {
-                var extensionProvider = context.Resolve<AggregateExtensionProvider>();
+                var extensionProvider = context.Resolve<AggregateExtension>();
 
                 // Read the package updater options from all extensions.
                 // Alternatively, if we wanted to just get options from this extension,

@@ -35,6 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
+
         public TryConvertProjectConverterStep(
             IPackageRestorer restorer,
             TryConvertProjectConverterStepOptions options,

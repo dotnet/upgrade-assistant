@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    public class DirectoryExtensionProvider : DefaultExtensionProvider
+    public class DirectoryExtension : DefaultExtension
     {
         public const string ManifestFileName = "ExtensionManifest.json";
         private const string ExtensionNamePropertyName = "ExtensionName";
 
         public override string Name { get; }
 
-        public DirectoryExtensionProvider(string directory, ILogger<DirectoryExtensionProvider> logger)
+        public DirectoryExtension(string directory, ILogger<DirectoryExtension> logger)
             : base(GetConfiguration(directory), logger, directory)
         {
             var configuration = GetConfiguration(directory);

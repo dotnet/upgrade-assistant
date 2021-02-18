@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    public interface IExtensionProvider
+    public interface IExtension
     {
         string Name { get; }
 

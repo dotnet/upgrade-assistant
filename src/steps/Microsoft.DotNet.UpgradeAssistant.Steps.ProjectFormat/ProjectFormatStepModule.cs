@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             builder.Register(context =>
             {
-                var extensionProvider = context.Resolve<AggregateExtensionProvider>();
+                var extensionProvider = context.Resolve<AggregateExtension>();
 
                 // Read the try-convert updater options from all extensions.
                 // Alternatively, if we wanted to just get options from this extension,

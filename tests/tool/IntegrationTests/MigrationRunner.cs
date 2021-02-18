@@ -35,7 +35,7 @@ namespace IntegrationTests
                 NonInteractiveWait = 0,
             };
 
-            var migrationTask = Program.RunCommandAsync(options, builder => RegisterTestServices(builder, output), AppCommand.Migrate, cts.Token);
+            var migrationTask = Program.RunCommandAsync(options, (context, services) => RegisterTestServices(services, output), AppCommand.Migrate, cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);
@@ -50,13 +50,13 @@ namespace IntegrationTests
             }
         }
 
-        private static void RegisterTestServices(ContainerBuilder builder, TextWriter output)
+        private static void RegisterTestServices(IServiceCollection services, TextWriter output)
         {
-            builder.RegisterInstance(new PackageUpdaterOptions
+            services.AddOptions<PackageUpdaterOptions>().Configure(o =>
             {
-                PackageMapPath = "PackageMaps",
-                MigrationAnalyzersPackageSource = "https://doesnotexist.net/index.json",
-                MigrationAnalyzersPackageVersion = "1.0.0"
+                o.PackageMapPath = "PackageMaps";
+                o.MigrationAnalyzersPackageSource = "https://doesnotexist.net/index.json";
+                o.MigrationAnalyzersPackageVersion = "1.0.0";
             });
         }
     }

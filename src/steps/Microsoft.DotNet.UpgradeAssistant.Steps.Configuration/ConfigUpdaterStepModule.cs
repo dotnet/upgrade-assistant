@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             builder.RegisterType<ConfigUpdaterStep>().As<MigrationStep>().InstancePerLifetimeScope();
             builder.Register(context =>
             {
-                var extensionProvider = context.Resolve<AggregateExtensionProvider>();
+                var extensionProvider = context.Resolve<AggregateExtension>();
 
                 // Read the config updater options from all extensions.
                 // Alternatively, if we wanted to just get options from this extension,

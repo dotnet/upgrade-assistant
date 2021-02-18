@@ -3,29 +3,28 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Autofac;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public static class ExtensionProviderExtensions
     {
-        private const string ConfigurationExtensionModulesSectionName = "ExtensionModules";
+        private const string ExtensionServiceProvidersSectionName = "ExtensionServiceProviders";
         private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
 
         /// <summary>
         /// Register extension services, including the default extension, aggregate extension, and any
         /// extensions found in specified paths.
         /// </summary>
-        /// <param name="containerBuilder">The Autofac container builder to register services to.</param>
-        /// <param name="configuration">The app configuraiton containing a setting for extension paths and the default extension modules. These extensions will be registered before those found with the string[] argument.</param>
+        /// <param name="services">The service collection to register services into.</param>
+        /// <param name="configuration">The app configuraiton containing a setting for extension paths and the default extension service providers. These extensions will be registered before those found with the string[] argument.</param>
         /// <param name="additionalExtensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files. These extensions will be registered after those found from configuration.</param>
-        public static void RegisterExtensions(this ContainerBuilder containerBuilder, IConfiguration configuration, IEnumerable<string> additionalExtensionPaths)
+        public static void AddExtensions(this IServiceCollection services, IConfiguration configuration, IEnumerable<string> additionalExtensionPaths)
         {
-            if (containerBuilder is null)
+            if (services is null)
             {
-                throw new ArgumentNullException(nameof(containerBuilder));
+                throw new ArgumentNullException(nameof(services));
             }
 
             if (configuration is null)
@@ -38,10 +37,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             var extensionPaths = pathsFromString.Concat(additionalExtensionPaths);
 
             // Always include the default extension which contains built-in source updaters, config updaters, etc.
-            containerBuilder.RegisterType<DefaultExtensionProvider>()
-                .As<IExtensionProvider>()
-                .SingleInstance();
-            RegisterExtensionModules(containerBuilder, configuration);
+            services.AddSingleton<IExtension, DefaultExtension>();
+            RegisterExtensionServices(services, configuration);
 
             foreach (var e in extensionPaths)
             {
@@ -52,16 +49,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 if (Directory.Exists(e))
                 {
-                    containerBuilder.Register(c => new DirectoryExtensionProvider(e, c.Resolve<ILogger<DirectoryExtensionProvider>>()));
-                    RegisterExtensionModules(containerBuilder, DirectoryExtensionProvider.GetConfiguration(e));
+                    services.AddSingleton<IExtension>(sp => ActivatorUtilities.CreateInstance<DirectoryExtension>(sp, e));
+                    RegisterExtensionServices(services, DirectoryExtension.GetConfiguration(e));
                 }
                 else if (File.Exists(e))
                 {
-                    if (DirectoryExtensionProvider.ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
+                    if (DirectoryExtension.ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
                     {
                         var dir = Path.GetDirectoryName(e) ?? string.Empty;
-                        containerBuilder.Register(c => new DirectoryExtensionProvider(dir, c.Resolve<ILogger<DirectoryExtensionProvider>>()));
-                        RegisterExtensionModules(containerBuilder, DirectoryExtensionProvider.GetConfiguration(dir));
+                        services.AddSingleton<IExtension>(sp => ActivatorUtilities.CreateInstance<DirectoryExtension>(sp, dir));
+                        RegisterExtensionServices(services, DirectoryExtension.GetConfiguration(dir));
                     }
                     else if (Path.GetExtension(e).Equals(".zip", StringComparison.OrdinalIgnoreCase))
                     {
@@ -74,19 +71,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 }
             }
 
-            containerBuilder.RegisterType<AggregateExtensionProvider>().SingleInstance();
+            services.AddSingleton<AggregateExtension>();
         }
 
-        private static void RegisterExtensionModules(ContainerBuilder containerBuilder, IConfiguration configuration)
+        private static void RegisterExtensionServices(IServiceCollection services, IConfiguration configuration)
         {
-            var extensionModulePaths = configuration.GetSection(ConfigurationExtensionModulesSectionName)?.Get<string[]>();
-            if (extensionModulePaths is not null)
+            var extensionServiceProviderPaths = configuration.GetSection(ExtensionServiceProvidersSectionName)?.Get<string[]>();
+            if (extensionServiceProviderPaths is not null)
             {
-                foreach (var path in extensionModulePaths)
+                foreach (var path in extensionServiceProviderPaths)
                 {
                     try
                     {
-                        containerBuilder.RegisterAssemblyModules(Assembly.LoadFrom(path));
+                        var assembly = Assembly.LoadFrom(path);
+                        var serviceProviders = assembly.GetTypes()
+                            .Where(t => t.IsPublic && t.IsAssignableTo(typeof(IUpgradeAssistantExtensionServiceProvider)))
+                            .Select(t => Activator.CreateInstance(t))
+                            .Cast<IUpgradeAssistantExtensionServiceProvider>();
+
+                        foreach (var sp in serviceProviders)
+                        {
+                            sp.AddServices(services, configuration);
+                        }
                     }
                     catch (FileLoadException)
                     {
