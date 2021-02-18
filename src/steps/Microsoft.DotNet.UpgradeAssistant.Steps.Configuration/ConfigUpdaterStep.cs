@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterStep : MigrationStep
     {
-        private readonly IEnumerable<string> _configFilePaths;
+        private readonly string[] _configFilePaths;
 
         public ImmutableArray<ConfigFile> ConfigFiles { get; private set; }
 
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            _configFilePaths = configUpdaterOptions?.ConfigFilePaths ?? Enumerable.Empty<string>();
+            _configFilePaths = (configUpdaterOptions.ConfigFilePaths ?? Enumerable.Empty<string>()).ToArray();
             SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 

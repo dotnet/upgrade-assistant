@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             {
                 var extensionProvider = context.Resolve<AggregateExtensionProvider>();
 
-                // Read the config updater options from all extensions
+                // Read the config updater options from all extensions.
                 // Alternatively, if we wanted to just get options from this extension,
                 // we could filter extensionProvider.ExtensionProviders by name to get
                 // this particular extension and read configuration from there.
