@@ -6,14 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStep : MigrationStep
     {
-        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -p \"{0}\"";
         private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
         private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
@@ -37,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
 
-        public TryConvertProjectConverterStep(AggregateExtensionProvider extensionProvider, ILogger<TryConvertProjectConverterStep> logger)
+        public TryConvertProjectConverterStep(TryConvertProjectConverterStepOptions options, ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
             if (logger is null)
@@ -45,7 +43,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            var options = extensionProvider.GetOptions<TryConvertProjectConverterStepOptions>(TryConvertProjectConverterStepOptionsSection);
             var rawPath = options?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
         }

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Autofac;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
-using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
@@ -15,8 +15,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             builder.RegisterType<PackageMapProvider>().SingleInstance();
             builder.Register(context =>
             {
-                var config = context.Resolve<IConfiguration>();
-                return config.GetSection(PackageUpdaterOptionsSectionName).Get<PackageUpdaterOptions>();
+                var extensionProvider = context.Resolve<AggregateExtensionProvider>();
+
+                // Read the package updater options from all extensions
+                // Alternatively, if we wanted to just get options from this extension,
+                // we could filter extensionProvider.ExtensionProviders by name to get
+                // this particular extension and read configuration from there.
+                return extensionProvider.GetOptions<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
+                    ?? new PackageUpdaterOptions();
             });
 
             // Although this only registers analyzers from the default extension,

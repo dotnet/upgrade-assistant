@@ -5,15 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterStep : MigrationStep
     {
-        private const string ConfigUpdaterOptionsSectionName = "ConfigUpdater";
-
         private readonly IEnumerable<string> _configFilePaths;
 
         public ImmutableArray<ConfigFile> ConfigFiles { get; private set; }
@@ -38,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
 
-        public ConfigUpdaterStep(IEnumerable<IConfigUpdater> configUpdaters, AggregateExtensionProvider extensions, ILogger<ConfigUpdaterStep> logger)
+        public ConfigUpdaterStep(IEnumerable<IConfigUpdater> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
             if (configUpdaters is null)
@@ -46,9 +43,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(configUpdaters));
             }
 
-            if (extensions is null)
+            if (configUpdaterOptions is null)
             {
-                throw new ArgumentNullException(nameof(extensions));
+                throw new ArgumentNullException(nameof(configUpdaterOptions));
             }
 
             if (logger is null)
@@ -56,8 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            var configOptions = extensions.GetOptions<ConfigUpdaterOptions>(ConfigUpdaterOptionsSectionName);
-            _configFilePaths = configOptions?.ConfigFilePaths ?? Enumerable.Empty<string>();
+            _configFilePaths = configUpdaterOptions?.ConfigFilePaths ?? Enumerable.Empty<string>();
             SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 

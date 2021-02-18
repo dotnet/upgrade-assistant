@@ -10,6 +10,5 @@
   <ItemGroup>
     <PackageReference Include="Autofac" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
-    <PackageReference Include="Microsoft.Extensions.Options" />
   </ItemGroup>
 </Project>

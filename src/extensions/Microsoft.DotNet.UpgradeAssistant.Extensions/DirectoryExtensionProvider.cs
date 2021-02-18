@@ -8,13 +8,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
     public class DirectoryExtensionProvider : DefaultExtensionProvider
     {
         public const string ManifestFileName = "ExtensionManifest.json";
+        private const string ExtensionNamePropertyName = "ExtensionName";
 
         public override string Name { get; }
 
         public DirectoryExtensionProvider(string directory, ILogger<DirectoryExtensionProvider> logger)
             : base(GetConfiguration(directory), logger, directory)
         {
-            Name = $"Extensions from {directory}";
+            var configuration = GetConfiguration(directory);
+            Name = configuration[ExtensionNamePropertyName] ?? $"Extensions from {directory}";
         }
 
         public static IConfiguration GetConfiguration(string directory)

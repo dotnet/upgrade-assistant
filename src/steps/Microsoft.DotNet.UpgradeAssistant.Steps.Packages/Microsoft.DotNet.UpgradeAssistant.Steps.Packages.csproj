@@ -15,7 +15,6 @@
     <!-- NuGet package versions need to match those used by MSBuild, so load them from the local MSBuild install -->
     <PackageReference Include="NuGet.ProjectModel" ExcludeAssets="runtime" />
     <PackageReference Include="Autofac" />
-    <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="System.IO.FileSystem.Primitives" />
     <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="System.Text.Encoding.Extensions" />
