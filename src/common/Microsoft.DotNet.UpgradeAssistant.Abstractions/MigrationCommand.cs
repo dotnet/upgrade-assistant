@@ -67,10 +67,4 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 => Task.FromResult(true);
         }
     }
-
-    public abstract class MigrationCommand<T> : MigrationCommand
-        where T : notnull
-    {
-        public T Value { get; init; } = default!;
-    }
 }
