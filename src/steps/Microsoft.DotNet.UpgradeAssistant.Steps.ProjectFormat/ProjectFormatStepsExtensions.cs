@@ -1,4 +1,7 @@
-﻿using Microsoft.DotNet.UpgradeAssistant.Reporting;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using Microsoft.DotNet.UpgradeAssistant.Reporting;
 using Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

@@ -13,6 +13,7 @@ indent_style = space
 indent_size = 4
 insert_final_newline = true
 charset = utf-8-bom
+file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
 
 # XML project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
@@ -215,17 +216,56 @@ csharp_prefer_braces = true:silent
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
-# CA1819: Properties should not return arrays
-dotnet_diagnostic.CA1819.severity = none
+# SA0001: XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+
+# SA1413: Use trailing comma in multi-line initializers
+dotnet_diagnostic.SA1413.severity = none
+
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1116: The parameters should begin on the line after the declaration, whenever the parameter span across multiple lines
+dotnet_diagnostic.SA1116.severity = none
+
+# SA1117: The parameters should all be placed on the same line or each parameter should be placed on its own line
+dotnet_diagnostic.SA1117.severity = none
 
 # SA1118: Parameters should not span multiple lines
 dotnet_diagnostic.SA1118.severity = none
 
+# SA1200: Using directive should appear within a namespace declaration
+dotnet_diagnostic.SA1200.severity = none
+
+# SA1201: A method should not follow a class
+dotnet_diagnostic.SA1201.severity = none
+
+# SA1202: 'public' members should come before 'private' members
+dotnet_diagnostic.SA1202.severity = none
+
+# SA1204: Static members should appear before non-static members
+dotnet_diagnostic.SA1204.severity = none
+
+# SA1309: Field should not begin with an underscore
+dotnet_diagnostic.SA1309.severity = none
+
+# SA1310: Field should not contain an underscore
+dotnet_diagnostic.SA1310.severity = none
+
+# SA1502: Element should not be on a single line
+dotnet_diagnostic.SA1502.severity = none
+
 # CA1303: Do not pass literals as localized parameters
 dotnet_diagnostic.CA1303.severity = none
 
-# CA2225: Operator overloads have named alternatives
-dotnet_diagnostic.CA2225.severity = none
-
 # CA1601: Partial elements should be documented
 dotnet_diagnostic.CA1601.severity = none
+
+# SA1633: The file header is missing or not located at the top of the file
+dotnet_diagnostic.SA1633.severity = none
+
+# CA1819: Properties should not return arrays
+dotnet_diagnostic.CA1819.severity = none
+
+# CA2225: Operator overloads have named alternatives
+dotnet_diagnostic.CA2225.severity = none
