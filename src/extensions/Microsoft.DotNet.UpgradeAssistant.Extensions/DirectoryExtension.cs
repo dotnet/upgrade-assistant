@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -15,8 +14,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public override string Name { get; }
 
-        public DirectoryExtension(string directory, ILogger<DirectoryExtension> logger)
-            : base(GetConfiguration(directory), logger, directory)
+        public DirectoryExtension(string directory)
+            : base(GetConfiguration(directory), directory)
         {
             var configuration = GetConfiguration(directory);
             Name = configuration[ExtensionNamePropertyName] ?? $"Extensions from {directory}";

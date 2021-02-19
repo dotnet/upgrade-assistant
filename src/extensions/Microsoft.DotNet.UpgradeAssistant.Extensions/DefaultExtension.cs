@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -14,18 +13,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
     {
         private readonly string _baseDirectory;
         private readonly IConfiguration _configuration;
-        private readonly ILogger _logger;
 
         public virtual string Name => "Default extension";
 
-        public DefaultExtension(IConfiguration configuration, ILogger<DefaultExtension> logger)
-            : this(configuration, logger, AppContext.BaseDirectory)
+        public DefaultExtension(IConfiguration configuration)
+            : this(configuration, AppContext.BaseDirectory)
         { }
 
-        public DefaultExtension(IConfiguration configuration, ILogger<DefaultExtension> logger, string baseDirectory)
+        public DefaultExtension(IConfiguration configuration, string baseDirectory)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _baseDirectory = baseDirectory ?? throw new ArgumentNullException(nameof(baseDirectory));
         }
 
@@ -34,7 +31,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             var filePath = GetAbsolutePath(path);
             if (!File.Exists(filePath))
             {
-                _logger.LogWarning("Expected extension file does not exist at {Path}", filePath);
                 return null;
             }
 
@@ -50,7 +46,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             var dirPath = GetAbsolutePath(path);
             if (!Directory.Exists(dirPath))
             {
-                _logger.LogWarning("Expected extension directory does not exist at {Path}", dirPath);
                 return Enumerable.Empty<string>();
             }
 
