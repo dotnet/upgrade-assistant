@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             else
             {
                 // If we can resolve the expression's type, check to see if it is an HttpContext
-                if (HttpContextTypes.Contains(containingSymbolType.ToString(), StringComparer.Ordinal))
+                if (HttpContextTypes.Contains(containingSymbolType.ToDisplayString(NullableFlowState.NotNull), StringComparer.Ordinal))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Rule, expression.GetLocation()));
                     return;
