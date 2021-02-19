@@ -11,9 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    public class AggregateExtensionProvider : IExtensionProvider
+    public class AggregateExtension : IExtension
     {
-        private readonly ILogger<AggregateExtensionProvider> _logger;
+        private readonly ILogger<AggregateExtension> _logger;
         private readonly Dictionary<Type, Mapper> _optionMappers;
 
         public string Name => $"Aggregate extensions from {ExtensionProviders.Length} underlying providers";
@@ -21,9 +21,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// <summary>
         /// Gets underlying extension providers.
         /// </summary>
-        public ImmutableArray<IExtensionProvider> ExtensionProviders { get; }
+        public ImmutableArray<IExtension> ExtensionProviders { get; }
 
-        public AggregateExtensionProvider(IEnumerable<IExtensionProvider> extensionProviders, ILogger<AggregateExtensionProvider> logger)
+        public AggregateExtension(IEnumerable<IExtension> extensionProviders, ILogger<AggregateExtension> logger)
         {
             if (extensionProviders is null)
             {

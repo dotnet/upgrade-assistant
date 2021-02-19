@@ -38,12 +38,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
 
-        public ConfigUpdaterStep(ConfigUpdaterProvider configUpdaterProvider, ILogger<ConfigUpdaterStep> logger)
+        public ConfigUpdaterStep(IEnumerable<IConfigUpdater> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
-            if (configUpdaterProvider is null)
+            if (configUpdaters is null)
             {
-                throw new ArgumentNullException(nameof(configUpdaterProvider));
+                throw new ArgumentNullException(nameof(configUpdaters));
+            }
+
+            if (configUpdaterOptions is null)
+            {
+                throw new ArgumentNullException(nameof(configUpdaterOptions));
             }
 
             if (logger is null)
@@ -51,8 +56,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            _configFilePaths = configUpdaterProvider.ConfigFilePaths.ToArray();
-            SubSteps = configUpdaterProvider.GetUpdaters().Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
+            _configFilePaths = (configUpdaterOptions.ConfigFilePaths ?? Enumerable.Empty<string>()).ToArray();
+            SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 
         protected override bool IsApplicableImpl(IMigrationContext context) =>

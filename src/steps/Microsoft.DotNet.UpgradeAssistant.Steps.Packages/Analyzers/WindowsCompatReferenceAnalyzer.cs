@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
-    internal class WindowsCompatReferenceAnalyzer : IPackageReferencesAnalyzer
+    public class WindowsCompatReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private const string PackageName = "Microsoft.Windows.Compatibility";
 

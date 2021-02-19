@@ -9,12 +9,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
-    public class WebNamespaceMigrator : IConfigUpdater
+    public class WebNamespaceConfigUpdater : IConfigUpdater
     {
         private const string NamespacesPath = "/configuration/system.web.webPages.razor/pages/namespaces";
         private const string AddElementName = "add";
@@ -28,11 +27,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             "System.Web"
         };
 
-        private readonly ILogger<AppSettingsMigrator> _logger;
+        private readonly ILogger<AppSettingsConfigUpdater> _logger;
         private IEnumerable<string> _namespacesToMigrate;
         private string? _viewImportsPath;
 
-        public string Id => typeof(WebNamespaceMigrator).FullName!;
+        public string Id => typeof(WebNamespaceConfigUpdater).FullName!;
 
         public string Title => "Migrate system.web.webPages.razor/pages/namespaces";
 
@@ -44,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
         // namespaces should be cleaned up by the same processes.
         public BuildBreakRisk Risk => BuildBreakRisk.Low;
 
-        public WebNamespaceMigrator(ILogger<AppSettingsMigrator> logger)
+        public WebNamespaceConfigUpdater(ILogger<AppSettingsConfigUpdater> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _namespacesToMigrate = Enumerable.Empty<string>();

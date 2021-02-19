@@ -10,19 +10,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    public class DefaultExtensionProvider : IExtensionProvider
+    public class DefaultExtension : IExtension
     {
         private readonly string _baseDirectory;
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
 
-        public virtual string Name => "Default extensions";
+        public virtual string Name => "Default extension";
 
-        public DefaultExtensionProvider(IConfiguration configuration, ILogger<DefaultExtensionProvider> logger)
+        public DefaultExtension(IConfiguration configuration, ILogger<DefaultExtension> logger)
             : this(configuration, logger, AppContext.BaseDirectory)
         { }
 
-        public DefaultExtensionProvider(IConfiguration configuration, ILogger<DefaultExtensionProvider> logger, string baseDirectory)
+        public DefaultExtension(IConfiguration configuration, ILogger<DefaultExtension> logger, string baseDirectory)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

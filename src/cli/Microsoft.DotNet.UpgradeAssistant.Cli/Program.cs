@@ -12,12 +12,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.DotNet.UpgradeAssistant.Migrator;
-using Microsoft.DotNet.UpgradeAssistant.Steps;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Backup;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
-using Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Solution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,9 +21,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class Program
     {
-        private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
-        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string LogFilePath = "log.txt";
 
         public static Task Main(string[] args)
@@ -106,9 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddReports();
 
                     services.AddSingleton(options);
-                    services.AddSingleton<IPackageLoader, PackageLoader>();
-
-                    services.AddExtensions(context.Configuration[UpgradeAssistantExtensionPathsSettingName], options.Extension);
+                    services.AddExtensions(context.Configuration, options.Extension);
 
                     // Add command handlers
                     if (options.NonInteractive)
@@ -124,14 +113,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
 
-                    // Add steps
-                    services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection));
-                    services.AddSolutionLevelSteps();
-                    services.AddScoped<MigrationStep, BackupStep>();
-                    services.AddTemplateInserterStep();
-                    services.AddConfigUpdaterStep();
-                    services.AddSourceUpdaterStep();
+                    services.AddSingleton<IProcessRunner, ProcessRunner>();
 
                     services.AddStepManagement();
 

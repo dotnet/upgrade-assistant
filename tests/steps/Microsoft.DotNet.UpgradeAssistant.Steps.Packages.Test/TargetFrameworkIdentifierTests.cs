@@ -4,7 +4,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Test
 {
     [Collection(PackageStepTestCollection.Name)]
     public class TargetFrameworkIdentifierTests
