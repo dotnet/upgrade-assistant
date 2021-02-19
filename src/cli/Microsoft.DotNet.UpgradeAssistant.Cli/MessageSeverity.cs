@@ -1,4 +1,7 @@
-﻿namespace Microsoft.DotNet.UpgradeAssistant.Cli
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     /// <summary>
     /// Gives a suggestion to the calling code about how to format a message displayed to the user.
