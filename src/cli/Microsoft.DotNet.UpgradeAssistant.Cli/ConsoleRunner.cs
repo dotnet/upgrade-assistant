@@ -64,7 +64,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             foreach (var startup in startups)
             {
-                await startup.StartupAsync(token);
+                if (!await startup.StartupAsync(token))
+                {
+                    throw new MigrationException($"Failure running start up action {startup.GetType().FullName}");
+                }
             }
         }
 
