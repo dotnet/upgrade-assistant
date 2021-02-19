@@ -1,4 +1,7 @@
-﻿using Microsoft.DotNet.UpgradeAssistant.Portability;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using Microsoft.DotNet.UpgradeAssistant.Portability;
 using Microsoft.DotNet.UpgradeAssistant.Portability.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Portability.Service;
 using Microsoft.DotNet.UpgradeAssistant.Reporting;
