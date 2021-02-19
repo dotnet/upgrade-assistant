@@ -4,7 +4,6 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;

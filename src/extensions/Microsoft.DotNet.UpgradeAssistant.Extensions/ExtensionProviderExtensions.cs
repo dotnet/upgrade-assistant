@@ -5,47 +5,43 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public static class ExtensionProviderExtensions
     {
-        /// <summary>
-        /// Register extension services, including the default extension, aggregate extension, and any
-        /// extensions found in specified paths.
-        /// </summary>
-        /// <param name="services">The service collection to register services to.</param>
-        /// <param name="extensionPathString">A ;-delimited list of paths to probe for extensions. These extensions will be registered before those found with the string[] argument.</param>
-        /// <param name="extensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files. These extensions will be registered after those found with the string argument.</param>
-        /// <returns>The service collection with extension services registered.</returns>
-        public static IServiceCollection AddExtensions(this IServiceCollection services, string? extensionPathString, IEnumerable<string> extensionPaths)
-        {
-            var pathsFromString = extensionPathString?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
-            return services.AddExtensions(pathsFromString.Concat(extensionPaths));
-        }
+        private const string ExtensionServiceProvidersSectionName = "ExtensionServiceProviders";
+        private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
 
         /// <summary>
         /// Register extension services, including the default extension, aggregate extension, and any
         /// extensions found in specified paths.
         /// </summary>
-        /// <param name="services">The service collection to register services to.</param>
-        /// <param name="extensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files.</param>
-        /// <returns>The service collection with extension services registered.</returns>
-        public static IServiceCollection AddExtensions(this IServiceCollection services, IEnumerable<string> extensionPaths)
+        /// <param name="services">The service collection to register services into.</param>
+        /// <param name="configuration">The app configuraiton containing a setting for extension paths and the default extension service providers. These extensions will be registered before those found with the string[] argument.</param>
+        /// <param name="additionalExtensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files. These extensions will be registered after those found from configuration.</param>
+        public static void AddExtensions(this IServiceCollection services, IConfiguration configuration, IEnumerable<string> additionalExtensionPaths)
         {
             if (services is null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            if (extensionPaths is null)
+            if (configuration is null)
             {
-                throw new ArgumentNullException(nameof(extensionPaths));
+                throw new ArgumentNullException(nameof(configuration));
             }
 
+            var extensionPathString = configuration[UpgradeAssistantExtensionPathsSettingName];
+            var pathsFromString = extensionPathString?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
+            var extensionPaths = pathsFromString.Concat(additionalExtensionPaths);
+
             // Always include the default extension which contains built-in source updaters, config updaters, etc.
-            services.AddSingleton<IExtensionProvider, DefaultExtensionProvider>();
+            services.AddSingleton<IExtension, DefaultExtension>();
+            RegisterExtensionServices(services, configuration);
 
             foreach (var e in extensionPaths)
             {
@@ -56,13 +52,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 if (Directory.Exists(e))
                 {
-                    services.AddSingleton<IExtensionProvider>(sp => ActivatorUtilities.CreateInstance<DirectoryExtensionProvider>(sp, e));
+                    services.AddSingleton<IExtension>(sp => ActivatorUtilities.CreateInstance<DirectoryExtension>(sp, e));
+                    RegisterExtensionServices(services, DirectoryExtension.GetConfiguration(e));
                 }
                 else if (File.Exists(e))
                 {
-                    if (DirectoryExtensionProvider.ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
+                    if (DirectoryExtension.ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
                     {
-                        services.AddSingleton<IExtensionProvider>(sp => ActivatorUtilities.CreateInstance<DirectoryExtensionProvider>(sp, Path.GetDirectoryName(e) ?? string.Empty));
+                        var dir = Path.GetDirectoryName(e) ?? string.Empty;
+                        services.AddSingleton<IExtension>(sp => ActivatorUtilities.CreateInstance<DirectoryExtension>(sp, dir));
+                        RegisterExtensionServices(services, DirectoryExtension.GetConfiguration(dir));
                     }
                     else if (Path.GetExtension(e).Equals(".zip", StringComparison.OrdinalIgnoreCase))
                     {
@@ -75,9 +74,39 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 }
             }
 
-            services.AddSingleton<AggregateExtensionProvider>();
+            services.AddSingleton<AggregateExtension>();
+        }
 
-            return services;
+        private static void RegisterExtensionServices(IServiceCollection services, IConfiguration configuration)
+        {
+            var extensionServiceProviderPaths = configuration.GetSection(ExtensionServiceProvidersSectionName)?.Get<string[]>();
+            if (extensionServiceProviderPaths is null)
+            {
+                return;
+            }
+
+            foreach (var path in extensionServiceProviderPaths)
+            {
+                try
+                {
+                    var assembly = Assembly.LoadFrom(path);
+                    var serviceProviders = assembly.GetTypes()
+                        .Where(t => t.IsPublic && !t.IsAbstract && t.IsAssignableTo(typeof(IExtensionServiceProvider)))
+                        .Select(t => Activator.CreateInstance(t))
+                        .Cast<IExtensionServiceProvider>();
+
+                    foreach (var sp in serviceProviders)
+                    {
+                        sp.AddServices(new ExtensionServiceConfiguration(services, configuration));
+                    }
+                }
+                catch (FileLoadException)
+                {
+                }
+                catch (BadImageFormatException)
+                {
+                }
+            }
         }
     }
 }

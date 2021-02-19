@@ -11,12 +11,11 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
-    public class AppSettingsMigrator : IConfigUpdater
+    public class AppSettingsConfigUpdater : IConfigUpdater
     {
         private const string AppSettingsPath = "/configuration/appSettings";
         private const string AddSettingElementName = "add";
@@ -25,10 +24,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
         private const string AppSettingsJsonFileName = "appsettings.json";
 
         private static readonly Regex AppSettingsFileRegex = new("^appsettings(\\..+)?\\.json$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private readonly ILogger<AppSettingsMigrator> _logger;
+        private readonly ILogger<AppSettingsConfigUpdater> _logger;
         private readonly Dictionary<string, string> _appSettingsToMigrate;
 
-        public string Id => typeof(AppSettingsMigrator).FullName!;
+        public string Id => typeof(AppSettingsConfigUpdater).FullName!;
 
         public string Title => "Migrate appSettings";
 
@@ -36,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
         public BuildBreakRisk Risk => BuildBreakRisk.Low;
 
-        public AppSettingsMigrator(ILogger<AppSettingsMigrator> logger)
+        public AppSettingsConfigUpdater(ILogger<AppSettingsConfigUpdater> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _appSettingsToMigrate = new Dictionary<string, string>();

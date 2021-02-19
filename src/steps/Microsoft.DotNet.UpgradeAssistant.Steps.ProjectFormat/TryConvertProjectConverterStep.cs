@@ -46,18 +46,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
-            if (tryConvertOptionsAccessor is null)
-            {
-                throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
-            }
-
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
             var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
-
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
         }

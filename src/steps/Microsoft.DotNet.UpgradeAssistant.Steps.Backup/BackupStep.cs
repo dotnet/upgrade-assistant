@@ -32,6 +32,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.CurrentProjectSelectionStep",
         };
 
+        public override IEnumerable<string> DependencyOf { get; } = new[]
+        {
+            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+        };
+
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, IUserInput userInput)
             : base(logger)
         {

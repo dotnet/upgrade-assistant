@@ -23,13 +23,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             Converters = { new JsonStringProjectItemTypeConverter() }
         };
 
-        private readonly AggregateExtensionProvider _extensions;
+        private readonly AggregateExtension _extensions;
         private readonly ILogger<TemplateProvider> _logger;
-        private readonly Dictionary<IExtensionProvider, IEnumerable<string>> _templateConfigFiles;
+        private readonly Dictionary<IExtension, IEnumerable<string>> _templateConfigFiles;
 
         public IEnumerable<string> TemplateConfigFileNames => _templateConfigFiles.SelectMany(kvp => kvp.Value.Select(c => $"{kvp.Key.Name}:{c}"));
 
-        public TemplateProvider(AggregateExtensionProvider extensions, ILogger<TemplateProvider> logger)
+        public TemplateProvider(AggregateExtension extensions, ILogger<TemplateProvider> logger)
         {
             _extensions = extensions ?? throw new ArgumentNullException(nameof(extensions));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             return templates;
         }
 
-        private async Task<TemplateConfiguration?> LoadTemplateConfigurationAsync(IExtensionProvider extension, string path, CancellationToken token)
+        private async Task<TemplateConfiguration?> LoadTemplateConfigurationAsync(IExtension extension, string path, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -103,13 +103,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
         /// </summary>
         /// <param name="extension">The extension provider to look in for template config files.</param>
         /// <returns>Paths to any template config files in the extension.</returns>
-        private IEnumerable<string> GetTemplateConfigFiles(IExtensionProvider extension)
+        private IEnumerable<string> GetTemplateConfigFiles(IExtension extension)
         {
             _logger.LogDebug("Looking for template config files in extension {Extension}", extension.Name);
-
             var options = extension.GetOptions<TemplateInserterOptions>(TemplateInserterOptionsSectionName);
-
-            return options?.TemplatePath is null ? Enumerable.Empty<string>() : extension.GetFiles(options.TemplatePath, TemplateConfigFileName);
+            var configFiles = options?.TemplatePath is null ? Enumerable.Empty<string>() : extension.GetFiles(options.TemplatePath, TemplateConfigFileName);
+            _logger.LogDebug("Found {TemplateCount} template config files in extension {Extension}", configFiles.Count(), extension.Name);
+            return configFiles;
         }
     }
 }

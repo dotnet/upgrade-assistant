@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
     /// </summary>
     internal record RuntimeItemSpec : ItemSpec
     {
-        public RuntimeItemSpec(ItemSpec baseItem, IExtensionProvider extension, string templateFilePath, Dictionary<string, string> replacements)
+        public RuntimeItemSpec(ItemSpec baseItem, IExtension extension, string templateFilePath, Dictionary<string, string> replacements)
             : base(baseItem.Type, baseItem.Path, baseItem.Keywords.ToArray())
         {
             Extension = extension;
@@ -36,6 +36,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
         /// <summary>
         /// Gets the extension the item comes from.
         /// </summary>
-        public IExtensionProvider Extension { get; }
+        public IExtension Extension { get; }
     }
 }

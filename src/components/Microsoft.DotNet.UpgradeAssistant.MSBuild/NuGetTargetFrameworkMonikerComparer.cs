@@ -5,13 +5,13 @@ using System;
 using Microsoft.Extensions.Logging;
 using NuGet.Frameworks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
-    public class TargetFrameworkMonikerComparer : ITargetFrameworkMonikerComparer
+    public class NuGetTargetFrameworkMonikerComparer : ITargetFrameworkMonikerComparer
     {
-        private readonly ILogger<TargetFrameworkMonikerComparer> _logger;
+        private readonly ILogger<NuGetTargetFrameworkMonikerComparer> _logger;
 
-        public TargetFrameworkMonikerComparer(ILogger<TargetFrameworkMonikerComparer> logger)
+        public NuGetTargetFrameworkMonikerComparer(ILogger<NuGetTargetFrameworkMonikerComparer> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

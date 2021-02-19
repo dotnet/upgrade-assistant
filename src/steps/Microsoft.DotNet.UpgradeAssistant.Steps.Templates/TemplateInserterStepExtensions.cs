@@ -4,7 +4,7 @@
 using Microsoft.DotNet.UpgradeAssistant.Steps.Templates;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class TemplateInserterStepExtensions
     {

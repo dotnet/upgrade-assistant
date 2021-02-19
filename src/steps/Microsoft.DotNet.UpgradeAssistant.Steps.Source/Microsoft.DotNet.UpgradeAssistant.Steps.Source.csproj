@@ -5,6 +5,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
     <ProjectReference Include="..\..\extensions\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />
+    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\..\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />

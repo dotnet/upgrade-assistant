@@ -128,9 +128,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
                 // If an input steps aren't ordered, then either their dependencies are missing or there is a cycle
                 foreach (var missingDependency in dependencies)
                 {
-                    if (dependencies.Any(d => d.Dependency.Equals(missingDependency.Dependent, StringComparison.Ordinal)))
+                    if (inputSteps.Any(s => s.Id.Equals(missingDependency.Dependency)))
                     {
-                        _logger.LogCritical("There is a dependency cycle between migration steps {MigrationStep1} and {MigrationStep2}", missingDependency.Dependent, missingDependency.Dependency);
+                        _logger.LogCritical("Migration step {MigrationStep1} cannot run because it's dependency {MigrationStep2} cannot run", missingDependency.Dependent, missingDependency.Dependency);
                     }
                     else
                     {
@@ -138,7 +138,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
                     }
                 }
 
-                throw new MigrationException($"Cannot order migration steps due to {dependencies.Count} unsatisfiable dependencies: {dependencies}");
+                throw new MigrationException($"Cannot order migration steps due to {dependencies.Count} unsatisfiable dependencies: {string.Join(", ", dependencies)}");
             }
             else
             {
@@ -156,6 +156,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
         private static IEnumerable<MigrationStep> GetStepsWithNoDependencies(List<MigrationStep> steps, List<MigrationStepDependency> dependencies) =>
             steps.Where(s => !dependencies.Any(d => d.Dependent.Equals(s.Id, StringComparison.Ordinal)));
 
-        private record MigrationStepDependency(string Dependency, string Dependent);
+        private record MigrationStepDependency(string Dependency, string Dependent)
+        {
+            public override string ToString() => $"{Dependent}->{Dependency}";
+        }
     }
 }

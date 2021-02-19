@@ -24,6 +24,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="5.0.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="2.3.2262-g94fae01e" />
     <PackageVersion Include="Moq" Version="4.16.0" />
