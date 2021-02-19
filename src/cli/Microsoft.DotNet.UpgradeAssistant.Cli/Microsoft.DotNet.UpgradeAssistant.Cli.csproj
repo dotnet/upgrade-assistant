@@ -20,14 +20,16 @@
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- Explicitly reference packages that we do *not* want included in output
          paths in case transitive dependencies pull them in. These runtime
          assets are excluded because they are loaded from the version of MSBuild
          used by the tool, instead. They should, therefore, never show up in this
-         tool's output. 
-         
+         tool's output.
+
          These are different from the MSBuild packages listed in
-         Directory.Build.Targets because tests can use these NuGet packages (and 
+         Directory.Build.Targets because tests can use these NuGet packages (and
          the test harness needs to). However, no project (this one or tests) should
          use MSBuild runtime assets. -->
     <PackageReference Include="NuGet.Common" ExcludeAssets="runtime" />
@@ -47,7 +49,7 @@
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Portability\Microsoft.DotNet.UpgradeAssistant.Portability.csproj" />
     <ProjectReference Include="..\..\extensions\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />
-    
+
     <!-- This isn't used directly, but needs to be referenced so that the binary is available at runtime to be registered as an extension -->
     <ProjectReference Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj" />
   </ItemGroup>

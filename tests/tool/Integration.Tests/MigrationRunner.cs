@@ -37,7 +37,7 @@ namespace Integration.Tests
                 NonInteractiveWait = 0,
             };
 
-            var migrationTask = Program.RunCommandAsync(options, (context, services) => RegisterTestServices(services, output), AppCommand.Migrate, cts.Token);
+            var migrationTask = Program.RunMigrationAsync(options, (context, services) => RegisterTestServices(services, output), cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);

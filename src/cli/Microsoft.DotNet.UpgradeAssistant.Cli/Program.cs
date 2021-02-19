@@ -56,13 +56,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        public static Task RunMigrationAsync(MigrateOptions options)
-            => RunCommandAsync(options, null, AppCommand.Migrate, CancellationToken.None);
+        public static Task RunMigrationAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection> configure, CancellationToken token)
+            => RunCommandAsync(options, (ctx, services) =>
+            {
+                services.AddScoped<IAppCommand, ConsoleMigrate>();
+                configure(ctx, services);
+            }, token);
 
         public static Task RunAnalysisAsync(MigrateOptions options)
-            => RunCommandAsync(options, null, AppCommand.Analyze, CancellationToken.None);
+            => RunCommandAsync(options, (ctx, services) =>
+            {
+                services.AddScoped<IAppCommand, ConsoleAnalyze>();
+                services.AddReports();
+                services.AddPortabilityAnalysis()
+                    .Bind(ctx.Configuration.GetSection("Portability"));
+            }, CancellationToken.None);
 
-        public static Task RunCommandAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection>? serviceConfiguration, AppCommand appCommand, CancellationToken token)
+        private static Task RunCommandAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection> serviceConfiguration, CancellationToken token)
         {
             ConsoleUtils.Clear();
 
@@ -79,23 +89,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureServices((context, services) =>
                 {
-                    if (appCommand == AppCommand.Migrate)
-                    {
-                        services.AddHostedService<ConsoleMigrate>();
-                    }
-                    else if (appCommand == AppCommand.Analyze)
-                    {
-                        services.AddHostedService<ConsoleAnalyze>();
-                    }
-
-                    services.AddPortabilityAnalysis()
-                        .Bind(context.Configuration.GetSection("Portability"));
+                    services.AddHostedService<ConsoleRunner>();
 
                     services.AddSingleton<IMigrationStateManager, FileMigrationStateFactory>();
 
                     services.AddMsBuild();
-                    services.AddReports();
-
                     services.AddSingleton(options);
                     services.AddExtensions(context.Configuration, options.Extension);
 
@@ -117,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddStepManagement();
 
-                    serviceConfiguration?.Invoke(context, services);
+                    serviceConfiguration(context, services);
                 })
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
@@ -172,7 +170,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ConfigureMigrateCommand(Command command)
         {
-            command.Handler = CommandHandler.Create<MigrateOptions>(RunMigrationAsync);
+            command.Handler = CommandHandler.Create<MigrateOptions, CancellationToken>((options, token) => RunMigrationAsync(options, (ctx, services) => { }, token));
 
             command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             command.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
