@@ -18,10 +18,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private const string PackageMapExtension = "*.json";
         private const string PackageUpdaterOptionsSectionName = "PackageUpdater";
 
-        private readonly AggregateExtensionProvider _extensions;
+        private readonly AggregateExtension _extensions;
         private readonly ILogger<PackageMapProvider> _logger;
 
-        public PackageMapProvider(AggregateExtensionProvider extensions, ILogger<PackageMapProvider> logger)
+        public PackageMapProvider(AggregateExtension extensions, ILogger<PackageMapProvider> logger)
         {
             _extensions = extensions ?? throw new ArgumentNullException(nameof(extensions));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -20,8 +20,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
     /// </summary>
     public class SourceUpdaterStep : MigrationStep
     {
-        private readonly ImmutableArray<DiagnosticAnalyzer> _allAnalyzers;
-        private readonly ImmutableArray<CodeFixProvider> _allCodeFixProviders;
+        private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
+        private readonly IEnumerable<CodeFixProvider> _allCodeFixProviders;
 
         internal IProject? Project { get; private set; }
 
@@ -50,21 +50,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
         };
 
-        public SourceUpdaterStep(AnalyzerProvider analyzerProvider, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
-            if (analyzerProvider is null)
-            {
-                throw new ArgumentNullException(nameof(analyzerProvider));
-            }
-
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            _allAnalyzers = ImmutableArray.CreateRange(analyzerProvider.GetAnalyzers().OrderBy(a => a.SupportedDiagnostics.First().Id));
-            _allCodeFixProviders = ImmutableArray.CreateRange(analyzerProvider.GetCodeFixProviders().OrderBy(c => c.FixableDiagnosticIds.First()));
+            _allAnalyzers = analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id);
+            _allCodeFixProviders = codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First());
 
             // Add sub-steps for each analyzer that will be run
             SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
@@ -130,7 +125,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             else
             {
                 var compilationWithAnalyzer = compilation
-                    .WithAnalyzers(_allAnalyzers, new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
+                    .WithAnalyzers(ImmutableArray.CreateRange(_allAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
 
                 // Find all diagnostics that migration code fixers can address
                 Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))

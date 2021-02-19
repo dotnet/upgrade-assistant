@@ -4,15 +4,11 @@
 using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class SourceUpdaterStepExtensions
     {
-        public static IServiceCollection AddSourceUpdaterStep(this IServiceCollection services)
-        {
-            services.AddSingleton<AnalyzerProvider>();
+        public static IServiceCollection AddSourceUpdaterStep(this IServiceCollection services) =>
             services.AddScoped<MigrationStep, SourceUpdaterStep>();
-            return services;
-        }
     }
 }

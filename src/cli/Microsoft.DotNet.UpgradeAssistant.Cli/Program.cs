@@ -26,9 +26,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class Program
     {
-        private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
-        private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
         private const string LogFilePath = "log.txt";
 
         public static Task Main(string[] args)
@@ -103,8 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddMsBuild();
                     services.AddSingleton(options);
-
-                    services.AddExtensions(context.Configuration[UpgradeAssistantExtensionPathsSettingName], options.Extension);
+                    services.AddExtensions(context.Configuration, options.Extension);
 
                     // Add command handlers
                     if (options.NonInteractive)
@@ -119,16 +115,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
-
-                    // Add steps
-                    services.AddTryConvertProjectConverterStep().Bind(context.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-                    services.AddPackageUpdaterStep().Bind(context.Configuration.GetSection(PackageUpdaterStepOptionsSection));
-                    services.AddSolutionLevelSteps();
-                    services.AddScoped<MigrationStep, BackupStep>();
-                    services.AddTemplateInserterStep();
-                    services.AddConfigUpdaterStep();
-                    services.AddSourceUpdaterStep();
-
                     services.AddStepManagement();
 
                     serviceConfiguration(context, services);
