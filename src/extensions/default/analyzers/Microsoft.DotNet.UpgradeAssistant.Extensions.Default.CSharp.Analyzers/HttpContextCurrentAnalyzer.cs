@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             var accessedSymbol = context.SemanticModel.GetSymbolInfo(accessedIdentifier).Symbol;
             if (accessedSymbol is INamedTypeSymbol symbol)
             {
-                if (!symbol.ToString().Equals(TargetTypeSymbolName, StringComparison.Ordinal))
+                if (!symbol.ToDisplayString(NullableFlowState.NotNull).Equals(TargetTypeSymbolName, StringComparison.Ordinal))
                 {
                     return;
                 }
