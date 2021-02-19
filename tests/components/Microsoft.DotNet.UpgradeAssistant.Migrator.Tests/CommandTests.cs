@@ -8,7 +8,7 @@ using Microsoft.DotNet.UpgradeAssistant.Migrator.Commands;
 using NSubstitute;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
+namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
 {
     public class CommandTests
     {

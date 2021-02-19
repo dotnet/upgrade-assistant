@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace IntegrationTests
+namespace Integration.Tests
 {
     [Collection(IntegrationTestCollection.Name)]
     public class E2ETest
