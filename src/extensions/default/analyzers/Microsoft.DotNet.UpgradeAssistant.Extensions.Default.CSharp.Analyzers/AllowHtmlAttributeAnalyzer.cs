@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             var attrNameSymbol = context.SemanticModel.GetTypeInfo(attribute.Name).Type;
             if (attrNameSymbol is INamedTypeSymbol symbol
                 && attrNameSymbol is not IErrorTypeSymbol
-                && !symbol.ToString().Equals(AllowHtmlAttributeName, StringComparison.Ordinal))
+                && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(AllowHtmlAttributeName, StringComparison.Ordinal))
             {
                 return;
             }

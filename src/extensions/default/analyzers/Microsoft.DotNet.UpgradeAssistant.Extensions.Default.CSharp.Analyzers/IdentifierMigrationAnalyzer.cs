@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
 
             // If the identifier resolves to an actual symbol that isn't the old identifier, bail out
-            if (context.SemanticModel.GetSymbolInfo(identifier).Symbol is INamedTypeSymbol symbol && !symbol.ToString().Equals(mapping.OldFullName))
+            if (context.SemanticModel.GetSymbolInfo(identifier).Symbol is INamedTypeSymbol symbol && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldFullName))
             {
                 return;
             }
