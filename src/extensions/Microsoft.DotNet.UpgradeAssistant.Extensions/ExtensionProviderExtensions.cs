@@ -80,29 +80,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         private static void RegisterExtensionServices(IServiceCollection services, IConfiguration configuration)
         {
             var extensionServiceProviderPaths = configuration.GetSection(ExtensionServiceProvidersSectionName)?.Get<string[]>();
-            if (extensionServiceProviderPaths is not null)
+            if (extensionServiceProviderPaths is null)
             {
-                foreach (var path in extensionServiceProviderPaths)
-                {
-                    try
-                    {
-                        var assembly = Assembly.LoadFrom(path);
-                        var serviceProviders = assembly.GetTypes()
-                            .Where(t => t.IsPublic && t.IsAssignableTo(typeof(IExtensionServiceProvider)))
-                            .Select(t => Activator.CreateInstance(t))
-                            .Cast<IExtensionServiceProvider>();
+                return;
+            }
 
-                        foreach (var sp in serviceProviders)
-                        {
-                            sp.AddServices(services, configuration);
-                        }
-                    }
-                    catch (FileLoadException)
+            foreach (var path in extensionServiceProviderPaths)
+            {
+                try
+                {
+                    var assembly = Assembly.LoadFrom(path);
+                    var serviceProviders = assembly.GetTypes()
+                        .Where(t => t.IsPublic && !t.IsAbstract && t.IsAssignableTo(typeof(IExtensionServiceProvider)))
+                        .Select(t => Activator.CreateInstance(t))
+                        .Cast<IExtensionServiceProvider>();
+
+                    foreach (var sp in serviceProviders)
                     {
+                        sp.AddServices(new ExtensionServiceConfiguration(services, configuration));
                     }
-                    catch (BadImageFormatException)
-                    {
-                    }
+                }
+                catch (FileLoadException)
+                {
+                }
+                catch (BadImageFormatException)
+                {
                 }
             }
         }

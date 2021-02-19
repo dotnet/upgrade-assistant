@@ -18,14 +18,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
 
-        public IServiceCollection AddServices(IServiceCollection services, IConfiguration serviceConfiguration)
+        public IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration)
         {
-            AddMigrationSteps(services, serviceConfiguration);
-            AddConfigUpdaters(services);
-            AddAnalyzersAndCodeFixProviders(services);
-            AddPackageReferenceAnalyzers(services);
+            AddMigrationSteps(serviceConfiguration.ServiceCollection, serviceConfiguration.ExtensionConfiguration);
+            AddConfigUpdaters(serviceConfiguration.ServiceCollection);
+            AddAnalyzersAndCodeFixProviders(serviceConfiguration.ServiceCollection);
+            AddPackageReferenceAnalyzers(serviceConfiguration.ServiceCollection);
 
-            return services;
+            return serviceConfiguration.ServiceCollection;
         }
 
         private static void AddMigrationSteps(IServiceCollection services, IConfiguration configuration)

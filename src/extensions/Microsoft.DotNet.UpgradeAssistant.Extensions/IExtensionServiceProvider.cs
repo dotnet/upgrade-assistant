@@ -17,9 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// IPackageReferenceAnalyzers will cause migration steps that use those types to pick up the
         /// new implementations.
         /// </summary>
-        /// <param name="services">The service collection to register services with.</param>
-        /// <param name="serviceConfiguration">Configuration from the extension's ExtensionManifest.json file.</param>
+        /// <param name="serviceConfiguration">The extension's service configuration, including the service collection
+        /// to register services into and configuration from the extension's ExtensionManifest.json file.</param>
         /// <returns>The service collection updated with services Upgrade Assistant should use.</returns>
-        IServiceCollection AddServices(IServiceCollection services, IConfiguration serviceConfiguration);
+        IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration);
     }
 }
