@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,10 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private static readonly string[] EnvVarsToWithold = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
 
         private readonly ILogger<DotnetRestorePackageRestorer> _logger;
+        private readonly IProcessRunner _runner;
 
-        public DotnetRestorePackageRestorer(ILogger<DotnetRestorePackageRestorer> logger)
+        public DotnetRestorePackageRestorer(ILogger<DotnetRestorePackageRestorer> logger, IProcessRunner runner)
         {
             _logger = logger;
+            _runner = runner;
         }
 
         public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, IProject project, CancellationToken token)
@@ -52,57 +53,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return new RestoreOutput(lockFilePath, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
         }
 
-        private async Task<bool> RunRestoreAsync(IMigrationContext context, string path, CancellationToken token)
+        private Task<bool> RunRestoreAsync(IMigrationContext context, string path, CancellationToken token)
         {
-            using var restoreProcess = new Process
+            return _runner.RunProcessAsync(new ProcessInfo
             {
-                StartInfo = new ProcessStartInfo("dotnet", Invariant($"restore {path}"))
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                }
-            };
-
-            foreach (var (name, value) in context.GlobalProperties)
-            {
-                restoreProcess.StartInfo.EnvironmentVariables[name] = value;
-            }
-
-            foreach (var envVar in EnvVarsToWithold)
-            {
-                if (restoreProcess.StartInfo.EnvironmentVariables.ContainsKey(envVar))
-                {
-                    restoreProcess.StartInfo.EnvironmentVariables.Remove(envVar);
-                }
-            }
-
-            restoreProcess.OutputDataReceived += TryConvertOutputReceived;
-            restoreProcess.ErrorDataReceived += TryConvertErrorReceived;
-            restoreProcess.Start();
-            restoreProcess.BeginOutputReadLine();
-            restoreProcess.BeginErrorReadLine();
-
-            await restoreProcess.WaitForExitAsync(token).ConfigureAwait(false);
-
-            return restoreProcess.ExitCode == 0;
-
-            void TryConvertOutputReceived(object sender, DataReceivedEventArgs e)
-            {
-                if (!string.IsNullOrWhiteSpace(e.Data))
-                {
-                    _logger.LogInformation($"[dotnet-restore] {e.Data}");
-                }
-            }
-
-            void TryConvertErrorReceived(object sender, DataReceivedEventArgs e)
-            {
-                if (!string.IsNullOrWhiteSpace(e.Data))
-                {
-                    _logger.LogError($"[dotnet-restore] {e.Data}");
-                }
-            }
+                Command = "dotnet",
+                Arguments = Invariant($"restore {path}"),
+                EnvironmentVariables = context.GlobalProperties,
+                Name = "dotnet-restore"
+            }, token);
         }
     }
 }

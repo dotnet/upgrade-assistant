@@ -3,29 +3,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertProjectConverterStep : MigrationStep
     {
-        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -p \"{0}\"";
-        private static readonly string[] EnvVarsToWitholdFromTryConvert = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
-        private static readonly string[] ErrorMessages = new[] { "This project has custom imports that are not accepted by try-convert" };
-
-        private readonly string _tryConvertPath;
+        private readonly ITryConvertTool _runner;
         private readonly IPackageRestorer _restorer;
 
         public override string Id => typeof(TryConvertProjectConverterStep).FullName!;
 
-        public override string Description => $"Use the try-convert tool ({_tryConvertPath}) to convert the project file to an SDK-style csproj";
+        public override string Description => $"Use the try-convert tool ({_runner.Path}) to convert the project file to an SDK-style csproj";
 
         public override string Title => $"Convert project file to SDK style";
 
@@ -41,19 +32,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         };
 
         public TryConvertProjectConverterStep(
+            ITryConvertTool runner,
             IPackageRestorer restorer,
-            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor,
             ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
-            if (logger is null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-
-            var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
-            _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
+            _runner = runner ?? throw new ArgumentNullException(nameof(runner));
         }
 
         protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
@@ -65,99 +50,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var projectPath = context.CurrentProject.Required().FilePath;
-
-            if (!File.Exists(projectPath))
-            {
-                Logger.LogCritical("Project file {ProjectPath} not found", projectPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Project file {projectPath} not found");
-            }
-
-            var result = await RunTryConvertAsync(context, projectPath, token);
+            var result = await RunTryConvertAsync(context, context.CurrentProject.Required(), token);
 
             await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
 
             return result;
         }
 
-        private async Task<MigrationStepApplyResult> RunTryConvertAsync(IMigrationContext context, string projectPath, CancellationToken token)
+        private async Task<MigrationStepApplyResult> RunTryConvertAsync(IMigrationContext context, IProject project, CancellationToken token)
         {
             Logger.LogInformation("Converting project file format with try-convert");
-            using var tryConvertProcess = new Process
-            {
-                StartInfo = new ProcessStartInfo(_tryConvertPath, string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectPath))
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                }
-            };
 
-            foreach (var (name, value) in context.GlobalProperties)
-            {
-                tryConvertProcess.StartInfo.EnvironmentVariables[name] = value;
-            }
-
-            // Clear some MSBuild env vars that can prevent try-convert from successfully
-            // opening non-SDK projects.
-            foreach (var envVar in EnvVarsToWitholdFromTryConvert)
-            {
-                if (tryConvertProcess.StartInfo.EnvironmentVariables.ContainsKey(envVar))
-                {
-                    tryConvertProcess.StartInfo.EnvironmentVariables.Remove(envVar);
-                }
-            }
-
-            var errorEncountered = false;
-
-            tryConvertProcess.OutputDataReceived += TryConvertOutputReceived;
-            tryConvertProcess.ErrorDataReceived += TryConvertErrorReceived;
-            tryConvertProcess.Start();
-            tryConvertProcess.BeginOutputReadLine();
-            tryConvertProcess.BeginErrorReadLine();
-
-            await tryConvertProcess.WaitForExitAsync(token).ConfigureAwait(false);
+            var result = await _runner.RunAsync(context, project, token);
 
             // Reload the workspace since an external process worked on and
             // may have changed the workspace's project.
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            if (tryConvertProcess.ExitCode != 0 || errorEncountered)
+            if (!result)
             {
-                Logger.LogCritical("Conversion with try-convert failed (exit code {ExitCode}). Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.", tryConvertProcess.ExitCode);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Conversion with try-convert failed (exit code {tryConvertProcess.ExitCode})");
+                Logger.LogCritical("Conversion with try-convert failed. Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Conversion with try-convert failed.");
             }
             else
             {
                 Logger.LogInformation("Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.");
                 return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Project file converted successfully");
-            }
-
-            void TryConvertOutputReceived(object sender, DataReceivedEventArgs e)
-            {
-                if (!string.IsNullOrWhiteSpace(e.Data))
-                {
-                    CheckForErrors(e.Data);
-                    Logger.LogInformation($"[try-convert] {e.Data}");
-                }
-            }
-
-            void TryConvertErrorReceived(object sender, DataReceivedEventArgs e)
-            {
-                if (!string.IsNullOrWhiteSpace(e.Data))
-                {
-                    CheckForErrors(e.Data);
-                    Logger.LogError($"[try-convert] {e.Data}");
-                }
-            }
-
-            void CheckForErrors(string data)
-            {
-                if (ErrorMessages.Any(data.Contains))
-                {
-                    errorEncountered = true;
-                }
             }
         }
 
@@ -173,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             var project = context.CurrentProject.Required();
 
-            if (!File.Exists(_tryConvertPath))
+            if (!_runner.IsAvailable)
             {
                 Logger.LogCritical("Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
                 return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert", BuildBreakRisk.Unknown);
@@ -189,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                     Logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
                     return new MigrationStepInitializeResult(
                         MigrationStepStatus.Incomplete,
-                        $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project and retarget it to .NET Core/Standard: {_tryConvertPath} {string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, projectFile.FilePath)}",
+                        $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project: {_runner.GetCommandLine(project)}",
                         (project.Components & ProjectComponents.Web) == ProjectComponents.Web ? BuildBreakRisk.High : BuildBreakRisk.Medium);
                 }
                 else
