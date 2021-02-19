@@ -79,11 +79,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return document;
             }
 
-            // Update to new identifier
-            SyntaxNode updatedName = SyntaxFactory.ParseName(newIdentifier)
-                .WithTriviaFrom(name)
-                .WithAdditionalAnnotations(Simplifier.Annotation);
-
             // Make sure the name syntax node includes the whole name in case it is qualified
             if (name.Parent is NameSyntax)
             {
@@ -98,9 +93,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 }
             }
 
+            // Create new identifier
+            SyntaxNode updatedName = SyntaxFactory.ParseName(newIdentifier)
+                .WithTriviaFrom(name)
+                .WithAdditionalAnnotations(Simplifier.Annotation);
+
             // In some cases (accessing a static member), the name may be part of a member access expression chain
             // instead of a qualified name. If that's the case, update the name and updatedName accordingly.
-            else if (name.Parent is MemberAccessExpressionSyntax m && m.Name.ToString().Equals(name.ToString(), StringComparison.Ordinal))
+            if (name.Parent is MemberAccessExpressionSyntax m && m.Name.ToString().Equals(name.ToString(), StringComparison.Ordinal))
             {
                 name = name.Parent;
 
