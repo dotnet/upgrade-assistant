@@ -12,9 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static OptionsBuilder<PackageUpdaterOptions> AddPackageUpdaterStep(this IServiceCollection services)
         {
             services.AddSingleton<PackageMapProvider>();
-            services.AddScoped<MigrationStep, PackageUpdaterStep>();
             services.AddSingleton<IPackageLoader, PackageLoader>();
-
+            services.AddScoped<MigrationStep, PackageUpdaterStep>();
             return services.AddOptions<PackageUpdaterOptions>();
         }
     }
