@@ -20,20 +20,24 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Autofac" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- Explicitly reference packages that we do *not* want included in output
          paths in case transitive dependencies pull them in. These runtime
          assets are excluded because they are loaded from the version of MSBuild
          used by the tool, instead. They should, therefore, never show up in this
-         tool's output. 
-         
+         tool's output.
+
          These are different from the MSBuild packages listed in
-         Directory.Build.Targets because tests can use these NuGet packages (and 
+         Directory.Build.Targets because tests can use these NuGet packages (and
          the test harness needs to). However, no project (this one or tests) should
          use MSBuild runtime assets. -->
     <PackageReference Include="NuGet.Common" ExcludeAssets="runtime" />

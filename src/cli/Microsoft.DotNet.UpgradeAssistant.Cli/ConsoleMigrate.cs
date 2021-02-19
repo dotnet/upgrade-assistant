@@ -7,95 +7,51 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Migrator;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    // TODO : Eventually, this may need to be localized and pull strings from resources, etc.
-    public class ConsoleMigrate : IHostedService
+    public class ConsoleMigrate : IAppCommand
     {
-        private readonly IServiceProvider _services;
         private readonly IUserInput _input;
         private readonly InputOutputStreams _io;
+        private readonly IMigrationContextFactory _contextFactory;
         private readonly CommandProvider _commandProvider;
-        private readonly ILogger _logger;
-        private readonly IHostApplicationLifetime _lifetime;
+        private readonly Lazy<MigratorManager> _migrator;
+        private readonly IMigrationStateManager _stateManager;
+        private readonly ILogger<ConsoleMigrate> _logger;
 
         public ConsoleMigrate(
             IUserInput input,
             InputOutputStreams io,
+            IMigrationContextFactory contextFactory,
             CommandProvider commandProvider,
-            ILogger<ConsoleMigrate> logger,
-            IServiceProvider services,
-            IHostApplicationLifetime lifetime)
+            Lazy<MigratorManager> migratorManager,
+            IMigrationStateManager stateManager,
+            ILogger<ConsoleMigrate> logger)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _io = io ?? throw new ArgumentNullException(nameof(io));
+            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _commandProvider = commandProvider ?? throw new ArgumentNullException(nameof(commandProvider));
+            _migrator = migratorManager ?? throw new ArgumentNullException(nameof(migratorManager));
+            _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _lifetime = lifetime ?? throw new ArgumentNullException(nameof(lifetime));
-            _services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
-        public async Task StartAsync(CancellationToken token)
+        public async Task RunAsync(CancellationToken token)
         {
-            try
-            {
-                _logger.LogInformation("Configuration loaded from context base directory: {BaseDirectory}", AppContext.BaseDirectory);
+            using var context = await _contextFactory.CreateContext(token);
 
-                if (await RunStartupTasks(token))
-                {
-                    await RunReplAsync(token);
-                }
-                else
-                {
-                    _logger.LogError("Error encountered while starting migration");
-                }
-
-                _lifetime.StopApplication();
-            }
-            catch (MigrationException e)
-            {
-                _logger.LogError("Unexpected error: {Message}", e.Message);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            finally
-            {
-                _lifetime.StopApplication();
-            }
-        }
-
-        private async Task<bool> RunStartupTasks(CancellationToken token)
-        {
-            var startupTasks = _services.GetRequiredService<IEnumerable<IMigrationStartup>>()
-                .Select(m => m.StartupAsync(token));
-            var completion = await Task.WhenAll(startupTasks);
-
-            return completion.All(t => t);
-        }
-
-        private async Task RunReplAsync(CancellationToken token)
-        {
-            using var scope = _services.CreateScope();
-            var contextFactory = scope.ServiceProvider.GetRequiredService<IMigrationContextFactory>();
-            var context = await contextFactory.CreateContext(token);
-            var options = scope.ServiceProvider.GetRequiredService<MigrateOptions>();
-            var migrator = scope.ServiceProvider.GetRequiredService<MigratorManager>();
-            var stateManager = scope.ServiceProvider.GetRequiredService<IMigrationStateManager>();
-
-            await stateManager.LoadStateAsync(context, token);
+            await _stateManager.LoadStateAsync(context, token);
 
             try
             {
                 // Cache current steps here as defense-in-depth against the possibility
                 // of a bug (or very weird migration step behavior) causing the current step
                 // to reset state after being initialized by GetNextStepAsync
-                var steps = await migrator.InitializeAsync(context, token);
-                var step = await migrator.GetNextStepAsync(context, token);
+                var steps = await _migrator.Value.InitializeAsync(context, token);
+                var step = await _migrator.Value.GetNextStepAsync(context, token);
 
                 while (step is not null)
                 {
@@ -125,12 +81,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         }
                         else
                         {
-                            _logger.LogWarning("Upgrade process was cancelled. Quitting....");
+                            _logger.LogWarning("Upgrade process was canceled. Quitting....");
                             return;
                         }
                     }
 
-                    step = await migrator.GetNextStepAsync(context, token);
+                    step = await _migrator.Value.GetNextStepAsync(context, token);
                 }
 
                 _logger.LogInformation("Migration has completed. Please review any changes.");
@@ -138,11 +94,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             finally
             {
                 // Do not pass the same token as it may have been canceled and we still need to persist this.
-                await stateManager.SaveStateAsync(context, default);
+                await _stateManager.SaveStateAsync(context, default);
             }
         }
-
-        public Task StopAsync(CancellationToken token) => Task.CompletedTask;
 
         private void ShowMigrationSteps(IEnumerable<MigrationStep> steps, IMigrationContext context, MigrationStep? currentStep = null, int offset = 0)
         {
