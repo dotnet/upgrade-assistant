@@ -111,6 +111,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
                     services.AddSingleton(logSettings);
+
+                    services.AddSingleton<IProcessRunner, ProcessRunner>();
+
                     services.AddStepManagement();
 
                     serviceConfiguration(context, services);

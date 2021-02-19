@@ -14,9 +14,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddScoped<MigrationStep, SetTFMStep>();
             services.AddScoped<MigrationStep, TryConvertProjectConverterStep>();
+            services.AddSingleton<ITryConvertTool, TryConvertTool>();
             services.AddTransient<ISectionGenerator, TryConvertReport>();
 
-            return services.AddOptions<TryConvertProjectConverterStepOptions>();
+            return services.AddOptions<TryConvertProjectConverterStepOptions>()
+                .ValidateDataAnnotations();
         }
     }
 }
