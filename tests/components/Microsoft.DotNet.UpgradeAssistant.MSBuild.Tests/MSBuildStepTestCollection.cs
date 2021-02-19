@@ -4,7 +4,7 @@
 using Microsoft.DotNet.UpgradeAssistant.Fixtures;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Test
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
     /// <summary>
     /// Class (which is never instantiated) for collecting package step tests that

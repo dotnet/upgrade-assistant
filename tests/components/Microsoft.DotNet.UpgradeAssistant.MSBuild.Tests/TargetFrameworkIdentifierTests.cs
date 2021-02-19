@@ -4,7 +4,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Test
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
     [Collection(MSBuildStepTestCollection.Name)]
     public class TargetFrameworkIdentifierTests

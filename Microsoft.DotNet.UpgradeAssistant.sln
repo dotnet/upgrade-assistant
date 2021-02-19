@@ -58,7 +58,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Integration.Tests", "tests\tool\Integration.Tests\Integration.Tests.csproj", "{7AE37670-7570-4EB1-8E66-94DE225CC63E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.MSBuild.Test", "tests\components\Microsoft.DotNet.UpgradeAssistant.MSBuild.Test\Microsoft.DotNet.UpgradeAssistant.MSBuild.Test.csproj", "{326A3938-5C0B-4280-9175-7E059679731B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests", "tests\components\Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests\Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests.csproj", "{326A3938-5C0B-4280-9175-7E059679731B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj", "{9F99DC5B-DAD0-4C43-BFFF-8027E4077334}"
 EndProject
