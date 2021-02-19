@@ -1,4 +1,7 @@
-﻿namespace Microsoft.DotNet.UpgradeAssistant.Reporting
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
     public record Divider : Content
     {
