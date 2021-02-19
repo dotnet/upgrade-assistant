@@ -16,7 +16,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public static class TestHelper
     {

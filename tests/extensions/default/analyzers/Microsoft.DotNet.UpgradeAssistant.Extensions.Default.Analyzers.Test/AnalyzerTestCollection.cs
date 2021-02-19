@@ -3,7 +3,7 @@
 
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     /// <summary>
     /// Class (which is never instantiated) for collecting analyzer tests that

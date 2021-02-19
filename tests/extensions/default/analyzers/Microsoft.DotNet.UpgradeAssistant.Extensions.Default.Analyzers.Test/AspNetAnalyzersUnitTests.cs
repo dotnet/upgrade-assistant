@@ -7,10 +7,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Tests;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
 {
     [Collection(AnalyzerTestCollection.Name)]
     public class AspNetAnalyzersUnitTests

@@ -5,7 +5,7 @@ using System;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
 {
     public class ExpectedDiagnostic
     {

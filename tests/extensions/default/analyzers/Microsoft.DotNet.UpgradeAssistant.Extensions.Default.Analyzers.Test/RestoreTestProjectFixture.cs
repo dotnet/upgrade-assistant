@@ -6,7 +6,7 @@ using Microsoft.DotNet.UpgradeAssistant.Fixtures;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public class RestoreTestProjectFixture : MSBuildRegistrationFixture
     {
