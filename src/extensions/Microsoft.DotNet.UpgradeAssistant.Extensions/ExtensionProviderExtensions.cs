@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Runtime.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,8 +40,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             var extensionPaths = pathsFromString.Concat(additionalExtensionPaths);
 
             // Always include the default extension which contains built-in source updaters, config updaters, etc.
-            services.AddSingleton<IExtension, DefaultExtension>();
-            RegisterExtensionServices(services, configuration);
+            var defaultExtension = new DefaultExtension(configuration);
+            services.AddSingleton<IExtension>(defaultExtension);
+            RegisterExtensionServices(services, defaultExtension, configuration);
 
             foreach (var e in extensionPaths)
             {
@@ -52,16 +53,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 if (Directory.Exists(e))
                 {
-                    services.AddSingleton<IExtension>(sp => ActivatorUtilities.CreateInstance<DirectoryExtension>(sp, e));
-                    RegisterExtensionServices(services, DirectoryExtension.GetConfiguration(e));
+                    var extension = new DirectoryExtension(e);
+                    services.AddSingleton<IExtension>(extension);
+                    RegisterExtensionServices(services, extension, DirectoryExtension.GetConfiguration(e));
                 }
                 else if (File.Exists(e))
                 {
                     if (DirectoryExtension.ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
                     {
                         var dir = Path.GetDirectoryName(e) ?? string.Empty;
-                        services.AddSingleton<IExtension>(sp => ActivatorUtilities.CreateInstance<DirectoryExtension>(sp, dir));
-                        RegisterExtensionServices(services, DirectoryExtension.GetConfiguration(dir));
+                        var extension = new DirectoryExtension(dir);
+                        services.AddSingleton<IExtension>(extension);
+                        RegisterExtensionServices(services, extension, DirectoryExtension.GetConfiguration(dir));
                     }
                     else if (Path.GetExtension(e).Equals(".zip", StringComparison.OrdinalIgnoreCase))
                     {
@@ -77,9 +80,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             services.AddSingleton<AggregateExtension>();
         }
 
-        private static void RegisterExtensionServices(IServiceCollection services, IConfiguration configuration)
+        private static void RegisterExtensionServices(IServiceCollection services, IExtension extension, IConfiguration extensionConfiguration)
         {
-            var extensionServiceProviderPaths = configuration.GetSection(ExtensionServiceProvidersSectionName)?.Get<string[]>();
+            var extensionServiceProviderPaths = extension.GetOptions<string[]>(ExtensionServiceProvidersSectionName);
             if (extensionServiceProviderPaths is null)
             {
                 return;
@@ -89,7 +92,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 try
                 {
-                    var assembly = Assembly.LoadFrom(path);
+                    using var assemblyStream = extension.GetFile(path);
+                    if (assemblyStream is null)
+                    {
+                        Console.WriteLine($"ERROR: Could not find extension service provider assembly {path} in extension {extension.Name}");
+                        continue;
+                    }
+
+                    var assembly = AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
                     var serviceProviders = assembly.GetTypes()
                         .Where(t => t.IsPublic && !t.IsAbstract && t.IsAssignableTo(typeof(IExtensionServiceProvider)))
                         .Select(t => Activator.CreateInstance(t))
@@ -97,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                     foreach (var sp in serviceProviders)
                     {
-                        sp.AddServices(new ExtensionServiceConfiguration(services, configuration));
+                        sp.AddServices(new ExtensionServiceConfiguration(services, extensionConfiguration));
                     }
                 }
                 catch (FileLoadException)
