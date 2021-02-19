@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
@@ -17,19 +18,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
         [Fact]
         public async Task NegativeTests()
         {
-            Assert.Throws<ArgumentNullException>(() => new MigratorManager(Substitute.For<IPackageRestorer>(), null!, new NullLogger<MigratorManager>()));
-            Assert.Throws<ArgumentNullException>(() => new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(Enumerable.Empty<MigrationStep>()), null!));
-
             var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
-            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(unknownStep), new NullLogger<MigratorManager>());
-            using var context = Substitute.For<IMigrationContext>();
+            using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(unknownStep)));
+
+            var migrator = mock.Create<MigratorManager>();
+            var context = mock.Mock<IMigrationContext>().Object;
+
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
         [Fact]
         public async Task MigratorStepsEnumeration()
         {
-            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(GetMigrationSteps()), new NullLogger<MigratorManager>());
+            using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(GetMigrationSteps())));
+
+            var migrator = mock.Create<MigratorManager>();
 
             var expectedTopLevelStepsAndSubSteps = new[]
             {
@@ -46,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
 
             // Get both the steps property and the GetAllSteps enumeration and confirm that both return steps
             // in the expected order
-            using var context = Substitute.For<IMigrationContext>();
+            using var context = mock.Mock<IMigrationContext>().Object;
 
             var steps = migrator.GetStepsForContext(context);
             var allSteps = new List<string>();
@@ -67,9 +70,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
         [Theory]
         public async Task CompletedStepsAreNotEnumerated(MigrationStep[] steps, string[] expectedSteps)
         {
-            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(steps), new NullLogger<MigratorManager>());
+            using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
+            var migrator = mock.Create<MigratorManager>();
+            using var context = mock.Mock<IMigrationContext>().Object;
+
             var allSteps = new List<string>();
-            using var context = Substitute.For<IMigrationContext>();
 
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             while (nextStep is not null)
@@ -88,8 +93,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Test
             var steps = new MigrationStep[] { new SkippedTestMigrationStep("Step 1"), new FailedTestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") };
             var expectedNextStepId = "Step 2";
 
-            var migrator = new MigratorManager(Substitute.For<IPackageRestorer>(), GetOrderer(steps), new NullLogger<MigratorManager>());
-            using var context = Substitute.For<IMigrationContext>();
+            using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
+            var migrator = mock.Create<MigratorManager>();
+            using var context = mock.Mock<IMigrationContext>().Object;
+
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
 
             // The failed step is next
