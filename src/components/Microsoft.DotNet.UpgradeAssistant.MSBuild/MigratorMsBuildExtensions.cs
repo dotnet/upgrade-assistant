@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
             services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
-            services.AddTransient<MSBuildRegistrationStartup>();
+            services.AddTransient<IMigrationStartup, MSBuildRegistrationStartup>();
             services.AddSingleton<IMigrationContextFactory, MSBuildMigrationContextFactory>();
 
             // Instantiate the migration context with a func to avoid needing MSBuild types prior to MSBuild registration

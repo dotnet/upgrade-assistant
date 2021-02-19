@@ -14,8 +14,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
@@ -51,7 +49,7 @@
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Portability\Microsoft.DotNet.UpgradeAssistant.Portability.csproj" />
     <ProjectReference Include="..\..\extensions\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />
-    
+
     <!-- This isn't used directly, but needs to be referenced so that the binary is available at runtime to be registered as an extension -->
     <ProjectReference Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj" />
   </ItemGroup>

@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly InputOutputStreams _io;
         private readonly IMigrationContextFactory _contextFactory;
         private readonly CommandProvider _commandProvider;
-        private readonly Lazy<MigratorManager> _migrator;
+        private readonly MigratorManager _migrator;
         private readonly IMigrationStateManager _stateManager;
         private readonly ILogger<ConsoleMigrate> _logger;
 
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             InputOutputStreams io,
             IMigrationContextFactory contextFactory,
             CommandProvider commandProvider,
-            Lazy<MigratorManager> migratorManager,
+            MigratorManager migratorManager,
             IMigrationStateManager stateManager,
             ILogger<ConsoleMigrate> logger)
         {
@@ -50,8 +50,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 // Cache current steps here as defense-in-depth against the possibility
                 // of a bug (or very weird migration step behavior) causing the current step
                 // to reset state after being initialized by GetNextStepAsync
-                var steps = await _migrator.Value.InitializeAsync(context, token);
-                var step = await _migrator.Value.GetNextStepAsync(context, token);
+                var steps = await _migrator.InitializeAsync(context, token);
+                var step = await _migrator.GetNextStepAsync(context, token);
 
                 while (step is not null)
                 {
@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         }
                     }
 
-                    step = await _migrator.Value.GetNextStepAsync(context, token);
+                    step = await _migrator.GetNextStepAsync(context, token);
                 }
 
                 _logger.LogInformation("Migration has completed. Please review any changes.");

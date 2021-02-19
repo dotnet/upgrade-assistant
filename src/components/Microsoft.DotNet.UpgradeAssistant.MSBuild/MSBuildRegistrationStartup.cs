@@ -7,12 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
-    public class MSBuildRegistrationStartup
+    public class MSBuildRegistrationStartup : IMigrationStartup
     {
         private readonly ILogger _logger;
         private VisualStudioInstance? _msBuildInstance;
@@ -20,6 +22,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public MSBuildRegistrationStartup(ILogger<MSBuildRegistrationStartup> logger)
         {
             _logger = logger;
+        }
+
+        public Task<bool> StartupAsync(CancellationToken token)
+        {
+            RegisterMSBuildInstance();
+            return Task.FromResult(true);
         }
 
         public string RegisterMSBuildInstance()

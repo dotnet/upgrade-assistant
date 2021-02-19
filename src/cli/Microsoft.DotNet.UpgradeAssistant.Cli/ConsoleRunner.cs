@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,9 +35,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 try
                 {
-                    using var scope = _services.CreateScope();
-                    var command = scope.ServiceProvider.GetRequiredService<IAppCommand>();
-                    await command.RunAsync(token);
+                    await RunStartupAsync(token);
+                    await RunCommandAsync(token);
                 }
                 finally
                 {
@@ -55,6 +55,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 _lifetime.StopApplication();
             }
+        }
+
+        private async Task RunStartupAsync(CancellationToken token)
+        {
+            using var scope = _services.CreateScope();
+            var startups = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationStartup>>();
+
+            foreach (var startup in startups)
+            {
+                await startup.StartupAsync(token);
+            }
+        }
+
+        private async Task RunCommandAsync(CancellationToken token)
+        {
+            using var scope = _services.CreateScope();
+            var command = scope.ServiceProvider.GetRequiredService<IAppCommand>();
+            await command.RunAsync(token);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

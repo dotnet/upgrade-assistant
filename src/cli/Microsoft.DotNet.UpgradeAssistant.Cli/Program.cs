@@ -11,7 +11,6 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -118,7 +117,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     serviceConfiguration(context, services);
                 })
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
                     .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
                     .Enrich.FromLogContext()
