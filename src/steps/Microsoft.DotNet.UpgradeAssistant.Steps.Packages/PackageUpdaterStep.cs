@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NuGet.Configuration;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
@@ -56,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public PackageUpdaterStep(
             MigrateOptions options,
-            PackageUpdaterOptions updaterOptions,
+            IOptions<PackageUpdaterOptions> updaterOptions,
             ITargetTFMSelector tfmSelector,
             IPackageLoader packageLoader,
             IPackageRestorer packageRestorer,
@@ -79,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
-            _analyzerPackageSource = updaterOptions.MigrationAnalyzersPackageSource;
+            _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
             _analysisState = null;
         }
 

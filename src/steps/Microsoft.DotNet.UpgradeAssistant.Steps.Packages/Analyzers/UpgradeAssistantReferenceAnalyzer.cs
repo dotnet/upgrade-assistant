@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
@@ -18,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public string Name => "Upgrade assistant reference analyzer";
 
-        public UpgradeAssistantReferenceAnalyzer(PackageUpdaterOptions updaterOptions, IPackageLoader packageLoader, ILogger<UpgradeAssistantReferenceAnalyzer> logger)
+        public UpgradeAssistantReferenceAnalyzer(IOptions<PackageUpdaterOptions> updaterOptions, IPackageLoader packageLoader, ILogger<UpgradeAssistantReferenceAnalyzer> logger)
         {
             if (updaterOptions is null)
             {
@@ -27,8 +28,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _analyzerPackageSource = updaterOptions.MigrationAnalyzersPackageSource;
-            _analyzerPackageVersion = updaterOptions.MigrationAnalyzersPackageVersion;
+            _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
+            _analyzerPackageVersion = updaterOptions.Value.MigrationAnalyzersPackageVersion;
         }
 
         public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)

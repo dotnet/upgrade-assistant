@@ -135,7 +135,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
                     }
                 }
 
-                throw new MigrationException($"Cannot order migration steps due to {dependencies.Count} unsatisfiable dependencies: {dependencies}");
+                throw new MigrationException($"Cannot order migration steps due to {dependencies.Count} unsatisfiable dependencies: {string.Join(", ", dependencies)}");
             }
             else
             {
@@ -153,6 +153,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
         private static IEnumerable<MigrationStep> GetStepsWithNoDependencies(List<MigrationStep> steps, List<MigrationStepDependency> dependencies) =>
             steps.Where(s => !dependencies.Any(d => d.Dependent.Equals(s.Id, StringComparison.Ordinal)));
 
-        private record MigrationStepDependency(string Dependency, string Dependent);
+        private record MigrationStepDependency(string Dependency, string Dependent)
+        {
+            public override string ToString() => $"{Dependent}->{Dependency}";
+        }
     }
 }

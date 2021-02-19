@@ -85,9 +85,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     {
                         var assembly = Assembly.LoadFrom(path);
                         var serviceProviders = assembly.GetTypes()
-                            .Where(t => t.IsPublic && t.IsAssignableTo(typeof(IUpgradeAssistantExtensionServiceProvider)))
+                            .Where(t => t.IsPublic && t.IsAssignableTo(typeof(IExtensionServiceProvider)))
                             .Select(t => Activator.CreateInstance(t))
-                            .Cast<IUpgradeAssistantExtensionServiceProvider>();
+                            .Cast<IExtensionServiceProvider>();
 
                         foreach (var sp in serviceProviders)
                         {

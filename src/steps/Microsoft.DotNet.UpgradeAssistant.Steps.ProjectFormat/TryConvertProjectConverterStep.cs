@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
@@ -38,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public TryConvertProjectConverterStep(
             IPackageRestorer restorer,
-            TryConvertProjectConverterStepOptions options,
+            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor,
             ILogger<TryConvertProjectConverterStep> logger)
             : base(logger)
         {
@@ -47,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            var rawPath = options?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
+            var rawPath = tryConvertOptionsAccessor.Value?.TryConvertPath ?? throw new ArgumentException("Try-Convert options must be provided with a non-null TryConvertPath. App configuration may be missing or invalid.");
             _tryConvertPath = Environment.ExpandEnvironmentVariables(rawPath);
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
         }

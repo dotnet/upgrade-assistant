@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <ItemGroup>
-    <PackageVersion Include="Autofac" Version="6.1.0" />
-    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageVersion Include="Automapper" Version="10.1.1" />
     <PackageVersion Include="coverlet.collector" Version="3.0.2" />
     <PackageVersion Include="Microsoft.Build" Version="16.8.0" />
@@ -26,6 +24,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="5.0.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="2.3.2262-g94fae01e" />
     <PackageVersion Include="Moq" Version="4.16.0" />
