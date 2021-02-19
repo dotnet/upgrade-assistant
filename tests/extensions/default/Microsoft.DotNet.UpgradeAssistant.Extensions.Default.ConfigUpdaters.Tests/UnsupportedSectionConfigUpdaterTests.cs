@@ -4,8 +4,8 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
+using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
@@ -15,9 +15,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
         [Fact]
         public async Task NoConfig()
         {
-            var context = Substitute.For<IMigrationContext>();
-            var logger = Substitute.For<ILogger<UnsupportedSectionConfigUpdater>>();
-            var updater = new UnsupportedSectionConfigUpdater(logger);
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+            var updater = mock.Create<UnsupportedSectionConfigUpdater>();
 
             var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create<ConfigFile>(), default);
             Assert.False(isAvailable);
@@ -29,9 +29,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
         [Fact]
         public async Task SingleConfigNoConfigSection()
         {
-            var context = Substitute.For<IMigrationContext>();
-            var logger = Substitute.For<ILogger<UnsupportedSectionConfigUpdater>>();
-            var updater = new UnsupportedSectionConfigUpdater(logger);
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+            var updater = mock.Create<UnsupportedSectionConfigUpdater>();
+
             var config = @"<?xml version=""1.0""?>" +
                 @"<NotConfiguration />";
             var configFile = CreateFile(config);
@@ -46,9 +47,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
         [Fact]
         public async Task SingleConfigHasConfigSection()
         {
-            var context = Substitute.For<IMigrationContext>();
-            var logger = Substitute.For<ILogger<UnsupportedSectionConfigUpdater>>();
-            var updater = new UnsupportedSectionConfigUpdater(logger);
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+            var updater = mock.Create<UnsupportedSectionConfigUpdater>();
+
             var config = @"<?xml version=""1.0""?>" +
                 @"<configuration />";
             var configFile = CreateFile(config);
@@ -63,9 +65,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
         [Fact]
         public async Task SingleConfigHasSystemDiagnosticsSection()
         {
-            var context = Substitute.For<IMigrationContext>();
-            var logger = Substitute.For<ILogger<UnsupportedSectionConfigUpdater>>();
-            var updater = new UnsupportedSectionConfigUpdater(logger);
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+            var updater = mock.Create<UnsupportedSectionConfigUpdater>();
+
             var config = @"<?xml version=""1.0""?>
 <configuration>
     <system.diagnostics/>
@@ -90,9 +93,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
         [Fact]
         public async Task SingleConfigHasSystemDiagnosticsSectionWithChildren()
         {
-            var context = Substitute.For<IMigrationContext>();
-            var logger = Substitute.For<ILogger<UnsupportedSectionConfigUpdater>>();
-            var updater = new UnsupportedSectionConfigUpdater(logger);
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+            var updater = mock.Create<UnsupportedSectionConfigUpdater>();
+
             var config = @"<?xml version=""1.0""?>
 <configuration>
     <system.diagnostics>

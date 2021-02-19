@@ -4,8 +4,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Migrator.Commands;
-using NSubstitute;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
@@ -20,7 +20,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
             Assert.Throws<ArgumentNullException>(() => new ExitCommand(null!));
 
             // Applying before intialization throws
-            using var context = Substitute.For<IMigrationContext>();
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
             var step = new TestMigrationStep(string.Empty);
             var command = new ApplyNextCommand(step);
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await command.ExecuteAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
@@ -29,7 +30,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         [Fact]
         public async Task ApplyNextCommandAppliesSteps()
         {
-            using var context = Substitute.For<IMigrationContext>();
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+
             var stepTitle = "Test step!";
             var step = new TestMigrationStep(stepTitle);
             var command = new ApplyNextCommand(step);
@@ -59,7 +62,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         [Fact]
         public async Task FailedStepsAreNotApplied()
         {
-            using var context = Substitute.For<IMigrationContext>();
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+
             var stepTitle = "Failed test step!";
             var step = new FailedTestMigrationStep(stepTitle);
             var command = new ApplyNextCommand(step);
@@ -81,7 +86,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         [Fact]
         public async Task SkipNextCommandSkips()
         {
-            using var context = Substitute.For<IMigrationContext>();
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+
             var stepTitle = "Test step!";
             var step = new TestMigrationStep(stepTitle);
             var command = new SkipNextCommand(step);
@@ -106,7 +113,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         [Fact]
         public async Task ExitCommandExits()
         {
-            using var context = Substitute.For<IMigrationContext>();
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IMigrationContext>().Object;
+
             var exitCalled = false;
             var command = new ExitCommand(() => exitCalled = true);
 
