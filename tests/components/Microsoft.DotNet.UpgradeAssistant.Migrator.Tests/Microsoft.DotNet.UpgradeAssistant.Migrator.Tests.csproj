@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
     <IsUnitTestProject>true</IsUnitTestProject>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Moq" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="coverlet.collector">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -11,6 +13,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
+    <ProjectReference Include="..\..\..\src\components\Microsoft.DotNet.UpgradeAssistant.Migrator\Microsoft.DotNet.UpgradeAssistant.Migrator.csproj" />
+    <ProjectReference Include="..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

@@ -64,6 +64,7 @@ stages:
             value: Test
           - name: _BuildArgs
             value: /p:SignType=$(_SignType)
+              /p:DotNetSignType=$(_SignType)
         strategy:
           matrix:
             Debug:
