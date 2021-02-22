@@ -150,9 +150,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 ShowHeader();
 
-                WriteString("Makes a best-effort attempt to migrate an ASP.NET MVC or Web API project to an ASP.NET Core project.");
-                WriteString("No tool can completely automate this process and the project *will* have build errors after the tool runs and will require significant manual changes to complete migration.");
-                WriteString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
+                WriteString("Makes a best-effort attempt to migrate .NET Framework projects to .NET 5.");
+                WriteString("This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.");
+                WriteString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in .NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
 
                 base.Write(command);
             }

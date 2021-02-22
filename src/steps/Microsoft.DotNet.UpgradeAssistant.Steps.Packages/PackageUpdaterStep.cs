@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
         public PackageUpdaterStep(

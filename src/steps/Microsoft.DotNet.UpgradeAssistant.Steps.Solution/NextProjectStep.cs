@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Steps
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     internal class NextProjectStep : MigrationStep
     {
