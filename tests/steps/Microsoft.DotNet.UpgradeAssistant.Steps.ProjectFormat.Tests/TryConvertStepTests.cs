@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             var step = mock.Create<TryConvertProjectConverterStep>();
 
             Assert.Equal(new[] { "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep" }, step.DependsOn);
-            Assert.Equal(new[] { "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep" }, step.DependencyOf);
+            Assert.Equal(new[] { "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep" }, step.DependencyOf);
         }
 
         [InlineData(true)]
