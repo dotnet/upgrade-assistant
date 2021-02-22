@@ -83,7 +83,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             // Regenerating diagnostics is slow for large projects, but is necessary in between fixing multiple diagnostics
             // in a single file. To try and minimize the number of time diagnostics are gathered, fix one diagnostic each
             // from multiple files before regenerating diagnostics.
-            while (Diagnostics.Any())
+            var diagnosticCount = Diagnostics.Count();
+            while (diagnosticCount > 0)
             {
                 // Iterate through the first diagnostic from each document
                 foreach (var diagnostic in Diagnostics.GroupBy(d => d.Location.SourceTree?.FilePath).Select(g => g.First()))
@@ -109,6 +110,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
                 // Re-build and get an updated list of diagnostics
                 await _sourceUpdater.GetDiagnosticsAsync(token).ConfigureAwait(false);
+
+                // There should be less diagnostics for the given diagnostic ID after applying code fixes.
+                // Confirm that that's true to guard against a project in a bad state or a bad analyzer/code fix provider
+                // pair causing an infinite loop.
+                var newDiagnosticCount = Diagnostics.Count();
+                if (diagnosticCount == newDiagnosticCount)
+                {
+                    Logger.LogWarning("Diagnostic {DiagnosticId} was not fixed as expected. This may be caused by the project being in a bad state (did NuGet packages restore correctly?) or by errors in analyzers or code fix providers related to this diagnostic.", DiagnosticId);
+                    break;
+                }
+                else
+                {
+                    diagnosticCount = newDiagnosticCount;
+                }
 
                 // Normally, the migrator will apply steps one at a time
                 // at the user's instruction. In the case of parent and child steps,

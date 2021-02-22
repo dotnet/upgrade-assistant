@@ -148,9 +148,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             await file.SaveAsync(token).ConfigureAwait(false);
 
-            return Diagnostics.Any() ?
-                    new MigrationStepApplyResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed") :
-                    new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty);
+            if (Diagnostics.Any())
+            {
+                Logger.LogWarning("Completing source updates with {DiagnosticCount} diagnostics still unaddressed", Diagnostics.Count());
+            }
+
+            return new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty);
         }
 
         // TODO
