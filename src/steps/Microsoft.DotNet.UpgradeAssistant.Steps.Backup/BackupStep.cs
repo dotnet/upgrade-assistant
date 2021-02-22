@@ -22,9 +22,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         public override string Id => typeof(BackupStep).FullName!;
 
-        public override string Description => $"Backup the current project to another directory";
+        public override string Description => $"Back up the current project to another directory";
 
-        public override string Title => "Backup project";
+        public override string Title => "Back up project";
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
