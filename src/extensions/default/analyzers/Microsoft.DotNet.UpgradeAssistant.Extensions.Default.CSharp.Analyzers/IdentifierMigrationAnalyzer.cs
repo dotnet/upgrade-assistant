@@ -66,12 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
             // If the identified is part of a fully qualified name and the qualified name exactly matches the new full name,
             // then bail out because the code is likely fine and the symbol is just unavailable because of missing references.
-            NameSyntax qualifiedNameSyntax = identifier;
-            while (qualifiedNameSyntax.Parent is QualifiedNameSyntax qualifiedParent)
-            {
-                qualifiedNameSyntax = qualifiedParent;
-            }
-
+            var qualifiedNameSyntax = identifier.GetFullName();
             if (qualifiedNameSyntax.ToString().Equals(mapping.NewFullName))
             {
                 return;
