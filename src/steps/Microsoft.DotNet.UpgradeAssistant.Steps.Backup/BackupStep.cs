@@ -59,23 +59,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             if (_skipBackup)
             {
-                Logger.LogDebug("Back up migration step initalized as complete (back up skipped)");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Skipped, "Back up skipped", BuildBreakRisk.None));
+                Logger.LogDebug("Backup migration step initalized as complete (backup skipped)");
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
             else if (_backupPath is null)
             {
-                Logger.LogDebug("No back up path specified");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Back up step cannot be applied without a back up location", BuildBreakRisk.None));
+                Logger.LogDebug("No backup path specified");
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
             }
             else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
             {
-                Logger.LogDebug("Back up migration step initalized as complete (already done)");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Existing back up found", BuildBreakRisk.None));
+                Logger.LogDebug("Backup migration step initalized as complete (already done)");
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
             }
             else
             {
-                Logger.LogDebug("Back up migration step initialized as incomplete");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"No existing back up found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
+                Logger.LogDebug("Backup migration step initialized as incomplete");
+                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
             }
         }
 
@@ -83,28 +83,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         {
             if (_skipBackup)
             {
-                Logger.LogInformation("Skipping back up");
-                return new MigrationStepApplyResult(MigrationStepStatus.Skipped, "Back up skipped");
+                Logger.LogInformation("Skipping backup");
+                return new MigrationStepApplyResult(MigrationStepStatus.Skipped, "Backup skipped");
             }
 
             var backupPath = await ChooseBackupPath(context, token);
 
             if (backupPath is null)
             {
-                Logger.LogDebug("No back up path specified");
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Back up step cannot be applied without a back up location");
+                Logger.LogDebug("No backup path specified");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a backup location");
             }
 
             if (_projectDir is null)
             {
                 Logger.LogDebug("No project specified");
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Back up step cannot be applied without a valid project selected");
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a valid project selected");
             }
 
             if (Status == MigrationStepStatus.Complete)
             {
-                Logger.LogInformation("Back up already exists at {BackupPath}; nothing to do", backupPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Existing back up found");
+                Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", backupPath);
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Existing backup found");
             }
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, backupPath);
@@ -113,20 +113,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 Directory.CreateDirectory(backupPath);
                 if (!Directory.Exists(backupPath))
                 {
-                    Logger.LogError("Failed to create back up directory ({BackupPath})", backupPath);
-                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to create back up directory {backupPath}");
+                    Logger.LogError("Failed to create backup directory ({BackupPath})", backupPath);
+                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to create backup directory {backupPath}");
                 }
 
                 await CopyDirectoryAsync(_projectDir, backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
-                await File.WriteAllTextAsync(Path.Combine(backupPath, FlagFileName), $"Back up created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
+                await File.WriteAllTextAsync(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
                 Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "back up completed successfully");
+                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Backup completed successfully");
             }
             catch (IOException exc)
             {
-                Logger.LogError("Unexpected exception while creating back up: {Exception}", exc);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Unexpected exception while creating back up");
+                Logger.LogError("Unexpected exception while creating backup: {Exception}", exc);
+                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Unexpected exception while creating backup");
             }
         }
 
@@ -144,14 +144,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 MigrationCommand.Create($"Use default path [{_backupPath}]"),
                 MigrationCommand.Create("Enter custom path", async (ctx, token) =>
                 {
-                    customPath = await _userInput.AskUserAsync("Please enter a custom path for back ups:");
+                    customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:");
                     return !string.IsNullOrEmpty(customPath);
                 })
             };
 
             while (!token.IsCancellationRequested)
             {
-                var result = await _userInput.ChooseAsync("Please choose a back up path", commands, token);
+                var result = await _userInput.ChooseAsync("Please choose a backup path", commands, token);
 
                 if (await result.ExecuteAsync(context, token))
                 {
@@ -197,18 +197,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         private string GetDefaultBackupPath(string projectDir)
         {
-            Logger.LogDebug("Determining back up path");
+            Logger.LogDebug("Determining backup path");
 
             var candidateBasePath = $"{Path.TrimEndingDirectorySeparator(projectDir)}.backup";
             var candidatePath = candidateBasePath;
             var iteration = 0;
             while (!IsPathValid(candidatePath))
             {
-                Logger.LogDebug("Unable to use back up path {CandidatePath}", candidatePath);
+                Logger.LogDebug("Unable to use backup path {CandidatePath}", candidatePath);
                 candidatePath = $"{candidateBasePath}.{iteration++}";
             }
 
-            Logger.LogDebug("Using back up path {BackupPath}", candidatePath);
+            Logger.LogDebug("Using backup path {BackupPath}", candidatePath);
             return candidatePath;
         }
 
