@@ -34,10 +34,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(GitVersion_PreReleaseNumber)' != '' ">
-    <OfficialBuildId>$([System.DateTime]::Now.ToString(yyyyMMdd)).$(GitVersion_PreReleaseNumber)</OfficialBuildId>
-  </PropertyGroup>
-
   <!-- Treat warnings as errors in release builds, so that all warnings
          are fixed before pushing to CI but don't need to be immediately
          fixed during development -->
