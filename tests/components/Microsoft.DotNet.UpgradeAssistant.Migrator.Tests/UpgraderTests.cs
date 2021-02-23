@@ -11,7 +11,7 @@ using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Tests
 {
     public class UpgraderTests
     {

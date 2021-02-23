@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Commands
+namespace Microsoft.DotNet.UpgradeAssistant.Commands
 {
     public class ApplyNextCommand : UpgradeCommand
     {

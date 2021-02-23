@@ -5,7 +5,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests

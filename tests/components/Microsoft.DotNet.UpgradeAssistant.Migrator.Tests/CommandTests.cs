@@ -5,10 +5,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
-using Microsoft.DotNet.UpgradeAssistant.Upgrader.Commands;
+using Microsoft.DotNet.UpgradeAssistant.Commands;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Tests
 {
     public class CommandTests
     {

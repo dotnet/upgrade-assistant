@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public class UpgradeStepOrderer : IUpgradeStepOrderer
     {

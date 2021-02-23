@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Cli.Commands;
-using Microsoft.DotNet.UpgradeAssistant.Upgrader.Commands;
+using Microsoft.DotNet.UpgradeAssistant.Commands;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
