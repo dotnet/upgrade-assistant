@@ -14,9 +14,10 @@
     <RepositoryUrl>https://github.com/dotnet/upgrade-assistant</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Analyzers for Microsoft .NET Upgrade Assistant</Description>
-    <PackageReleaseNotes>Initial ASP.NET migration analyzers</PackageReleaseNotes>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageTags>Upgrade, analyzers</PackageTags>
+    <Description>A set of analyzers to assist developers in upgrading .NET Framework applications to .NET 5.</Description>
+    <PackageIcon>icon.png</PackageIcon>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>

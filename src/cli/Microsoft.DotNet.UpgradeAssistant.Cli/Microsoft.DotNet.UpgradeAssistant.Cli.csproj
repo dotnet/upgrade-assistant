@@ -5,8 +5,10 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>upgrade-assistant</ToolCommandName>
-    <PackageId>upgrade-assistant</PackageId>
+    <ToolCommandName>dotnet-upgrade-assistant</ToolCommandName>
+    <Description>A tool to assist developers in upgrading .NET Framework applications to .NET 5.</Description>
+    <PackageId>Microsoft.DotNet.UpgradeAssistant.Cli</PackageId>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.json">
