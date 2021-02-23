@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace TestProject.TestClasses
 {
-    public class AM0006
+    public class UA0006
     {
         public bool IsDebuggingEnabled => Debugger.IsAttached;
 

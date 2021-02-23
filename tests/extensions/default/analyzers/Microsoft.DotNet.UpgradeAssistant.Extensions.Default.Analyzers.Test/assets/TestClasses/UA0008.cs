@@ -1,6 +1,6 @@
 ﻿namespace TestProject.TestClasses
 {
-    public class AM0008 : System.Web.Mvc.UrlHelper
+    public class UA0008 : System.Web.Mvc.UrlHelper
     {
         public UrlHelper Method1(this System.Web.Mvc.UrlHelper h)
         {

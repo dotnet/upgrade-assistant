@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TestProject.TestClasses
 {
-    public class AM0001
+    public class UA0001
     {
     }
 }

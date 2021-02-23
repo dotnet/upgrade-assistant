@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Html;
 
 namespace TestProject.TestClasses
 {
-    public class AM0002
+    public class UA0002
     {
         public HtmlString String1 { get; set; }
         public HtmlString String2 { get; set; }

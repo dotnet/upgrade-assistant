@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class AllowHtmlAttributeAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "AM0010";
+        public const string DiagnosticId = "UA0010";
         private const string Category = "Upgrade";
         private const string AllowHtmlAttributeName = "System.Web.Mvc.AllowHtmlAttribute";
 

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace TestProject.TestClasses
 {
-    public class AM0008 : IUrlHelper
+    public class UA0008 : IUrlHelper
     {
         public IUrlHelper Method1(this IUrlHelper h)
         {

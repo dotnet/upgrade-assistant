@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace TestProject.TestClasses
 {
-    public class AM0007 : System.Web.Mvc.HtmlHelper
+    public class UA0007 : IHtmlHelper
     {
-        public AM0007()
+        public UA0007()
         {
         }
 
         // General usage => IHtmlHelper
-        public static TestProject.MyNamespace.HtmlHelper Method1(this Foo.HtmlHelper helper)
+        public static TestProject.MyNamespace.HtmlHelper Method1(this IHtmlHelper helper)
         {
-            List<System.Web.Mvc.HtmlHelper> x = new List<System.Web.Mvc.HtmlHelper>();
+            List<IHtmlHelper> x = new List<IHtmlHelper>();
 
             return new TestProject.MyNamespace.HtmlHelper();
         }
 
         // Member access and ctor => HtmlHelper
-        public static IEnumerable<Foo.HtmlHelper> Method2(HtmlHelper helper)
+        public static IEnumerable<IHtmlHelper> Method2(IHtmlHelper helper)
         {
-            System.Web.Mvc.HtmlHelper.ClientValidationEnabled = true;
+            HtmlHelper.ClientValidationEnabled = true;
             Foo(HtmlHelper.AnonymousObjectToHtmlAttributes(null));
-            var x = new System.Web.Mvc.HtmlHelper(null, null);
+            var x = new HtmlHelper(null, null);
             x = new HtmlHelper();
             helper.ExtensionMethod();
             yield return x;

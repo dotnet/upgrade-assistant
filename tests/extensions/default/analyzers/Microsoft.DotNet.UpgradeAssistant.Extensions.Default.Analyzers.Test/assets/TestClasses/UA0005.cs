@@ -3,7 +3,7 @@ using System.Web;
 
 namespace TestProject.TestClasses
 {
-    public class AM0005
+    public class UA0005
     {
         public HttpContext GetContext()
         {

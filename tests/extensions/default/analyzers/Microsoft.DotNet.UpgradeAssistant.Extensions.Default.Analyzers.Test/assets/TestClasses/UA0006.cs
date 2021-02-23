@@ -3,7 +3,7 @@ using AspNetUpgrade;
 
 namespace TestProject.TestClasses
 {
-    public class AM0006
+    public class UA0006
     {
         public bool IsDebuggingEnabled => HttpContext.Current.IsDebuggingEnabled;
 

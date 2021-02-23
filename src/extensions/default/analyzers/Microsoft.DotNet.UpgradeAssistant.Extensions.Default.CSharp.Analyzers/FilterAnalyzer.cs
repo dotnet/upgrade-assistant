@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class FilterAnalyzer : IdentifierUpgradeAnalyzer
     {
-        public const string DiagnosticId = "AM0004";
+        public const string DiagnosticId = "UA0004";
         private const string Category = "Upgrade";
 
         public override IEnumerable<IdentifierMapping> IdentifierMappings { get; } = new[]

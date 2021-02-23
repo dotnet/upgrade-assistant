@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.AspNetCore.Mvc;
 
 namespace TestProject.TestClasses
 {
-    public class AM0003
+    public class UA0003
     {
-        public ViewResult Index()
+        public System.Web.Mvc.ViewResult Index()
         {
             return View();
         }
 
-        public RedirectResult AnotherPage() => new RedirectResult("foo");
+        public Foo.RedirectResult AnotherPage() => new RedirectResult("foo");
 
         public ActionResult YetAnotherPage()
         {
-            ActionResult a = new ViewResult();
+            System.Web.Mvc.ActionResult a = new System.Web.Mvc.ViewResult();
             a = new RedirectResult("bar");
 
-            return new NotFoundResult();
+            return new HttpNotFoundResult();
         }
 
         // These shouldn't be flagged by analyzers

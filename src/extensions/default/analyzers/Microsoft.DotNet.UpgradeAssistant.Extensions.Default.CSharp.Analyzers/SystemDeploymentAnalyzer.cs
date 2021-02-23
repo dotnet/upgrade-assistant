@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic, LanguageNames.FSharp)]
     public class SystemDeploymentAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "AM0011";
+        public const string DiagnosticId = "UA0011";
         private const string Category = "Upgrade";
         private const string AssemblyName = "System.Deployment";
 

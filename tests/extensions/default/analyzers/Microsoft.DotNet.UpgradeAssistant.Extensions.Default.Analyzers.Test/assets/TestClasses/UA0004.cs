@@ -2,7 +2,7 @@
 
 namespace TestProject.TestClasses
 {
-    public class AM0004A : System.Web.Mvc.IResultFilter
+    public class UA0004A : System.Web.Mvc.IResultFilter
     {
         public void OnResultExecuted(System.Web.Mvc.ResultExecutedContext filterContext)
         {
@@ -16,7 +16,7 @@ namespace TestProject.TestClasses
         }
     }
 
-    public class AM0004B : System.Web.Mvc.ActionFilterAttribute
+    public class UA0004B : System.Web.Mvc.ActionFilterAttribute
     {
         public override void OnActionExecuting(System.Web.Mvc.ActionExecutingContext context)
         {

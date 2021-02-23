@@ -3,15 +3,17 @@ using System.Web.Mvc;
 
 namespace TestProject.TestClasses
 {
-    public class AM0010
+    public class UA0010
     {
+        [AllowHtml]
         [Required]
         public string Property1 { get; set; }
 
+        [AllowHtmlAttribute]
         [MyNamespace.AllowHtml]
         public int Property2 { get; }
 
-        [Required]
+        [Foo.AllowHtml, Required]
         public double Property3 { set { } }
     }
 }
