@@ -32,9 +32,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             };
 
 #if ANALYZE_COMMAND
-            var migrateCmd = new Command("migrate");
-            ConfigureUpgradeCommand(migrateCmd);
-            root.AddCommand(migrateCmd);
+            var upgradeCmd = new Command("upgrade");
+            ConfigureUpgradeCommand(upgradeCmd);
+            root.AddCommand(upgradeCmd);
 
             var analyzeCmd = new Command("analyze");
             ConfigureAnalyzeCommand(analyzeCmd);
@@ -150,9 +150,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 ShowHeader();
 
-                WriteString("Makes a best-effort attempt to migrate .NET Framework projects to .NET 5.");
+                WriteString("Makes a best-effort attempt to upgrade .NET Framework projects to .NET 5.");
                 WriteString("This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.");
-                WriteString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in .NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
+                WriteString("This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in .NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
 
                 base.Write(command);
             }

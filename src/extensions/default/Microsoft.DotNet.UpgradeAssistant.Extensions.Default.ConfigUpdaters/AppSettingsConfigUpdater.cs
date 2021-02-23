@@ -160,7 +160,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 }
             }
 
-            _logger.LogInformation("Found {AppSettingCount} app settings for migration: {AppSettingNames}", _appSettingsToUpgrade.Count, string.Join(", ", _appSettingsToUpgrade.Keys));
+            _logger.LogInformation("Found {AppSettingCount} app settings for upgrade: {AppSettingNames}", _appSettingsToUpgrade.Count, string.Join(", ", _appSettingsToUpgrade.Keys));
 
             var result = _appSettingsToUpgrade.Count > 0;
 

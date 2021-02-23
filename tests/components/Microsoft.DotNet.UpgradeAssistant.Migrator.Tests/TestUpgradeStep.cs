@@ -35,9 +35,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
             ApplicationCount = 0;
         }
 
-        public virtual string AppliedMessage => "Test migration step complete";
+        public virtual string AppliedMessage => "Test upgrade step complete";
 
-        public virtual string InitializedMessage => "Test migration step incomplete";
+        public virtual string InitializedMessage => "Test upgrade step incomplete";
 
         protected override bool IsApplicableImpl(IUpgradeContext context) => true;
 

@@ -6,27 +6,27 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public enum UpgradeStepStatus
     {
         /// <summary>
-        /// A migration step in an unknown state, possibly uninitialized.
+        /// A upgrade step in an unknown state, possibly uninitialized.
         /// </summary>
         Unknown,
 
         /// <summary>
-        /// A migration step that is initialized but has not completed.
+        /// A upgrade step that is initialized but has not completed.
         /// </summary>
         Incomplete,
 
         /// <summary>
-        /// A migration step that has run successfully.
+        /// A upgrade step that has run successfully.
         /// </summary>
         Complete,
 
         /// <summary>
-        /// A migration step that was initialized and then skipped.
+        /// A upgrade step that was initialized and then skipped.
         /// </summary>
         Skipped,
 
         /// <summary>
-        /// A migration step that ran and failed while running.
+        /// A upgrade step that ran and failed while running.
         /// </summary>
         Failed
     }

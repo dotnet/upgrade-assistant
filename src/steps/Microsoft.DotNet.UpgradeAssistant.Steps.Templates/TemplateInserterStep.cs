@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     /// <summary>
-    /// A migration step that adds files from templates if they're
+    /// A upgrade step that adds files from templates if they're
     /// not present in the project. Adds files based on TemplateConfig
     /// files read at runtime.
     /// </summary>

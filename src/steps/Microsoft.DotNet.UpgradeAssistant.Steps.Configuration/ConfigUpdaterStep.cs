@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            // Nothing needs applied here because the actual migration changes are applied by the substeps
+            // Nothing needs applied here because the actual upgrade changes are applied by the substeps
             // (which should apply before this step).
             var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
 

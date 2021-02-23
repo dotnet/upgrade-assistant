@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly InputOutputStreams _io;
         private readonly IUpgradeContextFactory _contextFactory;
         private readonly CommandProvider _commandProvider;
-        private readonly UpgraderManager _migrator;
+        private readonly UpgraderManager _upgrader;
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleUpgrade> _logger;
 
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             InputOutputStreams io,
             IUpgradeContextFactory contextFactory,
             CommandProvider commandProvider,
-            UpgraderManager migratorManager,
+            UpgraderManager upgrader,
             IUpgradeStateManager stateManager,
             ILogger<ConsoleUpgrade> logger)
         {
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _io = io ?? throw new ArgumentNullException(nameof(io));
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _commandProvider = commandProvider ?? throw new ArgumentNullException(nameof(commandProvider));
-            _migrator = migratorManager ?? throw new ArgumentNullException(nameof(migratorManager));
+            _upgrader = upgrader ?? throw new ArgumentNullException(nameof(upgrader));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -48,10 +48,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             try
             {
                 // Cache current steps here as defense-in-depth against the possibility
-                // of a bug (or very weird migration step behavior) causing the current step
+                // of a bug (or very weird upgrade step behavior) causing the current step
                 // to reset state after being initialized by GetNextStepAsync
-                var steps = await _migrator.InitializeAsync(context, token);
-                var step = await _migrator.GetNextStepAsync(context, token);
+                var steps = await _upgrader.InitializeAsync(context, token);
+                var step = await _upgrader.GetNextStepAsync(context, token);
 
                 while (step is not null)
                 {
@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         }
                     }
 
-                    step = await _migrator.GetNextStepAsync(context, token);
+                    step = await _upgrader.GetNextStepAsync(context, token);
                 }
 
                 _logger.LogInformation("Upgrade has completed. Please review any changes.");

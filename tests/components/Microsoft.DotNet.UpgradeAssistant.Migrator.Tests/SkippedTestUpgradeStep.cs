@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public override string Id => typeof(SkippedTestUpgradeStep).FullName!;
 
-        private const string SkippedMessage = "Test migration step skipped";
+        private const string SkippedMessage = "Test upgrade step skipped";
 
         public override string AppliedMessage => SkippedMessage;
 

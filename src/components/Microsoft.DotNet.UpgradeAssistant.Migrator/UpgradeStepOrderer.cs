@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
                 throw new ArgumentNullException(nameof(step));
             }
 
-            _logger.LogDebug("Attempting to add migration step {Id}", step.Id);
+            _logger.LogDebug("Attempting to add upgrade step {Id}", step.Id);
 
             // Find a place in the order after all dependencies
             var dependencies = step.DependsOn.ToList();
@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
             }
 
             _migrationSteps.Insert(index, step);
-            _logger.LogDebug("Inserted migration step {UpgradeStep} at index {Index}", step.Id, index);
+            _logger.LogDebug("Inserted upgrade step {UpgradeStep} at index {Index}", step.Id, index);
 
             return true;
         }
@@ -83,11 +83,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
 
             if (ret)
             {
-                _logger.LogDebug("Removed migration step {UpgradeStep}", stepId);
+                _logger.LogDebug("Removed upgrade step {UpgradeStep}", stepId);
             }
             else
             {
-                _logger.LogError("There was an unexpected error removing migration step {UpgradeStep}", stepId);
+                _logger.LogError("There was an unexpected error removing upgrade step {UpgradeStep}", stepId);
             }
 
             return ret;
@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
         {
             foreach (var step in migrationSteps)
             {
-                _logger.LogDebug("Using {Step} migration step", step.Id);
+                _logger.LogDebug("Using {Step} upgrade step", step.Id);
             }
 
             // Kahn's algorithm
@@ -138,11 +138,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
                     }
                 }
 
-                throw new UpgradeException($"Cannot order migration steps due to {dependencies.Count} unsatisfiable dependencies: {string.Join(", ", dependencies)}");
+                throw new UpgradeException($"Cannot order upgrade steps due to {dependencies.Count} unsatisfiable dependencies: {string.Join(", ", dependencies)}");
             }
             else
             {
-                _logger.LogDebug("Finished ordering migration steps: {UpgradeStepList}", string.Join(", ", orderedSteps.Select(s => s.Id)));
+                _logger.LogDebug("Finished ordering upgrade steps: {UpgradeStepList}", string.Join(", ", orderedSteps.Select(s => s.Id)));
                 return orderedSteps;
             }
         }

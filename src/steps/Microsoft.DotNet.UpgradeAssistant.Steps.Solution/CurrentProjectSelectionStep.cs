@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         protected override bool IsApplicableImpl(IUpgradeContext context) => context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p));
 
-        // This migration step is meant to be run fresh every time a new project needs selected
+        // This upgrade step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IUpgradeContext context) => context?.CurrentProject is null && Status == UpgradeStepStatus.Complete;
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

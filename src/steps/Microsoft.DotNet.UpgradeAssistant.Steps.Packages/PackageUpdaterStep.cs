@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     /// <summary>
     /// Upgrade step that updates NuGet package references
-    /// to better work after migration. Packages references are
+    /// to better work after upgrade. Packages references are
     /// updated if the reference appears to be transitive (with
     /// SDK style projects, only top-level dependencies are necessary
     /// in the project file), if the package version doesn't
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             var project = context.CurrentProject.Required();
 
-            // TODO : Temporary workaround until the migration analyzers are available on NuGet.org
+            // TODO : Temporary workaround until the upgrade analyzers are available on NuGet.org
             // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
             if (_analyzerPackageSource is not null && !_packageLoader.PackageSources.Contains(_analyzerPackageSource))
             {

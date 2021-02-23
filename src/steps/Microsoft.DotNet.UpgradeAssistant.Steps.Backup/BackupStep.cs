@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 {
     public class BackupStep : UpgradeStep
     {
-        private const string FlagFileName = "migration.backup";
+        private const string FlagFileName = "upgrade.backup";
 
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             if (_skipBackup)
             {
-                Logger.LogDebug("Backup migration step initalized as complete (backup skipped)");
+                Logger.LogDebug("Backup upgrade step initalized as complete (backup skipped)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
             else if (_backupPath is null)
@@ -69,12 +69,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
             else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
             {
-                Logger.LogDebug("Backup migration step initalized as complete (already done)");
+                Logger.LogDebug("Backup upgrade step initalized as complete (already done)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
             }
             else
             {
-                Logger.LogDebug("Backup migration step initialized as incomplete");
+                Logger.LogDebug("Backup upgrade step initialized as incomplete");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
             }
         }

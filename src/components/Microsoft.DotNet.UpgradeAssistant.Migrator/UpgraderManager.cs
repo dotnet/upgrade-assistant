@@ -39,11 +39,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
         public IEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context) => AllSteps.Where(s => s.IsApplicable(context));
 
         /// <summary>
-        /// Finds and returns the next applicable and incomplete step for the given migration context.
+        /// Finds and returns the next applicable and incomplete step for the given upgrade context.
         /// </summary>
-        /// <param name="context">The migration context to evaluate migration steps against.</param>
-        /// <returns>The next applicable but incomplete migration step, which should be the next migration step applied.
-        /// Returns null if no migration steps need to be applied.</returns>
+        /// <param name="context">The upgrade context to evaluate upgrade steps against.</param>
+        /// <returns>The next applicable but incomplete upgrade step, which should be the next upgrade step applied.
+        /// Returns null if no upgrade steps need to be applied.</returns>
         public async Task<UpgradeStep?> GetNextStepAsync(IUpgradeContext context, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
 
             if (!steps.Any())
             {
-                Logger.LogDebug("No applicable migration steps found");
+                Logger.LogDebug("No applicable upgrade steps found");
                 return null;
             }
 
@@ -71,11 +71,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
 
             if (nextStep is null)
             {
-                Logger.LogDebug("No applicable incomplete migration steps found");
+                Logger.LogDebug("No applicable incomplete upgrade steps found");
             }
             else
             {
-                Logger.LogDebug("Identified migration step {UpgradeStep} as the next step", nextStep.Id);
+                Logger.LogDebug("Identified upgrade step {UpgradeStep} as the next step", nextStep.Id);
             }
 
             return nextStep;
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
                 {
                     // It is not necessary to iterate through sub-steps because parents steps are
                     // expected to initialize their children during their own initialization
-                    Logger.LogInformation("Initializing migration step {StepTitle}", step.Title);
+                    Logger.LogInformation("Initializing upgrade step {StepTitle}", step.Title);
                     await step.InitializeAsync(context, token).ConfigureAwait(false);
                     if (step.Status == UpgradeStepStatus.Unknown)
                     {

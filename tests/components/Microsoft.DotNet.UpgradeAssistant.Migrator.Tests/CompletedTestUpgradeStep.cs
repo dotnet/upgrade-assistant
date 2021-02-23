@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public override string Id => typeof(CompletedTestUpgradeStep).FullName!;
 
-        private const string CompletedMessage = "Test migration step completed";
+        private const string CompletedMessage = "Test upgrade step completed";
 
         public override string AppliedMessage => CompletedMessage;
 

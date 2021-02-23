@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeStartup, MSBuildRegistrationStartup>();
             services.AddSingleton<IUpgradeContextFactory, MSBuildUpgradeContextFactory>();
 
-            // Instantiate the migration context with a func to avoid needing MSBuild types prior to MSBuild registration
+            // Instantiate the upgrade context with a func to avoid needing MSBuild types prior to MSBuild registration
             services.AddTransient<MSBuildWorkspaceUpgradeContext>();
             services.AddTransient<IUpgradeContext>(sp => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
             services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());

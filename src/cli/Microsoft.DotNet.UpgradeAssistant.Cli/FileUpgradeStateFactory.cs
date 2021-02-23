@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         {
             if (File.Exists(_path))
             {
-                _logger.LogInformation("Loading migration progress file at {Path}", _path);
+                _logger.LogInformation("Loading upgrade progress file at {Path}", _path);
 
                 using var stream = File.OpenRead(_path);
 
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 }
                 catch (JsonException e)
                 {
-                    _logger.LogWarning(e, "Could not deserialize migration progress.");
+                    _logger.LogWarning(e, "Could not deserialize upgrade progress.");
                 }
             }
 
@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _logger.LogInformation("Saving migration progress file at {Path}", _path);
+            _logger.LogInformation("Saving upgrade progress file at {Path}", _path);
 
             using var stream = File.OpenWrite(_path);
             stream.SetLength(0);

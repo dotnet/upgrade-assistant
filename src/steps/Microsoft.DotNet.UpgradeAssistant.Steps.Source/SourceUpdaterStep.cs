@@ -93,8 +93,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             return Diagnostics.Any() ?
-                new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed", BuildBreakRisk.None) :
-                new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No migration diagnostics found", BuildBreakRisk.None);
+                new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{Diagnostics.Count()} upgrade diagnostics need fixed", BuildBreakRisk.None) :
+                new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No upgrade diagnostics found", BuildBreakRisk.None);
         }
 
         public async Task GetDiagnosticsAsync(CancellationToken token)
@@ -113,9 +113,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return;
             }
 
-            Logger.LogTrace("Running ASP.NET Core migration analyzers on {ProjectName}", project.Name);
+            Logger.LogTrace("Running ASP.NET Core upgrade analyzers on {ProjectName}", project.Name);
 
-            // Compile with migration analyzers enabled
+            // Compile with upgrade analyzers enabled
             var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
 
             if (compilation is null)
@@ -127,7 +127,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 var compilationWithAnalyzer = compilation
                     .WithAnalyzers(ImmutableArray.CreateRange(_allAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
 
-                // Find all diagnostics that migration code fixers can address
+                // Find all diagnostics that upgrade code fixers can address
                 Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
                     .Where(d => d.Location.IsInSource &&
                            _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));

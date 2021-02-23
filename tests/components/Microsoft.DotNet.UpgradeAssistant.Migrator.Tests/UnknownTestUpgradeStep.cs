@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public override string Id => typeof(UnknownTestUpgradeStep).FullName!;
 
-        private const string UnknownMessage = "Test migration status unknown";
+        private const string UnknownMessage = "Test upgrade status unknown";
 
         public override string AppliedMessage => UnknownMessage;
 

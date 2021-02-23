@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     /// <summary>
-    /// Upgrade step that addresses a particular migration diagnostic with a Roslyn code fixer.
+    /// Upgrade step that addresses a particular upgrade diagnostic with a Roslyn code fixer.
     /// Meant to be used as a sub-step of SourceUpdaterStep.
     /// </summary>
     public class CodeFixerStep : UpgradeStep
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override string Id => $"{typeof(CodeFixerStep).FullName!}:{DiagnosticId}";
 
-        public override string Description => $"Update source files to automatically fix migration analyzer {DiagnosticId}";
+        public override string Description => $"Update source files to automatically fix upgrade analyzer {DiagnosticId}";
 
         public override string Title { get; }
 
@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         {
             Logger.LogDebug("Identified {DiagnosticCount} fixable {DiagnosticId} diagnostics", Diagnostics.Count(), DiagnosticId);
 
-            // This migration step is incomplete if any diagnostics it can fix remain
+            // This upgrade step is incomplete if any diagnostics it can fix remain
             return Diagnostics.Any() ?
                 Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{Diagnostics.Count()} {DiagnosticId} diagnostics need fixed", BuildBreakRisk.Low)) :
                 Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None));

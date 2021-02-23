@@ -42,7 +42,7 @@ namespace Integration.Tests
                 var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioName);
                 await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
 
-                // Run migration
+                // Run upgrade
                 await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), Console.Out, 300).ConfigureAwait(false);
                 CleanupBuildArtifacts(workingDir);
 

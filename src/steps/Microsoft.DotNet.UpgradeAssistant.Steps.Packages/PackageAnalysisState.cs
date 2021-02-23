@@ -38,9 +38,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         }
 
         /// <summary>
-        /// Creates a new analysis state object for a given migration context. This involves restoring packages for the context's current project.
+        /// Creates a new analysis state object for a given upgrade context. This involves restoring packages for the context's current project.
         /// </summary>
-        /// <param name="context">The migration context to create an analysis state for.</param>
+        /// <param name="context">The upgrade context to create an analysis state for.</param>
         /// <param name="tfmSelector">Used to identify the final expected TFM.</param>
         /// <param name="packageRestorer">The package restorer to use to restore packages for the context's project and generate a lock file.</param>
         /// <returns>A new PackageAnalysisState instance for the specified context.</returns>

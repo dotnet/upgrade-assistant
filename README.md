@@ -10,7 +10,7 @@
 
 ## Overview
 
-This project enables automation of common tasks related to upgrading .NET Framework projects to .NET 5.0. Note that this is not a complete migration tool and work *will* be required after using the tooling to upgrade a project.
+This project enables automation of common tasks related to upgrading .NET Framework projects to .NET 5.0. Note that this is not a complete upgrade tool and work *will* be required after using the tooling to upgrade a project.
 
 When run on a solution, the tool will:
 
@@ -21,15 +21,15 @@ When run on a solution, the tool will:
 - Make simple updates in C# source code to replace patterns that worked in .NET Framework with .NET 5.0 equivalents
 - For some app models (like ASP.NET apps), add common template files (like startup.cs) and make simple updates based on recognized web.config or app.config values
 - For projects targeting Windows, add a reference to the Microsoft.Windows.Compatibility package
-- Add references to analyzers that help with migration, such as the Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers package
+- Add references to analyzers that help with upgrade, such as the Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers package
 
-After running this tool on a solution, the solution will likely not build until the migration is completed manually. Analyzers added to the solution will highlight some of the remaining changes needed after the tool runs.
+After running this tool on a solution, the solution will likely not build until the upgrade is completed manually. Analyzers added to the solution will highlight some of the remaining changes needed after the tool runs.
 
 ## Upgrade documentation
 
-As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [migration documentation](https://docs.microsoft.com/dotnet/core/porting/).
+As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [upgrade documentation](https://docs.microsoft.com/dotnet/core/porting/).
 
-Web scenarios can be especially challenging, so it you are upgrading and ASP.NET app, be sure to read [ASP.NET Core migration documentation](https://docs.microsoft.com/aspnet/core/migration/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
+Web scenarios can be especially challenging, so it you are upgrading and ASP.NET app, be sure to read [ASP.NET Core upgrade documentation](https://docs.microsoft.com/aspnet/core/upgrade/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
 
 ## Installation
 
@@ -80,14 +80,14 @@ Options:
   -?, -h, --help                 Show help and usage information
 ```
 
-### Determining migration feasibility
+### Determining upgrade feasibility
 
 Note that this tool does not (yet) advise on the feasibility or estimated cost of migrating projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to .NET 5.0.
 
 If you're just starting to look at .NET 5.0 and would like to understand more about potential challenges in migrating any particular project, you should begin by looking at .NET Framework dependencies the project has and third-party libraries or NuGet packages it depends on and understand whether those dependencies are likely to work on .NET 5.0. Resources that can help with that analysis include:
 
 1. [The .NET Portability Analyzer tool](https://github.com/microsoft/dotnet-apiport)
-2. [.NET Core migration documentation](https://docs.microsoft.com/dotnet/core/porting/)
+2. [.NET Core upgrade documentation](https://docs.microsoft.com/dotnet/core/porting/)
 3. [Documentation of features not available on .NET Core](https://docs.microsoft.com/dotnet/core/porting/net-framework-tech-unavailable)
 
 ### Troubleshooting common issues
@@ -112,7 +112,7 @@ A similar structure is mirrored for the tests to identify where each of the test
 
 ## Extensibility
 
-The Upgrade Assistant has an extension system that make it easy for users to customize many of the migration steps without having to rebuild the tool. An Upgrade Assistant extension can extend the following upgrade steps (described in more detail below):
+The Upgrade Assistant has an extension system that make it easy for users to customize many of the upgrade steps without having to rebuild the tool. An Upgrade Assistant extension can extend the following upgrade steps (described in more detail below):
 
 1. Source updates (via Roslyn analyzers and code fix providers)
 2. NuGet package updates (by explicitly mapping certain packages to their replacements)
@@ -150,7 +150,7 @@ Any type with a `DiagnosticAnalyzerAttribute` attribute is considered an analyze
 
 ### Custom NuGet package mapping configuration
 
-The Package updater step of the Upgrade Assistant attempts to update NuGet package references to versions that will work with .NET 5.0. There are a few rules the migration step uses to make those updates:
+The Package updater step of the Upgrade Assistant attempts to update NuGet package references to versions that will work with .NET 5.0. There are a few rules the upgrade step uses to make those updates:
 
   1. It removes packages that other referenced packages depend on (transitive dependencies). Try-convert moves all packages from packages.config to PackageReference references, but PackageReference-style references only need to include top level packages. The NuGet package updater step removes package references that appear to be transitive so that only top-level dependencies are included in the csproj.
   2. If a referenced NuGet package isn't compatible with the target .NET version but a newer version of the NuGet package is, the package updater step automatically updates the version to the first major version that will work.
@@ -239,6 +239,6 @@ Concepts referred to in this repository which may have unclear meaning are expla
 
 | Name    | Description |
 |---------|-------------|
-| Step    | A step can define commands that can perform actions on the project. Each step implements `UpgradeStep`. The migration process comprises a series of steps that are visited in turn. Examples include the 'Update package versions step' or the 'Project backup step'|
+| Step    | A step can define commands that can perform actions on the project. Each step implements `UpgradeStep`. The upgrade process comprises a series of steps that are visited in turn. Examples include the 'Update package versions step' or the 'Project backup step'|
 | Command | A command is an action that can be invoked by a user. Examples include a command to apply the current step or a command to change the backup location.|
 | Project Components | AppModel-specific components that a project may depend on. The most common are `WindowsDesktop` components (for WPF and WinForms scenarios) and `Web` (for ASP.NET scenarios) |
