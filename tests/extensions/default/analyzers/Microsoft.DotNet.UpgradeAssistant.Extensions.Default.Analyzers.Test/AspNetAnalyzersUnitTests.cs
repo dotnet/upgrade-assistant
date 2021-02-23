@@ -82,10 +82,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "AM0006",
                 new[]
                 {
-                    new ExpectedDiagnostic("AM0006", new TextSpan(157, 38)),
-                    new ExpectedDiagnostic("AM0006", new TextSpan(302, 20)),
-                    new ExpectedDiagnostic("AM0006", new TextSpan(405, 44)),
-                    new ExpectedDiagnostic("AM0006", new TextSpan(499, 42))
+                    new ExpectedDiagnostic("AM0006", new TextSpan(155, 38)),
+                    new ExpectedDiagnostic("AM0006", new TextSpan(300, 20)),
+                    new ExpectedDiagnostic("AM0006", new TextSpan(403, 44)),
+                    new ExpectedDiagnostic("AM0006", new TextSpan(497, 42))
                 }
             },
             {
