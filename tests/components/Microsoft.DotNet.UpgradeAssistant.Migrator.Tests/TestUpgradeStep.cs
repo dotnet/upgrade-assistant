@@ -10,28 +10,28 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class TestMigrationStep : MigrationStep
+    public class TestUpgradeStep : UpgradeStep
     {
         public int ApplicationCount { get; set; }
 
-        public override string Id => typeof(TestMigrationStep).FullName!;
+        public override string Id => typeof(TestUpgradeStep).FullName!;
 
         public override string Description { get; }
 
         public override string Title { get; }
 
-        public TestMigrationStep(
+        public TestUpgradeStep(
             string title,
             string? description = null,
-            MigrationStep? parentStep = null,
-            IEnumerable<MigrationStep>? subSteps = null,
+            UpgradeStep? parentStep = null,
+            IEnumerable<UpgradeStep>? subSteps = null,
             ILogger? logger = null)
-            : base(logger ?? new NullLogger<TestMigrationStep>())
+            : base(logger ?? new NullLogger<TestUpgradeStep>())
         {
             Title = title;
             Description = description ?? string.Empty;
             ParentStep = parentStep;
-            SubSteps = subSteps ?? Enumerable.Empty<MigrationStep>();
+            SubSteps = subSteps ?? Enumerable.Empty<UpgradeStep>();
             ApplicationCount = 0;
         }
 
@@ -39,15 +39,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public virtual string InitializedMessage => "Test migration step incomplete";
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => true;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => true;
 
-        protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             ApplicationCount++;
-            return Task.FromResult(new MigrationStepApplyResult(MigrationStepStatus.Complete, AppliedMessage));
+            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, AppliedMessage));
         }
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token) =>
-            Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, InitializedMessage, BuildBreakRisk.Low));
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token) =>
+            Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, InitializedMessage, BuildBreakRisk.Low));
     }
 }

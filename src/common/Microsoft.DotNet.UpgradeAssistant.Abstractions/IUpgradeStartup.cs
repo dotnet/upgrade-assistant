@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IMigrationContextFactory
+    public interface IUpgradeStartup
     {
-        ValueTask<IMigrationContext> CreateContext(CancellationToken token);
+        Task<bool> StartupAsync(CancellationToken token);
     }
 }

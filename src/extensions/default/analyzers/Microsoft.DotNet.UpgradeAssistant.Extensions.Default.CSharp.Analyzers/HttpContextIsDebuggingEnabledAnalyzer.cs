@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     public class HttpContextIsDebuggingEnabledAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "AM0006";
-        private const string Category = "Migration";
+        private const string Category = "Upgrade";
 
         private const string MemberName = "IsDebuggingEnabled";
         private static readonly string[] HttpContextTypes = new[] { "System.Web.HttpContext", "Microsoft.AspNetCore.Http.HttpContext" };

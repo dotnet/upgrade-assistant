@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
     /// not present in the project. Adds files based on TemplateConfig
     /// files read at runtime.
     /// </summary>
-    public class TemplateInserterStep : MigrationStep
+    public class TemplateInserterStep : UpgradeStep
     {
         private const int BufferSize = 65536;
         private static readonly Regex PropertyRegex = new(@"^\$\((.*)\)$", RegexOptions.Compiled);
@@ -73,9 +73,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             }
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null && _templateProvider.TemplateConfigFileNames.Any();
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && _templateProvider.TemplateConfigFileNames.Any();
 
-        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -95,21 +95,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 if (_itemsToAdd.Any())
                 {
                     Logger.LogDebug("Needed items: {NeededFiles}", string.Join(", ", _itemsToAdd.Keys));
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{_itemsToAdd.Count} expected template items needed ({string.Join(", ", _itemsToAdd.Keys)})", BuildBreakRisk.Medium);
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_itemsToAdd.Count} expected template items needed ({string.Join(", ", _itemsToAdd.Keys)})", BuildBreakRisk.Medium);
                 }
                 else
                 {
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "All expected template items found", BuildBreakRisk.None);
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "All expected template items found", BuildBreakRisk.None);
                 }
             }
             catch (Exception)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", project.FilePath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {project.FilePath}", BuildBreakRisk.Unknown);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {project.FilePath}", BuildBreakRisk.Unknown);
             }
         }
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                     if (templateStream is null)
                     {
                         Logger.LogCritical("Expected template {TemplatePath} not found in extension {Extension}", item.Path, item.Extension.Name);
-                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
+                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
                     }
 
                     using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
@@ -150,7 +150,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 catch (IOException exc)
                 {
                     Logger.LogCritical(exc, "Expected template {TemplatePath} not found in extension {Extension}", item.Path, item.Extension.Name);
-                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
+                    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
                 }
 
                 Logger.LogInformation("Added template file {ItemName} from {Extension}", item.Path, item.Extension.Name);
@@ -171,7 +171,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             await projectFile.SaveAsync(token).ConfigureAwait(false);
 
             Logger.LogInformation("{ItemCount} template items added", _itemsToAdd.Count);
-            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
         }
 
         private bool IsTemplateNeeded(IProject project, RuntimeItemSpec template)

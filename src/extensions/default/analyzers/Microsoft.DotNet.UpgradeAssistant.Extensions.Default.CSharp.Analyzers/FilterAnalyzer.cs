@@ -9,10 +9,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class FilterAnalyzer : IdentifierMigrationAnalyzer
+    public class FilterAnalyzer : IdentifierUpgradeAnalyzer
     {
         public const string DiagnosticId = "AM0004";
-        private const string Category = "Migration";
+        private const string Category = "Upgrade";
 
         public override IEnumerable<IdentifierMapping> IdentifierMappings { get; } = new[]
         {

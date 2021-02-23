@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     {
         public const string NewIdentifierKey = "NewIdentifier";
         public const string DiagnosticId = "AM0008";
-        private const string Category = "Migration";
+        private const string Category = "Upgrade";
 
         private const string UrlHelperName = "UrlHelper";
         private const string SystemWebUrlHelperName = "System.Web.Mvc.UrlHelper";

@@ -16,7 +16,7 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
-    public abstract class IdentifierMigrationCodeFixer : CodeFixProvider
+    public abstract class IdentifierUpgradeCodeFixer : CodeFixProvider
     {
         public abstract string CodeFixTitle { get; }
 
@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return;
             }
 
-            if (diagnostic.Properties.TryGetValue(IdentifierMigrationAnalyzer.NewIdentifierKey, out var property) && property is not null)
+            if (diagnostic.Properties.TryGetValue(IdentifierUpgradeAnalyzer.NewIdentifierKey, out var property) && property is not null)
             {
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(

@@ -3,5 +3,9 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public record MigrationStepApplyResult(MigrationStepStatus Status, string Details);
+    public abstract class UpgradeCommand<T> : UpgradeCommand
+        where T : notnull
+    {
+        public T Value { get; init; } = default!;
+    }
 }

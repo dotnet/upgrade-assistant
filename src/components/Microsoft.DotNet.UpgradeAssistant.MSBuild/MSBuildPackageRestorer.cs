@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, IProject project, CancellationToken token)
+        public async Task<RestoreOutput> RestorePackagesAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
             if (context is null)
             {
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return GetRestoreOutput(project);
         }
 
-        private static ProjectInstance CreateProjectInstance(IMigrationContext context, IProject project) => new ProjectInstance(project.FilePath, context.GlobalProperties, toolsVersion: null);
+        private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new ProjectInstance(project.FilePath, context.GlobalProperties, toolsVersion: null);
 
         private RestoreOutput GetRestoreOutput(IProject project)
         {

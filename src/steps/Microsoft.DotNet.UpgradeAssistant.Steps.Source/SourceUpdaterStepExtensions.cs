@@ -9,6 +9,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public static class SourceUpdaterStepExtensions
     {
         public static IServiceCollection AddSourceUpdaterStep(this IServiceCollection services) =>
-            services.AddScoped<MigrationStep, SourceUpdaterStep>();
+            services.AddScoped<UpgradeStep, SourceUpdaterStep>();
     }
 }

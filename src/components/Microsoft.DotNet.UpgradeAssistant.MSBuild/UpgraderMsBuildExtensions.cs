@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public static class MigratorMsBuildExtensions
+    public static class UpgraderMsBuildExtensions
     {
         private static readonly string[] ItemTypesToDeduplicate = new[] { "Compile", "Content" };
 
@@ -18,13 +18,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
             services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
-            services.AddTransient<IMigrationStartup, MSBuildRegistrationStartup>();
-            services.AddSingleton<IMigrationContextFactory, MSBuildMigrationContextFactory>();
+            services.AddTransient<IUpgradeStartup, MSBuildRegistrationStartup>();
+            services.AddSingleton<IUpgradeContextFactory, MSBuildUpgradeContextFactory>();
 
             // Instantiate the migration context with a func to avoid needing MSBuild types prior to MSBuild registration
-            services.AddTransient<MSBuildWorkspaceMigrationContext>();
-            services.AddTransient<IMigrationContext>(sp => sp.GetRequiredService<MSBuildWorkspaceMigrationContext>());
-            services.AddTransient<Func<MSBuildWorkspaceMigrationContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceMigrationContext>());
+            services.AddTransient<MSBuildWorkspaceUpgradeContext>();
+            services.AddTransient<IUpgradeContext>(sp => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
+            services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
             services.AddTransient<ITargetTFMSelector, MSBuildTargetTFMSelector>();
             services.AddTransient<ITargetFrameworkMonikerFactory, NuGetTargetFrameworkMonikerFactory>();
             services.AddTransient<ITargetFrameworkMonikerComparer, NuGetTargetFrameworkMonikerComparer>();

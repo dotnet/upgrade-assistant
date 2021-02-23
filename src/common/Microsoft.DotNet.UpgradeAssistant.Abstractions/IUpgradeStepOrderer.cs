@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IMigrationStepOrderer
+    public interface IUpgradeStepOrderer
     {
-        bool TryAddStep(MigrationStep newStep);
+        bool TryAddStep(UpgradeStep newStep);
 
         bool TryRemoveStep(string stepId);
 
-        IEnumerable<MigrationStep> MigrationSteps { get; }
+        IEnumerable<UpgradeStep> UpgradeSteps { get; }
     }
 }

@@ -12,9 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Integration.Tests
 {
-    public static class MigrationRunner
+    public static class UpgradeRunner
     {
-        public static async Task MigrateAsync(string inputPath, TextWriter output, int timeoutSeconds = 300)
+        public static async Task UpgradeAsync(string inputPath, TextWriter output, int timeoutSeconds = 300)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -29,7 +29,7 @@ namespace Integration.Tests
             var project = new FileInfo(inputPath);
             using var cts = new CancellationTokenSource();
 
-            var options = new MigrateOptions
+            var options = new UpgradeOptions
             {
                 SkipBackup = true,
                 Project = project,
@@ -37,7 +37,7 @@ namespace Integration.Tests
                 NonInteractiveWait = 0,
             };
 
-            var migrationTask = Program.RunMigrationAsync(options, (context, services) => RegisterTestServices(services, output), cts.Token);
+            var migrationTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services, output), cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);
@@ -57,8 +57,8 @@ namespace Integration.Tests
             services.AddOptions<PackageUpdaterOptions>().Configure(o =>
             {
                 o.PackageMapPath = "PackageMaps";
-                o.MigrationAnalyzersPackageSource = "https://doesnotexist.net/index.json";
-                o.MigrationAnalyzersPackageVersion = "1.0.0";
+                o.UpgradeAnalyzersPackageSource = "https://doesnotexist.net/index.json";
+                o.UpgradeAnalyzersPackageVersion = "1.0.0";
             });
         }
     }

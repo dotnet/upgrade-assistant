@@ -5,10 +5,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
-using Microsoft.DotNet.UpgradeAssistant.Migrator.Commands;
+using Microsoft.DotNet.UpgradeAssistant.Upgrader.Commands;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
 {
     public class CommandTests
     {
@@ -21,8 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
 
             // Applying before intialization throws
             using var mock = AutoMock.GetLoose();
-            var context = mock.Mock<IMigrationContext>().Object;
-            var step = new TestMigrationStep(string.Empty);
+            var context = mock.Mock<IUpgradeContext>().Object;
+            var step = new TestUpgradeStep(string.Empty);
             var command = new ApplyNextCommand(step);
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await command.ExecuteAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
@@ -31,16 +31,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         public async Task ApplyNextCommandAppliesSteps()
         {
             using var mock = AutoMock.GetLoose();
-            var context = mock.Mock<IMigrationContext>().Object;
+            var context = mock.Mock<IUpgradeContext>().Object;
 
             var stepTitle = "Test step!";
-            var step = new TestMigrationStep(stepTitle);
+            var step = new TestUpgradeStep(stepTitle);
             var command = new ApplyNextCommand(step);
 
             // Initialize step
-            Assert.Equal(MigrationStepStatus.Unknown, step.Status);
+            Assert.Equal(UpgradeStepStatus.Unknown, step.Status);
             await step.InitializeAsync(context, CancellationToken.None).ConfigureAwait(false);
-            Assert.Equal(MigrationStepStatus.Incomplete, step.Status);
+            Assert.Equal(UpgradeStepStatus.Incomplete, step.Status);
             Assert.Equal(BuildBreakRisk.Low, step.Risk);
 
             // Apply command
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
             // Confirm command text and step state are as expected
             Assert.Equal($"Apply next step ({stepTitle})", command.CommandText);
             Assert.Equal(1, step.ApplicationCount);
-            Assert.Equal(MigrationStepStatus.Complete, step.Status);
+            Assert.Equal(UpgradeStepStatus.Complete, step.Status);
             Assert.Equal(BuildBreakRisk.Low, step.Risk);
             Assert.Equal(step.AppliedMessage, step.StatusDetails);
 
@@ -63,10 +63,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         public async Task FailedStepsAreNotApplied()
         {
             using var mock = AutoMock.GetLoose();
-            var context = mock.Mock<IMigrationContext>().Object;
+            var context = mock.Mock<IUpgradeContext>().Object;
 
             var stepTitle = "Failed test step!";
-            var step = new FailedTestMigrationStep(stepTitle);
+            var step = new FailedTestUpgradeStep(stepTitle);
             var command = new ApplyNextCommand(step);
 
             await step.InitializeAsync(context, CancellationToken.None).ConfigureAwait(false);
@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
             // Confirm step was not applied
             Assert.Equal($"Apply next step ({stepTitle})", command.CommandText);
             Assert.Equal(0, step.ApplicationCount);
-            Assert.Equal(MigrationStepStatus.Failed, step.Status);
+            Assert.Equal(UpgradeStepStatus.Failed, step.Status);
             Assert.Equal(BuildBreakRisk.Unknown, step.Risk);
             Assert.Equal(step.InitializedMessage, step.StatusDetails);
         }
@@ -87,16 +87,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         public async Task SkipNextCommandSkips()
         {
             using var mock = AutoMock.GetLoose();
-            var context = mock.Mock<IMigrationContext>().Object;
+            var context = mock.Mock<IUpgradeContext>().Object;
 
             var stepTitle = "Test step!";
-            var step = new TestMigrationStep(stepTitle);
+            var step = new TestUpgradeStep(stepTitle);
             var command = new SkipNextCommand(step);
 
             // Initialize step
-            Assert.Equal(MigrationStepStatus.Unknown, step.Status);
+            Assert.Equal(UpgradeStepStatus.Unknown, step.Status);
             await step.InitializeAsync(context, CancellationToken.None).ConfigureAwait(false);
-            Assert.Equal(MigrationStepStatus.Incomplete, step.Status);
+            Assert.Equal(UpgradeStepStatus.Incomplete, step.Status);
             Assert.Equal(BuildBreakRisk.Low, step.Risk);
 
             // Apply command
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
             // Confirm command text and step state are as expected
             Assert.Equal($"Skip next step ({stepTitle})", command.CommandText);
             Assert.Equal(0, step.ApplicationCount);
-            Assert.Equal(MigrationStepStatus.Skipped, step.Status);
+            Assert.Equal(UpgradeStepStatus.Skipped, step.Status);
             Assert.Equal(BuildBreakRisk.Low, step.Risk);
             Assert.Equal("Step skipped", step.StatusDetails);
         }
@@ -114,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         public async Task ExitCommandExits()
         {
             using var mock = AutoMock.GetLoose();
-            var context = mock.Mock<IMigrationContext>().Object;
+            var context = mock.Mock<IUpgradeContext>().Object;
 
             var exitCalled = false;
             var command = new ExitCommand(() => exitCalled = true);

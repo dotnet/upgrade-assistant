@@ -25,23 +25,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
         private static readonly Regex AppSettingsFileRegex = new("^appsettings(\\..+)?\\.json$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger<AppSettingsConfigUpdater> _logger;
-        private readonly Dictionary<string, string> _appSettingsToMigrate;
+        private readonly Dictionary<string, string> _appSettingsToUpgrade;
 
         public string Id => typeof(AppSettingsConfigUpdater).FullName!;
 
-        public string Title => "Migrate appSettings";
+        public string Title => "Upgrade appSettings";
 
-        public string Description => "Migrate app settings from app.config and web.config files to appsettings.json";
+        public string Description => "Upgrade app settings from app.config and web.config files to appsettings.json";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Low;
 
         public AppSettingsConfigUpdater(ILogger<AppSettingsConfigUpdater> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _appSettingsToMigrate = new Dictionary<string, string>();
+            _appSettingsToUpgrade = new Dictionary<string, string>();
         }
 
-        public async Task<bool> ApplyAsync(IMigrationContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
             if (context is null)
             {
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                     property.WriteTo(jsonWriter);
                 }
 
-                foreach (var setting in _appSettingsToMigrate)
+                foreach (var setting in _appSettingsToUpgrade)
                 {
                     if (bool.TryParse(setting.Value, out var boolValue))
                     {
@@ -111,7 +111,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             return true;
         }
 
-        public Task<bool> IsApplicableAsync(IMigrationContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
             if (context is null)
             {
@@ -152,7 +152,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             {
                 if (!jsonConfigFiles.Any(s => !string.IsNullOrEmpty(s.Configuration[setting.Key])))
                 {
-                    _appSettingsToMigrate.Add(setting.Key, setting.Value);
+                    _appSettingsToUpgrade.Add(setting.Key, setting.Value);
                 }
                 else
                 {
@@ -160,9 +160,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 }
             }
 
-            _logger.LogInformation("Found {AppSettingCount} app settings for migration: {AppSettingNames}", _appSettingsToMigrate.Count, string.Join(", ", _appSettingsToMigrate.Keys));
+            _logger.LogInformation("Found {AppSettingCount} app settings for migration: {AppSettingNames}", _appSettingsToUpgrade.Count, string.Join(", ", _appSettingsToUpgrade.Keys));
 
-            var result = _appSettingsToMigrate.Count > 0;
+            var result = _appSettingsToUpgrade.Count > 0;
 
             return Task.FromResult(result);
         }

@@ -9,7 +9,7 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "AM007 CodeFix Provider")]
-    public class HtmlHelperCodeFixer : IdentifierMigrationCodeFixer
+    public class HtmlHelperCodeFixer : IdentifierUpgradeCodeFixer
     {
         public override string CodeFixTitle => CodeFixResources.HtmlHelperTitle;
 

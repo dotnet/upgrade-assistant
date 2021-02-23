@@ -5,13 +5,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Commands
+namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Commands
 {
-    public class ApplyNextCommand : MigrationCommand
+    public class ApplyNextCommand : UpgradeCommand
     {
-        private readonly MigrationStep _step;
+        private readonly UpgradeStep _step;
 
-        public ApplyNextCommand(MigrationStep step)
+        public ApplyNextCommand(UpgradeStep step)
         {
             _step = step ?? throw new ArgumentNullException(nameof(step));
         }
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Commands
         // todo - support localization
         public override string CommandText => $"Apply next step ({_step.Title})";
 
-        public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+        public override async Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
         {
             return await _step.ApplyAsync(context, token).ConfigureAwait(false);
         }

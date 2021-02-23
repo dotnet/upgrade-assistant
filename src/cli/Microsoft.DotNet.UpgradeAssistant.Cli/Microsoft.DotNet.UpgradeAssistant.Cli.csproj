@@ -47,7 +47,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
     <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj" />
-    <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Migrator\Microsoft.DotNet.UpgradeAssistant.Migrator.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Migrator\Microsoft.DotNet.UpgradeAssistant.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Portability\Microsoft.DotNet.UpgradeAssistant.Portability.csproj" />
     <ProjectReference Include="..\..\extensions\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />

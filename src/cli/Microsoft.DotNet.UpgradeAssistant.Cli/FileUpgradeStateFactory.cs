@@ -11,12 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    public class FileMigrationStateFactory : IMigrationStateManager
+    public class FileUpgradeStateFactory : IUpgradeStateManager
     {
         private readonly string _path;
-        private readonly ILogger<FileMigrationStateFactory> _logger;
+        private readonly ILogger<FileUpgradeStateFactory> _logger;
 
-        public FileMigrationStateFactory(MigrateOptions options, ILogger<FileMigrationStateFactory> logger)
+        public FileUpgradeStateFactory(UpgradeOptions options, ILogger<FileUpgradeStateFactory> logger)
         {
             if (options is null)
             {
@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _logger = logger;
         }
 
-        public async Task LoadStateAsync(IMigrationContext context, CancellationToken token)
+        public async Task LoadStateAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == path);
         }
 
-        private async ValueTask<MigrationState> GetStateAsync(CancellationToken token)
+        private async ValueTask<UpgradeState> GetStateAsync(CancellationToken token)
         {
             if (File.Exists(_path))
             {
@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 try
                 {
-                    var result = await JsonSerializer.DeserializeAsync<MigrationState>(stream, cancellationToken: token).ConfigureAwait(false);
+                    var result = await JsonSerializer.DeserializeAsync<UpgradeState>(stream, cancellationToken: token).ConfigureAwait(false);
 
                     if (result is not null)
                     {
@@ -69,10 +69,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 }
             }
 
-            return new MigrationState();
+            return new UpgradeState();
         }
 
-        public async Task SaveStateAsync(IMigrationContext context, CancellationToken token)
+        public async Task SaveStateAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             using var stream = File.OpenWrite(_path);
             stream.SetLength(0);
 
-            var state = new MigrationState
+            var state = new UpgradeState
             {
                 EntryPoint = NormalizePath(context.EntryPoint?.FilePath),
                 CurrentProject = NormalizePath(context.CurrentProject?.FilePath),
@@ -96,7 +96,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static string NormalizePath(string? path) => path is null ? string.Empty : Path.GetFileName(path);
 
-        private class MigrationState
+        private class UpgradeState
         {
             public string Build { get; set; } = Constants.Version;
 

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 {
-    public class ConfigureConsoleLoggingCommand : MigrationCommand
+    public class ConfigureConsoleLoggingCommand : UpgradeCommand
     {
         private readonly IUserInput _userInput;
         private readonly LogSettings _logSettings;
@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 
         public override string CommandText => "Configure logging";
 
-        public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+        public override async Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
         {
             var result = await _userInput.ChooseAsync("Choose your log level:", CreateFromEnum<LogLevel>(), token);
             var newLogLevel = result.Value;

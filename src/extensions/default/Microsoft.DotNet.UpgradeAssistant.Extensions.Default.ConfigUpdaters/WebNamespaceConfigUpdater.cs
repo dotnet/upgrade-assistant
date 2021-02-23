@@ -28,14 +28,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
         };
 
         private readonly ILogger<AppSettingsConfigUpdater> _logger;
-        private IEnumerable<string> _namespacesToMigrate;
+        private IEnumerable<string> _namespacesToUpgrade;
         private string? _viewImportsPath;
 
         public string Id => typeof(WebNamespaceConfigUpdater).FullName!;
 
-        public string Title => "Migrate system.web.webPages.razor/pages/namespaces";
+        public string Title => "Upgrade system.web.webPages.razor/pages/namespaces";
 
-        public string Description => "Migrate namespaces which are auto-included for web pages to _ViewImports.cshtml";
+        public string Description => "Upgrade namespaces which are auto-included for web pages to _ViewImports.cshtml";
 
         // This may add namespaces that don't exist in ASP.NET Core which would increase build breaks,
         // but the risk is still low because it should only add namespaces that are used by the project's
@@ -46,11 +46,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
         public WebNamespaceConfigUpdater(ILogger<AppSettingsConfigUpdater> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _namespacesToMigrate = Enumerable.Empty<string>();
+            _namespacesToUpgrade = Enumerable.Empty<string>();
             _viewImportsPath = null;
         }
 
-        public async Task<bool> ApplyAsync(IMigrationContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
             if (context is null)
             {
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                     ? new[] { string.Empty, ViewImportsInitialContent }
                     : await File.ReadAllLinesAsync(_viewImportsPath, token).ConfigureAwait(false));
 
-                foreach (var ns in _namespacesToMigrate.OrderByDescending(s => s))
+                foreach (var ns in _namespacesToUpgrade.OrderByDescending(s => s))
                 {
                     _logger.LogDebug("Namespace {Namespace} added to _ViewImports.cshtml", ns);
                     viewImportsContents.Insert(0, $"{RazorUsingPrefix}{ns}");
@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             }
         }
 
-        public async Task<bool> IsApplicableAsync(IMigrationContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public async Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
             if (context is null)
             {
@@ -143,9 +143,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 _logger.LogDebug("Found {NamespaceCount} namespaces already in _ViewImports.cshtml", alreadyImportedNamespaces.Count);
             }
 
-            _namespacesToMigrate = namespaces.Distinct().Where(ns => !alreadyImportedNamespaces.Contains(ns));
-            _logger.LogInformation("{NamespaceCount} web page namespace imports need migrated: {Namespaces}", _namespacesToMigrate.Count(), string.Join(", ", _namespacesToMigrate));
-            return _namespacesToMigrate.Any();
+            _namespacesToUpgrade = namespaces.Distinct().Where(ns => !alreadyImportedNamespaces.Contains(ns));
+            _logger.LogInformation("{NamespaceCount} web page namespace imports need migrated: {Namespaces}", _namespacesToUpgrade.Count(), string.Join(", ", _namespacesToUpgrade));
+            return _namespacesToUpgrade.Any();
         }
     }
 }

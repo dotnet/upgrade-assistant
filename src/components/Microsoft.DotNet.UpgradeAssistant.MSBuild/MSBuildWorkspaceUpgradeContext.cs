@@ -13,11 +13,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
-    internal sealed class MSBuildWorkspaceMigrationContext : IMigrationContext, IDisposable
+    internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
         private readonly string _path;
         private readonly ITargetTFMSelector _tfmSelector;
-        private readonly ILogger<MSBuildWorkspaceMigrationContext> _logger;
+        private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
 
@@ -43,12 +43,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public bool IsComplete { get; set; }
 
-        public MSBuildWorkspaceMigrationContext(
-            MigrateOptions options,
+        public MSBuildWorkspaceUpgradeContext(
+            UpgradeOptions options,
             ITargetTFMSelector tfmSelector,
             ITargetFrameworkMonikerFactory tfmFactory,
             IVisualStudioFinder vsFinder,
-            ILogger<MSBuildWorkspaceMigrationContext> logger)
+            ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
             if (options is null)
             {
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (vsPath is null)
             {
-                throw new MigrationException("Could not find a Visual Studio install to use for upgrade.");
+                throw new UpgradeException("Could not find a Visual Studio install to use for upgrade.");
             }
 
             _vsPath = vsPath;

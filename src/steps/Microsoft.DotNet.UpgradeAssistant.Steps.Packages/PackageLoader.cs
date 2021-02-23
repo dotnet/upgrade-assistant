@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public IEnumerable<string> PackageSources => _packageSources.Select(s => s.Source);
 
-        public PackageLoader(MigrateOptions options, ILogger<PackageLoader> logger)
+        public PackageLoader(UpgradeOptions options, ILogger<PackageLoader> logger)
         {
             if (options is null)
             {
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             if (options.ProjectPath is null)
             {
-                throw new ArgumentException("Project path must be set in MigrateOptions", nameof(options));
+                throw new ArgumentException("Project path must be set in UpgradeOptions", nameof(options));
             }
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

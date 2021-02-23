@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
-    public class SetTFMStep : MigrationStep
+    public class SetTFMStep : UpgradeStep
     {
         private readonly IPackageRestorer _restorer;
         private readonly ITargetTFMSelector _tfmSelector;
@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public override string Description => "Update TFM for current project";
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             var project = context.CurrentProject.Required();
 
@@ -51,24 +51,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             // With an updated TFM, we should restore packages
             await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
 
-            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Updated TFM to {targetTfm}");
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Updated TFM to {targetTfm}");
         }
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             var project = context.CurrentProject.Required();
             var targetTfm = _tfmSelector.SelectTFM(project);
 
             if (targetTfm == project.TFM)
             {
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None));
             }
             else
             {
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High));
             }
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
     }
 }

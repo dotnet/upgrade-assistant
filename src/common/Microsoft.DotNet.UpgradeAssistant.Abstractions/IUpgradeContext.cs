@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IMigrationContext : IDisposable
+    public interface IUpgradeContext : IDisposable
     {
         bool IsComplete { get; set; }
 

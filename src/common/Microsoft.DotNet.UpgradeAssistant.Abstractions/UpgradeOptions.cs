@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class MigrateOptions
+    public class UpgradeOptions
     {
         public FileInfo Project { get; set; } = null!;
 

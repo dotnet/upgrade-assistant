@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         string Path { get; }
 
-        Task<bool> RunAsync(IMigrationContext context, IProject project, CancellationToken token);
+        Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token);
 
         string GetCommandLine(IProject project);
     }

@@ -8,25 +8,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator
+namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
 {
-    public class MigratorManager
+    public class UpgraderManager
     {
         private readonly IPackageRestorer _restorer;
-        private readonly IMigrationStepOrderer _orderer;
+        private readonly IUpgradeStepOrderer _orderer;
 
         private ILogger Logger { get; }
 
-        public MigratorManager(IPackageRestorer restorer, IMigrationStepOrderer orderer, ILogger<MigratorManager> logger)
+        public UpgraderManager(IPackageRestorer restorer, IUpgradeStepOrderer orderer, ILogger<UpgraderManager> logger)
         {
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public IEnumerable<MigrationStep> AllSteps => _orderer.MigrationSteps;
+        public IEnumerable<UpgradeStep> AllSteps => _orderer.UpgradeSteps;
 
-        public async Task<IEnumerable<MigrationStep>> InitializeAsync(IMigrationContext context, CancellationToken token)
+        public async Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context.EntryPoint is not null)
             {
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
             return GetStepsForContext(context);
         }
 
-        public IEnumerable<MigrationStep> GetStepsForContext(IMigrationContext context) => AllSteps.Where(s => s.IsApplicable(context));
+        public IEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context) => AllSteps.Where(s => s.IsApplicable(context));
 
         /// <summary>
         /// Finds and returns the next applicable and incomplete step for the given migration context.
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
         /// <param name="context">The migration context to evaluate migration steps against.</param>
         /// <returns>The next applicable but incomplete migration step, which should be the next migration step applied.
         /// Returns null if no migration steps need to be applied.</returns>
-        public async Task<MigrationStep?> GetNextStepAsync(IMigrationContext context, CancellationToken token)
+        public async Task<UpgradeStep?> GetNextStepAsync(IUpgradeContext context, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
@@ -75,13 +75,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
             }
             else
             {
-                Logger.LogDebug("Identified migration step {MigrationStep} as the next step", nextStep.Id);
+                Logger.LogDebug("Identified migration step {UpgradeStep} as the next step", nextStep.Id);
             }
 
             return nextStep;
         }
 
-        private async Task<MigrationStep?> GetNextStepAsyncInternal(IEnumerable<MigrationStep> steps, IMigrationContext context, CancellationToken token)
+        private async Task<UpgradeStep?> GetNextStepAsyncInternal(IEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -100,15 +100,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator
             {
                 token.ThrowIfCancellationRequested();
 
-                if (step.Status == MigrationStepStatus.Unknown)
+                if (step.Status == UpgradeStepStatus.Unknown)
                 {
                     // It is not necessary to iterate through sub-steps because parents steps are
                     // expected to initialize their children during their own initialization
                     Logger.LogInformation("Initializing migration step {StepTitle}", step.Title);
                     await step.InitializeAsync(context, token).ConfigureAwait(false);
-                    if (step.Status == MigrationStepStatus.Unknown)
+                    if (step.Status == UpgradeStepStatus.Unknown)
                     {
-                        Logger.LogError("Migration step initialization failed for step {StepTitle}", step.Title);
+                        Logger.LogError("Upgrade step initialization failed for step {StepTitle}", step.Title);
                         throw new InvalidOperationException($"Step must not have unknown status after initialization. Step: {step.Title}");
                     }
                     else

@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [InlineData("AM0009")]
         [InlineData("AM0010")]
         [Theory]
-        public async Task MigrationAnalyzers(string diagnosticId)
+        public async Task UpgradeAnalyzers(string diagnosticId)
         {
             var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.cs", diagnosticId).ConfigureAwait(false);
 
@@ -179,7 +179,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [InlineData("AM0009")]
         [InlineData("AM0010")]
         [Theory]
-        public async Task MigrationCodeFixer(string diagnosticId)
+        public async Task UpgradeCodeFixer(string diagnosticId)
         {
             var fixedSource = await TestHelper.FixSourceAsync($"{diagnosticId}.cs", diagnosticId).ConfigureAwait(false);
             var expectedSource = await TestHelper.GetSourceAsync($"{diagnosticId}.Fixed.cs").ConfigureAwait(false);

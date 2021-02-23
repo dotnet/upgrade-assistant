@@ -11,28 +11,28 @@ using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
 {
-    public class MigratorTests
+    public class UpgraderTests
     {
         [Fact]
         public async Task NegativeTests()
         {
-            var unknownStep = new[] { new UnknownTestMigrationStep("Unknown step") };
+            var unknownStep = new[] { new UnknownTestUpgradeStep("Unknown step") };
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(unknownStep)));
 
-            var migrator = mock.Create<MigratorManager>();
-            var context = mock.Mock<IMigrationContext>().Object;
+            var migrator = mock.Create<UpgraderManager>();
+            var context = mock.Mock<IUpgradeContext>().Object;
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task MigratorStepsEnumeration()
+        public async Task UpgraderStepsEnumeration()
         {
-            using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(GetMigrationSteps())));
+            using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(GetUpgradeSteps())));
 
-            var migrator = mock.Create<MigratorManager>();
+            var migrator = mock.Create<UpgraderManager>();
 
             var expectedTopLevelStepsAndSubSteps = new[]
             {
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
 
             // Get both the steps property and the GetAllSteps enumeration and confirm that both return steps
             // in the expected order
-            using var context = mock.Mock<IMigrationContext>().Object;
+            using var context = mock.Mock<IUpgradeContext>().Object;
 
             var steps = migrator.GetStepsForContext(context);
             var allSteps = new List<string>();
@@ -68,11 +68,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
 
         [MemberData(nameof(CompletedStepsAreNotEnumeratedData))]
         [Theory]
-        public async Task CompletedStepsAreNotEnumerated(MigrationStep[] steps, string[] expectedSteps)
+        public async Task CompletedStepsAreNotEnumerated(UpgradeStep[] steps, string[] expectedSteps)
         {
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
-            var migrator = mock.Create<MigratorManager>();
-            using var context = mock.Mock<IMigrationContext>().Object;
+            var migrator = mock.Create<UpgraderManager>();
+            using var context = mock.Mock<IUpgradeContext>().Object;
 
             var allSteps = new List<string>();
 
@@ -90,12 +90,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
         [Fact]
         public async Task FailedStepsAreEnumerated()
         {
-            var steps = new MigrationStep[] { new SkippedTestMigrationStep("Step 1"), new FailedTestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") };
+            var steps = new UpgradeStep[] { new SkippedTestUpgradeStep("Step 1"), new FailedTestUpgradeStep("Step 2"), new CompletedTestUpgradeStep("Step 3") };
             var expectedNextStepId = "Step 2";
 
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
-            var migrator = mock.Create<MigratorManager>();
-            using var context = mock.Mock<IMigrationContext>().Object;
+            var migrator = mock.Create<UpgraderManager>();
+            using var context = mock.Mock<IUpgradeContext>().Object;
 
             var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
 
@@ -113,60 +113,60 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Tests
                 // Incomplete steps are enumerated
                 new object[]
                 {
-                    new[] { new TestMigrationStep("Step 1"), new TestMigrationStep("Step 2"), new TestMigrationStep("Step 3") },
+                    new[] { new TestUpgradeStep("Step 1"), new TestUpgradeStep("Step 2"), new TestUpgradeStep("Step 3") },
                     new[] { "Step 1", "Step 2", "Step 3" }
                 },
 
                 // Completed steps are not enumerated
                 new object[]
                 {
-                    new[] { new TestMigrationStep("Step 1"), new CompletedTestMigrationStep("Step 2"), new TestMigrationStep("Step 3") },
+                    new[] { new TestUpgradeStep("Step 1"), new CompletedTestUpgradeStep("Step 2"), new TestUpgradeStep("Step 3") },
                     new[] { "Step 1", "Step 3" }
                 },
 
                 // Skipped steps are not enumerated
                 new object[]
                 {
-                    new[] { new SkippedTestMigrationStep("Step 1"), new TestMigrationStep("Step 2"), new CompletedTestMigrationStep("Step 3") },
+                    new[] { new SkippedTestUpgradeStep("Step 1"), new TestUpgradeStep("Step 2"), new CompletedTestUpgradeStep("Step 3") },
                     new[] { "Step 2" }
                 },
 
                 // Make sure enumerating an empty step list doesn't cause problems
                 new object[]
                 {
-                    Array.Empty<MigrationStep>(),
+                    Array.Empty<UpgradeStep>(),
                     Array.Empty<string>()
                 }
             };
 
-        private static MigrationStep[] GetMigrationSteps()
+        private static UpgradeStep[] GetUpgradeSteps()
         {
             var subsubsteps = new[]
             {
-                new TestMigrationStep("Subsubstep 1"),
-                new TestMigrationStep("Subsubstep 2")
+                new TestUpgradeStep("Subsubstep 1"),
+                new TestUpgradeStep("Subsubstep 2")
             };
 
             var substeps = new[]
             {
-                new TestMigrationStep("Substep 1"),
-                new TestMigrationStep("Substep 2", subSteps: subsubsteps),
-                new TestMigrationStep("Substep 3")
+                new TestUpgradeStep("Substep 1"),
+                new TestUpgradeStep("Substep 2", subSteps: subsubsteps),
+                new TestUpgradeStep("Substep 3")
             };
 
             var otherSubsteps = new[]
             {
-                new TestMigrationStep("Substep A")
+                new TestUpgradeStep("Substep A")
             };
 
             return new[]
             {
-                new TestMigrationStep("Step 1", subSteps: substeps),
-                new TestMigrationStep("Step 2"),
-                new TestMigrationStep("Step 3", subSteps: otherSubsteps)
+                new TestUpgradeStep("Step 1", subSteps: substeps),
+                new TestUpgradeStep("Step 2"),
+                new TestUpgradeStep("Step 3", subSteps: otherSubsteps)
             };
         }
 
-        private static IMigrationStepOrderer GetOrderer(IEnumerable<MigrationStep> steps) => new MigrationStepOrderer(steps, new NullLogger<MigrationStepOrderer>());
+        private static IUpgradeStepOrderer GetOrderer(IEnumerable<UpgradeStep> steps) => new UpgradeStepOrderer(steps, new NullLogger<UpgradeStepOrderer>());
     }
 }

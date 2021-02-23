@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     public class HttpContextCurrentAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "AM0005";
-        private const string Category = "Migration";
+        private const string Category = "Upgrade";
 
         private const string TargetTypeSimpleName = "HttpContext";
         private const string TargetTypeSymbolName = "System.Web.HttpContext";

@@ -6,29 +6,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Migrator;
+using Microsoft.DotNet.UpgradeAssistant.Upgrader;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    public class ConsoleMigrate : IAppCommand
+    public class ConsoleUpgrade : IAppCommand
     {
         private readonly IUserInput _input;
         private readonly InputOutputStreams _io;
-        private readonly IMigrationContextFactory _contextFactory;
+        private readonly IUpgradeContextFactory _contextFactory;
         private readonly CommandProvider _commandProvider;
-        private readonly MigratorManager _migrator;
-        private readonly IMigrationStateManager _stateManager;
-        private readonly ILogger<ConsoleMigrate> _logger;
+        private readonly UpgraderManager _migrator;
+        private readonly IUpgradeStateManager _stateManager;
+        private readonly ILogger<ConsoleUpgrade> _logger;
 
-        public ConsoleMigrate(
+        public ConsoleUpgrade(
             IUserInput input,
             InputOutputStreams io,
-            IMigrationContextFactory contextFactory,
+            IUpgradeContextFactory contextFactory,
             CommandProvider commandProvider,
-            MigratorManager migratorManager,
-            IMigrationStateManager stateManager,
-            ILogger<ConsoleMigrate> logger)
+            UpgraderManager migratorManager,
+            IUpgradeStateManager stateManager,
+            ILogger<ConsoleUpgrade> logger)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _io = io ?? throw new ArgumentNullException(nameof(io));
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     {
                         token.ThrowIfCancellationRequested();
 
-                        ShowMigrationSteps(steps, context, step);
+                        ShowUpgradeSteps(steps, context, step);
                         _io.Output.WriteLine();
 
                         var commands = _commandProvider.GetCommands(step);
@@ -89,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     step = await _migrator.GetNextStepAsync(context, token);
                 }
 
-                _logger.LogInformation("Migration has completed. Please review any changes.");
+                _logger.LogInformation("Upgrade has completed. Please review any changes.");
             }
             finally
             {
@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        private void ShowMigrationSteps(IEnumerable<MigrationStep> steps, IMigrationContext context, MigrationStep? currentStep = null, int offset = 0)
+        private void ShowUpgradeSteps(IEnumerable<UpgradeStep> steps, IUpgradeContext context, UpgradeStep? currentStep = null, int offset = 0)
         {
             if (steps is null || !steps.Any())
             {
@@ -112,7 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             if (offset == 0)
             {
                 _io.Output.WriteLine();
-                _io.Output.WriteLine("Migration Steps");
+                _io.Output.WriteLine("Upgrade Steps");
                 _io.Output.WriteLine();
 
                 var displayedProjectInfo = false;
@@ -147,29 +147,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 // (since that would mean future steps shouldn't show "[Next step]")
                 WriteStepStatus(step, step == currentStep);
                 _io.Output.WriteLine(step.Title);
-                nextStepFound = nextStepFound || step.Status != MigrationStepStatus.Complete;
+                nextStepFound = nextStepFound || step.Status != UpgradeStepStatus.Complete;
 
-                ShowMigrationSteps(step.SubSteps, context, currentStep, offset + 1);
+                ShowUpgradeSteps(step.SubSteps, context, currentStep, offset + 1);
             }
         }
 
-        private void WriteStepStatus(MigrationStep step, bool isNextStep)
+        private void WriteStepStatus(UpgradeStep step, bool isNextStep)
         {
             switch (step.Status)
             {
-                case MigrationStepStatus.Complete:
+                case UpgradeStepStatus.Complete:
                     Console.ForegroundColor = ConsoleColor.Green;
                     _io.Output.Write("[Complete] ");
                     break;
-                case MigrationStepStatus.Failed:
+                case UpgradeStepStatus.Failed:
                     Console.ForegroundColor = ConsoleColor.Red;
                     _io.Output.Write("[Failed] ");
                     break;
-                case MigrationStepStatus.Skipped:
+                case UpgradeStepStatus.Skipped:
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
                     _io.Output.Write("[Skipped] ");
                     break;
-                case MigrationStepStatus.Incomplete:
+                case UpgradeStepStatus.Incomplete:
                     if (isNextStep)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;

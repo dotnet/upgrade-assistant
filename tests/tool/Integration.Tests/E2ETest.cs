@@ -18,7 +18,7 @@ namespace Integration.Tests
         private const string IntegrationTestAssetsPath = "IntegrationScenarios";
         private const string CommandsFileName = "Commands.txt";
         private const string OriginalProjectSubDir = "Original";
-        private const string MigratedProjectSubDir = "Migrated";
+        private const string UpgradedProjectSubDir = "Upgraded";
 
         private static readonly string[] DirsToIgnore = new[] { "bin", "obj" };
 
@@ -29,7 +29,7 @@ namespace Integration.Tests
 
         [InlineData("AspNetMvcTemplate", "TemplateMvc.csproj")]
         [Theory]
-        public async Task MigrationTest(string scenarioName, string inputFileName)
+        public async Task UpgradeTest(string scenarioName, string inputFileName)
         {
             // Create a temporary working directory
             var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -43,10 +43,10 @@ namespace Integration.Tests
                 await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
 
                 // Run migration
-                await MigrationRunner.MigrateAsync(Path.Combine(workingDir, inputFileName), Console.Out, 300).ConfigureAwait(false);
+                await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), Console.Out, 300).ConfigureAwait(false);
                 CleanupBuildArtifacts(workingDir);
 
-                await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, MigratedProjectSubDir), workingDir).ConfigureAwait(false);
+                await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
             }
             finally
             {

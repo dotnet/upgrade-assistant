@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Cli.Commands;
-using Microsoft.DotNet.UpgradeAssistant.Migrator.Commands;
+using Microsoft.DotNet.UpgradeAssistant.Upgrader.Commands;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
@@ -34,14 +34,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _exit = new ExitCommand(lifetime.StopApplication);
         }
 
-        public IReadOnlyList<MigrationCommand> GetCommands(MigrationStep step)
+        public IReadOnlyList<UpgradeCommand> GetCommands(UpgradeStep step)
         {
             if (step is null)
             {
                 throw new ArgumentNullException(nameof(step));
             }
 
-            return new List<MigrationCommand>(step.Commands)
+            return new List<UpgradeCommand>(step.Commands)
             {
                 new ApplyNextCommand(step),
                 new SkipNextCommand(step),
@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             };
         }
 
-        private Task ShowStepStatus(MigrationStep step)
+        private Task ShowStepStatus(UpgradeStep step)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             _io.Output.WriteLine(new string('-', step.Title.Length));

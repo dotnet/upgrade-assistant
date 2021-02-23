@@ -5,9 +5,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Commands
+namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Commands
 {
-    public class ExitCommand : MigrationCommand
+    public class ExitCommand : UpgradeCommand
     {
         private readonly Action _stopTheProgram;
 
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Commands
         // todo - support localization
         public override string CommandText => "Exit";
 
-        public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+        public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
         {
             _stopTheProgram();
             return Task.FromResult(true);

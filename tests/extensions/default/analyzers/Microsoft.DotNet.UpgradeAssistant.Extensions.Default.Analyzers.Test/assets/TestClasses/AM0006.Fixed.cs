@@ -1,5 +1,5 @@
 ﻿using System.Web;
-using AspNetMigration;
+using AspNetUpgrade;
 using System.Diagnostics;
 
 namespace TestProject.TestClasses

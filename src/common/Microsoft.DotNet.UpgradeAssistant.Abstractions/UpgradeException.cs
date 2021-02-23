@@ -5,18 +5,18 @@ using System;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class MigrationException : Exception
+    public class UpgradeException : Exception
     {
-        public MigrationException()
+        public UpgradeException()
         {
         }
 
-        public MigrationException(string message)
+        public UpgradeException(string message)
             : base(message)
         {
         }
 
-        public MigrationException(string message, Exception innerException)
+        public UpgradeException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

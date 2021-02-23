@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public abstract class MigrationCommand
+    public abstract class UpgradeCommand
     {
         /// <summary>
         /// A command that can be executed.
         /// </summary>
-        public abstract Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token);
+        public abstract Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token);
 
         /// <summary>
         /// Gets the text displayed to the user from the REPL (e.g. Set Backup Path).
@@ -23,33 +23,33 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public bool IsEnabled { get; init; } = true;
 
-        public static MigrationCommand Create(string text, bool isEnabled = true)
+        public static UpgradeCommand Create(string text, bool isEnabled = true)
             => Create(text, (_, __) => Task.FromResult(true), isEnabled);
 
-        public static MigrationCommand Create(string text, Action execute, bool isEnabled = true)
-            => new DelegateMigrationCommand(text, (_, __) =>
+        public static UpgradeCommand Create(string text, Action execute, bool isEnabled = true)
+            => new DelegateUpgradeCommand(text, (_, __) =>
             {
                 execute();
                 return Task.FromResult(true);
             })
             { IsEnabled = isEnabled };
 
-        public static MigrationCommand Create(string text, Func<IMigrationContext, CancellationToken, Task<bool>> execute, bool isEnabled = true)
-            => new DelegateMigrationCommand(text, execute) { IsEnabled = isEnabled };
+        public static UpgradeCommand Create(string text, Func<IUpgradeContext, CancellationToken, Task<bool>> execute, bool isEnabled = true)
+            => new DelegateUpgradeCommand(text, execute) { IsEnabled = isEnabled };
 
-        public static IEnumerable<MigrationCommand<T>> CreateFromEnum<T>()
+        public static IEnumerable<UpgradeCommand<T>> CreateFromEnum<T>()
             where T : struct, Enum
             => Enum.GetValues<T>()
-                .Select(t => new EnumMigrationCommand<T>
+                .Select(t => new EnumUpgradeCommand<T>
                 {
                     Value = t,
                 });
 
-        private class DelegateMigrationCommand : MigrationCommand
+        private class DelegateUpgradeCommand : UpgradeCommand
         {
-            private readonly Func<IMigrationContext, CancellationToken, Task<bool>> _execute;
+            private readonly Func<IUpgradeContext, CancellationToken, Task<bool>> _execute;
 
-            public DelegateMigrationCommand(string text, Func<IMigrationContext, CancellationToken, Task<bool>> execute)
+            public DelegateUpgradeCommand(string text, Func<IUpgradeContext, CancellationToken, Task<bool>> execute)
             {
                 _execute = execute;
                 CommandText = text;
@@ -57,16 +57,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             public override string CommandText { get; }
 
-            public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+            public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
                 => _execute(context, token);
         }
 
-        private class EnumMigrationCommand<TEnum> : MigrationCommand<TEnum>
+        private class EnumUpgradeCommand<TEnum> : UpgradeCommand<TEnum>
             where TEnum : Enum
         {
             public override string CommandText => Value.ToString();
 
-            public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+            public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
                 => Task.FromResult(true);
         }
     }

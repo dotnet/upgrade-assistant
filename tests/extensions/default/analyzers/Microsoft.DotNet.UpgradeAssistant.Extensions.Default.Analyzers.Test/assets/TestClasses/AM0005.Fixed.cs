@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web;
-using AspNetMigration;
+using AspNetUpgrade;
 
 namespace TestProject.TestClasses
 {

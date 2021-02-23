@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static IServiceCollection AddConfigUpdaterStep(this IServiceCollection services)
         {
-            services.AddScoped<MigrationStep, ConfigUpdaterStep>();
+            services.AddScoped<UpgradeStep, ConfigUpdaterStep>();
 
             // Register config updater options from the aggregate extension so that other
             // extensions have an opportunity to add their own config file paths.

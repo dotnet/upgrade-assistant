@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     /// <summary>
     /// Base class analyzer for identifying usage of APIs that should be replaced with other APIs.
     /// </summary>
-    public abstract class IdentifierMigrationAnalyzer : DiagnosticAnalyzer
+    public abstract class IdentifierUpgradeAnalyzer : DiagnosticAnalyzer
     {
         public const string NewIdentifierKey = "NewIdentifier";
 

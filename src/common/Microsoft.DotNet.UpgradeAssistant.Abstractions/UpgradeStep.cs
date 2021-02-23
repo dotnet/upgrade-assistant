@@ -10,21 +10,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public abstract class MigrationStep
+    public abstract class UpgradeStep
     {
-        private bool Initialized => Status != MigrationStepStatus.Unknown;
+        private bool Initialized => Status != UpgradeStepStatus.Unknown;
 
         protected ILogger Logger { get; }
 
         protected string? ProjectInitializedAgainst { get; set; }
 
-        public MigrationStep(ILogger logger)
+        public UpgradeStep(ILogger logger)
         {
             Logger = logger;
-            Commands = new List<MigrationCommand>();
+            Commands = new List<UpgradeCommand>();
             ProjectInitializedAgainst = null;
 
-            Status = MigrationStepStatus.Unknown;
+            Status = UpgradeStepStatus.Unknown;
             StatusDetails = string.Empty;
             Risk = BuildBreakRisk.Unknown;
         }
@@ -47,17 +47,17 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets or sets the migration step (if any) that this migration step is a sub-step of.
         /// </summary>
-        public virtual MigrationStep? ParentStep { get; protected set; }
+        public virtual UpgradeStep? ParentStep { get; protected set; }
 
         /// <summary>
         /// Gets or sets migration step-specific commands that the user can choose from in addition to the migrator's default commands.
         /// </summary>
-        public virtual List<MigrationCommand> Commands { get; set; }
+        public virtual List<UpgradeCommand> Commands { get; set; }
 
         /// <summary>
         /// Gets or sets the migration steps that are sub-steps of this migration step. SubSteps are executed as part of executing the parent step.
         /// </summary>
-        public virtual IEnumerable<MigrationStep> SubSteps { get; protected set; } = Enumerable.Empty<MigrationStep>();
+        public virtual IEnumerable<UpgradeStep> SubSteps { get; protected set; } = Enumerable.Empty<UpgradeStep>();
 
         /// <summary>
         /// Gets the IDs of migration steps that must run before this migration step executes. 'DependsOn' steps are not children or parents (in that the steps don't contain one another). Instead, these are separate migration steps that must execute before this migration step can execute.
@@ -72,7 +72,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets the migration step's execution status.
         /// </summary>
-        public MigrationStepStatus Status { get; private set; }
+        public UpgradeStepStatus Status { get; private set; }
 
         /// <summary>
         /// Gets the risk that executing the migration step will introduce a build break.
@@ -84,8 +84,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         public bool IsDone => Status switch
         {
-            MigrationStepStatus.Complete => true,
-            MigrationStepStatus.Skipped => true,
+            UpgradeStepStatus.Complete => true,
+            UpgradeStepStatus.Skipped => true,
             _ => false,
         };
 
@@ -103,22 +103,22 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="context">The migration context to evaluate.</param>
         /// <returns>True if the migration step makes sense to evaluate and display for the given context, false otherwise.</returns>
-        protected abstract bool IsApplicableImpl(IMigrationContext context);
+        protected abstract bool IsApplicableImpl(IUpgradeContext context);
 
         /// <summary>
         /// Implementers should use this method to initialize Status and any other state needed.
         /// </summary>
-        protected abstract Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token);
+        protected abstract Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token);
 
         /// <summary>
         /// Implementers should use this method to apply the migration step and return updated status and status details.
         /// </summary>
-        protected abstract Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token);
+        protected abstract Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token);
 
         /// <summary>
         /// Initialize the migration step, including checking whether it is already complete and setting up necessary internal state.
         /// </summary>
-        public virtual async Task InitializeAsync(IMigrationContext context, CancellationToken token)
+        public virtual async Task InitializeAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -136,7 +136,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
             catch (Exception e)
             {
-                (Status, StatusDetails) = (MigrationStepStatus.Failed, "Unexpected error initializing step.");
+                (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error initializing step.");
                 Logger.LogError(e, "Unexpected error initializing step");
             }
         }
@@ -145,7 +145,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// Apply migration and update Status as necessary.
         /// </summary>
         /// <returns>True if the migration step was successfully applied or false if migration failed.</returns>
-        public virtual async Task<bool> ApplyAsync(IMigrationContext context, CancellationToken token)
+        public virtual async Task<bool> ApplyAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -154,10 +154,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             if (!Initialized)
             {
-                throw new InvalidOperationException("Migration steps must be initialized before they are applied");
+                throw new InvalidOperationException("Upgrade steps must be initialized before they are applied");
             }
 
-            if (Status == MigrationStepStatus.Complete)
+            if (Status == UpgradeStepStatus.Complete)
             {
                 return true;
             }
@@ -168,14 +168,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 (Status, StatusDetails) = await ApplyImplAsync(context, token).ConfigureAwait(false);
 
-                if (Status == MigrationStepStatus.Complete)
+                if (Status == UpgradeStepStatus.Complete)
                 {
-                    Logger.LogInformation("Migration step {StepTitle} applied successfully", Title);
+                    Logger.LogInformation("Upgrade step {StepTitle} applied successfully", Title);
                     return true;
                 }
                 else
                 {
-                    Logger.LogWarning("Migration step {StepTitle} failed: {Status}: {StatusDetail}", Title, Status, StatusDetails);
+                    Logger.LogWarning("Upgrade step {StepTitle} failed: {Status}: {StatusDetail}", Title, Status, StatusDetails);
                     return false;
                 }
             }
@@ -185,7 +185,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
             catch (Exception e)
             {
-                (Status, StatusDetails) = (MigrationStepStatus.Failed, "Unexpected error applying step.");
+                (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error applying step.");
                 Logger.LogError(e, "Unexpected error applying step");
                 return false;
             }
@@ -198,7 +198,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="context">The migration context to evaluate.</param>
         /// <returns>True if the migration step makes sense to evaluate and display for the given context, false otherwise.</returns>
-        public virtual bool IsApplicable(IMigrationContext context)
+        public virtual bool IsApplicable(IUpgradeContext context)
         {
             if (context is null)
             {
@@ -210,7 +210,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             // If the migration step applies, but it was previously initialized against a sufficiently different context, reset
             if (ret && Initialized && ShouldReset(context))
             {
-                Logger.LogDebug("Resetting migration step {MigrationStep} because migration context has changed significantly since it was initialized", Id);
+                Logger.LogDebug("Resetting migration step {UpgradeStep} because migration context has changed significantly since it was initialized", Id);
                 Reset();
             }
 
@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="context">The migration context to evaluate.</param>
         /// <returns>True if the migration step should reset its status, otherwise false.</returns>
-        protected virtual bool ShouldReset(IMigrationContext context)
+        protected virtual bool ShouldReset(IUpgradeContext context)
         {
             if (context is null)
             {
@@ -248,9 +248,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Resets migration step status as if the step had not yet been initialized or applied. Useful for re-running a migration step when migration context changes.
         /// </summary>
-        public virtual MigrationStepInitializeResult Reset()
+        public virtual UpgradeStepInitializeResult Reset()
         {
-            Status = MigrationStepStatus.Unknown;
+            Status = UpgradeStepStatus.Unknown;
             StatusDetails = string.Empty;
             Risk = BuildBreakRisk.Unknown;
             ProjectInitializedAgainst = null;
@@ -260,7 +260,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 subStep.Reset();
             }
 
-            return new MigrationStepInitializeResult(Status, StatusDetails, Risk);
+            return new UpgradeStepInitializeResult(Status, StatusDetails, Risk);
         }
 
         /// <summary>
@@ -273,8 +273,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             // I've implemented it this way for now, though, to match ApplyAsync in case inheritors
             // want to change the behavior.
             Logger.LogInformation("Skipping migration step {StepTitle}", Title);
-            (Status, StatusDetails) = (MigrationStepStatus.Skipped, "Step skipped");
-            Logger.LogInformation("Migration step {StepTitle} skipped", Title);
+            (Status, StatusDetails) = (UpgradeStepStatus.Skipped, "Step skipped");
+            Logger.LogInformation("Upgrade step {StepTitle} skipped", Title);
             return Task.FromResult(true);
         }
     }

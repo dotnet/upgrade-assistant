@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     public class UsingSystemWebAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "AM0001";
-        private const string Category = "Migration";
+        private const string Category = "Upgrade";
         private static readonly string[] DisallowedNamespaces = new[] { "System.Web", "Microsoft.AspNet", "Microsoft.Owin", "Owin" };
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.UsingSystemWebTitle), Resources.ResourceManager, typeof(Resources));

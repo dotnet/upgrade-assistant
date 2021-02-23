@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
-    public class EntrypointSelectionStep : MigrationStep
+    public class EntrypointSelectionStep : UpgradeStep
     {
         private readonly IPackageRestorer _restorer;
         private readonly IUserInput _userInput;
@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override string Description => "The entrypoint is the application you run or the library that is to be upgraded. Dependencies will then be analyzed and a recommended process will then be determined";
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -41,21 +41,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (selectedProject is null)
             {
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "No project was selected.");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "No project was selected.");
             }
             else
             {
                 context.SetEntryPoint(selectedProject);
                 await _restorer.RestorePackagesAsync(context, selectedProject, token);
 
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
             => Task.FromResult(InitializeImpl(context));
 
-        protected MigrationStepInitializeResult InitializeImpl(IMigrationContext context)
+        protected UpgradeStepInitializeResult InitializeImpl(IUpgradeContext context)
         {
             if (context is null)
             {
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (context.EntryPoint is not null)
             {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
             }
 
             var projects = context.Projects.ToList();
@@ -76,13 +76,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
                 Logger.LogInformation("Setting entrypoint to only project in solution: {Project}", project.FilePath);
 
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
 
-            return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
+            return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
         }
 
-        private async ValueTask<IProject> GetEntrypointAsync(IMigrationContext context, CancellationToken token)
+        private async ValueTask<IProject> GetEntrypointAsync(IUpgradeContext context, CancellationToken token)
         {
             const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
 
@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             return result.Project;
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context)
+        protected override bool IsApplicableImpl(IUpgradeContext context)
             => context.EntryPoint is null && !context.IsComplete;
     }
 }

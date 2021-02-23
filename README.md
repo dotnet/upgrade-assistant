@@ -239,6 +239,6 @@ Concepts referred to in this repository which may have unclear meaning are expla
 
 | Name    | Description |
 |---------|-------------|
-| Step    | A step can define commands that can perform actions on the project. Each step implements `MigrationStep`. The migration process comprises a series of steps that are visited in turn. Examples include the 'Update package versions step' or the 'Project backup step'|
+| Step    | A step can define commands that can perform actions on the project. Each step implements `UpgradeStep`. The migration process comprises a series of steps that are visited in turn. Examples include the 'Update package versions step' or the 'Project backup step'|
 | Command | A command is an action that can be invoked by a user. Examples include a command to apply the current step or a command to change the backup location.|
 | Project Components | AppModel-specific components that a project may depend on. The most common are `WindowsDesktop` components (for WPF and WinForms scenarios) and `Web` (for ASP.NET scenarios) |

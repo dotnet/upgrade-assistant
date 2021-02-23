@@ -3,7 +3,7 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public enum MigrationStepStatus
+    public enum UpgradeStepStatus
     {
         /// <summary>
         /// A migration step in an unknown state, possibly uninitialized.

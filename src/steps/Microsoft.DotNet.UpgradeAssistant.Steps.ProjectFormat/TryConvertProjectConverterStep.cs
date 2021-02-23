@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
-    public class TryConvertProjectConverterStep : MigrationStep
+    public class TryConvertProjectConverterStep : UpgradeStep
     {
         private readonly ITryConvertTool _runner;
         private readonly IPackageRestorer _restorer;
@@ -41,9 +41,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
 
-        protected async override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected async override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return result;
         }
 
-        private async Task<MigrationStepApplyResult> RunTryConvertAsync(IMigrationContext context, IProject project, CancellationToken token)
+        private async Task<UpgradeStepApplyResult> RunTryConvertAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
             Logger.LogInformation("Converting project file format with try-convert");
 
@@ -70,19 +70,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             if (!result)
             {
                 Logger.LogCritical("Conversion with try-convert failed. Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.");
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Conversion with try-convert failed.");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Conversion with try-convert failed.");
             }
             else
             {
                 Logger.LogInformation("Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.");
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Project file converted successfully");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Project file converted successfully");
             }
         }
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
             => Task.FromResult(InitializeImpl(context));
 
-        private MigrationStepInitializeResult InitializeImpl(IMigrationContext context)
+        private UpgradeStepInitializeResult InitializeImpl(IUpgradeContext context)
         {
             if (context is null)
             {
@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             if (!_runner.IsAvailable)
             {
                 Logger.LogCritical("Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert", BuildBreakRisk.Unknown);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert", BuildBreakRisk.Unknown);
             }
 
             var projectFile = project.GetFile();
@@ -105,21 +105,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 if (!projectFile.IsSdk)
                 {
                     Logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
-                    return new MigrationStepInitializeResult(
-                        MigrationStepStatus.Incomplete,
+                    return new UpgradeStepInitializeResult(
+                        UpgradeStepStatus.Incomplete,
                         $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project: {_runner.GetCommandLine(project)}",
                         (project.Components & ProjectComponents.Web) == ProjectComponents.Web ? BuildBreakRisk.High : BuildBreakRisk.Medium);
                 }
                 else
                 {
                     Logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.Sdk);
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
                 }
             }
             catch (Exception exc)
             {
                 Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectFile.FilePath, exc.ToString());
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
             }
         }
     }

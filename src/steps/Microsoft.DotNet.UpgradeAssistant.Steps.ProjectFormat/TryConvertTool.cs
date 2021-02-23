@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         public string GetCommandLine(IProject project)
             => Invariant($"{Path} {GetArguments(project)}");
 
-        public Task<bool> RunAsync(IMigrationContext context, IProject project, CancellationToken token)
+        public Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token)
             => _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = Path,

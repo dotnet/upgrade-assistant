@@ -15,10 +15,10 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     /// <summary>
-    /// Migration step that addresses a particular migration diagnostic with a Roslyn code fixer.
+    /// Upgrade step that addresses a particular migration diagnostic with a Roslyn code fixer.
     /// Meant to be used as a sub-step of SourceUpdaterStep.
     /// </summary>
-    public class CodeFixerStep : MigrationStep
+    public class CodeFixerStep : UpgradeStep
     {
         // This stores a reference to the parent source updater step, which will have all the diagnostics for the project.
         private readonly SourceUpdaterStep _sourceUpdater;
@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override string Title { get; }
 
-        public CodeFixerStep(MigrationStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, ILogger logger)
+        public CodeFixerStep(UpgradeStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, ILogger logger)
             : base(logger)
         {
             if (logger is null)
@@ -56,19 +56,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             Logger.LogDebug("Identified {DiagnosticCount} fixable {DiagnosticId} diagnostics", Diagnostics.Count(), DiagnosticId);
 
             // This migration step is incomplete if any diagnostics it can fix remain
             return Diagnostics.Any() ?
-                Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} {DiagnosticId} diagnostics need fixed", BuildBreakRisk.Low)) :
-                Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, string.Empty, BuildBreakRisk.None));
+                Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{Diagnostics.Count()} {DiagnosticId} diagnostics need fixed", BuildBreakRisk.Low)) :
+                Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None));
         }
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             if (_sourceUpdater.Project is null)
             {
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "No project available.");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "No project available.");
             }
 
             // Regenerating diagnostics is slow for large projects, but is necessary in between fixing multiple diagnostics
@@ -95,12 +95,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                     if (updatedSolution is null)
                     {
                         Logger.LogError("Failed to fix diagnostic {DiagnosticId} in {FilePath}", diagnostic.Id, doc.FilePath);
-                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}");
+                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}");
                     }
                     else if (!context.UpdateSolution(updatedSolution))
                     {
                         Logger.LogError("Failed to apply changes after fixing {DiagnosticId} to {FilePath}", diagnostic.Id, doc.FilePath);
-                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}");
+                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}");
                     }
                     else
                     {
@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             Logger.LogDebug("All instances of {DiagnosticId} fixed", DiagnosticId);
-            return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
 
         private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
