@@ -18,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public int SuccessCode { get; init; }
 
+        public bool Quiet { get; init; }
+
         public IEnumerable<KeyValuePair<string, string>> EnvironmentVariables { get; init; } = Enumerable.Empty<KeyValuePair<string, string>>();
 
         public Func<string, bool> IsErrorFilter { get; init; } = _ => false;
