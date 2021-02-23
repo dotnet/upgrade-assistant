@@ -64,7 +64,7 @@ Full usage information:
 
 ```
 Usage:
-  dotnet-upgrade-assistant [options] <project>
+  dotnet upgrade-assistant [options] <project>
 
 Arguments:
   <project>
