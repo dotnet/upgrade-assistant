@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
-    internal class ProjectCommand : MigrationCommand
+    internal class ProjectCommand : UpgradeCommand
     {
         public static ProjectCommand Create(IProject project) => new(project, false);
 
@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public IProject Project { get; }
 
-        public override Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+        public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
             => Task.FromResult(true);
     }
 }

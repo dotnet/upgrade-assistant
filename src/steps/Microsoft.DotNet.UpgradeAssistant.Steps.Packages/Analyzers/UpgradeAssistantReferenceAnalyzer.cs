@@ -31,8 +31,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
-            _analyzerPackageVersion = updaterOptions.Value.MigrationAnalyzersPackageVersion;
+            _analyzerPackageSource = updaterOptions.Value.UpgradeAnalyzersPackageSource;
+            _analyzerPackageVersion = updaterOptions.Value.UpgradeAnalyzersPackageVersion;
         }
 
         public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)

@@ -18,13 +18,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private readonly ILogger _logger;
 
-        public MSBuildWorkspaceMigrationContext Context { get; }
+        public MSBuildWorkspaceUpgradeContext Context { get; }
 
         public string FilePath { get; }
 
         public string Directory => Path.GetDirectoryName(FilePath)!;
 
-        public MSBuildProject(MSBuildWorkspaceMigrationContext context, string path, ILogger logger)
+        public MSBuildProject(MSBuildWorkspaceUpgradeContext context, string path, ILogger logger)
         {
             FilePath = path;
             Context = context;

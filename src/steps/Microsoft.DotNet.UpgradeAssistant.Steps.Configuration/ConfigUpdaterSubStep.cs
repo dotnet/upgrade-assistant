@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
-    public class ConfigUpdaterSubStep : MigrationStep
+    public class ConfigUpdaterSubStep : UpgradeStep
     {
         private readonly ConfigUpdaterStep _parentStep;
         private readonly IConfigUpdater _configUpdater;
@@ -20,16 +20,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         public override string Title => _configUpdater.Title;
 
-        public ConfigUpdaterSubStep(MigrationStep parentStep, IConfigUpdater configUpdater, ILogger logger)
+        public ConfigUpdaterSubStep(UpgradeStep parentStep, IConfigUpdater configUpdater, ILogger logger)
             : base(logger)
         {
             _parentStep = (ParentStep = parentStep) as ConfigUpdaterStep ?? throw new ArgumentNullException(nameof(parentStep));
             _configUpdater = configUpdater ?? throw new ArgumentNullException(nameof(configUpdater));
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null && (_parentStep?.ConfigFiles.Any() ?? false);
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && (_parentStep?.ConfigFiles.Any() ?? false);
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -39,21 +39,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             try
             {
                 return await _configUpdater.ApplyAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
-                    ? new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty)
-                    : new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to apply config updater \"{_configUpdater.Title}\"");
+                    ? new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty)
+                    : new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to apply config updater \"{_configUpdater.Title}\"");
             }
             catch (Exception exc)
             {
                 Logger.LogError(exc, "Unexpected exception while apply config updater \"{ConfigUpdater}\"", _configUpdater.Title);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Unexpected exception while applying config updater \"{_configUpdater.Title}\": {exc}");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while applying config updater \"{_configUpdater.Title}\": {exc}");
             }
         }
 
-        public override async Task<bool> ApplyAsync(IMigrationContext context, CancellationToken token)
+        public override async Task<bool> ApplyAsync(IUpgradeContext context, CancellationToken token)
         {
             var result = await base.ApplyAsync(context, token).ConfigureAwait(false);
 
-            // Normally, the migrator will apply steps one at a time
+            // Normally, the upgrader will apply steps one at a time
             // at the user's instruction. In the case of parent and child steps,
             // the parent has any top-level application done after the children.
             // In the case of the ConfigUpdateStep, the parent (this step's parent)
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             return result;
         }
 
-        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -78,13 +78,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             try
             {
                 return await _configUpdater.IsApplicableAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
-                    ? new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"Config updater \"{_configUpdater.Title}\" needs applied", _configUpdater.Risk)
-                    : new MigrationStepInitializeResult(MigrationStepStatus.Complete, string.Empty, BuildBreakRisk.None);
+                    ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Config updater \"{_configUpdater.Title}\" needs applied", _configUpdater.Risk)
+                    : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }
             catch (Exception exc)
             {
                 Logger.LogError(exc, "Unexpected exception while initializing config updater \"{ConfigUpdater}\"", _configUpdater.Title);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Unexpected exception while initializing config updater \"{_configUpdater.Title}\": {exc}", Risk);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception while initializing config updater \"{_configUpdater.Title}\": {exc}", Risk);
             }
         }
     }

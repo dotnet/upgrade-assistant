@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _runner = runner;
         }
 
-        public async Task<RestoreOutput> RestorePackagesAsync(IMigrationContext context, IProject project, CancellationToken token)
+        public async Task<RestoreOutput> RestorePackagesAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
             if (context is null)
             {
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return new RestoreOutput(lockFilePath, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
         }
 
-        private Task<bool> RunRestoreAsync(IMigrationContext context, string path, CancellationToken token)
+        private Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token)
         {
             // Run `dotnet restore` using quiet mode since some warnings and errors are
             // expected. As long as a lock file is produced (which is checked elsewhere),

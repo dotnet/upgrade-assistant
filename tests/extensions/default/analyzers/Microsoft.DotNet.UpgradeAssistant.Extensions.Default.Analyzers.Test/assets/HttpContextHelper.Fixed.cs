@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace AspNetMigration
+namespace AspNetUpgrade
 {
     public static class HttpContextHelper
     {

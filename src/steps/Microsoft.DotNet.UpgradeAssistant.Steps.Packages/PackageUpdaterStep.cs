@@ -13,8 +13,8 @@ using NuGet.Configuration;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     /// <summary>
-    /// Migration step that updates NuGet package references
-    /// to better work after migration. Packages references are
+    /// Upgrade step that updates NuGet package references
+    /// to better work after upgrade. Packages references are
     /// updated if the reference appears to be transitive (with
     /// SDK style projects, only top-level dependencies are necessary
     /// in the project file), if the package version doesn't
@@ -22,12 +22,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     /// or if the package is explicitly mapped to an updated
     /// NuGet package in a mapping configuration file.
     /// </summary>
-    public class PackageUpdaterStep : MigrationStep
+    public class PackageUpdaterStep : UpgradeStep
     {
         private const int MaxAnalysisIterations = 3;
 
         private readonly string? _analyzerPackageSource;
-        private readonly MigrateOptions _options;
+        private readonly UpgradeOptions _options;
         private readonly ITargetTFMSelector _tfmSelector;
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         };
 
         public PackageUpdaterStep(
-            MigrateOptions options,
+            UpgradeOptions options,
             IOptions<PackageUpdaterOptions> updaterOptions,
             ITargetTFMSelector tfmSelector,
             IPackageLoader packageLoader,
@@ -83,13 +83,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
-            _analyzerPackageSource = updaterOptions.Value.MigrationAnalyzersPackageSource;
+            _analyzerPackageSource = updaterOptions.Value.UpgradeAnalyzersPackageSource;
             _analysisState = null;
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
 
-        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -100,19 +100,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             {
                 if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
                 {
-                    return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
             }
             catch (Exception)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
-                return new MigrationStepInitializeResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
             }
 
             if (_analysisState is null || !_analysisState.ChangesRecommended)
             {
                 Logger.LogInformation("No package updates needed");
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
             }
             else
             {
@@ -126,11 +126,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogInformation($"Packages to be addded:\n{string.Join('\n', _analysisState.PackagesToAdd.Distinct())}");
                 }
 
-                return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{_analysisState.PackagesToRemove.Distinct().Count()} packages need removed and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analysisState.PackagesToRemove.Distinct().Count()} packages need removed and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
             }
         }
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             var project = context.CurrentProject.Required();
 
-            // TODO : Temporary workaround until the migration analyzers are available on NuGet.org
+            // TODO : Temporary workaround until the upgrade analyzers are available on NuGet.org
             // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
             if (_analyzerPackageSource is not null && !_packageLoader.PackageSources.Contains(_analyzerPackageSource))
             {
@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 var localNuGetSettings = new Settings(_options.Project.DirectoryName);
 
                 // Add the analyzer package's source to the config file's sources
-                localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("migrationAnalyzerSource", _analyzerPackageSource));
+                localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("upgradeAnalyzerSource", _analyzerPackageSource));
                 localNuGetSettings.SaveToDisk();
             }
 
@@ -161,7 +161,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     if (count >= MaxAnalysisIterations)
                     {
                         Logger.LogError("Maximum package analysis and update iterations reached. Review NuGet dependencies manually");
-                        return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Maximum package analysis and update iterations reached");
+                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Maximum package analysis and update iterations reached");
                     }
 
                     if (_analysisState is not null)
@@ -175,22 +175,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
                         if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
                         {
-                            return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Package analysis failed");
+                            return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
                         }
                     }
                 }
                 while (_analysisState is not null && _analysisState.ChangesRecommended);
 
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Packages updated");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
             }
             catch (Exception)
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}");
             }
         }
 
-        private async Task<bool> RunPackageAnalyzersAsync(IMigrationContext context, CancellationToken token)
+        private async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, CancellationToken token)
         {
             _analysisState = await PackageAnalysisState.CreateAsync(context, _tfmSelector, _packageRestorer, token).ConfigureAwait(false);
             var projectRoot = context.CurrentProject;

@@ -12,8 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public static OptionsBuilder<TryConvertProjectConverterStepOptions> AddProjectFormatSteps(this IServiceCollection services)
         {
-            services.AddScoped<MigrationStep, SetTFMStep>();
-            services.AddScoped<MigrationStep, TryConvertProjectConverterStep>();
+            services.AddScoped<UpgradeStep, SetTFMStep>();
+            services.AddScoped<UpgradeStep, TryConvertProjectConverterStep>();
             services.AddSingleton<ITryConvertTool, TryConvertTool>();
             services.AddTransient<ISectionGenerator, TryConvertReport>();
 

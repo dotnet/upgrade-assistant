@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     _lifetime.StopApplication();
                 }
             }
-            catch (MigrationException e)
+            catch (UpgradeException e)
             {
                 _logger.LogError("Unexpected error: {Message}", e.Message);
             }
@@ -60,13 +60,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private async Task RunStartupAsync(CancellationToken token)
         {
             using var scope = _services.CreateScope();
-            var startups = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationStartup>>();
+            var startups = scope.ServiceProvider.GetRequiredService<IEnumerable<IUpgradeStartup>>();
 
             foreach (var startup in startups)
             {
                 if (!await startup.StartupAsync(token))
                 {
-                    throw new MigrationException($"Failure running start up action {startup.GetType().FullName}");
+                    throw new UpgradeException($"Failure running start up action {startup.GetType().FullName}");
                 }
             }
         }

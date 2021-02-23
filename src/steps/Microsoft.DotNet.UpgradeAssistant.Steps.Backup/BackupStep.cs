@@ -10,9 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 {
-    public class BackupStep : MigrationStep
+    public class BackupStep : UpgradeStep
     {
-        private const string FlagFileName = "migration.backup";
+        private const string FlagFileName = "upgrade.backup";
 
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
-        public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, IUserInput userInput)
+        public BackupStep(UpgradeOptions options, ILogger<BackupStep> logger, IUserInput userInput)
             : base(logger)
         {
             _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));
@@ -45,9 +45,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         }
 
         // The backup step backs up at the project level, so it doesn't apply if no project is selected
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -59,32 +59,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             if (_skipBackup)
             {
-                Logger.LogDebug("Backup migration step initalized as complete (backup skipped)");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
+                Logger.LogDebug("Backup upgrade step initalized as complete (backup skipped)");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
             else if (_backupPath is null)
             {
                 Logger.LogDebug("No backup path specified");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
             }
             else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
             {
-                Logger.LogDebug("Backup migration step initalized as complete (already done)");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
+                Logger.LogDebug("Backup upgrade step initalized as complete (already done)");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
             }
             else
             {
-                Logger.LogDebug("Backup migration step initialized as incomplete");
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
+                Logger.LogDebug("Backup upgrade step initialized as incomplete");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
             }
         }
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (_skipBackup)
             {
                 Logger.LogInformation("Skipping backup");
-                return new MigrationStepApplyResult(MigrationStepStatus.Skipped, "Backup skipped");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, "Backup skipped");
             }
 
             var backupPath = await ChooseBackupPath(context, token);
@@ -92,19 +92,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             if (backupPath is null)
             {
                 Logger.LogDebug("No backup path specified");
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a backup location");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location");
             }
 
             if (_projectDir is null)
             {
                 Logger.LogDebug("No project specified");
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "Backup step cannot be applied without a valid project selected");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a valid project selected");
             }
 
-            if (Status == MigrationStepStatus.Complete)
+            if (Status == UpgradeStepStatus.Complete)
             {
                 Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", backupPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Existing backup found");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Existing backup found");
             }
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, backupPath);
@@ -114,35 +114,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 if (!Directory.Exists(backupPath))
                 {
                     Logger.LogError("Failed to create backup directory ({BackupPath})", backupPath);
-                    return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Failed to create backup directory {backupPath}");
+                    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to create backup directory {backupPath}");
                 }
 
                 await CopyDirectoryAsync(_projectDir, backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
                 await File.WriteAllTextAsync(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
                 Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, "Backup completed successfully");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Backup completed successfully");
             }
             catch (IOException exc)
             {
                 Logger.LogError("Unexpected exception while creating backup: {Exception}", exc);
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, $"Unexpected exception while creating backup");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while creating backup");
             }
         }
 
-        public override MigrationStepInitializeResult Reset()
+        public override UpgradeStepInitializeResult Reset()
         {
             _backupPath = null;
             return base.Reset();
         }
 
-        private async Task<string?> ChooseBackupPath(IMigrationContext context, CancellationToken token)
+        private async Task<string?> ChooseBackupPath(IUpgradeContext context, CancellationToken token)
         {
             var customPath = default(string);
             var commands = new[]
             {
-                MigrationCommand.Create($"Use default path [{_backupPath}]"),
-                MigrationCommand.Create("Enter custom path", async (ctx, token) =>
+                UpgradeCommand.Create($"Use default path [{_backupPath}]"),
+                UpgradeCommand.Create("Enter custom path", async (ctx, token) =>
                 {
                     customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:");
                     return !string.IsNullOrEmpty(customPath);

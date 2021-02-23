@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
-    internal class FinalizeSolutionStep : MigrationStep
+    internal class FinalizeSolutionStep : UpgradeStep
     {
         public FinalizeSolutionStep(ILogger<FinalizeSolutionStep> logger)
             : base(logger)
@@ -26,26 +26,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override string Description => "All projects have been upgraded. Please review any changes and test accordingly.";
 
-        protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             context.IsComplete = true;
             context.SetEntryPoint(null);
-            return Task.FromResult(new MigrationStepApplyResult(MigrationStepStatus.Complete, "Complete solution"));
+            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Complete solution"));
         }
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context.IsComplete)
             {
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Solution completed", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Solution completed", BuildBreakRisk.None));
             }
             else
             {
-                return Task.FromResult(new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "Complete solution", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Complete solution", BuildBreakRisk.None));
             }
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context)
+        protected override bool IsApplicableImpl(IUpgradeContext context)
             => context.CurrentProject is null && context.EntryPoint is not null;
     }
 }

@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddSingleton<PackageMapProvider>();
             services.AddSingleton<IPackageLoader, PackageLoader>();
-            services.AddScoped<MigrationStep, PackageUpdaterStep>();
+            services.AddScoped<UpgradeStep, PackageUpdaterStep>();
             return services.AddOptions<PackageUpdaterOptions>();
         }
     }

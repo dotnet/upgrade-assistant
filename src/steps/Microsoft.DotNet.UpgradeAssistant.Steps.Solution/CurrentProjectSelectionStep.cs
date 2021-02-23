@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
-    public class CurrentProjectSelectionStep : MigrationStep
+    public class CurrentProjectSelectionStep : UpgradeStep
     {
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
@@ -39,15 +39,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p));
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p));
 
-        // This migration step is meant to be run fresh every time a new project needs selected
-        protected override bool ShouldReset(IMigrationContext context) => context?.CurrentProject is null && Status == MigrationStepStatus.Complete;
+        // This upgrade step is meant to be run fresh every time a new project needs selected
+        protected override bool ShouldReset(IUpgradeContext context) => context?.CurrentProject is null && Status == UpgradeStepStatus.Complete;
 
-        protected override Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
             => Task.FromResult(InitializeImpl(context));
 
-        private MigrationStepInitializeResult InitializeImpl(IMigrationContext context)
+        private UpgradeStepInitializeResult InitializeImpl(IUpgradeContext context)
         {
             if (context is null)
             {
@@ -56,14 +56,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (context.CurrentProject is not null)
             {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Current project is already selected.", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Current project is already selected.", BuildBreakRisk.None);
             }
 
             var projects = context.Projects.ToList();
 
             if (projects.All(p => IsCompleted(context, p)))
             {
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgrade", BuildBreakRisk.None);
             }
 
             if (projects.Count == 1)
@@ -73,13 +73,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
                 Logger.LogInformation("Setting only project in solution as the current project: {Project}", project.FilePath);
 
-                return new MigrationStepInitializeResult(MigrationStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
 
-            return new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
+            return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
         }
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -90,22 +90,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (selectedProject is null)
             {
-                return new MigrationStepApplyResult(MigrationStepStatus.Failed, "No project was selected.");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "No project was selected.");
             }
             else
             {
                 context.SetCurrentProject(selectedProject);
-                return new MigrationStepApplyResult(MigrationStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }
 
         // Consider a project completely upgraded if it is SDK-style and has a TFM equal to (or greater then) the expected one
-        private bool IsCompleted(IMigrationContext context, IProject project) =>
+        private bool IsCompleted(IUpgradeContext context, IProject project) =>
             project.GetFile().IsSdk && _tfmComparer.IsCompatible(project.TFM, _tfmSelector.SelectTFM(project));
 
-        private async Task<IProject> GetProject(IMigrationContext context, Func<IMigrationContext, IProject, bool> isProjectCompleted, CancellationToken token)
+        private async Task<IProject> GetProject(IUpgradeContext context, Func<IUpgradeContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {
-            const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
+            const string SelectProjectQuestion = "Here is the recommended order to upgrade. Select enter to follow this list, or input the project you want to start with.";
 
             if (context.EntryPoint is null)
             {

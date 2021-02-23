@@ -12,12 +12,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     public class ConsoleAnalyze : IAppCommand
     {
         private readonly ILogger<ConsoleAnalyze> _logger;
-        private readonly IMigrationContextFactory _factory;
+        private readonly IUpgradeContextFactory _factory;
         private readonly IReportGenerator _reportGenerator;
 
         public ConsoleAnalyze(
             ILogger<ConsoleAnalyze> logger,
-            IMigrationContextFactory factory,
+            IUpgradeContextFactory factory,
             IReportGenerator reportGenerator)
         {
             _logger = logger;

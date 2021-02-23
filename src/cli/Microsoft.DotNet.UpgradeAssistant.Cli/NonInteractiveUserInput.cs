@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         private readonly TimeSpan _waitPeriod;
 
-        public NonInteractiveUserInput(MigrateOptions options)
+        public NonInteractiveUserInput(UpgradeOptions options)
         {
             _waitPeriod = TimeSpan.FromSeconds(options.NonInteractiveWait);
         }
@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         }
 
         public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
-            where T : MigrationCommand
+            where T : UpgradeCommand
             => Task.FromResult(commands.First(c => c.IsEnabled));
 
         public async Task<bool> WaitToProceedAsync(CancellationToken token)

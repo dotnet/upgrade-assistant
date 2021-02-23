@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static IServiceCollection AddTemplateInserterStep(this IServiceCollection services)
         {
             services.AddSingleton<TemplateProvider>();
-            services.AddScoped<MigrationStep, TemplateInserterStep>();
+            services.AddScoped<UpgradeStep, TemplateInserterStep>();
             return services;
         }
     }

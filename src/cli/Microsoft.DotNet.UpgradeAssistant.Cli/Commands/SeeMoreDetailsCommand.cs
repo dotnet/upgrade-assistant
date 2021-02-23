@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 {
-    public class SeeMoreDetailsCommand : MigrationCommand
+    public class SeeMoreDetailsCommand : UpgradeCommand
     {
-        private readonly MigrationStep _step;
-        private readonly Func<MigrationStep, Task> _showDetails;
+        private readonly UpgradeStep _step;
+        private readonly Func<UpgradeStep, Task> _showDetails;
 
-        public SeeMoreDetailsCommand(MigrationStep step, Func<MigrationStep, Task> showDetails)
+        public SeeMoreDetailsCommand(UpgradeStep step, Func<UpgradeStep, Task> showDetails)
         {
             _step = step ?? throw new ArgumentNullException(nameof(step));
             _showDetails = showDetails ?? throw new ArgumentNullException(nameof(showDetails));
@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 
         public override string CommandText => "See more step details";
 
-        public override async Task<bool> ExecuteAsync(IMigrationContext context, CancellationToken token)
+        public override async Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
         {
             await _showDetails(_step).ConfigureAwait(false);
             return true;

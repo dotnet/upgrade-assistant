@@ -8,6 +8,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
     public interface IReportGenerator
     {
-        public IAsyncEnumerable<Page> Generate(IMigrationContext response, CancellationToken token);
+        public IAsyncEnumerable<Page> Generate(IUpgradeContext response, CancellationToken token);
     }
 }

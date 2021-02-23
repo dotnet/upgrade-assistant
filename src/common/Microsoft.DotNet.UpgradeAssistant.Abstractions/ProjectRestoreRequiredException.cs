@@ -5,7 +5,7 @@ using System;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class ProjectRestoreRequiredException : MigrationException
+    public class ProjectRestoreRequiredException : UpgradeException
     {
         public ProjectRestoreRequiredException()
         {

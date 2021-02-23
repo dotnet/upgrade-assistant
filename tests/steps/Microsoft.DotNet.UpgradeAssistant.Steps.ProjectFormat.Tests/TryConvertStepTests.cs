@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
 
             var step = mock.Create<TryConvertProjectConverterStep>();
 
-            var context = mock.Mock<IMigrationContext>();
+            var context = mock.Mock<IUpgradeContext>();
 
             if (isApplicable)
             {
@@ -59,13 +59,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             mock.Mock<ITryConvertTool>().Setup(m => m.IsAvailable).Returns(false);
 
             var step = mock.Create<TryConvertProjectConverterStep>();
-            var context = mock.Mock<IMigrationContext>();
+            var context = mock.Mock<IUpgradeContext>();
 
             // Act
             await step.InitializeAsync(context.Object, default);
 
             // Assert
-            Assert.Equal(MigrationStepStatus.Failed, step.Status);
+            Assert.Equal(UpgradeStepStatus.Failed, step.Status);
         }
 
         [InlineData(true)]
@@ -86,14 +86,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
 
-            var context = mock.Mock<IMigrationContext>();
+            var context = mock.Mock<IUpgradeContext>();
             context.Setup(m => m.CurrentProject).Returns(project.Object);
 
             // Act
             await step.InitializeAsync(context.Object, default);
 
             // Assert
-            var expected = isSdk ? MigrationStepStatus.Complete : MigrationStepStatus.Incomplete;
+            var expected = isSdk ? UpgradeStepStatus.Complete : UpgradeStepStatus.Incomplete;
             Assert.Equal(expected, step.Status);
         }
 
@@ -106,11 +106,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             using var mock = AutoMock.GetLoose();
 
             var step = mock.Create<TryConvertProjectConverterStep>();
-            step.SetStatus(MigrationStepStatus.Incomplete);
+            step.SetStatus(UpgradeStepStatus.Incomplete);
 
             var project = mock.Mock<IProject>();
 
-            var context = mock.Mock<IMigrationContext>();
+            var context = mock.Mock<IUpgradeContext>();
             context.Setup(m => m.CurrentProject).Returns(project.Object);
 
             mock.Mock<ITryConvertTool>().Setup(m => m.RunAsync(context.Object, project.Object, default)).ReturnsAsync(isSuccess);
@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             await step.ApplyAsync(context.Object, default);
 
             // Assert
-            var expected = isSuccess ? MigrationStepStatus.Complete : MigrationStepStatus.Failed;
+            var expected = isSuccess ? UpgradeStepStatus.Complete : UpgradeStepStatus.Failed;
             Assert.Equal(expected, step.Status);
         }
     }

@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
-    public class MSBuildRegistrationStartup : IMigrationStartup
+    public class MSBuildRegistrationStartup : IUpgradeStartup
     {
         private readonly ILogger _logger;
         private VisualStudioInstance? _msBuildInstance;
@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 if (msBuildInstances.Count == 0)
                 {
                     _logger.LogError($"No supported MSBuild found. Ensure `dotnet --list-sdks` show an install that is {ExpectedBitness}");
-                    throw new MigrationException("MSBuild not found");
+                    throw new UpgradeException("MSBuild not found");
                 }
                 else
                 {

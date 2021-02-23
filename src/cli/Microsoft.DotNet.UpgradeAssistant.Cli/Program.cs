@@ -32,15 +32,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             };
 
 #if ANALYZE_COMMAND
-            var migrateCmd = new Command("migrate");
-            ConfigureMigrateCommand(migrateCmd);
-            root.AddCommand(migrateCmd);
+            var upgradeCmd = new Command("upgrade");
+            ConfigureUpgradeCommand(upgradeCmd);
+            root.AddCommand(upgradeCmd);
 
             var analyzeCmd = new Command("analyze");
             ConfigureAnalyzeCommand(analyzeCmd);
             root.AddCommand(analyzeCmd);
 #else
-            ConfigureMigrateCommand(root);
+            ConfigureUpgradeCommand(root);
 #endif
 
             return new CommandLineBuilder(root)
@@ -56,14 +56,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        public static Task RunMigrationAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection> configure, CancellationToken token)
+        public static Task RunUpgradeAsync(UpgradeOptions options, Action<HostBuilderContext, IServiceCollection> configure, CancellationToken token)
             => RunCommandAsync(options, (ctx, services) =>
             {
-                services.AddScoped<IAppCommand, ConsoleMigrate>();
+                services.AddScoped<IAppCommand, ConsoleUpgrade>();
                 configure(ctx, services);
             }, token);
 
-        public static Task RunAnalysisAsync(MigrateOptions options)
+        public static Task RunAnalysisAsync(UpgradeOptions options)
             => RunCommandAsync(options, (ctx, services) =>
             {
                 services.AddScoped<IAppCommand, ConsoleAnalyze>();
@@ -72,7 +72,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     .Bind(ctx.Configuration.GetSection("Portability"));
             }, CancellationToken.None);
 
-        private static Task RunCommandAsync(MigrateOptions options, Action<HostBuilderContext, IServiceCollection> serviceConfiguration, CancellationToken token)
+        private static Task RunCommandAsync(UpgradeOptions options, Action<HostBuilderContext, IServiceCollection> serviceConfiguration, CancellationToken token)
         {
             ConsoleUtils.Clear();
 
@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 {
                     services.AddHostedService<ConsoleRunner>();
 
-                    services.AddSingleton<IMigrationStateManager, FileMigrationStateFactory>();
+                    services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
 
                     services.AddMsBuild();
                     services.AddSingleton(options);
@@ -150,9 +150,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 ShowHeader();
 
-                WriteString("Makes a best-effort attempt to migrate .NET Framework projects to .NET 5.");
+                WriteString("Makes a best-effort attempt to upgrade .NET Framework projects to .NET 5.");
                 WriteString("This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.");
-                WriteString("This tool's purpose is to automate some of the 'routine' migration tasks such as changing project file formats and updating APIs with near-equivalents in .NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
+                WriteString("This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in .NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
 
                 base.Write(command);
             }
@@ -168,9 +168,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        private static void ConfigureMigrateCommand(Command command)
+        private static void ConfigureUpgradeCommand(Command command)
         {
-            command.Handler = CommandHandler.Create<MigrateOptions, CancellationToken>((options, token) => RunMigrationAsync(options, (ctx, services) => { }, token));
+            command.Handler = CommandHandler.Create<UpgradeOptions, CancellationToken>((options, token) => RunUpgradeAsync(options, (ctx, services) => { }, token));
 
             command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             command.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
@@ -183,7 +183,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 #if ANALYZE_COMMAND
         private static void ConfigureAnalyzeCommand(Command command)
         {
-            command.Handler = CommandHandler.Create<MigrateOptions>(RunAnalysisAsync);
+            command.Handler = CommandHandler.Create<UpgradeOptions>(RunAnalysisAsync);
 
             command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));

@@ -38,13 +38,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         }
 
         /// <summary>
-        /// Creates a new analysis state object for a given migration context. This involves restoring packages for the context's current project.
+        /// Creates a new analysis state object for a given upgrade context. This involves restoring packages for the context's current project.
         /// </summary>
-        /// <param name="context">The migration context to create an analysis state for.</param>
+        /// <param name="context">The upgrade context to create an analysis state for.</param>
         /// <param name="tfmSelector">Used to identify the final expected TFM.</param>
         /// <param name="packageRestorer">The package restorer to use to restore packages for the context's project and generate a lock file.</param>
         /// <returns>A new PackageAnalysisState instance for the specified context.</returns>
-        public static async Task<PackageAnalysisState> CreateAsync(IMigrationContext context, ITargetTFMSelector tfmSelector, IPackageRestorer packageRestorer, CancellationToken token)
+        public static async Task<PackageAnalysisState> CreateAsync(IUpgradeContext context, ITargetTFMSelector tfmSelector, IPackageRestorer packageRestorer, CancellationToken token)
         {
             if (context is null)
             {
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             return ret;
         }
 
-        private async Task<bool> PopulatePackageRestoreState(IMigrationContext context, IPackageRestorer packageRestorer, CancellationToken token)
+        private async Task<bool> PopulatePackageRestoreState(IUpgradeContext context, IPackageRestorer packageRestorer, CancellationToken token)
         {
             if (LockFilePath is null || PackageCachePath is null || Failed)
             {

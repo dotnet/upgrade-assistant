@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         }
 
         public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
-            where T : MigrationCommand
+            where T : UpgradeCommand
         {
             if (commands is null)
             {

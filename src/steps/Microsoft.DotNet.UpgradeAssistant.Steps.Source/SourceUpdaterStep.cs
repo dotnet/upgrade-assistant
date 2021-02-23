@@ -15,10 +15,10 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     /// <summary>
-    /// Migration step that updates C# source using Roslyn analyzers and code fixers.
+    /// Upgrade step that updates C# source using Roslyn analyzers and code fixers.
     /// Contains sub-steps for different code fixers.
     /// </summary>
-    public class SourceUpdaterStep : MigrationStep
+    public class SourceUpdaterStep : UpgradeStep
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
         private readonly IEnumerable<CodeFixProvider> _allCodeFixProviders;
@@ -62,16 +62,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             _allCodeFixProviders = codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First());
 
             // Add sub-steps for each analyzer that will be run
-            SubSteps = new List<MigrationStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
+            SubSteps = new List<UpgradeStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
         }
 
         // Gets supported diagnostics from analyzers that are fixable by a given code fixer
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
-        protected override bool IsApplicableImpl(IMigrationContext context) => context?.CurrentProject is not null && SubSteps.Any();
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && SubSteps.Any();
 
-        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -93,8 +93,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             return Diagnostics.Any() ?
-                new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{Diagnostics.Count()} migration diagnostics need fixed", BuildBreakRisk.None) :
-                new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No migration diagnostics found", BuildBreakRisk.None);
+                new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{Diagnostics.Count()} upgrade diagnostics need fixed", BuildBreakRisk.None) :
+                new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No upgrade diagnostics found", BuildBreakRisk.None);
         }
 
         public async Task GetDiagnosticsAsync(CancellationToken token)
@@ -113,9 +113,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return;
             }
 
-            Logger.LogTrace("Running ASP.NET Core migration analyzers on {ProjectName}", project.Name);
+            Logger.LogTrace("Running ASP.NET Core upgrade analyzers on {ProjectName}", project.Name);
 
-            // Compile with migration analyzers enabled
+            // Compile with upgrade analyzers enabled
             var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
 
             if (compilation is null)
@@ -127,7 +127,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 var compilationWithAnalyzer = compilation
                     .WithAnalyzers(ImmutableArray.CreateRange(_allAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
 
-                // Find all diagnostics that migration code fixers can address
+                // Find all diagnostics that upgrade code fixers can address
                 Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
                     .Where(d => d.Location.IsInSource &&
                            _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
@@ -135,7 +135,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
         }
 
-        protected override async Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 Logger.LogWarning("Completing source updates with {DiagnosticCount} diagnostics still unaddressed", Diagnostics.Count());
             }
 
-            return new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty);
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
         }
 
         // TODO

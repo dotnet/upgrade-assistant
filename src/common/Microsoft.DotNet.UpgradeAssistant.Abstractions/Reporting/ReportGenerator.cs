@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Reporting
             _generators = generators;
         }
 
-        public async IAsyncEnumerable<Page> Generate(IMigrationContext response, [EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<Page> Generate(IUpgradeContext response, [EnumeratorCancellation] CancellationToken token)
         {
             foreach (var project in response.Projects)
             {

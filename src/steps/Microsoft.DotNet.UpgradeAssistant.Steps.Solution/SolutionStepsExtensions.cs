@@ -10,10 +10,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public static void AddSolutionSteps(this IServiceCollection services)
         {
-            services.AddScoped<MigrationStep, CurrentProjectSelectionStep>();
-            services.AddScoped<MigrationStep, NextProjectStep>();
-            services.AddScoped<MigrationStep, FinalizeSolutionStep>();
-            services.AddScoped<MigrationStep, EntrypointSelectionStep>();
+            services.AddScoped<UpgradeStep, CurrentProjectSelectionStep>();
+            services.AddScoped<UpgradeStep, NextProjectStep>();
+            services.AddScoped<UpgradeStep, FinalizeSolutionStep>();
+            services.AddScoped<UpgradeStep, EntrypointSelectionStep>();
         }
     }
 }

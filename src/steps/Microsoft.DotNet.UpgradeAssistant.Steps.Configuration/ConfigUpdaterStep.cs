@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
-    public class ConfigUpdaterStep : MigrationStep
+    public class ConfigUpdaterStep : UpgradeStep
     {
         private readonly string[] _configFilePaths;
 
@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         public override string Description => $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
 
-        public override string Title => "Migrate app config files";
+        public override string Title => "Upgrade app config files";
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
@@ -60,12 +60,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 
-        protected override bool IsApplicableImpl(IMigrationContext context) =>
+        protected override bool IsApplicableImpl(IUpgradeContext context) =>
             context?.CurrentProject is not null &&
             SubSteps.Any() &&
             _configFilePaths.Select(p => Path.Combine(context.CurrentProject.Directory, p)).Any(f => File.Exists(f));
 
-        protected override async Task<MigrationStepInitializeResult> InitializeImplAsync(IMigrationContext context, CancellationToken token)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -87,19 +87,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
 
             return incompleteSubSteps == 0
-                ? new MigrationStepInitializeResult(MigrationStepStatus.Complete, "No config updaters need applied", BuildBreakRisk.None)
-                : new MigrationStepInitializeResult(MigrationStepStatus.Incomplete, $"{incompleteSubSteps} config updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
+                ? new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No config updaters need applied", BuildBreakRisk.None)
+                : new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} config updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
         }
 
-        protected override Task<MigrationStepApplyResult> ApplyImplAsync(IMigrationContext context, CancellationToken token)
+        protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            // Nothing needs applied here because the actual migration changes are applied by the substeps
+            // Nothing needs applied here because the actual upgrade changes are applied by the substeps
             // (which should apply before this step).
             var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
 
             return Task.FromResult(incompleteSubSteps == 0
-                ? new MigrationStepApplyResult(MigrationStepStatus.Complete, string.Empty)
-                : new MigrationStepApplyResult(MigrationStepStatus.Incomplete, $"{incompleteSubSteps} config updaters need applied"));
+                ? new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty)
+                : new UpgradeStepApplyResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} config updaters need applied"));
         }
     }
 }

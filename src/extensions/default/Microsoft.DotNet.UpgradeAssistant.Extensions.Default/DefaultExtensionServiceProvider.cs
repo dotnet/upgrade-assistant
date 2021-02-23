@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
         public IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration)
         {
-            AddMigrationSteps(serviceConfiguration.ServiceCollection, serviceConfiguration.ExtensionConfiguration);
+            AddUpgradeSteps(serviceConfiguration.ServiceCollection, serviceConfiguration.ExtensionConfiguration);
             AddConfigUpdaters(serviceConfiguration.ServiceCollection);
             AddAnalyzersAndCodeFixProviders(serviceConfiguration.ServiceCollection);
             AddPackageReferenceAnalyzers(serviceConfiguration.ServiceCollection);
@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             return serviceConfiguration.ServiceCollection;
         }
 
-        private static void AddMigrationSteps(IServiceCollection services, IConfiguration configuration)
+        private static void AddUpgradeSteps(IServiceCollection services, IConfiguration configuration)
         {
             services.AddBackupStep();
             services.AddConfigUpdaterStep();

@@ -4,14 +4,14 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-AM0001 | Migration | Warning | UsingSystemWebAnalyzer
-AM0002 | Migration | Warning | HtmlStringAnalyzer
-AM0003 | Migration | Warning | ResultTypeAnalyzer
-AM0004 | Migration | Warning | FilterAnalyzer
-AM0005 | Migration | Warning | HttpContextCurrentAnalyzer
-AM0006 | Migration | Warning | HttpContextIsDebuggingEnabledAnalyzer
-AM0007 | Migration | Warning | HtmlHelperAnalyzer
-AM0008 | Migration | Warning | UrlHelperAnalyzer
-AM0009 | Migration | Warning | HelperResultAnalyzer
-AM0010 | Migration | Warning | AllowHtmlAttributeAnalyzer
-AM0011 | Migration | Warning | SystemDeploymentAnalyzer
+UA0001 | Upgrade | Warning | UsingSystemWebAnalyzer
+UA0002 | Upgrade | Warning | HtmlStringAnalyzer
+UA0003 | Upgrade | Warning | ResultTypeAnalyzer
+UA0004 | Upgrade | Warning | FilterAnalyzer
+UA0005 | Upgrade | Warning | HttpContextCurrentAnalyzer
+UA0006 | Upgrade | Warning | HttpContextIsDebuggingEnabledAnalyzer
+UA0007 | Upgrade | Warning | HtmlHelperAnalyzer
+UA0008 | Upgrade | Warning | UrlHelperAnalyzer
+UA0009 | Upgrade | Warning | HelperResultAnalyzer
+UA0010 | Upgrade | Warning | AllowHtmlAttributeAnalyzer
+UA0011 | Upgrade | Warning | SystemDeploymentAnalyzer
