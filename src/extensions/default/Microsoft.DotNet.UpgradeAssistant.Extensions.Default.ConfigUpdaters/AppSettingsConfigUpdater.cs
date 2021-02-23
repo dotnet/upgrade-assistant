@@ -25,20 +25,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
         private static readonly Regex AppSettingsFileRegex = new("^appsettings(\\..+)?\\.json$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger<AppSettingsConfigUpdater> _logger;
-        private readonly Dictionary<string, string> _appSettingsToUpgrade;
+        private readonly Dictionary<string, string> _appSettings;
 
         public string Id => typeof(AppSettingsConfigUpdater).FullName!;
 
-        public string Title => "Upgrade appSettings";
+        public string Title => "Convert Application Settings";
 
-        public string Description => "Upgrade app settings from app.config and web.config files to appsettings.json";
+        public string Description => "Convert application settings from app.config and web.config files to appsettings.json";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Low;
 
         public AppSettingsConfigUpdater(ILogger<AppSettingsConfigUpdater> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _appSettingsToUpgrade = new Dictionary<string, string>();
+            _appSettings = new Dictionary<string, string>();
         }
 
         public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                     property.WriteTo(jsonWriter);
                 }
 
-                foreach (var setting in _appSettingsToUpgrade)
+                foreach (var setting in _appSettings)
                 {
                     if (bool.TryParse(setting.Value, out var boolValue))
                     {
@@ -152,7 +152,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             {
                 if (!jsonConfigFiles.Any(s => !string.IsNullOrEmpty(s.Configuration[setting.Key])))
                 {
-                    _appSettingsToUpgrade.Add(setting.Key, setting.Value);
+                    _appSettings.Add(setting.Key, setting.Value);
                 }
                 else
                 {
@@ -160,9 +160,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 }
             }
 
-            _logger.LogInformation("Found {AppSettingCount} app settings for upgrade: {AppSettingNames}", _appSettingsToUpgrade.Count, string.Join(", ", _appSettingsToUpgrade.Keys));
+            _logger.LogInformation("Found {AppSettingCount} app settings for upgrade: {AppSettingNames}", _appSettings.Count, string.Join(", ", _appSettings.Keys));
 
-            var result = _appSettingsToUpgrade.Count > 0;
+            var result = _appSettings.Count > 0;
 
             return Task.FromResult(result);
         }

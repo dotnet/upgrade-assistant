@@ -33,9 +33,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
         public string Id => typeof(WebNamespaceConfigUpdater).FullName!;
 
-        public string Title => "Upgrade system.web.webPages.razor/pages/namespaces";
+        public string Title => "Convert system.web.webPages.razor/pages/namespaces";
 
-        public string Description => "Upgrade namespaces which are auto-included for web pages to _ViewImports.cshtml";
+        public string Description => "Convert namespaces which are auto-included for web pages to _ViewImports.cshtml";
 
         // This may add namespaces that don't exist in ASP.NET Core which would increase build breaks,
         // but the risk is still low because it should only add namespaces that are used by the project's

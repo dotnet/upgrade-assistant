@@ -6,7 +6,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public enum BuildBreakRisk
     {
         /// <summary>
-        /// Unknown or inapplicable chance that a upgrade step will break a previously working build.
+        /// Unknown or inapplicable chance that an upgrade step will break a previously working build.
         /// </summary>
         Unknown,
 

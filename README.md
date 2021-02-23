@@ -27,9 +27,9 @@ After running this tool on a solution, the solution will likely not build until 
 
 ## Upgrade documentation
 
-As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [upgrade documentation](https://docs.microsoft.com/dotnet/core/porting/).
+As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [porting documentation](https://docs.microsoft.com/dotnet/core/porting/).
 
-Web scenarios can be especially challenging, so it you are upgrading and ASP.NET app, be sure to read [ASP.NET Core upgrade documentation](https://docs.microsoft.com/aspnet/core/upgrade/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
+Web scenarios can be especially challenging, so it you are upgrading and ASP.NET app, be sure to read [ASP.NET Core migration documentation](https://docs.microsoft.com/aspnet/core/migration/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
 
 Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook)
 
@@ -91,7 +91,7 @@ Note that this tool does not (yet) advise on the feasibility or estimated cost o
 If you're just starting to look at .NET 5.0 and would like to understand more about potential challenges in upgrading any particular project, you should begin by looking at .NET Framework dependencies the project has and third-party libraries or NuGet packages it depends on and understand whether those dependencies are likely to work on .NET 5.0. Resources that can help with that analysis include:
 
 1. [The .NET Portability Analyzer tool](https://github.com/microsoft/dotnet-apiport)
-2. [.NET Core upgrade documentation](https://docs.microsoft.com/dotnet/core/porting/)
+2. [.NET Core porting documentation](https://docs.microsoft.com/dotnet/core/porting/)
 3. [Documentation of features not available on .NET Core](https://docs.microsoft.com/dotnet/core/porting/net-framework-tech-unavailable)
 
 ### Troubleshooting common issues
