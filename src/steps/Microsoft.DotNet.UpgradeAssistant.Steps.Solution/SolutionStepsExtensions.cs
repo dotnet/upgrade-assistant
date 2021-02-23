@@ -8,8 +8,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class SolutionStepsExtensions
     {
-        public static IServiceCollection AddSolutionSteps(this IServiceCollection services) =>
-            services.AddScoped<MigrationStep, CurrentProjectSelectionStep>()
-                .AddScoped<MigrationStep, EntrypointSelectionStep>();
+        public static void AddSolutionSteps(this IServiceCollection services)
+        {
+            services.AddScoped<MigrationStep, CurrentProjectSelectionStep>();
+            services.AddScoped<MigrationStep, NextProjectStep>();
+            services.AddScoped<MigrationStep, FinalizeSolutionStep>();
+            services.AddScoped<MigrationStep, EntrypointSelectionStep>();
+        }
     }
 }

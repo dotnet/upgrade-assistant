@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)

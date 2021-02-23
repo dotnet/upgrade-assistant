@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
         public BackupStep(MigrateOptions options, ILogger<BackupStep> logger, IUserInput userInput)

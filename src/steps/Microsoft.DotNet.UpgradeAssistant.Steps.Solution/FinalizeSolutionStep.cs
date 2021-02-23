@@ -6,23 +6,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Migrator.Steps
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
-    internal class SolutionCompletedStep : MigrationStep
+    internal class FinalizeSolutionStep : MigrationStep
     {
-        public SolutionCompletedStep(ILogger<SolutionCompletedStep> logger)
+        public FinalizeSolutionStep(ILogger<FinalizeSolutionStep> logger)
             : base(logger)
         {
         }
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
-        public override string Id => typeof(SolutionCompletedStep).FullName!;
+        public override string Id => typeof(FinalizeSolutionStep).FullName!;
 
-        public override string Title => "Complete Solution";
+        public override string Title => "Finalize Solution";
 
         public override string Description => "All projects have been upgraded. Please review any changes and test accordingly.";
 

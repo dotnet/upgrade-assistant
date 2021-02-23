@@ -42,16 +42,11 @@ Web scenarios can be especially challenging, so it you are upgrading and ASP.NET
 
 ### Installation steps
 
-There are two ways to install the Upgrade Assistant:
+The tool can be installed as a .NET CLI tool by running: `dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
 
-1. The tool can be installed as a .NET CLI tool by running: `dotnet tool install -g upgrade-assistant --add-source https://upgradeassistant.blob.core.windows.net/feed/index.json`
-    1. This is the recommended approach
-    1. Installing as a .NET CLI tool makes updating easy (`dotnet tool update -g upgrade-assistant --add-source https://upgradeassistant.blob.core.windows.net/feed/index.json`)
-    1. Note that if you add the source to [NuGet's configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) you may omit the `--add-source` parameter.
-    1. Only released versions will be installed with this command; any prerelease version must be explicitly opted into by adding `--version [desired-version]` to the command.
-1. A 64-bit Windows version of the tool can be downloaded [as a binary](https://upgradeassistant.blob.core.windows.net/download/Microsoft.UpgradeAssistant.zip).
-    1. To install the tool, simply download the zip file and extract it.
-    1. This is a simple way to retrieve the tool binaries, but doesn't benefit from the .NET CLI's update infrastructure and the .NET CLI will likely need to be present anyhow to install try-convert (as mentioned in the 'prerequisites' section of these instructions).
+Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can be easily updated by running: `https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
+
+Note that if you add the source to [NuGet's configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) you may omit the `--add-source` parameter.
 
 ## Usage
 

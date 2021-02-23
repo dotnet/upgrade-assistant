@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Migrator.Steps.NextProjectStep",
+            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
         public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<SourceUpdaterStep> logger)
