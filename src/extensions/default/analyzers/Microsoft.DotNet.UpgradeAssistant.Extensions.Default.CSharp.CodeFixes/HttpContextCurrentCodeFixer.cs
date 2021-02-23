@@ -91,13 +91,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
             var docRoot = (CompilationUnitSyntax)docEditor.OriginalRoot;
 
-            // Add a using statement, if necessary
-            docRoot = docRoot.AddUsingIfMissing(httpContextHelperClass.ContainingNamespace.ToString())!;
-
             // Update the HttpContext.Current reference
             var replacementSyntax = ParseExpression($"{httpContextHelperClass.Name}.Current")
                 .WithTriviaFrom(node);
             docRoot = docRoot.ReplaceNode(node, replacementSyntax);
+
+            // Add a using statement, if necessary
+            // This must be done after the diagnostic node is replaced since the node won't be the same
+            // after updating using statements.
+            docRoot = docRoot.AddUsingIfMissing(httpContextHelperClass.ContainingNamespace.ToString())!;
+
             docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
 
             return slnEditor.GetChangedSolution();
