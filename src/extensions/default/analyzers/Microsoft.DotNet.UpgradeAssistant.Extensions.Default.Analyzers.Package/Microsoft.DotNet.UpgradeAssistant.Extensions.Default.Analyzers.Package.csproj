@@ -17,6 +17,7 @@
     <PackageReleaseNotes>Initial ASP.NET migration analyzers</PackageReleaseNotes>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageTags>Upgrade, analyzers</PackageTags>
+    <PackageIcon>icon.png</PackageIcon>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>

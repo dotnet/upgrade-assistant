@@ -42,9 +42,9 @@ Web scenarios can be especially challenging, so it you are upgrading and ASP.NET
 
 ### Installation steps
 
-The tool can be installed as a .NET CLI tool by running: `dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
+The tool can be installed as a .NET CLI tool by running: `dotnet tool install -g Microsoft.DotNet.UpgradeAssistant.Cli --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
 
-Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can be easily updated by running: `https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
+Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can be easily updated by running: `dotnet tool update -g Microsoft.DotNet.UpgradeAssistant.Cli --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
 
 Note that if you add the source to [NuGet's configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) you may omit the `--add-source` parameter.
 
@@ -60,7 +60,7 @@ Full usage information:
 
 ```
 Usage:
-  upgrade-assistant [options] <project>
+  dotnet-upgrade-assistant [options] <project>
 
 Arguments:
   <project>
