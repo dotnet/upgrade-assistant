@@ -56,15 +56,15 @@ Note that if you add the source to [NuGet's configuration](https://docs.microsof
 
 ### Running the tool
 
-If you installed the tool using the .NET CLI, it can be run by calling `upgrade-assistant`. Otherwise, it can be run by invoking `Microsoft.DotNet.UpgradeAssistant.Cli.exe`.
+If you installed the tool using the .NET CLI, it can be run by calling `dotnet upgrade-assistant`. Otherwise, it can be run by invoking `Microsoft.DotNet.UpgradeAssistant.Cli.exe`.
 
-The usual usage of the tool is: `upgrade-assistant <Path to csproj or sln to upgrade>`
+The usual usage of the tool is: `dotnet upgrade-assistant <Path to csproj or sln to upgrade>`
 
 Full usage information:
 
 ```
 Usage:
-  dotnet-upgrade-assistant [options] <project>
+  dotnet upgrade-assistant [options] <project>
 
 Arguments:
   <project>
