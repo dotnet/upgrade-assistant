@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 using var current = System.Diagnostics.Process.GetCurrentProcess();
 
                 // If packaged as a tool, the process will be `dotnet-upgrade-assistant` but can be run as `dotnet upgrade-assistant`
-                return current.ProcessName.Replace($"dotnet-", $"dotnet ");
+                return current.ProcessName.Replace("dotnet-", "dotnet ");
             }
         }
 
