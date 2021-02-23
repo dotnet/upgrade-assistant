@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                                 _logger.LogDebug("Found namespace {NamespaceName} in {ConfigFilePath}", nsNameValue, configFile.Path);
                                 if (NamespacesToDrop.Any(s => nsNameValue.Equals(s, StringComparison.Ordinal) || nsNameValue.StartsWith($"{s}.", StringComparison.Ordinal)))
                                 {
-                                    _logger.LogDebug("Not migrating namespace {NamespaceName}", nsNameValue);
+                                    _logger.LogDebug("Not upgrading namespace {NamespaceName}", nsNameValue);
                                 }
                                 else
                                 {
@@ -144,7 +144,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             }
 
             _namespacesToUpgrade = namespaces.Distinct().Where(ns => !alreadyImportedNamespaces.Contains(ns));
-            _logger.LogInformation("{NamespaceCount} web page namespace imports need migrated: {Namespaces}", _namespacesToUpgrade.Count(), string.Join(", ", _namespacesToUpgrade));
+            _logger.LogInformation("{NamespaceCount} web page namespace imports need upgraded: {Namespaces}", _namespacesToUpgrade.Count(), string.Join(", ", _namespacesToUpgrade));
             return _namespacesToUpgrade.Any();
         }
     }

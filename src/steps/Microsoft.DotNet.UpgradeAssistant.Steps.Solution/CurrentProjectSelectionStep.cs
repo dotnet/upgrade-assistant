@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (projects.All(p => IsCompleted(context, p)))
             {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need migrated", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgrade", BuildBreakRisk.None);
             }
 
             if (projects.Count == 1)
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         private async Task<IProject> GetProject(IUpgradeContext context, Func<IUpgradeContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {
-            const string SelectProjectQuestion = "Here is the recommended order to migrate. Select enter to follow this list, or input the project you want to start with.";
+            const string SelectProjectQuestion = "Here is the recommended order to upgrade. Select enter to follow this list, or input the project you want to start with.";
 
             if (context.EntryPoint is null)
             {

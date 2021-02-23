@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
         {
             var result = await base.ApplyAsync(context, token).ConfigureAwait(false);
 
-            // Normally, the migrator will apply steps one at a time
+            // Normally, the upgrader will apply steps one at a time
             // at the user's instruction. In the case of parent and child steps,
             // the parent has any top-level application done after the children.
             // In the case of the ConfigUpdateStep, the parent (this step's parent)

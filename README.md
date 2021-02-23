@@ -14,7 +14,7 @@ This project enables automation of common tasks related to upgrading .NET Framew
 
 When run on a solution, the tool will:
 
-- Determine which projects need upgraded and recommend the order the projects should be migrated in
+- Determine which projects need upgraded and recommend the order the projects should be upgraded in
 - Update the project file to be an SDK-style project and re-target it to .NET 5.0
 - Update NuGet package dependencies to versions that are compatible with .NET 5.0
 - Remove transitive NuGet package dependencies that may have been present in packages.config
@@ -82,9 +82,9 @@ Options:
 
 ### Determining upgrade feasibility
 
-Note that this tool does not (yet) advise on the feasibility or estimated cost of migrating projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to .NET 5.0.
+Note that this tool does not (yet) advise on the feasibility or estimated cost of upgrading projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to .NET 5.0.
 
-If you're just starting to look at .NET 5.0 and would like to understand more about potential challenges in migrating any particular project, you should begin by looking at .NET Framework dependencies the project has and third-party libraries or NuGet packages it depends on and understand whether those dependencies are likely to work on .NET 5.0. Resources that can help with that analysis include:
+If you're just starting to look at .NET 5.0 and would like to understand more about potential challenges in upgrading any particular project, you should begin by looking at .NET Framework dependencies the project has and third-party libraries or NuGet packages it depends on and understand whether those dependencies are likely to work on .NET 5.0. Resources that can help with that analysis include:
 
 1. [The .NET Portability Analyzer tool](https://github.com/microsoft/dotnet-apiport)
 2. [.NET Core upgrade documentation](https://docs.microsoft.com/dotnet/core/porting/)
@@ -156,9 +156,9 @@ The Package updater step of the Upgrade Assistant attempts to update NuGet packa
   2. If a referenced NuGet package isn't compatible with the target .NET version but a newer version of the NuGet package is, the package updater step automatically updates the version to the first major version that will work.
   3. The package updater step will replace NuGet references based on specific replacement packages listed in configuration files. For example, there's a config setting that specifically indicates System.Threading.Tasks.Dataflow should replace TPL.Dataflow.
 
-This third type of NuGet package replacement can be customized by users. An extension's PackageMapPath path can contain json files that map old packages to new ones. In each set, there are old (.NET Framework) package references which should be removed and new (.NET 5.0/Standard) package references which should be added. If a project being migrated by the tool contains references to any of the 'NetFrameworkPackages' references from a set, those references will be removed and all of the 'NetCorePackages' references from that same set will be added. If old (NetFrameworkPackage) package references specify a version, then the references will only be replaced if the referenced version is less than or equal to that version.
+This third type of NuGet package replacement can be customized by users. An extension's PackageMapPath path can contain json files that map old packages to new ones. In each set, there are old (.NET Framework) package references which should be removed and new (.NET 5.0/Standard) package references which should be added. If a project being upgraded by the tool contains references to any of the 'NetFrameworkPackages' references from a set, those references will be removed and all of the 'NetCorePackages' references from that same set will be added. If old (NetFrameworkPackage) package references specify a version, then the references will only be replaced if the referenced version is less than or equal to that version.
 
-By adding package map files, users can supply customized rules about which NuGet package references should be removed from migrated projects and which NuGet package references (if any) should replace them.
+By adding package map files, users can supply customized rules about which NuGet package references should be removed from upgraded projects and which NuGet package references (if any) should replace them.
 
 An example package map files looks like this:
 

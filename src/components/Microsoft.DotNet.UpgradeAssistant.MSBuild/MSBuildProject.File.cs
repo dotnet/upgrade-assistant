@@ -132,8 +132,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _logger.LogInformation("File already exists, moving {FileName} to {BackupFileName}", fileName, backupName);
 
-            // Even though the file may not make sense in the migrated project,
-            // don't remove the file from the project because the user will probably want to migrate some of the code manually later
+            // Even though the file may not make sense in the upgraded project,
+            // don't remove the file from the project because the user will probably want to upgrade some of the code manually later
             // so it's useful to leave it in the project so that the upgrade need is clearly visible.
             foreach (var item in ProjectRoot.Items.Where(i => i.Include.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
             {

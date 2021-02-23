@@ -13,14 +13,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
     {
         private readonly ILogger<UpgradeStepOrderer> _logger;
 
-        private readonly List<UpgradeStep> _migrationSteps;
+        private readonly List<UpgradeStep> _steps;
 
-        public IEnumerable<UpgradeStep> UpgradeSteps => _migrationSteps;
+        public IEnumerable<UpgradeStep> UpgradeSteps => _steps;
 
-        public UpgradeStepOrderer(IEnumerable<UpgradeStep> migrationSteps, ILogger<UpgradeStepOrderer> logger)
+        public UpgradeStepOrderer(IEnumerable<UpgradeStep> steps, ILogger<UpgradeStepOrderer> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _migrationSteps = Order(migrationSteps);
+            _steps = Order(steps);
         }
 
         public bool TryAddStep(UpgradeStep step)
@@ -35,9 +35,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
             // Find a place in the order after all dependencies
             var dependencies = step.DependsOn.ToList();
             var index = 0;
-            for (index = 0; index < _migrationSteps.Count && dependencies.Any(); index++)
+            for (index = 0; index < _steps.Count && dependencies.Any(); index++)
             {
-                var currentId = _migrationSteps[index].Id;
+                var currentId = _steps[index].Id;
                 if (dependencies.Contains(currentId))
                 {
                     dependencies.RemoveAll(d => d.Equals(currentId, StringComparison.Ordinal));
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
                 return false;
             }
 
-            _migrationSteps.Insert(index, step);
+            _steps.Insert(index, step);
             _logger.LogDebug("Inserted upgrade step {UpgradeStep} at index {Index}", step.Id, index);
 
             return true;
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
 
         public bool TryRemoveStep(string stepId)
         {
-            var step = _migrationSteps.Find(s => s.Id.Equals(stepId, StringComparison.Ordinal));
+            var step = _steps.Find(s => s.Id.Equals(stepId, StringComparison.Ordinal));
 
             if (step is null)
             {
@@ -72,14 +72,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
                 return false;
             }
 
-            var dependents = _migrationSteps.Where(s => s.DependsOn.Contains(stepId, StringComparer.Ordinal)).Select(s => s.Id);
+            var dependents = _steps.Where(s => s.DependsOn.Contains(stepId, StringComparer.Ordinal)).Select(s => s.Id);
             if (dependents.Any())
             {
                 _logger.LogError("Cannot remove step {UpgradeStep} because later steps depend on it: {Dependents}", stepId, string.Join(", ", dependents));
                 return false;
             }
 
-            var ret = _migrationSteps.Remove(step);
+            var ret = _steps.Remove(step);
 
             if (ret)
             {
@@ -93,17 +93,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
             return ret;
         }
 
-        private List<UpgradeStep> Order(IEnumerable<UpgradeStep> migrationSteps)
+        private List<UpgradeStep> Order(IEnumerable<UpgradeStep> steps)
         {
-            foreach (var step in migrationSteps)
+            foreach (var step in steps)
             {
                 _logger.LogDebug("Using {Step} upgrade step", step.Id);
             }
 
             // Kahn's algorithm
             var orderedSteps = new List<UpgradeStep>();
-            var inputSteps = migrationSteps.ToList();
-            var dependencies = GetDependencies(migrationSteps);
+            var inputSteps = steps.ToList();
+            var dependencies = GetDependencies(steps);
             var stepsToAdd = GetStepsWithNoDependencies(inputSteps, dependencies);
 
             while (stepsToAdd.Any())
@@ -147,9 +147,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader
             }
         }
 
-        private static List<UpgradeStepDependency> GetDependencies(IEnumerable<UpgradeStep> migrationSteps) =>
-            migrationSteps.SelectMany(s => s.DependsOn.Select(d => new UpgradeStepDependency(d, s.Id)))
-            .Concat(migrationSteps.SelectMany(s => s.DependencyOf.Select(d => new UpgradeStepDependency(s.Id, d))))
+        private static List<UpgradeStepDependency> GetDependencies(IEnumerable<UpgradeStep> steps) =>
+            steps.SelectMany(s => s.DependsOn.Select(d => new UpgradeStepDependency(d, s.Id)))
+            .Concat(steps.SelectMany(s => s.DependencyOf.Select(d => new UpgradeStepDependency(s.Id, d))))
             .Distinct()
             .ToList();
 

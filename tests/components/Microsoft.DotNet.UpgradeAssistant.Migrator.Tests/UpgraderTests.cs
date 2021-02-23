@@ -21,10 +21,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
             var unknownStep = new[] { new UnknownTestUpgradeStep("Unknown step") };
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(unknownStep)));
 
-            var migrator = mock.Create<UpgraderManager>();
+            var upgrader = mock.Create<UpgraderManager>();
             var context = mock.Mock<IUpgradeContext>().Object;
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await upgrader.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
         {
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(GetUpgradeSteps())));
 
-            var migrator = mock.Create<UpgraderManager>();
+            var upgrader = mock.Create<UpgraderManager>();
 
             var expectedTopLevelStepsAndSubSteps = new[]
             {
@@ -51,15 +51,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
             // in the expected order
             using var context = mock.Mock<IUpgradeContext>().Object;
 
-            var steps = migrator.GetStepsForContext(context);
+            var steps = upgrader.GetStepsForContext(context);
             var allSteps = new List<string>();
 
-            var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+            var nextStep = await upgrader.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             while (nextStep is not null)
             {
                 allSteps.Add(nextStep.Title);
                 await nextStep.ApplyAsync(context, CancellationToken.None).ConfigureAwait(false);
-                nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+                nextStep = await upgrader.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             }
 
             Assert.Equal(expectedTopLevelStepsAndSubSteps, steps.Select(s => (s.Title, s.SubSteps.Count())).ToArray());
@@ -71,17 +71,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
         public async Task CompletedStepsAreNotEnumerated(UpgradeStep[] steps, string[] expectedSteps)
         {
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
-            var migrator = mock.Create<UpgraderManager>();
+            var upgrader = mock.Create<UpgraderManager>();
             using var context = mock.Mock<IUpgradeContext>().Object;
 
             var allSteps = new List<string>();
 
-            var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+            var nextStep = await upgrader.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             while (nextStep is not null)
             {
                 allSteps.Add(nextStep.Title);
                 await nextStep.ApplyAsync(context, CancellationToken.None).ConfigureAwait(false);
-                nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+                nextStep = await upgrader.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
             }
 
             Assert.Equal(expectedSteps, allSteps);
@@ -94,10 +94,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Upgrader.Tests
             var expectedNextStepId = "Step 2";
 
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
-            var migrator = mock.Create<UpgraderManager>();
+            var upgrader = mock.Create<UpgraderManager>();
             using var context = mock.Mock<IUpgradeContext>().Object;
 
-            var nextStep = await migrator.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
+            var nextStep = await upgrader.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);
 
             // The failed step is next
             Assert.Equal(expectedNextStepId, nextStep?.Title);

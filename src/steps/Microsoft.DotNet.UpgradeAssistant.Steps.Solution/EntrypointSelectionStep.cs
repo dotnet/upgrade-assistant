@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         private async ValueTask<IProject> GetEntrypointAsync(IUpgradeContext context, CancellationToken token)
         {
-            const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to migrate projects.";
+            const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to upgrade projects.";
 
             if (context.EntryPoint is not null)
             {

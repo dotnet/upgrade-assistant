@@ -37,15 +37,15 @@ namespace Integration.Tests
                 NonInteractiveWait = 0,
             };
 
-            var migrationTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services, output), cts.Token);
+            var upgradeTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services, output), cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
-            await Task.WhenAny(migrationTask, timeoutTimer).ConfigureAwait(false);
+            await Task.WhenAny(upgradeTask, timeoutTimer).ConfigureAwait(false);
             cts.Cancel();
 
             try
             {
-                await Task.WhenAll(migrationTask, timeoutTimer).ConfigureAwait(false);
+                await Task.WhenAll(upgradeTask, timeoutTimer).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {

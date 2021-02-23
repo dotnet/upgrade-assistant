@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public virtual UpgradeStep? ParentStep { get; protected set; }
 
         /// <summary>
-        /// Gets or sets upgrade step-specific commands that the user can choose from in addition to the migrator's default commands.
+        /// Gets or sets upgrade step-specific commands that the user can choose from in addition to the default commands.
         /// </summary>
         public virtual List<UpgradeCommand> Commands { get; set; }
 

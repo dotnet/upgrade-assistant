@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 var localNuGetSettings = new Settings(_options.Project.DirectoryName);
 
                 // Add the analyzer package's source to the config file's sources
-                localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("migrationAnalyzerSource", _analyzerPackageSource));
+                localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("upgradeAnalyzerSource", _analyzerPackageSource));
                 localNuGetSettings.SaveToDisk();
             }
 
