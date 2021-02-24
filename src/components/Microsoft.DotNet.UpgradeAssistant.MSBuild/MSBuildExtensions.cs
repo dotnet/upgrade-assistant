@@ -3,14 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public static class MSBuildExtensions
+    internal static class MSBuildExtensions
     {
         public static NuGetReference AsNuGetReference(this ProjectItemElement item)
         {
@@ -78,20 +77,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 // If no element remain in the item group, remove it
                 itemGroup.Parent.RemoveChild(itemGroup);
             }
-        }
-
-        public static bool TryGetPackageByName(this IProject project, string packageName, [MaybeNullWhen(false)] out NuGetReference nugetReference)
-        {
-            var matches = project.Required().PackageReferences.Where(p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase)).OrderByDescending(p => p.GetNuGetVersion());
-
-            if (!matches.Any())
-            {
-                nugetReference = null;
-                return false;
-            }
-
-            nugetReference = matches.First();
-            return true;
         }
     }
 }

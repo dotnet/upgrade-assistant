@@ -3,9 +3,9 @@
 
 using NuGet.Versioning;
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    public static class NuGetExtensions
+    internal static class NuGetExtensions
     {
         public static NuGetVersion? GetNuGetVersion(this NuGetReference nugetRef)
         {
