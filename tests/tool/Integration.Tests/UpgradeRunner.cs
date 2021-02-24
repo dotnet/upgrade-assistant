@@ -57,7 +57,6 @@ namespace Integration.Tests
             services.AddOptions<PackageUpdaterOptions>().Configure(o =>
             {
                 o.PackageMapPath = "PackageMaps";
-                o.UpgradeAnalyzersPackageSource = "https://doesnotexist.net/index.json";
                 o.UpgradeAnalyzersPackageVersion = "1.0.0";
             });
         }

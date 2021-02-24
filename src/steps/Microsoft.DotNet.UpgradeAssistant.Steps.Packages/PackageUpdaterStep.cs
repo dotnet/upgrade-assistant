@@ -26,9 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     {
         private const int MaxAnalysisIterations = 3;
 
-        private readonly string? _analyzerPackageSource;
         private readonly UpgradeOptions _options;
-        private readonly ITargetTFMSelector _tfmSelector;
         private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
@@ -79,11 +77,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             _options = options ?? throw new ArgumentNullException(nameof(options));
-            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
-            _analyzerPackageSource = updaterOptions.Value.UpgradeAnalyzersPackageSource;
             _analysisState = null;
         }
 
@@ -143,18 +139,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             var project = context.CurrentProject.Required();
-
-            // TODO : Temporary workaround until the upgrade analyzers are available on NuGet.org
-            // Check whether the analyzer package's source is present in NuGet.config and add it if it isn't
-            if (_analyzerPackageSource is not null && !_packageLoader.PackageSources.Contains(_analyzerPackageSource))
-            {
-                // Get or create a local NuGet.config file
-                var localNuGetSettings = new Settings(_options.Project.DirectoryName);
-
-                // Add the analyzer package's source to the config file's sources
-                localNuGetSettings.AddOrUpdate("packageSources", new SourceItem("upgradeAnalyzerSource", _analyzerPackageSource));
-                localNuGetSettings.SaveToDisk();
-            }
 
             try
             {
