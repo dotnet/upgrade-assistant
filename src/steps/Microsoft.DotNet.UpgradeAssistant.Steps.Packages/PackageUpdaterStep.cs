@@ -116,6 +116,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
             else
             {
+                if (_analysisState.ReferencesToRemove.Count > 0)
+                {
+                    Logger.LogInformation($"References to be removed:\n{string.Join('\n', _analysisState.ReferencesToRemove.Distinct())}");
+                }
+
                 if (_analysisState.PackagesToRemove.Count > 0)
                 {
                     Logger.LogInformation($"Packages to be removed:\n{string.Join('\n', _analysisState.PackagesToRemove.Distinct())}");
@@ -126,7 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogInformation($"Packages to be addded:\n{string.Join('\n', _analysisState.PackagesToAdd.Distinct())}");
                 }
 
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analysisState.PackagesToRemove.Distinct().Count()} packages need removed and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analysisState.ReferencesToRemove.Distinct().Count()} references need removed, {_analysisState.PackagesToRemove.Distinct().Count()} packages need removed, and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
             }
         }
 
@@ -166,6 +171,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                     if (_analysisState is not null)
                     {
+                        projectFile.RemoveReferences(_analysisState.ReferencesToRemove.Distinct());
                         projectFile.RemovePackages(_analysisState.PackagesToRemove.Distinct());
                         projectFile.AddPackages(_analysisState.PackagesToAdd.Distinct());
 

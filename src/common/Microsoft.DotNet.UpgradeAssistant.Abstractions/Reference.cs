@@ -3,5 +3,8 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public record Reference(string Name);
+    public record Reference(string Name)
+    {
+        public override string ToString() => Name;
+    }
 }
