@@ -34,7 +34,7 @@ The source updater step of the Upgrade Assistant uses Roslyn analyzers to identi
 
 To add their own analyzers and code fixes, users should include binaries with their own Roslyn analyzers and code fix providers in the SourceUpdaterPath specified in the extension's manifest. The Upgrade Assistant will automatically pick analyzers and code fix providers up from these extension directories when it starts.
 
-Any type with a `DiagnosticAnalyzerAttribute` attribute is considered an analyzer and any type with an `ExportCodeFixProviderAttribute` attribute is considered a code fix provider.
+Any type with a `DiagnosticAnalyzerAttribute` set is considered an analyzer and any type with an `ExportCodeFixProviderAttribute` set is considered a code fix provider.
 
 ### Custom NuGet package mapping configuration
 
