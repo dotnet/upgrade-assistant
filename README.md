@@ -29,7 +29,7 @@ After running this tool on a solution, the solution will likely not build until 
 
 As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [porting documentation](https://docs.microsoft.com/dotnet/core/porting/).
 
-Web scenarios can be especially challenging, so it you are upgrading and ASP.NET app, be sure to read [ASP.NET Core migration documentation](https://docs.microsoft.com/aspnet/core/migration/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
+Web scenarios can be especially challenging, so it you are upgrading an ASP.NET app, be sure to read [ASP.NET Core migration documentation](https://docs.microsoft.com/aspnet/core/migration/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
 
 Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook)
 
@@ -101,6 +101,9 @@ If you're just starting to look at .NET 5.0 and would like to understand more ab
     2. Check that try-convert is at least version 0.7.157502 or higher).
     3. Check whether the input project imports custom props or targets files. Try-convert doesn't support converting projects that import unknown props and targets files. Look at the output from upgrade-assistant and try-convert to see if any unrecognized imports are mentioned.
 
+### Extensibility
+The Upgrade Assistant has an extension system that make it easy for you to customize many of the upgrade steps without having to rebuild the tool. See how you can extend the tool [here](docs/extensibility.md).
+
 ## Solution Structure
 
 The structure of projects in the solution is organized into the following categories:
@@ -123,3 +126,13 @@ Concepts referred to in this repository which may have unclear meaning are expla
 | Step    | A step can define commands that can perform actions on the project. Each step implements `UpgradeStep`. The upgrade process comprises a series of steps that are visited in turn. Examples include the 'Update package versions step' or the 'Project backup step'|
 | Command | A command is an action that can be invoked by a user. Examples include a command to apply the current step or a command to change the backup location.|
 | Project Components | AppModel-specific components that a project may depend on. The most common are `WindowsDesktop` components (for WPF and WinForms scenarios) and `Web` (for ASP.NET scenarios) |
+
+## Feedback and Issues
+As you use the tool to upgrade your apps to .NET 5, please share your thoughts with us. If you have a suggestion for a new feature or idea, we want to know!
+And course if you find an issue or need help, please log an issue.
+
+[Share your feedback with us or report an issue](https://github.com/dotnet/upgrade-assistant/issues)
+
+The repo will be open for code contributions very soon.
+
+Happy upgrading to .NET 5!
