@@ -17,7 +17,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<UpgradeAssistantReferenceAnalyzer> _logger;
-        private readonly string? _analyzerPackageSource;
         private readonly string? _analyzerPackageVersion;
 
         public string Name => "Upgrade assistant reference analyzer";
@@ -31,7 +30,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _analyzerPackageSource = updaterOptions.Value.UpgradeAnalyzersPackageSource;
             _analyzerPackageVersion = updaterOptions.Value.UpgradeAnalyzersPackageVersion;
         }
 
@@ -52,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 // if one is specified, otherwise just use the package sources from the project being analyzed.
                 var analyzerPackageVersion = _analyzerPackageVersion is not null
                     ? NuGetVersion.Parse(_analyzerPackageVersion)
-                    : await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, true, _analyzerPackageSource is null ? null : new[] { _analyzerPackageSource }, token).ConfigureAwait(false);
+                    : await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, true, null, token).ConfigureAwait(false);
                 if (analyzerPackageVersion is not null)
                 {
                     _logger.LogInformation("Reference to .NET Upgrade Assistant analyzer package ({AnalyzerPackageName}, version {AnalyzerPackageVersion}) needs added", AnalyzerPackageName, analyzerPackageVersion);

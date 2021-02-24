@@ -5,8 +5,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageUpdaterOptions
     {
-        public string? UpgradeAnalyzersPackageSource { get; set; }
-
         public string? UpgradeAnalyzersPackageVersion { get; set; }
 
         public string? PackageMapPath { get; set; }
