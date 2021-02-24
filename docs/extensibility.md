@@ -40,7 +40,7 @@ Any type with a `DiagnosticAnalyzerAttribute` set is considered an analyzer and 
 
 The Package updater step of the Upgrade Assistant attempts to update NuGet package references to versions that will work with .NET 5.0. There are a few rules the upgrade step uses to make those updates:
 
-  1. It removes packages that other referenced packages depend on (transitive dependencies). Try-convert moves all packages from packages.config to PackageReference references, but PackageReference-style references only need to include top level packages. The NuGet package updater step removes package references that appear to be transitive so that only top-level dependencies are included in the csproj.
+  1. It removes packages that other referenced packages depend on (transitive dependencies). [Try-convert](https://github.com/dotnet/try-convert) moves all packages from packages.config to PackageReference references, but PackageReference-style references only need to include top level packages. The NuGet package updater step removes package references that appear to be transitive so that only top-level dependencies are included in the csproj.
   2. If a referenced NuGet package isn't compatible with the target .NET version but a newer version of the NuGet package is, the package updater step automatically updates the version to the first major version that will work.
   3. The package updater step will replace NuGet references based on specific replacement packages listed in configuration files. For example, there's a config setting that specifically indicates System.Threading.Tasks.Dataflow should replace TPL.Dataflow.
 
