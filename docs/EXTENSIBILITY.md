@@ -30,7 +30,7 @@ To use an extension at runtime, either use the -e argument to point to the exten
 
 ### Custom source analyzers and code fix providers
 
-The source updater step of the Upgrade Assistant uses Roslyn analyzers to identify problematic code patterns in users' projects and code fixes to automatically correct them to .NET 5.0-compatible alternatives. Over time, the set of built-in analyzers and code fixes will continue to grow. Users may want to add their own analyzers and code fix providers as well, though, to flag and fix issues in source code specific to libraries and patterns they use in their apps.
+The source updater step of the Upgrade Assistant uses Roslyn analyzers to identify problematic code patterns in users' projects and code fixers to automatically correct them to .NET 5.0-compatible alternatives. Over time, the set of built-in analyzers and code fixers will continue to grow. Users may want to add their own analyzers and code fix providers as well, though, to flag and fix issues in source code specific to libraries and patterns they use in their apps.
 
 To add their own analyzers and code fixes, users should include binaries with their own Roslyn analyzers and code fix providers in the SourceUpdaterPath specified in the extension's manifest. The Upgrade Assistant will automatically pick analyzers and code fix providers up from these extension directories when it starts.
 
