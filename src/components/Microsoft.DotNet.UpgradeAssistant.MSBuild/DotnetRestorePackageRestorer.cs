@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = "dotnet",
-                Arguments = Invariant($"restore {path}"),
+                Arguments = Invariant($"restore \"{path}\""),
                 EnvironmentVariables = context.GlobalProperties,
                 Name = "dotnet-restore",
                 Quiet = true
