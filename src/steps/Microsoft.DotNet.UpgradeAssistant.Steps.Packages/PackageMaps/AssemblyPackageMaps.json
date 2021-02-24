@@ -1,0 +1,36 @@
+﻿[
+  {
+    "PackageSetName": "System.ServiceModel",
+    "NetFrameworkAssemblies": [
+      {
+        "Name": "System.ServiceModel"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "System.ServiceModel.Primitives",
+        "Version": "4.8.1"
+      },
+      {
+        "Name": "System.ServiceModel.Http",
+        "Version": "4.8.1"
+      },
+      {
+        "Name": "System.ServiceModel.Duplex",
+        "Version": "4.8.1"
+      },
+      {
+        "Name": "System.ServiceModel.NetTcp",
+        "Version": "4.8.1"
+      },
+      {
+        "Name": "System.ServiceModel.Security",
+        "Version": "4.8.1"
+      },
+      {
+        "Name": "System.ServiceModel.Federation",
+        "Version": "4.8.1"
+      }
+    ]
+  }
+]

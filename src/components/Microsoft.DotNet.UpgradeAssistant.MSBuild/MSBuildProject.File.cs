@@ -119,6 +119,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        public void RemoveReferences(IEnumerable<Reference> references)
+        {
+            foreach (var reference in references)
+            {
+                if (references.Contains(reference))
+                {
+                    _logger.LogInformation("Removing outdated assembly reference: {Reference}", reference);
+                    ProjectRoot.RemoveReference(reference);
+                }
+            }
+        }
+
         public void RenameFile(string filePath)
         {
             var fileName = Path.GetFileName(filePath);

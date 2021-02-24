@@ -48,6 +48,17 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
         }
 
+        public static void RemoveReference(this ProjectRootElement projectRoot, Reference reference)
+        {
+            var element = projectRoot.GetAllReferences()
+                .FirstOrDefault(r => reference.Equals(r.AsReference()));
+
+            if (element is not null)
+            {
+                element.RemoveElement();
+            }
+        }
+
         public static IEnumerable<ProjectItemElement> GetAllReferences(this ProjectRootElement projectRoot)
             => projectRoot.Items.Where(i => i.ItemType.Equals(MSBuildConstants.ReferenceType, StringComparison.OrdinalIgnoreCase));
 

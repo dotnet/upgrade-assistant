@@ -19,16 +19,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public IList<NuGetReference> PackagesToRemove { get; }
 
+        public IList<Reference> ReferencesToRemove { get; }
+
         public bool Failed { get; set; }
 
         public bool PossibleBreakingChangeRecommended { get; set; }
 
-        public bool ChangesRecommended => PackagesToAdd.Any() || PackagesToRemove.Any();
+        public bool ChangesRecommended => PackagesToAdd.Any() || PackagesToRemove.Any() || ReferencesToRemove.Any();
 
         private PackageAnalysisState()
         {
             PackagesToRemove = new List<NuGetReference>();
             PackagesToAdd = new List<NuGetReference>();
+            ReferencesToRemove = new List<Reference>();
             Failed = false;
             PossibleBreakingChangeRecommended = false;
         }
