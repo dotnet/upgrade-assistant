@@ -1,6 +1,7 @@
 ﻿[
   {
     "PackageSetName": "System.ServiceModel",
+    "NetCorePackagesWorkOnNetFx": true,
     "NetFrameworkAssemblies": [
       {
         "Name": "System.ServiceModel"

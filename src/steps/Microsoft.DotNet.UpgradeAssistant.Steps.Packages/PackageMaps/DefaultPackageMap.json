@@ -10,6 +10,7 @@
   },
   {
     "PackageSetName": "PowerShell",
+    "NetCorePackagesWorkOnNetFx": true,
     "NetFrameworkPackages": [
       {
         "Name": "Microsoft.PowerShell.5.ReferenceAssemblies",
@@ -125,6 +126,7 @@
   },
   {
     "PackageSetName": "TPL.Dataflow",
+    "NetCorePackagesWorkOnNetFx": true,
     "NetFrameworkPackages": [
       {
         "Name": "Microsoft.Tpl.Dataflow",

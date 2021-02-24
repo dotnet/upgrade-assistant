@@ -5,9 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Build.Construction;
-using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal static class MSBuildExtensions
     {

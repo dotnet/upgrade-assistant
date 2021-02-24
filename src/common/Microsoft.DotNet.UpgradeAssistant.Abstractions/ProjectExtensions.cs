@@ -16,14 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             var matches = project.Required().PackageReferences.Where(p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase)).OrderByDescending(p => Version.Parse(p.Version));
 
-            if (!matches.Any())
-            {
-                nugetReference = null;
-                return false;
-            }
-
-            nugetReference = matches.First();
-            return true;
+            nugetReference = matches.FirstOrDefault();
+            return nugetReference is not null;
         }
     }
 }

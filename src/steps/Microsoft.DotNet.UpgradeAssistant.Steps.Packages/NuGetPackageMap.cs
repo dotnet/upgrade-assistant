@@ -12,6 +12,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     {
         public string PackageSetName { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the NetCore packages can be substituted while a project is still targeting .NET Framework.
+        /// </summary>
+        public bool NetCorePackagesWorkOnNetFx { get; set; }
+
         public IEnumerable<Reference> NetFrameworkAssemblies { get; set; } = Enumerable.Empty<Reference>();
 
         public IEnumerable<NuGetReference> NetFrameworkPackages { get; set; } = Enumerable.Empty<NuGetReference>();
