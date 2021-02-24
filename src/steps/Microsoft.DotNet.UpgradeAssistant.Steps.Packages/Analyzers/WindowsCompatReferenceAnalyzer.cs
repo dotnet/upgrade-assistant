@@ -22,14 +22,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public string Name => "Windows Compatibility Pack Analyzer";
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
-            if (!state.CurrentTFM.IsWindows)
+            if (!project.Required().TFM.IsWindows)
             {
                 return state;
             }
 
-            if (state.IsTransitivelyAvailable(PackageName))
+            if (project.IsTransitivelyAvailable(PackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
                 return state;
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-            if (references.TryGetPackageByName(PackageName, out var existing))
+            if (project.TryGetPackageByName(PackageName, out var existing))
             {
                 var version = existing.GetNuGetVersion();
 

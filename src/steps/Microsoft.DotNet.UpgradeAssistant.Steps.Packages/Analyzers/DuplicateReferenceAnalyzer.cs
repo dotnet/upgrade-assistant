@@ -20,20 +20,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
+        public Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
-            if (references is null)
-            {
-                throw new ArgumentNullException(nameof(references));
-            }
-
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
             // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
-            foreach (var duplicates in references.Packages.Where(g => g.Count() > 1))
+            var packages = project.Required().PackageReferences.ToLookup(p => p.Name);
+            foreach (var duplicates in packages.Where(g => g.Count() > 1))
             {
                 var highestVersion = duplicates.Select(p => p.GetNuGetVersion()).Max();
 

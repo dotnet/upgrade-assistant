@@ -15,9 +15,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         string FilePath { get; }
 
-        void AddPackages(IEnumerable<NuGetReference> references);
+        void AddPackages(IEnumerable<NuGetReference> packages);
 
-        void RemovePackages(IEnumerable<NuGetReference> referenceItem);
+        void RemovePackages(IEnumerable<NuGetReference> packages);
+
+        void RemoveReferences(IEnumerable<Reference> references);
 
         ValueTask SaveAsync(CancellationToken token);
 

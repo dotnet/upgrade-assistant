@@ -11,10 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageAnalysisState
     {
-        public TargetFrameworkMoniker CurrentTFM { get; init; } = null!;
-
-        public TargetFrameworkMoniker TargetTFM { get; init; } = null!;
-
         public string LockFilePath { get; private set; } = default!;
 
         public string PackageCachePath { get; private set; } = default!;
@@ -23,16 +19,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public IList<NuGetReference> PackagesToRemove { get; }
 
+        public IList<Reference> ReferencesToRemove { get; }
+
         public bool Failed { get; set; }
 
         public bool PossibleBreakingChangeRecommended { get; set; }
 
-        public bool ChangesRecommended => PackagesToAdd.Any() || PackagesToRemove.Any();
+        public bool ChangesRecommended => PackagesToAdd.Any() || PackagesToRemove.Any() || ReferencesToRemove.Any();
 
         private PackageAnalysisState()
         {
             PackagesToRemove = new List<NuGetReference>();
             PackagesToAdd = new List<NuGetReference>();
+            ReferencesToRemove = new List<Reference>();
             Failed = false;
             PossibleBreakingChangeRecommended = false;
         }
@@ -41,10 +40,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         /// Creates a new analysis state object for a given upgrade context. This involves restoring packages for the context's current project.
         /// </summary>
         /// <param name="context">The upgrade context to create an analysis state for.</param>
-        /// <param name="tfmSelector">Used to identify the final expected TFM.</param>
         /// <param name="packageRestorer">The package restorer to use to restore packages for the context's project and generate a lock file.</param>
         /// <returns>A new PackageAnalysisState instance for the specified context.</returns>
-        public static async Task<PackageAnalysisState> CreateAsync(IUpgradeContext context, ITargetTFMSelector tfmSelector, IPackageRestorer packageRestorer, CancellationToken token)
+        public static async Task<PackageAnalysisState> CreateAsync(IUpgradeContext context, IPackageRestorer packageRestorer, CancellationToken token)
         {
             if (context is null)
             {
@@ -61,14 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new InvalidOperationException("Target TFM must be set before analyzing package references");
             }
 
-            var project = context.CurrentProject.Required();
-
-            var ret = new PackageAnalysisState
-            {
-                CurrentTFM = project.TFM,
-                TargetTFM = tfmSelector.SelectTFM(project)
-            };
-
+            var ret = new PackageAnalysisState();
             await ret.PopulatePackageRestoreState(context, packageRestorer, token).ConfigureAwait(false);
             return ret;
         }
