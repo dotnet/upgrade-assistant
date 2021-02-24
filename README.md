@@ -102,7 +102,7 @@ If you're just starting to look at .NET 5.0 and would like to understand more ab
     3. Check whether the input project imports custom props or targets files. Try-convert doesn't support converting projects that import unknown props and targets files. Look at the output from upgrade-assistant and try-convert to see if any unrecognized imports are mentioned.
 
 ### Extensibility
-The Upgrade Assistant has an extension system that make it easy for you to customize many of the upgrade steps without having to rebuild the tool. See how you can extend the tool [here](docs/EXTENSIBILITY.md).
+The Upgrade Assistant has an extension system that make it easy for you to customize many of the upgrade steps without having to rebuild the tool. See how you can extend the tool [here](docs/extensibility.md).
 
 ## Solution Structure
 
