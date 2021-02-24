@@ -16,7 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
     {
         private static (string Name, string Issue)[] _names = new (string, string)[]
         {
-            ("system.diagnostics", "https://github.com/dotnet/runtime/issues/23937")
+            ("system.diagnostics", "https://github.com/dotnet/runtime/issues/23937"),
+            ("system.serviceModel", "https://devblogs.microsoft.com/dotnet/migrating-a-sample-wpf-app-to-net-core-3-part-2/#updating-wcf-client-usage")
         };
 
         private readonly ILogger<UnsupportedSectionConfigUpdater> _logger;
