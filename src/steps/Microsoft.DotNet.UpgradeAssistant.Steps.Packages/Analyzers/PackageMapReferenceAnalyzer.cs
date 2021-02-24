@@ -22,13 +22,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
-            if (references is null)
-            {
-                throw new ArgumentNullException(nameof(references));
-            }
-
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
@@ -36,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
             var packageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
-
+            var references = project.Required().PackageReferences;
             foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 foreach (var map in packageMaps.Where(m => m.ContainsReference(packageReference.Name, packageReference.Version)))

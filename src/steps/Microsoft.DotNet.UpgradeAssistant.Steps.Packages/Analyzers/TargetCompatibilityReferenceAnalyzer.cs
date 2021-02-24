@@ -16,31 +16,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     public class TargetCompatibilityReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private readonly IPackageLoader _packageLoader;
+        private readonly ITargetTFMSelector _tfmSelector;
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
 
         public string Name => "Target compatibility reference analyzer";
 
-        public TargetCompatibilityReferenceAnalyzer(IPackageLoader packageLoader, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
+        public TargetCompatibilityReferenceAnalyzer(IPackageLoader packageLoader, ITargetTFMSelector tfmSelector, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
+            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
-            if (references is null)
-            {
-                throw new ArgumentNullException(nameof(references));
-            }
-
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var targetFramework = NuGetFramework.Parse(state.TargetTFM.Name);
+            var targetFramework = NuGetFramework.Parse(_tfmSelector.SelectTFM(project.Required()).Name);
 
-            foreach (var packageReference in references.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in project.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
                 if (await DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, targetFramework, token).ConfigureAwait(false))

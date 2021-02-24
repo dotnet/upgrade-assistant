@@ -192,7 +192,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, CancellationToken token)
         {
-            _analysisState = await PackageAnalysisState.CreateAsync(context, _tfmSelector, _packageRestorer, token).ConfigureAwait(false);
+            _analysisState = await PackageAnalysisState.CreateAsync(context, _packageRestorer, token).ConfigureAwait(false);
             var projectRoot = context.CurrentProject;
 
             if (projectRoot is null)
@@ -201,13 +201,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return false;
             }
 
-            var packageReferences = new PackageCollection(projectRoot.PackageReferences);
-
             // Iterate through all package references in the project file
             foreach (var analyzer in _packageAnalyzers)
             {
                 Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                _analysisState = await analyzer.AnalyzeAsync(packageReferences, _analysisState, token).ConfigureAwait(false);
+                _analysisState = await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
                 if (_analysisState.Failed)
                 {
                     Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}", analyzer.Name);

@@ -35,19 +35,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _analyzerPackageVersion = updaterOptions.Value.UpgradeAnalyzersPackageVersion;
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(PackageCollection references, PackageAnalysisState state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
-            if (references is null)
-            {
-                throw new ArgumentNullException(nameof(references));
-            }
-
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var packageReferences = references.Where(r => !state.PackagesToRemove.Contains(r));
+            var packageReferences = project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
             // If the project doesn't include a reference to the analyzer package, mark it for addition
             if (!packageReferences.Any(r => AnalyzerPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
