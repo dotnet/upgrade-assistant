@@ -13,8 +13,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class DotnetRestorePackageRestorer : IPackageRestorer
     {
-        private static readonly string[] EnvVarsToWithold = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
-
         private readonly ILogger<DotnetRestorePackageRestorer> _logger;
         private readonly IProcessRunner _runner;
 

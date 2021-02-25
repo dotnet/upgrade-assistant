@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            context.EnableConcurrentExecution();
+            context!.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
             context.RegisterSyntaxNodeAction(AnalyzeAttribute, SyntaxKind.Attribute);
         }

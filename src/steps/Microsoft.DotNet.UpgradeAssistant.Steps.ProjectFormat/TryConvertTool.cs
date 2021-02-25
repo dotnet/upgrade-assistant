@@ -42,17 +42,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         public bool IsAvailable => File.Exists(Path);
 
         public string GetCommandLine(IProject project)
-            => Invariant($"{Path} {GetArguments(project)}");
+            => Invariant($"{Path} {GetArguments(project.Required())}");
 
         public Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token)
-            => _runner.RunProcessAsync(new ProcessInfo
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            return _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = Path,
-                Arguments = GetArguments(project),
+                Arguments = GetArguments(project.Required()),
                 EnvironmentVariables = context.GlobalProperties,
                 IsErrorFilter = data => ErrorMessages.Any(data.Contains),
             }, token);
+        }
 
-        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.FilePath);
+        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.Required().FilePath);
     }
 }

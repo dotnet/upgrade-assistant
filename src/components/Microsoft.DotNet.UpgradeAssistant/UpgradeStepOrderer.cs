@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 // If an input steps aren't ordered, then either their dependencies are missing or there is a cycle
                 foreach (var missingDependency in dependencies)
                 {
-                    if (inputSteps.Any(s => s.Id.Equals(missingDependency.Dependency)))
+                    if (inputSteps.Any(s => s.Id.Equals(missingDependency.Dependency, StringComparison.Ordinal)))
                     {
                         _logger.LogCritical("Upgrade step {UpgradeStep1} cannot run because it's dependency {UpgradeStep2} cannot run", missingDependency.Dependent, missingDependency.Dependency);
                     }

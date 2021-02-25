@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         protected string? ProjectInitializedAgainst { get; set; }
 
-        public UpgradeStep(ILogger logger)
+        protected UpgradeStep(ILogger logger)
         {
             Logger = logger;
             Commands = new List<UpgradeCommand>();
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets or sets upgrade step-specific commands that the user can choose from in addition to the default commands.
         /// </summary>
-        public virtual List<UpgradeCommand> Commands { get; set; }
+        public virtual List<UpgradeCommand> Commands { get; }
 
         /// <summary>
         /// Gets or sets the upgrade steps that are sub-steps of this upgrade step. SubSteps are executed as part of executing the parent step.

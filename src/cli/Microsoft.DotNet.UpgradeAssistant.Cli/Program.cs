@@ -17,9 +17,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Console apps don't have a synchronization context")]
+
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    public class Program
+    public static class Program
     {
         private const string LogFilePath = "log.txt";
 

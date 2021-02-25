@@ -269,3 +269,6 @@ dotnet_diagnostic.CA1819.severity = none
 
 # CA2225: Operator overloads have named alternatives
 dotnet_diagnostic.CA2225.severity = none
+
+# CA1812: Avoid uninstantiated internal classes
+dotnet_diagnostic.CA1812.severity = none

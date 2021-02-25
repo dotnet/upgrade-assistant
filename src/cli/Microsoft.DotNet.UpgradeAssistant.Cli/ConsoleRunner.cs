@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
+    /// <summary>
+    /// Hosted service for running the upgrade pipeline.
+    /// </summary>
     internal class ConsoleRunner : IHostedService
     {
         private readonly IServiceProvider _services;

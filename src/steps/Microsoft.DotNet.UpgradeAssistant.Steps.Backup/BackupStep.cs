@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, "Backup skipped");
             }
 
-            var backupPath = await ChooseBackupPath(context, token);
+            var backupPath = await ChooseBackupPath(context, token).ConfigureAwait(false);
 
             if (backupPath is null)
             {
@@ -144,16 +144,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 UpgradeCommand.Create($"Use default path [{_backupPath}]"),
                 UpgradeCommand.Create("Enter custom path", async (ctx, token) =>
                 {
-                    customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:");
+                    customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:").ConfigureAwait(false);
                     return !string.IsNullOrEmpty(customPath);
                 })
             };
 
             while (!token.IsCancellationRequested)
             {
-                var result = await _userInput.ChooseAsync("Please choose a backup path", commands, token);
+                var result = await _userInput.ChooseAsync("Please choose a backup path", commands, token).ConfigureAwait(false);
 
-                if (await result.ExecuteAsync(context, token))
+                if (await result.ExecuteAsync(context, token).ConfigureAwait(false))
                 {
                     return customPath ?? _backupPath;
                 }

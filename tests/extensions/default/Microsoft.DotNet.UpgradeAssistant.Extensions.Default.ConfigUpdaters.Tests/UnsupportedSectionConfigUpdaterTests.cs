@@ -18,10 +18,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
             var context = mock.Mock<IUpgradeContext>().Object;
             var updater = mock.Create<UnsupportedSectionConfigUpdater>();
 
-            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create<ConfigFile>(), default);
+            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create<ConfigFile>(), default).ConfigureAwait(false);
             Assert.False(isAvailable);
 
-            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create<ConfigFile>(), default);
+            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create<ConfigFile>(), default).ConfigureAwait(false);
             Assert.False(isApplied);
         }
 
@@ -36,10 +36,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
                 @"<NotConfiguration />";
             var configFile = CreateFile(config);
 
-            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
+            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.False(isAvailable);
 
-            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
+            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.False(isApplied);
         }
 
@@ -54,10 +54,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
                 @"<configuration />";
             var configFile = CreateFile(config);
 
-            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
+            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.False(isAvailable);
 
-            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
+            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.False(isApplied);
         }
 
@@ -80,10 +80,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
 
             var configFile = CreateFile(config);
 
-            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
+            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.True(isAvailable);
 
-            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
+            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.True(isApplied);
 
             AssertConfigEquals(configFile, after);
@@ -112,10 +112,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
 
             var configFile = CreateFile(config);
 
-            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default);
+            var isAvailable = await updater.IsApplicableAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.True(isAvailable);
 
-            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default);
+            var isApplied = await updater.ApplyAsync(context, ImmutableArray.Create(configFile), default).ConfigureAwait(false);
             Assert.True(isApplied);
 
             AssertConfigEquals(configFile, after);
