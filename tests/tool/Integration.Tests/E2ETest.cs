@@ -16,7 +16,6 @@ namespace Integration.Tests
     {
         // TODO : Make this configurable so the test can pass from other working dirs
         private const string IntegrationTestAssetsPath = "IntegrationScenarios";
-        private const string CommandsFileName = "Commands.txt";
         private const string OriginalProjectSubDir = "Original";
         private const string UpgradedProjectSubDir = "Upgraded";
 
@@ -28,6 +27,7 @@ namespace Integration.Tests
         };
 
         [InlineData("AspNetMvcTemplate", "TemplateMvc.csproj")]
+        [InlineData("WpfSample", "BeanTrader.sln")]
         [Theory]
         public async Task UpgradeTest(string scenarioName, string inputFileName)
         {
@@ -102,7 +102,7 @@ namespace Integration.Tests
 
         private static void CleanupBuildArtifacts(string workingDir)
         {
-            foreach (var dir in DirsToIgnore.Select(d => Path.Combine(workingDir, d)))
+            foreach (var dir in DirsToIgnore.SelectMany(d => Directory.GetDirectories(workingDir, d, SearchOption.AllDirectories)))
             {
                 if (Directory.Exists(dir))
                 {

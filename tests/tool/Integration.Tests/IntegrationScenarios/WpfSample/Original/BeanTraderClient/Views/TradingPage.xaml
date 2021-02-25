@@ -1,0 +1,63 @@
+﻿<Page x:Class="BeanTraderClient.Views.TradingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:resources="clr-namespace:BeanTraderClient.Resources"
+      xmlns:models="clr-namespace:BeanTrader.Models;assembly=BeanTraderInterfaces"
+      xmlns:localDesign="clr-namespace:BeanTraderClient.DesignTimeData"
+      xmlns:controls="clr-namespace:BeanTraderClient.Controls"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="1100"
+      xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+      Dialog:DialogParticipation.Register="{Binding}"
+      d:DataContext="{x:Static localDesign:DesignTimeContexts.DesignTimeTradingViewModel}"
+      Style="{StaticResource DefaultPageStyle}"
+      Title="TradingPage" 
+      Loaded="Load"
+      Unloaded="Unload">
+    <Page.Resources>
+        <DataTemplate DataType="{x:Type models:TradeOffer}">
+            <controls:TradeOfferControl TradeOffer="{Binding}" TradingModel="{Binding ElementName=TradeOfferList, Path=DataContext}"/>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" Background="{StaticResource WindowBackgroundBrush}">
+            <Button Name="LogoutButton" Content="{x:Static resources:StringResources.Logout}" Click="LogoutButton_Click" DockPanel.Dock="Right" Margin="10 5" HorizontalAlignment="Right" />
+            <TextBlock Name="UsernameLabel" Text="{Binding Path=WelcomeMessage, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Right" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel Grid.Row="1" Background="{StaticResource WindowBackgroundBrush}">
+            <ListView x:Name="TradeOfferList" Grid.Row="1" Margin="10, 5" Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="3" ItemsSource="{Binding TradeOffers}" HorizontalContentAlignment="Stretch" />
+        </DockPanel>
+        <DockPanel Grid.Row="2" Background="{StaticResource WindowBackgroundBrush}">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Margin="10 5">
+                <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" Margin="10 0 5 0" >
+                    <Image Source="{StaticResource RedBean}" Width="40" />
+                </Border>
+                <TextBlock Name="RedBeanCount" Text="{Binding Inventory[0]}" FontSize="28" />
+                <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" Margin="10 0 5 0" >
+                    <Image Source="{StaticResource BlueBean}" Width="40" />
+                </Border>
+                <TextBlock Name="BlueBeanCount" Text="{Binding Inventory[1]}" FontSize="28" />
+                <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" Margin="10 0 5 0" >
+                    <Image Source="{StaticResource GreenBean}" Width="40" />
+                </Border>
+                <TextBlock Name="GreenBeanCount" Text="{Binding Inventory[2]}" FontSize="28" />
+                <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" Margin="10 0 5 0" >
+                    <Image Source="{StaticResource YellowBean}" Width="40" />
+                </Border>
+                <TextBlock Name="YellowBeanCount" Text="{Binding Inventory[3]}" FontSize="28" />
+            </StackPanel>
+            <Button Name="NewTradeButton" Content="{x:Static resources:StringResources.NewTradeOffer}" DockPanel.Dock="Right" Margin="10 5" HorizontalAlignment="Right" Click="NewTradeButton_Click" />
+            <Border Background="{StaticResource ControlBackgroundBrush}" Height="30" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" Margin="10 5" >
+                <TextBlock Name="Status" FontSize="16" Margin="5 0" HorizontalAlignment="Stretch" Background="{StaticResource ControlBackgroundBrush}" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}" />
+            </Border>
+        </DockPanel>
+    </Grid>
+</Page>

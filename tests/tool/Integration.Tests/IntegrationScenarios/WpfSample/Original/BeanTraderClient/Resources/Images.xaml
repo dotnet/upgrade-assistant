@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:BeanTraderClient.Resources">
+    <BitmapImage x:Key="RedBean" UriSource="/Resources/Images/RedBean.png" />
+    <BitmapImage x:Key="BlueBean" UriSource="/Resources/Images/BlueBean.png" />
+    <BitmapImage x:Key="GreenBean" UriSource="/Resources/Images/GreenBean.png" />
+    <BitmapImage x:Key="YellowBean" UriSource="/Resources/Images/YellowBean.png" />
+
+</ResourceDictionary>

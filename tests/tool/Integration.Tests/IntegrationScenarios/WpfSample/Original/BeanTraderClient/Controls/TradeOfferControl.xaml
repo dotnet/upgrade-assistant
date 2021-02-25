@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="BeanTraderClient.Controls.TradeOfferControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:BeanTraderClient.Converters"
+             xmlns:models="clr-namespace:BeanTrader.Models;assembly=BeanTraderInterfaces"
+             xmlns:models2="clr-namespace:BeanTrader.Models"
+             mc:Ignorable="d" 
+             Loaded="TradeOfferControl_Loaded"
+             d:DesignHeight="50" d:DesignWidth="600">
+    <UserControl.Resources>
+        <converters:UIntToVisibleOnNonZeroConverter x:Key="CountToVisibilityConverter" />
+        <DataTemplate DataType="{x:Type models2:BeanDictionary}">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="5 2" Orientation="Horizontal" Visibility="{Binding ConverterParameter={x:Static models:Beans.Red}, Converter={StaticResource CountToVisibilityConverter}}">
+                    <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" >
+                        <Image Source="{StaticResource RedBean}" Width="30" />
+                    </Border>
+                    <TextBlock Text="{Binding Path=[(models:Beans)Red]}" Foreground="{StaticResource RedBeanBrush}" Margin="2 0" FontSize="20" />
+                </StackPanel>
+
+                <StackPanel Margin="5 2" Orientation="Horizontal" Visibility="{Binding ConverterParameter={x:Static models:Beans.Blue}, Converter={StaticResource CountToVisibilityConverter}}">
+                    <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" >
+                        <Image Source="{StaticResource BlueBean}" Width="30" />
+                    </Border>
+                    <TextBlock Text="{Binding Path=[(models:Beans)Blue]}" Foreground="{StaticResource BlueBeanBrush}" Margin="2 0" FontSize="20" />
+                </StackPanel>
+
+                <StackPanel Margin="5 2" Orientation="Horizontal" Visibility="{Binding ConverterParameter={x:Static models:Beans.Green}, Converter={StaticResource CountToVisibilityConverter}}">
+                    <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" >
+                        <Image Source="{StaticResource GreenBean}" Width="30" />
+                    </Border>
+                    <TextBlock Text="{Binding Path=[(models:Beans)Green]}" Foreground="{StaticResource GreenBeanBrush}" Margin="2 0" FontSize="20" />
+                </StackPanel>
+
+                <StackPanel Margin="5 2" Orientation="Horizontal" Visibility="{Binding ConverterParameter={x:Static models:Beans.Yellow}, Converter={StaticResource CountToVisibilityConverter}}">
+                    <Border Background="{StaticResource ControlBackgroundBrush}" BorderBrush="{StaticResource ControlBorderBrush}" BorderThickness="1" >
+                        <Image Source="{StaticResource YellowBean}" Width="30" />
+                    </Border>
+                    <TextBlock Text="{Binding Path=[(models:Beans)Yellow]}" Foreground="{StaticResource YellowBeanBrush}" Margin="2 0" FontSize="20" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <DockPanel x:Name="LayoutRoot">
+        <Grid DockPanel.Dock="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="255" />
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="255" />
+            </Grid.ColumnDefinitions>
+            <ContentControl Grid.Column="0" Content="{Binding Asking}" />
+            <TextBlock Grid.Column="1" Text="➞" FontSize="36" Margin="10 2" />
+            <ContentControl Grid.Column="2" Content="{Binding Offering}" />
+        </Grid>
+
+        <Button x:Name="CompleteTradeButton" Margin="10 5" DockPanel.Dock="Right" HorizontalAlignment="Right" Content="{Binding CompleteTradeDescription}" Click="CompleteTradeButton_Click" />
+        <TextBlock Margin="10 5" Text="{Binding Path=SellerName}" HorizontalAlignment="Right" />
+    </DockPanel>
+</UserControl>
