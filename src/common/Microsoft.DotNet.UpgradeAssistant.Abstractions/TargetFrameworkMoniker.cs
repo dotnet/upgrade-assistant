@@ -16,8 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public bool IsNetStandard => Name.StartsWith(NetStandardNamePrefix, StringComparison.OrdinalIgnoreCase);
 
-        public bool IsNetCore => Name.StartsWith(NetPrefix, StringComparison.OrdinalIgnoreCase) && Name.Contains('.');
+        public bool IsNetCore => Name.StartsWith(NetPrefix, StringComparison.OrdinalIgnoreCase) && Name.Contains(".");
 
-        public bool IsWindows => Name.Contains("windows", StringComparison.OrdinalIgnoreCase);
+        public bool IsWindows => Name.Contains("windows");
     }
 }

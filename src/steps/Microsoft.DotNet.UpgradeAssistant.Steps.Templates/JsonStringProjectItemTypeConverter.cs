@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class JsonStringProjectItemTypeConverter : JsonConverter<ProjectItemType>
+    internal class JsonStringProjectItemTypeConverter : JsonConverter<ProjectItemType>
     {
         public override ProjectItemType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

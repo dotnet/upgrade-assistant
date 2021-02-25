@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         // instances of MSBuildRegistrationStartup (which should only
         // happen in test scenarios) will share a single instance
         // per process.
-        private static VisualStudioInstance? MSBuildInstance;
+        private static VisualStudioInstance? _instance;
 
         private readonly ILogger _logger;
 
@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public string RegisterMSBuildInstance()
         {
-            if (MSBuildInstance is null)
+            if (_instance is null)
             {
                 // TODO : Harden this and allow MSBuild location to be read from env vars.
                 var msBuildInstances = FilterForBitness(MSBuildLocator.QueryVisualStudioInstances()).ToList();
@@ -54,17 +54,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                         _logger.LogDebug("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
                     }
 
-                    MSBuildInstance = msBuildInstances
+                    _instance = msBuildInstances
                         .OrderByDescending(m => m.Version)
                         .First();
-                    _logger.LogInformation("MSBuild registered from {MSBuildPath}", MSBuildInstance.MSBuildPath);
+                    _logger.LogInformation("MSBuild registered from {MSBuildPath}", _instance.MSBuildPath);
 
-                    MSBuildLocator.RegisterInstance(MSBuildInstance);
+                    MSBuildLocator.RegisterInstance(_instance);
                     AssemblyLoadContext.Default.Resolving += ResolveAssembly;
                 }
             }
 
-            return MSBuildInstance.MSBuildPath;
+            return _instance.MSBuildPath;
         }
 
         private IEnumerable<VisualStudioInstance> FilterForBitness(IEnumerable<VisualStudioInstance> instances)
@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private Assembly? ResolveAssembly(AssemblyLoadContext context, AssemblyName assemblyName)
         {
-            if (context is null || assemblyName is null || MSBuildInstance is null)
+            if (context is null || assemblyName is null || _instance is null)
             {
                 return null;
             }
@@ -96,14 +96,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // If the assembly has a culture, check for satellite assemblies
             if (assemblyName.CultureInfo != null)
             {
-                var satellitePath = Path.Combine(MSBuildInstance.MSBuildPath, assemblyName.CultureInfo.Name, $"{assemblyName.Name}.dll");
+                var satellitePath = Path.Combine(_instance.MSBuildPath, assemblyName.CultureInfo.Name, $"{assemblyName.Name}.dll");
                 if (File.Exists(satellitePath))
                 {
                     _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
                     return context.LoadFromAssemblyPath(satellitePath);
                 }
 
-                satellitePath = Path.Combine(MSBuildInstance.MSBuildPath, assemblyName.CultureInfo.TwoLetterISOLanguageName, $"{assemblyName.Name}.dll");
+                satellitePath = Path.Combine(_instance.MSBuildPath, assemblyName.CultureInfo.TwoLetterISOLanguageName, $"{assemblyName.Name}.dll");
                 if (File.Exists(satellitePath))
                 {
                     _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
@@ -111,7 +111,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
             }
 
-            var assemblyPath = Path.Combine(MSBuildInstance.MSBuildPath, $"{assemblyName.Name}.dll");
+            var assemblyPath = Path.Combine(_instance.MSBuildPath, $"{assemblyName.Name}.dll");
             if (File.Exists(assemblyPath))
             {
                 _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, assemblyPath);
