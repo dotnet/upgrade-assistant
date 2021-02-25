@@ -104,8 +104,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             if (!file.ContainsItem(appSettingsPath, ProjectItemType.Content, token))
             {
-                var projectPath = project.Directory is not null ? Path.GetRelativePath(project.Directory, appSettingsPath) : appSettingsPath;
-                file.AddItem(ProjectItemType.Content.Name, projectPath);
+                var itemPath = project.Directory is not null ? Path.GetRelativePath(project.Directory, appSettingsPath) : appSettingsPath;
+                file.AddItem(ProjectItemType.Content.Name, itemPath);
                 await file.SaveAsync(token).ConfigureAwait(false);
             }
 
