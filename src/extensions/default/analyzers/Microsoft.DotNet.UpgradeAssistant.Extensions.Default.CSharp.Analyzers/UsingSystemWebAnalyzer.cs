@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class UsingSystemWebAnalyzer : DiagnosticAnalyzer
+    public sealed class UsingSystemWebAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0001";
         private const string Category = "Upgrade";
@@ -24,15 +24,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
@@ -41,10 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private void AnalyzeUsingStatements(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is not UsingDirectiveSyntax usingDirective)
-            {
-                return;
-            }
+            var usingDirective = (UsingDirectiveSyntax)context.Node;
 
             var namespaceName = usingDirective.Name?.ToString();
 

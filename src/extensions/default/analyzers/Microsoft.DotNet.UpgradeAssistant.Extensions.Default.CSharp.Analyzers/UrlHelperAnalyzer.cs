@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class UrlHelperAnalyzer : DiagnosticAnalyzer
+    public sealed class UrlHelperAnalyzer : DiagnosticAnalyzer
     {
         public const string NewIdentifierKey = "NewIdentifier";
         public const string DiagnosticId = "UA0008";
@@ -24,11 +24,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
@@ -41,14 +36,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         private void AnalyzeIdentifiers(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is not IdentifierNameSyntax identifier)
-            {
-                return;
-            }
+            var identifier = (IdentifierNameSyntax)context.Node;
 
             var name = identifier.Identifier.ValueText;
 

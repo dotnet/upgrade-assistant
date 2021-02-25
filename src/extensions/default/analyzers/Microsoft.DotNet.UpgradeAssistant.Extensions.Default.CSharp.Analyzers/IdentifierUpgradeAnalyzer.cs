@@ -23,11 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
@@ -38,11 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private void AnalyzeIdentifiers(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is not IdentifierNameSyntax identifier)
-            {
-                return;
-            }
-
+            var identifier = (IdentifierNameSyntax)context.Node;
             var name = identifier.Identifier.ValueText;
 
             // If the node isn't an identifier, bail out

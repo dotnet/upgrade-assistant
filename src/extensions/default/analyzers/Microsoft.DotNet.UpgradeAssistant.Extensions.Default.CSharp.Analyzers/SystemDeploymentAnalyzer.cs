@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic, LanguageNames.FSharp)]
-    public class SystemDeploymentAnalyzer : DiagnosticAnalyzer
+    public sealed class SystemDeploymentAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0011";
         private const string Category = "Upgrade";
@@ -24,11 +24,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
             context.RegisterMemberAccess(context =>
