@@ -24,14 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         {
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
-            context.RegisterCompilationStartAction(context =>
-            {
-                var allowHtmlType = context.Compilation.GetTypeByMetadataName(AllowHtmlAttributeName);
-                if (allowHtmlType is not null)
-                {
-                    context.RegisterSyntaxNodeAction(context => AnalyzeAttribute(context, allowHtmlType), SyntaxKind.Attribute);
-                }
-            });
+            context.RegisterSyntaxNodeAction(AnalyzeAttribute, SyntaxKind.Attribute);
         }
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AllowHtmlAttributeTitle), Resources.ResourceManager, typeof(Resources));
@@ -42,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
-        private void AnalyzeAttribute(SyntaxNodeAnalysisContext context, INamedTypeSymbol allowHtmlType)
+        private void AnalyzeAttribute(SyntaxNodeAnalysisContext context)
         {
             var attribute = (AttributeSyntax)context.Node;
 
@@ -62,11 +55,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
             // If the identifier resolves to an actual symbol that isn't System.Web.Mvc.AllowHtmlAttribute, then bail out
             var attrNameSymbol = context.SemanticModel.GetTypeInfo(attribute.Name).Type;
-            if (SymbolEqualityComparer.Default.Equals(attrNameSymbol, allowHtmlType))
+            if (attrNameSymbol is INamedTypeSymbol symbol
+                && attrNameSymbol is not IErrorTypeSymbol
+                && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(AllowHtmlAttributeName, StringComparison.Ordinal))
             {
-                var diagnostic = Diagnostic.Create(Rule, attribute.GetLocation(), attribute.Name.ToString());
-                context.ReportDiagnostic(diagnostic);
+                return;
             }
+
+            var diagnostic = Diagnostic.Create(Rule, attribute.GetLocation(), attribute.Name.ToString());
+            context.ReportDiagnostic(diagnostic);
         }
     }
 }
