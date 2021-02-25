@@ -46,17 +46,23 @@ Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https:
 
 ### Installation steps
 
-The tool can be installed as a .NET CLI tool by running: `dotnet tool install -g Microsoft.DotNet.UpgradeAssistant.Cli --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
+The tool can be installed [from NuGet](https://www.nuget.org/packages/upgrade-assistant/) as a .NET CLI tool by running:
 
-Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can be easily updated by running: `dotnet tool update -g Microsoft.DotNet.UpgradeAssistant.Cli --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json`
+```
+dotnet tool install -g upgrade-assistant
+```
 
-Note that if you add the source to [NuGet's configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) you may omit the `--add-source` parameter.
+Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can be easily updated from the command line:
+
+```
+dotnet tool update -g upgrade-assistant
+```
+
+To try the latest (and likely less stable) versions of the tool, CI builds are available on the dotnet-tools NuGet feed and can be installed with `dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json` or updated using the same --add-source parameter.
 
 ## Usage
 
 ### Running the tool
-
-If you installed the tool using the .NET CLI, it can be run by calling `dotnet upgrade-assistant`. Otherwise, it can be run by invoking `Microsoft.DotNet.UpgradeAssistant.Cli.exe`.
 
 The usual usage of the tool is: `upgrade-assistant <Path to csproj or sln to upgrade>`
 
@@ -98,8 +104,8 @@ If you're just starting to look at .NET 5.0 and would like to understand more ab
 
 1. If try-convert fails:
     1. Check that try-convert is installed (and that it is either located at %USERPROFILE%\.dotnet\tools\try-convert.exe or upgrade-assistant's appsettings.json file has been updated with the correct location).
-    2. Check that try-convert is at least version 0.7.157502 or higher).
-    3. Check whether the input project imports custom props or targets files. Try-convert doesn't support converting projects that import unknown props and targets files. Look at the output from upgrade-assistant and try-convert to see if any unrecognized imports are mentioned.
+    2. Check that try-convert is at least version 0.7.212201 or higher).
+    3. Check whether the input project imports custom props or targets files. Older versions of try-convert didn't support converting projects that import unknown props and targets files. Look at the output from upgrade-assistant and try-convert to see if any unrecognized imports are mentioned. If so, you will need to either update try-convert or remove the imports.
 
 ### Extensibility
 The Upgrade Assistant has an extension system that make it easy for you to customize many of the upgrade steps without having to rebuild the tool. See how you can extend the tool [here](docs/extensibility.md).
@@ -132,7 +138,7 @@ Take a look at the high level overview of the roadmap for this tool and the jour
 
 ## Feedback and Issues
 As you use the tool to upgrade your apps to .NET 5, please share your thoughts with us. If you have a suggestion for a new feature or idea, we want to know!
-And course if you find an issue or need help, please log an issue.
+And, of course, if you find an issue or need help, please log an issue.
 
 [Share your feedback with us or report an issue](https://github.com/dotnet/upgrade-assistant/issues)
 
