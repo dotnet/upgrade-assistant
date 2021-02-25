@@ -28,7 +28,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
-                }
+                },
+                EnableRaisingEvents = true
             };
 
             _logger.LogTrace("Starting process '{Command} {Arguments}'", args.Command, args.Arguments);
