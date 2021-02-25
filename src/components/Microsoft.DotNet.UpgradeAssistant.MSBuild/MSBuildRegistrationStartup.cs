@@ -16,8 +16,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class MSBuildRegistrationStartup : IUpgradeStartup
     {
+        // MSBuildInstance is stored in a static so that multiple
+        // instances of MSBuildRegistrationStartup (which should only
+        // happen in test scenarios) will share a single instance
+        // per process.
+        private static VisualStudioInstance? MSBuildInstance;
+
         private readonly ILogger _logger;
-        private VisualStudioInstance? _msBuildInstance;
 
         public MSBuildRegistrationStartup(ILogger<MSBuildRegistrationStartup> logger)
         {
@@ -32,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public string RegisterMSBuildInstance()
         {
-            if (_msBuildInstance is null)
+            if (MSBuildInstance is null)
             {
                 // TODO : Harden this and allow MSBuild location to be read from env vars.
                 var msBuildInstances = FilterForBitness(MSBuildLocator.QueryVisualStudioInstances()).ToList();
@@ -49,17 +54,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                         _logger.LogDebug("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
                     }
 
-                    _msBuildInstance = msBuildInstances
+                    MSBuildInstance = msBuildInstances
                         .OrderByDescending(m => m.Version)
                         .First();
-                    _logger.LogInformation("MSBuild registered from {MSBuildPath}", _msBuildInstance.MSBuildPath);
+                    _logger.LogInformation("MSBuild registered from {MSBuildPath}", MSBuildInstance.MSBuildPath);
 
-                    MSBuildLocator.RegisterInstance(_msBuildInstance);
+                    MSBuildLocator.RegisterInstance(MSBuildInstance);
                     AssemblyLoadContext.Default.Resolving += ResolveAssembly;
                 }
             }
 
-            return _msBuildInstance.MSBuildPath;
+            return MSBuildInstance.MSBuildPath;
         }
 
         private IEnumerable<VisualStudioInstance> FilterForBitness(IEnumerable<VisualStudioInstance> instances)
@@ -83,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private Assembly? ResolveAssembly(AssemblyLoadContext context, AssemblyName assemblyName)
         {
-            if (context is null || assemblyName is null || _msBuildInstance is null)
+            if (context is null || assemblyName is null || MSBuildInstance is null)
             {
                 return null;
             }
@@ -91,14 +96,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // If the assembly has a culture, check for satellite assemblies
             if (assemblyName.CultureInfo != null)
             {
-                var satellitePath = Path.Combine(_msBuildInstance.MSBuildPath, assemblyName.CultureInfo.Name, $"{assemblyName.Name}.dll");
+                var satellitePath = Path.Combine(MSBuildInstance.MSBuildPath, assemblyName.CultureInfo.Name, $"{assemblyName.Name}.dll");
                 if (File.Exists(satellitePath))
                 {
                     _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
                     return context.LoadFromAssemblyPath(satellitePath);
                 }
 
-                satellitePath = Path.Combine(_msBuildInstance.MSBuildPath, assemblyName.CultureInfo.TwoLetterISOLanguageName, $"{assemblyName.Name}.dll");
+                satellitePath = Path.Combine(MSBuildInstance.MSBuildPath, assemblyName.CultureInfo.TwoLetterISOLanguageName, $"{assemblyName.Name}.dll");
                 if (File.Exists(satellitePath))
                 {
                     _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
@@ -106,7 +111,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
             }
 
-            var assemblyPath = Path.Combine(_msBuildInstance.MSBuildPath, $"{assemblyName.Name}.dll");
+            var assemblyPath = Path.Combine(MSBuildInstance.MSBuildPath, $"{assemblyName.Name}.dll");
             if (File.Exists(assemblyPath))
             {
                 _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, assemblyPath);
