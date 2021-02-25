@@ -39,7 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static IEnumerable<UpgradeCommand<T>> CreateFromEnum<T>()
             where T : struct, Enum
-            => Enum.GetValues<T>()
+            => Enum.GetValues(typeof(T))
+                .Cast<T>()
                 .Select(t => new EnumUpgradeCommand<T>
                 {
                     Value = t,

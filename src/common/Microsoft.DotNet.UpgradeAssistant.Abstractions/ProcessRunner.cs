@@ -47,14 +47,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             var errorEncountered = false;
+            var tcs = new TaskCompletionSource<bool>();
 
+            using var registration = token.Register(() => tcs.SetCanceled());
+
+            process.Exited += (_, __) => tcs.SetResult(true);
             process.OutputDataReceived += args.Quiet ? QuietOutputReceived : OutputReceived;
             process.ErrorDataReceived += args.Quiet ? QuietOutputReceived : OutputReceived;
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            await process.WaitForExitAsync(token).ConfigureAwait(false);
+            await tcs.Task.ConfigureAwait(false);
 
             if (process.ExitCode != args.SuccessCode)
             {
