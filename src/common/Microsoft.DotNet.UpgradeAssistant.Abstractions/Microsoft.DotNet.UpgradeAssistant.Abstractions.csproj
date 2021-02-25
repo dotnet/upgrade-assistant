@@ -3,7 +3,6 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Microsoft.DotNet.UpgradeAssistant</RootNamespace>
     <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Microsoft.DotNet.UpgradeAssistant.Abstractions</PackageId>
@@ -15,7 +14,6 @@
     <Description>Abstractions for extending Microsoft .NET Upgrade Assistant</Description>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageTags>Upgrade Assistant</PackageTags>
-    <Description>Classes for building components used by the Microsoft .NET Upgrade Assistant.</Description>
     <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
