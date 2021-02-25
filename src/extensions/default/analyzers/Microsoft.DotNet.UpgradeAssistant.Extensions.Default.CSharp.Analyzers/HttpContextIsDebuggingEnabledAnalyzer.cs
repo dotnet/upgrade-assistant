@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class HttpContextIsDebuggingEnabledAnalyzer : DiagnosticAnalyzer
+    public sealed class HttpContextIsDebuggingEnabledAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0006";
         private const string Category = "Upgrade";
@@ -27,15 +27,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
@@ -44,10 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is not MemberAccessExpressionSyntax expression)
-            {
-                return;
-            }
+            var expression = (MemberAccessExpressionSyntax)context.Node;
 
             // If the member being accessed isn't named "IsDebuggingEnabled", bail out
             if (!expression.Name.Identifier.Text.Equals(MemberName, StringComparison.Ordinal))

@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class AllowHtmlAttributeAnalyzer : DiagnosticAnalyzer
+    public sealed class AllowHtmlAttributeAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0010";
         private const string Category = "Upgrade";
@@ -22,14 +22,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
-
             context.RegisterSyntaxNodeAction(AnalyzeAttribute, SyntaxKind.Attribute);
         }
 
@@ -39,14 +33,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         private void AnalyzeAttribute(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is not AttributeSyntax attribute)
-            {
-                return;
-            }
+            var attribute = (AttributeSyntax)context.Node;
 
             // Get the attribute's simple name
             var name = attribute.Name.ToString();
