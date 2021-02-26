@@ -279,3 +279,6 @@ dotnet_diagnostic.CA1711.severity = none
 # CA1716: Using a reserved keyword as the name of a namespace makes it harder for consumers in other languages to use the namespace
 dotnet_diagnostic.CA1716.severity = none
 
+# SA1200: Using directives must be placed within namespace
+dotnet_diagnostic.SA1200.severity = none
+
