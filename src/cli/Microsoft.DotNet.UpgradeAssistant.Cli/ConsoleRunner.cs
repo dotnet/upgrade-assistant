@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
             catch (UpgradeException e)
             {
-                _logger.LogError("Unexpected error: {Message}", e.Message);
+                _logger.LogError("{Message}", e.Message);
             }
             catch (OperationCanceledException)
             {
