@@ -7,12 +7,14 @@ Below is a preview of some of the areas we want to focus on in that journey and 
 This list is not meant to be exhaustive of all features and [issues](https://github.com/dotnet/upgrade-assistant/issues) that could be supported, just a high level overview.
 
 **1. Pre-migration analysis**
+
 Example areas:
 - Up front checks for technologies that might not be supported in .NET 5+ or could make the upgrade effort large in cost (links to docs, options available, best practices, etc.).
 - More visibility into NuGet dependencies (e.g. newer versions, do they support .NET 5+?)
 - Recommendations for TFM (target frameworks) to move to
 
 **2. Upgrade**
+
 Example areas:
 - Multitargeting support for specific and multiple target frameworks
 - Identify areas of an app that might require manual changes
@@ -23,6 +25,7 @@ Example areas:
 - Even more ideas listed in the repo [issues](https://github.com/dotnet/upgrade-assistant/issues)
 
 **3. Tooling support**
+
 Example areas:
 - Tool maintains the state of the upgrade
 - UI on top of the CLI experience
