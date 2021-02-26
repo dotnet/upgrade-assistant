@@ -21,35 +21,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 
         public override string CommandText => "Configure logging";
 
+        private enum LogTarget
+        {
+            Console,
+            File
+        }
+
         public override async Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
         {
+            var target = await _userInput.ChooseAsync("Choose log target:", CreateFromEnum<LogTarget>(), token);
             var result = await _userInput.ChooseAsync("Choose your log level:", CreateFromEnum<LogLevel>(), token);
-            var newLogLevel = result.Value;
 
-            // if the choice cannot be parsed then we will not change the setting
-            _logSettings.SetLogLevel(newLogLevel);
-
-            if (newLogLevel == LogLevel.None)
+            switch (target.Value)
             {
-                _logSettings.SelectedTargets = LogTargets.None;
+                case LogTarget.Console:
+                    _logSettings.SetConsoleLevel(result.Value);
+                    return true;
+                case LogTarget.File:
+                    _logSettings.SetFileLevel(result.Value);
+                    return true;
+                default:
+                    return false;
             }
-            else
-            {
-                var target = LogTargets.None;
-
-                var commands = new[]
-                {
-                    Create("Console", () => target = LogTargets.Console),
-                    Create("File", () => target = LogTargets.File),
-                    Create("Both", () => target = LogTargets.Console | LogTargets.File),
-                };
-
-                await _userInput.ChooseAsync("Choose where to send log messages:", commands, token);
-
-                _logSettings.SelectedTargets = target;
-            }
-
-            return true;
         }
     }
 }

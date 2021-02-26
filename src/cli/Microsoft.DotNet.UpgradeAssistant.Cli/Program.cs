@@ -126,11 +126,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     serviceConfiguration(context, services);
                 })
-                .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
-                    .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
+                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
                     .Enrich.FromLogContext()
-                    .WriteTo.Conditional(evt => logSettings.IsConsoleEnabled, sink => sink.Console())
-                    .WriteTo.Conditional(evt => logSettings.IsFileEnabled, sink => sink.File(LogFilePath)))
+                    .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
+                    .WriteTo.Console(levelSwitch: logSettings.Console)
+                    .WriteTo.File(LogFilePath, levelSwitch: logSettings.File))
                 .RunConsoleAsync(options =>
                 {
                     options.SuppressStatusMessages = true;
