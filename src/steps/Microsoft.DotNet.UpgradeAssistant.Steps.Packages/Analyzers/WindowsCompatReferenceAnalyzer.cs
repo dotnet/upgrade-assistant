@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             {
                 var version = existing.GetNuGetVersion();
 
-                if (version >= latestVersion)
+                if (version >= latestVersion.GetNuGetVersion())
                 {
                     return state;
                 }
@@ -61,10 +61,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 state.PackagesToRemove.Add(existing);
             }
 
-            var versionToAdd = latestVersion.ToNormalizedString();
-            _logger.LogInformation("Adding {PackageName} {Version}", PackageName, versionToAdd);
+            _logger.LogInformation("Adding {PackageName} {Version}", PackageName, latestVersion.Version);
 
-            state.PackagesToAdd.Add(new NuGetReference(PackageName, versionToAdd));
+            state.PackagesToAdd.Add(new NuGetReference(PackageName, latestVersion.Version));
 
             return state;
         }

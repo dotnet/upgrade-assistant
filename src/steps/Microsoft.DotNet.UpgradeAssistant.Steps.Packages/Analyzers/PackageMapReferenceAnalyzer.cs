@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     var version = await _packageLoader.GetLatestVersionAsync(packageToAdd.Name, false, null, token).ConfigureAwait(false);
                     if (version is not null)
                     {
-                        packageToAdd = packageToAdd with { Version = version.ToNormalizedString() };
+                        packageToAdd = version;
                     }
                 }
 

@@ -48,13 +48,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 // Use the analyzer package version from configuration if specified, otherwise get the latest version.
                 // When looking for the latest analyzer version, use the analyzer package source from configuration
                 // if one is specified, otherwise just use the package sources from the project being analyzed.
-                var analyzerPackageVersion = _analyzerPackageVersion is not null
-                    ? NuGetVersion.Parse(_analyzerPackageVersion)
+                var analyzerPackage = _analyzerPackageVersion is not null
+                    ? new NuGetReference(AnalyzerPackageName, _analyzerPackageVersion)
                     : await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, true, null, token).ConfigureAwait(false);
-                if (analyzerPackageVersion is not null)
+
+                if (analyzerPackage is not null)
                 {
-                    _logger.LogInformation("Reference to .NET Upgrade Assistant analyzer package ({AnalyzerPackageName}, version {AnalyzerPackageVersion}) needs added", AnalyzerPackageName, analyzerPackageVersion);
-                    state.PackagesToAdd.Add(new NuGetReference(AnalyzerPackageName, analyzerPackageVersion.ToString()) { PrivateAssets = "all" });
+                    _logger.LogInformation("Reference to .NET Upgrade Assistant analyzer package ({AnalyzerPackageName}, version {AnalyzerPackageVersion}) needs added", AnalyzerPackageName, analyzerPackage.Version);
+                    state.PackagesToAdd.Add(analyzerPackage with { PrivateAssets = "all" });
                 }
                 else
                 {

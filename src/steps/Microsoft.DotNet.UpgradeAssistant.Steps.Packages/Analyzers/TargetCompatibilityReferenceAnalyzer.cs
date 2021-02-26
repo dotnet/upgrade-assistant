@@ -2,14 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NuGet.Frameworks;
-using NuGet.Packaging;
-using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
@@ -35,12 +31,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var targetFramework = NuGetFramework.Parse(_tfmSelector.SelectTFM(project.Required()).Name);
+            var targetFramework = _tfmSelector.SelectTFM(project.Required());
 
             foreach (var packageReference in project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
-                if (await DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, targetFramework, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, targetFramework, token).ConfigureAwait(false))
                 {
                     _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, targetFramework);
                     continue;
@@ -74,64 +70,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return state;
         }
 
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, NuGetFramework targetFramework, CancellationToken token)
+        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, TargetFrameworkMoniker targetFramework, CancellationToken token)
         {
-            var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference.Name, new NuGetVersion(packageReference.GetNuGetVersion()), true, token).ConfigureAwait(false);
-            NuGetReference? updatedReference = null;
-            foreach (var newerPackage in latestMinorVersions.Select(v => new NuGetReference(packageReference.Name, v.ToString())))
+            var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, true, token).ConfigureAwait(false);
+
+            foreach (var newerPackage in latestMinorVersions)
             {
-                if (await DoesPackageSupportTargetFrameworkAsync(newerPackage, packageCachePath, targetFramework, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworkAsync(newerPackage, packageCachePath, targetFramework, token).ConfigureAwait(false))
                 {
                     _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, targetFramework);
-                    updatedReference = newerPackage;
-                    break;
+                    return newerPackage;
                 }
             }
 
-            return updatedReference;
-        }
-
-        private async Task<bool> DoesPackageSupportTargetFrameworkAsync(NuGetReference packageReference, string cachePath, NuGetFramework targetFramework, CancellationToken token)
-        {
-            using var packageArchive = await _packageLoader.GetPackageArchiveAsync(packageReference, token, cachePath).ConfigureAwait(false);
-
-            if (packageArchive is null)
-            {
-                return false;
-            }
-
-            var packageFrameworks = await GetTargetFrameworksAsync(packageArchive, token).ConfigureAwait(false);
-            return packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(targetFramework, f));
-        }
-
-        private async Task<IEnumerable<NuGetFramework>> GetTargetFrameworksAsync(PackageArchiveReader packageArchive, CancellationToken token)
-        {
-            var frameworksNames = new List<NuGetFramework>();
-
-            // Add any target framework there are libraries for
-            var libraries = await packageArchive.GetLibItemsAsync(token).ConfigureAwait(false);
-            frameworksNames.AddRange(libraries.Select(l => l.TargetFramework));
-
-            // Add any specific target framework there are dependencies for (do not add any, since
-            // an 'any' dependency just means that does not necessarilly mean this package can work
-            // with any target)
-            var dependencies = await packageArchive.GetPackageDependenciesAsync(token).ConfigureAwait(false);
-            frameworksNames.AddRange(dependencies.Select(d => d.TargetFramework).Where(f => !f.IsAny));
-
-            // Add any target framework there are reference assemblies for
-            var refs = await packageArchive.GetReferenceItemsAsync(token).ConfigureAwait(false);
-            frameworksNames.AddRange(refs.Select(r => r.TargetFramework));
-
-            // If no frameworks are referenced, then assume the package works everywhere (it is likely
-            // a package of analyzers or some other tooling)
-            if (!frameworksNames.Any())
-            {
-                frameworksNames.Add(NuGetFramework.AnyFramework);
-            }
-
-            var ret = frameworksNames.Distinct();
-            _logger.LogDebug("Found target frameworks for package {NuGetPackage}: {TargetFrameworks}", (await packageArchive.GetIdentityAsync(token).ConfigureAwait(false)).ToString(), ret);
-            return ret;
+            return null;
         }
     }
 }
