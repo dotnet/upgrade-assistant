@@ -101,7 +101,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 }
             }
 
+#pragma warning disable CA1508 // Avoid dead conditional code
             if (context.EntryPoint is null && _isNonInteractiveMode)
+#pragma warning restore CA1508 // Avoid dead conditional code
             {
                 throw new UpgradeException("Entry Point needs to be provided when more than 1 projects present in a non-interative mode. There are 2 ways of providing an entry-point :\n" +
                     "a) Execute upgrade-assistant in interactive mode up until select entry point step and re-run upgrade-assistant in non-interactive mode \n" +
