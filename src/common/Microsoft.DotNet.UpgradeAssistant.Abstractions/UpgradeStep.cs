@@ -134,6 +134,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 throw;
             }
+            catch (UpgradeException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error initializing step.");
