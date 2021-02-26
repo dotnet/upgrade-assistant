@@ -5,6 +5,9 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Setup.Configuration;
 
+#pragma warning disable CA5392 // Use DefaultDllImportSearchPaths attribute for P/Invokes
+#pragma warning disable SA1114 // Parameter list should follow declaration
+
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal static class NativeMethods
