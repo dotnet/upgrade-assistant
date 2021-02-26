@@ -9,6 +9,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
@@ -23,8 +24,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         private const string LogFilePath = "log.txt";
 
-        public static Task Main(string[] args)
+        public static Task<int> Main(string[] args)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Console.WriteLine("This tool is not supported on non-Windows platforms due to dependencies on Visual Studio.");
+                return Task.FromResult(1);
+            }
+
             var root = new RootCommand
             {
                 // Get name from process so that it will show correctly if run as a .NET CLI tool
