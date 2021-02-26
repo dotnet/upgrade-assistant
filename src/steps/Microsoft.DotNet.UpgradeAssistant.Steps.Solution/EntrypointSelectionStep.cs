@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var selectedProject = await GetEntrypointAsync(context, token);
+            var selectedProject = await GetEntrypointAsync(context, token).ConfigureAwait(false);
 
             if (selectedProject is null)
             {
@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             else
             {
                 context.SetEntryPoint(selectedProject);
-                await _restorer.RestorePackagesAsync(context, selectedProject, token);
+                await _restorer.RestorePackagesAsync(context, selectedProject, token).ConfigureAwait(false);
 
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
@@ -98,6 +98,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         }
 
         protected override bool IsApplicableImpl(IUpgradeContext context)
-            => context.EntryPoint is null && !context.IsComplete;
+            => context is not null && context.EntryPoint is null && !context.IsComplete;
     }
 }

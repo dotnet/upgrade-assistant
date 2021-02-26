@@ -37,7 +37,7 @@ namespace Integration.Tests
                 NonInteractiveWait = 0,
             };
 
-            var upgradeTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services, output), cts.Token);
+            var upgradeTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services), cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(upgradeTask, timeoutTimer).ConfigureAwait(false);
@@ -52,7 +52,7 @@ namespace Integration.Tests
             }
         }
 
-        private static void RegisterTestServices(IServiceCollection services, TextWriter output)
+        private static void RegisterTestServices(IServiceCollection services)
         {
             services.AddOptions<PackageUpdaterOptions>().Configure(o =>
             {

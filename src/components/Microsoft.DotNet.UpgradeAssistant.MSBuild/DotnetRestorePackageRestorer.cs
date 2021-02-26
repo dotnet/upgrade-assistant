@@ -13,8 +13,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class DotnetRestorePackageRestorer : IPackageRestorer
     {
-        private static readonly string[] EnvVarsToWithold = new string[] { "MSBuildSDKsPath", "MSBuildExtensionsPath", "MSBUILD_EXE_PATH" };
-
         private readonly ILogger<DotnetRestorePackageRestorer> _logger;
         private readonly IProcessRunner _runner;
 
@@ -31,7 +29,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
-            await RunRestoreAsync(context, project.FilePath, token);
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            await RunRestoreAsync(context, project.FilePath, token).ConfigureAwait(false);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
@@ -41,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return GetRestoreOutput(project);
         }
 
-        private RestoreOutput GetRestoreOutput(IProject project)
+        private static RestoreOutput GetRestoreOutput(IProject project)
         {
             // Check for the lock file's existence rather than success since a bad NuGet reference won't
             // prevent other (valid) packages from being restored and we may still have a (partial) lock file.

@@ -42,7 +42,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                     ? new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty)
                     : new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to apply config updater \"{_configUpdater.Title}\"");
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogError(exc, "Unexpected exception while apply config updater \"{ConfigUpdater}\"", _configUpdater.Title);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while applying config updater \"{_configUpdater.Title}\": {exc}");
@@ -81,7 +83,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                     ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Config updater \"{_configUpdater.Title}\" needs applied", _configUpdater.Risk)
                     : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogError(exc, "Unexpected exception while initializing config updater \"{ConfigUpdater}\"", _configUpdater.Title);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception while initializing config updater \"{_configUpdater.Title}\": {exc}", Risk);

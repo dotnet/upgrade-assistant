@@ -102,7 +102,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "All expected template items found", BuildBreakRisk.None);
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", project.FilePath);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {project.FilePath}", BuildBreakRisk.Unknown);

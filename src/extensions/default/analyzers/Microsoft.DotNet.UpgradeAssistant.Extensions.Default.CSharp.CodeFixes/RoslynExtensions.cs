@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             node?.DescendantNodes()
                 .OfType<MethodDeclarationSyntax>()
                 .FirstOrDefault(m =>
-                    m.Identifier.ToString().Equals(methodName) &&
+                    m.Identifier.ToString().Equals(methodName, StringComparison.Ordinal) &&
                     requiredParameterTypes.All(req => m.ParameterList.Parameters.Any(p => string.Equals(p.Type?.ToString(), req, StringComparison.Ordinal))));
 
         /// <summary>

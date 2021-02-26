@@ -269,3 +269,13 @@ dotnet_diagnostic.CA1819.severity = none
 
 # CA2225: Operator overloads have named alternatives
 dotnet_diagnostic.CA2225.severity = none
+
+# CA1812: Avoid uninstantiated internal classes
+dotnet_diagnostic.CA1812.severity = none
+
+# CA1711: Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1716: Using a reserved keyword as the name of a namespace makes it harder for consumers in other languages to use the namespace
+dotnet_diagnostic.CA1716.severity = none
+

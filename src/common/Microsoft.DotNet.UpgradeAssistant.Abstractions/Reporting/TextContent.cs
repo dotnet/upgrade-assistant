@@ -3,6 +3,6 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 {
-    public record Text(string Content)
+    public record TextContent(string Content)
         : Content;
 }

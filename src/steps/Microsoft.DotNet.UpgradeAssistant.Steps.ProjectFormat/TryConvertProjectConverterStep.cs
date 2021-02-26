@@ -50,9 +50,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var result = await RunTryConvertAsync(context, context.CurrentProject.Required(), token);
+            var result = await RunTryConvertAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
-            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
+            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
             return result;
         }
@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             Logger.LogInformation("Converting project file format with try-convert");
 
-            var result = await _runner.RunAsync(context, project, token);
+            var result = await _runner.RunAsync(context, project, token).ConfigureAwait(false);
 
             // Reload the workspace since an external process worked on and
             // may have changed the workspace's project.
@@ -116,7 +116,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectFile.FilePath, exc.ToString());
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);

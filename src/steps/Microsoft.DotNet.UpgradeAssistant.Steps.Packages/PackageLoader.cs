@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             // First look in the local NuGet cache for the archive
             if (cachePath != null)
             {
-                var archivePath = Path.Combine(cachePath, packageReference.Name.ToLowerInvariant(), packageReference.Version, $"{packageReference.Name.ToLowerInvariant()}.{packageReference.Version}.nupkg");
+                var archivePath = Path.Combine(cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
                 if (File.Exists(archivePath))
                 {
                     _logger.LogDebug("NuGet package {NuGetPackage} loaded from {PackagePath}", packageReference, archivePath);

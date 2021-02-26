@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             var duplicateItems = project.Items.Where(i =>
             {
                 // Only consider items that are added explicitly (not via a globbing pattern)
-                if (!i.EvaluatedInclude.Equals(i.UnevaluatedInclude))
+                if (!i.EvaluatedInclude.Equals(i.UnevaluatedInclude, StringComparison.Ordinal))
                 {
                     return false;
                 }
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 foreach (var projectItem in duplicateItems)
                 {
                     // For any duplcate items, find them in the project root element and remove them
-                    foreach (var item in rootElement.Items.Where(i => i.Include.Equals(projectItem.EvaluatedInclude)))
+                    foreach (var item in rootElement.Items.Where(i => i.Include.Equals(projectItem.EvaluatedInclude, StringComparison.Ordinal)))
                     {
                         var parent = item.Parent;
                         parent.RemoveChild(item);

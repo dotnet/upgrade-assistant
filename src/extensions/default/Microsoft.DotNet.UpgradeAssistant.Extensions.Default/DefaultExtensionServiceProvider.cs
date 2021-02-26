@@ -20,6 +20,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
         public IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration)
         {
+            if (serviceConfiguration is null)
+            {
+                throw new System.ArgumentNullException(nameof(serviceConfiguration));
+            }
+
             AddUpgradeSteps(serviceConfiguration.ServiceCollection, serviceConfiguration.ExtensionConfiguration);
             AddConfigUpdaters(serviceConfiguration.ServiceCollection);
             AddAnalyzersAndCodeFixProviders(serviceConfiguration.ServiceCollection);

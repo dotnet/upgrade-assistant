@@ -28,9 +28,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public async Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (context.EntryPoint is not null)
             {
-                await _restorer.RestorePackagesAsync(context, context.EntryPoint, token);
+                await _restorer.RestorePackagesAsync(context, context.EntryPoint, token).ConfigureAwait(false);
             }
 
             return GetStepsForContext(context);
@@ -106,7 +111,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     // expected to initialize their children during their own initialization
                     Logger.LogInformation("Initializing upgrade step {StepTitle}", step.Title);
                     await step.InitializeAsync(context, token).ConfigureAwait(false);
+
+                    // This is actually not dead code. The above sentence InitializeAsync(...) call will potentially change the status.
+#pragma warning disable CA1508 // Avoid dead conditional code
                     if (step.Status == UpgradeStepStatus.Unknown)
+#pragma warning restore CA1508 // Avoid dead conditional code
                     {
                         Logger.LogError("Upgrade step initialization failed for step {StepTitle}", step.Title);
                         throw new InvalidOperationException($"Step must not have unknown status after initialization. Step: {step.Title}");

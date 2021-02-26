@@ -23,6 +23,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
@@ -50,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
 
             // If the identifier resolves to an actual symbol that isn't the old identifier, bail out
-            if (context.SemanticModel.GetSymbolInfo(identifier).Symbol is INamedTypeSymbol symbol && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldFullName))
+            if (context.SemanticModel.GetSymbolInfo(identifier).Symbol is INamedTypeSymbol symbol && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldFullName, StringComparison.Ordinal))
             {
                 return;
             }
@@ -58,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             // If the identified is part of a fully qualified name and the qualified name exactly matches the new full name,
             // then bail out because the code is likely fine and the symbol is just unavailable because of missing references.
             var qualifiedNameSyntax = identifier.GetFullName();
-            if (qualifiedNameSyntax.ToString().Equals(mapping.NewFullName))
+            if (qualifiedNameSyntax.ToString().Equals(mapping.NewFullName, StringComparison.Ordinal))
             {
                 return;
             }
