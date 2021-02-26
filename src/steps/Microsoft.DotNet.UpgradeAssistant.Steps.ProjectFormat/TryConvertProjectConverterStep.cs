@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
@@ -117,7 +116,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
                 }
             }
-            catch (InvalidProjectFileException exc)
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception exc)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectFile.FilePath, exc.ToString());
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
