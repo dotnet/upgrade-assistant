@@ -39,6 +39,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new System.ArgumentNullException(nameof(context));
+            }
+
             var project = context.CurrentProject.Required();
 
             var targetTfm = _tfmSelector.SelectTFM(project);
@@ -46,16 +51,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             file.SetTFM(targetTfm);
 
-            await file.SaveAsync(token);
+            await file.SaveAsync(token).ConfigureAwait(false);
 
             // With an updated TFM, we should restore packages
-            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token);
+            await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Updated TFM to {targetTfm}");
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new System.ArgumentNullException(nameof(context));
+            }
+
             var project = context.CurrentProject.Required();
             var targetTfm = _tfmSelector.SelectTFM(project);
 

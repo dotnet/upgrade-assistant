@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -29,13 +30,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
             if (project.IsTransitivelyAvailable(PackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
                 return state;
             }
 
-            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, false, null, token);
+            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, false, null, token).ConfigureAwait(false);
 
             if (latestVersion is null)
             {

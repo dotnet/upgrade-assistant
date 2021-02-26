@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(step));
             }
 
-            return new List<UpgradeCommand>(step.Commands)
+            return new List<UpgradeCommand>()
             {
                 new ApplyNextCommand(step),
                 new SkipNextCommand(step),

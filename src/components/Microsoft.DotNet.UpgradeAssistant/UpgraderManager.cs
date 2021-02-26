@@ -12,28 +12,57 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public class UpgraderManager
     {
+        private readonly IEnumerable<IUpgradeReadyCheck> _checks;
         private readonly IPackageRestorer _restorer;
         private readonly IUpgradeStepOrderer _orderer;
+        private readonly ILogger _logger;
 
-        private ILogger Logger { get; }
-
-        public UpgraderManager(IPackageRestorer restorer, IUpgradeStepOrderer orderer, ILogger<UpgraderManager> logger)
+        public UpgraderManager(
+            IEnumerable<IUpgradeReadyCheck> checks,
+            IPackageRestorer restorer,
+            IUpgradeStepOrderer orderer,
+            ILogger<UpgraderManager> logger)
         {
+            _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IEnumerable<UpgradeStep> AllSteps => _orderer.UpgradeSteps;
 
         public async Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (context.EntryPoint is not null)
             {
-                await _restorer.RestorePackagesAsync(context, context.EntryPoint, token);
+                await _restorer.RestorePackagesAsync(context, context.EntryPoint, token).ConfigureAwait(false);
+            }
+
+            if (!await RunChecksAsync(context, token).ConfigureAwait(false))
+            {
+                throw new UpgradeException("Readiness checks did not succeed. Please address any issues and try again.");
             }
 
             return GetStepsForContext(context);
+        }
+
+        private async Task<bool> RunChecksAsync(IUpgradeContext context, CancellationToken token)
+        {
+            var success = true;
+
+            foreach (var check in _checks)
+            {
+                _logger.LogTrace("Running readiness check {Id}", check.Id);
+
+                success &= await check.IsReadyAsync(context, token).ConfigureAwait(false);
+            }
+
+            return success;
         }
 
         public IEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context) => AllSteps.Where(s => s.IsApplicable(context));
@@ -52,13 +81,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             if (!steps.Any())
             {
-                Logger.LogDebug("No applicable upgrade steps found");
+                _logger.LogDebug("No applicable upgrade steps found");
                 return null;
             }
 
             if (steps.All(s => s.IsDone))
             {
-                Logger.LogDebug("All steps have completed");
+                _logger.LogDebug("All steps have completed");
                 return null;
             }
 
@@ -71,11 +100,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             if (nextStep is null)
             {
-                Logger.LogDebug("No applicable incomplete upgrade steps found");
+                _logger.LogDebug("No applicable incomplete upgrade steps found");
             }
             else
             {
-                Logger.LogDebug("Identified upgrade step {UpgradeStep} as the next step", nextStep.Id);
+                _logger.LogDebug("Identified upgrade step {UpgradeStep} as the next step", nextStep.Id);
             }
 
             return nextStep;
@@ -104,16 +133,20 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 {
                     // It is not necessary to iterate through sub-steps because parents steps are
                     // expected to initialize their children during their own initialization
-                    Logger.LogInformation("Initializing upgrade step {StepTitle}", step.Title);
+                    _logger.LogInformation("Initializing upgrade step {StepTitle}", step.Title);
                     await step.InitializeAsync(context, token).ConfigureAwait(false);
+
+                    // This is actually not dead code. The above sentence InitializeAsync(...) call will potentially change the status.
+#pragma warning disable CA1508 // Avoid dead conditional code
                     if (step.Status == UpgradeStepStatus.Unknown)
+#pragma warning restore CA1508 // Avoid dead conditional code
                     {
-                        Logger.LogError("Upgrade step initialization failed for step {StepTitle}", step.Title);
+                        _logger.LogError("Upgrade step initialization failed for step {StepTitle}", step.Title);
                         throw new InvalidOperationException($"Step must not have unknown status after initialization. Step: {step.Title}");
                     }
                     else
                     {
-                        Logger.LogDebug("Step {StepTitle} initialized", step.Title);
+                        _logger.LogDebug("Step {StepTitle} initialized", step.Title);
                     }
                 }
 

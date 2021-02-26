@@ -38,11 +38,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             {
                 var line = new StringBuilder(await input.ReadLineAsync().ConfigureAwait(false));
 
-                if (line is null)
-                {
-                    break;
-                }
-
                 foreach (var key in tokenReplacements.Keys)
                 {
                     line.Replace(key, tokenReplacements[key]);

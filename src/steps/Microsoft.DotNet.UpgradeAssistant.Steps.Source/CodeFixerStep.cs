@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override string Title { get; }
 
-        public CodeFixerStep(UpgradeStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, ILogger logger)
+        public CodeFixerStep(SourceUpdaterStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, ILogger logger)
             : base(logger)
         {
             if (logger is null)
@@ -49,10 +49,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             _fixProvider = fixProvider ?? throw new ArgumentNullException(nameof(fixProvider));
-            _sourceUpdater = (ParentStep = parentStep) as SourceUpdaterStep ?? throw new ArgumentException(nameof(parentStep)); // The parent step has the compilation/diagnostics
+            _sourceUpdater = parentStep ?? throw new ArgumentNullException(nameof(parentStep)); // The parent step has the compilation/diagnostics
+
+            ParentStep = parentStep;
 
             // Get titles for all the diagnostics this step can fix
-            var diagnosticTitles = _fixProvider.FixableDiagnosticIds.Select(i => diagnostics.FirstOrDefault(d => d.Id.Equals(i))?.Title).Where(t => t != null);
+            var diagnosticTitles = _fixProvider.FixableDiagnosticIds.Select(i => diagnostics.FirstOrDefault(d => d.Id.Equals(i, StringComparison.Ordinal))?.Title).Where(t => t != null);
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
         }
 
@@ -159,7 +161,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
             await _fixProvider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
+            // fixAction may not be null if the code fixer is applied.
+#pragma warning disable CA1508 // Avoid dead conditional code
             if (fixAction is null)
+#pragma warning restore CA1508 // Avoid dead conditional code
             {
                 Logger.LogWarning("No code fix found for {DiagnosticId}", diagnostic.Id);
                 return null;

@@ -16,12 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             if (!project.GetFile().IsSdk)
             {
-                content.Add(new Text("Project needs to be updated to the SDK-style .csproj"));
+                content.Add(new TextContent("Project needs to be updated to the SDK-style .csproj"));
             }
 
             if (project.PackageReferenceFormat == NugetPackageFormat.PackageConfig)
             {
-                content.Add(new Text("NuGet packages must be updated to PackageReference"));
+                content.Add(new TextContent("NuGet packages must be updated to PackageReference"));
             }
 
             var section = new Section("Project File Status")

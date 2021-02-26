@@ -18,9 +18,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Console apps don't have a synchronization context")]
+
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    public class Program
+    public static class Program
     {
         private const string LogFilePath = "log.txt";
 
@@ -124,11 +126,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     serviceConfiguration(context, services);
                 })
-                .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
-                    .MinimumLevel.ControlledBy(logSettings.LoggingLevelSwitch)
+                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
                     .Enrich.FromLogContext()
-                    .WriteTo.Conditional(evt => logSettings.IsConsoleEnabled, sink => sink.Console())
-                    .WriteTo.Conditional(evt => logSettings.IsFileEnabled, sink => sink.File(LogFilePath)))
+                    .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
+                    .WriteTo.Console(levelSwitch: logSettings.Console)
+                    .WriteTo.File(LogFilePath, levelSwitch: logSettings.File))
                 .RunConsoleAsync(options =>
                 {
                     options.SuppressStatusMessages = true;

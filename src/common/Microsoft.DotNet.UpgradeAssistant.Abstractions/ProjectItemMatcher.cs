@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "ProjectItemMatcher instances are not likely to be compared, so the default equals behavior is sufficient")]
     public readonly struct ProjectItemMatcher
     {
         private readonly object _match;

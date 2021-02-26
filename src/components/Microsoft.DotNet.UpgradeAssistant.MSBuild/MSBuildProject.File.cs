@@ -180,6 +180,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public string GetPropertyValue(string propertyName)
             => Project.GetPropertyValue(propertyName);
 
+        public void SetPropertyValue(string propertyName, string propertyValue)
+            => Project.SetProperty(propertyName, propertyValue);
+
         private static string GetPathRelativeToProject(string path, string projectDir) =>
             Path.IsPathFullyQualified(path)
             ? path

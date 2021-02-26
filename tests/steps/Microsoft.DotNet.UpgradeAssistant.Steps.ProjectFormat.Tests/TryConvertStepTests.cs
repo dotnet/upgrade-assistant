@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             var context = mock.Mock<IUpgradeContext>();
 
             // Act
-            await step.InitializeAsync(context.Object, default);
+            await step.InitializeAsync(context.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(UpgradeStepStatus.Failed, step.Status);
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             context.Setup(m => m.CurrentProject).Returns(project.Object);
 
             // Act
-            await step.InitializeAsync(context.Object, default);
+            await step.InitializeAsync(context.Object, default).ConfigureAwait(false);
 
             // Assert
             var expected = isSdk ? UpgradeStepStatus.Complete : UpgradeStepStatus.Incomplete;
@@ -116,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             mock.Mock<ITryConvertTool>().Setup(m => m.RunAsync(context.Object, project.Object, default)).ReturnsAsync(isSuccess);
 
             // Act
-            await step.ApplyAsync(context.Object, default);
+            await step.ApplyAsync(context.Object, default).ConfigureAwait(false);
 
             // Assert
             var expected = isSuccess ? UpgradeStepStatus.Complete : UpgradeStepStatus.Failed;
