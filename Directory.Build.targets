@@ -8,7 +8,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)/common/**/*.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)/shared/**/*.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.0'">
