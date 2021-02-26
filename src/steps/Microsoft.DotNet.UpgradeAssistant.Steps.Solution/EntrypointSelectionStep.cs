@@ -98,6 +98,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         }
 
         protected override bool IsApplicableImpl(IUpgradeContext context)
-            => context.EntryPoint is null && !context.IsComplete;
+            => context is not null && context.EntryPoint is null && !context.IsComplete;
     }
 }

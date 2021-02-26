@@ -27,6 +27,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             var projectInstance = CreateProjectInstance(context, project);
             RestorePackages(projectInstance);
 

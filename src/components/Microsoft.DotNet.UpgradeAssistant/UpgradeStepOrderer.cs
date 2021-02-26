@@ -19,6 +19,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public UpgradeStepOrderer(IEnumerable<UpgradeStep> steps, ILogger<UpgradeStepOrderer> logger)
         {
+            if (steps is null)
+            {
+                throw new ArgumentNullException(nameof(steps));
+            }
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _steps = Order(steps);
         }

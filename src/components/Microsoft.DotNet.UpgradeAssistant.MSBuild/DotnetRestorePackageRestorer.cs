@@ -29,6 +29,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             await RunRestoreAsync(context, project.FilePath, token).ConfigureAwait(false);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)

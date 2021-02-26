@@ -255,9 +255,6 @@ dotnet_diagnostic.SA1310.severity = none
 # SA1502: Element should not be on a single line
 dotnet_diagnostic.SA1502.severity = none
 
-# CA1062: Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity = none
-
 # CA1303: Do not pass literals as localized parameters
 dotnet_diagnostic.CA1303.severity = none
 
