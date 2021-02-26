@@ -60,6 +60,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }, token);
         }
 
-        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.Required().FilePath);
+        private static string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.Required().FilePath);
     }
 }

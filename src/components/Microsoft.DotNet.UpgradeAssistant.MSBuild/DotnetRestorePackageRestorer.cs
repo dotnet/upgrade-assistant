@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(context));
             }
 
-            await RunRestoreAsync(context, project.FilePath, token);
+            await RunRestoreAsync(context, project.FilePath, token).ConfigureAwait(false);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return GetRestoreOutput(project);
         }
 
-        private RestoreOutput GetRestoreOutput(IProject project)
+        private static RestoreOutput GetRestoreOutput(IProject project)
         {
             // Check for the lock file's existence rather than success since a bad NuGet reference won't
             // prevent other (valid) packages from being restored and we may still have a (partial) lock file.

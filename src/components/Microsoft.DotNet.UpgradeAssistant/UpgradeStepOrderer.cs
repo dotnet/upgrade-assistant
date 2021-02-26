@@ -23,17 +23,17 @@ namespace Microsoft.DotNet.UpgradeAssistant
             _steps = Order(steps);
         }
 
-        public bool TryAddStep(UpgradeStep step)
+        public bool TryAddStep(UpgradeStep newStep)
         {
-            if (step is null)
+            if (newStep is null)
             {
-                throw new ArgumentNullException(nameof(step));
+                throw new ArgumentNullException(nameof(newStep));
             }
 
-            _logger.LogDebug("Attempting to add upgrade step {Id}", step.Id);
+            _logger.LogDebug("Attempting to add upgrade step {Id}", newStep.Id);
 
             // Find a place in the order after all dependencies
-            var dependencies = step.DependsOn.ToList();
+            var dependencies = newStep.DependsOn.ToList();
             var index = 0;
             for (index = 0; index < _steps.Count && dependencies.Any(); index++)
             {
@@ -43,21 +43,21 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     dependencies.RemoveAll(d => d.Equals(currentId, StringComparison.Ordinal));
                 }
 
-                if (step.DependencyOf.Contains(currentId, StringComparer.Ordinal))
+                if (newStep.DependencyOf.Contains(currentId, StringComparer.Ordinal))
                 {
-                    _logger.LogError("Could not add dependency {UpgradeStep} because its dependent step {Dependent} is executed before all of its dependencies are satisfied", step.Id, currentId);
+                    _logger.LogError("Could not add dependency {UpgradeStep} because its dependent step {Dependent} is executed before all of its dependencies are satisfied", newStep.Id, currentId);
                     return false;
                 }
             }
 
             if (dependencies.Any())
             {
-                _logger.LogError("Could not add dependency {UpgradeStep} because dependencies were not satisfied: {Dependencies}", step.Id, string.Join(", ", dependencies));
+                _logger.LogError("Could not add dependency {UpgradeStep} because dependencies were not satisfied: {Dependencies}", newStep.Id, string.Join(", ", dependencies));
                 return false;
             }
 
-            _steps.Insert(index, step);
-            _logger.LogDebug("Inserted upgrade step {UpgradeStep} at index {Index}", step.Id, index);
+            _steps.Insert(index, newStep);
+            _logger.LogDebug("Inserted upgrade step {UpgradeStep} at index {Index}", newStep.Id, index);
 
             return true;
         }

@@ -25,14 +25,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _reportGenerator = reportGenerator;
         }
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        public async Task RunAsync(CancellationToken token)
         {
             _logger.LogInformation("Starting report");
 
-            var context = await _factory.CreateContext(cancellationToken);
+            var context = await _factory.CreateContext(token);
             var visitor = new ConsolePageVisitor();
 
-            await foreach (var page in _reportGenerator.Generate(context, cancellationToken))
+            await foreach (var page in _reportGenerator.Generate(context, token))
             {
                 visitor.Visit(page);
             }
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Console.WriteLine();
             }
 
-            public override void Visit(Text text)
+            public override void Visit(TextContent text)
             {
                 Console.WriteLine(text.Content);
             }

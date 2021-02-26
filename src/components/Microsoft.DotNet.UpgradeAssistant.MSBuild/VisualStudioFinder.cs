@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 if (result < 0)
                 {
-                    throw new COMException($"Failed to get {nameof(query)}", result);
+                    throw;
                 }
 
                 return query;

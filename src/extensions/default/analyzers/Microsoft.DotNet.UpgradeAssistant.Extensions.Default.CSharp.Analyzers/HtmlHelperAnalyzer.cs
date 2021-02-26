@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
 
             // If the identifier resolves to an actual symbol that isn't System.Web.Mvc.HtmlHelper, then bail out
-            if (context.SemanticModel.GetSymbolInfo(identifier).Symbol is INamedTypeSymbol symbol && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(SystemWebHtmlHelperName))
+            if (context.SemanticModel.GetSymbolInfo(identifier).Symbol is INamedTypeSymbol symbol && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(SystemWebHtmlHelperName, StringComparison.Ordinal))
             {
                 return;
             }

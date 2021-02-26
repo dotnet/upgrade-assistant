@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NuGet.Configuration;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
@@ -26,8 +25,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     {
         private const int MaxAnalysisIterations = 3;
 
-        private readonly UpgradeOptions _options;
-        private readonly IPackageLoader _packageLoader;
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
 
@@ -57,10 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         };
 
         public PackageUpdaterStep(
-            UpgradeOptions options,
             IOptions<PackageUpdaterOptions> updaterOptions,
-            ITargetTFMSelector tfmSelector,
-            IPackageLoader packageLoader,
             IPackageRestorer packageRestorer,
             IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
             ILogger<PackageUpdaterStep> logger)
@@ -76,8 +70,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            _options = options ?? throw new ArgumentNullException(nameof(options));
-            _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _analysisState = null;
@@ -99,7 +91,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
@@ -173,7 +167,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}");

@@ -255,6 +255,12 @@ dotnet_diagnostic.SA1310.severity = none
 # SA1502: Element should not be on a single line
 dotnet_diagnostic.SA1502.severity = none
 
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+# CA1014: Mark assemblies with CLSCompliantAttribute
+dotnet_diagnostic.CA1014.severity = none
+
 # CA1303: Do not pass literals as localized parameters
 dotnet_diagnostic.CA1303.severity = none
 
@@ -272,3 +278,10 @@ dotnet_diagnostic.CA2225.severity = none
 
 # CA1812: Avoid uninstantiated internal classes
 dotnet_diagnostic.CA1812.severity = none
+
+# CA1711: Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1716: Using a reserved keyword as the name of a namespace makes it harder for consumers in other languages to use the namespace
+dotnet_diagnostic.CA1716.severity = none
+

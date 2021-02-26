@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             using var workspace = MSBuildWorkspace.Create();
             var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
-            return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath)));
+            return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
         }
 
         public static async Task<Document> FixSourceAsync(string documentPath, string diagnosticId)
@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             while (diagnosticFixed);
 
             project = solution.GetProject(projectId)!;
-            return project.Documents.First(d => documentPath.Equals(Path.GetFileName(d.FilePath)));
+            return project.Documents.First(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
         }
 
         private static async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
@@ -150,7 +150,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
             await provider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
+            // fixAction may not be null if the code fixer is applied.
+#pragma warning disable CA1508 // Avoid dead conditional code
             if (fixAction is null)
+#pragma warning restore CA1508 // Avoid dead conditional code
             {
                 return null;
             }

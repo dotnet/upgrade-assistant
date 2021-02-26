@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
@@ -132,8 +133,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Te
 
         private static void AssertConfigEquals(ConfigFile actualConfig, string expected)
         {
-            var actual = File.ReadAllText(actualConfig.Path).Replace("\r", string.Empty);
-            expected = expected.Replace("\r", string.Empty);
+            var actual = File.ReadAllText(actualConfig.Path).Replace("\r", string.Empty, StringComparison.OrdinalIgnoreCase);
+            expected = expected.Replace("\r", string.Empty, StringComparison.OrdinalIgnoreCase);
 
             Assert.Equal(actual, expected);
         }

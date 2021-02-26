@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new ProjectInstance(project.FilePath, context.GlobalProperties, toolsVersion: null);
 
-        private RestoreOutput GetRestoreOutput(IProject project)
+        private static RestoreOutput GetRestoreOutput(IProject project)
         {
             // Check for the lock file's existence rather than success since a bad NuGet reference won't
             // prevent other (valid) packages from being restored and we may still have a (partial) lock file.

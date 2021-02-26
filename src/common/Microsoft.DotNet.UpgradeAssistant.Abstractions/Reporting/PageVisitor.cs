@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Reporting
 
         public abstract void Visit(Divider divider);
 
-        public abstract void Visit(Text text);
+        public abstract void Visit(TextContent text);
 
         public abstract void Visit(Section section);
 
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Reporting
             {
                 Visit(table);
             }
-            else if (content is Text text)
+            else if (content is TextContent text)
             {
                 Visit(text);
             }

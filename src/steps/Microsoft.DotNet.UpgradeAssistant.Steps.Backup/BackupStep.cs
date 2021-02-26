@@ -155,7 +155,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
                 if (await result.ExecuteAsync(context, token).ConfigureAwait(false))
                 {
+                    // customPath may be set in the lambda above.
+#pragma warning disable CA1508 // Avoid dead conditional code
                     return customPath ?? _backupPath;
+#pragma warning restore CA1508 // Avoid dead conditional code
                 }
             }
 

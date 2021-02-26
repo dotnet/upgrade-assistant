@@ -21,7 +21,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         protected UpgradeStep(ILogger logger)
         {
             Logger = logger;
-            Commands = new List<UpgradeCommand>();
             ProjectInitializedAgainst = null;
 
             Status = UpgradeStepStatus.Unknown;
@@ -48,11 +47,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// Gets or sets the upgrade step (if any) that this upgrade step is a sub-step of.
         /// </summary>
         public virtual UpgradeStep? ParentStep { get; protected set; }
-
-        /// <summary>
-        /// Gets or sets upgrade step-specific commands that the user can choose from in addition to the default commands.
-        /// </summary>
-        public virtual List<UpgradeCommand> Commands { get; }
 
         /// <summary>
         /// Gets or sets the upgrade steps that are sub-steps of this upgrade step. SubSteps are executed as part of executing the parent step.
@@ -134,7 +128,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 throw;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error initializing step.");
                 Logger.LogError(e, "Unexpected error initializing step");
@@ -183,7 +179,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 throw;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error applying step.");
                 Logger.LogError(e, "Unexpected error applying step");
