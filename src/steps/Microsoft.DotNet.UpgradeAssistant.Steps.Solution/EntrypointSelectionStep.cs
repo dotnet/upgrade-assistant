@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +14,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
     {
         private readonly IPackageRestorer _restorer;
         private readonly IUserInput _userInput;
+        private readonly bool _isNonInteractiveMode;
+        private readonly string _entryPoint;
 
         public EntrypointSelectionStep(
+            UpgradeOptions options,
             IPackageRestorer restorer,
             IUserInput userInput,
             ILogger<EntrypointSelectionStep> logger)
             : base(logger)
         {
+            _isNonInteractiveMode = options?.NonInteractive ?? throw new ArgumentNullException(nameof(options));
+            _entryPoint = options?.EntryPoint ?? string.Empty;
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
         }
@@ -77,6 +83,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 Logger.LogInformation("Setting entrypoint to only project in solution: {Project}", project.FilePath);
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+            }
+
+            if (!string.IsNullOrEmpty(_entryPoint))
+            {
+                var entryPointProject = projects.Where(i => Path.GetFileName(i.FilePath) == _entryPoint).FirstOrDefault();
+                if (entryPointProject is not null)
+                {
+                    context.SetEntryPoint(entryPointProject);
+                    Logger.LogInformation("Setting entrypoint to user selected project in solution: {Project}", _entryPoint);
+
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
+                }
+                else
+                {
+                    Logger.LogInformation("Invalid Entry-Point Project specified : {Project}", _entryPoint);
+                }
+            }
+
+#pragma warning disable CA1508 // Avoid dead conditional code
+            if (context.EntryPoint is null && _isNonInteractiveMode)
+#pragma warning restore CA1508 // Avoid dead conditional code
+            {
+                throw new UpgradeException("Entry Point needs to be provided when more than 1 projects present in a non-interative mode. There are 2 ways of providing an entry-point :\n" +
+                    "a) Execute upgrade-assistant in interactive mode up until select entry point step and re-run upgrade-assistant in non-interactive mode \n" +
+                    "b) Execute upgrade-assistant in non-interactive mode with valid value for --entry-point");
             }
 
             return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);

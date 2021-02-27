@@ -128,6 +128,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 throw;
             }
+            catch (UpgradeException)
+            {
+                throw;
+            }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types

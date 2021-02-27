@@ -14,7 +14,7 @@ namespace Integration.Tests
 {
     public static class UpgradeRunner
     {
-        public static async Task UpgradeAsync(string inputPath, TextWriter output, int timeoutSeconds = 300)
+        public static async Task UpgradeAsync(string inputPath, string entrypoint, TextWriter output, int timeoutSeconds = 300)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -35,6 +35,7 @@ namespace Integration.Tests
                 Project = project,
                 NonInteractive = true,
                 NonInteractiveWait = 0,
+                EntryPoint = entrypoint,
             };
 
             var upgradeTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services), cts.Token);
