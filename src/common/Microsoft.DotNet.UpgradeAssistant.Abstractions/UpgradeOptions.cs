@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public bool SkipBackup { get; set; }
 
-        public string EntryPoint { get; set; } = string.Empty;
+        public string? EntryPoint { get; set; } = string.Empty;
 
         public bool Verbose { get; set; }
 
