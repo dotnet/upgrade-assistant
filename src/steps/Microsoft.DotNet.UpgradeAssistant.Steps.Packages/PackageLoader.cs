@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NuGet.Configuration;
+using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
@@ -44,7 +45,171 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _packageSources = GetPackageSources(Path.GetDirectoryName(options.ProjectPath));
         }
 
-        public async Task<PackageArchiveReader?> GetPackageArchiveAsync(NuGetReference packageReference, CancellationToken token, string? cachePath = null)
+        public async Task<bool> DoesPackageSupportTargetFrameworkAsync(NuGetReference packageReference, string cachePath, TargetFrameworkMoniker targetFramework, CancellationToken token)
+        {
+            using var packageArchive = await GetPackageArchiveAsync(packageReference, token, cachePath).ConfigureAwait(false);
+
+            if (packageArchive is null)
+            {
+                return false;
+            }
+
+            var packageFrameworks = await GetTargetFrameworksAsync(packageArchive, token).ConfigureAwait(false);
+            return packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(targetFramework.Name), f));
+        }
+
+        public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, bool latestMinorAndBuildOnly, CancellationToken token)
+        {
+            if (reference is null)
+            {
+                throw new ArgumentNullException(nameof(reference));
+            }
+
+            var versions = new List<NuGetVersion>();
+
+            // Query each package source for listed versions of the given package name
+            foreach (var source in _packageSources)
+            {
+                var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
+                try
+                {
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(reference.Name, includePrerelease: true, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
+                    versions.AddRange(searchResults.Select(r => r.Identity.Version));
+                }
+                catch (NuGetProtocolException)
+                {
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
+                }
+            }
+
+            // Filter to only include versions higher than the user's current version and,
+            // optionally, only the highest minor/build for each major version
+            var currentVersion = reference.GetNuGetVersion();
+            var filteredVersions = versions.Distinct().Where(v => v > currentVersion);
+            var versionsToReturn = latestMinorAndBuildOnly
+                ? filteredVersions.GroupBy(v => v.Major).Select(g => g.Max()!)
+                : filteredVersions;
+
+            _logger.LogDebug("Found versions for package {PackageName}: {PackageVersions}", reference.Name, versionsToReturn);
+
+            return versionsToReturn.OrderBy(v => v).Select(v => reference with { Version = v.ToNormalizedString() });
+        }
+
+        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, bool includePreRelease, string[]? packageSources, CancellationToken token)
+        {
+            NuGetVersion? highestVersion = null;
+
+            // Query each package source for listed versions of the given package name
+            foreach (var source in packageSources?.Select(p => new PackageSource(p)) ?? _packageSources)
+            {
+                var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
+                try
+                {
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: includePreRelease, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
+                    var highestVersionResult = searchResults.Select(r => r.Identity.Version).Max(v => v);
+                    if (highestVersionResult is null)
+                    {
+                        continue;
+                    }
+
+                    if (highestVersion is null || highestVersionResult > highestVersion)
+                    {
+                        highestVersion = highestVersionResult;
+                    }
+                }
+                catch (NuGetProtocolException)
+                {
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
+                }
+            }
+
+            if (highestVersion is null)
+            {
+                return null;
+            }
+
+            return new NuGetReference(packageName, highestVersion.ToFullString());
+        }
+
+        private List<PackageSource> GetPackageSources(string? projectDir)
+        {
+            var packageSources = new List<PackageSource>();
+            if (projectDir != null)
+            {
+                var nugetSettings = Settings.LoadDefaultSettings(projectDir);
+                var sourceProvider = new PackageSourceProvider(nugetSettings);
+                packageSources.AddRange(sourceProvider.LoadPackageSources());
+            }
+
+            if (packageSources.Count == 0)
+            {
+                packageSources.Add(new PackageSource(DefaultPackageSource));
+            }
+
+            _logger.LogDebug("Found package sources: {PackageSources}", packageSources);
+            return packageSources;
+        }
+
+        private async Task<T> CallWithRetryAsync<T>(Func<Task<T>> func)
+        {
+            for (var i = 0; i < MaxRetries; i++)
+            {
+                try
+                {
+                    var ret = await func.Invoke().ConfigureAwait(false);
+                    return ret;
+                }
+                catch (NuGetProtocolException)
+                {
+                    if (i < MaxRetries - 1)
+                    {
+                        var delay = (int)(1000 * Math.Pow(2, i));
+                        _logger.LogInformation("NuGet operation failed; retrying in {RetryTime} seconds", delay / 1000);
+                        await Task.Delay(delay).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to execute NuGet action after {MaxRetries} attempts", MaxRetries);
+                        throw;
+                    }
+                }
+            }
+
+            // The compiler doesn't believe me that the above code either always returns or always throws
+            throw new InvalidOperationException("This should never be reached; fix the bug in PackageLoader");
+        }
+
+        private async Task<IEnumerable<NuGetFramework>> GetTargetFrameworksAsync(PackageArchiveReader packageArchive, CancellationToken token)
+        {
+            var frameworksNames = new List<NuGetFramework>();
+
+            // Add any target framework there are libraries for
+            var libraries = await packageArchive.GetLibItemsAsync(token).ConfigureAwait(false);
+            frameworksNames.AddRange(libraries.Select(l => l.TargetFramework));
+
+            // Add any specific target framework there are dependencies for (do not add any, since
+            // an 'any' dependency just means that does not necessarilly mean this package can work
+            // with any target)
+            var dependencies = await packageArchive.GetPackageDependenciesAsync(token).ConfigureAwait(false);
+            frameworksNames.AddRange(dependencies.Select(d => d.TargetFramework).Where(f => !f.IsAny));
+
+            // Add any target framework there are reference assemblies for
+            var refs = await packageArchive.GetReferenceItemsAsync(token).ConfigureAwait(false);
+            frameworksNames.AddRange(refs.Select(r => r.TargetFramework));
+
+            // If no frameworks are referenced, then assume the package works everywhere (it is likely
+            // a package of analyzers or some other tooling)
+            if (!frameworksNames.Any())
+            {
+                frameworksNames.Add(NuGetFramework.AnyFramework);
+            }
+
+            var ret = frameworksNames.Distinct();
+            _logger.LogDebug("Found target frameworks for package {NuGetPackage}: {TargetFrameworks}", (await packageArchive.GetIdentityAsync(token).ConfigureAwait(false)).ToString(), ret);
+            return ret;
+        }
+
+        private async Task<PackageArchiveReader?> GetPackageArchiveAsync(NuGetReference packageReference, CancellationToken token, string? cachePath = null)
         {
             if (packageReference is null)
             {
@@ -95,115 +260,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             _logger.LogWarning("NuGet package {NuGetPackage} not found", packageReference);
             return null;
-        }
-
-        public async Task<IEnumerable<NuGetVersion>> GetNewerVersionsAsync(string packageName, NuGetVersion currentVersion, bool latestMinorAndBuildOnly, CancellationToken token)
-        {
-            var versions = new List<NuGetVersion>();
-
-            // Query each package source for listed versions of the given package name
-            foreach (var source in _packageSources)
-            {
-                var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                try
-                {
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: true, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
-                    versions.AddRange(searchResults.Select(r => r.Identity.Version));
-                }
-                catch (NuGetProtocolException)
-                {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
-                }
-            }
-
-            // Filter to only include versions higher than the user's current version and,
-            // optionally, only the highest minor/build for each major version
-            var filteredVersions = versions.Distinct().Where(v => v > currentVersion);
-            var versionsToReturn = latestMinorAndBuildOnly
-                ? filteredVersions.GroupBy(v => v.Major).Select(g => g.Max()!)
-                : filteredVersions;
-
-            _logger.LogDebug("Found versions for package {PackageName}: {PackageVersions}", packageName, versionsToReturn);
-            return versionsToReturn.OrderBy(v => v);
-        }
-
-        public async Task<NuGetVersion?> GetLatestVersionAsync(string packageName, bool includePreRelease, string[]? packageSources, CancellationToken token)
-        {
-            NuGetVersion? highestVersion = null;
-
-            // Query each package source for listed versions of the given package name
-            foreach (var source in packageSources?.Select(p => new PackageSource(p)) ?? _packageSources)
-            {
-                var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                try
-                {
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: includePreRelease, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
-                    var highestVersionResult = searchResults.Select(r => r.Identity.Version).Max(v => v);
-                    if (highestVersionResult is null)
-                    {
-                        continue;
-                    }
-
-                    if (highestVersion is null || highestVersionResult > highestVersion)
-                    {
-                        highestVersion = highestVersionResult;
-                    }
-                }
-                catch (NuGetProtocolException)
-                {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
-                }
-            }
-
-            return highestVersion;
-        }
-
-        private List<PackageSource> GetPackageSources(string? projectDir)
-        {
-            var packageSources = new List<PackageSource>();
-            if (projectDir != null)
-            {
-                var nugetSettings = Settings.LoadDefaultSettings(projectDir);
-                var sourceProvider = new PackageSourceProvider(nugetSettings);
-                packageSources.AddRange(sourceProvider.LoadPackageSources());
-            }
-
-            if (packageSources.Count == 0)
-            {
-                packageSources.Add(new PackageSource(DefaultPackageSource));
-            }
-
-            _logger.LogDebug("Found package sources: {PackageSources}", packageSources);
-            return packageSources;
-        }
-
-        private async Task<T> CallWithRetryAsync<T>(Func<Task<T>> func)
-        {
-            for (var i = 0; i < MaxRetries; i++)
-            {
-                try
-                {
-                    var ret = await func.Invoke().ConfigureAwait(false);
-                    return ret;
-                }
-                catch (NuGetProtocolException)
-                {
-                    if (i < MaxRetries - 1)
-                    {
-                        var delay = (int)(1000 * Math.Pow(2, i));
-                        _logger.LogInformation("NuGet operation failed; retrying in {RetryTime} seconds", delay / 1000);
-                        await Task.Delay(delay).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to execute NuGet action after {MaxRetries} attempts", MaxRetries);
-                        throw;
-                    }
-                }
-            }
-
-            // The compiler doesn't believe me that the above code either always returns or always throws
-            throw new InvalidOperationException("This should never be reached; fix the bug in PackageLoader");
         }
 
         public void Dispose()
