@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Checks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -14,15 +15,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
 {
     public class MultiTargetingCheckTests
     {
+        public static IEnumerable<object[]> TestData =>
+            new List<object[]>
+            {
+                            new object[] { new IProject[] { GetValidProject() }, true },
+                            new object[] { new IProject[] { GetValidProject(), GetValidProject() }, true },
+                            new object[] { new IProject[] { GetInvalidProject() }, false },
+                            new object[] { new IProject[] { GetValidProject(), GetInvalidProject(), GetValidProject() }, false },
+                            new object[] { Array.Empty<IProject>(), true },
+            };
+
         [Theory]
         [MemberData(nameof(TestData))]
         public async Task OnlyValidTFMsPassCheck(IProject[] projects, bool isReady)
         {
             // Arrange
-            var context = new Mock<IUpgradeContext>();
+            using var mock = AutoMock.GetLoose();
+
+            var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(projects);
 
-            var readyCheck = new MultiTargetingCheck(NullLogger<MultiTargetingCheck>.Instance);
+            var readyCheck = mock.Create<MultiTargetingCheck>();
 
             // Act
             var result = await readyCheck.IsReadyAsync(context.Object, CancellationToken.None).ConfigureAwait(false);
@@ -30,16 +43,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
             // Assert
             Assert.Equal(isReady, result);
         }
-
-        public static IEnumerable<object[]> TestData =>
-            new List<object[]>
-            {
-                    new object[] { new IProject[] { GetValidProject() }, true },
-                    new object[] { new IProject[] { GetValidProject(), GetValidProject() }, true },
-                    new object[] { new IProject[] { GetInvalidProject() }, false },
-                    new object[] { new IProject[] { GetValidProject(), GetInvalidProject(), GetValidProject() }, false },
-                    new object[] { Array.Empty<IProject>(), true },
-            };
 
         private static IProject GetValidProject()
         {
