@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Loader;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             var extensionPathString = configuration[UpgradeAssistantExtensionPathsSettingName];
-            var pathsFromString = extensionPathString?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Enumerable.Empty<string>();
+            var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
             var extensionPaths = pathsFromString.Concat(additionalExtensionPaths);
 
             // Always include the default extension which contains built-in source updaters, config updaters, etc.
@@ -99,9 +99,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         continue;
                     }
 
-                    var assembly = AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
+                    // AssemblyLoadContext is not available in .NET Standard 2.0
+                    // var assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
+                    var assemblyBytes = new byte[assemblyStream.Length];
+                    assemblyStream.Read(assemblyBytes, 0, assemblyBytes.Length);
+                    var assembly = Assembly.Load(assemblyBytes);
+
                     var serviceProviders = assembly.GetTypes()
-                        .Where(t => t.IsPublic && !t.IsAbstract && t.IsAssignableTo(typeof(IExtensionServiceProvider)))
+                        .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
                         .Select(t => Activator.CreateInstance(t))
                         .Cast<IExtensionServiceProvider>();
 
