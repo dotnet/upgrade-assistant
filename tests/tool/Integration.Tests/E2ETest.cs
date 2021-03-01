@@ -57,6 +57,41 @@ namespace Integration.Tests
             }
         }
 
+        [InlineData("AspNetMvcTemplate", "vb", "SinglePageApp.vbproj", "")]
+        [InlineData("WpfSample", "vb", "WpfApp1.sln", "WpfApp1.csproj")]
+        [Theory]
+        public async Task UnsupportedUpgradeTest(string scenarioName, string language, string inputFileName, string entrypoint)
+        {
+            // Create a temporary working directory
+            var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            try
+            {
+                var dir = Directory.CreateDirectory(workingDir);
+                Assert.True(dir.Exists);
+
+                // Copy the scenario files to the temporary directory
+                var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioName, language);
+                await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
+
+                // Run upgrade
+                await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, Console.Out, 300).ConfigureAwait(false);
+                CleanupBuildArtifacts(workingDir);
+
+                await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.Equal($"Cannot open project '{Path.Combine(workingDir, inputFileName)}' because the language 'Visual Basic' is not supported.", ex.Message);
+            }
+            finally
+            {
+                if (Directory.Exists(workingDir))
+                {
+                    Directory.Delete(workingDir, true);
+                }
+            }
+        }
+
         private async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
         {
             var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p[(expectedDir.Length + 1)..]).ToArray();
