@@ -26,10 +26,10 @@ namespace Integration.Tests
             ".upgrade-assistant"
         };
 
-        [InlineData("AspNetMvcTemplate", "TemplateMvc.csproj")]
-        [InlineData("WpfSample", "BeanTrader.sln")]
+        [InlineData("AspNetMvcTemplate", "TemplateMvc.csproj", "")]
+        [InlineData("WpfSample", "BeanTrader.sln", "BeanTraderClient.csproj")]
         [Theory]
-        public async Task UpgradeTest(string scenarioName, string inputFileName)
+        public async Task UpgradeTest(string scenarioName, string inputFileName, string entrypoint)
         {
             // Create a temporary working directory
             var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -43,7 +43,7 @@ namespace Integration.Tests
                 await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
 
                 // Run upgrade
-                await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), Console.Out, 300).ConfigureAwait(false);
+                await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, Console.Out, 300).ConfigureAwait(false);
                 CleanupBuildArtifacts(workingDir);
 
                 await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);

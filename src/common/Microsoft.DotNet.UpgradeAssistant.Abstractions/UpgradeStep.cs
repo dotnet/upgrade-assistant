@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         protected UpgradeStep(ILogger logger)
         {
-            Logger = logger;
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             ProjectInitializedAgainst = null;
 
             Status = UpgradeStepStatus.Unknown;
@@ -125,6 +125,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 (Status, StatusDetails, Risk) = await InitializeImplAsync(context, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (UpgradeException)
             {
                 throw;
             }

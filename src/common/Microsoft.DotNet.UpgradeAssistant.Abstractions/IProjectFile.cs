@@ -33,6 +33,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         string GetPropertyValue(string propertyName);
 
+        void SetPropertyValue(string propertyName, string propertyValue);
+
         void SetTFM(TargetFrameworkMoniker targetTFM);
     }
 }
