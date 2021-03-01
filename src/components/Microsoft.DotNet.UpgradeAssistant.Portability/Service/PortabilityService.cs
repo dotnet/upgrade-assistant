@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Portability.Service
                 yield break;
             }
 
-            using var stream = await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false);
+            using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             var result = await JsonSerializer.DeserializeAsync<IEnumerable<ApiInformation>>(stream, _options, cancellationToken: token).ConfigureAwait(false);
 

@@ -50,5 +50,6 @@
     <PackageVersion Include="System.Linq.Async" Version="5.0.0" />
     <PackageVersion Include="System.Reactive" Version="5.0.0" />
     <PackageVersion Include="System.Text.Encoding.Extensions" Version="4.3.0" />
+    <PackageVersion Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
 </Project>
