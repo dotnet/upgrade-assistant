@@ -24,8 +24,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
         }
 
-        public override string Id => typeof(EntrypointSelectionStep).FullName!;
-
         public override string Title => "Select an entrypoint";
 
         public override string Description => "The entrypoint is the application you run or the library that is to be upgraded. Dependencies will then be analyzed and a recommended process will then be determined";

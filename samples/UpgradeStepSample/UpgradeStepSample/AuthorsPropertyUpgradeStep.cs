@@ -93,7 +93,7 @@ namespace UpgradeStepSample
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // The IProjectFile abstraction exposes the csproj file.
+            // The IProjectFile abstraction exposes the project file.
             var projectFile = context.CurrentProject.Required().GetFile();
 
             if (_options?.Authors is null)
@@ -143,7 +143,7 @@ namespace UpgradeStepSample
                 throw new InvalidOperationException("AuthorsPropertyUpgradeStep should not be applied without a valid authors option set.");
             }
 
-            // The IProjectFile abstraction exposes the csproj file.
+            // The IProjectFile abstraction exposes the project file.
             var projectFile = context.CurrentProject.Required().GetFile();
             var existingAuthorsProperty = projectFile.GetPropertyValue(AuthorsPropertyName);
 

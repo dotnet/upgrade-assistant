@@ -20,8 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
-        public override string Id => typeof(FinalizeSolutionStep).FullName!;
-
         public override string Title => "Finalize Solution";
 
         public override string Description => "All projects have been upgraded. Please review any changes and test accordingly.";

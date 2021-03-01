@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets a string that uniquely identifies this upgrade step.
         /// </summary>
-        public abstract string Id { get; }
+        public virtual string Id => GetType().FullName!;
 
         /// <summary>
         /// Gets a user-friendly display name for the upgrade step.

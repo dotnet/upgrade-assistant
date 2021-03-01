@@ -30,8 +30,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private PackageAnalysisState? _analysisState;
 
-        public override string Id => typeof(PackageUpdaterStep).FullName!;
-
         public override string Description => "Update package references to versions compatible with the target framework";
 
         public override string Title => "Update NuGet packages";

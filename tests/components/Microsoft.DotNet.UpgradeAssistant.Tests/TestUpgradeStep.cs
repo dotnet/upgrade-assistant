@@ -14,8 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public int ApplicationCount { get; set; }
 
-        public override string Id => typeof(TestUpgradeStep).FullName!;
-
         public override string Description { get; }
 
         public override string Title { get; }
