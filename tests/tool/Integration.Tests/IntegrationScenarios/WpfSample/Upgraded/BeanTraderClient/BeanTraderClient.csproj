@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.22" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure" Version="3.3.7" />
     <PackageReference Include="Hyak.Common" Version="1.2.2" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.3" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.4" />
     <PackageReference Include="Nito.AsyncEx" Version="5.1.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
