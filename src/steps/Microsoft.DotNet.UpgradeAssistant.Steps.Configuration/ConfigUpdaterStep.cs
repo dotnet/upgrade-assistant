@@ -18,8 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         public ImmutableArray<ConfigFile> ConfigFiles { get; private set; }
 
-        public override string Id => typeof(ConfigUpdaterStep).FullName!;
-
         public override string Description => $"Update project based on settings in app config files ({string.Join(", ", _configFilePaths)})";
 
         public override string Title => "Upgrade app config files";

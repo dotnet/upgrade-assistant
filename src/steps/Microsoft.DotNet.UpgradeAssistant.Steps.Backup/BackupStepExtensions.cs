@@ -9,6 +9,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public static class BackupStepExtensions
     {
         public static IServiceCollection AddBackupStep(this IServiceCollection services) =>
-            services.AddScoped<UpgradeStep, BackupStep>();
+            services.AddUpgradeStep<BackupStep>();
     }
 }

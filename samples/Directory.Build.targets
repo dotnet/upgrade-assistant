@@ -1,0 +1,8 @@
+<Project>
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.321">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <Compile Include="$(MSBuildThisFileDirectory)/../shared/**/*.cs" />
+  </ItemGroup>
+</Project>

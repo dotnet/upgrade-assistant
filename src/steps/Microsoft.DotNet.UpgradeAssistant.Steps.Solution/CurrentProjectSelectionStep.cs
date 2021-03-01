@@ -21,8 +21,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.EntrypointSelectionStep"
         };
 
-        public override string Id => typeof(CurrentProjectSelectionStep).FullName!;
-
         public override string Description => string.Empty;
 
         public override string Title => "Select project to upgrade";

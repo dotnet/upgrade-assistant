@@ -14,8 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         {
         }
 
-        public override string Id => typeof(NextProjectStep).FullName!;
-
         public override string Title => "Move to next project";
 
         public override string Description => "The current project has completed upgrade. Please review any changes and ensure project is able to build before moving on.";

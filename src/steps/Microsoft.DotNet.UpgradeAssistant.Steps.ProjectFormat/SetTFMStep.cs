@@ -31,8 +31,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             _tfmSelector = tfmSelector;
         }
 
-        public override string Id => typeof(SetTFMStep).FullName!;
-
         public override string Title => "Update TFM";
 
         public override string Description => "Update TFM for current project";

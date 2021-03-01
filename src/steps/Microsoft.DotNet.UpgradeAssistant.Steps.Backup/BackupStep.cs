@@ -20,8 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         private string? _projectDir;
         private string? _backupPath;
 
-        public override string Id => typeof(BackupStep).FullName!;
-
         public override string Description => $"Back up the current project to another directory";
 
         public override string Title => "Back up project";

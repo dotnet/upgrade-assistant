@@ -14,8 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         private readonly ITryConvertTool _runner;
         private readonly IPackageRestorer _restorer;
 
-        public override string Id => typeof(TryConvertProjectConverterStep).FullName!;
-
         public override string Description => $"Use the try-convert tool ({_runner.Path}) to convert the project file to an SDK-style csproj";
 
         public override string Title => $"Convert project file to SDK style";
