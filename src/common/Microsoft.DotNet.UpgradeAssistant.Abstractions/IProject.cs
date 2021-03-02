@@ -12,6 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         string FilePath { get; }
 
+        Languages Language { get; }
+
         Project GetRoslynProject();
 
         IEnumerable<IProject> ProjectReferences { get; }

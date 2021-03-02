@@ -43,6 +43,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return Context.GetOrAddProject(project.FilePath);
         });
 
+        public Languages Language => ParseLanguageByProjectFileExtension(FilePath);
+
+        private static Languages ParseLanguageByProjectFileExtension(string filePath)
+        {
+            return Path.GetExtension(filePath).ToUpperInvariant() switch
+            {
+                ".CSPROJ"=> Languages.CSharp,
+                ".VBPROJ"=> Languages.VisualBasic,
+                ".FSPROJ"=> Languages.FSharp,
+                _ => Languages.Unknown
+            };
+        }
+
         public MBuild.Project Project => Context.ProjectCollection.LoadProject(FilePath);
 
         public ProjectOutputType OutputType =>
