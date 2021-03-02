@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             {
                 // Read all text instead of keeping the stream open so that we can
                 // re-open the config file later in this method as writeable
-                existingJson = await File.ReadAllTextAsync(appSettingsPath, token).ConfigureAwait(false);
+                existingJson = File.ReadAllText(appSettingsPath);
             }
 
             using var json = JsonDocument.Parse(existingJson, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
@@ -104,7 +104,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             if (!file.ContainsItem(appSettingsPath, ProjectItemType.Content, token))
             {
-                var itemPath = project.Directory is not null ? Path.GetRelativePath(project.Directory, appSettingsPath) : appSettingsPath;
+                // Remove the directory that was added at the beginning of this method.
+                var itemPath = Path.IsPathRooted(appSettingsPath)
+                    ? Path.GetFileName(appSettingsPath)
+                    : appSettingsPath;
                 file.AddItem(ProjectItemType.Content.Name, itemPath);
                 await file.SaveAsync(token).ConfigureAwait(false);
             }

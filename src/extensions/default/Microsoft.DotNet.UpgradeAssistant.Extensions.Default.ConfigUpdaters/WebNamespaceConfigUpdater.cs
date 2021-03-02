@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _viewImportsPath = null;
         }
 
-        public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
             if (context is null)
             {
@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
                 var viewImportsContents = new List<string>(_viewImportsPath is null
                     ? new[] { string.Empty, ViewImportsInitialContent }
-                    : await File.ReadAllLinesAsync(_viewImportsPath, token).ConfigureAwait(false));
+                    : File.ReadAllLines(_viewImportsPath));
 
                 foreach (var ns in _namespacesToUpgrade.OrderByDescending(s => s))
                 {
@@ -72,19 +72,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 }
 
                 var path = _viewImportsPath ?? Path.Combine(project.Directory ?? string.Empty, ViewImportsRelativePath);
-                await File.WriteAllLinesAsync(path, viewImportsContents, token).ConfigureAwait(false);
+                File.WriteAllLines(path, viewImportsContents);
                 _logger.LogInformation("View imports written to {ViewImportsPath}", path);
 
-                return true;
+                return Task.FromResult(true);
             }
             catch (IOException exc)
             {
                 _logger.LogError(exc, "Unexpected exception accessing _ViewImports");
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public async Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
             if (context is null)
             {
@@ -135,17 +135,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             }
             else
             {
-                alreadyImportedNamespaces.AddRange((await File.ReadAllLinesAsync(_viewImportsPath, token).ConfigureAwait(false))
+                alreadyImportedNamespaces.AddRange(File.ReadAllLines(_viewImportsPath)
                     .Select(line => line.Trim())
                     .Where(line => line.StartsWith(RazorUsingPrefix, StringComparison.Ordinal))
-                    .Select(line => line[RazorUsingPrefix.Length..].Trim()));
+                    .Select(line => line.Substring(RazorUsingPrefix.Length).Trim()));
 
                 _logger.LogDebug("Found {NamespaceCount} namespaces already in _ViewImports.cshtml", alreadyImportedNamespaces.Count);
             }
 
             _namespacesToUpgrade = namespaces.Distinct().Where(ns => !alreadyImportedNamespaces.Contains(ns));
             _logger.LogInformation("{NamespaceCount} web page namespace imports need upgraded: {Namespaces}", _namespacesToUpgrade.Count(), string.Join(", ", _namespacesToUpgrade));
-            return _namespacesToUpgrade.Any();
+            return Task.FromResult(_namespacesToUpgrade.Any());
         }
     }
 }
