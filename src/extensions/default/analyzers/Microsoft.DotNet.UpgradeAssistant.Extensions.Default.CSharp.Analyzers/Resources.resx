@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AllowHtmlAttributeDescription" xml:space="preserve">
-    <value>[AllowHtmlAttrubute] should be removed.</value>
+    <value>[AllowHtmlAttribute] should be removed.</value>
   </data>
   <data name="AllowHtmlAttributeMessageFormat" xml:space="preserve">
     <value>Attribute '{0}' should be removed</value>
   </data>
   <data name="AllowHtmlAttributeTitle" xml:space="preserve">
-    <value>[AllowHtmlAttrubute] should be removed</value>
+    <value>[AllowHtmlAttribute] should be removed</value>
   </data>
   <data name="FilterDescription" xml:space="preserve">
     <value>Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core.</value>
