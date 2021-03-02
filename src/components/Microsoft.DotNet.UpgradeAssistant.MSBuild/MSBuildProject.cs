@@ -100,6 +100,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                         components |= ProjectComponents.Web;
                     }
 
+                    if (GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        components |= ProjectComponents.WPF;
+                    }
+
                     if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
                         GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
                         GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
@@ -129,6 +134,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     // Check imports and references
                     var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
                     var references = References.Select(r => r.Name);
+
+                    if (references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.WPF;
+                    }
 
                     if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
                         references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))

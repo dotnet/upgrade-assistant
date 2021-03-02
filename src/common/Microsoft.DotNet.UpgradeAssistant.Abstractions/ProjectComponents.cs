@@ -12,5 +12,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         WindowsDesktop = 1,
         Web = 1 << 1,
         WinRT = 1 << 2,
+        WPF = 1 << 3,
     }
 }

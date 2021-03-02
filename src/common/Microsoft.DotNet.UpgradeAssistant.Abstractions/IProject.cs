@@ -12,6 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         string FilePath { get; }
 
+        bool IsSdk { get; }
+
         Languages Language { get; }
 
         Project GetRoslynProject();

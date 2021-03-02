@@ -39,7 +39,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null
+            /* try convert does not support the migration of Visual Basic WPF applications */
+            && !(context.CurrentProject.Language == Languages.VisualBasic && (context.CurrentProject.Components & ProjectComponents.WPF) == ProjectComponents.WPF);
 
         protected async override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
