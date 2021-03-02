@@ -43,6 +43,8 @@ Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https:
 1. This Upgrade Assistant depends on [try-convert](https://github.com/dotnet/try-convert). In order for the tool to run correctly, you must install the try-convert tool for converting project files to the new SDK style. If you already have try-convert installed, you may need to update it instead (since upgrade-assistant depends on version 0.7.157502 or later)
     1. To install try-convert: `dotnet tool install -g try-convert`
     1. To update try-convert: `dotnet tool update -g try-convert`
+    1. If try-convert fails to install, try ignoring failed NuGet sources during install by running: `dotnet tool install -g try-convert --ignore-failed-sources`
+        1. Because .NET CLI tools (like try-convert and upgrade-assistant) are installed via NuGet, if you have invalid or authenticated NuGet sources in your [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior), that can cause installation issues. Ignoring failed sources will work past those problems.
 
 ### Installation steps
 
@@ -57,6 +59,8 @@ Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can
 ```
 dotnet tool update -g upgrade-assistant
 ```
+
+If installation fails, trying running the install command with the `--ignore-failed-sources` parameter: `dotnet tool install -g upgrade-assistant --ignore-failed-sources`. Like try-convert, upgrade-assistant is installed as a NuGet package, so invalid or authenticated sources in [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) can cause installation problems.
 
 To try the latest (and likely less stable) versions of the tool, CI builds are available on the dotnet-tools NuGet feed and can be installed with `dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json` or updated using the same --add-source parameter.
 
