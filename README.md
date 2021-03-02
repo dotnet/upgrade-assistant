@@ -149,6 +149,25 @@ Concepts referred to in this repository which may have unclear meaning are expla
 ## Roadmap
 Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to .NET 5 and beyond in the [roadmap](docs/roadmap.md).
 
+## FAQ
+
+**401 Unauthorized using dotnet tool install**: <br/>
+If your nuget configs have package feed sources defined that require authentication, sometime you might see errors installing packages from non-authenticated feeds too like nuget.org. If you see error similar to below installing upgrade-assistant: 
+```
+PS C:\> dotnet tool install -g upgrade-assistant
+C:\Program Files\dotnet\sdk\5.0.103\NuGet.targets(131,5): error : Unable to load the service index for source <source>. [<path-to-csproj>.csproj]
+C:\Program Files\dotnet\sdk\5.0.103\NuGet.targets(131,5): error : Response status code does not indicate success: 401 (Unauthorized). [<path-to-csproj>.csproj]
+The tool package could not be restored.
+Tool 'upgrade-assistant' failed to install. This failure may have been caused by:
+
+You are attempting to install a preview release and did not use the --version option to specify the version.
+A package by this name was found, but it was not a .NET tool.
+The required NuGet feed cannot be accessed, perhaps because of an Internet connection problem.
+You mistyped the name of the tool.
+For more reasons, including package naming enforcement, visit https://aka.ms/failure-installing-tool
+```
+Use the option ```--ignore-failed-sources``` while using ```dotnet tool install``` like so <br/> ```dotnet tool install -g upgrade-assistant --ignore-failed-sources```
+
 ## Feedback and Issues
 As you use the tool to upgrade your apps to .NET 5, please share your thoughts with us. If you have a suggestion for a new feature or idea, we want to know!
 And, of course, if you find an issue or need help, please log an issue.
