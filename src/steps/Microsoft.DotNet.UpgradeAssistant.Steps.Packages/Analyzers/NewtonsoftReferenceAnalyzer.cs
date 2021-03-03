@@ -40,15 +40,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 // If the web project doesn't include a reference to the Newtonsoft package, mark it for addition
                 && !packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                // Use the analyzer package version from configuration if specified, otherwise get the latest version.
-                // When looking for the latest analyzer version, use the analyzer package source from configuration
-                // if one is specified, otherwise just use the package sources from the project being analyzed.
                 var analyzerPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, false, null, token).ConfigureAwait(false);
 
                 if (analyzerPackage is not null)
                 {
                     _logger.LogInformation("Reference to Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs added", NewtonsoftPackageName, analyzerPackage.Version);
-                    state.PackagesToAdd.Add(analyzerPackage with { PrivateAssets = "all" });
+                    state.PackagesToAdd.Add(analyzerPackage);
                 }
                 else
                 {
