@@ -12,18 +12,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public class UpgraderManager
     {
-        private readonly IEnumerable<IUpgradeReadyCheck> _checks;
         private readonly IPackageRestorer _restorer;
         private readonly IUpgradeStepOrderer _orderer;
         private readonly ILogger _logger;
 
         public UpgraderManager(
-            IEnumerable<IUpgradeReadyCheck> checks,
             IPackageRestorer restorer,
             IUpgradeStepOrderer orderer,
             ILogger<UpgraderManager> logger)
         {
-            _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -43,26 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 await _restorer.RestorePackagesAsync(context, context.EntryPoint, token).ConfigureAwait(false);
             }
 
-            if (!await RunChecksAsync(context, token).ConfigureAwait(false))
-            {
-                throw new UpgradeException("Readiness checks did not succeed. Please address any issues and try again.");
-            }
-
             return GetStepsForContext(context);
-        }
-
-        private async Task<bool> RunChecksAsync(IUpgradeContext context, CancellationToken token)
-        {
-            var success = true;
-
-            foreach (var check in _checks)
-            {
-                _logger.LogTrace("Running readiness check {Id}", check.Id);
-
-                success &= await check.IsReadyAsync(context, token).ConfigureAwait(false);
-            }
-
-            return success;
         }
 
         public IEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context) => AllSteps.Where(s => s.IsApplicable(context));
