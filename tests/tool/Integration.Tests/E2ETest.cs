@@ -28,7 +28,6 @@ namespace Integration.Tests
 
         [InlineData("AspNetMvcTemplate.", "csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample", "csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-        [InlineData("AspNetMvcTemplate", "vb", "SinglePageApp.vbproj", "SinglePageApp.csproj")]
         [InlineData("WpfSample", "vb", "WpfApp1.sln", "")]
         [Theory]
         public async Task UpgradeTest(string scenarioName, string language, string inputFileName, string entrypoint)
