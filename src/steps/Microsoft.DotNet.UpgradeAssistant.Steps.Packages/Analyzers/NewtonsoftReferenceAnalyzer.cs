@@ -47,17 +47,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
                 if (analyzerPackage is not null)
                 {
-                    _logger.LogInformation("Reference to .NET Upgrade Assistant Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs added", NewtonsoftPackageName, analyzerPackage.Version);
+                    _logger.LogInformation("Reference to Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs added", NewtonsoftPackageName, analyzerPackage.Version);
                     state.PackagesToAdd.Add(analyzerPackage with { PrivateAssets = "all" });
                 }
                 else
                 {
-                    _logger.LogWarning(".NET Upgrade Assistant Newtonsoft NuGet package reference cannot be added because the package cannot be found");
+                    _logger.LogWarning("Newtonsoft NuGet package reference cannot be added because the package cannot be found");
                 }
             }
             else
             {
-                _logger.LogDebug("Reference to .NET Upgrade Assistant Newtonsoft package ({NewtonsoftPackageName}) already exists", NewtonsoftPackageName);
+                _logger.LogDebug("Reference to Newtonsoft package ({NewtonsoftPackageName}) already exists", NewtonsoftPackageName);
             }
 
             return state;
