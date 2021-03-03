@@ -1,4 +1,4 @@
-// This Startup file is based on ASP.NET Core new project templates and is included
+﻿// This Startup file is based on ASP.NET Core new project templates and is included
 // as a starting point for DI registration and HTTP request processing pipeline configuration.
 // This file will need updated according to the specific scenario of the application being upgraded.
 // For more information on ASP.NET Core startup files, see https://docs.microsoft.com/aspnet/core/fundamentals/startup
@@ -33,7 +33,7 @@ namespace TemplateMvc
                 // Newtonsoft.Json is added for compatibility reasons
                 // The recommended approach is to use System.Text.Json for serialization
                 // Visit the following link for more guidance about moving away from Newtonsoft.Json to System.Text.Json
-                // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to?pivots=dotnet-5-0
+                // https://docs.microsoft.com/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
                 .AddNewtonsoftJson(options =>
                 {
                     options.UseMemberCasing();
