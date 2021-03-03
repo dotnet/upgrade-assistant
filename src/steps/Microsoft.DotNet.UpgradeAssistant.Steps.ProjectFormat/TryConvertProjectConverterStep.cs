@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         }
 
         protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null
-            /* 03/02/2020 - try convert does not support the migration of Visual Basic WPF applications */
+            /* 03/02/2020 - try-convert version 0.7.212201 does not support the migration of Visual Basic WPF applications */
             && !(context.CurrentProject.Language == Languages.VisualBasic && (context.CurrentProject.Components & ProjectComponents.WPF) == ProjectComponents.WPF);
 
         protected async override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
