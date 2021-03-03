@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +29,16 @@ namespace WebApplication1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews(ConfigureMvcOptions);
+            services.AddControllersWithViews(ConfigureMvcOptions)
+                // Newtonsoft.Json is added for compatibility reasons
+                // The recommended approach is to use System.Text.Json for serialization
+                // Visit the following link for more guidance about moving away from Newtonsoft.Json to System.Text.Json
+                // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to?pivots=dotnet-5-0
+                .AddNewtonsoftJson(options =>
+                {
+                    options.UseMemberCasing();
+                });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
