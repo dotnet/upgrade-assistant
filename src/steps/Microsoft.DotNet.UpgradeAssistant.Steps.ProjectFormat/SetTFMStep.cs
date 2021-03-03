@@ -77,6 +77,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && context.CurrentProject.IsSdk;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
     }
 }

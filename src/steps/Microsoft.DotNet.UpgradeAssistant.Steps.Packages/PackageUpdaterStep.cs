@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _analysisState = null;
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && context.CurrentProject.IsSdk;
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
