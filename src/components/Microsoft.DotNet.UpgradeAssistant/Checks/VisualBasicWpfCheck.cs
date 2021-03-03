@@ -36,10 +36,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
                 if (project.Language == Languages.VisualBasic && project.Components.HasFlag(ProjectComponents.WPF))
                 {
                     _logger.LogCritical("Project {Project} cannot be upgraded. try-convert version 0.7.212201 does not support the migration of Visual Basic WPF applications", project.FilePath);
+                    return Task.FromResult(false);
                 }
             }
 
-            return Task.FromResult(false);
+            return Task.FromResult(true);
         }
     }
 }
