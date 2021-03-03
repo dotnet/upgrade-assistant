@@ -33,7 +33,7 @@ namespace WebApplication1
                 // Newtonsoft.Json is added for compatibility reasons
                 // The recommended approach is to use System.Text.Json for serialization
                 // Visit the following link for more guidance about moving away from Newtonsoft.Json to System.Text.Json
-                // https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to?pivots=dotnet-5-0
+                // https://docs.microsoft.com/dotnet/standard/serialization/system-text-json-migrate-from-newtonsoft-how-to
                 .AddNewtonsoftJson(options =>
                 {
                     options.UseMemberCasing();
