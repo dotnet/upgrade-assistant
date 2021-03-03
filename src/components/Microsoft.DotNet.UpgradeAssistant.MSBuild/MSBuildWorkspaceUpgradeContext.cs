@@ -44,7 +44,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public MSBuildWorkspaceUpgradeContext(
             UpgradeOptions options,
-            ITargetTFMSelector tfmSelector,
             ITargetFrameworkMonikerFactory tfmFactory,
             IVisualStudioFinder vsFinder,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
