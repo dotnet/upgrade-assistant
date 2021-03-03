@@ -3,7 +3,7 @@
   // while running and logging output from Upgrade Assistant.
   "ExtensionName": "Custom package map extension sample",
 
-  // The PackageUpdater section of an extension manifest lists settings
+  // The optional PackageUpdater section of an extension manifest lists settings
   // relevant to the packge upgrade step.
   "PackageUpdater": {
     // PackageMapPath indicates the folder (relative to this config file) where
