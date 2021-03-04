@@ -46,10 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         // This upgrade step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IUpgradeContext context) => context?.CurrentProject is null && Status == UpgradeStepStatus.Complete;
 
-        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
-            => Task.FromResult(InitializeImpl(context));
-
-        private UpgradeStepInitializeResult InitializeImpl(IUpgradeContext context)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -62,44 +59,47 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             }
 
             var projects = context.Projects.ToList();
-
-            if (projects.All(p => IsCompleted(context, p)))
+            var completeChecks = projects.Select(async p => IsCompleted(context, p) || !await RunChecksAsync(p, token).ConfigureAwait(false));
+            if ((await Task.WhenAll(completeChecks).ConfigureAwait(false)).All(b => b))
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgrade", BuildBreakRisk.None);
             }
 
+            IProject? newCurrentProject = null;
+
             if (projects.Count == 1)
             {
-                var project = projects[0];
-                context.SetCurrentProject(project);
-
-                Logger.LogInformation("Setting only project in solution as the current project: {Project}", project.FilePath);
-
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+                newCurrentProject = projects[0];
+                Logger.LogDebug("Setting only project in solution as the current project: {Project}", newCurrentProject.FilePath);
             }
-
-            // If the user has specified a particular project, only that should be the current project
-            if (!context.InputIsSolution)
+            else if (!context.InputIsSolution)
             {
-                var project = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-                if (project is not null)
-                {
-                    if (!IsCompleted(context, project))
-                    {
-                        context.SetCurrentProject(project);
-                        Logger.LogDebug("Setting user-selected project as the current project: {Project}", project.FilePath);
-                    }
-                    else
-                    {
-                        Logger.LogDebug("User-selected project is already upgraded.");
-                    }
-
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user-specified project.", BuildBreakRisk.None);
-                }
+                // If the user has specified a particular project, only that should be the current project
+                newCurrentProject = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
+                Logger.LogDebug("Setting user-selected project as the current project: {Project}", newCurrentProject.FilePath);
             }
 
-            return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
+            if (newCurrentProject is null)
+            {
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
+            }
+            else
+            {
+                if (IsCompleted(context, newCurrentProject))
+                {
+                    Logger.LogDebug("Project {Project} does not need upgraded", newCurrentProject.FilePath);
+                }
+                else if (!(await RunChecksAsync(newCurrentProject, token).ConfigureAwait(false)))
+                {
+                    Logger.LogError("Unable to upgrade project {Project}", newCurrentProject.FilePath);
+                }
+                else
+                {
+                    context.SetCurrentProject(newCurrentProject);
+                }
+
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project {newCurrentProject.GetRoslynProject().Name} was selected", BuildBreakRisk.None);
+            }
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
@@ -153,20 +153,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 return new ProjectCommand(project, isProjectCompleted(context, project), await RunChecksAsync(project, token).ConfigureAwait(false));
             }
+        }
 
-            async Task<bool> RunChecksAsync(IProject project, CancellationToken token)
+        private async Task<bool> RunChecksAsync(IProject project, CancellationToken token)
+        {
+            var success = true;
+
+            foreach (var check in _checks)
             {
-                var success = true;
+                Logger.LogTrace("Running readiness check {Id}", check.Id);
 
-                foreach (var check in _checks)
-                {
-                    Logger.LogTrace("Running readiness check {Id}", check.Id);
-
-                    success &= await check.IsReadyAsync(project, token).ConfigureAwait(false);
-                }
-
-                return success;
+                success &= await check.IsReadyAsync(project, token).ConfigureAwait(false);
             }
+
+            return success;
         }
     }
 }
