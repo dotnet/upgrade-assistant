@@ -166,7 +166,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
                 else
                 {
-                    var project = await workspace.OpenProjectAsync(InputPath, cancellationToken: token).ConfigureAwait(false);
+                    await workspace.OpenProjectAsync(InputPath, cancellationToken: token).ConfigureAwait(false);
                 }
 
                 _workspace = workspace;

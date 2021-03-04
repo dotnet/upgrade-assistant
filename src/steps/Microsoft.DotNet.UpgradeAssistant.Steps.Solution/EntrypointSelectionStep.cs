@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             // other dependencies were loaded along with it.
             if (!context.InputIsSolution)
             {
-                var project = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
+                var project = projects.First(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase));
                 context.SetEntryPoint(project);
 
                 Logger.LogInformation("Setting entrypoint to user selected project: {Project}", project.FilePath);
@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (!string.IsNullOrEmpty(_entryPoint))
             {
-                var entryPointProject = projects.Where(i => Path.GetFileName(i.FilePath).Equals(_entryPoint, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                var entryPointProject = projects.FirstOrDefault(i => Path.GetFileName(i.FilePath).Equals(_entryPoint, StringComparison.OrdinalIgnoreCase));
                 if (entryPointProject is not null)
                 {
                     context.SetEntryPoint(entryPointProject);
