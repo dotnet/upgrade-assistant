@@ -87,14 +87,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             // other dependencies were loaded along with it.
             if (!context.InputIsSolution)
             {
-                var entryPointProject = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                if (entryPointProject is not null)
-                {
-                    context.SetEntryPoint(entryPointProject);
-                    Logger.LogInformation("Setting entrypoint to user selected project in solution: {Project}", _entryPoint);
+                var project = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
+                context.SetEntryPoint(project);
 
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
-                }
+                Logger.LogInformation("Setting entrypoint to user selected project: {Project}", project.FilePath);
+
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
             }
 
             if (!string.IsNullOrEmpty(_entryPoint))
