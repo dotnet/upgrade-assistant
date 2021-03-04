@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddTransient<IUpgradeReadyCheck, VisualBasicWpfCheck>();
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
+            services.AddTransient<IUpgradeReadyCheck, MultiTargetingCheck>();
         }
     }
 }

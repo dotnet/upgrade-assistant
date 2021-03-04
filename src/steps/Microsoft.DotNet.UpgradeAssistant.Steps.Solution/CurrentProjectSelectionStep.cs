@@ -12,6 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     public class CurrentProjectSelectionStep : UpgradeStep
     {
+        private readonly IEnumerable<IUpgradeReadyCheck> _checks;
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetTFMSelector _tfmSelector;
@@ -26,12 +27,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         public override string Title => "Select project to upgrade";
 
         public CurrentProjectSelectionStep(
+            IEnumerable<IUpgradeReadyCheck> checks,
             IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
             ITargetTFMSelector tfmSelector,
             ILogger<CurrentProjectSelectionStep> logger)
             : base(logger)
         {
+            _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
@@ -110,15 +113,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new InvalidOperationException("Entrypoint must be set before using this step");
             }
 
-            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            var orderedProjects = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences);
 
-            var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
+            // No need for an IAsyncEnumerable here since the commands shouldn't be displayed until
+            // all are available anyhow.
+            var commands = new List<ProjectCommand>();
+            foreach (var project in orderedProjects)
+            {
+                commands.Add(await CreateProjectCommandAsync(project).ConfigureAwait(false));
+            }
+
+            var result = await _input.ChooseAsync(SelectProjectQuestion, commands, token).ConfigureAwait(false);
 
             return result.Project;
 
-            ProjectCommand CreateProjectCommand(IProject project)
+            async Task<ProjectCommand> CreateProjectCommandAsync(IProject project)
             {
-                return new ProjectCommand(project, isProjectCompleted(context, project));
+                return new ProjectCommand(project, isProjectCompleted(context, project), await RunChecksAsync(project, token).ConfigureAwait(false));
+            }
+
+            async Task<bool> RunChecksAsync(IProject project, CancellationToken token)
+            {
+                var success = true;
+
+                foreach (var check in _checks)
+                {
+                    Logger.LogTrace("Running readiness check {Id}", check.Id);
+
+                    success &= await check.IsReadyAsync(project, token).ConfigureAwait(false);
+                }
+
+                return success;
             }
         }
     }

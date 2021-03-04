@@ -296,7 +296,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                     if (propCount != 1)
                     {
-                        _logger.LogCritical("SDK projects being upgraded must have exactly one TargetFramework property. Found {TargetFrameworkCount} TargetFramework properties.", propCount);
+                        _logger.LogError("SDK projects being upgraded must have exactly one TargetFramework property. Found {TargetFrameworkCount} TargetFramework properties.", propCount);
                         throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFramework property. Found {propCount} TargetFramework properties.");
                     }
 
@@ -309,7 +309,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                     if (propCount != 1)
                     {
-                        _logger.LogCritical("Non-SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {TargetFrameworkVersionCount} TargetFrameworkVerion properties.", propCount);
+                        _logger.LogError("Non-SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {TargetFrameworkVersionCount} TargetFrameworkVerion properties.", propCount);
                         throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {propCount} TargetFrameworkVersion properties.");
                     }
 
