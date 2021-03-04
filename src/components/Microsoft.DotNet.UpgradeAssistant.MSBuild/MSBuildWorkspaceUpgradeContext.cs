@@ -15,7 +15,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
-        private readonly string _path;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
@@ -24,6 +23,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private string? _projectPath;
 
         private MSBuildWorkspace? _workspace;
+
+        public string InputPath { get; }
+
+        public bool InputIsSolution => InputPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase);
 
         public MSBuildWorkspace Workspace
         {
@@ -54,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
-            _path = options.ProjectPath;
+            InputPath = options.ProjectPath;
             TfmFactory = tfmFactory ?? throw new ArgumentNullException(nameof(tfmFactory));
             _logger = logger;
 
@@ -157,15 +160,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 workspace.WorkspaceFailed += Workspace_WorkspaceFailed;
 
-                if (_path.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+                if (InputIsSolution)
                 {
-                    await workspace.OpenSolutionAsync(_path, cancellationToken: token).ConfigureAwait(false);
+                    await workspace.OpenSolutionAsync(InputPath, cancellationToken: token).ConfigureAwait(false);
                 }
                 else
                 {
-                    var project = await workspace.OpenProjectAsync(_path, cancellationToken: token).ConfigureAwait(false);
-
-                    _projectPath = project.FilePath;
+                    var project = await workspace.OpenProjectAsync(InputPath, cancellationToken: token).ConfigureAwait(false);
                 }
 
                 _workspace = workspace;
@@ -188,20 +189,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             UnloadWorkspace();
 
             await InitializeWorkspace(token).ConfigureAwait(false);
-
-            if (string.IsNullOrWhiteSpace(_projectPath))
-            {
-                return;
-            }
-
-            foreach (var project in Projects)
-            {
-                if (string.Equals(project.FilePath, _projectPath, StringComparison.OrdinalIgnoreCase))
-                {
-                    SetCurrentProject(project);
-                    return;
-                }
-            }
         }
 
         private void Workspace_WorkspaceFailed(object? sender, WorkspaceDiagnosticEventArgs e)

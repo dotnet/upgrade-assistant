@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,6 +76,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 Logger.LogInformation("Setting only project in solution as the current project: {Project}", project.FilePath);
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+            }
+
+            // If the user has specified a particular project, only that should be the current project
+            if (!context.InputIsSolution)
+            {
+                var project = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+                if (project is not null)
+                {
+                    if (!IsCompleted(context, project))
+                    {
+                        context.SetCurrentProject(project);
+                        Logger.LogDebug("Setting user-selected project as the current project: {Project}", project.FilePath);
+                    }
+                    else
+                    {
+                        Logger.LogDebug("User-selected project is already upgraded.");
+                    }
+
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user-specified project.", BuildBreakRisk.None);
+                }
             }
 
             return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);

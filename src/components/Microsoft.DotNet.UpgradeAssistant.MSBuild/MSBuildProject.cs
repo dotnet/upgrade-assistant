@@ -260,8 +260,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                     if (propCount != 1)
                     {
-                        _logger.LogError("SDK projects being upgraded must have exactly one TargetFramework property. Found {TargetFrameworkCount} TargetFramework properties.", propCount);
-                        throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFramework property. Found {propCount} TargetFramework properties.");
+                        _logger.LogError("SDK projects being upgraded must have exactly one TargetFramework property. Found {TargetFrameworkCount} TargetFramework properties for project {Project}.", propCount, FilePath);
+                        throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFramework property. Found {propCount} TargetFramework properties for project {FilePath}.");
                     }
 
                     return new TargetFrameworkMoniker(targetFrameworkProperties.Single().Value);
@@ -273,8 +273,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                     if (propCount != 1)
                     {
-                        _logger.LogError("Non-SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {TargetFrameworkVersionCount} TargetFrameworkVerion properties.", propCount);
-                        throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {propCount} TargetFrameworkVersion properties.");
+                        _logger.LogError("Non-SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {TargetFrameworkVersionCount} TargetFrameworkVerion properties for project {Project}.", propCount, FilePath);
+                        throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {propCount} TargetFrameworkVersion properties for project {FilePath}.");
                     }
 
                     return Context.TfmFactory.GetTFMForNetFxVersion(targetFrameworkVersionProperties.Single().Value);

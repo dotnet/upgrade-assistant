@@ -83,9 +83,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
 
+            // If the user has specified a particular project, that project will be considered the entry point even if
+            // other dependencies were loaded along with it.
+            if (!context.InputIsSolution)
+            {
+                var entryPointProject = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (entryPointProject is not null)
+                {
+                    context.SetEntryPoint(entryPointProject);
+                    Logger.LogInformation("Setting entrypoint to user selected project in solution: {Project}", _entryPoint);
+
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
+                }
+            }
+
             if (!string.IsNullOrEmpty(_entryPoint))
             {
-                var entryPointProject = projects.Where(i => Path.GetFileName(i.FilePath) == _entryPoint).FirstOrDefault();
+                var entryPointProject = projects.Where(i => Path.GetFileName(i.FilePath).Equals(_entryPoint, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 if (entryPointProject is not null)
                 {
                     context.SetEntryPoint(entryPointProject);
