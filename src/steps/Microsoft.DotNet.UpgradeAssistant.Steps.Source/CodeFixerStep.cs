@@ -58,7 +58,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context)
+        {
+            // Code updates don't apply until a project is selected
+            if (context?.CurrentProject is null)
+            {
+                return false;
+            }
+
+            var applicableComponentsAttr = _fixProvider.GetType().CustomAttributes.FirstOrDefault(a => a.AttributeType.Equals(typeof(ApplicableComponentsAttribute)));
+            if (applicableComponentsAttr is not null)
+            {
+                var components = applicableComponentsAttr.ConstructorArguments.Single().Value;
+                if (components is ProjectComponents projectComponents)
+                {
+                    if (!context.CurrentProject.Components.HasFlag(projectComponents))
+                    {
+                        Logger.LogDebug($"Skipping code updater for {DiagnosticId} because project {context.CurrentProject.FilePath} does not have required components {projectComponents}");
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
