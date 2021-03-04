@@ -26,7 +26,7 @@ namespace Integration.Tests
             ".upgrade-assistant"
         };
 
-        [InlineData("AspNetMvcTemplate.", "csharp", "TemplateMvc.csproj", "")]
+        [InlineData("AspNetSample", "csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample", "csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
         [InlineData("WpfSample", "vb", "WpfApp1.sln", "")]
         [Theory]
