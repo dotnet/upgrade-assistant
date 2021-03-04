@@ -35,6 +35,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             "Microsoft.AspNetCore.App"
         };
 
+        public static readonly string[] WinFormsFrameworkReferences = new[]
+        {
+            "Microsoft.WindowsDesktop.App.WindowsForms",
+        };
+
+        public static readonly string[] WpfFrameworkReferences = new[]
+        {
+            "Microsoft.WindowsDesktop.App.WPF",
+        };
+
         public static readonly string[] DesktopFrameworkReferences = new[]
         {
             "Microsoft.WindowsDesktop.App",
@@ -54,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             "System.Windows.Forms"
         };
 
-        public static readonly string[] WPFReferences = new[]
+        public static readonly string[] WpfReferences = new[]
         {
             "System.Xaml",
             "PresentationCore",

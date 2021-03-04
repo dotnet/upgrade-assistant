@@ -100,15 +100,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                         components |= ProjectComponents.Web;
                     }
 
-                    if (GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase))
+                    if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
+                        GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase))
                     {
-                        components |= ProjectComponents.WPF;
+                        components |= ProjectComponents.Wpf;
+                        components |= ProjectComponents.WindowsDesktop;
                     }
 
                     if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
-                        GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
                         GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
                     {
+                        components |= ProjectComponents.WinForms;
                         components |= ProjectComponents.WindowsDesktop;
                     }
 
@@ -123,6 +125,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                         components |= ProjectComponents.WindowsDesktop;
                     }
 
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WinFormsReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.WinForms;
+                    }
+
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WpfReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.Wpf;
+                    }
+
                     return components;
                 }
 
@@ -135,21 +147,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
                     var references = References.Select(r => r.Name);
 
-                    if (references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.WPF;
-                    }
-
                     if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
                         references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
                     {
                         components |= ProjectComponents.Web;
                     }
 
-                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
-                        references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
                     {
                         components |= ProjectComponents.WindowsDesktop;
+                        components |= ProjectComponents.WinForms;
+                    }
+
+                    if (references.Any(r => MSBuildConstants.WpfReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.WindowsDesktop;
+                        components |= ProjectComponents.Wpf;
                     }
 
                     return components;
