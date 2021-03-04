@@ -16,7 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
         private readonly string _path;
-        private readonly ITargetTFMSelector _tfmSelector;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
@@ -45,7 +44,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public MSBuildWorkspaceUpgradeContext(
             UpgradeOptions options,
-            ITargetTFMSelector tfmSelector,
             ITargetFrameworkMonikerFactory tfmFactory,
             IVisualStudioFinder vsFinder,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
@@ -57,7 +55,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
             _path = options.ProjectPath;
-            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             TfmFactory = tfmFactory ?? throw new ArgumentNullException(nameof(tfmFactory));
             _logger = logger;
 
