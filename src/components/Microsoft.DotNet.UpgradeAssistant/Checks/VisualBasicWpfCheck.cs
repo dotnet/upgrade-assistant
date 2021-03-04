@@ -2,9 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -17,27 +14,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public VisualBasicWpfCheck(ILogger<MultiTargetingCheck> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string Id => nameof(VisualBasicWpfCheck);
 
-        public Task<bool> IsReadyAsync(IUpgradeContext context, CancellationToken token)
+        public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
         {
-            if (context is null)
+            if (project is null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(project));
             }
 
-            foreach (var project in context.Projects)
+            if (project.Language == Languages.VisualBasic && project.Components.HasFlag(ProjectComponents.Wpf))
             {
-                var projectRoot = project.GetFile();
-
-                if (project.Language == Languages.VisualBasic && project.Components.HasFlag(ProjectComponents.Wpf))
-                {
-                    _logger.LogCritical("Project {Project} cannot be upgraded. try-convert version 0.7.212201 does not support the migration of Visual Basic WPF applications", project.FilePath);
-                    return Task.FromResult(false);
-                }
+                _logger.LogCritical("Project {Project} cannot be upgraded. try-convert version 0.7.212201 does not support the migration of Visual Basic WPF applications", project.FilePath);
+                return Task.FromResult(false);
             }
 
             return Task.FromResult(true);
