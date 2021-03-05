@@ -11,6 +11,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public static class StreamHelpers
     {
+        private const int DefaultBufferSize = 1024;
+
         public static async Task CopyStreamWithTokenReplacementAsync(Stream templateStream, Stream outputStream, Dictionary<string, string> tokenReplacements)
         {
             if (templateStream is null)
@@ -32,8 +34,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             // This is inefficient but makes the code straightforward. If performance becomes an issue
             // here, we can replace tokens as we're writing the stream to the new file instead.
             // That would be faster but would be more complicated and is likely not necessary.
-            using var input = new StreamReader(templateStream, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
-            using var output = new StreamWriter(outputStream, leaveOpen: true);
+            using var input = new StreamReader(templateStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, DefaultBufferSize, leaveOpen: true);
+            using var output = new StreamWriter(outputStream, Encoding.UTF8, DefaultBufferSize, leaveOpen: true);
             while (!input.EndOfStream)
             {
                 var line = new StringBuilder(await input.ReadLineAsync().ConfigureAwait(false));
@@ -43,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                     line.Replace(key, tokenReplacements[key]);
                 }
 
-                await output.WriteLineAsync(line).ConfigureAwait(false);
+                await output.WriteLineAsync(line.ToString()).ConfigureAwait(false);
             }
         }
     }

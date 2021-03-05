@@ -27,12 +27,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Portability.Service
         {
             foreach (var supported in Supported)
             {
-                if (supported.Identifier.Contains("Standard", StringComparison.OrdinalIgnoreCase))
+                if (supported.Identifier.ToUpperInvariant().Contains("STANDARD"))
                 {
                     return true;
                 }
 
-                if (supported.Identifier.Contains("Core", StringComparison.OrdinalIgnoreCase))
+                if (supported.Identifier.ToUpperInvariant().Contains("CORE"))
                 {
                     return true;
                 }

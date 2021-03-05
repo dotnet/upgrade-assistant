@@ -49,11 +49,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return Enumerable.Empty<string>();
             }
 
-            return Directory.EnumerateFiles(dirPath, searchPattern, new EnumerationOptions { RecurseSubdirectories = true });
+            return Directory.EnumerateFiles(dirPath, searchPattern, SearchOption.AllDirectories);
         }
 
         protected string GetAbsolutePath(string path) =>
-            Path.IsPathFullyQualified(path)
+            Path.IsPathRooted(path)
             ? path
             : Path.Combine(_baseDirectory, path);
     }

@@ -217,7 +217,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                         if (!string.IsNullOrWhiteSpace(propertyValue))
                         {
                             Logger.LogDebug("Resolved project property {PropertyKey} to {PropertyValue}", propertyName, propertyValue);
-                            ret.Add(replacement.Key, propertyValue);
+                            ret.Add(replacement.Key, propertyValue!);
                         }
                         else
                         {
@@ -259,7 +259,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             if (expectedItem.Keywords.Any())
             {
                 var fileContents = File.ReadAllText(filePath);
-                if (expectedItem.Keywords.Any(k => !fileContents.Contains(k, StringComparison.Ordinal)))
+                if (expectedItem.Keywords.Any(k => !fileContents.Contains(k)))
                 {
                     Logger.LogDebug("File {FilePath} does not contain all necessary keywords to match", filePath);
                     return false;

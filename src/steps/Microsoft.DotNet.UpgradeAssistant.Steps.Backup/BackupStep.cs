@@ -117,7 +117,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
                 await CopyDirectoryAsync(_projectDir, backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
-                await File.WriteAllTextAsync(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})", token).ConfigureAwait(false);
+                File.WriteAllText(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})");
                 Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Backup completed successfully");
             }
@@ -200,7 +200,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         {
             Logger.LogDebug("Determining backup path");
 
-            var candidateBasePath = $"{Path.TrimEndingDirectorySeparator(projectDir)}.backup";
+            var candidateBasePath = $"{projectDir.TrimEnd('\\', '/')}.backup";
             var candidatePath = candidateBasePath;
             var iteration = 0;
             while (!IsPathValid(candidatePath))

@@ -28,10 +28,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Portability.Service
         }
 
         public override int GetHashCode()
-        {
-            var hashcode = default(HashCode);
-            hashcode.Add(DocId, StringComparer.Ordinal);
-            return hashcode.ToHashCode();
-        }
+            => DocId.GetHashCode();
     }
 }
