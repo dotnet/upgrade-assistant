@@ -1,40 +1,43 @@
 ## Extensibility
 
-The Upgrade Assistant has an extension system that make it easy for users to customize many of the upgrade steps without having to rebuild the tool. An Upgrade Assistant extension can extend the following upgrade steps (described in more detail below):
+The Upgrade Assistant has an extension system that make it easy for users to customize many of the upgrade steps (or add new upgrade steps) without having to rebuild the tool. Extensibility points include:
 
 1. Source updates (via Roslyn analyzers and code fix providers)
 2. NuGet package updates (by explicitly mapping certain packages to their replacements)
 3. Custom template files (files that should be added to upgraded projects)
 4. Config file updates (components that update the project based on the contents of app.config and web.config)
+5. Custom upgrade steps (allowing complete freedom to add whatever behaviors are necessary to the upgrade process)
 
-To create an Upgrade Assistant extension, you will need to start with a manifest file called "ExtensionManifest.json". The manifest file contains pointers to the paths (relative to the manifest file) where the different extension items can be found. A typical ExtensionManifest.json looks like this:
+To create an Upgrade Assistant extension, you will need to start with a manifest file called "ExtensionManifest.json". The manifest file contains pointers to the paths (relative to the manifest file) where the different extension items can be found. The extension manifest is required, but all of its elements are optional and it is only necessary to include the ones that are useful for the extension the manifest is describing. An outline of possible extension manifest elements is:
 
 ```json
 {
-  "ConfigUpdater": {
-    "ConfigUpdaterPath": "ConfigUpdaters"
-  },
+  "ExtensionName": "My extension",
+
   "PackageUpdater": {
     "PackageMapPath": "PackageMaps"
   },
-  "SourceUpdater": {
-    "SourceUpdaterPath": "SourceUpdaters"
-  },
   "TemplateInserter": {
     "TemplatePath": "Templates"
-  }
+  },
+
+  "ExtensionServiceProviders": [
+    "MyExtensionLibrary.dll"
+  ]
 }
 ```
 
 To use an extension at runtime, either use the -e argument to point to the extension's manifest file (or directory where the manifest file is located) or set the environment variable "UpgradeAssistantExtensionPaths" to a semicolon-delimited list of paths to probe for extensions.
 
-### Custom source analyzers and code fix providers
+### Custom upgrade steps, source updaters, and config updaters
 
-The source updater step of the Upgrade Assistant uses Roslyn analyzers to identify problematic code patterns in users' projects and code fixers to automatically correct them to .NET 5.0-compatible alternatives. Over time, the set of built-in analyzers and code fixers will continue to grow. Users may want to add their own analyzers and code fix providers as well, though, to flag and fix issues in source code specific to libraries and patterns they use in their apps.
+The ExtensionServiceProviders element of the extension manifest contains an array of assemblies that the Upgrade Assistant should look in for implementations of `Microsoft.DotNet.UpgradeAssistant.Extensions.IExtensionServiceProvider`. At runtime, Upgrade Assistant will load any assemblies listed in the ExtensionServiceProviders array (paths are relative to the extension manifest's location) and instantiate an public implementations of `IExtensionServiceProvider` found in those assemblies. The `IExtensionServiceProvider` instances will then be used to register services in Upgrade Assistant's dependency injection container. Common services that an extension might register include:
 
-To add their own analyzers and code fixes, users should include binaries with their own Roslyn analyzers and code fix providers in the SourceUpdaterPath specified in the extension's manifest. The Upgrade Assistant will automatically pick analyzers and code fix providers up from these extension directories when it starts.
-
-Any type with a `DiagnosticAnalyzerAttribute` set is considered an analyzer and any type with an `ExportCodeFixProviderAttribute` set is considered a code fix provider.
+1. Custom upgrade steps (inheriting from `UpgradeStep`). Any upgrade steps registered by an `IExtensionServiceProvider` in an assembly listed in the ExtensionServiceProviders array will be included in the upgrade steps the Upgrade Assistant executes. In this way, extenders can add their own custom steps to the upgrade pipeline.
+2. Roslyn analyzers and code fix providers. Upgrade Assistant's source updater step looks in the dependency injection container for any analyzers with associated code fix providers and will include them in the sub-steps to the source updater step. So, by registering their own Roslyn analyzers and code fix providers, extenders can customize the source update steps used by Upgrade Assistant.
+3. `IConfigUpdater` implementations. Upgrade Assistant's config updater step uses any registered `IConfigUpdater` services to make project updates based on config files (app.config, web.config). Therefore, by registering their own `IConfigUpdater` implementations, extenders can customize how config-related upgrades are made by Upgrade Assistant.
+4. `IPackageReferencesAnalyzer` implementations. For more information on how the package updater step works, see the next section of this document. If providing custom package mapping configuration is insufficient, however, extenders can register their own implementations of `IPackageReferenceAnalzyer` to more completely customize how NuGet package references are updated.
+5. Any other services that might be needed by Upgrade Assistant steps (either the default steps or those added by extensions). Extenders can register services that their own upgrade steps will need or services that will be used by other upgrade steps and Upgrade Assistant will make sure any services registered in an `IExtensionServiceProvider` implementation will be made available at runtime.
 
 ### Custom NuGet package mapping configuration
 
