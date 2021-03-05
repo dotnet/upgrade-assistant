@@ -8,17 +8,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     internal class ProjectCommand : UpgradeCommand
     {
-        public static ProjectCommand Create(IProject project) => new(project, false);
+        private readonly bool _isCompleted;
+        private readonly bool _isValid;
 
-        public ProjectCommand(IProject project, bool isCompleted)
+        public static ProjectCommand Create(IProject project) => new(project, false, true);
+
+        public ProjectCommand(IProject project, bool isCompleted, bool isValid)
         {
-            IsEnabled = !isCompleted;
-
+            _isCompleted = isCompleted;
+            _isValid = isValid;
+            IsEnabled = !isCompleted && isValid;
             Project = project;
         }
 
         // Use ANSI escape codes to colorize parts of the output (https://en.wikipedia.org/wiki/ANSI_escape_code)
-        public override string CommandText => IsEnabled ? Project.GetRoslynProject().Name : $"\u001b[32m[Completed]\u001b[0m {Project.GetRoslynProject().Name}";
+        public override string CommandText
+        {
+            get
+            {
+                var prefix = (_isCompleted, _isValid) switch
+                {
+                    (true, _) => "\u001b[32m[Completed]\u001b[0m ",
+                    (_, false) => "\u001b[31m[Invalid]\u001b[0m  ",
+                    _ => string.Empty
+                };
+
+                return $"{prefix}{Project.GetRoslynProject().Name}";
+            }
+        }
 
         public IProject Project { get; }
 

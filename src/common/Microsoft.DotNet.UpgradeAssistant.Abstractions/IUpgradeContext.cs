@@ -11,6 +11,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IUpgradeContext : IDisposable
     {
+        string InputPath { get; }
+
         bool IsComplete { get; set; }
 
         IProject? EntryPoint { get; }
@@ -22,6 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         void SetCurrentProject(IProject? project);
 
         IEnumerable<IProject> Projects { get; }
+
+        bool InputIsSolution { get; }
 
         bool UpdateSolution(Solution updatedSolution);
 

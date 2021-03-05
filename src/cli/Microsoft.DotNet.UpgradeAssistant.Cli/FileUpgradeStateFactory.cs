@@ -36,15 +36,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             var state = await GetStateAsync(token).ConfigureAwait(false);
 
-            context.SetEntryPoint(FindProject(state.EntryPoint));
-            context.SetCurrentProject(FindProject(state.CurrentProject));
-            context.IsComplete = state.IsComplete;
+            if (state is not null)
+            {
+                context.SetEntryPoint(FindProject(state.EntryPoint));
+                context.SetCurrentProject(FindProject(state.CurrentProject));
+                context.IsComplete = state.IsComplete;
+            }
 
             IProject? FindProject(string? path)
                 => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == path);
         }
 
-        private async ValueTask<UpgradeState> GetStateAsync(CancellationToken token)
+        private async ValueTask<UpgradeState?> GetStateAsync(CancellationToken token)
         {
             if (File.Exists(_path))
             {
@@ -69,7 +72,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 }
             }
 
-            return new UpgradeState();
+            return null;
         }
 
         public async Task SaveStateAsync(IUpgradeContext context, CancellationToken token)

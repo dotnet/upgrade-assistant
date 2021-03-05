@@ -18,6 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static void AddReadinessChecks(this IServiceCollection services)
         {
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
+            services.AddTransient<IUpgradeReadyCheck, MultiTargetingCheck>();
         }
     }
 }
