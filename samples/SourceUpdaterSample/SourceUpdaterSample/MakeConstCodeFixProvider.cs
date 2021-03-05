@@ -19,7 +19,7 @@ namespace SourceUpdaterSample
     /// dependency injection container (by IExtensionServiceProvider) will be used during
     /// the source update step.
     /// </summary>
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA001 CodeFix Provider")]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "Sample1 CodeFix Provider")]
     public class MakeConstCodeFixProvider : CodeFixProvider
     {
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including

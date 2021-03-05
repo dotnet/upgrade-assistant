@@ -15,5 +15,5 @@
   // need to be compiled. If your extension does have binaries that need
   // built, make sure that this manifest and any package map files are copied
   // into the binary output as content so that they are present in the
-  // extension's output.
+  // extension's output. Other samples demonstrate this.
 }

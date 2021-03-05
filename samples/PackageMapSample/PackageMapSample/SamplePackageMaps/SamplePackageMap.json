@@ -11,7 +11,7 @@
     "NetCorePackagesWorkOnNetFx": true,
 
     // The NetFrameworkPackages array lists package references that should be removed.
-    // If any of these package references are found, the will be removed.
+    // If any of these package references are found, they will be removed.
     "NetFrameworkPackages": [
       {
         "Name": "MyCompany.Package1",
