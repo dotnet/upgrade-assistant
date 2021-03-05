@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 }
             }
 
-            foreach (var step in steps)
+            foreach (var step in steps.Where(s => s.IsApplicable(context)).ToList())
             {
                 // Write indent (if any) and item number
                 var indexStr = offset % 2 == 0

@@ -19,5 +19,36 @@ namespace Microsoft.DotNet.UpgradeAssistant
             nugetReference = matches.FirstOrDefault();
             return nugetReference is not null;
         }
+
+        public static bool AppliesToProject(this Type type, IProject project)
+        {
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            // Check whether the type has an [ApplicableComponents] attribute.
+            // If one exists, the type only applies to the project if the project has the indicated components.
+            var applicableComponentsAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.Equals(typeof(ApplicableComponentsAttribute)));
+            if (applicableComponentsAttr is not null)
+            {
+                var components = applicableComponentsAttr.ConstructorArguments.Single().Value as int?;
+                if (components.HasValue)
+                {
+                    var projectComponents = (ProjectComponents)components.Value;
+                    if (!project.Components.HasFlag(projectComponents))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
     }
 }

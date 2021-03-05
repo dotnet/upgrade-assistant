@@ -40,10 +40,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 await _restorer.RestorePackagesAsync(context, context.EntryPoint, token).ConfigureAwait(false);
             }
 
-            return GetStepsForContext(context);
+            return AllSteps;
         }
-
-        public IEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context) => AllSteps.Where(s => s.IsApplicable(context));
 
         /// <summary>
         /// Finds and returns the next applicable and incomplete step for the given upgrade context.
@@ -55,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             token.ThrowIfCancellationRequested();
 
-            var steps = GetStepsForContext(context).ToList();
+            var steps = GetStepsForContext(context, AllSteps);
 
             if (!steps.Any())
             {
@@ -130,7 +128,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
                 if (step.SubSteps.Any())
                 {
-                    var nextSubStep = await GetNextStepAsyncInternal(step.SubSteps, context, token).ConfigureAwait(false);
+                    var applicableSubSteps = GetStepsForContext(context, step.SubSteps);
+                    var nextSubStep = await GetNextStepAsyncInternal(applicableSubSteps, context, token).ConfigureAwait(false);
                     if (nextSubStep is not null)
                     {
                         return nextSubStep;
@@ -145,5 +144,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             return null;
         }
+
+        private static IEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context, IEnumerable<UpgradeStep> steps) => steps.Where(s => s.IsApplicable(context));
     }
 }

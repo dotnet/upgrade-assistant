@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             // in the expected order
             using var context = mock.Mock<IUpgradeContext>().Object;
 
-            var steps = upgrader.GetStepsForContext(context);
+            var steps = upgrader.AllSteps;
             var allSteps = new List<string>();
 
             var nextStep = await upgrader.GetNextStepAsync(context, CancellationToken.None).ConfigureAwait(false);

@@ -58,7 +58,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
+        protected override bool IsApplicableImpl(IUpgradeContext context)
+        {
+            // Code updates don't apply until a project is selected
+            if (context?.CurrentProject is null)
+            {
+                return false;
+            }
+
+            // Check the code fix provider for an [ApplicableComponents] attribute
+            // If one exists, the step only applies if the project has the indicated components
+            return _fixProvider.GetType().AppliesToProject(context.CurrentProject);
+        }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {

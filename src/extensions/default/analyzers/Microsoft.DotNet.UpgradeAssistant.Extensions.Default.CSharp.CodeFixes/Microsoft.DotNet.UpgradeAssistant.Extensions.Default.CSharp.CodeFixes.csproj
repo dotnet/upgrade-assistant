@@ -6,6 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Templates\*.cs" />
