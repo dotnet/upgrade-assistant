@@ -12,5 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         WindowsDesktop = 1,
         Web = 1 << 1,
         WinRT = 1 << 2,
+        Wpf = 1 << 3,
+        WinForms = 1 << 4,
     }
 }

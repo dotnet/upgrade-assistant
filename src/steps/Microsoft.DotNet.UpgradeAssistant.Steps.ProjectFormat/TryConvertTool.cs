@@ -18,7 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -p \"{0}\"";
         private static readonly string[] ErrorMessages = new[]
         {
-            "This project has custom imports that are not accepted by try-convert"
+            "This project has custom imports that are not accepted by try-convert",
+            "is an unsupported project type. Not all project type guids are supported."
         };
 
         private readonly IProcessRunner _runner;

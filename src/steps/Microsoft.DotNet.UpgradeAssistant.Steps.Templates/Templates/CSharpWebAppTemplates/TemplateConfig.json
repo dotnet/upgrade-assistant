@@ -30,5 +30,8 @@
       "Keywords": []
     }
   ],
-  "UpdateWebAppsOnly": true
+  "TemplateLanguage": "CSharp",
+  "TemplateAppliesTo": [
+    "Web"
+  ]
 }
