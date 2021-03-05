@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
@@ -15,12 +16,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public class TemplateProvider
     {
-        private const string TemplateConfigFileName = "TemplateConfig.json";
         private const string TemplateInserterOptionsSectionName = "TemplateInserter";
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
-            Converters = { new JsonStringProjectItemTypeConverter() }
+            Converters = { new JsonStringProjectItemTypeConverter(), new JsonStringEnumConverter() }
         };
 
         private readonly AggregateExtension _extensions;
@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             _templateConfigFiles = _extensions.ExtensionProviders.ToDictionary(e => e, e => GetTemplateConfigFiles(e));
         }
 
-        internal async Task<Dictionary<string, RuntimeItemSpec>> GetTemplatesAsync(bool isWebApp, CancellationToken token)
+        internal async Task<Dictionary<string, RuntimeItemSpec>> GetTemplatesAsync(IProject project, CancellationToken token)
         {
             var templates = new Dictionary<string, RuntimeItemSpec>();
 
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
                     // If there was a problem reading the configuration or the configuration only applies to web apps and the
                     // current project isn't a web app, continue to the next config file.
-                    if (templateConfig?.TemplateItems is null || (!isWebApp && templateConfig.UpdateWebAppsOnly))
+                    if (templateConfig?.TemplateItems is null || !templateConfig.AppliesToProject(project))
                     {
                         _logger.LogDebug("Skipping inapplicable template config file {TemplateConfigFile}", configFile);
                         continue;
@@ -98,6 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             }
         }
 
+
         /// <summary>
         /// Gets template config files in an extension location.
         /// </summary>
@@ -107,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
         {
             _logger.LogDebug("Looking for template config files in extension {Extension}", extension.Name);
             var options = extension.GetOptions<TemplateInserterOptions>(TemplateInserterOptionsSectionName);
-            var configFiles = options?.TemplatePath is null ? Enumerable.Empty<string>() : extension.GetFiles(options.TemplatePath, TemplateConfigFileName);
+            var configFiles = options?.TemplateConfigFiles ?? Enumerable.Empty<string>();
             _logger.LogDebug("Found {TemplateCount} template config files in extension {Extension}", configFiles.Count(), extension.Name);
             return configFiles;
         }

@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             }
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && context.CurrentProject.Language == Language.CSharp && _templateProvider.TemplateConfigFileNames.Any();
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && _templateProvider.TemplateConfigFileNames.Any();
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
             try
             {
-                _itemsToAdd = (await _templateProvider.GetTemplatesAsync(IsWebApp(project), token).ConfigureAwait(false))
+                _itemsToAdd = (await _templateProvider.GetTemplatesAsync(project, token).ConfigureAwait(false))
                     .Where(kvp => IsTemplateNeeded(project, kvp.Value))
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
