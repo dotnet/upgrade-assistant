@@ -6,7 +6,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     /// <summary>
     /// An abstraction used to make contextual decisions based on language.
     /// </summary>
-    public enum Languages
+    public enum Language
     {
         /// <summary>
         /// The default. Used when the language has not been inspected, or cannot be determined.

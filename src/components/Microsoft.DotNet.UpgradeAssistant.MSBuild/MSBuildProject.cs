@@ -43,16 +43,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return Context.GetOrAddProject(project.FilePath);
         });
 
-        public Languages Language => ParseLanguageByProjectFileExtension(FilePath);
+        public Language Language => ParseLanguageByProjectFileExtension(FilePath);
 
-        private static Languages ParseLanguageByProjectFileExtension(string filePath)
+        private static Language ParseLanguageByProjectFileExtension(string filePath)
         {
             return Path.GetExtension(filePath).ToUpperInvariant() switch
             {
-                ".CSPROJ"=> Languages.CSharp,
-                ".VBPROJ"=> Languages.VisualBasic,
-                ".FSPROJ"=> Languages.FSharp,
-                _ => Languages.Unknown
+                ".CSPROJ"=> Language.CSharp,
+                ".VBPROJ"=> Language.VisualBasic,
+                ".FSPROJ"=> Language.FSharp,
+                _ => Language.Unknown
             };
         }
 

@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         string FilePath { get; }
 
-        Languages Language { get; }
+        Language Language { get; }
 
         Project GetRoslynProject();
 

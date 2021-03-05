@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             }
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && context.CurrentProject.Language == Languages.CSharp && _templateProvider.TemplateConfigFileNames.Any();
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && context.CurrentProject.Language == Language.CSharp && _templateProvider.TemplateConfigFileNames.Any();
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {

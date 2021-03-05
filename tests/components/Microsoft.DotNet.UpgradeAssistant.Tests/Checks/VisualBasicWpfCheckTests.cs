@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         private static IProject GetValidProject()
         {
             var project = new Mock<IProject>();
-            project.Setup(p => p.Language).Returns(Languages.CSharp);
+            project.Setup(p => p.Language).Returns(Language.CSharp);
             project.Setup(p => p.Components).Returns(ProjectComponents.Wpf);
 
             return project.Object;
@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         private static IProject GetInvalidProject()
         {
             var project = new Mock<IProject>();
-            project.Setup(p => p.Language).Returns(Languages.VisualBasic);
+            project.Setup(p => p.Language).Returns(Language.VisualBasic);
             project.Setup(p => p.Components).Returns(ProjectComponents.Wpf);
 
             return project.Object;
