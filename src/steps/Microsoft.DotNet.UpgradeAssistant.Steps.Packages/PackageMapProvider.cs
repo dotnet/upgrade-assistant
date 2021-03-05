@@ -18,6 +18,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private const string PackageMapExtension = "*.json";
         private const string PackageUpdaterOptionsSectionName = "PackageUpdater";
 
+        private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+        {
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip
+        };
+
         private readonly AggregateExtension _extensions;
         private readonly ILogger<PackageMapProvider> _logger;
 
@@ -43,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         try
                         {
                             using var config = File.OpenRead(file);
-                            newMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, cancellationToken: token).ConfigureAwait(false);
+                            newMaps = await JsonSerializer.DeserializeAsync<IEnumerable<NuGetPackageMap>>(config, JsonSerializerOptions, token).ConfigureAwait(false);
                         }
                         catch (JsonException exc)
                         {

@@ -1,5 +1,5 @@
 ﻿{
-  // This option property gives a friendly name used for the extension
+  // This optional property gives a friendly name used for the extension
   // while running and logging output from Upgrade Assistant.
   "ExtensionName": "Authors property sample extension",
 
