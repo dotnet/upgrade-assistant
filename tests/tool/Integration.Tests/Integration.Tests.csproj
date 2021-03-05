@@ -24,7 +24,6 @@
     <ProjectReference Include="..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="IntegrationScenarios\AspNetSample\vb\" />
     <Folder Include="IntegrationScenarios\WpfSample\vb\" />
   </ItemGroup>
   <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">

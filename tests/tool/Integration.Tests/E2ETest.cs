@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Integration.Tests
 {
@@ -29,6 +30,7 @@ namespace Integration.Tests
         [InlineData("AspNetSample", "csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample", "csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
         [InlineData("WpfSample", "vb", "WpfApp1.sln", "")]
+        [InlineData("ConsoleSample", "csharp", "ConsoleApp1.sln", "ConsoleApp1.csproj")]
         [Theory]
         public async Task UpgradeTest(string scenarioName, string language, string inputFileName, string entrypoint)
         {
@@ -84,10 +86,16 @@ namespace Integration.Tests
 
             foreach (var file in expectedFiles)
             {
-                var expectedText = $"{file}: {await File.ReadAllTextAsync(Path.Combine(expectedDir, file)).ConfigureAwait(false)}";
-                var actualText = $"{file}: {await File.ReadAllTextAsync(Path.Combine(actualDir, file)).ConfigureAwait(false)}";
-
-                Assert.Equal(expectedText, actualText);
+                var expectedText = await File.ReadAllTextAsync(Path.Combine(expectedDir, file)).ConfigureAwait(false);
+                var actualText = await File.ReadAllTextAsync(Path.Combine(actualDir, file)).ConfigureAwait(false);
+                try
+                {
+                    Assert.Equal(expectedText, actualText);
+                }
+                catch (EqualException ex)
+                {
+                    Assert.True(false, $"The contents of \"{file}\" do not match.{Environment.NewLine}{ex.Message}");
+                }
             }
         }
 
