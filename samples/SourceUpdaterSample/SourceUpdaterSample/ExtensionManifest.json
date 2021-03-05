@@ -1,0 +1,18 @@
+﻿{
+  // This optional property gives a friendly name used for the extension
+  // while running and logging output from Upgrade Assistant.
+  "ExtensionName": "Source updater sample extension",
+
+  // The optional ExtensionServiceProviders property lists libraries
+  // that contain IExtensionServiceProvider implementations. These
+  // types register services for the extension with Upgrade Assistant's
+  // dependency injection container.
+  //
+  // In this case, we list the SourceUpdaterSample library that contains
+  // SourceUpdaterSampleServiceProvider, which will be used to register
+  // the analyzer and code fix provider in this extension for use during
+  // Upgrade Assistant's source updater step.
+  "ExtensionServiceProviders": [
+    "SourceUpdaterSample.dll"
+  ]
+}

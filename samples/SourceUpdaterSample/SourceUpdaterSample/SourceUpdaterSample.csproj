@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Be sure the extension's manifest file is copied on build,
+       so that it will be present in the extension's binary output. -->
+  <ItemGroup>
+    <Content Include="ExtensionManifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions" Version="0.2.212606" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

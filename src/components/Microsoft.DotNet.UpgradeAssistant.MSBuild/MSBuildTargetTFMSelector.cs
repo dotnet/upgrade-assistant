@@ -70,15 +70,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var tfm = new TargetFrameworkMoniker(tfmName);
             foreach (var dep in project.ProjectReferences)
             {
-                if (_tfmComparer.IsCompatible(tfm, dep.TFM))
+                try
                 {
-                    continue;
-                }
+                    if (_tfmComparer.IsCompatible(tfm, dep.TFM))
+                    {
+                        continue;
+                    }
 
-                if (dep.TFM.IsNetCore || dep.TFM.IsNetStandard)
+                    if (dep.TFM.IsNetCore || dep.TFM.IsNetStandard)
+                    {
+                        tfm = dep.TFM;
+                        _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FilePath, dep.FilePath);
+                    }
+                }
+                catch (UpgradeException)
                 {
-                    tfm = dep.TFM;
-                    _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FilePath, dep.FilePath);
+                    _logger.LogWarning($"Unable to determine TFM for dependency {dep.FilePath}; TFM for {project.FilePath} may not be correct.");
                 }
             }
 
