@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         protected override bool IsApplicableImpl(IUpgradeContext context)
         {
-            // Code updates don't apply until a project is selected
+            // Config updates don't apply until a project is selected
             if (context?.CurrentProject is null)
             {
                 return false;

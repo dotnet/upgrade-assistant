@@ -140,18 +140,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
         }
 
-        private static IEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> allAnalyzers, IProject project)
-        {
-            foreach (var analyzer in allAnalyzers)
-            {
-                // If an analyzer has an [ApplicableComponents] attribute, only use it if the project has
-                // the specified components
-                if (analyzer.GetType().AppliesToProject(project))
-                {
-                    yield return analyzer;
-                }
-            }
-        }
+        private static IEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project) =>
+            analyzers.Where(a => a.GetType().AppliesToProject(project));
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
