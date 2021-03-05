@@ -31,5 +31,7 @@
     }
   ],
   "TemplateLanguage": "CSharp",
-  "TemplateAppliesTo": [ "Web" ]
+  "TemplateAppliesTo": [
+    "Web"
+  ]
 }
