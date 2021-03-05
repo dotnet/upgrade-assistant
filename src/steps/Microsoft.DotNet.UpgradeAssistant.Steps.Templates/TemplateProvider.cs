@@ -98,7 +98,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             }
         }
 
-
         /// <summary>
         /// Gets template config files in an extension location.
         /// </summary>
