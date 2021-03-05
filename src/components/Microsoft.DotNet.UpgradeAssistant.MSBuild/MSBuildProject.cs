@@ -255,29 +255,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 if (IsSdk)
                 {
                     // Currently only supporting non-multi-targeting scenarios
-                    var targetFrameworkProperties = ProjectRoot.Properties.Where(e => e.Name.Equals("TargetFramework", StringComparison.Ordinal));
+                    return new TargetFrameworkMoniker(GetSingleTFMProperty("TargetFramework"));
+                }
+                else
+                {
+                    // Non-SDK projects should have exactly one TargetFrameworkVersion property
+                    return Context.TfmFactory.GetTFMForNetFxVersion(GetSingleTFMProperty("TargetFrameworkVersion"));
+                }
+
+                string GetSingleTFMProperty(string propertyName)
+                {
+                    var targetFrameworkProperties = ProjectRoot.Properties.Where(e => e.Name.Equals(propertyName, StringComparison.Ordinal));
                     var propCount = targetFrameworkProperties.Count();
 
                     if (propCount != 1)
                     {
-                        _logger.LogCritical("SDK projects being upgraded must have exactly one TargetFramework property. Found {TargetFrameworkCount} TargetFramework properties.", propCount);
-                        throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFramework property. Found {propCount} TargetFramework properties.");
+                        _logger.LogError("Expected project to have exactly one {PropertyName} property. Found {TargetFrameworkCount} TargetFramework properties for project {Project}.", propertyName, propCount, FilePath);
+                        throw new UpgradeException($"Expected project to have exactly one {propertyName} property. Found {propCount} TargetFramework properties for project {FilePath}.");
                     }
 
-                    return new TargetFrameworkMoniker(targetFrameworkProperties.Single().Value);
-                }
-                else
-                {
-                    var targetFrameworkVersionProperties = ProjectRoot.Properties.Where(e => e.Name.Equals("TargetFrameworkVersion", StringComparison.Ordinal));
-                    var propCount = targetFrameworkVersionProperties.Count();
-
-                    if (propCount != 1)
-                    {
-                        _logger.LogCritical("Non-SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {TargetFrameworkVersionCount} TargetFrameworkVerion properties.", propCount);
-                        throw new UpgradeException($"SDK projects being upgraded must have exactly one TargetFrameworkVersion property. Found {propCount} TargetFrameworkVersion properties.");
-                    }
-
-                    return Context.TfmFactory.GetTFMForNetFxVersion(targetFrameworkVersionProperties.Single().Value);
+                    return targetFrameworkProperties.Single().Value;
                 }
             }
         }

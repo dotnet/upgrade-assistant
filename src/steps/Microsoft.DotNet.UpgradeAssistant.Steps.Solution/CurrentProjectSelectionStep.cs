@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     public class CurrentProjectSelectionStep : UpgradeStep
     {
+        private readonly IEnumerable<IUpgradeReadyCheck> _checks;
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetTFMSelector _tfmSelector;
@@ -26,26 +28,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         public override string Title => "Select project to upgrade";
 
         public CurrentProjectSelectionStep(
+            IEnumerable<IUpgradeReadyCheck> checks,
             IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
             ITargetTFMSelector tfmSelector,
             ILogger<CurrentProjectSelectionStep> logger)
             : base(logger)
         {
+            _checks = checks ?? throw new ArgumentNullException(nameof(checks));
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context is not null && context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p));
+        protected override bool IsApplicableImpl(IUpgradeContext context) => context is not null && context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p)) && !context.IsComplete;
 
         // This upgrade step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IUpgradeContext context) => context?.CurrentProject is null && Status == UpgradeStepStatus.Complete;
 
-        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
-            => Task.FromResult(InitializeImpl(context));
-
-        private UpgradeStepInitializeResult InitializeImpl(IUpgradeContext context)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -58,23 +59,47 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             }
 
             var projects = context.Projects.ToList();
-
-            if (projects.All(p => IsCompleted(context, p)))
+            var completeChecks = projects.Select(async p => IsCompleted(context, p) || !await RunChecksAsync(p, token).ConfigureAwait(false));
+            if ((await Task.WhenAll(completeChecks).ConfigureAwait(false)).All(b => b))
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgrade", BuildBreakRisk.None);
             }
 
+            IProject? newCurrentProject = null;
+
             if (projects.Count == 1)
             {
-                var project = projects[0];
-                context.SetCurrentProject(project);
-
-                Logger.LogInformation("Setting only project in solution as the current project: {Project}", project.FilePath);
-
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
+                newCurrentProject = projects[0];
+                Logger.LogDebug("Setting only project in solution as the current project: {Project}", newCurrentProject.FilePath);
+            }
+            else if (!context.InputIsSolution)
+            {
+                // If the user has specified a particular project, only that should be the current project
+                newCurrentProject = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
+                Logger.LogDebug("Setting user-selected project as the current project: {Project}", newCurrentProject.FilePath);
             }
 
-            return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
+            if (newCurrentProject is null)
+            {
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
+            }
+            else
+            {
+                if (IsCompleted(context, newCurrentProject))
+                {
+                    Logger.LogDebug("Project {Project} does not need upgraded", newCurrentProject.FilePath);
+                }
+                else if (!(await RunChecksAsync(newCurrentProject, token).ConfigureAwait(false)))
+                {
+                    Logger.LogError("Unable to upgrade project {Project}", newCurrentProject.FilePath);
+                }
+                else
+                {
+                    context.SetCurrentProject(newCurrentProject);
+                }
+
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project {newCurrentProject.GetRoslynProject().Name} was selected", BuildBreakRisk.None);
+            }
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
@@ -110,16 +135,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new InvalidOperationException("Entrypoint must be set before using this step");
             }
 
-            var ordered = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).Select(CreateProjectCommand);
+            var orderedProjects = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences);
 
-            var result = await _input.ChooseAsync(SelectProjectQuestion, ordered, token).ConfigureAwait(false);
+            // No need for an IAsyncEnumerable here since the commands shouldn't be displayed until
+            // all are available anyhow.
+            var commands = new List<ProjectCommand>();
+            foreach (var project in orderedProjects)
+            {
+                commands.Add(await CreateProjectCommandAsync(project).ConfigureAwait(false));
+            }
+
+            var result = await _input.ChooseAsync(SelectProjectQuestion, commands, token).ConfigureAwait(false);
 
             return result.Project;
 
-            ProjectCommand CreateProjectCommand(IProject project)
+            async Task<ProjectCommand> CreateProjectCommandAsync(IProject project)
             {
-                return new ProjectCommand(project, isProjectCompleted(context, project));
+                return new ProjectCommand(project, isProjectCompleted(context, project), await RunChecksAsync(project, token).ConfigureAwait(false));
             }
+        }
+
+        private async Task<bool> RunChecksAsync(IProject project, CancellationToken token)
+        {
+            var success = true;
+
+            foreach (var check in _checks)
+            {
+                Logger.LogTrace("Running readiness check {Id}", check.Id);
+
+                success &= await check.IsReadyAsync(project, token).ConfigureAwait(false);
+            }
+
+            return success;
         }
     }
 }

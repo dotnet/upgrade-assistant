@@ -64,7 +64,22 @@ namespace Integration.Tests
                 .Where(t => !_ignoredFiles.Contains(Path.GetFileName(t)))
                 .ToArray();
 
-            Assert.Equal(expectedFiles, actualFiles);
+            var maxLength = expectedFiles.Length > actualFiles.Length ? expectedFiles.Length : actualFiles.Length;
+            for (var i = 0; i < maxLength; i++)
+            {
+                if (i == expectedFiles.Length)
+                {
+                    Assert.True(false, $"Was not expecting to find file '{actualFiles[i]}'");
+                }
+                else if (i == actualFiles.Length)
+                {
+                    Assert.True(false, $"Could not find expected file '{expectedFiles[i]}'");
+                }
+                else if (expectedFiles[i] != actualFiles[i])
+                {
+                    Assert.True(false, $"Was expecting to see the file '{expectedFiles[i]}' but found '{actualFiles[i]}' instead");
+                }
+            }
 
             foreach (var file in expectedFiles)
             {

@@ -17,11 +17,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
         string Id { get; }
 
         /// <summary>
-        /// Verifies that given the supplied context, an upgrade is possible.
+        /// Verifies that given the supplied project, an upgrade is possible.
         /// </summary>
-        /// <param name="context">The current upgrade context.</param>
+        /// <param name="project">The project to be upgraded.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns><c>true</c> if the project is ready, <c>false</c> if it is not.</returns>
-        Task<bool> IsReadyAsync(IUpgradeContext context, CancellationToken token);
+        Task<bool> IsReadyAsync(IProject project, CancellationToken token);
     }
 }

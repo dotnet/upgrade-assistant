@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,103 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllowHtmlAttributeDescription" xml:space="preserve">
-    <value>[AllowHtmlAttribute] should be removed.</value>
+  <data name="MakeConstDescription" xml:space="preserve">
+    <value>Variables that are not set after they are created should be marked as constant.</value>
   </data>
-  <data name="AllowHtmlAttributeMessageFormat" xml:space="preserve">
-    <value>Attribute '{0}' should be removed</value>
+  <data name="MakeConstMessageFormat" xml:space="preserve">
+    <value>Variable '{0}' should be marked const</value>
   </data>
-  <data name="AllowHtmlAttributeTitle" xml:space="preserve">
-    <value>[AllowHtmlAttribute] should be removed</value>
-  </data>
-  <data name="FilterDescription" xml:space="preserve">
-    <value>Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core.</value>
-  </data>
-  <data name="FilterMessageFormat" xml:space="preserve">
-    <value>Identifier '{0}' should be replaced with '{1}'</value>
-  </data>
-  <data name="FilterTitle" xml:space="preserve">
-    <value>Filter types should be used from the Microsoft.AspNetCore.Mvc.Filters namespace</value>
-  </data>
-  <data name="HelperResultDescription" xml:space="preserve">
-    <value>HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult.</value>
-  </data>
-  <data name="HelperResultMessageFormat" xml:space="preserve">
-    <value>Identifier '{0}' should be replaced with '{1}'</value>
-  </data>
-  <data name="HelperResultTitle" xml:space="preserve">
-    <value>HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult</value>
-  </data>
-  <data name="HtmlHelperDescription" xml:space="preserve">
-    <value>HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper.</value>
-  </data>
-  <data name="HtmlHelperMessageFormat" xml:space="preserve">
-    <value>Identifier '{0}' should be replaced with '{1}'</value>
-  </data>
-  <data name="HtmlHelperTitle" xml:space="preserve">
-    <value>HtmlHelper should be replaced with IHtmlHelper</value>
-  </data>
-  <data name="HtmlStringDescription" xml:space="preserve">
-    <value>HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString.</value>
-  </data>
-  <data name="HtmlStringMessageFormat" xml:space="preserve">
-    <value>Identifier '{0}' should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
-  </data>
-  <data name="HtmlStringTitle" xml:space="preserve">
-    <value>HtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString</value>
-  </data>
-  <data name="HttpContextCurrentDescription" xml:space="preserve">
-    <value>HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead.</value>
-  </data>
-  <data name="HttpContextCurrentMessageFormat" xml:space="preserve">
-    <value>HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead</value>
-  </data>
-  <data name="HttpContextCurrentTitle" xml:space="preserve">
-    <value>Do not use HttpContext.Current</value>
-  </data>
-  <data name="HttpContextDebuggingEnabledDescription" xml:space="preserve">
-    <value>HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached.</value>
-  </data>
-  <data name="HttpContextDebuggingEnabledMessageFormat" xml:space="preserve">
-    <value>HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached</value>
-  </data>
-  <data name="HttpContextDebuggingEnabledTitle" xml:space="preserve">
-    <value>HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached</value>
-  </data>
-  <data name="ResultTypeDescription" xml:space="preserve">
-    <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core.</value>
-  </data>
-  <data name="ResultTypeMessageFormat" xml:space="preserve">
-    <value>Identifier '{0}' should be replaced with '{1}'</value>
-  </data>
-  <data name="ResultTypeTitle" xml:space="preserve">
-    <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace</value>
-  </data>
-  <data name="UrlHelperDescription" xml:space="preserve">
-    <value>UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper.</value>
-  </data>
-  <data name="UrlHelperMessageFormat" xml:space="preserve">
-    <value>Identifier '{0}' should be replaced with '{1}'</value>
-  </data>
-  <data name="UrlHelperTitle" xml:space="preserve">
-    <value>UrlHelper should be replaced with IUrlHelper</value>
-  </data>
-  <data name="UsingSystemDeployment" xml:space="preserve">
-    <value>System.Deployment is not supported on .NET Core</value>
-  </data>
-  <data name="UsingSystemDeploymentDescription" xml:space="preserve">
-    <value>System.Deployment is not supported on .NET Core.</value>
-  </data>
-  <data name="UsingSystemWebDescription" xml:space="preserve">
-    <value>ASP.NET Core projects should not reference System.Web or OWIN namespaces.</value>
-    <comment>An optional longer localizable description of the diagnostic.</comment>
-  </data>
-  <data name="UsingSystemWebMessageFormat" xml:space="preserve">
-    <value>Namespace '{0}' should not be referenced in ASP.NET Core projects</value>
-    <comment>The format-able message the diagnostic displays.</comment>
-  </data>
-  <data name="UsingSystemWebTitle" xml:space="preserve">
-    <value>ASP.NET Core projects should not reference ASP.NET namespaces</value>
-    <comment>The title of the diagnostic.</comment>
+  <data name="MakeConstTitle" xml:space="preserve">
+    <value>Add const modifier</value>
   </data>
 </root>

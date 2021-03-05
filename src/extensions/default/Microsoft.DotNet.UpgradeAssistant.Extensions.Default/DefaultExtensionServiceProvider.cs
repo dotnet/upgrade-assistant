@@ -94,6 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<IPackageReferencesAnalyzer, TargetCompatibilityReferenceAnalyzer>();
             services.AddTransient<IPackageReferencesAnalyzer, UpgradeAssistantReferenceAnalyzer>();
             services.AddTransient<IPackageReferencesAnalyzer, WindowsCompatReferenceAnalyzer>();
+            services.AddTransient<IPackageReferencesAnalyzer, NewtonsoftReferenceAnalyzer>();
         }
     }
 }
