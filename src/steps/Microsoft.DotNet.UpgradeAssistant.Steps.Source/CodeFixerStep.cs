@@ -66,21 +66,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return false;
             }
 
-            var applicableComponentsAttr = _fixProvider.GetType().CustomAttributes.FirstOrDefault(a => a.AttributeType.Equals(typeof(ApplicableComponentsAttribute)));
-            if (applicableComponentsAttr is not null)
-            {
-                var components = applicableComponentsAttr.ConstructorArguments.Single().Value;
-                if (components is ProjectComponents projectComponents)
-                {
-                    if (!context.CurrentProject.Components.HasFlag(projectComponents))
-                    {
-                        Logger.LogDebug($"Skipping code updater for {DiagnosticId} because project {context.CurrentProject.FilePath} does not have required components {projectComponents}");
-                        return false;
-                    }
-                }
-            }
-
-            return true;
+            // Check the code fix provider for an [ApplicableComponents] attribute
+            // If one exists, the step only applies if the project has the indicated components
+            return _fixProvider.GetType().AppliesToProject(context.CurrentProject);
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

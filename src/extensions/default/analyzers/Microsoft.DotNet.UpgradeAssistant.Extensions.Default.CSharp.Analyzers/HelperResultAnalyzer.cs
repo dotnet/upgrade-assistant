@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
+    [ApplicableComponents(ProjectComponents.Web)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class HelperResultAnalyzer : IdentifierUpgradeAnalyzer
     {

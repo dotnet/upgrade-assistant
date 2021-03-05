@@ -114,22 +114,42 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             Logger.LogTrace("Running ASP.NET Core upgrade analyzers on {ProjectName}", project.Name);
 
             // Compile with upgrade analyzers enabled
-            var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
-
-            if (compilation is null)
+            var applicableAnalyzers = GetApplicableAnalyzers(_allAnalyzers, Project);
+            if (!applicableAnalyzers.Any())
             {
                 Diagnostics = Enumerable.Empty<Diagnostic>();
             }
             else
             {
-                var compilationWithAnalyzer = compilation
-                    .WithAnalyzers(ImmutableArray.CreateRange(_allAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
+                var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
+                if (compilation is null)
+                {
+                    Diagnostics = Enumerable.Empty<Diagnostic>();
+                }
+                else
+                {
+                    var compilationWithAnalyzer = compilation
+                        .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
 
-                // Find all diagnostics that upgrade code fixers can address
-                Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
-                    .Where(d => d.Location.IsInSource &&
-                           _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
-                Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
+                    // Find all diagnostics that upgrade code fixers can address
+                    Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
+                        .Where(d => d.Location.IsInSource &&
+                               _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
+                    Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
+                }
+            }
+        }
+
+        private static IEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> allAnalyzers, IProject project)
+        {
+            foreach (var analyzer in allAnalyzers)
+            {
+                // If an analyzer has an [ApplicableComponents] attribute, only use it if the project has
+                // the specified components
+                if (analyzer.GetType().AppliesToProject(project))
+                {
+                    yield return analyzer;
+                }
             }
         }
 
