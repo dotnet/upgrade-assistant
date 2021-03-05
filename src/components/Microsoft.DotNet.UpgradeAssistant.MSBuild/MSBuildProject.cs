@@ -103,11 +103,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     if (GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase))
                     {
                         components |= ProjectComponents.Wpf;
+                        components |= ProjectComponents.WindowsDesktop;
                     }
 
                     if (GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
                     {
                         components |= ProjectComponents.WinForms;
+                        components |= ProjectComponents.WindowsDesktop;
                     }
 
                     if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase))
