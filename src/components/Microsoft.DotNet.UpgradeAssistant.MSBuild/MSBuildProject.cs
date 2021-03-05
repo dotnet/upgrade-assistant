@@ -43,6 +43,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return Context.GetOrAddProject(project.FilePath);
         });
 
+        public Language Language => ParseLanguageByProjectFileExtension(FilePath);
+
+        private static Language ParseLanguageByProjectFileExtension(string filePath)
+        {
+            return Path.GetExtension(filePath).ToUpperInvariant() switch
+            {
+                ".CSPROJ" => Language.CSharp,
+                ".VBPROJ" => Language.VisualBasic,
+                ".FSPROJ" => Language.FSharp,
+                _ => Language.Unknown
+            };
+        }
+
         public MBuild.Project Project => Context.ProjectCollection.LoadProject(FilePath);
 
         public ProjectOutputType OutputType =>
@@ -87,9 +100,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                         components |= ProjectComponents.Web;
                     }
 
-                    if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase) ||
-                        GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase) ||
-                        GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
+                    if (GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        components |= ProjectComponents.Wpf;
+                        components |= ProjectComponents.WindowsDesktop;
+                    }
+
+                    if (GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        components |= ProjectComponents.WinForms;
+                        components |= ProjectComponents.WindowsDesktop;
+                    }
+
+                    if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase))
                     {
                         components |= ProjectComponents.WindowsDesktop;
                     }
@@ -103,6 +126,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
                     {
                         components |= ProjectComponents.WindowsDesktop;
+                    }
+
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WinFormsReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.WinForms;
+                    }
+
+                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WpfReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.Wpf;
                     }
 
                     return components;
@@ -123,10 +156,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                         components |= ProjectComponents.Web;
                     }
 
-                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)) ||
-                        references.Any(r => MSBuildConstants.WPFReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
                     {
                         components |= ProjectComponents.WindowsDesktop;
+                        components |= ProjectComponents.WinForms;
+                    }
+
+                    if (references.Any(r => MSBuildConstants.WpfReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        components |= ProjectComponents.WindowsDesktop;
+                        components |= ProjectComponents.Wpf;
                     }
 
                     return components;

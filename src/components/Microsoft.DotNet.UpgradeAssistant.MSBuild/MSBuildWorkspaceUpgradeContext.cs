@@ -213,7 +213,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public void SetCurrentProject(IProject? project) => _projectPath = project?.FilePath;
+        public void SetCurrentProject(IProject? project)
+        {
+            _projectPath = project?.FilePath;
+        }
 
         public bool UpdateSolution(Solution updatedSolution)
         {
