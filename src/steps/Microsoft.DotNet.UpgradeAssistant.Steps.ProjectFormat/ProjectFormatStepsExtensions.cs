@@ -16,6 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddUpgradeStep<TryConvertProjectConverterStep>();
             services.AddSingleton<ITryConvertTool, TryConvertTool>();
             services.AddTransient<ISectionGenerator, TryConvertReport>();
+            services.AddTransient<IUpgradeStartup, TryConvertToolStartup>();
 
             return services.AddOptions<TryConvertProjectConverterStepOptions>()
                 .ValidateDataAnnotations();
