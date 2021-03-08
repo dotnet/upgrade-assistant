@@ -54,4 +54,6 @@
     <!-- This isn't used directly, but needs to be referenced so that the binary is available at runtime to be registered as an extension -->
     <ProjectReference Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj" />
   </ItemGroup>
+
+  <Import Project="ToolsInstaller.props" />
 </Project>

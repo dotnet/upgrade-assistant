@@ -92,3 +92,4 @@ PublishScripts/
 launchSettings.json
 
 .packages/
+/src/cli/Microsoft.DotNet.UpgradeAssistant.Cli/tools

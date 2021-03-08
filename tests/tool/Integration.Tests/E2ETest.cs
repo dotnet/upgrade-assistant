@@ -11,7 +11,6 @@ using Xunit;
 
 namespace Integration.Tests
 {
-    [Collection(IntegrationTestCollection.Name)]
     public class E2ETest
     {
         // TODO : Make this configurable so the test can pass from other working dirs

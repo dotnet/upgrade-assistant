@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- By default, NuGet will not include files starting with '.' or ending with '.nupkg'. Since we are including try-convert via global tools, some of the files fit into this. -->
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <TryConvertVersion>0.7.212201</TryConvertVersion>
+    <ToolsDirectory>$(MSBuildThisFileDirectory)\tools</ToolsDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="tools\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Target Name="RestoreTools" BeforeTargets="Build" Condition="!Exists($(ToolsDirectory))">
+    <Exec Command="dotnet tool install try-convert --version $(TryConvertVersion) --tool-path $(ToolsDirectory)" />
+  </Target>
+</Project>
