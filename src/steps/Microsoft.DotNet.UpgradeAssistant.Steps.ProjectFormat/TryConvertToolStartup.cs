@@ -24,24 +24,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public Task<bool> StartupAsync(CancellationToken token)
         {
-            TryConvertToolInstance(token);
+            if (!_tryConvertTool.IsAvailable)
+            {
+                TryConvertToolInstanceAsync(token);
+            }
+
             return Task.FromResult(true);
         }
 
-        public bool TryConvertToolInstance(CancellationToken token)
+        public Task<bool> TryConvertToolInstanceAsync(CancellationToken token)
         {
-            if (!_tryConvertTool.IsAvailable)
+            _logger.LogInformation("Try-Convert not found. This tool depends on the Try-Convert CLI tool, installing now to the path : {path}", _tryConvertTool.Path);
+            return _runner.RunProcessAsync(new ProcessInfo
             {
-                _logger.LogInformation("Try-Convert not found. This tool depends on the Try-Convert CLI tool, installing now to the path : {path}", _tryConvertTool.Path);
-
-                return _runner.RunProcessAsync(new ProcessInfo
-                {
-                    Command = "dotnet",
-                    Arguments = " tool install -g try-convert"
-                }, token).ConfigureAwait(true).GetAwaiter().GetResult();
-            }
-
-            return true;
+                Command = "dotnet",
+                Arguments = " tool install -g try-convert"
+            }, token);
         }
     }
 }
