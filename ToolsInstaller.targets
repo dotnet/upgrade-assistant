@@ -1,17 +1,24 @@
 <Project>
   <PropertyGroup>
+    <InstallTools Condition=" '$(InstallTools)' == ''">false</InstallTools>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(InstallTools)">
     <!-- By default, NuGet will not include files starting with '.' or ending with '.nupkg'. Since we are including try-convert via dotnet tools, some of the files fit into this. -->
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <TryConvertVersion>0.7.212201</TryConvertVersion>
-    <ToolsDirectory>$(MSBuildThisFileDirectory)\tools</ToolsDirectory>
+    <ToolsDirectory>$(MSBuildProjectDirectory)\tools\</ToolsDirectory>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="tools\**\*">
+
+  <ItemGroup Condition="$(InstallTools)">
+    <None Include="$(ToolsDirectory)**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="tools\**\*" />
+    <Content Include="$(ToolsDirectory)**\*" />
   </ItemGroup>
-  <Target Name="RestoreTools" BeforeTargets="Build" Condition="!Exists($(ToolsDirectory))">
+  
+  <Target Name="RestoreTools" BeforeTargets="Build" Condition="$(InstallTools) AND !Exists($(ToolsDirectory))">
     <Exec Command="dotnet tool install try-convert --version $(TryConvertVersion) --tool-path $(ToolsDirectory)" />
   </Target>
+
 </Project>
