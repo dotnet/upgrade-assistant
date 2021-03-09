@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
         {
         }
 
-        public Dictionary<string,string> GetAddresses()
+        public Dictionary<string, string> GetAddresses()
         {
             // Open the file containing the data that you want to deserialize.
             var fs = new FileStream(STATE_FILE, FileMode.Open);
