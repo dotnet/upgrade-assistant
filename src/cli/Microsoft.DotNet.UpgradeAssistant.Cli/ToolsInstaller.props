@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <!-- By default, NuGet will not include files starting with '.' or ending with '.nupkg'. Since we are including try-convert via global tools, some of the files fit into this. -->
+    <!-- By default, NuGet will not include files starting with '.' or ending with '.nupkg'. Since we are including try-convert via dotnet tools, some of the files fit into this. -->
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <TryConvertVersion>0.7.212201</TryConvertVersion>
     <ToolsDirectory>$(MSBuildThisFileDirectory)\tools</ToolsDirectory>
