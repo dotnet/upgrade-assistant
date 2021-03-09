@@ -27,7 +27,7 @@ namespace BeanTraderClient.Converters
 
             return Visibility.Collapsed;
         }
-            
+
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();

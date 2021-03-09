@@ -9,10 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public class TemplateConfiguration
     {
-    // This is a false positive
-#pragma warning disable CA2227 // Collection properties should be read only
         public Dictionary<string, string>? Replacements { get; init; }
-#pragma warning restore CA2227 // Collection properties should be read only
 
         public ItemSpec[]? TemplateItems { get; set; }
 
