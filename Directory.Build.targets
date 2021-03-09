@@ -2,6 +2,7 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
   <Import Project="$(MSBuildThisFileDirectory)/ToolsInstaller.targets" />
+
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers">
       <PrivateAssets>All</PrivateAssets>
@@ -10,6 +11,15 @@
 
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)/shared/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.0'">
+    <!-- Exclude MSBuild runtime assets from both src and test projects
+         as they shouldn't be present in this solution's output paths.
+         Instead, these dependencies should be loaded from the selected
+         MSBuild's location. -->
+    <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
   </ItemGroup>
 
 </Project>

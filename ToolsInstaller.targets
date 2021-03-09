@@ -16,7 +16,7 @@
     </None>
     <Content Include="$(ToolsDirectory)**\*" />
   </ItemGroup>
-  
+
   <Target Name="RestoreTools" BeforeTargets="Build" Condition="$(InstallTools) AND !Exists($(ToolsDirectory))">
     <Exec Command="dotnet tool install try-convert --version $(TryConvertVersion) --tool-path $(ToolsDirectory)" />
   </Target>
