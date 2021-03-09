@@ -37,8 +37,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
-
-            throw new InvalidOperationException($"try-convert not found: {_runner.Path}: {_runner.IsAvailable}");
         }
 
         protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
@@ -93,8 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             if (!_runner.IsAvailable)
             {
-                Logger.LogCritical("try-convert not found: {Path}", _runner.Path);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"try-convert not found {_runner.Path}", BuildBreakRisk.Unknown);
+                throw new UpgradeException($"try-convert not found: {_runner.Path}");
             }
 
             var projectFile = project.GetFile();
