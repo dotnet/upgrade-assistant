@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             if (!result)
             {
-                Logger.LogCritical("Conversion with try-convert failed. Make sure Try-Convert (version 0.7.157502 or higher) is installed and that your project does not use custom imports.");
+                Logger.LogCritical("Conversion with try-convert failed.");
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Conversion with try-convert failed.");
             }
             else
@@ -91,8 +91,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             if (!_runner.IsAvailable)
             {
-                Logger.LogCritical("Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert");
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Try-Convert not found. This tool depends on the Try-Convert CLI tool. Please ensure that Try-Convert is installed and that the correct location for the tool is specified (in configuration, for example). https://github.com/dotnet/try-convert", BuildBreakRisk.Unknown);
+                Logger.LogCritical("try-convert not found: {Path}", _runner.Path);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"try-convert not found {_runner.Path}", BuildBreakRisk.Unknown);
             }
 
             var projectFile = project.GetFile();
