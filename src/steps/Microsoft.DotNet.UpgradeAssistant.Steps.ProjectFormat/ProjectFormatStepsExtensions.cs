@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.IO;
 using Microsoft.DotNet.UpgradeAssistant.Reporting;
 using Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<ISectionGenerator, TryConvertReport>();
 
             return services.AddOptions<TryConvertProjectConverterStepOptions>()
+                .PostConfigure(options =>
+                {
+                    var path = Environment.ExpandEnvironmentVariables(options.TryConvertPath);
+
+                    if (!Path.IsPathRooted(path))
+                    {
+                        var directory = Path.GetDirectoryName(typeof(ProjectFormatStepsExtensions).Assembly.Location);
+                        path = Path.GetFullPath(Path.Combine(directory, options.TryConvertPath));
+                    }
+
+                    options.TryConvertPath = path;
+                })
                 .ValidateDataAnnotations();
         }
     }

@@ -1,6 +1,8 @@
 <Project>
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
+  <Import Project="$(MSBuildThisFileDirectory)/ToolsInstaller.targets" />
+
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers">
       <PrivateAssets>All</PrivateAssets>

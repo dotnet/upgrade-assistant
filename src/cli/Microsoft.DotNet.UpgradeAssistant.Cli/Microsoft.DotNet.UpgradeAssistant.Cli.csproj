@@ -9,6 +9,7 @@
     <Description>A tool to assist developers in upgrading .NET Framework applications to .NET 5.</Description>
     <PackageId>upgrade-assistant</PackageId>
     <PackageIcon>icon.png</PackageIcon>
+    <InstallTools>true</InstallTools>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.json">
@@ -54,4 +55,5 @@
     <!-- This isn't used directly, but needs to be referenced so that the binary is available at runtime to be registered as an extension -->
     <ProjectReference Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj" />
   </ItemGroup>
+
 </Project>
