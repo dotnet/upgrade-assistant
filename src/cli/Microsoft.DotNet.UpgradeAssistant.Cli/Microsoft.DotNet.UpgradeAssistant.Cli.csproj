@@ -10,6 +10,7 @@
     <PackageId>upgrade-assistant</PackageId>
     <PackageIcon>icon.png</PackageIcon>
     <InstallTools>true</InstallTools>
+    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.json">

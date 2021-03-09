@@ -4,6 +4,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <IsTestProject>true</IsTestProject>
+    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="assets\**" />
@@ -14,7 +15,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis" />
+    <PackageReference Include="Microsoft.CodeAnalysis" />    
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" />

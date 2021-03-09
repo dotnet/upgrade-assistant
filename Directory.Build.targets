@@ -13,7 +13,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)/shared/**/*.cs" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.0'">
+  <PropertyGroup>
+    <ExcludeMSBuildRuntime Condition=" '$(ExcludeMSBuildRuntime)' =='' ">false</ExcludeMSBuildRuntime>
+  </PropertyGroup>
+
+  <!-- This forces the MSBuild runtime assets to be excluded from build. We have this opt-in because
+       otherwise it will add these as dependencies to all projects. -->
+  <ItemGroup Condition="$(ExcludeMSBuildRuntime)">
     <!-- Exclude MSBuild runtime assets from both src and test projects
          as they shouldn't be present in this solution's output paths.
          Instead, these dependencies should be loaded from the selected

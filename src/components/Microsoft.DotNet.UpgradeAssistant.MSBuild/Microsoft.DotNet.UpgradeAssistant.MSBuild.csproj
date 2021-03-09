@@ -5,6 +5,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.ProjectModel" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Frameworks" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
     <PackageReference Include="Microsoft.Extensions.Options" />
@@ -13,7 +14,6 @@
       <!-- This package is mostly COM definitions which can be loaded in .NET 5 runtime just fine -->
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="NuGet.Frameworks" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
