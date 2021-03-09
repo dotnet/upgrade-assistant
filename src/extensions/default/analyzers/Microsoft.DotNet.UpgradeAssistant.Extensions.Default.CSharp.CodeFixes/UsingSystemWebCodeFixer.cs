@@ -13,7 +13,7 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ApplicableComponents(ProjectComponents.Web)]
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA001 CodeFix Provider")]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0001 CodeFix Provider")]
     public class UsingSystemWebCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UsingSystemWebAnalyzer.DiagnosticId);

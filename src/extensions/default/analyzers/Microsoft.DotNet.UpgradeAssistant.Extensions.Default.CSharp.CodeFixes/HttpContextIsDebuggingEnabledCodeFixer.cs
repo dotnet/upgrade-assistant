@@ -16,7 +16,7 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ApplicableComponents(ProjectComponents.Web)]
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA006 CodeFix Provider")]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0006 CodeFix Provider")]
     public class HttpContextIsDebuggingEnabledCodeFixer : CodeFixProvider
     {
         private const string DiagnosticsNamespace = "System.Diagnostics";
