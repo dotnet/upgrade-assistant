@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class BinaryFormaterUnsafeDeserializeAnalyzer : DiagnosticAnalyzer
+    public sealed class BinaryFormatterUnsafeDeserializeAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0012";
         private const string Category = "Upgrade";
