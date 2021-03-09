@@ -25,28 +25,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         internal const string TestProjectPath = @"assets\TestProject.csproj";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
-            new UsingSystemWebAnalyzer(),
-            new HtmlStringAnalyzer(),
-            new ResultTypeAnalyzer(),
+            new AllowHtmlAttributeAnalyzer(),
+            new BinaryFormaterUnsafeDeserializeAnalyzer(),
             new FilterAnalyzer(),
+            new HelperResultAnalyzer(),
+            new HtmlStringAnalyzer(),
+            new HtmlHelperAnalyzer(),
             new HttpContextCurrentAnalyzer(),
             new HttpContextIsDebuggingEnabledAnalyzer(),
-            new HtmlHelperAnalyzer(),
-            new UrlHelperAnalyzer(),
-            new HelperResultAnalyzer(),
-            new AllowHtmlAttributeAnalyzer());
+            new ResultTypeAnalyzer(),
+            new UsingSystemWebAnalyzer(),
+            new UrlHelperAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
-            new UsingSystemWebCodeFixer(),
-            new HtmlStringCodeFixer(),
-            new ResultTypeCodeFixer(),
+            new AllowHtmlAttributeCodeFixer(),
             new FilterCodeFixer(),
+            new HelperResultCodeFixer(),
+            new HtmlStringCodeFixer(),
+            new HtmlHelperCodeFixer(),
             new HttpContextCurrentCodeFixer(),
             new HttpContextIsDebuggingEnabledCodeFixer(),
-            new HtmlHelperCodeFixer(),
-            new UrlHelperCodeFixer(),
-            new HelperResultCodeFixer(),
-            new AllowHtmlAttributeCodeFixer());
+            new ResultTypeCodeFixer(),
+            new UsingSystemWebCodeFixer(),
+            new UrlHelperCodeFixer());
 
         public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
         {

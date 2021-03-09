@@ -126,6 +126,15 @@
   <data name="AllowHtmlAttributeTitle" xml:space="preserve">
     <value>[AllowHtmlAttribute] should be removed</value>
   </data>
+  <data name="BinaryFormatterUnsafeDeserializeDescription" xml:space="preserve">
+    <value>Identifier '{0}' should be replaced with '{1}'</value>
+  </data>
+  <data name="BinaryFormatterUnsafeDeserializeMessageFormat" xml:space="preserve">
+    <value>'UnsafeDeserialize()' should be replaced with 'Deserialize()'</value>
+  </data>
+  <data name="BinaryFormatterUnsafeDeserializeTitle" xml:space="preserve">
+    <value>'UnsafeDeserialize()' does not exist</value>
+  </data>
   <data name="FilterDescription" xml:space="preserve">
     <value>Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core.</value>
   </data>

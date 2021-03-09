@@ -136,6 +136,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                     new ExpectedDiagnostic("UA0010", new TextSpan(344, 13)),
                 }
             },
+            {
+                "UA0012",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0012", new TextSpan(1089, 27))
+                }
+            }
         };
 
         // No diagnostics expected to show up
@@ -160,6 +167,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [InlineData("UA0008")]
         [InlineData("UA0009")]
         [InlineData("UA0010")]
+        [InlineData("UA0012")]
         [Theory]
         public async Task UpgradeAnalyzers(string diagnosticId)
         {
@@ -178,6 +186,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [InlineData("UA0008")]
         [InlineData("UA0009")]
         [InlineData("UA0010")]
+        [InlineData("UA0012")]
         [Theory]
         public async Task UpgradeCodeFixer(string diagnosticId)
         {
