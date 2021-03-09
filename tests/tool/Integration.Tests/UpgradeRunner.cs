@@ -52,6 +52,7 @@ namespace Integration.Tests
                 })
                 .ConfigureLogging((ctx, logging) =>
                 {
+                    logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
                 }), cts.Token);
 
