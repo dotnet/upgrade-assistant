@@ -92,4 +92,7 @@ PublishScripts/
 launchSettings.json
 
 .packages/
+/.dotnet
+
+# Bundled dotnet tools
 /src/cli/Microsoft.DotNet.UpgradeAssistant.Cli/tools

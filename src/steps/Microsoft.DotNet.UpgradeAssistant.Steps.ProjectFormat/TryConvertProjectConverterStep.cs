@@ -37,6 +37,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
+
+            throw new InvalidOperationException($"try-convert not found: {_runner.Path}: {_runner.IsAvailable}");
         }
 
         protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
