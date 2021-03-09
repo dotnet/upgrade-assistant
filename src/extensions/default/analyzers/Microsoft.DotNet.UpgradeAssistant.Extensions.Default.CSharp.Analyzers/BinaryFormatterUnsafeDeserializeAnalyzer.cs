@@ -18,7 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         private const string Category = "Upgrade";
 
         private const string TargetTypeSimpleName = "formatter";
-        private const string TargetTypeSymbolName = "System.Runtime.Serialization.Formatters.Binary";
         private const string TargetMember = "UnsafeDeserialize";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeTitle), Resources.ResourceManager, typeof(Resources));
