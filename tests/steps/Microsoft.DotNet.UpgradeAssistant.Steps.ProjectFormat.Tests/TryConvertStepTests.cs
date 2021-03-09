@@ -50,6 +50,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             Assert.Equal(isApplicable, result);
         }
 
+        [Fact]
+        public async Task ToolNotAvailable()
+        {
+            // Arrange
+            using var mock = AutoMock.GetLoose();
+
+            mock.Mock<ITryConvertTool>().Setup(m => m.IsAvailable).Returns(false);
+
+            var step = mock.Create<TryConvertProjectConverterStep>();
+            var context = mock.Mock<IUpgradeContext>();
+
+            // Act
+            await step.InitializeAsync(context.Object, default).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(UpgradeStepStatus.Failed, step.Status);
+        }
+
         [InlineData(true)]
         [InlineData(false)]
         [Theory]
@@ -57,6 +75,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
+
+            mock.Mock<ITryConvertTool>().Setup(m => m.IsAvailable).Returns(true);
 
             var step = mock.Create<TryConvertProjectConverterStep>();
 

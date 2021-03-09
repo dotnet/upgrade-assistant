@@ -8,6 +8,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public interface ITryConvertTool
     {
+        bool IsAvailable { get; }
+
         string Path { get; }
 
         Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token);
