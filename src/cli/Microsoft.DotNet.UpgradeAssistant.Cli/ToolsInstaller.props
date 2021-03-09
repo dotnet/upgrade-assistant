@@ -9,6 +9,7 @@
     <None Include="tools\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="tools\**\*" />
   </ItemGroup>
   <Target Name="RestoreTools" BeforeTargets="Build" Condition="!Exists($(ToolsDirectory))">
     <Exec Command="dotnet tool install try-convert --version $(TryConvertVersion) --tool-path $(ToolsDirectory)" />
