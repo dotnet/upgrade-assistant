@@ -10,14 +10,14 @@
     <ToolsDirectory>$(MSBuildProjectDirectory)\tools\</ToolsDirectory>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(InstallTools)">
-    <None Include="$(ToolsDirectory)**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <Target Name="RestoreTools" BeforeTargets="Build" Condition="$(InstallTools) AND !Exists($(ToolsDirectory))">
-    <Exec Command="dotnet tool install try-convert --version $(TryConvertVersion) --tool-path $(ToolsDirectory)" />
+  <Target Name="RestoreTools" BeforeTargets="PreBuildEvent" Condition="$(InstallTools)">
+    <Exec Command="dotnet tool install try-convert --version $(TryConvertVersion) --tool-path $(ToolsDirectory)" Condition="!Exists($(ToolsDirectory))" />
+    
+    <ItemGroup>
+      <None Include="$(ToolsDirectory)**\*">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
   </Target>
 
 </Project>
