@@ -9,15 +9,12 @@ using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Xunit.Abstractions;
 
 namespace Integration.Tests
 {
     public static class UpgradeRunner
     {
-        public static async Task UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, int timeoutSeconds = 300)
+        public static async Task UpgradeAsync(string inputPath, string entrypoint, TextWriter output, int timeoutSeconds = 300)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -41,21 +38,7 @@ namespace Integration.Tests
                 EntryPoint = entrypoint,
             };
 
-            var upgradeTask = Program.RunUpgradeAsync(options, host => host
-                .ConfigureServices((_, services) =>
-                {
-                    services.AddOptions<PackageUpdaterOptions>().Configure(o =>
-                    {
-                        o.PackageMapPath = "PackageMaps";
-                        o.UpgradeAnalyzersPackageVersion = "1.0.0";
-                    });
-                })
-                .ConfigureLogging((ctx, logging) =>
-                {
-                    logging.SetMinimumLevel(LogLevel.Trace);
-                    logging.AddProvider(new TestOutputHelperLoggerProvider(output));
-                }), cts.Token);
-
+            var upgradeTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services), cts.Token);
             var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
 
             await Task.WhenAny(upgradeTask, timeoutTimer).ConfigureAwait(false);
@@ -68,6 +51,15 @@ namespace Integration.Tests
             catch (OperationCanceledException)
             {
             }
+        }
+
+        private static void RegisterTestServices(IServiceCollection services)
+        {
+            services.AddOptions<PackageUpdaterOptions>().Configure(o =>
+            {
+                o.PackageMapPath = "PackageMaps";
+                o.UpgradeAnalyzersPackageVersion = "1.0.0";
+            });
         }
     }
 }
