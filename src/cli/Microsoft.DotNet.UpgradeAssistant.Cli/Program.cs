@@ -13,8 +13,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -65,23 +65,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        public static Task RunUpgradeAsync(UpgradeOptions options, Action<HostBuilderContext, IServiceCollection> configure, CancellationToken token)
-            => RunCommandAsync(options, (ctx, services) =>
+        public static Task RunUpgradeAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
+            => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
             {
                 services.AddScoped<IAppCommand, ConsoleUpgrade>();
-                configure(ctx, services);
-            }, token);
+            }), token);
 
-        public static Task RunAnalysisAsync(UpgradeOptions options)
-            => RunCommandAsync(options, (ctx, services) =>
-            {
-                services.AddScoped<IAppCommand, ConsoleAnalyze>();
-                services.AddReports();
-                services.AddPortabilityAnalysis()
-                    .Bind(ctx.Configuration.GetSection("Portability"));
-            }, CancellationToken.None);
+        private static IHostBuilder EnableLogging(UpgradeOptions options, IHostBuilder host)
+        {
+            var logSettings = new LogSettings(options.Verbose);
 
-        private static Task RunCommandAsync(UpgradeOptions options, Action<HostBuilderContext, IServiceCollection> serviceConfiguration, CancellationToken token)
+            return host
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton(logSettings);
+                })
+                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
+                    .Enrich.FromLogContext()
+                    .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
+                    .WriteTo.Console(levelSwitch: logSettings.Console)
+                    .WriteTo.File(LogFilePath, levelSwitch: logSettings.File));
+        }
+
+        private static Task RunCommandAsync(
+            UpgradeOptions options,
+            Func<IHostBuilder, IHostBuilder> configure,
+            CancellationToken token)
         {
             ConsoleUtils.Clear();
 
@@ -91,8 +100,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 throw new ArgumentNullException(nameof(options));
             }
-
-            var logSettings = new LogSettings(options.Verbose);
 
             var host = Host.CreateDefaultBuilder()
                 .UseContentRoot(AppContext.BaseDirectory)
@@ -118,25 +125,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
-                    services.AddSingleton(logSettings);
+                    services.TryAddSingleton(new LogSettings(true));
 
                     services.AddSingleton<IProcessRunner, ProcessRunner>();
 
                     services.AddStepManagement();
+                });
 
-                    serviceConfiguration(context, services);
-                })
-                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
-                    .Enrich.FromLogContext()
-                    .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
-                    .WriteTo.Console(levelSwitch: logSettings.Console)
-                    .WriteTo.File(LogFilePath, levelSwitch: logSettings.File))
-                .RunConsoleAsync(options =>
-                {
-                    options.SuppressStatusMessages = true;
-                }, token);
-
-            return host;
+            return configure(host).RunConsoleAsync(options =>
+            {
+                options.SuppressStatusMessages = true;
+            }, token);
         }
 
         private static void ShowHeader()
@@ -179,7 +178,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ConfigureUpgradeCommand(Command command)
         {
-            command.Handler = CommandHandler.Create<UpgradeOptions, CancellationToken>((options, token) => RunUpgradeAsync(options, (ctx, services) => { }, token));
+            command.Handler = CommandHandler.Create<UpgradeOptions, CancellationToken>((options, token) => RunUpgradeAsync(options, host => EnableLogging(options, host), token));
 
             command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             command.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
