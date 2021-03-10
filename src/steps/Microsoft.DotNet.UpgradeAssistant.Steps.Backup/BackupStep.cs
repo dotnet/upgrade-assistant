@@ -123,7 +123,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
             catch (IOException exc)
             {
-                Logger.LogError("Unexpected exception while creating backup: {Exception}", exc);
+                Logger.LogError(exc, "Unexpected exception while creating backup");
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while creating backup");
             }
         }

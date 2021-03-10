@@ -90,11 +90,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception)
+            catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FilePath);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
             }
 
             if (_analysisState is null || !_analysisState.ChangesRecommended)
@@ -166,11 +166,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
             }
 #pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception)
+            catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}");
+                Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FilePath);
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FilePath}");
             }
         }
 
