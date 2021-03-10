@@ -1,16 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
@@ -18,7 +14,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
-    [ApplicableComponents(ProjectComponents.Web)]
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0012 CodeFix Provider")]
     public sealed class BinaryFormatterUnsafeDeserializeFixer : CodeFixProvider
     {
