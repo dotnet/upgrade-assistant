@@ -14,7 +14,6 @@
     <ApplicationIcon>BeanTrader.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Configuration" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.Net" />
     <Reference Include="System.Runtime.Remoting" />

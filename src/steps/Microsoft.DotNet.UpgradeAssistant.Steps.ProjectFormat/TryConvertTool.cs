@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
             }
 
-            Path = Environment.ExpandEnvironmentVariables(tryConvertOptionsAccessor.Value.TryConvertPath);
+            Path = tryConvertOptionsAccessor.Value.TryConvertPath;
         }
 
         public string Path { get; }
