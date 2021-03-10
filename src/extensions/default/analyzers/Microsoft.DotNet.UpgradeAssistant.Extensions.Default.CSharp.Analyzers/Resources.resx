@@ -127,7 +127,7 @@
     <value>[AllowHtmlAttribute] should be removed</value>
   </data>
   <data name="BinaryFormatterUnsafeDeserializeDescription" xml:space="preserve">
-    <value>Identifier '{0}' should be replaced with '{1}'</value>
+    <value>'UnsafeDeserialize()' should be replaced with 'Deserialize()'</value>
   </data>
   <data name="BinaryFormatterUnsafeDeserializeMessageFormat" xml:space="preserve">
     <value>'UnsafeDeserialize()' should be replaced with 'Deserialize()'</value>

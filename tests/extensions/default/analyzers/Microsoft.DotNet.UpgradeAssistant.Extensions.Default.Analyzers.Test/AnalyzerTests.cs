@@ -140,7 +140,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0012",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0012", new TextSpan(1089, 27))
+                    new ExpectedDiagnostic("UA0012", new TextSpan(1160, 27)),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(1962, 39))
                 }
             }
         };

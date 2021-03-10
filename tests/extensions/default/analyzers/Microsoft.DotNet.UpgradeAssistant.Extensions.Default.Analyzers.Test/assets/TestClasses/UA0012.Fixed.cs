@@ -13,7 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
 {
     public class UA0012
     {
-        public const string STATE_FILE = "DataFile.dat";
+        public const string ADDRESSES_FILE = "DataFile.dat";
+        public const string CONTACTS_FILE = "DataFile2.dat";
 
         public UA0012()
         {
@@ -22,16 +23,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
         public Dictionary<string, string> GetAddresses()
         {
             // Open the file containing the data that you want to deserialize.
-            var fs = new FileStream(STATE_FILE, FileMode.Open);
+            var fs = new FileStream(ADDRESSES_FILE, FileMode.Open);
             try
             {
                 var formatter = new BinaryFormatter();
 
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
-                // UA0012 - Call to method 'UnsafeDeserialize' was replaced with 'Deserialize'
-                // addresses = (Dictionary<string, string>)formatter.UnsafeDeserialize(fs, null);
                 var addresses = (Dictionary<string, string>)formatter.Deserialize(fs, null);
+                return addresses;
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine("Failed to deserialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        public Dictionary<string, string> GetContacts()
+        {
+            // Open the file containing the data that you want to deserialize.
+            var fs = new FileStream(CONTACTS_FILE, FileMode.Open);
+            try
+            {
+                // Deserialize the hashtable from the file and
+                // assign the reference to the local variable.
+                var addresses = (Dictionary<string, string>)new BinaryFormatter().Deserialize(fs, null);
                 return addresses;
             }
             catch (SerializationException e)

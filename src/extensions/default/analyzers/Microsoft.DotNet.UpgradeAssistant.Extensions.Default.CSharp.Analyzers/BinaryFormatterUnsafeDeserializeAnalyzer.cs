@@ -17,12 +17,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         public const string DiagnosticId = "UA0012";
         private const string Category = "Upgrade";
 
-        private const string TargetTypeSimpleName = "formatter";
+        private const string TargetTypeSymbolName = "System.Runtime.Serialization.Formatters.Binary.BinaryFormatter";
         private const string TargetMember = "UnsafeDeserialize";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeTitle), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.FilterMessageFormat), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.HttpContextCurrentDescription), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeDescription), Resources.ResourceManager, typeof(Resources));
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
@@ -61,13 +61,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             var accessedIdentifier = memberAccessExpression.Expression switch
             {
                 IdentifierNameSyntax i => i,
+                ObjectCreationExpressionSyntax o => o.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault(),
                 MemberAccessExpressionSyntax m => m.DescendantNodes().OfType<IdentifierNameSyntax>().LastOrDefault(),
                 _ => null
             };
 
-            // Return if the accessed identifier wasn't from a simple member access expression or identifier, or if it doesn't match HttpContext
-            if (accessedIdentifier is null || !TargetTypeSimpleName.Equals(accessedIdentifier.Identifier.ValueText, StringComparison.Ordinal))
+            // Return if the accessed identifier wasn't from a simple member access expression, object creation expression, or identifier
+            if (accessedIdentifier is null)
             {
+                return;
+            }
+
+            // If the accessed identifier resolves to a type symbol other than System.Web.HttpContext, then bail out
+            // since it means the user is calling some other similarly named API.
+            var accessedSymbol = context.SemanticModel.GetSymbolInfo(accessedIdentifier).Symbol;
+            if (accessedSymbol is ILocalSymbol localSymbol)
+            {
+                if (!TargetTypeSymbolName.Equals($"{localSymbol.Type.ContainingNamespace}.{localSymbol.Type.Name}", StringComparison.Ordinal))
+                {
+                    return;
+                }
+            }
+            else if (accessedSymbol is INamedTypeSymbol symbol)
+            {
+                if (!TargetTypeSymbolName.Equals(symbol.ToDisplayString(NullableFlowState.NotNull), StringComparison.Ordinal))
+                {
+                    return;
+                }
+            }
+            else if (accessedSymbol != null)
+            {
+                // If the accessed identifier resolves to a symbol other than a ILocalSymbol symbol, bail out
+                // since it's not a reference to BinaryFormatter
                 return;
             }
 

@@ -123,7 +123,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
             documentRoot = documentRoot.ReplaceNode(name, updatedName)!;
 
-            // Add using declation if needed
+            // Add using declaration if needed
             var namespaceName = GetNamespace(newIdentifier);
             documentRoot = documentRoot.AddUsingIfMissing(namespaceName);
 
