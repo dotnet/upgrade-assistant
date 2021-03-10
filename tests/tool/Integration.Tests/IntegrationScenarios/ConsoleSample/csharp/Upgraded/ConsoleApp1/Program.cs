@@ -104,9 +104,7 @@ namespace ConsoleApp1
 
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
-                // UA0012 - Call to method 'UnsafeDeserialize' was replaced with 'Deserialize'
-                // addresses = (Dictionary<string, string>)formatter.UnsafeDeserialize(fs, null);
-                addresses = (Dictionary<string, string>)formatter.Deserialize(fs);
+                addresses = (Dictionary<string, string>)formatter.Deserialize(fs, null);
                 return addresses;
             }
             catch (SerializationException e)

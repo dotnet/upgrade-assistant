@@ -8,14 +8,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace Integration.Tests
 {
-    [Collection(IntegrationTestCollection.Name)]
     public class E2ETest
     {
-        // TODO : Make this configurable so the test can pass from other working dirs
         private const string IntegrationTestAssetsPath = "IntegrationScenarios";
         private const string OriginalProjectSubDir = "Original";
         private const string UpgradedProjectSubDir = "Upgraded";
@@ -27,6 +26,13 @@ namespace Integration.Tests
             ".upgrade-assistant"
         };
 
+        private readonly ITestOutputHelper _output;
+
+        public E2ETest(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [InlineData("AspNetSample", "csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample", "csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
         [InlineData("WpfSample", "vb", "WpfApp1.sln", "")]
@@ -36,27 +42,23 @@ namespace Integration.Tests
         {
             // Create a temporary working directory
             var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            try
+            var dir = Directory.CreateDirectory(workingDir);
+            Assert.True(dir.Exists);
+
+            // Copy the scenario files to the temporary directory
+            var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioName, language);
+            await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
+
+            // Run upgrade
+            await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, 300).ConfigureAwait(false);
+
+            CleanupBuildArtifacts(workingDir);
+
+            await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
+
+            if (Directory.Exists(workingDir))
             {
-                var dir = Directory.CreateDirectory(workingDir);
-                Assert.True(dir.Exists);
-
-                // Copy the scenario files to the temporary directory
-                var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioName, language);
-                await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
-
-                // Run upgrade
-                await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, Console.Out, 300).ConfigureAwait(false);
-                CleanupBuildArtifacts(workingDir);
-
-                await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
-            }
-            finally
-            {
-                if (Directory.Exists(workingDir))
-                {
-                    Directory.Delete(workingDir, true);
-                }
+                Directory.Delete(workingDir, true);
             }
         }
 
