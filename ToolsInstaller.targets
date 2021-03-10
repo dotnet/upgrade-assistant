@@ -6,7 +6,7 @@
   <PropertyGroup Condition="$(InstallTools)">
     <!-- By default, NuGet will not include files starting with '.' or ending with '.nupkg'. Since we are including try-convert via dotnet tools, some of the files fit into this. -->
     <NoDefaultExcludes>true</NoDefaultExcludes>
-    <TryConvertVersion>0.7.212201</TryConvertVersion>
+    <TryConvertVersion>0.7.215802</TryConvertVersion>
     <ToolsDirectory>$(MSBuildProjectDirectory)\tools\</ToolsDirectory>
   </PropertyGroup>
 
