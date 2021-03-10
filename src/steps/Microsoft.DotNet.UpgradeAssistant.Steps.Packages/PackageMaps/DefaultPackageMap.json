@@ -139,5 +139,21 @@
         "Version": "4.11.1"
       }
     ]
+  },
+  {
+    "PackageSetName": "Microsoft.Net.Http",
+    "NetCorePackagesWorkOnNetFx": true,
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.Net.Http",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "System.Net.Http",
+        "Version": "4.3.0"
+      }
+    ]
   }
 ]
