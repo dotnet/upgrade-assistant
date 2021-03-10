@@ -49,11 +49,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(configUpdaterOptions));
             }
 
-            if (logger is null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-
             _configFilePaths = (configUpdaterOptions.ConfigFilePaths ?? Enumerable.Empty<string>()).ToArray();
             SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }

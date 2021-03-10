@@ -164,6 +164,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             }
         }
 
+        [Fact]
+        public async Task NegativeApplyTests()
+        {
+            (_, var step) = GetMockContextAndStep(Array.Empty<string>(), true, 1, 1);
+
+            await Assert.ThrowsAsync<ArgumentNullException>("context", () => step.ApplyAsync(null!, CancellationToken.None)).ConfigureAwait(true);
+        }
+
         private static (IUpgradeContext Context, ConfigUpdaterStep Step) GetMockContextAndStep(string[] configPaths, bool projectLoaded, int completeConfigUpdaterCount, int incompleteConfigUpdaterCount)
         {
             using var mock = AutoMock.GetLoose(cfg =>
