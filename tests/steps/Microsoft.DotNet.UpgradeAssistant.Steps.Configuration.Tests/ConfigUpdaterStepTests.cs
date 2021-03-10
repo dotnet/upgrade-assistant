@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
     public class ConfigUpdaterStepTests
     {
         [Fact]
-        public void PropertyTests()
+        public void CtorTests()
         {
             // Arrange
             using var mock = AutoMock.GetLoose(cfg =>
@@ -39,6 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             var id = step.Id;
             var title = step.Title;
             var subSteps = step.SubSteps;
+            var status = step.Status;
+            var done = step.IsDone;
 
             // Assert
             Assert.Equal(new[] { "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep" }, dependencyOf);
@@ -49,6 +51,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             Assert.Equal(typeof(ConfigUpdaterStep).FullName, id);
             Assert.Equal("Upgrade app config files", title);
             Assert.Equal(new[] { "ConfigUpdater #0", "ConfigUpdater #1" }, subSteps.Select(s => s.Id));
+            Assert.Equal(UpgradeStepStatus.Unknown, status);
+            Assert.False(done);
         }
 
         [Fact]

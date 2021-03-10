@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             // Check whether the type has an [ApplicableComponents] attribute.
             // If one exists, the type only applies to the project if the project has the indicated components.
-            var applicableComponentsAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.Equals(typeof(ApplicableComponentsAttribute)));
+            var applicableComponentsAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ApplicableComponentsAttribute).FullName, StringComparison.Ordinal));
             if (applicableComponentsAttr is not null)
             {
                 var components = applicableComponentsAttr.ConstructorArguments.Single().Value as int?;
