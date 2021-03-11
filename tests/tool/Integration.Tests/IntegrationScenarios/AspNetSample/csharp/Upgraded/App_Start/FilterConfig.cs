@@ -1,4 +1,6 @@
-﻿
+﻿using System.Web;
+using System.Web.Mvc;
+
 namespace TemplateMvc
 {
     public class FilterConfig
