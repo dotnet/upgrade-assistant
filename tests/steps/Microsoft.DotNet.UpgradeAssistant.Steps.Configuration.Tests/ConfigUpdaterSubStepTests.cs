@@ -21,30 +21,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         [Fact]
         public void CtorTests()
         {
-            // Arrange
+            // Arrange & Act
             (_, var step) = GetMockContextAndStep(new[] { "a" }, true, new[] { new TestConfigUpdater(BuildBreakRisk.Medium, false) });
 
-            // Act
-            var risk = step.Risk;
-            var parentId = step.ParentStep!.Id;
-            var title = step.Title;
-            var description = step.Description;
-            var id = step.Id;
-            var dependsOn = step.DependsOn;
-            var dependencyOf = step.DependencyOf;
-            var status = step.Status;
-            var done = step.IsDone;
-
             // Assert
-            Assert.Equal(typeof(ConfigUpdaterStep).FullName, parentId);
-            Assert.Equal(BuildBreakRisk.Unknown, risk);
-            Assert.Equal("Test title", title);
-            Assert.Equal("Test description", description);
-            Assert.Equal("Test ConfigUpdater", id);
-            Assert.Equal(Array.Empty<string>(), dependsOn);
-            Assert.Equal(Array.Empty<string>(), dependencyOf);
-            Assert.Equal(UpgradeStepStatus.Unknown, status);
-            Assert.False(done);
+            Assert.Equal(typeof(ConfigUpdaterStep).FullName, step.ParentStep!.Id);
+            Assert.Equal(BuildBreakRisk.Unknown, step.Risk);
+            Assert.Equal("Test title", step.Title);
+            Assert.Equal("Test description", step.Description);
+            Assert.Equal("Test ConfigUpdater", step.Id);
+            Assert.Equal(Array.Empty<string>(), step.DependsOn);
+            Assert.Equal(Array.Empty<string>(), step.DependencyOf);
+            Assert.Equal(UpgradeStepStatus.Unknown, step.Status);
+            Assert.False(step.IsDone);
         }
 
         [Fact]

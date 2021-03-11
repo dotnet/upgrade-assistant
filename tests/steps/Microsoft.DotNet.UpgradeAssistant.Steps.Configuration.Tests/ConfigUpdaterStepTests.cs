@@ -30,29 +30,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
                 });
                 RegisterConfigUpdaters(cfg, 0, 2);
             });
-            var step = mock.Create<ConfigUpdaterStep>();
 
             // Act
-            var dependencyOf = step.DependencyOf;
-            var dependsOn = step.DependsOn;
-            var description = step.Description;
-            var id = step.Id;
-            var title = step.Title;
-            var subSteps = step.SubSteps;
-            var status = step.Status;
-            var done = step.IsDone;
+            var step = mock.Create<ConfigUpdaterStep>();
 
             // Assert
-            Assert.Equal(new[] { WellKnownStepIds.NextProjectStepId }, dependencyOf);
-            Assert.Equal(
-                new[] { WellKnownStepIds.BackupStepId, WellKnownStepIds.TemplateInserterStepId }.OrderBy(x => x),
-                dependsOn.OrderBy(x => x));
-            Assert.Equal("Update project based on settings in app config files (a, b)", description);
-            Assert.Equal(WellKnownStepIds.ConfigUpdaterStepId, id);
-            Assert.Equal("Upgrade app config files", title);
-            Assert.Equal(new[] { "ConfigUpdater #0", "ConfigUpdater #1" }, subSteps.Select(s => s.Id));
-            Assert.Equal(UpgradeStepStatus.Unknown, status);
-            Assert.False(done);
+            Assert.Collection(
+                step.DependencyOf,
+                d => Assert.Equal(WellKnownStepIds.NextProjectStepId, d));
+            Assert.Collection(
+                step.DependsOn.OrderBy(x => x),
+                d => Assert.Equal(WellKnownStepIds.BackupStepId, d),
+                d => Assert.Equal(WellKnownStepIds.TemplateInserterStepId, d));
+            Assert.Equal("Update project based on settings in app config files (a, b)", step.Description);
+            Assert.Equal(WellKnownStepIds.ConfigUpdaterStepId, step.Id);
+            Assert.Equal("Upgrade app config files", step.Title);
+            Assert.Collection(
+                step.SubSteps.Select(s => s.Id),
+                s => Assert.Equal("ConfigUpdater #0", s),
+                s => Assert.Equal("ConfigUpdater #1", s));
+            Assert.Equal(UpgradeStepStatus.Unknown, step.Status);
+            Assert.False(step.IsDone);
         }
 
         [Fact]
