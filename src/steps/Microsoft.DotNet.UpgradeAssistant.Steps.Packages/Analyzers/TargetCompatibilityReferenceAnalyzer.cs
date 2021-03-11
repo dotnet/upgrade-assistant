@@ -26,17 +26,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
-            if (project is null)
-            {
-                throw new ArgumentNullException(nameof(project));
-            }
-
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var currentTFM = project.TFM;
+            var currentTFM = project.Required().TFM;
 
             foreach (var packageReference in project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
