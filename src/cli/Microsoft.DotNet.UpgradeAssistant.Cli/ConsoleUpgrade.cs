@@ -54,35 +54,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 while (step is not null)
                 {
-                    while (!step.IsDone)
+                    token.ThrowIfCancellationRequested();
+
+                    ShowUpgradeSteps(steps, context, step);
+                    _io.Output.WriteLine();
+
+                    var commands = _commandProvider.GetCommands(step, context);
+                    var command = await _input.ChooseAsync("Choose a command:", commands, token);
+
+                    // TODO : It might be nice to allow commands to show more details by having a 'status' property
+                    //        that can be shown here. Also, commands currently only return bools but, in the future,
+                    //        if they return more complex objects, custom handlers could be used to respond to the different
+                    //        commands' return values.
+                    if (!await command.ExecuteAsync(context, token))
                     {
-                        token.ThrowIfCancellationRequested();
-
-                        ShowUpgradeSteps(steps, context, step);
-                        _io.Output.WriteLine();
-
-                        var commands = _commandProvider.GetCommands(step);
-                        var command = await _input.ChooseAsync("Choose a command:", commands, token);
-
-                        // TODO : It might be nice to allow commands to show more details by having a 'status' property
-                        //        that can be shown here. Also, commands currently only return bools but, in the future,
-                        //        if they return more complex objects, custom handlers could be used to respond to the different
-                        //        commands' return values.
-                        if (!await command.ExecuteAsync(context, token))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
-                            Console.ResetColor();
-                        }
-                        else if (await _input.WaitToProceedAsync(token))
-                        {
-                            ConsoleUtils.Clear();
-                        }
-                        else
-                        {
-                            _logger.LogWarning("Upgrade process was canceled. Quitting....");
-                            return;
-                        }
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
+                        Console.ResetColor();
+                    }
+                    else if (await _input.WaitToProceedAsync(token))
+                    {
+                        ConsoleUtils.Clear();
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Upgrade process was canceled. Quitting....");
+                        return;
                     }
 
                     step = await _upgrader.GetNextStepAsync(context, token);
