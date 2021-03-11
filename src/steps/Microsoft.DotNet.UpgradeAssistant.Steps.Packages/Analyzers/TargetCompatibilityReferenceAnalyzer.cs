@@ -26,28 +26,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var targetFramework = _tfmSelector.SelectTFM(project.Required());
+            var currentTFM = project.TFM;
 
             foreach (var packageReference in project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
-                if (await _packageLoader.DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, targetFramework, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, currentTFM, token).ConfigureAwait(false))
                 {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, targetFramework);
+                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, currentTFM);
                     continue;
                 }
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, state.PackageCachePath!, targetFramework, token).ConfigureAwait(false);
+                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, state.PackageCachePath!, currentTFM, token).ConfigureAwait(false);
                     if (updatedReference == null)
                     {
-                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, targetFramework);
+                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, currentTFM);
                     }
                     else
                     {

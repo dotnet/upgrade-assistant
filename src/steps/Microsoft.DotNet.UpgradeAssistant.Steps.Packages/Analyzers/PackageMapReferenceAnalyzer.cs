@@ -36,10 +36,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
+            var currentTFM = project.TFM;
+
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
-            var packageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
+            var allPackageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
+            var packageMaps = currentTFM.IsFramework ? allPackageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray<NuGetPackageMap>() : allPackageMaps;
 
             var packageReferences = project.PackageReferences;
+
             foreach (var packageReference in packageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 foreach (var map in packageMaps.Where(m => m.ContainsPackageReference(packageReference.Name, packageReference.Version)))

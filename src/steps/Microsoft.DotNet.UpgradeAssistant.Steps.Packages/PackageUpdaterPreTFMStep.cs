@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     /// or if the package is explicitly mapped to an updated
     /// NuGet package in a mapping configuration file.
     /// </summary>
-    public class PackageUpdaterStep : UpgradeStep
+    public class PackageUpdaterPreTFMStep : UpgradeStep
     {
         private const int MaxAnalysisIterations = 3;
 
@@ -30,9 +30,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private PackageAnalysisState? _analysisState;
 
-        public override string Description => "Update package references to versions compatible with the target framework";
+        public override string Description => "Update package references and remove transitive dependencies";
 
-        public override string Title => "Update Nuget Packages After Updating the TFM";
+        public override string Title => "Update Nuget Packages Before Updating the TFM";
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
@@ -42,20 +42,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             // Project should be SDK-style before changing package references
             "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
 
-            // Project should have correct TFM
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
+                        // Project should have correct TFM
+            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+
             "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
         };
 
-        public PackageUpdaterStep(
+        public PackageUpdaterPreTFMStep(
             IOptions<PackageUpdaterOptions> updaterOptions,
             IPackageRestorer packageRestorer,
             IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
-            ILogger<PackageUpdaterStep> logger)
+            ILogger<PackageUpdaterPreTFMStep> logger)
             : base(logger)
         {
             if (updaterOptions is null)
