@@ -107,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                     return new UpgradeStepInitializeResult(
                         UpgradeStepStatus.Incomplete,
                         $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project: {_runner.GetCommandLine(project)}",
-                        (project.Components & ProjectComponents.Web) == ProjectComponents.Web ? BuildBreakRisk.High : BuildBreakRisk.Medium);
+                        project.Components.HasFlag(ProjectComponents.AspNetCore) ? BuildBreakRisk.High : BuildBreakRisk.Medium);
                 }
                 else
                 {

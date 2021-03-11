@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
+        private readonly IComponentIdentifier _componentIdentifier;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
@@ -49,6 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             UpgradeOptions options,
             ITargetFrameworkMonikerFactory tfmFactory,
             IVisualStudioFinder vsFinder,
+            IComponentIdentifier componentIdentifier,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
             if (options is null)
@@ -56,10 +58,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
+            if (vsFinder is null)
+            {
+                throw new ArgumentNullException(nameof(vsFinder));
+            }
+
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
             InputPath = options.ProjectPath;
             TfmFactory = tfmFactory ?? throw new ArgumentNullException(nameof(tfmFactory));
-            _logger = logger;
+            _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var vsPath = vsFinder.GetLatestVisualStudioPath();
 
@@ -90,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return cached;
             }
 
-            var project = new MSBuildProject(this, path, _logger);
+            var project = new MSBuildProject(this, _componentIdentifier, path, _logger);
 
             _projectCache.Add(path, project);
 
