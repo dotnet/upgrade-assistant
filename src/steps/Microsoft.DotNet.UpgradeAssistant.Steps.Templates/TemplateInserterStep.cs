@@ -37,21 +37,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         public override string Title => $"Add template files";
 
+        public override string Id => WellKnownStepIds.TemplateInserterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before adding template files
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
+            WellKnownStepIds.BackupStepId,
 
             // Project should be SDK-style before adding template files
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            WellKnownStepIds.TryConvertProjectConverterStepId,
 
             // Project should have correct TFM
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            WellKnownStepIds.SetTFMStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId
         };
 
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)

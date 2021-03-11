@@ -17,12 +17,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public override string Title => "Finalize Solution";
 
         public override string Description => "All projects have been upgraded. Please review any changes and test accordingly.";
+
+        public override string Id => WellKnownStepIds.FinalizeSolutionStepId;
 
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {

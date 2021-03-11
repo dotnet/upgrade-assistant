@@ -18,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override string Description => "The current project has completed upgrade. Please review any changes and ensure project is able to build before moving on.";
 
+        public override string Id => WellKnownStepIds.NextProjectStepId;
+
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             context.SetCurrentProject(null);

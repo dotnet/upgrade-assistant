@@ -34,21 +34,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public override string Title => "Update NuGet packages";
 
+        public override string Id => WellKnownStepIds.PackageUpdaterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
+            WellKnownStepIds.BackupStepId,
 
             // Project should be SDK-style before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            WellKnownStepIds.TryConvertProjectConverterStepId,
 
             // Project should have correct TFM
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            WellKnownStepIds.SetTFMStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public PackageUpdaterStep(
