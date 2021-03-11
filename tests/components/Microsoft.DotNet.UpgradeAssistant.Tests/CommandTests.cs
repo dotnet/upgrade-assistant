@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Commands;
+using Moq;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Tests
@@ -123,6 +124,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             Assert.False(exitCalled);
             Assert.True(await command.ExecuteAsync(context, CancellationToken.None).ConfigureAwait(false));
             Assert.True(exitCalled);
+        }
+
+        [Fact]
+        public async Task SelectProjectCommandClearsProject()
+        {
+            // Arrange
+            using var mock = AutoMock.GetLoose();
+            var context = mock.Mock<IUpgradeContext>();
+
+            var command = new SelectProjectCommand();
+
+            // Act
+            var result = await command.ExecuteAsync(context.Object, CancellationToken.None).ConfigureAwait(true);
+
+            // Assert
+            Assert.True(result);
+            Assert.Equal("Select different project", command.CommandText);
+            Assert.True(command.IsEnabled);
+            context.Verify(c => c.SetCurrentProject(null), Times.Once);
+        }
+
+        [Fact]
+        public async Task NegativeSelectProjectCommandTests()
+        {
+            var command = new SelectProjectCommand();
+
+            await Assert.ThrowsAsync<ArgumentNullException>("context", () => command.ExecuteAsync(null, CancellationToken.None)).ConfigureAwait(true);
         }
     }
 }
