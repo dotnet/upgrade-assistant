@@ -3,9 +3,11 @@
     <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Moq" />
+    <PackageReference Include="AutoFixture" />
     <PackageReference Include="coverlet.collector">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

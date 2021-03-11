@@ -34,21 +34,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public override string Title => "Update Nuget Packages";
 
+        public override string Id => WellKnownStepIds.PackageUpdaterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
+            WellKnownStepIds.BackupStepId,
 
             // Project should be SDK-style before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            WellKnownStepIds.TryConvertProjectConverterStepId,
 
             // Project should have correct TFM
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            WellKnownStepIds.SetTFMStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public PackageUpdaterStep(
@@ -90,11 +92,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception)
+            catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FilePath);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FilePath}", BuildBreakRisk.Unknown);
             }
 
             if (_analysisState is null || !_analysisState.ChangesRecommended)
@@ -166,11 +168,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
             }
 #pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception)
+            catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", context.CurrentProject.Required().FilePath);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Invalid project: {context.CurrentProject.Required().FilePath}");
+                Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FilePath);
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FilePath}");
             }
         }
 

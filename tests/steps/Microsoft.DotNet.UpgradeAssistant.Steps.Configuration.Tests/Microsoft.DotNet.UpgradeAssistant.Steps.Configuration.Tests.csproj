@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="TestConfig.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extras.Moq" />
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoFixture" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj" />
+    <ProjectReference Include="..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
+  </ItemGroup>
+</Project>

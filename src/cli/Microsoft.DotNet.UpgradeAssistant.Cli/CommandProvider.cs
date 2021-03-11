@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Cli.Commands;
 using Microsoft.DotNet.UpgradeAssistant.Commands;
@@ -34,21 +35,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _exit = new ExitCommand(lifetime.StopApplication);
         }
 
-        public IReadOnlyList<UpgradeCommand> GetCommands(UpgradeStep step)
+        public IReadOnlyList<UpgradeCommand> GetCommands(UpgradeStep step, IUpgradeContext context)
         {
             if (step is null)
             {
                 throw new ArgumentNullException(nameof(step));
             }
 
-            return new List<UpgradeCommand>()
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var commands = new List<UpgradeCommand>
             {
                 new ApplyNextCommand(step),
                 new SkipNextCommand(step),
-                new SeeMoreDetailsCommand(step, ShowStepStatus),
-                new ConfigureConsoleLoggingCommand(_userInput, _logSettings),
-                _exit,
+                new SeeMoreDetailsCommand(step, ShowStepStatus)
             };
+
+            if (context.Projects.Count() > 1 && context.CurrentProject is not null)
+            {
+                commands.Add(new SelectProjectCommand());
+            }
+
+            commands.Add(new ConfigureConsoleLoggingCommand(_userInput, _logSettings));
+            commands.Add(_exit);
+            return commands;
         }
 
         private Task ShowStepStatus(UpgradeStep step)

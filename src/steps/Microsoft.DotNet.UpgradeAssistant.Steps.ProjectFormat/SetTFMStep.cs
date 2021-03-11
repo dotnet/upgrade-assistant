@@ -16,12 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be SDK-style before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            WellKnownStepIds.TryConvertProjectConverterStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public SetTFMStep(IPackageRestorer restorer, ITargetTFMSelector tfmSelector, ILogger<SetTFMStep> logger)
@@ -34,6 +34,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         public override string Title => "Update TFM";
 
         public override string Description => "Update TFM for current project";
+
+        public override string Id => WellKnownStepIds.SetTFMStepId;
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
