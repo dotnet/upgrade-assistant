@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
                 new object?[] { true, ProjectComponents.WinRT | ProjectComponents.WinForms, new WebWinRTTestConfigUpdater(BuildBreakRisk.None, false), false },
 
                 // Components satisfied
-                new object?[] { true, ProjectComponents.WinRT | ProjectComponents.Web, new WebWinRTTestConfigUpdater(BuildBreakRisk.None, false), true },
+                new object?[] { true, ProjectComponents.WinRT | ProjectComponents.AspNetCore, new WebWinRTTestConfigUpdater(BuildBreakRisk.None, false), true },
 
                 // Invalid components
                 new object?[] { true, (ProjectComponents)2048, new WebWinRTTestConfigUpdater(BuildBreakRisk.None, false), false }

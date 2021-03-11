@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var components = ProjectComponents.None;
             if (file.Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
             {
-                components |= ProjectComponents.Web;
+                components |= ProjectComponents.AspNetCore;
             }
 
             if (file.GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase))
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var frameworkReferenceNames = project.FrameworkReferences.Select(r => r.Name);
             if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
             {
-                components |= ProjectComponents.Web;
+                components |= ProjectComponents.AspNetCore;
             }
 
             if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             if (file.Imports.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
                 references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
-                components |= ProjectComponents.Web;
+                components |= ProjectComponents.AspNet;
             }
 
             if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))

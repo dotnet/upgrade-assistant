@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!project.Components.HasFlag(ProjectComponents.Web))
+            if (!project.Components.HasFlag(ProjectComponents.AspNetCore))
             {
                 return state;
             }

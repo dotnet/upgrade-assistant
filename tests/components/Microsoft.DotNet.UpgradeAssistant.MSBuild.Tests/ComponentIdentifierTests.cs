@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         }
 
         [InlineData("", ProjectComponents.None)]
-        [InlineData("Microsoft.NET.Sdk.Web", ProjectComponents.Web)]
+        [InlineData("Microsoft.NET.Sdk.Web", ProjectComponents.AspNetCore)]
         [InlineData("Microsoft.NET.Sdk.Desktop", ProjectComponents.WindowsDesktop)]
         [Theory]
         public void SdkTypes(string sdk, ProjectComponents expected)
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         }
 
         [InlineData("", ProjectComponents.None)]
-        [InlineData("Microsoft.AspNetCore.App", ProjectComponents.Web)]
+        [InlineData("Microsoft.AspNetCore.App", ProjectComponents.AspNetCore)]
         [InlineData("Microsoft.WindowsDesktop.App", ProjectComponents.WindowsDesktop)]
         [InlineData("Microsoft.WindowsDesktop.App.WindowsForms", ProjectComponents.WindowsDesktop)]
         [InlineData("Microsoft.WindowsDesktop.App.WPF", ProjectComponents.WindowsDesktop)]
@@ -107,9 +107,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         }
 
         [InlineData("", ProjectComponents.None)]
-        [InlineData("System.Web", ProjectComponents.Web)]
-        [InlineData("System.Web.Abstractions", ProjectComponents.Web)]
-        [InlineData("System.Web.Routing", ProjectComponents.Web)]
+        [InlineData("System.Web", ProjectComponents.AspNet)]
+        [InlineData("System.Web.Abstractions", ProjectComponents.AspNet)]
+        [InlineData("System.Web.Routing", ProjectComponents.AspNet)]
         [InlineData("System.Windows.Forms", ProjectComponents.WinForms | ProjectComponents.WindowsDesktop)]
         [InlineData("System.Xaml", ProjectComponents.Wpf | ProjectComponents.WindowsDesktop)]
         [InlineData("PresentationCore", ProjectComponents.Wpf | ProjectComponents.WindowsDesktop)]
@@ -143,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         }
 
         [InlineData("", ProjectComponents.None)]
-        [InlineData("Microsoft.WebApplication.targets", ProjectComponents.Web)]
+        [InlineData("Microsoft.WebApplication.targets", ProjectComponents.AspNet)]
         [Theory]
         public void NonSdkImports(string import, ProjectComponents expected)
         {
