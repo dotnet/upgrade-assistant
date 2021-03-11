@@ -22,18 +22,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         public override string Title => "Upgrade app config files";
 
+        public override string Id => WellKnownStepIds.ConfigUpdaterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing things based on config files
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
+            WellKnownStepIds.BackupStepId,
 
             // Template files should be added prior to making config updates (since some IConfigUpdaters may change added templates)
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep"
+            WellKnownStepIds.TemplateInserterStepId
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId
         };
 
         public ConfigUpdaterStep(IEnumerable<IConfigUpdater> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)

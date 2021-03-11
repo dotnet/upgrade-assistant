@@ -31,21 +31,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override string Title => "Update C# source";
 
+        public override string Id => WellKnownStepIds.SourceUpdaterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing source
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
+            WellKnownStepIds.BackupStepId,
 
             // Template files should be added prior to changing source (since some code fixers will change added templates)
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
+            WellKnownStepIds.TemplateInserterStepId,
 
             // Project should have correct TFM
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            WellKnownStepIds.SetTFMStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<SourceUpdaterStep> logger)

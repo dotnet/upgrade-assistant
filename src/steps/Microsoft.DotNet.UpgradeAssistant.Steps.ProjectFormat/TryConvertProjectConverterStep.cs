@@ -18,15 +18,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public override string Title => $"Convert project file to SDK style";
 
+        public override string Id => WellKnownStepIds.TryConvertProjectConverterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep"
+            WellKnownStepIds.BackupStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public TryConvertProjectConverterStep(

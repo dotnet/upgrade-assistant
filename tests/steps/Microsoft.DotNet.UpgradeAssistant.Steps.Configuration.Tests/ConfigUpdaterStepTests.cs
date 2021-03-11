@@ -43,12 +43,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             var done = step.IsDone;
 
             // Assert
-            Assert.Equal(new[] { "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep" }, dependencyOf);
+            Assert.Equal(new[] { WellKnownStepIds.NextProjectStepId }, dependencyOf);
             Assert.Equal(
-                new[] { "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep", "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep" }.OrderBy(x => x),
+                new[] { WellKnownStepIds.BackupStepId, WellKnownStepIds.TemplateInserterStepId }.OrderBy(x => x),
                 dependsOn.OrderBy(x => x));
             Assert.Equal("Update project based on settings in app config files (a, b)", description);
-            Assert.Equal(typeof(ConfigUpdaterStep).FullName, id);
+            Assert.Equal(WellKnownStepIds.ConfigUpdaterStepId, id);
             Assert.Equal("Upgrade app config files", title);
             Assert.Equal(new[] { "ConfigUpdater #0", "ConfigUpdater #1" }, subSteps.Select(s => s.Id));
             Assert.Equal(UpgradeStepStatus.Unknown, status);

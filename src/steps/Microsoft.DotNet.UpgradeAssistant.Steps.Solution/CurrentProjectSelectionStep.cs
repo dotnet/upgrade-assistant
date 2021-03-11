@@ -20,12 +20,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.EntrypointSelectionStep"
+            WellKnownStepIds.EntrypointSelectionStepId,
         };
 
         public override string Description => string.Empty;
 
         public override string Title => "Select project to upgrade";
+
+        public override string Id => WellKnownStepIds.CurrentProjectSelectionStepId;
 
         public CurrentProjectSelectionStep(
             IEnumerable<IUpgradeReadyCheck> checks,
