@@ -150,7 +150,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         {
             var command = new SelectProjectCommand();
 
-            await Assert.ThrowsAsync<ArgumentNullException>("context", () => command.ExecuteAsync(null, CancellationToken.None)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<ArgumentNullException>("context", () => command.ExecuteAsync(null!, CancellationToken.None)).ConfigureAwait(true);
         }
     }
 }
