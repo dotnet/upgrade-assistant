@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectFile.FilePath, exc.ToString());
+                Logger.LogError(exc, "Failed to open project {ProjectPath}", projectFile.FilePath);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
             }
         }

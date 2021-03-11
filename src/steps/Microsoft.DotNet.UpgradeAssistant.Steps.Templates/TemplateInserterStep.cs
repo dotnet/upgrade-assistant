@@ -103,11 +103,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception)
+            catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", project.FilePath);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {project.FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical(exc, "Unexpected exception initializing template inserter step for: {ProjectPath}", project.FilePath);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception initializing template inserter step for: {project.FilePath}", BuildBreakRisk.Unknown);
             }
         }
 
