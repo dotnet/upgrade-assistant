@@ -72,7 +72,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 return;
             }
 
-            // If the accessed identifier resolves to a type symbol other than System.Web.HttpContext, then bail out
+            // If the accessed identifier resolves to a type symbol other than BinaryFormatter, then bail out
             // since it means the user is calling some other similarly named API.
             var accessedSymbol = context.SemanticModel.GetSymbolInfo(accessedIdentifier).Symbol;
             if (accessedSymbol is ILocalSymbol localSymbol)
