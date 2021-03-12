@@ -50,44 +50,42 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 context.Diagnostics);
         }
 
-        private static async Task<Solution> ReplaceUnsafeDeserializationAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private static async Task<Document> ReplaceUnsafeDeserializationAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
-            var project = document.Project;
-            var slnEditor = new SolutionEditor(project.Solution);
-            var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
-            var docRoot = (CompilationUnitSyntax)docEditor.OriginalRoot;
-
             if (!(node is MemberAccessExpressionSyntax))
             {
                 // stop processing - the code fixer only fixes member invocations of UnsafeDeserialize
-                return document.Project.Solution;
+                return document;
             }
 
             var memberExpression = node as MemberAccessExpressionSyntax;
 
             if (memberExpression!.Expression is IdentifierNameSyntax)
             {
-                return ProcessReplacementSyntax($"{((IdentifierNameSyntax)memberExpression!.Expression)!.Identifier.ValueText}");
+                return await ProcessReplacementSyntax($"{((IdentifierNameSyntax)memberExpression!.Expression)!.Identifier.ValueText}").ConfigureAwait(false);
             }
             else if (memberExpression!.Expression is ObjectCreationExpressionSyntax)
             {
-                return ProcessReplacementSyntax(((ObjectCreationExpressionSyntax)memberExpression!.Expression!).ToString());
+                return await ProcessReplacementSyntax(((ObjectCreationExpressionSyntax)memberExpression!.Expression!).ToString()).ConfigureAwait(false);
             }
             else
             {
                 // stop processing - the code fixer must be able to find an identifier on which the UnsafeDeserialize method was invoked
-                return document.Project.Solution;
+                return document;
             }
 
-            Solution ProcessReplacementSyntax(string replacementText)
+            async Task<Document> ProcessReplacementSyntax(string replacementText)
             {
                 var replacementSyntax = ParseExpression($"{replacementText}.Deserialize")
                     .WithTriviaFrom(node);
+                var slnEditor = new SolutionEditor(document.Project.Solution);
+                var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
+                var docRoot = (CompilationUnitSyntax)docEditor.OriginalRoot;
                 docRoot = docRoot.ReplaceNode(node, replacementSyntax);
 
                 docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
 
-                return slnEditor.GetChangedSolution();
+                return docEditor.GetChangedDocument();
             }
         }
     }
