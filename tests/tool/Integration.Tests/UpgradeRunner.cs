@@ -17,7 +17,7 @@ namespace Integration.Tests
 {
     public static class UpgradeRunner
     {
-        public static async Task UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, int timeoutSeconds = 300)
+        public static async Task<bool> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -30,7 +30,7 @@ namespace Integration.Tests
             }
 
             var project = new FileInfo(inputPath);
-            using var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource(maxDuration);
 
             var options = new UpgradeOptions
             {
@@ -41,7 +41,7 @@ namespace Integration.Tests
                 EntryPoint = entrypoint,
             };
 
-            var upgradeTask = Program.RunUpgradeAsync(options, host => host
+            var result = await Program.RunUpgradeAsync(options, host => host
                 .ConfigureServices((_, services) =>
                 {
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
@@ -54,20 +54,9 @@ namespace Integration.Tests
                 {
                     logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
-                }), cts.Token);
+                }), cts.Token).ConfigureAwait(false);
 
-            var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
-
-            await Task.WhenAny(upgradeTask, timeoutTimer).ConfigureAwait(false);
-            cts.Cancel();
-
-            try
-            {
-                await Task.WhenAll(upgradeTask, timeoutTimer).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-            }
+            return result == ErrorCodes.Success;
         }
     }
 }

@@ -49,7 +49,9 @@ namespace Integration.Tests
             await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
 
             // Run upgrade
-            await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, 300).ConfigureAwait(false);
+            var result = await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+
+            Assert.True(result);
 
             CleanupBuildArtifacts(workingDir);
 
