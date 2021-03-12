@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetTFMSelector _tfmSelector;
+        private IProject[] _orderedProjects;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
@@ -55,32 +56,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (context.EntryPoint is null)
+            {
+                throw new InvalidOperationException("Entrypoint must be set before using this step");
+            }
+
+            // If a current project is selected, then this step is done
             if (context.CurrentProject is not null)
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Current project is already selected.", BuildBreakRisk.None);
             }
 
-            var projects = context.Projects.ToList();
-            var completeChecks = projects.Select(async p => IsCompleted(context, p) || !await RunChecksAsync(p, token).ConfigureAwait(false));
+            // Get the projects we care about based on the entry point project
+            _orderedProjects = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).ToArray();
+
+            // If all projects related to the entry point project are complete or invalid, then the upgrade is done
+            var completeChecks = _orderedProjects.Select(async p => IsCompleted(context, p) || !await RunChecksAsync(p, token).ConfigureAwait(false));
             if ((await Task.WhenAll(completeChecks).ConfigureAwait(false)).All(b => b))
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgrade", BuildBreakRisk.None);
             }
 
+            // If no project is selected, and at least one still needs upgraded, identify the next project to upgrade
             IProject? newCurrentProject = null;
-
-            if (projects.Count == 1)
+            if (_orderedProjects.Length == 1)
             {
-                newCurrentProject = projects[0];
+                // If there is only one project, it is the current project
+                newCurrentProject = _orderedProjects[0];
                 Logger.LogDebug("Setting only project in solution as the current project: {Project}", newCurrentProject.FilePath);
             }
             else if (!context.InputIsSolution)
             {
                 // If the user has specified a particular project, only that should be the current project
-                newCurrentProject = projects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
+                newCurrentProject = _orderedProjects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
                 Logger.LogDebug("Setting user-selected project as the current project: {Project}", newCurrentProject.FilePath);
             }
 
+            // If no current project has been found, then this step is incomplete
             if (newCurrentProject is null)
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No project is currently selected.", BuildBreakRisk.None);
@@ -132,17 +144,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         {
             const string SelectProjectQuestion = "Here is the recommended order to upgrade. Select enter to follow this list, or input the project you want to start with.";
 
-            if (context.EntryPoint is null)
-            {
-                throw new InvalidOperationException("Entrypoint must be set before using this step");
-            }
-
-            var orderedProjects = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences);
-
             // No need for an IAsyncEnumerable here since the commands shouldn't be displayed until
             // all are available anyhow.
             var commands = new List<ProjectCommand>();
-            foreach (var project in orderedProjects)
+            foreach (var project in _orderedProjects)
             {
                 commands.Add(await CreateProjectCommandAsync(project).ConfigureAwait(false));
             }
