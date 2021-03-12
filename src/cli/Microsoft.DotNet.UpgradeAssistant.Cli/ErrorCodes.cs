@@ -3,7 +3,7 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    internal static class ErrorCodes
+    public static class ErrorCodes
     {
         public const int Success = 0;
 
@@ -11,6 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public const int UpgradeError = 2;
 
-        public const int UnexpectedError = 2;
+        public const int UnexpectedError = 3;
     }
 }

@@ -17,7 +17,7 @@ namespace Integration.Tests
 {
     public static class UpgradeRunner
     {
-        public static async Task<bool> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, int timeoutSeconds = 300)
+        public static async Task<bool> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -30,7 +30,7 @@ namespace Integration.Tests
             }
 
             var project = new FileInfo(inputPath);
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+            using var cts = new CancellationTokenSource(maxDuration);
 
             var options = new UpgradeOptions
             {
@@ -56,7 +56,7 @@ namespace Integration.Tests
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
                 }), cts.Token).ConfigureAwait(false);
 
-            return result == 0;
+            return result == ErrorCodes.Success;
         }
     }
 }
