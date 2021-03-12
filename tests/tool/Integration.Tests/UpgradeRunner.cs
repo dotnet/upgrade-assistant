@@ -30,7 +30,7 @@ namespace Integration.Tests
             }
 
             var project = new FileInfo(inputPath);
-            using var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
 
             var options = new UpgradeOptions
             {
@@ -41,7 +41,7 @@ namespace Integration.Tests
                 EntryPoint = entrypoint,
             };
 
-            var upgradeTask = Program.RunUpgradeAsync(options, host => host
+            var result = await Program.RunUpgradeAsync(options, host => host
                 .ConfigureServices((_, services) =>
                 {
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
@@ -54,24 +54,9 @@ namespace Integration.Tests
                 {
                     logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
-                }), cts.Token);
+                }), cts.Token).ConfigureAwait(false);
 
-            var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
-
-            await Task.WhenAny(upgradeTask, timeoutTimer).ConfigureAwait(false);
-            cts.Cancel();
-
-            try
-            {
-                var tasks = new[] { upgradeTask, timeoutTimer };
-                await Task.WhenAll(tasks).ConfigureAwait(false);
-
-                return await upgradeTask.ConfigureAwait(false) == 0;
-            }
-            catch (OperationCanceledException)
-            {
-                return false;
-            }
+            return result == 0;
         }
     }
 }
