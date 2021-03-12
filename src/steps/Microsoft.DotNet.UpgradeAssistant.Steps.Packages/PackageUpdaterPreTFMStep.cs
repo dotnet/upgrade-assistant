@@ -13,21 +13,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public override string Title => "Clean up NuGet package references";
 
+        public override string Id => WellKnownStepIds.PackageUpdaterPreTFMStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            // Project should be backed up before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
-
             // Project should be SDK-style before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            WellKnownStepIds.TryConvertProjectConverterStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
             // Project should have correct TFM
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            WellKnownStepIds.SetTFMStepId,
 
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public PackageUpdaterPreTFMStep(
