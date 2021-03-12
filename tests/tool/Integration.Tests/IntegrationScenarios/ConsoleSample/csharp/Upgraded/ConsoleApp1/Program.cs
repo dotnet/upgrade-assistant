@@ -104,7 +104,7 @@ namespace ConsoleApp1
 
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
-                addresses = (Dictionary<string, string>)formatter.Deserialize(fs, null);
+                addresses = (Dictionary<string, string>)formatter.Deserialize(fs);
                 return addresses;
             }
             catch (SerializationException e)
