@@ -159,16 +159,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         private async Task<bool> RunChecksAsync(IProject project, CancellationToken token)
         {
-            var success = true;
-
             foreach (var check in _checks)
             {
                 Logger.LogTrace("Running readiness check {Id}", check.Id);
 
-                success &= await check.IsReadyAsync(project, token).ConfigureAwait(false);
+                if (!await check.IsReadyAsync(project, token).ConfigureAwait(false))
+                {
+                    return false;
+                }
             }
 
-            return success;
+            return true;
         }
     }
 }
