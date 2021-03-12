@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 Console.WriteLine("This tool is not supported on non-Windows platforms due to dependencies on Visual Studio.");
-                return Task.FromResult(1);
+                return Task.FromResult(ErrorCodes.PlatformNotSupported);
             }
 
             var root = new RootCommand
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        public static Task RunUpgradeAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
+        public static Task<int> RunUpgradeAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
             => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
             {
                 services.AddScoped<IAppCommand, ConsoleUpgrade>();
@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     .WriteTo.File(LogFilePath, levelSwitch: logSettings.File));
         }
 
-        private static Task RunCommandAsync(
+        private static Task<int> RunCommandAsync(
             UpgradeOptions options,
             Func<IHostBuilder, IHostBuilder> configure,
             CancellationToken token)
@@ -101,7 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var host = Host.CreateDefaultBuilder()
+            var hostBuilder = Host.CreateDefaultBuilder()
                 .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureServices((context, services) =>
                 {
@@ -128,14 +128,42 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.TryAddSingleton(new LogSettings(true));
 
                     services.AddSingleton<IProcessRunner, ProcessRunner>();
+                    services.AddSingleton<ErrorCodeAccessor>();
 
                     services.AddStepManagement();
                 });
 
-            return configure(host).RunConsoleAsync(options =>
+            var host = configure(hostBuilder).UseConsoleLifetime(options =>
             {
                 options.SuppressStatusMessages = true;
-            }, token);
+            }).Build();
+
+            return RunAsync(host, token);
+        }
+
+        private static async Task<int> RunAsync(this IHost host, CancellationToken token)
+        {
+            var errorCode = host.Services.GetRequiredService<ErrorCodeAccessor>();
+
+            try
+            {
+                await host.StartAsync(token).ConfigureAwait(false);
+
+                await host.WaitForShutdownAsync(token).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (host is IAsyncDisposable asyncDisposable)
+                {
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+                }
+                else
+                {
+                    host.Dispose();
+                }
+            }
+
+            return errorCode.ErrorCode;
         }
 
         private static void ShowHeader()

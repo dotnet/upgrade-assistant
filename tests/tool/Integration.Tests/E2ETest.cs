@@ -32,12 +32,12 @@ namespace Integration.Tests
             _output = output;
         }
 
-        [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
-        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-        [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
-        [InlineData("PCL", "SamplePCL.csproj", "")]
+        [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "", true)]
+        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj", true)]
+        [InlineData("WpfSample/vb", "WpfApp1.sln", "", false)]
+        [InlineData("PCL", "SamplePCL.csproj", "", true)]
         [Theory]
-        public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
+        public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint, bool success)
         {
             // Create a temporary working directory
             var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -49,7 +49,9 @@ namespace Integration.Tests
             await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
 
             // Run upgrade
-            await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, 300).ConfigureAwait(false);
+            var result = await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, 300).ConfigureAwait(false);
+
+            Assert.Equal(success, result);
 
             CleanupBuildArtifacts(workingDir);
 

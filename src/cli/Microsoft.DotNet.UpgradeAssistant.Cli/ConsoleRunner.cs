@@ -19,14 +19,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
         private readonly IHostApplicationLifetime _lifetime;
+        private readonly ErrorCodeAccessor _errorCode;
 
         public ConsoleRunner(
             IServiceProvider services,
             IHostApplicationLifetime lifetime,
+            ErrorCodeAccessor errorCode,
             ILogger<ConsoleRunner> logger)
         {
             _lifetime = lifetime ?? throw new ArgumentNullException(nameof(lifetime));
             _services = services ?? throw new ArgumentNullException(nameof(services));
+            _errorCode = errorCode ?? throw new ArgumentNullException(nameof(errorCode));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -36,19 +39,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 _logger.LogDebug("Configuration loaded from context base directory: {BaseDirectory}", AppContext.BaseDirectory);
 
-                try
-                {
-                    await RunStartupAsync(token);
-                    await RunCommandAsync(token);
-                }
-                finally
-                {
-                    _lifetime.StopApplication();
-                }
+                await RunStartupAsync(token);
+                await RunCommandAsync(token);
+
+                _errorCode.ErrorCode = ErrorCodes.Success;
             }
             catch (UpgradeException e)
             {
                 _logger.LogError("{Message}", e.Message);
+                _errorCode.ErrorCode = ErrorCodes.UnexpectedError;
             }
             catch (OperationCanceledException)
             {

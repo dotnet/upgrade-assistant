@@ -17,7 +17,7 @@ namespace Integration.Tests
 {
     public static class UpgradeRunner
     {
-        public static async Task UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, int timeoutSeconds = 300)
+        public static async Task<bool> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, int timeoutSeconds = 300)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -63,10 +63,14 @@ namespace Integration.Tests
 
             try
             {
-                await Task.WhenAll(upgradeTask, timeoutTimer).ConfigureAwait(false);
+                var tasks = new[] { upgradeTask, timeoutTimer };
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+
+                return await upgradeTask.ConfigureAwait(false) == 0;
             }
             catch (OperationCanceledException)
             {
+                return false;
             }
         }
     }
