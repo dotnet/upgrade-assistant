@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public override string Description => "Update package references to versions compatible with the target framework";
 
-        public override string Title => "Update NuGet packages";
+        public override string Title => "Update NuGet Packages";
 
         public override string Id => WellKnownStepIds.PackageUpdaterStepId;
 
