@@ -9,6 +9,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public const int PlatformNotSupported = 1;
 
+        public const int UpgradeError = 2;
+
         public const int UnexpectedError = 2;
     }
 }
