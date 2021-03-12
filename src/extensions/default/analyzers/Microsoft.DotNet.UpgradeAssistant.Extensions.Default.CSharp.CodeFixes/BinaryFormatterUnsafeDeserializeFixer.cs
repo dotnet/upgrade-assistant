@@ -52,21 +52,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
         private static async Task<Document> ReplaceUnsafeDeserializationAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
-            if (!(node is MemberAccessExpressionSyntax))
+            if (node is not MemberAccessExpressionSyntax)
             {
                 // stop processing - the code fixer only fixes member invocations of UnsafeDeserialize
                 return document;
             }
 
-            var memberExpression = node as MemberAccessExpressionSyntax;
+            var memberExpression = (MemberAccessExpressionSyntax)node;
 
-            if (memberExpression!.Expression is IdentifierNameSyntax)
+            if (memberExpression.Expression is IdentifierNameSyntax)
             {
-                return await ProcessReplacementSyntax($"{((IdentifierNameSyntax)memberExpression!.Expression)!.Identifier.ValueText}").ConfigureAwait(false);
+                return await ProcessReplacementSyntax($"{((IdentifierNameSyntax)memberExpression.Expression).Identifier.ValueText}").ConfigureAwait(false);
             }
             else if (memberExpression!.Expression is ObjectCreationExpressionSyntax)
             {
-                return await ProcessReplacementSyntax(((ObjectCreationExpressionSyntax)memberExpression!.Expression!).ToString()).ConfigureAwait(false);
+                return await ProcessReplacementSyntax(((ObjectCreationExpressionSyntax)memberExpression.Expression).ToString()).ConfigureAwait(false);
             }
             else
             {
