@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetTFMSelector _tfmSelector;
-        private IProject[] _orderedProjects;
+        private IProject[]? _orderedProjects;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
@@ -143,6 +143,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         private async Task<IProject> GetProject(IUpgradeContext context, Func<IUpgradeContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {
             const string SelectProjectQuestion = "Here is the recommended order to upgrade. Select enter to follow this list, or input the project you want to start with.";
+
+            if (_orderedProjects is null)
+            {
+                throw new UpgradeException("Project selection step must be initialized before it is applied (null _orderedProjects)");
+            }
 
             // No need for an IAsyncEnumerable here since the commands shouldn't be displayed until
             // all are available anyhow.
