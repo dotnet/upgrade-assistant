@@ -56,6 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             // With an updated TFM, we should restore packages
             await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
+            Logger.LogInformation("Updated TFM to {TargetTFM}", targetTfm);
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Updated TFM to {targetTfm}");
         }
 
@@ -75,6 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
             else
             {
+                Logger.LogInformation("TFM needs updated to {TargetTFM}", targetTfm);
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High));
             }
         }
