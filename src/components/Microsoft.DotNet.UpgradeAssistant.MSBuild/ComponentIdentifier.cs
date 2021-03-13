@@ -17,7 +17,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             var file = project.GetFile();
-            var components = file.IsSdk ? GetSDKProjectComponents(project, file) : GetOldProjectComponents(project, file);
+
+            // SDK-style projects can target .NET Framework and use GAC-referenced app models,
+            // so old project components are checked regardless of SDK status
+            var components = GetOldProjectComponents(project, file);
+            if (file.IsSdk)
+            {
+                components |= GetSDKProjectComponents(project, file);
+            }
 
             if (project.TransitivePackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
             {
