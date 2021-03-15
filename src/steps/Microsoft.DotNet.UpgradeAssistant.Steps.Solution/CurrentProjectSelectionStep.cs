@@ -49,6 +49,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         // This upgrade step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IUpgradeContext context) => context?.CurrentProject is null && Status == UpgradeStepStatus.Complete;
 
+        public override UpgradeStepInitializeResult Reset()
+        {
+            _orderedProjects = null;
+            return base.Reset();
+        }
+
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
