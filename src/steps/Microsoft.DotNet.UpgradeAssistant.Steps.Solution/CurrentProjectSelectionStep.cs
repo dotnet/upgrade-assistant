@@ -64,7 +64,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             var completeChecks = projects.Select(async p => IsCompleted(context, p) || !await RunChecksAsync(p, token).ConfigureAwait(false));
             if ((await Task.WhenAll(completeChecks).ConfigureAwait(false)).All(b => b))
             {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgrade", BuildBreakRisk.None);
+                Logger.LogInformation("No projects need upgraded for entry point {EntryPoint}", context.EntryPoint?.FilePath);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgraded", BuildBreakRisk.None);
             }
 
             IProject? newCurrentProject = null;
