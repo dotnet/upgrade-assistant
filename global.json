@@ -4,7 +4,7 @@
     "rollForward": "feature"
   },
   "runtime": {
-    "version": "5.0.103"
+    "dotnet": ["5.0.103"]
   },
   "tools": {
     "dotnet": "6.0.100-preview.1.21103.13"
