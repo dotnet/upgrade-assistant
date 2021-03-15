@@ -50,8 +50,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                     var configFilePath = Path.GetDirectoryName(configFile) ?? string.Empty;
                     var templateConfig = await LoadTemplateConfigurationAsync(extension, configFile, token).ConfigureAwait(false);
 
-                    // If there was a problem reading the configuration or the configuration only applies to web apps and the
-                    // current project isn't a web app, continue to the next config file.
+                    // If there was a problem reading the configuration or the configuration only applies to certain output types
+                    // or project types which don't match the project, then continue to the next configuration.
                     if (templateConfig?.TemplateItems is null || !templateConfig.AppliesToProject(project))
                     {
                         _logger.LogDebug("Skipping inapplicable template config file {TemplateConfigFile}", configFile);
