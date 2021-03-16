@@ -3,13 +3,12 @@
     "version": "6.0.100-preview.2.21155.3",
     "rollForward": "feature"
   },
-  "runtimes": {
-    "dotnet": [
-      "5.0.3"
-    ]
-  },
   "tools": {
-    "dotnet": "6.0.100-preview.2.21155.3"
+    "dotnet": "6.0.100-preview.2.21155.3",
+    "runtimes": {
+      "dotnet": [
+        "5.0.3"
+    ]
   },
   "msbuild-sdks": {
     "Microsoft.DotNet.Arcade.Sdk": "6.0.0-beta.21165.1",
