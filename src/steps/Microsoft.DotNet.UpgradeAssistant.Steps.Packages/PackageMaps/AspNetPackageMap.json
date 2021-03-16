@@ -56,9 +56,6 @@
       },
       {
         "Name": "System.Web.WebPages.Razor"
-      },
-      {
-        "Name": "System.Net.Http.WebRequest"
       }
     ],
     "NetFrameworkPackages": [

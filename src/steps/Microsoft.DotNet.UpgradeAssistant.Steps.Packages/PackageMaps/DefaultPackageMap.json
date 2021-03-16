@@ -77,8 +77,13 @@
     ]
   },
   {
-    "PackageSetName": "Microsoft.Net.Http",
+    "PackageSetName": "HTTP packages",
     "NetCorePackagesWorkOnNetFx": true,
+    "NetFrameworkAssemblies": [
+      {
+        "Name": "System.Net.Http.WebRequest"
+      }
+    ],
     "NetFrameworkPackages": [
       {
         "Name": "Microsoft.Net.Http",
