@@ -71,11 +71,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void AddPackages(IEnumerable<NuGetReference> references)
         {
-            var packageReferenceItemGroup = ProjectRoot.GetOrCreateItemGroup(MSBuildConstants.PackageReferenceType);
-            foreach (var reference in references)
+            if (references.Any())
             {
-                _logger.LogInformation("Adding package reference: {PackageReference}", reference);
-                ProjectRoot.AddPackageReference(packageReferenceItemGroup, reference);
+                var packageReferenceItemGroup = ProjectRoot.GetOrCreateItemGroup(MSBuildConstants.PackageReferenceType);
+                foreach (var reference in references)
+                {
+                    _logger.LogInformation("Adding package reference: {PackageReference}", reference);
+                    ProjectRoot.AddPackageReference(packageReferenceItemGroup, reference);
+                }
             }
         }
 
@@ -93,11 +96,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void AddFrameworkReferences(IEnumerable<Reference> frameworkReferences)
         {
-            var frameworkReferenceItemGroup = ProjectRoot.GetOrCreateItemGroup(MSBuildConstants.FrameworkReferenceType);
-            foreach (var reference in frameworkReferences)
+            if (frameworkReferences.Any())
             {
-                _logger.LogInformation("Adding framework reference: {FrameworkReference}", reference);
-                ProjectRoot.AddFrameworkReference(frameworkReferenceItemGroup, reference);
+                var frameworkReferenceItemGroup = ProjectRoot.GetOrCreateItemGroup(MSBuildConstants.FrameworkReferenceType);
+                foreach (var reference in frameworkReferences)
+                {
+                    _logger.LogInformation("Adding framework reference: {FrameworkReference}", reference);
+                    ProjectRoot.AddFrameworkReference(frameworkReferenceItemGroup, reference);
+                }
             }
         }
 
