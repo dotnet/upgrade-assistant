@@ -15,9 +15,10 @@ This project enables automation of common tasks related to upgrading .NET Framew
 When run on a solution, the tool will:
 
 - Determine which projects need upgraded and recommend the order the projects should be upgraded in
-- Update the project file to be an SDK-style project and re-target it to .NET 5.0
-- Update NuGet package dependencies to versions that are compatible with .NET 5.0
+- Update the project file to be an SDK-style project
 - Remove transitive NuGet package dependencies that may have been present in packages.config
+- Re-target project to .NET 5.0
+- Update NuGet package dependencies to versions that are compatible with .NET 5.0
 - Make simple updates in C# source code to replace patterns that worked in .NET Framework with .NET 5.0 equivalents
 - For some app models (like ASP.NET apps), add common template files (like startup.cs) and make simple updates based on recognized web.config or app.config values
 - For projects targeting Windows, add a reference to the Microsoft.Windows.Compatibility package
