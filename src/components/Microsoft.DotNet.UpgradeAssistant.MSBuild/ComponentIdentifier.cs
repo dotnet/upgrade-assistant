@@ -20,15 +20,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             // SDK-style projects can target .NET Framework and use GAC-referenced app models,
             // so old project components are checked regardless of SDK status
-            var components = GetOldProjectComponents(project, file);
+            var components = GetGeneralProjectComponents(project, file);
             if (file.IsSdk)
             {
                 components |= GetSDKProjectComponents(project, file);
-            }
-
-            if (project.TransitivePackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
-            {
-                components |= ProjectComponents.WinRT;
             }
 
             return components;
@@ -85,9 +80,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         // Gets project components based on imports and References
-        private static ProjectComponents GetOldProjectComponents(IProject project, IProjectFile file)
+        private static ProjectComponents GetGeneralProjectComponents(IProject project, IProjectFile file)
         {
             var components = ProjectComponents.None;
+
+            // Check transitive dependencies
+            if (project.TransitivePackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.WinRT;
+            }
 
             // Check imports and references
             var references = project.References.Select(r => r.Name);

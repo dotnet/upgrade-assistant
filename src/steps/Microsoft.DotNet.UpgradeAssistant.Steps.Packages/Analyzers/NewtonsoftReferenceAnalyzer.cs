@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // This reference only needs added to ASP.NET Core exes
-            if (!project.Components.HasFlag(ProjectComponents.AspNetCore) || project.OutputType != ProjectOutputType.Exe)
+            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore) && project.OutputType == ProjectOutputType.Exe))
             {
                 return state;
             }

@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public WebSdkCleanupAnalyzer(ILogger<WebSdkCleanupAnalyzer> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return Task.FromResult(state);
             }
 
-            var aspNetCoreReference = project.FrameworkReferences.FirstOrDefault(f => f.Name.Equals(AspNetCoreFrameworkReference, StringComparison.OrdinalIgnoreCase));
+            var aspNetCoreReference = project.FrameworkReferences?.FirstOrDefault(f => f.Name.Equals(AspNetCoreFrameworkReference, StringComparison.OrdinalIgnoreCase));
 
             if (aspNetCoreReference is not null)
             {
