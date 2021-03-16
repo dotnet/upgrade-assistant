@@ -6,8 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
@@ -28,17 +26,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
+            if (!project.Components.HasFlag(ProjectComponents.AspNetCore))
+            {
+                return state;
+            }
+
             var packageReferences = project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
-            if (project != null && (project.Components & ProjectComponents.Web) == ProjectComponents.Web
-
-                // If the web project doesn't include a reference to the Newtonsoft package, mark it for addition
-                && !packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
+            if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 var analyzerPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, false, null, token).ConfigureAwait(false);
 

@@ -24,15 +24,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         public override string Title => "Back up project";
 
+        public override string Id => WellKnownStepIds.BackupStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // The user should select a specific project before backing up (since changes are only made at the project-level)
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.CurrentProjectSelectionStep",
+            WellKnownStepIds.CurrentProjectSelectionStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public BackupStep(UpgradeOptions options, ILogger<BackupStep> logger, IUserInput userInput)
@@ -123,7 +125,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
             catch (IOException exc)
             {
-                Logger.LogError("Unexpected exception while creating backup: {Exception}", exc);
+                Logger.LogError(exc, "Unexpected exception while creating backup");
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while creating backup");
             }
         }

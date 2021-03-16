@@ -10,9 +10,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         None = 0,
         WindowsDesktop = 1,
-        Web = 1 << 1,
+        AspNet = 1 << 1,
         WinRT = 1 << 2,
         Wpf = 1 << 3,
         WinForms = 1 << 4,
+        AspNetCore = 1 << 5,
     }
 }

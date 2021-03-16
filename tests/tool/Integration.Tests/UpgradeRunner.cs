@@ -9,12 +9,15 @@ using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Xunit.Abstractions;
 
 namespace Integration.Tests
 {
     public static class UpgradeRunner
     {
-        public static async Task UpgradeAsync(string inputPath, string entrypoint, TextWriter output, int timeoutSeconds = 300)
+        public static async Task<bool> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -27,7 +30,7 @@ namespace Integration.Tests
             }
 
             var project = new FileInfo(inputPath);
-            using var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource(maxDuration);
 
             var options = new UpgradeOptions
             {
@@ -38,28 +41,22 @@ namespace Integration.Tests
                 EntryPoint = entrypoint,
             };
 
-            var upgradeTask = Program.RunUpgradeAsync(options, (context, services) => RegisterTestServices(services), cts.Token);
-            var timeoutTimer = Task.Delay(timeoutSeconds * 1000, cts.Token);
+            var result = await Program.RunUpgradeAsync(options, host => host
+                .ConfigureServices((_, services) =>
+                {
+                    services.AddOptions<PackageUpdaterOptions>().Configure(o =>
+                    {
+                        o.PackageMapPath = "PackageMaps";
+                        o.UpgradeAnalyzersPackageVersion = "1.0.0";
+                    });
+                })
+                .ConfigureLogging((ctx, logging) =>
+                {
+                    logging.SetMinimumLevel(LogLevel.Trace);
+                    logging.AddProvider(new TestOutputHelperLoggerProvider(output));
+                }), cts.Token).ConfigureAwait(false);
 
-            await Task.WhenAny(upgradeTask, timeoutTimer).ConfigureAwait(false);
-            cts.Cancel();
-
-            try
-            {
-                await Task.WhenAll(upgradeTask, timeoutTimer).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-        }
-
-        private static void RegisterTestServices(IServiceCollection services)
-        {
-            services.AddOptions<PackageUpdaterOptions>().Configure(o =>
-            {
-                o.PackageMapPath = "PackageMaps";
-                o.UpgradeAnalyzersPackageVersion = "1.0.0";
-            });
+            return result == ErrorCodes.Success;
         }
     }
 }
