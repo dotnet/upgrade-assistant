@@ -27,11 +27,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var element = projectRoot.GetAllPackageReferences()
                 .FirstOrDefault(p => package.Equals(p.AsNuGetReference()));
 
-            if (element is not null)
-            {
-                element.RemoveElement();
-            }
+            element?.RemoveElement();
         }
+
+        public static void AddFrameworkReference(this ProjectRootElement projectRoot, ProjectItemGroupElement itemGroup, Reference frameworkReference) =>
+            itemGroup.AppendChild(projectRoot.CreateItemElement(MSBuildConstants.FrameworkReferenceType, frameworkReference.Name));
 
         public static void AddPackageReference(this ProjectRootElement projectRoot, ProjectItemGroupElement itemGroup, NuGetReference packageReference)
         {
@@ -51,10 +51,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var element = projectRoot.GetAllReferences()
                 .FirstOrDefault(r => reference.Equals(r.AsReference()));
 
-            if (element is not null)
-            {
-                element.RemoveElement();
-            }
+            element?.RemoveElement();
+        }
+
+        public static void RemoveFrameworkReference(this ProjectRootElement projectRoot, Reference frameworkReference)
+        {
+            var element = projectRoot.GetAllFrameworkReferences()
+                .FirstOrDefault(r => frameworkReference.Equals(r.AsReference()));
+
+            element?.RemoveElement();
         }
 
         public static IEnumerable<ProjectItemElement> GetAllReferences(this ProjectRootElement projectRoot)
@@ -76,6 +81,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 // If no element remain in the item group, remove it
                 itemGroup.Parent.RemoveChild(itemGroup);
             }
+        }
+
+        public static ProjectItemGroupElement GetOrCreateItemGroup(this ProjectRootElement projectRoot, string itemType)
+        {
+            var itemGroup = projectRoot.ItemGroups.FirstOrDefault(g => g.Items.Any(i => i.ItemType.Equals(itemType, StringComparison.OrdinalIgnoreCase)));
+            if (itemGroup is null)
+            {
+                itemGroup = projectRoot.CreateItemGroupElement();
+                projectRoot.AppendChild(itemGroup);
+            }
+
+            return itemGroup;
         }
     }
 }

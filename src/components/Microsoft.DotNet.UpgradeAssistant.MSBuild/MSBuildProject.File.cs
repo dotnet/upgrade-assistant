@@ -71,25 +71,63 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void AddPackages(IEnumerable<NuGetReference> references)
         {
-            const string PackageReferenceType = "PackageReference";
-
-            // Find a place to add new package references
-            var packageReferenceItemGroup = ProjectRoot.ItemGroups.FirstOrDefault(g => g.Items.Any(i => i.ItemType.Equals(PackageReferenceType, StringComparison.OrdinalIgnoreCase)));
-            if (packageReferenceItemGroup is null)
+            if (references.Any())
             {
-                _logger.LogDebug("Creating a new ItemGroup for package references");
-                packageReferenceItemGroup = ProjectRoot.CreateItemGroupElement();
-                ProjectRoot.AppendChild(packageReferenceItemGroup);
+                var packageReferenceItemGroup = ProjectRoot.GetOrCreateItemGroup(MSBuildConstants.PackageReferenceType);
+                foreach (var reference in references)
+                {
+                    _logger.LogInformation("Adding package reference: {PackageReference}", reference);
+                    ProjectRoot.AddPackageReference(packageReferenceItemGroup, reference);
+                }
             }
-            else
-            {
-                _logger.LogDebug("Found ItemGroup for package references");
-            }
+        }
 
-            foreach (var reference in references)
+        public void RemovePackages(IEnumerable<NuGetReference> references)
+        {
+            foreach (var reference in PackageReferences)
             {
-                _logger.LogInformation("Adding package reference: {PackageReference}", reference);
-                ProjectRoot.AddPackageReference(packageReferenceItemGroup, reference);
+                if (references.Contains(reference))
+                {
+                    _logger.LogInformation("Removing outdated package reference: {PackageReference}", reference);
+                    ProjectRoot.RemovePackage(reference);
+                }
+            }
+        }
+
+        public void AddFrameworkReferences(IEnumerable<Reference> frameworkReferences)
+        {
+            if (frameworkReferences.Any())
+            {
+                var frameworkReferenceItemGroup = ProjectRoot.GetOrCreateItemGroup(MSBuildConstants.FrameworkReferenceType);
+                foreach (var reference in frameworkReferences)
+                {
+                    _logger.LogInformation("Adding framework reference: {FrameworkReference}", reference);
+                    ProjectRoot.AddFrameworkReference(frameworkReferenceItemGroup, reference);
+                }
+            }
+        }
+
+        public void RemoveFrameworkReferences(IEnumerable<Reference> frameworkReferences)
+        {
+            foreach (var reference in FrameworkReferences)
+            {
+                if (frameworkReferences.Contains(reference))
+                {
+                    _logger.LogInformation("Removing outdated framework reference: {FrameworkReference}", reference);
+                    ProjectRoot.RemoveFrameworkReference(reference);
+                }
+            }
+        }
+
+        public void RemoveReferences(IEnumerable<Reference> references)
+        {
+            foreach (var reference in References)
+            {
+                if (references.Contains(reference))
+                {
+                    _logger.LogInformation("Removing outdated assembly reference: {Reference}", reference);
+                    ProjectRoot.RemoveReference(reference);
+                }
             }
         }
 
@@ -107,30 +145,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             // Reload the workspace since, at this point, the project may be different from what was loaded
             return Context.ReloadWorkspaceAsync(token);
-        }
-
-        public void RemovePackages(IEnumerable<NuGetReference> references)
-        {
-            foreach (var reference in PackageReferences)
-            {
-                if (references.Contains(reference))
-                {
-                    _logger.LogInformation("Removing outdated package reference: {PackageReference}", reference);
-                    ProjectRoot.RemovePackage(reference);
-                }
-            }
-        }
-
-        public void RemoveReferences(IEnumerable<Reference> references)
-        {
-            foreach (var reference in references)
-            {
-                if (references.Contains(reference))
-                {
-                    _logger.LogInformation("Removing outdated assembly reference: {Reference}", reference);
-                    ProjectRoot.RemoveReference(reference);
-                }
-            }
         }
 
         public void RenameFile(string filePath)

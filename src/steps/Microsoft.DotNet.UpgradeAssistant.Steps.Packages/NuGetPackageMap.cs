@@ -23,6 +23,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public IEnumerable<NuGetReference> NetCorePackages { get; set; } = Enumerable.Empty<NuGetReference>();
 
+        public IEnumerable<Reference> NetCoreFrameworkReferences { get; set; } = Enumerable.Empty<Reference>();
+
         /// <summary>
         /// Determines whether a package map's .NET Framework packages include a
         /// given package name and version.

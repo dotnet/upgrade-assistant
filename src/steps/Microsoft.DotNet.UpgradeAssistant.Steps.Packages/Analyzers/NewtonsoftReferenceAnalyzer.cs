@@ -36,8 +36,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!project.Components.HasFlag(ProjectComponents.AspNetCore))
+            // This reference only needs added to ASP.NET Core exes
+            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore) && project.OutputType == ProjectOutputType.Exe))
             {
+                return state;
+            }
+
+            if (project.IsTransitivelyAvailable(NewtonsoftPackageName))
+            {
+                _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return state;
             }
 
@@ -45,12 +52,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, false, null, token).ConfigureAwait(false);
+                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, false, null, token).ConfigureAwait(false);
 
-                if (analyzerPackage is not null)
+                if (newtonsoftPackage is not null)
                 {
-                    _logger.LogInformation("Reference to Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs added", NewtonsoftPackageName, analyzerPackage.Version);
-                    state.PackagesToAdd.Add(analyzerPackage);
+                    _logger.LogInformation("Reference to Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs added", NewtonsoftPackageName, newtonsoftPackage.Version);
+                    state.PackagesToAdd.Add(newtonsoftPackage);
                 }
                 else
                 {

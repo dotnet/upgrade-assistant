@@ -56,7 +56,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             "System.Web",
             "System.Web.Abstractions",
-            "System.Web.Routing"
+            "System.Web.Mvc",
+            "System.Web.Razor",
+            "System.Web.Routing",
+            "System.Web.WebPages"
         };
 
         public static readonly string[] WinFormsReferences = new[]

@@ -26,6 +26,7 @@
   },
   {
     "PackageSetName": "Microsoft.Toolkit.Wpf.UI.Controls.WebView",
+    "NetCorePackagesWorkOnNetFx": true,
     "NetFrameworkPackages": [
       {
         "Name": "Microsoft.Toolkit.Wpf.UI.Controls.WebView",
@@ -36,71 +37,6 @@
       {
         "Name": "Microsoft.Web.WebView2",
         "Version": "1.0.705.50"
-      }
-    ]
-  },
-  {
-    "PackageSetName": "StructureMap.Web",
-    "NetFrameworkPackages": [
-      {
-        "Name": "structuremap.web",
-        "Version": "*"
-      }
-    ],
-    "NetCorePackages": []
-  },
-  {
-    "PackageSetName": "Autofac.Mvc",
-    "NetFrameworkPackages": [
-      {
-        "Name": "Autofac.Mvc5",
-        "Version": "*"
-      }
-    ],
-    "NetCorePackages": []
-  },
-  {
-    "PackageSetName": "ASP.NET",
-    "NetCorePackages": [],
-    "NetFrameworkPackages": [
-      {
-        "Name": "Microsoft.AspNet.SessionState.SessionStateModule",
-        "Version": "*"
-      },
-      {
-        "Name": "Microsoft.AspNet.TelemetryCorrelation",
-        "Version": "*"
-      },
-      {
-        "Name": "Microsoft.AspNet.SessionState.SqlSessionStateProviderAsync",
-        "Version": "*"
-      },
-      {
-        "Name": "Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync",
-        "Version": "*"
-      },
-      {
-        "Name": "Microsoft.AspNet.Mvc",
-        "Version": "*"
-      }
-    ]
-  },
-  {
-    "PackageSetName": "Antlr",
-    "NetFrameworkPackages": [
-      {
-        "Name": "Antlr",
-        "Version": "*"
-      },
-      {
-        "Name": "Antlr3.Runtime",
-        "Version": "*"
-      }
-    ],
-    "NetCorePackages": [
-      {
-        "Name": "Antlr4",
-        "Version": "4.6.6"
       }
     ]
   },
@@ -141,8 +77,13 @@
     ]
   },
   {
-    "PackageSetName": "Microsoft.Net.Http",
+    "PackageSetName": "HTTP packages",
     "NetCorePackagesWorkOnNetFx": true,
+    "NetFrameworkAssemblies": [
+      {
+        "Name": "System.Net.Http.WebRequest"
+      }
+    ],
     "NetFrameworkPackages": [
       {
         "Name": "Microsoft.Net.Http",
