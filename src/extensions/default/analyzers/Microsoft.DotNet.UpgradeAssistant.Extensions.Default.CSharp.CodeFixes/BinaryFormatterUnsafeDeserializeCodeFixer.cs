@@ -15,7 +15,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0012 CodeFix Provider")]
-    public sealed class BinaryFormatterUnsafeDeserializeFixer : CodeFixProvider
+    public sealed class BinaryFormatterUnsafeDeserializeCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(BinaryFormatterUnsafeDeserializeAnalyzer.DiagnosticId);
 
@@ -41,6 +41,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return;
             }
 
+            var invocationExpression = node.Parent as InvocationExpressionSyntax;
+            if (invocationExpression is null)
+            {
+                return;
+            }
+
+            var lastArg = invocationExpression.ArgumentList.Arguments.Last();
+            if (!"null".Equals(lastArg.GetText().ToString(), System.StringComparison.Ordinal))
+            {
+                // UnsafeDeserialize accepts 2 parameters. This code fix only applies when the 2nd param is null
+                return;
+            }
+
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
@@ -52,40 +65,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
         private static async Task<Document> ReplaceUnsafeDeserializationAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
-            if (node is not MemberAccessExpressionSyntax)
+            if (node.Parent is null)
             {
-                // stop processing - the code fixer only fixes member invocations of UnsafeDeserialize
                 return document;
             }
 
-            var memberExpression = (MemberAccessExpressionSyntax)node;
+            var project = document.Project;
+            var slnEditor = new SolutionEditor(project.Solution);
 
-            if (memberExpression.Expression is IdentifierNameSyntax)
-            {
-                return await ProcessReplacementSyntax($"{((IdentifierNameSyntax)memberExpression.Expression).Identifier.ValueText}").ConfigureAwait(false);
-            }
-            else if (memberExpression!.Expression is ObjectCreationExpressionSyntax)
-            {
-                return await ProcessReplacementSyntax(((ObjectCreationExpressionSyntax)memberExpression.Expression).ToString()).ConfigureAwait(false);
-            }
-            else
-            {
-                // stop processing - the code fixer must be able to find an identifier on which the UnsafeDeserialize method was invoked
-                return document;
-            }
+            var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
+            var docRoot = docEditor.OriginalRoot;
 
-            async Task<Document> ProcessReplacementSyntax(string replacementText)
-            {
-                var replacementSyntax = ParseExpression($"{replacementText}.Deserialize")
+            var replacementExpression = node.Parent.ToFullString();
+            replacementExpression = ReplaceMethodName(replacementExpression);
+            replacementExpression = DropSecondParameter(replacementExpression);
+            var replacementSyntax = ParseExpression(replacementExpression)
                     .WithTriviaFrom(node);
-                var slnEditor = new SolutionEditor(document.Project.Solution);
-                var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
-                var docRoot = (CompilationUnitSyntax)docEditor.OriginalRoot;
-                docRoot = docRoot.ReplaceNode(node, replacementSyntax);
+            docRoot = docRoot.ReplaceNode(node.Parent, replacementSyntax);
 
-                docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
+            docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
+            return docEditor.GetChangedDocument();
 
-                return docEditor.GetChangedDocument();
+            string DropSecondParameter(string invocationExpression)
+            {
+                return invocationExpression.Substring(0, invocationExpression.IndexOf(",", System.StringComparison.Ordinal)) + ")";
+            }
+
+            string ReplaceMethodName(string invocationExpression)
+            {
+                return invocationExpression.Replace("UnsafeDeserialize", "Deserialize");
             }
         }
     }

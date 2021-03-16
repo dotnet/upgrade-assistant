@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new AllowHtmlAttributeCodeFixer(),
-            new BinaryFormatterUnsafeDeserializeFixer(),
+            new BinaryFormatterUnsafeDeserializeCodeFixer(),
             new FilterCodeFixer(),
             new HelperResultCodeFixer(),
             new HtmlStringCodeFixer(),

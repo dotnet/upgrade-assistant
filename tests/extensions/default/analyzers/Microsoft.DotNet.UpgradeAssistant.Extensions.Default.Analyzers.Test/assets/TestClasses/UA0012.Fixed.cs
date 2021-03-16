@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
 
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
-                var addresses = (Dictionary<string, string>)formatter.Deserialize(fs, null);
+                var addresses = (Dictionary<string, string>)formatter.Deserialize(fs);
                 return addresses;
             }
             catch (SerializationException e)
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
             {
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
-                var addresses = (Dictionary<string, string>)new BinaryFormatter().Deserialize(fs, null);
+                var addresses = (Dictionary<string, string>)new BinaryFormatter().Deserialize(fs);
                 return addresses;
             }
             catch (SerializationException e)

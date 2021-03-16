@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
             // Code fix providers
             services.AddTransient<CodeFixProvider, AllowHtmlAttributeCodeFixer>();
-            services.AddTransient<CodeFixProvider, BinaryFormatterUnsafeDeserializeFixer>();
+            services.AddTransient<CodeFixProvider, BinaryFormatterUnsafeDeserializeCodeFixer>();
             services.AddTransient<CodeFixProvider, FilterCodeFixer>();
             services.AddTransient<CodeFixProvider, HelperResultCodeFixer>();
             services.AddTransient<CodeFixProvider, HtmlHelperCodeFixer>();
