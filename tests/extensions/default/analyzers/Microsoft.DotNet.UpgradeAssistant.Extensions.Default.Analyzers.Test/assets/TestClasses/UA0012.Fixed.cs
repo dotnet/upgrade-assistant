@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
     {
         public const string ADDRESSES_FILE = "DataFile.dat";
         public const string CONTACTS_FILE = "DataFile2.dat";
+        public const string PROFILES_FILE = "button1_click.dat";
 
         public UA0012()
         {
@@ -53,6 +54,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
                 var addresses = (Dictionary<string, string>)new BinaryFormatter().Deserialize(fs, null);
+                return addresses;
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine("Failed to deserialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        public Dictionary<string, string> GetProfiles()
+        {
+            // Open the file containing the data that you want to deserialize.
+            var fs = new FileStream(PROFILES_FILE, FileMode.Open);
+            try
+            {
+                // Deserialize the hashtable from the file and
+                // assign the reference to the local variable.
+                string someValue = null;
+                var addresses = (Dictionary<string, string>)new BinaryFormatter().UnsafeDeserialize(fs, headers => {
+                    someValue = "something from the headers";
+                    return null;
+                });
                 return addresses;
             }
             catch (SerializationException e)
