@@ -105,8 +105,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var diagnosticFixed = false;
             var solution = workspace.CurrentSolution;
+            const int MAX_TRIES = 100;
+            var fixAttempts = 0;
             do
             {
+                fixAttempts++;
                 diagnosticFixed = false;
                 project = solution.GetProject(projectId)!;
                 var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticId).ConfigureAwait(false);
@@ -123,7 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     }
                 }
             }
-            while (diagnosticFixed);
+            while (diagnosticFixed && fixAttempts < MAX_TRIES);
 
             project = solution.GetProject(projectId)!;
             return project.Documents.First(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
