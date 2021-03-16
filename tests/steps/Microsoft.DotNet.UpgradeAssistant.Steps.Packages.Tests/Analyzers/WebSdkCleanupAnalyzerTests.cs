@@ -3,15 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using Autofac;
 using Autofac.Extras.Moq;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
 
@@ -52,11 +47,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            (var project, var state) = await GetMockProjectAndPackageState(mock, sdk, frameworkReferences?.Select(r => new Reference(r)));
+            (var project, var state) = await GetMockProjectAndPackageState(mock, sdk, frameworkReferences?.Select(r => new Reference(r))).ConfigureAwait(true);
             var analyzer = mock.Create<WebSdkCleanupAnalyzer>();
 
             // Act
-            var finalState = await analyzer.AnalyzeAsync(project, state, CancellationToken.None);
+            var finalState = await analyzer.AnalyzeAsync(project, state, CancellationToken.None).ConfigureAwait(true);
 
             // Assert
             Assert.Equal(state, finalState);
@@ -70,15 +65,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            (var project, var state) = await GetMockProjectAndPackageState(mock);
+            (var project, var state) = await GetMockProjectAndPackageState(mock).ConfigureAwait(true);
             var analyzer = mock.Create<WebSdkCleanupAnalyzer>();
 
             // Act / Assert
-            await Assert.ThrowsAsync<ArgumentNullException>("state", () => analyzer.AnalyzeAsync(project, null!, CancellationToken.None));
-            await Assert.ThrowsAsync<InvalidOperationException>(() => analyzer.AnalyzeAsync(null!, state, CancellationToken.None));
+            await Assert.ThrowsAsync<ArgumentNullException>("state", () => analyzer.AnalyzeAsync(project, null!, CancellationToken.None)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => analyzer.AnalyzeAsync(null!, state, CancellationToken.None)).ConfigureAwait(true);
         }
 
-        private async Task<(IProject Project, PackageAnalysisState State)> GetMockProjectAndPackageState(AutoMock mock, string? sdk = null, IEnumerable<Reference>? frameworkReferences = null)
+        private static async Task<(IProject Project, PackageAnalysisState State)> GetMockProjectAndPackageState(AutoMock mock, string? sdk = null, IEnumerable<Reference>? frameworkReferences = null)
         {
             var projectRoot = mock.Mock<IProjectFile>();
             projectRoot.Setup(r => r.IsSdk).Returns(sdk is not null);
@@ -93,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectRoot.Object);
-            project.Setup(p => p.FrameworkReferences).Returns(frameworkReferences);
+            project.Setup(p => p.FrameworkReferences).Returns(frameworkReferences!);
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.CurrentProject).Returns(project.Object);
@@ -104,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
                 It.IsAny<IProject>(),
                 It.IsAny<CancellationToken>())).Returns(Task.FromResult(new RestoreOutput(string.Empty, string.Empty)));
 
-            return (project.Object, await PackageAnalysisState.CreateAsync(context.Object, restorer.Object, CancellationToken.None));
+            return (project.Object, await PackageAnalysisState.CreateAsync(context.Object, restorer.Object, CancellationToken.None).ConfigureAwait(true));
         }
     }
 }
