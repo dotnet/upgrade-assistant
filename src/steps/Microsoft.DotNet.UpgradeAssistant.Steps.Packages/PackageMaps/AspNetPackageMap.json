@@ -1,0 +1,196 @@
+﻿[
+  {
+    "PackageSetName": "ASP.NET",
+    "NetCorePackagesWorkOnNetFx": false,
+    "NetFrameworkAssemblies": [
+      {
+        "Name": "System.Web"
+      },
+      {
+        "Name": "System.Web.Abstractions"
+      },
+      {
+        "Name": "System.Web.ApplicationServices"
+      },
+      {
+        "Name": "System.Web.DataVisualization"
+      },
+      {
+        "Name": "System.Web.DynamicData"
+      },
+      {
+        "Name": "System.Web.Entity"
+      },
+      {
+        "Name": "System.Web.Extensions"
+      },
+      {
+        "Name": "System.Web.Extensions.Design"
+      },
+      {
+        "Name": "System.Web.Helpers"
+      },
+      {
+        "Name": "System.Web.Mobile"
+      },
+      {
+        "Name": "System.Web.Mvc"
+      },
+      {
+        "Name": "System.Web.Optimization"
+      },
+      {
+        "Name": "System.Web.Razor"
+      },
+      {
+        "Name": "System.Web.Routing"
+      },
+      {
+        "Name": "System.Web.Services"
+      },
+      {
+        "Name": "System.Web.WebPages"
+      },
+      {
+        "Name": "System.Web.WebPages.Deployment"
+      },
+      {
+        "Name": "System.Web.WebPages.Razor"
+      }
+    ],
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.AspNet.Mvc",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.Razor",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.Identity.Core",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.Identity.EntityFramework",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.Identity.Owin",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.SessionState.CosmosDBSessionStateProviderAsync",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.SessionState.SessionStateModule",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.SessionState.SqlSessionStateProviderAsync",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.Web.Optimization",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.WebApi.Core",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.WebApi.WebHost",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.WebPages",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.CodeDom.Providers.DotNetCompilerPlatform",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Owin",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Owin.Host.SystemWeb",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Owin.Security",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Owin.Security.Cookies",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Owin.Security.OAuth",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Owin.Security.OpenIdConnect",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Web.Infrastructure",
+        "Version": "*"
+      },
+      {
+        "Name": "Owin",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AspNet.TelemetryCorrelation",
+        "Version": "*"
+      }
+    ],
+    "NetCoreFrameworkReferences": [
+      {
+        "Name": "Microsoft.AspNetCore.App"
+      }
+    ]
+  },
+  {
+    "PackageSetName": "StructureMap.Web",
+    "NetFrameworkPackages": [
+      {
+        "Name": "structuremap.web",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "Autofac.Mvc",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Autofac.Mvc5",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "Antlr",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Antlr",
+        "Version": "*"
+      },
+      {
+        "Name": "Antlr3.Runtime",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "Antlr4",
+        "Version": "4.6.6"
+      }
+    ]
+  }
+]

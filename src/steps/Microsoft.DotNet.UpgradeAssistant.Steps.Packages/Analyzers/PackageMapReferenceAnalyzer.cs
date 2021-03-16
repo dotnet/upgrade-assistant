@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     state.PossibleBreakingChangeRecommended = true;
                     _logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
                     state.PackagesToRemove.Add(packageReference);
-                    await AddNetCorePackages(map, state, project, token).ConfigureAwait(false);
+                    await AddNetCoreReferences(map, state, project, token).ConfigureAwait(false);
                 }
             }
 
@@ -63,14 +63,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     state.PossibleBreakingChangeRecommended = true;
                     _logger.LogInformation("Marking assembly reference {ReferenceName} for removal based on package mapping configuration {PackageMapSet}", reference.Name, map.PackageSetName);
                     state.ReferencesToRemove.Add(reference);
-                    await AddNetCorePackages(map, state, project, token).ConfigureAwait(false);
+                    await AddNetCoreReferences(map, state, project, token).ConfigureAwait(false);
                 }
             }
 
             return state;
         }
 
-        private async Task AddNetCorePackages(NuGetPackageMap packageMap, PackageAnalysisState state, IProject project, CancellationToken token)
+        private async Task AddNetCoreReferences(NuGetPackageMap packageMap, PackageAnalysisState state, IProject project, CancellationToken token)
         {
             foreach (var newPackage in packageMap.NetCorePackages)
             {
@@ -89,6 +89,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 {
                     _logger.LogInformation("Adding package {PackageName} based on package mapping configuration {PackageMapSet}", packageToAdd.Name, packageMap.PackageSetName);
                     state.PackagesToAdd.Add(packageToAdd);
+                }
+            }
+
+            foreach (var frameworkReference in packageMap.NetCoreFrameworkReferences)
+            {
+                if (!state.FrameworkReferencesToAdd.Contains(frameworkReference) && !project.FrameworkReferences.Contains(frameworkReference))
+                {
+                    _logger.LogInformation("Adding framework reference {FrameworkReference} based on package mapping configuration {PackageMapSet}", frameworkReference.Name, packageMap.PackageSetName);
+                    state.FrameworkReferencesToAdd.Add(frameworkReference);
                 }
             }
         }

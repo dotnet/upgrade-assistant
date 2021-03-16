@@ -16,12 +16,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         public ItemSpec[]? TemplateItems { get; set; }
 
+        public ProjectOutputType[]? TemplateOutputType { get; set; }
+
         public ProjectComponents[]? TemplateAppliesTo { get; set; }
 
         public Language? TemplateLanguage { get; set; }
 
         internal bool AppliesToProject(IProject project)
         {
+            if (TemplateOutputType is not null && !TemplateOutputType.Contains(project.OutputType))
+            {
+                return false;
+            }
+
             if (TemplateAppliesTo is not null && !TemplateAppliesTo.All(flag => project.Components.HasFlag(flag)))
             {
                 return false;

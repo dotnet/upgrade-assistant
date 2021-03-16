@@ -15,6 +15,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         string FilePath { get; }
 
+        void AddFrameworkReferences(IEnumerable<Reference> frameworkReferences);
+
+        void RemoveFrameworkReferences(IEnumerable<Reference> frameworkReferences);
+
         void AddPackages(IEnumerable<NuGetReference> packages);
 
         void RemovePackages(IEnumerable<NuGetReference> packages);

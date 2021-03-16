@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var tfmName = GetNetStandardTFM(project);
 
             // Projects with web components or an Exe output type should use app TFMs
-            if (project.Components.HasFlag(ProjectComponents.AspNetCore) || project.OutputType == ProjectOutputType.Exe)
+            if (project.Components.HasFlag(ProjectComponents.AspNet) || project.Components.HasFlag(ProjectComponents.AspNetCore) || project.OutputType == ProjectOutputType.Exe)
             {
                 tfmName = AppTFMBase;
             }

@@ -116,9 +116,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogInformation($"Packages to be removed:\n{string.Join("\n", _analysisState.PackagesToRemove.Distinct())}");
                 }
 
+                if (_analysisState.FrameworkReferencesToRemove.Count > 0)
+                {
+                    Logger.LogInformation($"Framework references to be removed:\n{string.Join("\n", _analysisState.FrameworkReferencesToRemove.Distinct())}");
+                }
+
                 if (_analysisState.PackagesToAdd.Count > 0)
                 {
                     Logger.LogInformation($"Packages to be addded:\n{string.Join("\n", _analysisState.PackagesToAdd.Distinct())}");
+                }
+
+                if (_analysisState.FrameworkReferencesToAdd.Count > 0)
+                {
+                    Logger.LogInformation($"Framework references to be addded:\n{string.Join("\n", _analysisState.FrameworkReferencesToAdd.Distinct())}");
                 }
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analysisState.ReferencesToRemove.Distinct().Count()} references need removed, {_analysisState.PackagesToRemove.Distinct().Count()} packages need removed, and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
@@ -151,7 +161,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     {
                         projectFile.RemoveReferences(_analysisState.ReferencesToRemove.Distinct());
                         projectFile.RemovePackages(_analysisState.PackagesToRemove.Distinct());
+                        projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferencesToRemove.Distinct());
                         projectFile.AddPackages(_analysisState.PackagesToAdd.Distinct());
+                        projectFile.AddFrameworkReferences(_analysisState.FrameworkReferencesToAdd.Distinct());
 
                         await projectFile.SaveAsync(token).ConfigureAwait(false);
                         count++;
