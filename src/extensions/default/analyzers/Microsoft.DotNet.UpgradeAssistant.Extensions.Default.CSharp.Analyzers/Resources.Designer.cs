@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers 
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; should be replaced with &apos;Deserialize()&apos;.
+        ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; should be replaced with &apos;Deserialize()&apos;..
         /// </summary>
         internal static string BinaryFormatterUnsafeDeserializeDescription {
             get {
