@@ -15,9 +15,10 @@ This project enables automation of common tasks related to upgrading .NET Framew
 When run on a solution, the tool will:
 
 - Determine which projects need upgraded and recommend the order the projects should be upgraded in
-- Update the project file to be an SDK-style project and re-target it to .NET 5.0
-- Update NuGet package dependencies to versions that are compatible with .NET 5.0
+- Update the project file to be an SDK-style project
 - Remove transitive NuGet package dependencies that may have been present in packages.config
+- Re-target project to .NET 5.0
+- Update NuGet package dependencies to versions that are compatible with .NET 5.0
 - Make simple updates in C# source code to replace patterns that worked in .NET Framework with .NET 5.0 equivalents
 - For some app models (like ASP.NET apps), add common template files (like startup.cs) and make simple updates based on recognized web.config or app.config values
 - For projects targeting Windows, add a reference to the Microsoft.Windows.Compatibility package
@@ -40,11 +41,6 @@ Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https:
 ### Prerequisites
 
 1. This tool uses MSBuild to work with project files. Make sure that a recent version of MSBuild is installed. An easy way to do this is to [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
-1. This Upgrade Assistant depends on [try-convert](https://github.com/dotnet/try-convert). In order for the tool to run correctly, you must install the try-convert tool for converting project files to the new SDK style. If you already have try-convert installed, you may need to update it instead (since upgrade-assistant depends on version 0.7.157502 or later)
-    1. To install try-convert: `dotnet tool install -g try-convert`
-    1. To update try-convert: `dotnet tool update -g try-convert`
-    1. If try-convert fails to install, try ignoring failed NuGet sources during install by running: `dotnet tool install -g try-convert --ignore-failed-sources`
-        1. Because .NET CLI tools (like try-convert and upgrade-assistant) are installed via NuGet, if you have invalid or authenticated NuGet sources in your [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior), that can cause installation issues. Ignoring failed sources will work past those problems.
 
 ### Installation steps
 
@@ -60,7 +56,7 @@ Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can
 dotnet tool update -g upgrade-assistant
 ```
 
-If installation fails, trying running the install command with the `--ignore-failed-sources` parameter: `dotnet tool install -g upgrade-assistant --ignore-failed-sources`. Like try-convert, upgrade-assistant is installed as a NuGet package, so invalid or authenticated sources in [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) can cause installation problems.
+If installation fails, trying running the install command with the `--ignore-failed-sources` parameter: `dotnet tool install -g upgrade-assistant --ignore-failed-sources`. Upgrade-assistant is installed as a NuGet package, so invalid or authenticated sources in [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) can cause installation problems.
 
 To try the latest (and likely less stable) versions of the tool, CI builds are available on the dotnet-tools NuGet feed and can be installed with `dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json` or updated using the same --add-source parameter.
 
@@ -116,13 +112,6 @@ If you're just starting to look at .NET 5.0 and would like to understand more ab
 1. [The .NET Portability Analyzer tool](https://github.com/microsoft/dotnet-apiport)
 2. [.NET Core porting documentation](https://docs.microsoft.com/dotnet/core/porting/)
 3. [Documentation of features not available on .NET Core](https://docs.microsoft.com/dotnet/core/porting/net-framework-tech-unavailable)
-
-### Troubleshooting common issues
-
-1. If try-convert fails:
-    1. Check that try-convert is installed (and that it is either located at %USERPROFILE%\.dotnet\tools\try-convert.exe or upgrade-assistant's appsettings.json file has been updated with the correct location).
-    2. Check that try-convert is at least version 0.7.212201 or higher).
-    3. Check whether the input project imports custom props or targets files. Older versions of try-convert didn't support converting projects that import unknown props and targets files. Look at the output from upgrade-assistant and try-convert to see if any unrecognized imports are mentioned. If so, you will need to either update try-convert or remove the imports.
 
 ### Extensibility
 The Upgrade Assistant has an extension system that make it easy for you to customize many of the upgrade steps without having to rebuild the tool. See how you can extend the tool [here](docs/extensibility.md).

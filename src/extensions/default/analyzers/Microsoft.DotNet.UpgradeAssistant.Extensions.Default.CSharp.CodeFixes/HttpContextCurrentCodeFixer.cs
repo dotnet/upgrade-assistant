@@ -18,7 +18,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
-    [ApplicableComponents(ProjectComponents.Web)]
+    [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0005 CodeFix Provider")]
     public class HttpContextCurrentCodeFixer : CodeFixProvider
     {

@@ -8,7 +8,7 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
-    [ApplicableComponents(ProjectComponents.Web)]
+    [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0009 CodeFix Provider")]
     public class HelperResultCodeFixer : IdentifierUpgradeCodeFixer
     {

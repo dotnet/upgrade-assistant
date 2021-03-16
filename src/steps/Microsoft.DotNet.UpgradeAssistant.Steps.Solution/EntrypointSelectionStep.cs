@@ -34,6 +34,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override string Description => "The entrypoint is the application you run or the library that is to be upgraded. Dependencies will then be analyzed and a recommended process will then be determined";
 
+        public override string Id => WellKnownStepIds.EntrypointSelectionStepId;
+
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)

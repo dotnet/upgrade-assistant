@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     internal partial class MSBuildProject : IProject
     {
         private readonly ILogger _logger;
+        private readonly IComponentIdentifier _componentIdentifier;
 
         public MSBuildWorkspaceUpgradeContext Context { get; }
 
@@ -24,10 +25,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public string Directory => Path.GetDirectoryName(FilePath)!;
 
-        public MSBuildProject(MSBuildWorkspaceUpgradeContext context, string path, ILogger logger)
+        public MSBuildProject(MSBuildWorkspaceUpgradeContext context, IComponentIdentifier componentIdentifier, string path, ILogger logger)
         {
             FilePath = path;
             Context = context;
+
+            _componentIdentifier = componentIdentifier;
             _logger = logger;
         }
 
@@ -78,100 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return ProjectOutputType.Library;
         }
 
-        public ProjectComponents Components
-        {
-            get
-            {
-                var components = IsSdk ? GetSDKProjectComponents() : GetOldProjectComponents();
-
-                if (TransitivePackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
-                {
-                    components |= ProjectComponents.WinRT;
-                }
-
-                return components;
-
-                // Gets project components based on SDK, properties, and FrameworkReferences
-                ProjectComponents GetSDKProjectComponents()
-                {
-                    var components = ProjectComponents.None;
-                    if (Sdk.Equals(MSBuildConstants.WebSdk, StringComparison.OrdinalIgnoreCase))
-                    {
-                        components |= ProjectComponents.Web;
-                    }
-
-                    if (GetPropertyValue("UseWPF").Equals("true", StringComparison.OrdinalIgnoreCase))
-                    {
-                        components |= ProjectComponents.Wpf;
-                        components |= ProjectComponents.WindowsDesktop;
-                    }
-
-                    if (GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
-                    {
-                        components |= ProjectComponents.WinForms;
-                        components |= ProjectComponents.WindowsDesktop;
-                    }
-
-                    if (Sdk.Equals(MSBuildConstants.DesktopSdk, StringComparison.OrdinalIgnoreCase))
-                    {
-                        components |= ProjectComponents.WindowsDesktop;
-                    }
-
-                    var frameworkReferenceNames = FrameworkReferences.Select(r => r.Name);
-                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.Web;
-                    }
-
-                    if (frameworkReferenceNames.Any(f => MSBuildConstants.DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.WindowsDesktop;
-                    }
-
-                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WinFormsReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.WinForms;
-                    }
-
-                    if (frameworkReferenceNames.Any(f => MSBuildConstants.WpfReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.Wpf;
-                    }
-
-                    return components;
-                }
-
-                // Gets project components based on imports and References
-                ProjectComponents GetOldProjectComponents()
-                {
-                    var components = ProjectComponents.None;
-
-                    // Check imports and references
-                    var importedProjects = ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
-                    var references = References.Select(r => r.Name);
-
-                    if (importedProjects.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
-                        references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.Web;
-                    }
-
-                    if (references.Any(r => MSBuildConstants.WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.WindowsDesktop;
-                        components |= ProjectComponents.WinForms;
-                    }
-
-                    if (references.Any(r => MSBuildConstants.WpfReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-                    {
-                        components |= ProjectComponents.WindowsDesktop;
-                        components |= ProjectComponents.Wpf;
-                    }
-
-                    return components;
-                }
-            }
-        }
+        public ProjectComponents Components => _componentIdentifier.GetComponents(this);
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
         {

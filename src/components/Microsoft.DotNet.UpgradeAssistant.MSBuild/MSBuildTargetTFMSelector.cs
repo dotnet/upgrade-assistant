@@ -44,15 +44,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var tfmName = GetNetStandardTFM(project);
 
             // Projects with web components or an Exe output type should use app TFMs
-            if ((project.Components & ProjectComponents.Web) == ProjectComponents.Web
-                || project.OutputType == ProjectOutputType.Exe)
+            if (project.Components.HasFlag(ProjectComponents.AspNetCore) || project.OutputType == ProjectOutputType.Exe)
             {
                 tfmName = AppTFMBase;
             }
 
             // Projects with Windows Desktop components or a WinExe output type should use a -windows suffix
-            if ((project.Components & ProjectComponents.WindowsDesktop) == ProjectComponents.WindowsDesktop
-                || project.OutputType == ProjectOutputType.WinExe)
+            if (project.Components.HasFlag(ProjectComponents.WindowsDesktop) || project.OutputType == ProjectOutputType.WinExe)
             {
                 tfmName = $"{AppTFMBase}{WindowsSuffix}";
 

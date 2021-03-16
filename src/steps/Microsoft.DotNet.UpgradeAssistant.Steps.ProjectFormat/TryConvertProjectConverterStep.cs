@@ -18,15 +18,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public override string Title => $"Convert project file to SDK style";
 
+        public override string Id => WellKnownStepIds.TryConvertProjectConverterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing package references
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep"
+            WellKnownStepIds.BackupStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
         public TryConvertProjectConverterStep(
@@ -105,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                     return new UpgradeStepInitializeResult(
                         UpgradeStepStatus.Incomplete,
                         $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project: {_runner.GetCommandLine(project)}",
-                        (project.Components & ProjectComponents.Web) == ProjectComponents.Web ? BuildBreakRisk.High : BuildBreakRisk.Medium);
+                        project.Components.HasFlag(ProjectComponents.AspNetCore) ? BuildBreakRisk.High : BuildBreakRisk.Medium);
                 }
                 else
                 {
@@ -117,7 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogError("Failed to open project {ProjectPath}; Exception: {Exception}", projectFile.FilePath, exc.ToString());
+                Logger.LogError(exc, "Failed to open project {ProjectPath}", projectFile.FilePath);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
             }
         }

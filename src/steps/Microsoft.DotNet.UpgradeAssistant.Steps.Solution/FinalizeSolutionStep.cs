@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -17,29 +18,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId,
         };
 
-        public override string Title => "Finalize Solution";
+        public override string Title => "Finalize upgrade";
 
         public override string Description => "All projects have been upgraded. Please review any changes and test accordingly.";
+
+        public override string Id => WellKnownStepIds.FinalizeSolutionStepId;
 
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             context.IsComplete = true;
             context.SetEntryPoint(null);
-            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Complete solution"));
+            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Upgrade complete"));
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            if (context.IsComplete)
+            if (context.EntryPoint is null)
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Solution completed", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Upgrade completed", BuildBreakRisk.None));
             }
             else
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Complete solution", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Finalize upgrade of entry point {context.EntryPoint.FilePath}", BuildBreakRisk.None));
             }
         }
 

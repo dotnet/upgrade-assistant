@@ -37,21 +37,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         public override string Title => $"Add template files";
 
+        public override string Id => WellKnownStepIds.TemplateInserterStepId;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before adding template files
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.BackupStep",
+            WellKnownStepIds.BackupStepId,
 
             // Project should be SDK-style before adding template files
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+            WellKnownStepIds.TryConvertProjectConverterStepId,
 
             // Project should have correct TFM
-            "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+            WellKnownStepIds.SetTFMStepId,
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.NextProjectStep",
+            WellKnownStepIds.NextProjectStepId
         };
 
         public TemplateInserterStep(TemplateProvider templateProvider, ILogger<TemplateInserterStep> logger)
@@ -101,11 +103,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception)
+            catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogCritical("Invalid project: {ProjectPath}", project.FilePath);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Invalid project: {project.FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical(exc, "Unexpected exception initializing template inserter step for: {ProjectPath}", project.FilePath);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception initializing template inserter step for: {project.FilePath}", BuildBreakRisk.Unknown);
             }
         }
 

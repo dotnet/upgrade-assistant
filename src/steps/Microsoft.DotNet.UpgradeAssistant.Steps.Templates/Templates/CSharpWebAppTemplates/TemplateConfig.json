@@ -32,6 +32,6 @@
   ],
   "TemplateLanguage": "CSharp",
   "TemplateAppliesTo": [
-    "Web"
+    "AspNetCore"
   ]
 }
