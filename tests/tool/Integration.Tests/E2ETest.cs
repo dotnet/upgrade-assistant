@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Integration.Tests
 {
@@ -33,10 +34,10 @@ namespace Integration.Tests
         }
 
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
-        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-        [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
         [InlineData("PCL", "SamplePCL.csproj", "")]
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
+        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
+        [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
@@ -90,10 +91,16 @@ namespace Integration.Tests
 
             foreach (var file in expectedFiles)
             {
-                var expectedText = $"{file}: {await File.ReadAllTextAsync(Path.Combine(expectedDir, file)).ConfigureAwait(false)}";
-                var actualText = $"{file}: {await File.ReadAllTextAsync(Path.Combine(actualDir, file)).ConfigureAwait(false)}";
-
-                Assert.Equal(expectedText, actualText);
+                var expectedText = await File.ReadAllTextAsync(Path.Combine(expectedDir, file)).ConfigureAwait(false);
+                var actualText = await File.ReadAllTextAsync(Path.Combine(actualDir, file)).ConfigureAwait(false);
+                try
+                {
+                    Assert.Equal(expectedText, actualText);
+                }
+                catch (EqualException ex)
+                {
+                    Assert.True(false, $"The contents of \"{file}\" do not match.{Environment.NewLine}{ex.Message}");
+                }
             }
         }
 

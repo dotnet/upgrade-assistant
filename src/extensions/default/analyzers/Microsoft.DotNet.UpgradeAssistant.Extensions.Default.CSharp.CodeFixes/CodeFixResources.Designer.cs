@@ -71,6 +71,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes 
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace with BinaryFormatter.Deserialize.
+        /// </summary>
+        internal static string BinaryFormatterUnsafeDeserializeTitle {
+            get {
+                return ResourceManager.GetString("BinaryFormatterUnsafeDeserializeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with ASP.NET Core filter type.
         /// </summary>
         internal static string FilterTitle {

@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
@@ -25,28 +26,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         internal const string TestProjectPath = @"assets\TestProject.csproj";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
-            new UsingSystemWebAnalyzer(),
-            new HtmlStringAnalyzer(),
-            new ResultTypeAnalyzer(),
+            new AllowHtmlAttributeAnalyzer(),
+            new BinaryFormatterUnsafeDeserializeAnalyzer(),
             new FilterAnalyzer(),
+            new HelperResultAnalyzer(),
+            new HtmlStringAnalyzer(),
+            new HtmlHelperAnalyzer(),
             new HttpContextCurrentAnalyzer(),
             new HttpContextIsDebuggingEnabledAnalyzer(),
-            new HtmlHelperAnalyzer(),
-            new UrlHelperAnalyzer(),
-            new HelperResultAnalyzer(),
-            new AllowHtmlAttributeAnalyzer());
+            new ResultTypeAnalyzer(),
+            new UsingSystemWebAnalyzer(),
+            new UrlHelperAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
-            new UsingSystemWebCodeFixer(),
-            new HtmlStringCodeFixer(),
-            new ResultTypeCodeFixer(),
+            new AllowHtmlAttributeCodeFixer(),
+            new BinaryFormatterUnsafeDeserializeCodeFixer(),
             new FilterCodeFixer(),
+            new HelperResultCodeFixer(),
+            new HtmlStringCodeFixer(),
+            new HtmlHelperCodeFixer(),
             new HttpContextCurrentCodeFixer(),
             new HttpContextIsDebuggingEnabledCodeFixer(),
-            new HtmlHelperCodeFixer(),
-            new UrlHelperCodeFixer(),
-            new HelperResultCodeFixer(),
-            new AllowHtmlAttributeCodeFixer());
+            new ResultTypeCodeFixer(),
+            new UsingSystemWebCodeFixer(),
+            new UrlHelperCodeFixer());
 
         public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
         {
@@ -103,8 +106,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var diagnosticFixed = false;
             var solution = workspace.CurrentSolution;
+            const int MAX_TRIES = 100;
+            var fixAttempts = 0;
             do
             {
+                fixAttempts++;
                 diagnosticFixed = false;
                 project = solution.GetProject(projectId)!;
                 var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticId).ConfigureAwait(false);
@@ -119,6 +125,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                         diagnosticFixed = true;
                         break;
                     }
+                }
+
+                if (fixAttempts + 1 == MAX_TRIES)
+                {
+                    Assert.True(false, $"The code fixers were unable to resolve the following diagnostic(s):{Environment.NewLine}   {string.Join(',', diagnostics.Select(d => d.Id))}");
                 }
             }
             while (diagnosticFixed);

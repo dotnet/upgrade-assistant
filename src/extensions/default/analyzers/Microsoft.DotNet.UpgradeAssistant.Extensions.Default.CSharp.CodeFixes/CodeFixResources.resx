@@ -120,6 +120,9 @@
   <data name="AllowHtmlAttributeTitle" xml:space="preserve">
     <value>Remove [AllowHtml] attribute</value>
   </data>
+  <data name="BinaryFormatterUnsafeDeserializeTitle" xml:space="preserve">
+    <value>Replace with BinaryFormatter.Deserialize</value>
+  </data>
   <data name="FilterTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core filter type</value>
   </data>

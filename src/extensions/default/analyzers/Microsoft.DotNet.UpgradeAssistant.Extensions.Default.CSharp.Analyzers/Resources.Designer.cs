@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers 
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [AllowHtmlAttrubute] should be removed..
+        ///   Looks up a localized string similar to [AllowHtmlAttribute] should be removed..
         /// </summary>
         internal static string AllowHtmlAttributeDescription {
             get {
@@ -79,11 +79,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers 
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [AllowHtmlAttrubute] should be removed.
+        ///   Looks up a localized string similar to [AllowHtmlAttribute] should be removed.
         /// </summary>
         internal static string AllowHtmlAttributeTitle {
             get {
                 return ResourceManager.GetString("AllowHtmlAttributeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; should be replaced with &apos;Deserialize()&apos;..
+        /// </summary>
+        internal static string BinaryFormatterUnsafeDeserializeDescription {
+            get {
+                return ResourceManager.GetString("BinaryFormatterUnsafeDeserializeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; should be replaced with &apos;Deserialize()&apos;.
+        /// </summary>
+        internal static string BinaryFormatterUnsafeDeserializeMessageFormat {
+            get {
+                return ResourceManager.GetString("BinaryFormatterUnsafeDeserializeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; does not exist.
+        /// </summary>
+        internal static string BinaryFormatterUnsafeDeserializeTitle {
+            get {
+                return ResourceManager.GetString("BinaryFormatterUnsafeDeserializeTitle", resourceCulture);
             }
         }
         
