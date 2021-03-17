@@ -17,7 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         public const string DiagnosticId = "UA0012";
         private const string Category = "Upgrade";
 
-        private const string TargetTypeSymbolName = "System.Runtime.Serialization.Formatters.Binary.BinaryFormatter";
+        private const string TargetTypeSymbolNamespace = "System.Runtime.Serialization.Formatters.Binary";
+        private const string TargetTypeSymbolName = "BinaryFormatter";
         private const string TargetMember = "UnsafeDeserialize";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeTitle), Resources.ResourceManager, typeof(Resources));
@@ -77,14 +78,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             var accessedSymbol = context.SemanticModel.GetSymbolInfo(accessedIdentifier).Symbol;
             if (accessedSymbol is ILocalSymbol localSymbol)
             {
-                if (!TargetTypeSymbolName.Equals($"{localSymbol.Type.ContainingNamespace}.{localSymbol.Type.Name}", StringComparison.Ordinal))
+                // refactored from $"{localSymbol.Type.ContainingNamespace}.{localSymbol.Type.Name}" for performance reasons
+                // avoiding the memory pressure from creating an interpolated string due to the volume of times a syntax analyzer is executed
+                if (!TargetTypeSymbolNamespace.Equals(localSymbol.Type.ContainingNamespace.ToString(), StringComparison.Ordinal)
+                    && !TargetTypeSymbolName.Equals(localSymbol.Type.Name, StringComparison.Ordinal))
                 {
                     return;
                 }
             }
             else if (accessedSymbol is INamedTypeSymbol symbol)
             {
-                if (!TargetTypeSymbolName.Equals(symbol.ToDisplayString(NullableFlowState.NotNull), StringComparison.Ordinal))
+                var symbolText = symbol.ToDisplayString(NullableFlowState.NotNull);
+                if (!symbolText.StartsWith(TargetTypeSymbolNamespace, StringComparison.Ordinal)
+                    || !symbolText.EndsWith(TargetTypeSymbolName, StringComparison.Ordinal))
                 {
                     return;
                 }
