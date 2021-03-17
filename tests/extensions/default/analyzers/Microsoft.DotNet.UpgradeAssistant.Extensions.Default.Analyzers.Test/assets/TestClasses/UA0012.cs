@@ -16,9 +16,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
         public const string ADDRESSES_FILE = "DataFile.dat";
         public const string CONTACTS_FILE = "DataFile2.dat";
         public const string PROFILES_FILE = "button1_click.dat";
+        public const string PHONE_NUMBERS_FILE = "button2_click.dat";
+        public const string SUPER_FILE = "button3_click.dat";
 
         public UA0012()
         {
+        }
+
+        public Dictionary<string, string> GetSuperPowers()
+        {
+            // Open the file containing the data that you want to deserialize.
+            var fs = new FileStream(SUPER_FILE, FileMode.Open);
+            try
+            {
+                var formatter1 = new SuperHeroicSerializer.BinaryFormatter();
+
+                // Deserialize the hashtable from the file and
+                // assign the reference to the local variable.
+                var superPowers = (Dictionary<string, string>)formatter1.UnsafeDeserialize(fs, null);
+                return superPowers;
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine("Failed to deserialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
         }
 
         public Dictionary<string, string> GetAddresses()
@@ -27,12 +53,40 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
             var fs = new FileStream(ADDRESSES_FILE, FileMode.Open);
             try
             {
-                var formatter = new BinaryFormatter();
+                var formatter2 = new BinaryFormatter();
 
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
-                var addresses = (Dictionary<string, string>)formatter.UnsafeDeserialize(fs, null);
+                var addresses = (Dictionary<string, string>)formatter2.UnsafeDeserialize(fs, null);
                 return addresses;
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine("Failed to deserialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        public Dictionary<string, string> GetAlternateIdentities()
+        {
+            // Open the file containing the data that you want to deserialize.
+            var fs = new FileStream(SUPER_FILE, FileMode.Open);
+            try
+            {
+                var formatter3 = new BinaryFormatter();
+
+                // Deserialize the hashtable from the file and
+                // assign the reference to the local variable.
+                string someValue = null;
+                var identities = (Dictionary<string, string>)formatter3.UnsafeDeserialize(fs, headers => {
+                    someValue = "something from the headers";
+                    return null;
+                });
+                return identities;
             }
             catch (SerializationException e)
             {
@@ -53,8 +107,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
             {
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
-                var addresses = (Dictionary<string, string>)new BinaryFormatter().UnsafeDeserialize(fs, null);
-                return addresses;
+                var contacts = (Dictionary<string, string>)new BinaryFormatter().UnsafeDeserialize(fs, null);
+                return contacts;
             }
             catch (SerializationException e)
             {
@@ -76,11 +130,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
                 // Deserialize the hashtable from the file and
                 // assign the reference to the local variable.
                 string someValue = null;
-                var addresses = (Dictionary<string, string>)new BinaryFormatter().UnsafeDeserialize(fs, headers => {
+                var profiles = (Dictionary<string, string>)new BinaryFormatter().UnsafeDeserialize(fs, headers => {
                     someValue = "something from the headers";
                     return null;
                 });
-                return addresses;
+                return profiles;
             }
             catch (SerializationException e)
             {
@@ -91,6 +145,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
             {
                 fs.Close();
             }
+        }
+    }
+}
+
+namespace SuperHeroicSerializer
+{
+    public class BinaryFormatter
+    {
+        public object UnsafeDeserialize(Stream serializationStream, System.Runtime.Remoting.Messaging.HeaderHandler handler)
+        {
+            return throw new NotImplementedException("under construction");
         }
     }
 }
