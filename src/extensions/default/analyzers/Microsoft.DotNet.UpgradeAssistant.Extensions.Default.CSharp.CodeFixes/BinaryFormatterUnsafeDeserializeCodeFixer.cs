@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             }
 
             var lastArg = invocationExpression.ArgumentList.Arguments.Last();
-            if (!"null".Equals(lastArg.GetText().ToString(), System.StringComparison.Ordinal))
+            if (invocationExpression.ArgumentList.Arguments.Count != 2 || !lastArg.Expression.IsKind(CodeAnalysis.CSharp.SyntaxKind.NullLiteralExpression))
             {
                 // UnsafeDeserialize accepts 2 parameters. This code fix only applies when the 2nd param is null
                 return;
