@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -70,31 +71,47 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return document;
             }
 
+            var memberExpression = node as MemberAccessExpressionSyntax;
+            if (memberExpression is null)
+            {
+                return document;
+            }
+
             var project = document.Project;
             var slnEditor = new SolutionEditor(project.Solution);
 
             var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
             var docRoot = docEditor.OriginalRoot;
 
-            var replacementExpression = node.Parent.ToFullString();
-            replacementExpression = ReplaceMethodName(replacementExpression);
-            replacementExpression = DropSecondParameter(replacementExpression);
-            var replacementSyntax = ParseExpression(replacementExpression)
-                    .WithTriviaFrom(node);
-            docRoot = docRoot.ReplaceNode(node.Parent, replacementSyntax);
+            ReplaceMethodCall(memberExpression, docEditor);
+            DropNullParameter(memberExpression, docEditor);
 
             docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
             return docEditor.GetChangedDocument();
+        }
 
-            string DropSecondParameter(string invocationExpression)
+        private static void ReplaceMethodCall(MemberAccessExpressionSyntax? memberExpression, DocumentEditor docEditor)
+        {
+            if (memberExpression is null)
             {
-                return invocationExpression.Substring(0, invocationExpression.IndexOf(",", System.StringComparison.Ordinal)) + ")";
+                return;
             }
 
-            string ReplaceMethodName(string invocationExpression)
+            var parsedExpression = ParseExpression("Deserialize");
+            var identifierExpression = memberExpression.DescendantNodes().OfType<IdentifierNameSyntax>().Last();
+            docEditor.ReplaceNode(identifierExpression, parsedExpression);
+        }
+
+        private static void DropNullParameter(MemberAccessExpressionSyntax? memberExpression, DocumentEditor docEditor)
+        {
+            if (memberExpression is null || memberExpression.Parent is null)
             {
-                return invocationExpression.Replace("UnsafeDeserialize", "Deserialize");
+                return;
             }
+
+            var argumentListSyntaxOriginal = memberExpression.Parent.DescendantNodes().OfType<ArgumentListSyntax>().Last();
+            var modified = argumentListSyntaxOriginal.WithArguments(argumentListSyntaxOriginal.Arguments.RemoveAt(1));
+            docEditor.ReplaceNode(argumentListSyntaxOriginal, modified);
         }
     }
 }
