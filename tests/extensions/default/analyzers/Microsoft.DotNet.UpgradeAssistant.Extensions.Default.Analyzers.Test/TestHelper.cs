@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
@@ -125,8 +126,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                         break;
                     }
                 }
+
+                if (fixAttempts + 1 == MAX_TRIES)
+                {
+                    Assert.True(false, $"The code fixers were unable to resolve the following diagnostic(s):{Environment.NewLine}   {string.Join(',', diagnostics.Select(d => d.Id))}");
+                }
             }
-            while (diagnosticFixed && fixAttempts < MAX_TRIES);
+            while (diagnosticFixed);
 
             project = solution.GetProject(projectId)!;
             return project.Documents.First(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
