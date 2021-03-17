@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 // refactored from $"{localSymbol.Type.ContainingNamespace}.{localSymbol.Type.Name}" for performance reasons
                 // avoiding the memory pressure from creating an interpolated string due to the volume of times a syntax analyzer is executed
                 if (!TargetTypeSymbolNamespace.Equals(localSymbol.Type.ContainingNamespace.ToString(), StringComparison.Ordinal)
-                    && !TargetTypeSymbolName.Equals(localSymbol.Type.Name, StringComparison.Ordinal))
+                    || !TargetTypeSymbolName.Equals(localSymbol.Type.Name, StringComparison.Ordinal))
                 {
                     return;
                 }
