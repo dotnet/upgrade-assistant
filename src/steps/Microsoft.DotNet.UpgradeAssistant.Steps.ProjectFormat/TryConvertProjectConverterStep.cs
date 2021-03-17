@@ -13,9 +13,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     {
         private readonly ITryConvertTool _runner;
         private readonly IPackageRestorer _restorer;
-        private readonly string _versionString;
 
-        public override string Description => $"Use the try-convert tool ({_runner.Path}{_versionString}) to convert the project file to an SDK-style csproj";
+        private string VersionString => _runner?.Version is null
+            ? string.Empty
+            : $", version {_runner.Version}";
+
+        public override string Description => $"Use the try-convert tool ({_runner.Path}{VersionString}) to convert the project file to an SDK-style csproj";
 
         public override string Title => $"Convert project file to SDK style";
 
@@ -40,10 +43,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
-            var tryConvertVersion = _runner.TryGetVersion();
-            _versionString = tryConvertVersion is null
-                ? string.Empty
-                : $", version {tryConvertVersion}";
         }
 
         protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
@@ -64,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         private async Task<UpgradeStepApplyResult> RunTryConvertAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
-            Logger.LogInformation($"Converting project file format with try-convert{_versionString}");
+            Logger.LogInformation($"Converting project file format with try-convert{VersionString}");
 
             var result = await _runner.RunAsync(context, project, token).ConfigureAwait(false);
 

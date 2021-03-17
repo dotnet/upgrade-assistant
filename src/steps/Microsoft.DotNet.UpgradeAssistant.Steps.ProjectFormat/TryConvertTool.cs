@@ -38,9 +38,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
 
             Path = tryConvertOptionsAccessor.Value.TryConvertPath;
+            Version = GetVersion();
         }
 
         public string Path { get; }
+
+        public string? Version { get; }
 
         public bool IsAvailable => File.Exists(Path);
 
@@ -63,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }, token);
         }
 
-        public string? TryGetVersion()
+        private string? GetVersion()
         {
             // The host that runs .NET CLI tools (like try-convert) stores
             // its version as a product version attribute.
