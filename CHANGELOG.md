@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 ### Added
-Include try-convert version in upgrade-assistant output [(#358)](https://github.com/dotnet/upgrade-assistant/pull/358)
+- Include try-convert version in upgrade-assistant output [(#358)](https://github.com/dotnet/upgrade-assistant/pull/358)
 - Add check so ensure file can be loaded. [(#346)](https://github.com/dotnet/upgrade-assistant/pull/346)
 - Add a command to select a different current project [(#343)](https://github.com/dotnet/upgrade-assistant/pull/343)
 - Add a step to update package dependecies before TFM change [(#342)](https://github.com/dotnet/upgrade-assistant/pull/342)
