@@ -37,7 +37,7 @@ Include try-convert version in upgrade-assistant output [(#358)](https://github.
 - Retarget to .NET Standard [(#289)](https://github.com/dotnet/upgrade-assistant/pull/289)
 - Update MSBuildProject to give better error if TFM can't be read [(#281)](https://github.com/dotnet/upgrade-assistant/pull/281)
 - Move IPackageLoader to abstractions library [(#280)](https://github.com/dotnet/upgrade-assistant/pull/280)
-- Change too only target windows for now [(#264)](https://github.com/dotnet/upgrade-assistant/pull/264)
+- Change to only target windows for now [(#264)](https://github.com/dotnet/upgrade-assistant/pull/264)
 - Update Directory.Build.props for anything targetting less than .NET 5.0 [(#253)](https://github.com/dotnet/upgrade-assistant/pull/253)
 - Convert abstractions to target .NET Standard 2.0 for extensions [(#250)](https://github.com/dotnet/upgrade-assistant/pull/250)
 - Package Microsoft.DotNet.UpgradeAssistant.Extensions as a NuGet package [(#261)](https://github.com/dotnet/upgrade-assistant/pull/261)
