@@ -96,6 +96,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private static string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.Required().FilePath);
+        private static string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.Required().FileInfo);
     }
 }

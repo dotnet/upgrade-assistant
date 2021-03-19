@@ -17,6 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private ProjectRootElement? _projectRoot;
 
+        string IProjectFile.FilePath => FileInfo.FullName;
+
         // Don't get the project root from Project.Xml since some upgrade
         // steps may need to work with the project XML while it's not in
         // a completely loadable state (for example, prior to converting
@@ -27,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 if (_projectRoot is null)
                 {
-                    _projectRoot = ProjectRootElement.Open(FilePath, Context.ProjectCollection);
+                    _projectRoot = ProjectRootElement.Open(FileInfo.FullName, Context.ProjectCollection);
                 }
 
                 return _projectRoot;

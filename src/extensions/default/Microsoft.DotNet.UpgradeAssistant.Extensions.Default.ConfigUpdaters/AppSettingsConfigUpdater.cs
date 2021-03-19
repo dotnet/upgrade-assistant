@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             var project = context.CurrentProject.Required();
 
             // Determine where appsettings.json should live
-            var appSettingsPath = Path.Combine(project.Directory ?? string.Empty, AppSettingsJsonFileName);
+            var appSettingsPath = Path.Combine(project.FileInfo.DirectoryName, AppSettingsJsonFileName);
 
             // Parse existing appsettings.json properties, if any
             var existingJson = "{}";

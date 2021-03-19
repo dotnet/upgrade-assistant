@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
             }
 
-            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FilePath, project.Components, project.OutputType);
+            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FileInfo, project.Components, project.OutputType);
 
             // If the project depends on another project with a higher version NetCore or NetStandard TFM,
             // use that TFM instead.
@@ -78,16 +78,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     if (dep.TFM.IsNetCore || dep.TFM.IsNetStandard)
                     {
                         tfm = dep.TFM;
-                        _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FilePath, dep.FilePath);
+                        _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FileInfo, dep.FileInfo);
                     }
                 }
                 catch (UpgradeException)
                 {
-                    _logger.LogWarning($"Unable to determine TFM for dependency {dep.FilePath}; TFM for {project.FilePath} may not be correct.");
+                    _logger.LogWarning($"Unable to determine TFM for dependency {dep.FileInfo}; TFM for {project.FileInfo} may not be correct.");
                 }
             }
 
-            _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
+            _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FileInfo);
 
             // Ensure we don't downgrade a project
             return _tfmComparer.Compare(project.TFM, tfm) > 0 ? project.TFM : tfm;

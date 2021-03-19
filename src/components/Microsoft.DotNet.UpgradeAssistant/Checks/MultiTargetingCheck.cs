@@ -29,12 +29,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             try
             {
                 var tfm = project.TFM;
-                _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FilePath, tfm);
+                _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FileInfo, tfm);
                 return Task.FromResult(true);
             }
             catch (UpgradeException)
             {
-                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one <TargetFramework> or <TargetFrameworkVersion> property. Multi-targeted projects are not yet supported.", project.FilePath);
+                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one <TargetFramework> or <TargetFrameworkVersion> property. Multi-targeted projects are not yet supported.", project.FileInfo);
                 return Task.FromResult(false);
             }
         }

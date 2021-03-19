@@ -181,7 +181,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
                 RegisterConfigUpdaters(cfg, completeConfigUpdaterCount, incompleteConfigUpdaterCount);
             });
             var project = mock.Mock<IProject>();
-            project.Setup(p => p.Directory).Returns(".");
+            project.Setup(p => p.FileInfo).Returns(new FileInfo("./test"));
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.CurrentProject).Returns(projectLoaded ? project.Object : null);
             var step = mock.Create<ConfigUpdaterStep>();
