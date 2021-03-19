@@ -21,7 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         private static readonly string[] ErrorMessages = new[]
         {
             "This project has custom imports that are not accepted by try-convert",
-            "is an unsupported project type. Not all project type guids are supported."
+            "is an unsupported project type. Not all project type guids are supported.",
+            "has invalid Project Type Guids for test projects and is not supported."
         };
 
         private readonly IProcessRunner _runner;
