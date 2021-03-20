@@ -22,7 +22,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             "This project has custom imports that are not accepted by try-convert",
             "is an unsupported project type. Not all project type guids are supported.",
-            "has invalid Project Type Guids for test projects and is not supported."
+            "has invalid Project Type Guids for test projects and is not supported.",
+            "is a coded UI test. Coded UI tests are deprecated and not convertable to .NET Core.",
+            "is an unsupported MSTest test type. Only Unit Tests are supported.",
+            "does not have a supported OutputType."
         };
 
         private readonly IProcessRunner _runner;
