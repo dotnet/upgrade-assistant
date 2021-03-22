@@ -5,7 +5,7 @@ using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    internal static class NuGetExtensions
+    public static class NuGetExtensions
     {
         public static NuGetVersion? GetNuGetVersion(this NuGetReference nugetRef)
         {
