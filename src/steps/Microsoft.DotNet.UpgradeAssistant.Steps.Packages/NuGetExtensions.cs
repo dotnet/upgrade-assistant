@@ -11,10 +11,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             if (nugetRef.HasWildcardVersion)
             {
+                if (FloatRange.TryParse(nugetRef.Version, out var range))
+                {
+                    if (range.HasMinVersion)
+                    {
+                        return range.MinVersion;
+                    }
+                }
+
                 return null;
             }
 
-            return NuGetVersion.Parse(nugetRef.Version);
+            if (NuGetVersion.TryParse(nugetRef.Version, out var version))
+            {
+                return version;
+            }
+
+            return null;
         }
     }
 }
