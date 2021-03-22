@@ -7,7 +7,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public record NuGetReference(string Name, string Version)
     {
-        public bool HasWildcardVersion => Version.Contains("*");
+        public bool HasWildcardVersion => Version.EndsWith("*", StringComparison.OrdinalIgnoreCase);
 
         public override string ToString()
         {

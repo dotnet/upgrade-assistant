@@ -11,8 +11,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             if (nugetRef.HasWildcardVersion)
             {
+                // https://docs.microsoft.com/en-us/nuget/concepts/dependency-resolution#floating-versions
+                // reference versions can be any of the following (*, 4.*, 6.0.*)
                 if (FloatRange.TryParse(nugetRef.Version, out var range))
                 {
+                    // when a range is used
                     if (range.HasMinVersion)
                     {
                         return range.MinVersion;
