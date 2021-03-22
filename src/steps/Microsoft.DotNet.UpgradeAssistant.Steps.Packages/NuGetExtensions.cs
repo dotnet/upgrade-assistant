@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
@@ -9,6 +10,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     {
         public static NuGetVersion? GetNuGetVersion(this NuGetReference nugetRef)
         {
+            if (nugetRef == null)
+            {
+                throw new ArgumentNullException(nameof(nugetRef));
+            }
+
             if (nugetRef.HasWildcardVersion)
             {
                 // https://docs.microsoft.com/en-us/nuget/concepts/dependency-resolution#floating-versions

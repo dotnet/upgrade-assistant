@@ -5,6 +5,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests
 {
     public class NuGetExtensionsTests
     {
+
+        [Fact]
+        public void GetNuGetVersionThrowsWhenNull()
+        {
+            NuGetReference reference = default;
+
+            Assert.Throws<ArgumentNullException>(() => reference!.GetNuGetVersion());
+        }
+
         [InlineData("6.0.*")]
         [InlineData("4.*")]
         [InlineData("*")]
