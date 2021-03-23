@@ -13,25 +13,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests
             Assert.Throws<ArgumentNullException>(() => reference!.GetNuGetVersion());
         }
 
-        [InlineData("6.0.*")]
-        [InlineData("4.*")]
-        [InlineData("*")]
+        [InlineData("6.0.*", "6.0.0")]
+        [InlineData("4.*", "4.0")]
+        [InlineData("*", "0.0")]
         [Theory]
-        public void GetNuGetVersionCanHandleFloatingVersions(string version)
+        public void GetNuGetVersionCanHandleFloatingVersions(string versionToTest, string expectedVersion)
         {
-            if (version == null)
+            if (versionToTest == null)
             {
-                throw new ArgumentNullException(nameof(version));
+                throw new ArgumentNullException(nameof(versionToTest));
             }
 
-            var indexOfWildCard = version.IndexOf("*", StringComparison.Ordinal);
-            var expectedVersion = version.Substring(0, indexOfWildCard) + "0";
-            if (version.Equals("*", StringComparison.Ordinal))
+            if (expectedVersion == null)
             {
-                expectedVersion = "0.0";
+                throw new ArgumentNullException(nameof(expectedVersion));
             }
 
-            var reference = new NuGetReference("Example", version);
+            var reference = new NuGetReference("Example", versionToTest);
 
             var actualVersion = reference.GetNuGetVersion();
 
