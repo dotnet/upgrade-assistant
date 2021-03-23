@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <IsTestProject>true</IsTestProject>
@@ -16,6 +16,7 @@
     <PackageReference Include="AutoFixture" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="NuGet.Versioning" />
     <ProjectReference Include="..\..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj" />
   </ItemGroup>
 </Project>
