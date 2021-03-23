@@ -6,9 +6,6 @@
   "tools": {
     "dotnet": "6.0.100-preview.2.21155.3",
     "runtimes": {
-      "dotnet/x86": [
-        "5.0.3"
-      ],
       "dotnet/x64": [
         "5.0.3"
       ]
