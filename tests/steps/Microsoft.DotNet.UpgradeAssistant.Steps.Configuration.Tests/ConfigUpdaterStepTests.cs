@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 
             // Assert
             Assert.Equal(expectedConfigPaths.Select(f => XDocument.Load(f, LoadOptions.SetLineInfo).ToString()).ToArray(), step.ConfigFiles.Select(c => c.Contents.ToString()).ToArray());
-            Assert.Equal(expectedConfigPaths.Select(f => Path.Combine(".", f)).ToArray(), step.ConfigFiles.Select(c => c.Path).ToArray());
+            Assert.Equal(expectedConfigPaths.Select(f => new FileInfo(f).FullName).ToArray(), step.ConfigFiles.Select(c => c.Path).ToArray());
             if (incompleteConfigUpdaterCount > 0)
             {
                 Assert.Equal(UpgradeStepStatus.Incomplete, step.Status);

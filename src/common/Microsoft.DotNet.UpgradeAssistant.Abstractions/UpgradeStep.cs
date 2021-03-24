@@ -121,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             try
             {
-                ProjectInitializedAgainst = context.CurrentProject?.FileInfo.FullName;
+                ProjectInitializedAgainst = context.CurrentProject?.FileInfo?.FullName;
                 (Status, StatusDetails, Risk) = await InitializeImplAsync(context, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
