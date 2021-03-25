@@ -183,9 +183,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token)
         {
-            var targetItemPath = GetPathRelativeToProject(itemName, Directory);
+            var targetItemPath = GetPathRelativeToProject(itemName, FileInfo.DirectoryName ?? string.Empty);
             var candidateItems = Project.Items
-                .Where(i => GetPathRelativeToProject(i.EvaluatedInclude, Directory).Equals(targetItemPath, StringComparison.OrdinalIgnoreCase));
+                .Where(i => GetPathRelativeToProject(i.EvaluatedInclude, FileInfo.DirectoryName ?? string.Empty).Equals(targetItemPath, StringComparison.OrdinalIgnoreCase));
 
             if (itemType is not null)
             {

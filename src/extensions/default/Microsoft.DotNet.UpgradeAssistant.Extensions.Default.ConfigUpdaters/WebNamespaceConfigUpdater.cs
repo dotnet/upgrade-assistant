@@ -72,7 +72,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                     viewImportsContents.Insert(0, $"{RazorUsingPrefix}{ns}");
                 }
 
-                var path = _viewImportsPath ?? Path.Combine(project.FileInfo.DirectoryName, ViewImportsRelativePath);
+                var path = _viewImportsPath ?? Path.Combine(project.FileInfo.DirectoryName ?? string.Empty, ViewImportsRelativePath);
                 File.WriteAllLines(path, viewImportsContents);
                 _logger.LogInformation("View imports written to {ViewImportsPath}", path);
 

@@ -23,8 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public FileInfo FileInfo { get; }
 
-        public string Directory => FileInfo.Directory!.FullName;
-
         public MSBuildProject(MSBuildWorkspaceUpgradeContext context, IComponentIdentifier componentIdentifier, FileInfo file, ILogger logger)
         {
             FileInfo = file;
@@ -182,7 +180,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 if (!Path.IsPathFullyQualified(lockFilePath))
                 {
-                    lockFilePath = Path.Combine(Directory, lockFilePath);
+                    lockFilePath = Path.Combine(FileInfo.DirectoryName ?? string.Empty, lockFilePath);
                 }
 
                 return lockFilePath;
