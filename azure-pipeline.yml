@@ -89,8 +89,6 @@ stages:
               arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
-        - script: dotnet --list-sdks
-          displayName: List SDKs
         - script: eng\common\cibuild.cmd
             -configuration $(_BuildConfig) 
             -prepareMachine
