@@ -79,7 +79,7 @@ stages:
           inputs:
             packageType: sdk
             version: 5.0.103
-            installationPath: $(Agent.ToolsDirectory)/dotnet
+            installationPath: $(Build.SourcesDirectory)/.dotnet
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
           - task: PowerShell@2
             displayName: Setup Private Feeds Credentials
