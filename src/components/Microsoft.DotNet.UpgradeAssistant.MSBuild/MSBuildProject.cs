@@ -197,7 +197,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     // Currently only supporting non-multi-targeting scenarios
                     return GetTfms("TargetFramework")
+#pragma warning disable CA1507 // Use nameof to express symbol names
                         .Concat(GetTfms("TargetFrameworks"))
+#pragma warning restore CA1507 // Use nameof to express symbol names
                         .Select(t => new TargetFrameworkMoniker(t));
                 }
                 else

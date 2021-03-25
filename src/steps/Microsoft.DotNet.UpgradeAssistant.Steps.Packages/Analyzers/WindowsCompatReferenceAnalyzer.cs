@@ -26,15 +26,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
-            if (!project.Required().TargetFrameworks.Any(tfm => tfm.IsWindows))
+            if (project is null)
             {
-                return state;
+                throw new ArgumentNullException(nameof(project));
             }
 
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
+
+            if (!project.TargetFrameworks.Any(tfm => tfm.IsWindows))
+            {
+                return state;
+            }
+
 
             if (project.IsTransitivelyAvailable(PackageName))
             {
