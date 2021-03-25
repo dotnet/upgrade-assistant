@@ -144,8 +144,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         }
 
         // Consider a project completely upgraded if it is SDK-style and has a TFM equal to (or greater then) the expected one
-        private bool IsCompleted(IUpgradeContext context, IProject project) =>
-            project.GetFile().IsSdk && _tfmComparer.IsCompatible(project.TFM, _tfmSelector.SelectTFM(project));
+        private bool IsCompleted(IUpgradeContext context, IProject project)
+        {
+            if (!project.GetFile().IsSdk)
+            {
+                return false;
+            }
+
+            var expectedTfm = _tfmSelector.SelectTFM(project);
+
+            return project.TFM.Any(tfm => _tfmComparer.IsCompatible(tfm, expectedTfm));
+        }
 
         private async Task<IProject> GetProject(IUpgradeContext context, Func<IUpgradeContext, IProject, bool> isProjectCompleted, CancellationToken token)
         {

@@ -136,39 +136,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public IEnumerable<NuGetReference> TransitivePackageReferences
+        public IEnumerable<NuGetReference> GetTransitivePackageReferences(TargetFrameworkMoniker tfm)
         {
-            get
+            if (PackageReferenceFormat != NugetPackageFormat.PackageReference)
             {
-                return PackageReferences.Concat(GetTransitiveDependencies()).Distinct();
-
-                IEnumerable<NuGetReference> GetTransitiveDependencies()
-                {
-                    if (PackageReferenceFormat != NugetPackageFormat.PackageReference)
-                    {
-                        return Enumerable.Empty<NuGetReference>();
-                    }
-
-                    var tfm = NuGetFramework.Parse(TFM.Name);
-                    var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
-
-                    if (lockFile is null)
-                    {
-                        throw new ProjectRestoreRequiredException($"Project is not restored: {FilePath}");
-                    }
-
-                    var lockFileTarget = lockFile
-                        .Targets
-                        .FirstOrDefault(t => t.TargetFramework.DotNetFrameworkName.Equals(tfm.DotNetFrameworkName, StringComparison.Ordinal));
-
-                    if (lockFileTarget is null)
-                    {
-                        throw new ProjectRestoreRequiredException($"Could not find {tfm.DotNetFrameworkName} in {LockFilePath} for {FilePath}");
-                    }
-
-                    return lockFileTarget.Libraries.Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
-                }
+                return Enumerable.Empty<NuGetReference>();
             }
+
+            var parsedTfm = NuGetFramework.Parse(tfm.Name);
+            var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+
+            if (lockFile is null)
+            {
+                throw new ProjectRestoreRequiredException($"Project is not restored: {FilePath}");
+            }
+
+            var lockFileTarget = lockFile
+                .Targets
+                .FirstOrDefault(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal));
+
+            if (lockFileTarget is null)
+            {
+                throw new ProjectRestoreRequiredException($"Could not find {parsedTfm.DotNetFrameworkName} in {LockFilePath} for {FilePath}");
+            }
+
+            return lockFileTarget.Libraries.Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
         }
 
         public string? LockFilePath
@@ -197,34 +189,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public IEnumerable<Reference> References =>
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
-        public TargetFrameworkMoniker TFM
+        public IEnumerable<TargetFrameworkMoniker> TFM
         {
             get
             {
                 if (IsSdk)
                 {
                     // Currently only supporting non-multi-targeting scenarios
-                    return new TargetFrameworkMoniker(GetSingleTFMProperty("TargetFramework"));
+                    return GetTfms("TargetFramework")
+                        .Concat(GetTfms("TargetFrameworks"))
+                        .Select(t => new TargetFrameworkMoniker(t));
                 }
                 else
                 {
                     // Non-SDK projects should have exactly one TargetFrameworkVersion property
-                    return Context.TfmFactory.GetTFMForNetFxVersion(GetSingleTFMProperty("TargetFrameworkVersion"));
+                    return GetTfms("TargetFrameworkVersion").Select(Context.TfmFactory.GetTFMForNetFxVersion);
                 }
 
-                string GetSingleTFMProperty(string propertyName)
-                {
-                    var targetFrameworkProperties = ProjectRoot.Properties.Where(e => e.Name.Equals(propertyName, StringComparison.Ordinal));
-                    var propCount = targetFrameworkProperties.Count();
-
-                    if (propCount != 1)
-                    {
-                        _logger.LogError("Expected project to have exactly one {PropertyName} property. Found {TargetFrameworkCount} TargetFramework properties for project {Project}.", propertyName, propCount, FilePath);
-                        throw new UpgradeException($"Expected project to have exactly one {propertyName} property. Found {propCount} TargetFramework properties for project {FilePath}.");
-                    }
-
-                    return targetFrameworkProperties.Single().Value;
-                }
+                IEnumerable<string> GetTfms(string propertyName)
+                    => ProjectRoot.Properties
+                        .Where(e => e.Name.Equals(propertyName, StringComparison.Ordinal))
+                        .SelectMany(t => t.Value.Split(';'));
             }
         }
 

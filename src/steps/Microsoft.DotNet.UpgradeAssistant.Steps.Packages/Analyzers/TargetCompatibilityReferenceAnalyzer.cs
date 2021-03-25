@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return state;
         }
 
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, TargetFrameworkMoniker targetFramework, CancellationToken token)
+        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, IEnumerable<TargetFrameworkMoniker> targetFramework, CancellationToken token)
         {
             var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, true, token).ConfigureAwait(false);
 

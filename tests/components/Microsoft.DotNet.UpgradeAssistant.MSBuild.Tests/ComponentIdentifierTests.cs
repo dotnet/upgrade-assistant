@@ -189,7 +189,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
-            project.Setup(p => p.TransitivePackageReferences).Returns(dependencies);
+            project.Setup(p => p.GetTransitivePackageReferences()).Returns(dependencies);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 

@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         private static IProject GetValidProject()
         {
             var project = new Mock<IProject>();
-            project.Setup(p => p.TFM).Returns(new TargetFrameworkMoniker("net5.0"));
+            project.Setup(p => p.TFM).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
 
             return project.Object;
         }

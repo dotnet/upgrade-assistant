@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -68,36 +69,53 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var tfm = new TargetFrameworkMoniker(tfmName);
             foreach (var dep in project.ProjectReferences)
             {
-                try
+                foreach (var depTFM in dep.TFM)
                 {
-                    if (_tfmComparer.IsCompatible(tfm, dep.TFM))
+                    try
                     {
-                        continue;
-                    }
+                        if (_tfmComparer.IsCompatible(tfm, depTFM))
+                        {
+                            continue;
+                        }
 
-                    if (dep.TFM.IsNetCore || dep.TFM.IsNetStandard)
-                    {
-                        tfm = dep.TFM;
-                        _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FilePath, dep.FilePath);
+                        if (depTFM.IsNetCore || depTFM.IsNetStandard)
+                        {
+                            tfm = depTFM;
+                            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FilePath, dep.FilePath);
+                        }
                     }
-                }
-                catch (UpgradeException)
-                {
-                    _logger.LogWarning($"Unable to determine TFM for dependency {dep.FilePath}; TFM for {project.FilePath} may not be correct.");
+                    catch (UpgradeException)
+                    {
+                        _logger.LogWarning($"Unable to determine TFM for dependency {dep.FilePath}; TFM for {project.FilePath} may not be correct.");
+                    }
                 }
             }
 
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
 
             // Ensure we don't downgrade a project
-            return _tfmComparer.Compare(project.TFM, tfm) > 0 ? project.TFM : tfm;
+            foreach (var t in project.TFM)
+            {
+                if (_tfmComparer.Compare(t, tfm) > 0)
+                {
+                    return t;
+                }
+            }
+
+            return tfm;
         }
 
         private static string GetNetStandardTFM(IProject project)
         {
-            var currentTfm = project.TFM;
+            foreach (var currentTfm in project.TFM)
+            {
+                if (currentTfm.IsNetStandard)
+                {
+                    return currentTfm.Name;
+                }
+            }
 
-            return currentTfm?.IsNetStandard ?? false ? currentTfm.Name : NetStandardTFM;
+            return NetStandardTFM;
         }
     }
 }
