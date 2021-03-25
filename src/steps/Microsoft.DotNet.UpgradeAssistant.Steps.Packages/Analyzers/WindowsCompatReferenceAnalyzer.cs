@@ -41,7 +41,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-
             if (project.IsTransitivelyAvailable(PackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
