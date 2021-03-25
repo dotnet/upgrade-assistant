@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
 
             IProject? FindProject(string? path)
-                => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FilePath) == path);
+                => path is null ? null : context.Projects.FirstOrDefault(p => NormalizePath(p.FileInfo.FullName) == path);
         }
 
         private async ValueTask<UpgradeState?> GetStateAsync(CancellationToken token)
@@ -88,12 +88,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             var state = new UpgradeState
             {
-                EntryPoint = NormalizePath(context.EntryPoint?.FilePath),
-                CurrentProject = NormalizePath(context.CurrentProject?.FilePath),
+                EntryPoint = NormalizePath(context.EntryPoint?.FileInfo),
+                CurrentProject = NormalizePath(context.CurrentProject?.FileInfo),
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
         }
+
+        private static string NormalizePath(FileInfo? file) => file is null ? string.Empty : file.Name;
 
         private static string NormalizePath(string? path) => path is null ? string.Empty : Path.GetFileName(path);
 

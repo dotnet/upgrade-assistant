@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 var project = projects[0];
                 context.SetEntryPoint(project);
 
-                Logger.LogInformation("Setting entrypoint to only project in solution: {Project}", project.FilePath);
+                Logger.LogInformation("Setting entrypoint to only project in solution: {Project}", project.FileInfo);
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected only project.", BuildBreakRisk.None);
             }
@@ -89,17 +89,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             // other dependencies were loaded along with it.
             if (!context.InputIsSolution)
             {
-                var project = projects.First(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase));
+                var project = projects.First(i => i.FileInfo.Name.Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase));
                 context.SetEntryPoint(project);
 
-                Logger.LogInformation("Setting entrypoint to user selected project: {Project}", project.FilePath);
+                Logger.LogInformation("Setting entrypoint to user selected project: {Project}", project.FileInfo);
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
             }
 
             if (!string.IsNullOrEmpty(_entryPoint))
             {
-                var entryPointProject = projects.FirstOrDefault(i => Path.GetFileName(i.FilePath).Equals(_entryPoint, StringComparison.OrdinalIgnoreCase));
+                var entryPointProject = projects.FirstOrDefault(i => i.FileInfo.Name.Equals(_entryPoint, StringComparison.OrdinalIgnoreCase));
                 if (entryPointProject is not null)
                 {
                     context.SetEntryPoint(entryPointProject);

@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Reporting
                     .Select(generator => generator.GenerateContentAsync(project, token));
                 var sections = await Task.WhenAll(sectionTasks).ConfigureAwait(false);
 
-                yield return new Page(Path.GetFileName(project.FilePath))
+                yield return new Page(project.FileInfo.Name)
                 {
                     Content = sections
                 };

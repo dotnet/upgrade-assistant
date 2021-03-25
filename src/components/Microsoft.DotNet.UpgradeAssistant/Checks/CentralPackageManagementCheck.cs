@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
             if (bool.TryParse(projectRoot.GetPropertyValue("EnableCentralPackageVersions"), out var result) && result)
             {
-                _logger.LogError("Project {Name} uses EnableCentralPackageVersions which is not currently supported. Please see https://github.com/dotnet/upgrade-assistant/issues/252 to request this feature.", project.FilePath);
+                _logger.LogError("Project {Name} uses EnableCentralPackageVersions which is not currently supported. Please see https://github.com/dotnet/upgrade-assistant/issues/252 to request this feature.", project.FileInfo);
                 return Task.FromResult(false);
             }
             else

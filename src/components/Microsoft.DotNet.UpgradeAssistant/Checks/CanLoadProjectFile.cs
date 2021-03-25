@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                _logger.LogError("Project {Name} can not be loaded: {Message}", project.FilePath, e.Message);
+                _logger.LogError("Project {Name} can not be loaded: {Message}", project.FileInfo, e.Message);
                 return Task.FromResult(false);
             }
         }

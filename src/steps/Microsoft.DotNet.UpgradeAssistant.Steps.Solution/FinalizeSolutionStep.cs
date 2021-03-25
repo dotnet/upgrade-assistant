@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             }
             else
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Finalize upgrade of entry point {context.EntryPoint.FilePath}", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Finalize upgrade of entry point {context.EntryPoint.FileInfo}", BuildBreakRisk.None));
             }
         }
 

@@ -20,8 +20,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
 
-        private string? _entryPointPath;
-        private string? _projectPath;
+        private FileInfo? _entryPointPath;
+        private FileInfo? _projectPath;
 
         private MSBuildWorkspace? _workspace;
 
@@ -91,16 +91,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ProjectCollection.Dispose();
         }
 
-        public IProject GetOrAddProject(string path)
+        public IProject GetOrAddProject(FileInfo path)
         {
-            if (_projectCache.TryGetValue(path, out var cached))
+            if (_projectCache.TryGetValue(path.FullName, out var cached))
             {
                 return cached;
             }
 
             var project = new MSBuildProject(this, _componentIdentifier, path, _logger);
 
-            _projectCache.Add(path, project);
+            _projectCache.Add(path.FullName, project);
 
             return project;
         }
@@ -118,7 +118,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public void SetEntryPoint(IProject? entryPoint) => _entryPointPath = entryPoint?.FilePath;
+        public void SetEntryPoint(IProject? entryPoint) => _entryPointPath = entryPoint?.FileInfo;
 
         public IEnumerable<IProject> Projects
         {
@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     }
                     else
                     {
-                        yield return GetOrAddProject(project.FilePath);
+                        yield return GetOrAddProject(new FileInfo(project.FilePath));
                     }
                 }
             }
@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void SetCurrentProject(IProject? project)
         {
-            _projectPath = project?.FilePath;
+            _projectPath = project?.FileInfo;
         }
 
         public bool UpdateSolution(Solution updatedSolution)

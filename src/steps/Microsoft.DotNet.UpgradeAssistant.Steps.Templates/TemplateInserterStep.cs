@@ -106,8 +106,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogCritical(exc, "Unexpected exception initializing template inserter step for: {ProjectPath}", project.FilePath);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception initializing template inserter step for: {project.FilePath}", BuildBreakRisk.Unknown);
+                Logger.LogCritical(exc, "Unexpected exception initializing template inserter step for: {ProjectPath}", project.FileInfo);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception initializing template inserter step for: {project.FileInfo}", BuildBreakRisk.Unknown);
             }
         }
 
@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             // For each item to be added, make necessary replacements and then add the item to the project
             foreach (var item in _itemsToAdd.Values)
             {
-                var filePath = Path.Combine(project.Directory, item.Path);
+                var filePath = Path.Combine(project.FileInfo.DirectoryName, item.Path);
 
                 // If the file already exists, move it
                 if (File.Exists(filePath))
