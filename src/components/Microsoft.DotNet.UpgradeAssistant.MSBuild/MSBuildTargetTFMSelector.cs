@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var tfm = new TargetFrameworkMoniker(tfmName);
             foreach (var dep in project.ProjectReferences)
             {
-                foreach (var depTFM in dep.TFM)
+                foreach (var depTFM in dep.TargetFrameworks)
                 {
                     try
                     {
@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
 
             // Ensure we don't downgrade a project
-            foreach (var t in project.TFM)
+            foreach (var t in project.TargetFrameworks)
             {
                 if (_tfmComparer.Compare(t, tfm) > 0)
                 {
@@ -107,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private static string GetNetStandardTFM(IProject project)
         {
-            foreach (var currentTfm in project.TFM)
+            foreach (var currentTfm in project.TargetFrameworks)
             {
                 if (currentTfm.IsNetStandard)
                 {

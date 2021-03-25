@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             var expectedTfm = _tfmSelector.SelectTFM(project);
 
-            return project.TFM.Any(tfm => _tfmComparer.IsCompatible(tfm, expectedTfm));
+            return project.TargetFrameworks.Any(tfm => _tfmComparer.IsCompatible(tfm, expectedTfm));
         }
 
         private async Task<IProject> GetProject(IUpgradeContext context, Func<IUpgradeContext, IProject, bool> isProjectCompleted, CancellationToken token)

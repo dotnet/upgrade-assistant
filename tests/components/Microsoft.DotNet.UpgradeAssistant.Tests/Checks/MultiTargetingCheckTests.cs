@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         private static IProject GetValidProject()
         {
             var project = new Mock<IProject>();
-            project.Setup(p => p.TFM).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
+            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
 
             return project.Object;
         }
@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         private static IProject GetInvalidProject()
         {
             var project = new Mock<IProject>();
-            project.Setup(p => p.TFM).Throws<UpgradeException>();
+            project.Setup(p => p.TargetFrameworks).Throws<UpgradeException>();
 
             return project.Object;
         }

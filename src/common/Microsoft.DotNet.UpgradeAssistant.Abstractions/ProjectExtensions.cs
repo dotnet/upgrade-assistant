@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             => project ?? throw new InvalidOperationException("Project cannot be null");
 
         public static IEnumerable<NuGetReference> GetTransitivePackageReferences(this IProject project)
-            => project.Required().TFM
+            => project.Required().TargetFrameworks
                 .SelectMany(tfm => project.GetTransitivePackageReferences(tfm))
                 .Distinct();
 

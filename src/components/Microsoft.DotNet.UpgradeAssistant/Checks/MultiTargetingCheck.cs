@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
             try
             {
-                var tfm = project.TFM;
+                var tfm = project.TargetFrameworks;
                 _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FilePath, tfm);
                 return Task.FromResult(true);
             }

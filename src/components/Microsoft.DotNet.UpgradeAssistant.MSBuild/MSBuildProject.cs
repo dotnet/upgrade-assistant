@@ -189,7 +189,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public IEnumerable<Reference> References =>
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
-        public IEnumerable<TargetFrameworkMoniker> TFM
+        public IEnumerable<TargetFrameworkMoniker> TargetFrameworks
         {
             get
             {

@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var currentTFM = project.Required().TFM;
+            var currentTFM = project.Required().TargetFrameworks;
 
             foreach (var packageReference in project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {

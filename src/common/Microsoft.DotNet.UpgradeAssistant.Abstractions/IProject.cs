@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IEnumerable<Reference> References { get; }
 
-        IEnumerable<TargetFrameworkMoniker> TFM { get; }
+        IEnumerable<TargetFrameworkMoniker> TargetFrameworks { get; }
 
         ProjectComponents Components { get; }
 

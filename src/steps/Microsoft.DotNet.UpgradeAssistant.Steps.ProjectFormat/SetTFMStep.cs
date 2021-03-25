@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             var project = context.CurrentProject.Required();
             var targetTfm = _tfmSelector.SelectTFM(project);
 
-            if (project.TFM.Any(tfm => tfm == targetTfm))
+            if (project.TargetFrameworks.Any(tfm => tfm == targetTfm))
             {
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None));
             }

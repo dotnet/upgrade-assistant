@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var currentTFM = project.TFM;
+            var currentTFM = project.TargetFrameworks;
 
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
             var allPackageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);

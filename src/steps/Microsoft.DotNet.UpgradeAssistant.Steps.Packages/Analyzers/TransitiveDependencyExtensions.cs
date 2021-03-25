@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     internal static class TransitiveDependencyExtensions
     {
         public static bool IsTransitivelyAvailable(this IProject project, string packageName)
-            => project.TFM.Any(tfm => project.IsTransitivelyAvailable(packageName, tfm));
+            => project.TargetFrameworks.Any(tfm => project.IsTransitivelyAvailable(packageName, tfm));
 
         public static bool IsTransitivelyAvailable(this IProject project, string packageName, TargetFrameworkMoniker tfm)
             => project.ContainsDependency(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase));
@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             => project.ContainsDependency(tfm, d => d.ReferenceSatisfiesDependency(nugetReference, true));
 
         public static bool IsTransitiveDependency(this IProject project, NuGetReference nugetReference)
-            => project.TFM.Any(tfm => project.ContainsDependency(tfm, d => d.ReferenceSatisfiesDependency(nugetReference, true)));
+            => project.TargetFrameworks.Any(tfm => project.ContainsDependency(tfm, d => d.ReferenceSatisfiesDependency(nugetReference, true)));
 
         private static bool ReferenceSatisfiesDependency(this PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
