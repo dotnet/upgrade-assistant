@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -64,42 +65,41 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FilePath, project.Components, project.OutputType);
 
-            // If the project depends on another project with a higher version NetCore or NetStandard TFM,
-            // use that TFM instead.
-            var tfm = new TargetFrameworkMoniker(tfmName);
-            foreach (var dep in project.ProjectReferences)
-            {
-                foreach (var depTFM in dep.TargetFrameworks)
-                {
-                    try
-                    {
-                        if (_tfmComparer.IsCompatible(tfm, depTFM))
-                        {
-                            continue;
-                        }
-
-                        if (depTFM.IsNetCore || depTFM.IsNetStandard)
-                        {
-                            tfm = depTFM;
-                            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FilePath, dep.FilePath);
-                        }
-                    }
-                    catch (UpgradeException)
-                    {
-                        _logger.LogWarning($"Unable to determine TFM for dependency {dep.FilePath}; TFM for {project.FilePath} may not be correct.");
-                    }
-                }
-            }
+            var tfm = EnsureProjectDependenciesNoDowngrade(tfmName, project);
 
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
 
             // Ensure we don't downgrade a project
-            foreach (var t in project.TargetFrameworks)
+            return GetBestMatch(tfm, project.TargetFrameworks);
+        }
+
+        private TargetFrameworkMoniker GetBestMatch(TargetFrameworkMoniker tfm, IEnumerable<TargetFrameworkMoniker> others)
+        {
+            foreach (var t in others)
             {
                 if (_tfmComparer.Compare(t, tfm) > 0)
                 {
                     return t;
                 }
+            }
+
+            return tfm;
+        }
+
+        public TargetFrameworkMoniker EnsureProjectDependenciesNoDowngrade(string tfmName, IProject project)
+        {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            // If the project depends on another project with a higher version NetCore or NetStandard TFM,
+            // use that TFM instead.
+            var tfm = new TargetFrameworkMoniker(tfmName);
+
+            foreach (var dep in project.ProjectReferences)
+            {
+                tfm = GetBestMatch(tfm, dep.TargetFrameworks);
             }
 
             return tfm;
