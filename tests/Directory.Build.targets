@@ -1,3 +1,6 @@
 <Project>
+  <ItemGroup>
+    <PackageReference Include="Autofixture" />
+  </ItemGroup>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 </Project>
