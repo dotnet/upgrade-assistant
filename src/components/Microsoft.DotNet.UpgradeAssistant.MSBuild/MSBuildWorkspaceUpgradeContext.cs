@@ -42,13 +42,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public ITargetFrameworkMonikerFactory TfmFactory { get; }
-
         public bool IsComplete { get; set; }
 
         public MSBuildWorkspaceUpgradeContext(
             UpgradeOptions options,
-            ITargetFrameworkMonikerFactory tfmFactory,
             IVisualStudioFinder vsFinder,
             IComponentIdentifier componentIdentifier,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
@@ -65,7 +62,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
             InputPath = options.ProjectPath;
-            TfmFactory = tfmFactory ?? throw new ArgumentNullException(nameof(tfmFactory));
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 

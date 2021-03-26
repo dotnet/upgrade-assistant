@@ -2,22 +2,23 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
-    public class MultiTargetingCheck : IUpgradeReadyCheck
+    public class TargetFrameworkCheck : IUpgradeReadyCheck
     {
-        private readonly ILogger<MultiTargetingCheck> _logger;
+        private readonly ILogger<TargetFrameworkCheck> _logger;
 
-        public MultiTargetingCheck(ILogger<MultiTargetingCheck> logger)
+        public TargetFrameworkCheck(ILogger<TargetFrameworkCheck> logger)
         {
             _logger = logger;
         }
 
-        public string Id => nameof(MultiTargetingCheck);
+        public string Id => nameof(TargetFrameworkCheck);
 
         public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
         {
@@ -26,15 +27,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
                 throw new ArgumentNullException(nameof(project));
             }
 
-            try
+            var tfms = project.TargetFrameworks;
+
+            if (tfms.Count == 1)
             {
-                var tfm = project.TargetFrameworks;
-                _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FilePath, tfm);
+                _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FilePath, tfms.First());
                 return Task.FromResult(true);
             }
-            catch (UpgradeException)
+            else
             {
-                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one <TargetFramework> or <TargetFrameworkVersion> property. Multi-targeted projects are not yet supported.", project.FilePath);
+                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. Multi-targeted projects are not yet supported.", project.FilePath);
                 return Task.FromResult(false);
             }
         }

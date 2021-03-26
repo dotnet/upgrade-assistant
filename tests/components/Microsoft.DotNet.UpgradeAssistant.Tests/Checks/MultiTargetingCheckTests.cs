@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            var readyCheck = mock.Create<MultiTargetingCheck>();
+            var readyCheck = mock.Create<TargetFrameworkCheck>();
 
             // Act
             var result = await readyCheck.IsReadyAsync(project, CancellationToken.None).ConfigureAwait(false);

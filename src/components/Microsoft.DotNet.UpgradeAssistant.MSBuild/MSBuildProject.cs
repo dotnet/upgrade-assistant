@@ -189,31 +189,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public IEnumerable<Reference> References =>
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
-        public IEnumerable<TargetFrameworkMoniker> TargetFrameworks
-        {
-            get
-            {
-                if (IsSdk)
-                {
-                    // Currently only supporting non-multi-targeting scenarios
-                    return GetTfms("TargetFramework")
-#pragma warning disable CA1507 // Use nameof to express symbol names
-                        .Concat(GetTfms("TargetFrameworks"))
-#pragma warning restore CA1507 // Use nameof to express symbol names
-                        .Select(t => new TargetFrameworkMoniker(t));
-                }
-                else
-                {
-                    // Non-SDK projects should have exactly one TargetFrameworkVersion property
-                    return GetTfms("TargetFrameworkVersion").Select(Context.TfmFactory.GetTFMForNetFxVersion);
-                }
-
-                IEnumerable<string> GetTfms(string propertyName)
-                    => ProjectRoot.Properties
-                        .Where(e => e.Name.Equals(propertyName, StringComparison.Ordinal))
-                        .SelectMany(t => t.Value.Split(';'));
-            }
-        }
+        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworksn => new TargetFrameworkMonikerCollection(this);
 
         IProjectFile IProject.GetFile() => this;
 
