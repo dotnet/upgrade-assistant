@@ -13,6 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         private const string DefaultCurrentTFMBase = "net5.0";
         private const string DefaultLTSTFMBase = "net5.0";
         private const string WindowsSuffix = "-windows";
+
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ILogger<TargetTFMSelector> _logger;
         private readonly string _currentTFMBase;
