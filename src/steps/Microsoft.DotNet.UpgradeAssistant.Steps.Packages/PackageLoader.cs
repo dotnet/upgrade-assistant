@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _packageSources = GetPackageSources(Path.GetDirectoryName(options.ProjectPath));
         }
 
-        public async Task<bool> DoesPackageSupportTargetFrameworkAsync(NuGetReference packageReference, string cachePath, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
+        public async Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, string cachePath, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
         {
             using var packageArchive = await GetPackageArchiveAsync(packageReference, token, cachePath).ConfigureAwait(false);
 
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             var packageFrameworks = await GetTargetFrameworksAsync(packageArchive, token).ConfigureAwait(false);
 
-            return packageFrameworks.Any(f => targetFrameworks.All(targetFramework => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(targetFramework.Name), f)));
+            return targetFrameworks.All(tfm => packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(tfm.Name), f)));
         }
 
         public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, bool latestMinorAndBuildOnly, CancellationToken token)
