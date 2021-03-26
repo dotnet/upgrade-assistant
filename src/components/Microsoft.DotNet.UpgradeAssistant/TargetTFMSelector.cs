@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             var tfm = EnsureProjectDependenciesNoDowngrade(tfmName, project);
 
-            _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FilePath);
+            _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FileInfo);
 
             // Ensure we don't downgrade a project
             return GetBestMatch(tfm, project.TargetFrameworks);

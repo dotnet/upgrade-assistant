@@ -142,10 +142,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var parsedTfm = NuGetFramework.Parse(tfm.Name);
             var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
 
-                    if (lockFile is null)
-                    {
-                        throw new ProjectRestoreRequiredException($"Project is not restored: {FileInfo}");
-                    }
+            if (lockFile is null)
+            {
+                throw new ProjectRestoreRequiredException($"Project is not restored: {FileInfo}");
+            }
 
             var lockFileTarget = lockFile
                 .Targets

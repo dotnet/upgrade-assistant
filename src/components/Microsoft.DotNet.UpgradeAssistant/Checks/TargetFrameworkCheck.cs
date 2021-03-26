@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
             if (tfms.Count == 1)
             {
-                _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FilePath, tfms.First());
+                _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FileInfo, tfms.First());
                 return Task.FromResult(true);
             }
             else
