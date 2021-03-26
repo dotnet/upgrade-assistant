@@ -2,15 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IProject
     {
-        string Directory { get; }
-
-        string FilePath { get; }
+        FileInfo FileInfo { get; }
 
         Language Language { get; }
 

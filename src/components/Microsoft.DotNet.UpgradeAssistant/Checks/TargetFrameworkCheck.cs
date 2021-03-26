@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             }
             else
             {
-                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. Multi-targeted projects are not yet supported.", project.FilePath);
+                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. Multi-targeted projects are not yet supported.", project.FileInfo);
                 return Task.FromResult(false);
             }
         }

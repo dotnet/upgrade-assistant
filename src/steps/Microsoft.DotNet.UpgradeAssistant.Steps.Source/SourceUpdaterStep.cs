@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             Project = context.CurrentProject.Required();
 
-            var projectPath = Project.FilePath;
+            var projectPath = Project.FileInfo;
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 

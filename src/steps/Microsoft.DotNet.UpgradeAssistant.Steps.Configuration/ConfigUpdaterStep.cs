@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
         protected override bool IsApplicableImpl(IUpgradeContext context) =>
             context?.CurrentProject is not null &&
             SubSteps.Any() &&
-            _configFilePaths.Select(p => Path.Combine(context.CurrentProject.Directory, p)).Any(f => File.Exists(f));
+            _configFilePaths.Select(p => Path.Combine(context.CurrentProject.FileInfo.DirectoryName, p)).Any(f => File.Exists(f));
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             var project = context.CurrentProject.Required();
 
-            var configPaths = _configFilePaths.Select(p => Path.Combine(project.Directory ?? string.Empty, p)).Where(p => File.Exists(p));
+            var configPaths = _configFilePaths.Select(p => Path.Combine(project.FileInfo.DirectoryName, p)).Where(p => File.Exists(p));
             Logger.LogDebug("Loading config files: {ConfigFiles}", string.Join(", ", configPaths));
             ConfigFiles = ImmutableArray.CreateRange(configPaths.Select(p => new ConfigFile(p)));
             Logger.LogDebug("Loaded {ConfigCount} config files", ConfigFiles.Length);

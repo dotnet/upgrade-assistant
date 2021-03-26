@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 }
             }
 
-            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FilePath, project.Components, project.OutputType);
+            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FileInfo, project.Components, project.OutputType);
 
             var tfm = EnsureProjectDependenciesNoDowngrade(tfmName, project);
 

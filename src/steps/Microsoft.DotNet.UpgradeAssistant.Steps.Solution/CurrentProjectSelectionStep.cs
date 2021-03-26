@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             var completeChecks = _orderedProjects.Select(async p => IsCompleted(context, p) || !await RunChecksAsync(p, token).ConfigureAwait(false));
             if ((await Task.WhenAll(completeChecks).ConfigureAwait(false)).All(b => b))
             {
-                Logger.LogInformation("No projects need upgraded for entry point {EntryPoint}", context.EntryPoint.FilePath);
+                Logger.LogInformation("No projects need upgraded for entry point {EntryPoint}", context.EntryPoint.FileInfo);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgraded", BuildBreakRisk.None);
             }
 
@@ -90,13 +90,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 // If there is only one project, it is the current project
                 newCurrentProject = _orderedProjects[0];
-                Logger.LogDebug("Setting only project in solution as the current project: {Project}", newCurrentProject.FilePath);
+                Logger.LogDebug("Setting only project in solution as the current project: {Project}", newCurrentProject.FileInfo);
             }
             else if (!context.InputIsSolution)
             {
                 // If the user has specified a particular project, only that should be the current project
-                newCurrentProject = _orderedProjects.Where(i => Path.GetFileName(i.FilePath).Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
-                Logger.LogDebug("Setting user-selected project as the current project: {Project}", newCurrentProject.FilePath);
+                newCurrentProject = _orderedProjects.Where(i => i.FileInfo.Name.Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase)).First();
+                Logger.LogDebug("Setting user-selected project as the current project: {Project}", newCurrentProject.FileInfo);
             }
 
             // If no current project has been found, then this step is incomplete
@@ -108,11 +108,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 if (IsCompleted(context, newCurrentProject))
                 {
-                    Logger.LogDebug("Project {Project} does not need upgraded", newCurrentProject.FilePath);
+                    Logger.LogDebug("Project {Project} does not need upgraded", newCurrentProject.FileInfo);
                 }
                 else if (!(await RunChecksAsync(newCurrentProject, token).ConfigureAwait(false)))
                 {
-                    Logger.LogError("Unable to upgrade project {Project}", newCurrentProject.FilePath);
+                    Logger.LogError("Unable to upgrade project {Project}", newCurrentProject.FileInfo);
                 }
                 else
                 {

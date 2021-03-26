@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -219,7 +220,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             });
 
             var project = mock.Mock<IProject>();
-            project.Setup(p => p.Directory).Returns(".");
+            project.Setup(p => p.FileInfo).Returns(new FileInfo("./test"));
             if (projectComponents.HasValue)
             {
                 project.Setup(p => p.Components).Returns(projectComponents.Value);

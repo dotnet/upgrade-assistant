@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return GetRestoreOutput(project);
         }
 
-        private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new ProjectInstance(project.FilePath, context.GlobalProperties, toolsVersion: null);
+        private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new ProjectInstance(project.FileInfo.FullName, context.GlobalProperties, toolsVersion: null);
 
         private static RestoreOutput GetRestoreOutput(IProject project)
         {
