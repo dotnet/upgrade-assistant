@@ -9,7 +9,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class TargetFrameworkMonikerCollection : IReadOnlyCollection<TargetFrameworkMoniker>
     {
-        private readonly string[] _tfms;
+        private const string SdkSingleTargetFramework = "TargetFramework";
+        private const string SdkMultipleTargetFrameworks = "TargetFrameworks";
+
+        private readonly IProjectFile _projectFile;
+
+        private string[]? _tfms;
 
         public TargetFrameworkMonikerCollection(IProjectFile projectFile)
         {
@@ -18,14 +23,55 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(projectFile));
             }
 
-            _tfms = GetFrameworkMonikers(projectFile);
+            _projectFile = projectFile;
         }
 
-        public int Count => _tfms.Length;
+        public void SetTargetFramework(TargetFrameworkMoniker tfm)
+        {
+            if (tfm is null)
+            {
+                throw new ArgumentNullException(nameof(tfm));
+            }
+
+            if (!_projectFile.IsSdk)
+            {
+                throw new InvalidOperationException("Project file only supports setting TFM on new style csproj");
+            }
+
+            _tfms = null;
+
+            if (!string.IsNullOrWhiteSpace(_projectFile.GetPropertyValue(SdkSingleTargetFramework)))
+            {
+                _projectFile.SetPropertyValue(SdkSingleTargetFramework, tfm.Name);
+            }
+            else if (!string.IsNullOrWhiteSpace(_projectFile.GetPropertyValue(SdkMultipleTargetFrameworks)))
+            {
+                _projectFile.SetPropertyValue(SdkMultipleTargetFrameworks, tfm.Name);
+            }
+            else
+            {
+                throw new InvalidOperationException("Could not find existing TFM node.");
+            }
+        }
+
+        private string[] RawValues
+        {
+            get
+            {
+                if (_tfms is null)
+                {
+                    _tfms = GetFrameworkMonikers(_projectFile);
+                }
+
+                return _tfms;
+            }
+        }
+
+        public int Count => RawValues.Length;
 
         public IEnumerator<TargetFrameworkMoniker> GetEnumerator()
         {
-            foreach (var tfm in _tfms)
+            foreach (var tfm in RawValues)
             {
                 yield return new TargetFrameworkMoniker(tfm);
             }
@@ -38,9 +84,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private static string[] GetSdkTargetFramework(IProjectFile file)
         {
-            const string SdkSingleTargetFramework = "TargetFramework";
-            const string SdkMultipleTargetFrameworks = "TargetFrameworks";
-
             var single = GetTfms(file, SdkSingleTargetFramework);
 
             if (single.Length > 0)

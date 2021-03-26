@@ -54,20 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IEnumerable<string> Imports => ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
 
-        public void SetTFM(TargetFrameworkMoniker tfm)
-        {
-            if (IsSdk)
-            {
-                var property = ProjectRoot.Properties
-                    .Single(e => e.Name == "TargetFramework");
-
-                property.Value = tfm.Name;
-            }
-            else
-            {
-                throw new NotImplementedException("Setting a TFM is only supported with SDK style projects");
-            }
-        }
+        public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this).SetTargetFramework(tfm);
 
         public void AddPackages(IEnumerable<NuGetReference> references)
         {
