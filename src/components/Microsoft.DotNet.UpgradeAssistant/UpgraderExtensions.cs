@@ -12,6 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddScoped<UpgraderManager>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
+            services.AddTransient<ITargetTFMSelector, TargetTFMSelector>();
             services.AddReadinessChecks();
         }
 

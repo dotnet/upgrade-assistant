@@ -189,7 +189,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public IEnumerable<Reference> References =>
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
-        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworksn => new TargetFrameworkMonikerCollection(this);
+        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks => new TargetFrameworkMonikerCollection(this);
 
         IProjectFile IProject.GetFile() => this;
 

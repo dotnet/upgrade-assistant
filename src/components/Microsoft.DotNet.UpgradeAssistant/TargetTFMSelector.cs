@@ -2,27 +2,26 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class MSBuildTargetTFMSelector : ITargetTFMSelector
+    public class TargetTFMSelector : ITargetTFMSelector
     {
         private const string NetStandardTFM = "netstandard2.0";
         private const string DefaultCurrentTFMBase = "net5.0";
         private const string DefaultLTSTFMBase = "net5.0";
         private const string WindowsSuffix = "-windows";
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
-        private readonly ILogger<MSBuildTargetTFMSelector> _logger;
+        private readonly ILogger<TargetTFMSelector> _logger;
         private readonly string _currentTFMBase;
         private readonly string _ltsTFMBase;
         private readonly UpgradeTarget _upgradeTarget;
 
         private string AppTFMBase => _upgradeTarget == UpgradeTarget.Current ? _currentTFMBase : _ltsTFMBase;
 
-        public MSBuildTargetTFMSelector(UpgradeOptions options, IOptions<TFMSelectorOptions> selectorOptions, ITargetFrameworkMonikerComparer tfmComparer, ILogger<MSBuildTargetTFMSelector> logger)
+        public TargetTFMSelector(UpgradeOptions options, IOptions<TFMSelectorOptions> selectorOptions, ITargetFrameworkMonikerComparer tfmComparer, ILogger<TargetTFMSelector> logger)
         {
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
