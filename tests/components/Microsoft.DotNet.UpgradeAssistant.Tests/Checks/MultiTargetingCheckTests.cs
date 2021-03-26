@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         [InlineData(1, true)]
         [InlineData(2, false)]
         [InlineData(3, false)]
+        [Theory]
         public async Task IsReadyTest(int tfmCount, bool isValid)
         {
             // Arrange
