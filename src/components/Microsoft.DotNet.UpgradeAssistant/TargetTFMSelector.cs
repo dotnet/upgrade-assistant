@@ -71,20 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FileInfo);
 
             // Ensure we don't downgrade a project
-            return GetBestMatch(tfm, project.TargetFrameworks);
-        }
-
-        private TargetFrameworkMoniker GetBestMatch(TargetFrameworkMoniker tfm, IEnumerable<TargetFrameworkMoniker> others)
-        {
-            foreach (var t in others)
-            {
-                if (_tfmComparer.Compare(t, tfm) > 0)
-                {
-                    return t;
-                }
-            }
-
-            return tfm;
+            return EnsureNoDowngrade(tfm, project.TargetFrameworks);
         }
 
         public TargetFrameworkMoniker EnsureProjectDependenciesNoDowngrade(string tfmName, IProject project)
@@ -94,21 +81,27 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 throw new ArgumentNullException(nameof(project));
             }
 
-            // If the project depends on another project with a higher version NetCore or NetStandard TFM,
-            // use that TFM instead.
             var tfm = new TargetFrameworkMoniker(tfmName);
 
             foreach (var dep in project.ProjectReferences)
             {
-                var min = dep.TargetFrameworks.OrderBy(t => t, _tfmComparer).FirstOrDefault();
+                tfm = EnsureNoDowngrade(tfm, dep.TargetFrameworks);
+            }
 
-                if (min is not null)
+            return tfm;
+        }
+
+        private TargetFrameworkMoniker EnsureNoDowngrade(TargetFrameworkMoniker tfm, IEnumerable<TargetFrameworkMoniker> others)
+        {
+            var min = others.OrderBy(t => t, _tfmComparer)
+                .Where(tfm => !tfm.IsFramework)
+                .FirstOrDefault();
+
+            if (min is not null)
+            {
+                if (_tfmComparer.Compare(min, tfm) > 0)
                 {
-
-                    if (_tfmComparer.Compare(min, tfm) > 0)
-                    {
-                        tfm = min;
-                    }
+                    tfm = min;
                 }
             }
 

@@ -126,6 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
                 {
                     _ when x == y => 0,
                     (Net45, _) => -1,
+                    (_, Net45) => 1,
                     (Preview, Current) => 1,
                     (Current, Preview) => -1,
                     (NetStandard20, NetStandard21) => -1,
