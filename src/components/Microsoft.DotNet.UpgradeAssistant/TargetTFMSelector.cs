@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -99,7 +100,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             foreach (var dep in project.ProjectReferences)
             {
-                tfm = GetBestMatch(tfm, dep.TargetFrameworks);
+                var min = dep.TargetFrameworks.OrderBy(t => t, _tfmComparer).FirstOrDefault();
+
+                if (min is not null)
+                {
+
+                    if (_tfmComparer.Compare(min, tfm) > 0)
+                    {
+                        tfm = min;
+                    }
+                }
             }
 
             return tfm;
