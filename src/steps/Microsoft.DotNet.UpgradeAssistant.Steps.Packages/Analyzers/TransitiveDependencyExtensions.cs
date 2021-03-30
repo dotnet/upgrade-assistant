@@ -13,8 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     internal static class TransitiveDependencyExtensions
     {
         public static bool IsTransitivelyAvailable(this IProject project, string packageName)
-            => project.TargetFrameworks.Any(tfm => project.IsTransitivelyAvailable(packageName, tfm));
-
+            // TODO - review mocking extension methods with the team
+            => !string.IsNullOrWhiteSpace(project.LockFilePath) && project.TargetFrameworks.Any(tfm => project.IsTransitivelyAvailable(packageName, tfm));
         public static bool IsTransitivelyAvailable(this IProject project, string packageName, TargetFrameworkMoniker tfm)
             => project.ContainsDependency(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase));
 
@@ -66,6 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         private static IEnumerable<LockFileTargetLibrary> GetAllDependencies(this IProject project, TargetFrameworkMoniker tfm)
         {
             var parsed = NuGetFramework.Parse(tfm.Name);
+
             var lockFileTarget = LockFileUtilities.GetLockFile(project.LockFilePath, NuGet.Common.NullLogger.Instance)
                 .Targets
                 .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsed.DotNetFrameworkName, StringComparison.Ordinal));

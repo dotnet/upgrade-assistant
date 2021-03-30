@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
+    /// <summary>
+    /// Increases backward compatibility by using the Newtonsoft Serializer for ASP.NET Core.
+    /// </summary>
     public class NewtonsoftReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
@@ -24,6 +27,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Limits the step from being applied to the wrong project types.
+        /// </summary>
+        /// <param name="project">The project whose NuGet package references should be analyzed.</param>
+        /// <param name="token">The token used to gracefully cancel this request.</param>
+        /// <returns>True if the project is a web project targeting ASP.NET Core.</returns>
+        public async Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
+        {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            // This reference only needs added to ASP.NET Core exes
+            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore) && project.OutputType == ProjectOutputType.Exe && !project.TargetFrameworks.Any(tfm => tfm.IsFramework)))
+            {
+                return false;
+            }
+
+            if (project.IsTransitivelyAvailable(NewtonsoftPackageName))
+            {
+                _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
             if (project is null)
@@ -36,15 +67,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            // This reference only needs added to ASP.NET Core exes
-            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore) && project.OutputType == ProjectOutputType.Exe))
+            if (!await IsApplicableAsync(project, token).ConfigureAwait(false))
             {
-                return state;
-            }
-
-            if (project.IsTransitivelyAvailable(NewtonsoftPackageName))
-            {
-                _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return state;
             }
 
