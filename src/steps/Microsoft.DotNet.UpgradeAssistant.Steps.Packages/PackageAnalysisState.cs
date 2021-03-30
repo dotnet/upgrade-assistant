@@ -11,8 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageAnalysisState
     {
-        public string LockFilePath { get; private set; } = default!;
-
         public string PackageCachePath { get; private set; } = default!;
 
         public IList<Reference> FrameworkReferencesToAdd { get; }
@@ -77,17 +75,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private async Task<bool> PopulatePackageRestoreState(IUpgradeContext context, IPackageRestorer packageRestorer, CancellationToken token)
         {
-            if (LockFilePath is null || PackageCachePath is null || Failed)
+            if (PackageCachePath is null || Failed)
             {
                 var restoreOutput = await packageRestorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
-                if (restoreOutput.LockFilePath is null || restoreOutput.PackageCachePath is null)
+                if (restoreOutput.PackageCachePath is null)
                 {
                     Failed = true;
                     return false;
                 }
                 else
                 {
-                    (LockFilePath, PackageCachePath) = (restoreOutput.LockFilePath, restoreOutput.PackageCachePath);
+                    PackageCachePath = restoreOutput.PackageCachePath;
                     Failed = false;
                 }
             }

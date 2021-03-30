@@ -48,12 +48,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             // Check for the lock file's existence rather than success since a bad NuGet reference won't
             // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
-            var lockFilePath = project.LockFilePath;
 
             // Get the path used for caching NuGet packages
             var nugetCachePath = project.GetFile().GetPropertyValue("NuGetPackageRoot");
 
-            return new RestoreOutput(lockFilePath, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
+            return new RestoreOutput(nugetCachePath);
         }
 
         private Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token)

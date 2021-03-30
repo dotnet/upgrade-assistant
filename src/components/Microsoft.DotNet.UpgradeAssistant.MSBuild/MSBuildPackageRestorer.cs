@@ -47,14 +47,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private static RestoreOutput GetRestoreOutput(IProject project)
         {
-            // Check for the lock file's existence rather than success since a bad NuGet reference won't
-            // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
-            var lockFilePath = project.LockFilePath;
-
             // Get the path used for caching NuGet packages
             var nugetCachePath = project.GetFile().GetPropertyValue("NuGetPackageRoot");
 
-            return new RestoreOutput(lockFilePath, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
+            return new RestoreOutput(Directory.Exists(nugetCachePath) ? nugetCachePath : null);
         }
 
         public BuildResult? RestorePackages(ProjectInstance projectInstance)

@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
             restorer.Setup(r => r.RestorePackagesAsync(
                 It.IsAny<IUpgradeContext>(),
                 It.IsAny<IProject>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(new RestoreOutput(string.Empty, string.Empty)));
+                It.IsAny<CancellationToken>())).Returns(Task.FromResult(new RestoreOutput(string.Empty)));
 
             return (project.Object, await PackageAnalysisState.CreateAsync(context.Object, restorer.Object, CancellationToken.None).ConfigureAwait(true));
         }

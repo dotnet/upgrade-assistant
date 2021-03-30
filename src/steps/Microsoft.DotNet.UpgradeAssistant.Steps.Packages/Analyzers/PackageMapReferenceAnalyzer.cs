@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var allPackageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
             var packageMaps = currentTFM.Any(c => c.IsFramework) ? allPackageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray<NuGetPackageMap>() : allPackageMaps;
 
-            var packageReferences = project.PackageReferences;
+            var packageReferences = project.NuGetReferences.PackageReferences;
 
             foreach (var packageReference in packageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     }
                 }
 
-                if (!state.PackagesToAdd.Contains(packageToAdd) && !project.PackageReferences.Contains(packageToAdd))
+                if (!state.PackagesToAdd.Contains(packageToAdd) && !project.NuGetReferences.PackageReferences.Contains(packageToAdd))
                 {
                     _logger.LogInformation("Adding package {PackageName} based on package mapping configuration {PackageMapSet}", packageToAdd.Name, packageMap.PackageSetName);
                     state.PackagesToAdd.Add(packageToAdd);
