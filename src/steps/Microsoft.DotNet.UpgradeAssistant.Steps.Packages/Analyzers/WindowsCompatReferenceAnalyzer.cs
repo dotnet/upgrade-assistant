@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         /// <param name="project">The project whose NuGet package references should be analyzed.</param>
         /// <param name="token">The token used to gracefully cancel this request.</param>
         /// <returns>True if the project targets windows and the package is not already transitively available.</returns>
-        public async Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -39,16 +39,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             if (!project.TargetFrameworks.Any(tfm => tfm.IsWindows))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             if (project.IsTransitivelyAvailable(PackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
-                return false;
+                return Task.FromResult(false);
             }
 
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)

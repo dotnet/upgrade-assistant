@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         /// <param name="project">The project whose NuGet package references should be analyzed.</param>
         /// <param name="token">The token used to gracefully cancel this request.</param>
         /// <returns>True if the project is a web project targeting ASP.NET Core.</returns>
-        public async Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -43,16 +43,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // This reference only needs added to ASP.NET Core exes
             if (!(project.Components.HasFlag(ProjectComponents.AspNetCore) && project.OutputType == ProjectOutputType.Exe && !project.TargetFrameworks.Any(tfm => tfm.IsFramework)))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             if (project.IsTransitivelyAvailable(NewtonsoftPackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
-                return false;
+                return Task.FromResult(false);
             }
 
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
