@@ -18,5 +18,6 @@
   <ItemGroup>
     <PackageReference Include="NuGet.Versioning" />
     <ProjectReference Include="..\..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests\Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests.csproj" />
   </ItemGroup>
 </Project>
