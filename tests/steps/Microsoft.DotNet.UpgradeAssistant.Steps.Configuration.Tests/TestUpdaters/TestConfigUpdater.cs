@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 {
-    public class TestConfigUpdater : IConfigUpdater
+    public class TestConfigUpdater : IUpdater<ConfigFile>
     {
         public bool IsApplicable { get; }
 

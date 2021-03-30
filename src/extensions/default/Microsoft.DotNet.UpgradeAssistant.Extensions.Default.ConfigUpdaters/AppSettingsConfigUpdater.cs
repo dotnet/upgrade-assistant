@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
-    public class AppSettingsConfigUpdater : IConfigUpdater
+    public class AppSettingsConfigUpdater : IUpdater<ConfigFile>
     {
         private const string AppSettingsPath = "/configuration/appSettings";
         private const string AddSettingElementName = "add";

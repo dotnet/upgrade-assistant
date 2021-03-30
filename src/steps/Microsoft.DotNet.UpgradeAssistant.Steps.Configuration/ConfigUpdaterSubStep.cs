@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
     public class ConfigUpdaterSubStep : UpgradeStep
     {
         private readonly ConfigUpdaterStep _parentStep;
-        private readonly IConfigUpdater _configUpdater;
+        private readonly IUpdater<ConfigFile> _configUpdater;
 
         public override string Id => _configUpdater.Id;
 
@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         public override string Title => _configUpdater.Title;
 
-        public ConfigUpdaterSubStep(UpgradeStep parentStep, IConfigUpdater configUpdater, ILogger logger)
+        public ConfigUpdaterSubStep(UpgradeStep parentStep, IUpdater<ConfigFile> configUpdater, ILogger logger)
             : base(logger)
         {
             _parentStep = (ParentStep = parentStep) as ConfigUpdaterStep ?? throw new ArgumentNullException(nameof(parentStep));

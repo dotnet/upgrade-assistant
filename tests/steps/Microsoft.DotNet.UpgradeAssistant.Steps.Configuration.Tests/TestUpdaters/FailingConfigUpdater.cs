@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 {
-    public class FailingConfigUpdater : IConfigUpdater
+    public class FailingConfigUpdater : IUpdater<ConfigFile>
     {
         public string Id => "Test ConfigUpdater";
 

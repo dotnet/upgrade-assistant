@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 {
     [ApplicableComponents(ProjectComponents.WinRT | ProjectComponents.AspNetCore)]
-    public class WebWinRTTestConfigUpdater : IConfigUpdater
+    public class WebWinRTTestConfigUpdater : IUpdater<ConfigFile>
     {
         private readonly bool _isApplicable;
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 {
     [ApplicableComponents(ProjectComponents.None)]
-    public class NoneConfigUpdater : IConfigUpdater
+    public class NoneConfigUpdater : IUpdater<ConfigFile>
     {
         private readonly bool _isApplicable;
 

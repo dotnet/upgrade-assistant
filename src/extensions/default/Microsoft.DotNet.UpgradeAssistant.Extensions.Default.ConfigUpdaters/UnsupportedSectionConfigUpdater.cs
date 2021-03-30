@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
-    public class UnsupportedSectionConfigUpdater : IConfigUpdater
+    public class UnsupportedSectionConfigUpdater : IUpdater<ConfigFile>
     {
         private static (string Name, string Issue)[] _names = new (string, string)[]
         {
