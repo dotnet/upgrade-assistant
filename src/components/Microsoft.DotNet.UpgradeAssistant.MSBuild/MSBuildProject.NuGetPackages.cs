@@ -63,11 +63,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private IEnumerable<LockFileTargetLibrary> GetAllDependencies(TargetFrameworkMoniker tfm)
         {
             var parsedTfm = NuGetFramework.Parse(tfm.Name);
-            var lockFileTarget = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance)
-                .Targets
-                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal));
+            var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
 
-            return lockFileTarget.Libraries;
+            if (lockFile is null)
+            {
+                return Enumerable.Empty<LockFileTargetLibrary>();
+            }
+
+            return lockFile.Targets
+                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal))
+                .Libraries;
         }
     }
 }
