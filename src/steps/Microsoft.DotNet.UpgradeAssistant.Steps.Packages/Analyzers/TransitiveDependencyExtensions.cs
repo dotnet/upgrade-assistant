@@ -13,10 +13,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     internal static class TransitiveDependencyExtensions
     {
         public static bool IsTransitivelyAvailable(this IProject project, string packageName)
-            => project.ContainsDependency(d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase));
+            => project.TargetFrameworks.Any(tfm => project.IsTransitivelyAvailable(packageName, tfm));
+
+        public static bool IsTransitivelyAvailable(this IProject project, string packageName, TargetFrameworkMoniker tfm)
+            => project.ContainsDependency(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase));
+
+        public static bool IsTransitiveDependency(this IProject project, NuGetReference nugetReference, TargetFrameworkMoniker tfm)
+            => project.ContainsDependency(tfm, d => d.ReferenceSatisfiesDependency(nugetReference, true));
 
         public static bool IsTransitiveDependency(this IProject project, NuGetReference nugetReference)
-            => project.ContainsDependency(d => d.ReferenceSatisfiesDependency(nugetReference, true));
+            => project.TargetFrameworks.Any(tfm => project.ContainsDependency(tfm, d => d.ReferenceSatisfiesDependency(nugetReference, true)));
 
         private static bool ReferenceSatisfiesDependency(this PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
@@ -54,15 +60,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return true;
         }
 
-        private static bool ContainsDependency(this IProject project, Func<PackageDependency, bool> filter)
-            => project.GetAllDependencies().Any(l => l.Dependencies.Any(d => filter(d)));
+        private static bool ContainsDependency(this IProject project, TargetFrameworkMoniker tfm, Func<PackageDependency, bool> filter)
+            => project.GetAllDependencies(tfm).Any(l => l.Dependencies.Any(d => filter(d)));
 
-        private static IEnumerable<LockFileTargetLibrary> GetAllDependencies(this IProject project)
+        private static IEnumerable<LockFileTargetLibrary> GetAllDependencies(this IProject project, TargetFrameworkMoniker tfm)
         {
-            var tfm = NuGetFramework.Parse(project.TFM.Name);
+            var parsed = NuGetFramework.Parse(tfm.Name);
             var lockFileTarget = LockFileUtilities.GetLockFile(project.LockFilePath, NuGet.Common.NullLogger.Instance)
                 .Targets
-                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(tfm.DotNetFrameworkName, StringComparison.Ordinal));
+                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsed.DotNetFrameworkName, StringComparison.Ordinal));
 
             return lockFileTarget.Libraries;
         }

@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Linq;
 using Autofac.Extras.Moq;
 using AutoFixture;
@@ -31,6 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -57,6 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -96,6 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.FrameworkReferences).Returns(frameworkReferences);
+            project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -132,6 +136,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.References).Returns(references);
+            project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -161,6 +166,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -187,9 +193,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var projectFile = mock.Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(false);
 
+            var tfm = fixture.Create<TargetFrameworkMoniker>();
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
-            project.Setup(p => p.TransitivePackageReferences).Returns(dependencies);
+            project.Setup(p => p.GetTransitivePackageReferences(tfm)).Returns(dependencies);
+            project.Setup(p => p.TargetFrameworks).Returns(new[] { tfm });
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 

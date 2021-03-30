@@ -22,13 +22,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
             // If the package is referenced transitively, mark for removal
-            foreach (var packageReference in project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in project.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 if (project.IsTransitiveDependency(packageReference))
                 {

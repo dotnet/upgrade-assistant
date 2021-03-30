@@ -26,8 +26,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<MSBuildWorkspaceUpgradeContext>();
             services.AddTransient<IUpgradeContext>(sp => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
             services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
-            services.AddTransient<ITargetTFMSelector, MSBuildTargetTFMSelector>();
-            services.AddTransient<ITargetFrameworkMonikerFactory, NuGetTargetFrameworkMonikerFactory>();
             services.AddTransient<ITargetFrameworkMonikerComparer, NuGetTargetFrameworkMonikerComparer>();
         }
 

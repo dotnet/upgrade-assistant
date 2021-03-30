@@ -10,9 +10,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
     public class VisualBasicWpfCheck : IUpgradeReadyCheck
     {
-        private readonly ILogger<MultiTargetingCheck> _logger;
+        private readonly ILogger<TargetFrameworkCheck> _logger;
 
-        public VisualBasicWpfCheck(ILogger<MultiTargetingCheck> logger)
+        public VisualBasicWpfCheck(ILogger<TargetFrameworkCheck> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

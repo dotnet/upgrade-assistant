@@ -12,6 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddScoped<UpgraderManager>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
+            services.AddTransient<ITargetTFMSelector, TargetTFMSelector>();
             services.AddReadinessChecks();
         }
 
@@ -20,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeReadyCheck, CanLoadProjectFile>();
             services.AddTransient<IUpgradeReadyCheck, VisualBasicWpfCheck>();
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
-            services.AddTransient<IUpgradeReadyCheck, MultiTargetingCheck>();
+            services.AddTransient<IUpgradeReadyCheck, TargetFrameworkCheck>();
         }
     }
 }

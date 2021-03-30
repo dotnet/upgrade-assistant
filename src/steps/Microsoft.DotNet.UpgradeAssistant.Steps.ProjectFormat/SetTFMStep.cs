@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -70,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             var project = context.CurrentProject.Required();
             var targetTfm = _tfmSelector.SelectTFM(project);
 
-            if (targetTfm == project.TFM)
+            if (project.TargetFrameworks.Any(tfm => tfm == targetTfm))
             {
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None));
             }

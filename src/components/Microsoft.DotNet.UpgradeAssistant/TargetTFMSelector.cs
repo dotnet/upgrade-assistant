@@ -2,26 +2,29 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class MSBuildTargetTFMSelector : ITargetTFMSelector
+    public class TargetTFMSelector : ITargetTFMSelector
     {
         private const string NetStandardTFM = "netstandard2.0";
         private const string DefaultCurrentTFMBase = "net5.0";
         private const string DefaultLTSTFMBase = "net5.0";
         private const string WindowsSuffix = "-windows";
+
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
-        private readonly ILogger<MSBuildTargetTFMSelector> _logger;
+        private readonly ILogger<TargetTFMSelector> _logger;
         private readonly string _currentTFMBase;
         private readonly string _ltsTFMBase;
         private readonly UpgradeTarget _upgradeTarget;
 
         private string AppTFMBase => _upgradeTarget == UpgradeTarget.Current ? _currentTFMBase : _ltsTFMBase;
 
-        public MSBuildTargetTFMSelector(UpgradeOptions options, IOptions<TFMSelectorOptions> selectorOptions, ITargetFrameworkMonikerComparer tfmComparer, ILogger<MSBuildTargetTFMSelector> logger)
+        public TargetTFMSelector(UpgradeOptions options, IOptions<TFMSelectorOptions> selectorOptions, ITargetFrameworkMonikerComparer tfmComparer, ILogger<TargetTFMSelector> logger)
         {
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -63,41 +66,59 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FileInfo, project.Components, project.OutputType);
 
-            // If the project depends on another project with a higher version NetCore or NetStandard TFM,
-            // use that TFM instead.
-            var tfm = new TargetFrameworkMoniker(tfmName);
-            foreach (var dep in project.ProjectReferences)
-            {
-                try
-                {
-                    if (_tfmComparer.IsCompatible(tfm, dep.TFM))
-                    {
-                        continue;
-                    }
-
-                    if (dep.TFM.IsNetCore || dep.TFM.IsNetStandard)
-                    {
-                        tfm = dep.TFM;
-                        _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its dependency on {DepProject}", tfm, project.FileInfo, dep.FileInfo);
-                    }
-                }
-                catch (UpgradeException)
-                {
-                    _logger.LogWarning($"Unable to determine TFM for dependency {dep.FileInfo}; TFM for {project.FileInfo} may not be correct.");
-                }
-            }
+            var tfm = EnsureProjectDependenciesNoDowngrade(tfmName, project);
 
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FileInfo);
 
             // Ensure we don't downgrade a project
-            return _tfmComparer.Compare(project.TFM, tfm) > 0 ? project.TFM : tfm;
+            return EnsureNoDowngrade(tfm, project.TargetFrameworks);
+        }
+
+        public TargetFrameworkMoniker EnsureProjectDependenciesNoDowngrade(string tfmName, IProject project)
+        {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            var tfm = new TargetFrameworkMoniker(tfmName);
+
+            foreach (var dep in project.ProjectReferences)
+            {
+                tfm = EnsureNoDowngrade(tfm, dep.TargetFrameworks);
+            }
+
+            return tfm;
+        }
+
+        private TargetFrameworkMoniker EnsureNoDowngrade(TargetFrameworkMoniker tfm, IEnumerable<TargetFrameworkMoniker> others)
+        {
+            var min = others.OrderBy(t => t, _tfmComparer)
+                .Where(tfm => !tfm.IsFramework)
+                .FirstOrDefault();
+
+            if (min is not null)
+            {
+                if (_tfmComparer.Compare(min, tfm) > 0)
+                {
+                    tfm = min;
+                }
+            }
+
+            return tfm;
         }
 
         private static string GetNetStandardTFM(IProject project)
         {
-            var currentTfm = project.TFM;
+            foreach (var currentTfm in project.TargetFrameworks)
+            {
+                if (currentTfm.IsNetStandard)
+                {
+                    return currentTfm.Name;
+                }
+            }
 
-            return currentTfm?.IsNetStandard ?? false ? currentTfm.Name : NetStandardTFM;
+            return NetStandardTFM;
         }
     }
 }

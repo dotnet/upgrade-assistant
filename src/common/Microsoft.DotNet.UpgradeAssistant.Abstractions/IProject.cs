@@ -23,13 +23,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IEnumerable<NuGetReference> PackageReferences { get; }
 
-        IEnumerable<NuGetReference> TransitivePackageReferences { get; }
+        IEnumerable<NuGetReference> GetTransitivePackageReferences(TargetFrameworkMoniker tfm);
 
         string? LockFilePath { get; }
 
         IEnumerable<Reference> References { get; }
 
-        TargetFrameworkMoniker TFM { get; }
+        IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks { get; }
 
         ProjectComponents Components { get; }
 

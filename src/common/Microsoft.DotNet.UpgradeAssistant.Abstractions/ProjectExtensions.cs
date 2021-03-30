@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -11,6 +12,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public static IProject Required(this IProject? project)
             => project ?? throw new InvalidOperationException("Project cannot be null");
+
+        public static IEnumerable<NuGetReference> GetTransitivePackageReferences(this IProject project)
+            => project.Required().TargetFrameworks
+                .SelectMany(tfm => project.GetTransitivePackageReferences(tfm))
+                .Distinct();
 
         public static bool TryGetPackageByName(this IProject project, string packageName, [MaybeNullWhen(false)] out NuGetReference nugetReference)
         {

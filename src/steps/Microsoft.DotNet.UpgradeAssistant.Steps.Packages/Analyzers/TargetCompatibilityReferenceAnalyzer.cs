@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,12 +32,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var currentTFM = project.Required().TFM;
+            var currentTFM = project.Required().TargetFrameworks;
 
             foreach (var packageReference in project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
-                if (await _packageLoader.DoesPackageSupportTargetFrameworkAsync(packageReference, state.PackageCachePath!, currentTFM, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, state.PackageCachePath!, currentTFM, token).ConfigureAwait(false))
                 {
                     _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, currentTFM);
                     continue;
@@ -70,13 +71,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return state;
         }
 
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, TargetFrameworkMoniker targetFramework, CancellationToken token)
+        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, IEnumerable<TargetFrameworkMoniker> targetFramework, CancellationToken token)
         {
             var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, true, token).ConfigureAwait(false);
 
             foreach (var newerPackage in latestMinorVersions)
             {
-                if (await _packageLoader.DoesPackageSupportTargetFrameworkAsync(newerPackage, packageCachePath, targetFramework, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, packageCachePath, targetFramework, token).ConfigureAwait(false))
                 {
                     _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, targetFramework);
                     return newerPackage;

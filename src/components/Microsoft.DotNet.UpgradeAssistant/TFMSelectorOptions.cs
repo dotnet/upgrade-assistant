@@ -3,8 +3,10 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface ITargetFrameworkMonikerFactory
+    public class TFMSelectorOptions
     {
-        TargetFrameworkMoniker GetTFMForNetFxVersion(string netFxVersion);
+        public string? CurrentTFMBase { get; set; }
+
+        public string? LTSTFMBase { get; set; }
     }
 }

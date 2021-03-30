@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var components = ProjectComponents.None;
 
             // Check transitive dependencies
-            if (project.TransitivePackageReferences.Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
+            if (project.GetTransitivePackageReferences().Any(f => MSBuildConstants.WinRTPackages.Contains(f.Name, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.WinRT;
             }
