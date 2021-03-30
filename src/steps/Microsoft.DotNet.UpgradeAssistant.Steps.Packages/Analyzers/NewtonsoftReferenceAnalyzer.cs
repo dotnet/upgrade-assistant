@@ -18,13 +18,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<NewtonsoftReferenceAnalyzer> _logger;
+        private readonly ITargetFrameworkMonikerComparer _tfmComparer;
 
         public string Name => "Newtonsoft.Json reference analyzer";
 
-        public NewtonsoftReferenceAnalyzer(IPackageLoader packageLoader, ILogger<NewtonsoftReferenceAnalyzer> logger)
+        public NewtonsoftReferenceAnalyzer(IPackageLoader packageLoader, ILogger<NewtonsoftReferenceAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
         }
 
         /// <summary>
@@ -41,7 +43,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // This reference only needs added to ASP.NET Core exes
-            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore) && project.OutputType == ProjectOutputType.Exe && !project.TargetFrameworks.Any(tfm => tfm.IsFramework)))
+            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore)
+                && project.OutputType == ProjectOutputType.Exe
+                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, new TargetFrameworkMoniker("netcoreapp3.0")) < 0)))
             {
                 return Task.FromResult(false);
             }

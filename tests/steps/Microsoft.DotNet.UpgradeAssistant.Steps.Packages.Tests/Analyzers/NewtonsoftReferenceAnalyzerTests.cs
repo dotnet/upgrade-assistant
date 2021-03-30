@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
+using Moq;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
@@ -47,6 +48,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
+            var comparer = mock.Mock<ITargetFrameworkMonikerComparer>();
+            comparer.Setup(comparer => comparer.Compare(It.IsAny<TargetFrameworkMoniker>(), It.IsAny<TargetFrameworkMoniker>()))
+                .Returns(-1);
+
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
             using var tokenSource = new CancellationTokenSource();
             var project = mock.Mock<IProject>();
