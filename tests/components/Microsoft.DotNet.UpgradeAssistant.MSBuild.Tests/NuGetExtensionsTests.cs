@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
+    [Collection(MSBuildStepTestCollection.Name)]
     public class NuGetExtensionsTests
     {
         [Fact]
