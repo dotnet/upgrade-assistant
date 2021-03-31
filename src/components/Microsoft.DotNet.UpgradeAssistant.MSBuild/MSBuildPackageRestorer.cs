@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            return result.OverallResult == BuildResultCode.Success;
+            return result?.OverallResult == BuildResultCode.Success;
         }
 
         private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new ProjectInstance(project.FileInfo.FullName, context.GlobalProperties, toolsVersion: null);
