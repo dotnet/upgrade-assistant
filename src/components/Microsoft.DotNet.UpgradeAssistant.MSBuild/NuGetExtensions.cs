@@ -9,7 +9,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     public static class NuGetExtensions
     {
         public static NuGetVersion? GetNuGetVersion(this NuGetReference nugetRef)
-            => nugetRef.TryGetNuGetVersion(out var result) ? result : null;
+        {
+            if (nugetRef is null)
+            {
+                throw new System.ArgumentNullException(nameof(nugetRef));
+            }
+
+            return nugetRef.TryGetNuGetVersion(out var result) ? result : null;
+        }
 
         public static bool TryGetNuGetVersion(this NuGetReference? nugetRef, [MaybeNullWhen(false)] out NuGetVersion result)
         {
