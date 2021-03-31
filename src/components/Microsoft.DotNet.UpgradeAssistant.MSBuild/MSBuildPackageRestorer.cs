@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<RestoreOutput> RestorePackagesAsync(IUpgradeContext context, IProject project, CancellationToken token)
+        public async Task<bool> RestorePackagesAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
             if (context is null)
             {
@@ -33,25 +33,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             var projectInstance = CreateProjectInstance(context, project);
-            RestorePackages(projectInstance);
+            var result = RestorePackages(projectInstance);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            return GetRestoreOutput(project);
+            return result.OverallResult == BuildResultCode.Success;
         }
 
         private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new ProjectInstance(project.FileInfo.FullName, context.GlobalProperties, toolsVersion: null);
-
-        private static RestoreOutput GetRestoreOutput(IProject project)
-        {
-            // Get the path used for caching NuGet packages
-            var nugetCachePath = project.GetFile().GetPropertyValue("NuGetPackageRoot");
-
-            return new RestoreOutput(Directory.Exists(nugetCachePath) ? nugetCachePath : null);
-        }
 
         public BuildResult? RestorePackages(ProjectInstance projectInstance)
         {
