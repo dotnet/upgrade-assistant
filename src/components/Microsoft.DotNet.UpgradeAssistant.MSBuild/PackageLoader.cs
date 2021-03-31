@@ -143,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 var nugetSettings = Settings.LoadDefaultSettings(projectDir);
                 var sourceProvider = new PackageSourceProvider(nugetSettings);
-                packageSources.AddRange(sourceProvider.LoadPackageSources());
+                packageSources.AddRange(sourceProvider.LoadPackageSources().Where(e => e.IsEnabled));
             }
 
             if (packageSources.Count == 0)
