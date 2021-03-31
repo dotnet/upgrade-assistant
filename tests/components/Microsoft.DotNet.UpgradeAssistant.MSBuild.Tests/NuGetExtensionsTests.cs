@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
     public class NuGetExtensionsTests
     {

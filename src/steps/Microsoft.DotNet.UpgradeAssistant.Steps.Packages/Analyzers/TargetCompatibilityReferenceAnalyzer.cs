@@ -14,14 +14,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     {
         private readonly IPackageLoader _packageLoader;
         private readonly ITargetTFMSelector _tfmSelector;
+        private readonly IVersionComparer _comparer;
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
 
         public string Name => "Target compatibility reference analyzer";
 
-        public TargetCompatibilityReferenceAnalyzer(IPackageLoader packageLoader, ITargetTFMSelector tfmSelector, ILogger<TargetCompatibilityReferenceAnalyzer> logger)
+        public TargetCompatibilityReferenceAnalyzer(
+            IPackageLoader packageLoader,
+            ITargetTFMSelector tfmSelector,
+            IVersionComparer comparer,
+            ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -53,12 +59,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     else
                     {
                         _logger.LogInformation("Marking package {NuGetPackage} for removal because it doesn't support the target framework but a newer version ({Version}) does", packageReference, updatedReference.Version);
-                        var newMajorVersion = updatedReference.GetNuGetVersion()?.Major;
-                        var oldMajorVersion = packageReference.GetNuGetVersion()?.Major;
+                        var isMajorChange = _comparer.IsMajorChange(updatedReference, packageReference);
 
-                        if (newMajorVersion != oldMajorVersion)
+                        if (isMajorChange)
                         {
-                            _logger.LogWarning("Package {NuGetPackage} has been upgraded across major versions ({OldVersion} -> {NewVersion}) which may introduce breaking changes", packageReference.Name, oldMajorVersion, newMajorVersion);
+                            _logger.LogWarning("Package {NuGetPackage} has been upgraded across major versions ({OldVersion} -> {NewVersion}) which may introduce breaking changes", packageReference.Name, packageReference.Version, updatedReference.Version);
                             state.PossibleBreakingChangeRecommended = true;
                         }
 

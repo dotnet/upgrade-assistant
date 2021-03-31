@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,13 +15,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         private readonly ILogger<PackageMapReferenceAnalyzer> _logger;
         private readonly PackageMapProvider _packageMapProvider;
         private readonly IPackageLoader _packageLoader;
+        private readonly IVersionComparer _comparer;
 
         public string Name => "Package map reference analyzer";
 
-        public PackageMapReferenceAnalyzer(PackageMapProvider packageMapProvider, IPackageLoader packageLoader, ILogger<PackageMapReferenceAnalyzer> logger)
+        public PackageMapReferenceAnalyzer(
+            PackageMapProvider packageMapProvider,
+            IPackageLoader packageLoader,
+            IVersionComparer comparer,
+            ILogger<PackageMapReferenceAnalyzer> logger)
         {
             _packageMapProvider = packageMapProvider ?? throw new ArgumentNullException(nameof(packageMapProvider));
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -46,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             foreach (var packageReference in packageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
-                foreach (var map in packageMaps.Where(m => m.ContainsPackageReference(packageReference.Name, packageReference.Version)))
+                foreach (var map in packageMaps.Where(m => ContainsPackageReference(m.NetFrameworkPackages, packageReference.Name, packageReference.Version)))
                 {
                     state.PossibleBreakingChangeRecommended = true;
                     _logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
@@ -68,6 +75,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             return state;
+        }
+
+        /// <summary>
+        /// Determines whether a package map's .NET Framework packages include a
+        /// given package name and version.
+        /// </summary>
+        /// <param name="name">The package name to look for.</param>
+        /// <param name="version">The package version to look for or null to match any version.</param>
+        /// <returns>True if the package exists in NetFrameworkPackages with a version equal to or higher the version specified. Otherwise, false.</returns>
+        private bool ContainsPackageReference(IEnumerable<NuGetReference> NetFrameworkPackages, string name, string? version)
+        {
+            // Check whether any NetFx packages have the right name
+            var reference = NetFrameworkPackages.FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            // If no packages matched, return false
+            if (reference is null)
+            {
+                return false;
+            }
+
+            // If the version isn't specified, then matching the name is sufficient
+            // Similarly, if the NetFx package has a wildcard version, then any version matches
+            if (version is null || reference.HasWildcardVersion)
+            {
+                return true;
+            }
+
+            return _comparer.Compare(version, reference.Version) > 0;
         }
 
         private async Task AddNetCoreReferences(NuGetPackageMap packageMap, PackageAnalysisState state, IProject project, CancellationToken token)

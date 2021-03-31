@@ -13,13 +13,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     {
         private const string PackageName = "Microsoft.Windows.Compatibility";
 
-        private readonly ILogger<WindowsCompatReferenceAnalyzer> _logger;
         private readonly IPackageLoader _loader;
+        private readonly IVersionComparer _comparer;
+        private readonly ILogger<WindowsCompatReferenceAnalyzer> _logger;
 
-        public WindowsCompatReferenceAnalyzer(ILogger<WindowsCompatReferenceAnalyzer> logger, IPackageLoader loader)
+        public WindowsCompatReferenceAnalyzer(
+            IPackageLoader loader,
+            IVersionComparer comparer,
+            ILogger<WindowsCompatReferenceAnalyzer> logger)
         {
             _logger = logger;
             _loader = loader;
+            _comparer = comparer;
         }
 
         public string Name => "Windows Compatibility Pack Analyzer";
@@ -57,9 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             if (project.TryGetPackageByName(PackageName, out var existing))
             {
-                var version = existing.GetNuGetVersion();
-
-                if (version >= latestVersion.GetNuGetVersion())
+                if (_comparer.Compare(existing, latestVersion) >= 0)
                 {
                     return state;
                 }
