@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 content.Add(new TextContent("Project needs to be updated to the SDK-style .csproj"));
             }
 
-            if (project.PackageReferenceFormat == NugetPackageFormat.PackageConfig)
+            if (project.NuGetReferences.PackageReferenceFormat == NugetPackageFormat.PackageConfig)
             {
                 content.Add(new TextContent("NuGet packages must be updated to PackageReference"));
             }

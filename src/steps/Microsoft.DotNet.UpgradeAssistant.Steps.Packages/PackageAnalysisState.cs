@@ -11,10 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageAnalysisState
     {
-        public string LockFilePath { get; private set; } = default!;
-
-        public string PackageCachePath { get; private set; } = default!;
-
         public IList<Reference> FrameworkReferencesToAdd { get; }
 
         public IList<Reference> FrameworkReferencesToRemove { get; }
@@ -70,29 +66,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new InvalidOperationException("Target TFM must be set before analyzing package references");
             }
 
-            var ret = new PackageAnalysisState();
-            await ret.PopulatePackageRestoreState(context, packageRestorer, token).ConfigureAwait(false);
-            return ret;
-        }
+            await packageRestorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
-        private async Task<bool> PopulatePackageRestoreState(IUpgradeContext context, IPackageRestorer packageRestorer, CancellationToken token)
-        {
-            if (LockFilePath is null || PackageCachePath is null || Failed)
-            {
-                var restoreOutput = await packageRestorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
-                if (restoreOutput.LockFilePath is null || restoreOutput.PackageCachePath is null)
-                {
-                    Failed = true;
-                    return false;
-                }
-                else
-                {
-                    (LockFilePath, PackageCachePath) = (restoreOutput.LockFilePath, restoreOutput.PackageCachePath);
-                    Failed = false;
-                }
-            }
-
-            return true;
+            return new PackageAnalysisState();
         }
     }
 }

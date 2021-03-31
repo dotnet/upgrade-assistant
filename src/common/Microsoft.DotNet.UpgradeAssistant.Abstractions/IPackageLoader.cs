@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         IEnumerable<string> PackageSources { get; }
 
-        Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, string cachePath, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token);
+        Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token);
 
         Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, bool latestMinorAndBuildOnly, CancellationToken token);
 

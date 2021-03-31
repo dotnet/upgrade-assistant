@@ -34,10 +34,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             var currentTFM = project.Required().TargetFrameworks;
 
-            foreach (var packageReference in project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in project.Required().NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
-                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, state.PackageCachePath!, currentTFM, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, currentTFM, token).ConfigureAwait(false))
                 {
                     _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, currentTFM);
                     continue;
@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, state.PackageCachePath!, currentTFM, token).ConfigureAwait(false);
+                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, currentTFM, token).ConfigureAwait(false);
                     if (updatedReference == null)
                     {
                         _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, currentTFM);
@@ -71,13 +71,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return state;
         }
 
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, string packageCachePath, IEnumerable<TargetFrameworkMoniker> targetFramework, CancellationToken token)
+        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFramework, CancellationToken token)
         {
             var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, true, token).ConfigureAwait(false);
 
             foreach (var newerPackage in latestMinorVersions)
             {
-                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, packageCachePath, targetFramework, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, targetFramework, token).ConfigureAwait(false))
                 {
                     _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, targetFramework);
                     return newerPackage;

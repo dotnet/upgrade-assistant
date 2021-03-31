@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
-            var packages = project.Required().PackageReferences.ToLookup(p => p.Name);
+            var packages = project.Required().NuGetReferences.PackageReferences.ToLookup(p => p.Name);
             foreach (var duplicates in packages.Where(g => g.Count() > 1))
             {
                 var highestVersion = duplicates.Select(p => p.GetNuGetVersion()).Max();
