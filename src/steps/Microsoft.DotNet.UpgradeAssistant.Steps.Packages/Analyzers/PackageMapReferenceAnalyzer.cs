@@ -49,9 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var allPackageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
             var packageMaps = currentTFM.Any(c => c.IsFramework) ? allPackageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray<NuGetPackageMap>() : allPackageMaps;
 
-            var packageReferences = project.NuGetReferences.PackageReferences;
-
-            foreach (var packageReference in packageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in project.NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 foreach (var map in packageMaps.Where(m => ContainsPackageReference(m.NetFrameworkPackages, packageReference.Name, packageReference.Version)))
                 {
@@ -62,8 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 }
             }
 
-            var assemblyReferences = project.References;
-            foreach (var reference in assemblyReferences.Where(r => !state.ReferencesToRemove.Contains(r)))
+            foreach (var reference in project.References.Where(r => !state.ReferencesToRemove.Contains(r)))
             {
                 foreach (var map in packageMaps.Where(m => m.ContainsAssemblyReference(reference.Name)))
                 {
@@ -84,10 +81,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         /// <param name="name">The package name to look for.</param>
         /// <param name="version">The package version to look for or null to match any version.</param>
         /// <returns>True if the package exists in NetFrameworkPackages with a version equal to or higher the version specified. Otherwise, false.</returns>
-        private bool ContainsPackageReference(IEnumerable<NuGetReference> NetFrameworkPackages, string name, string? version)
+        private bool ContainsPackageReference(IEnumerable<NuGetReference> packages, string name, string? version)
         {
             // Check whether any NetFx packages have the right name
-            var reference = NetFrameworkPackages.FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var reference = packages.FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
             // If no packages matched, return false
             if (reference is null)
