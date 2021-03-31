@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using NuGet.Frameworks;
@@ -62,13 +63,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private IEnumerable<LockFileTargetLibrary> GetAllDependencies(TargetFrameworkMoniker tfm)
         {
-            var parsedTfm = NuGetFramework.Parse(tfm.Name);
-            var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+            if (LockFilePath is null)
+            {
+                throw new InvalidOperationException("Project needs to be restored before continuing");
+            }
 
-            if (lockFile is null)
+            // If the LockFilePath is defined but does not exist, there are no libraries
+            if (!File.Exists(LockFilePath))
             {
                 return Enumerable.Empty<LockFileTargetLibrary>();
             }
+
+            var parsedTfm = NuGetFramework.Parse(tfm.Name);
+            var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
 
             return lockFile.Targets
                 .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal))
