@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     else
                     {
                         _logger.LogInformation("Marking package {NuGetPackage} for removal because it doesn't support the target framework but a newer version ({Version}) does", packageReference, updatedReference.Version);
-                        var isMajorChange = _comparer.IsMajorChange(updatedReference, packageReference);
+                        var isMajorChange = _comparer.IsMajorChange(updatedReference.Version, packageReference.Version);
 
                         if (isMajorChange)
                         {

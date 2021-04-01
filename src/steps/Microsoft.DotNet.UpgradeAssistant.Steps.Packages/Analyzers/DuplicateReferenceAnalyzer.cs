@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var packages = project.Required().NuGetReferences.PackageReferences.ToLookup(p => p.Name);
             foreach (var duplicates in packages.Where(g => g.Count() > 1))
             {
-                var highestVersion = duplicates.OrderByDescending(p => p, _comparer).First();
+                var highestVersion = duplicates.OrderByDescending(p => p.Version, _comparer).First();
 
                 foreach (var package in duplicates.Where(p => p != highestVersion))
                 {

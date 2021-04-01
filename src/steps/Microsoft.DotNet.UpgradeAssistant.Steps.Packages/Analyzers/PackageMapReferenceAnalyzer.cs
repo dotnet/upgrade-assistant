@@ -75,15 +75,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         }
 
         /// <summary>
-        /// Determines whether a package map's .NET Framework packages include a
-        /// given package name and version.
+        /// Determines whether a packages given contain a given package name and version.
         /// </summary>
         /// <param name="name">The package name to look for.</param>
         /// <param name="version">The package version to look for or null to match any version.</param>
         /// <returns>True if the package exists in NetFrameworkPackages with a version equal to or higher the version specified. Otherwise, false.</returns>
         private bool ContainsPackageReference(IEnumerable<NuGetReference> packages, string name, string? version)
         {
-            // Check whether any NetFx packages have the right name
             var reference = packages.FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
             // If no packages matched, return false
@@ -93,13 +91,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // If the version isn't specified, then matching the name is sufficient
-            // Similarly, if the NetFx package has a wildcard version, then any version matches
             if (version is null || reference.HasWildcardVersion)
             {
                 return true;
             }
 
-            return _comparer.Compare(version, reference.Version) > 0;
+            return _comparer.Compare(version, reference.Version) <= 0;
         }
 
         private async Task AddNetCoreReferences(NuGetPackageMap packageMap, PackageAnalysisState state, IProject project, CancellationToken token)

@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IVersionComparer : IComparer<string>, IComparer<NuGetReference>
+    public interface IVersionComparer : IComparer<string>
     {
-        bool IsMajorChange(NuGetReference x, NuGetReference y);
+        bool IsMajorChange(string x, string y);
     }
 }

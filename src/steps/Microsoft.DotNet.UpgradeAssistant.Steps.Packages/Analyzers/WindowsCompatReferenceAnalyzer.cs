@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             if (project.TryGetPackageByName(PackageName, out var existing))
             {
-                if (_comparer.Compare(existing, latestVersion) >= 0)
+                if (_comparer.Compare(existing.Version, latestVersion.Version) >= 0)
                 {
                     return state;
                 }

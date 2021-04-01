@@ -9,12 +9,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         public int Compare(string? x, string? y)
         {
-            if (NuGetVersion.TryParse(x, out var nx))
+            if (!NuGetVersion.TryParse(x, out var nx))
             {
                 return -1;
             }
 
-            if (NuGetVersion.TryParse(y, out var ny))
+            if (!NuGetVersion.TryParse(y, out var ny))
             {
                 return 1;
             }
@@ -22,27 +22,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return nx.CompareTo(ny);
         }
 
-        public int Compare(NuGetReference? x, NuGetReference? y)
+        public bool IsMajorChange(string x, string y)
         {
-            if (!x.TryGetNuGetVersion(out var nx))
+            if (!TryGetMajorValue(x, out var xMajor))
             {
-                return -1;
+                return false;
             }
 
-            if (!y.TryGetNuGetVersion(out var ny))
+            if (!TryGetMajorValue(y, out var yMajor))
             {
-                return 1;
+                return false;
             }
 
-            return nx.CompareTo(ny);
+            return xMajor != yMajor;
         }
 
-        public bool IsMajorChange(NuGetReference x, NuGetReference y)
+        private static bool TryGetMajorValue(string version, out int majorVersion)
         {
-            var nx = x.GetNuGetVersion();
-            var ny = y.GetNuGetVersion();
+            if (NuGetVersion.TryParse(version, out var nversion))
+            {
+                majorVersion = nversion.Major;
+                return true;
+            }
 
-            return nx?.Major != ny?.Major;
+            if (FloatRange.TryParse(version, out var fversion) && fversion.HasMinVersion)
+            {
+                majorVersion = fversion.MinVersion.Major;
+                return true;
+            }
+
+            majorVersion = default;
+            return false;
         }
     }
 }
