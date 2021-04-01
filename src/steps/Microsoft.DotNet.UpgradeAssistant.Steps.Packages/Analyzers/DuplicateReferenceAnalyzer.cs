@@ -11,12 +11,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     public class DuplicateReferenceAnalyzer : IPackageReferencesAnalyzer
     {
+        private readonly IVersionComparer _comparer;
         private readonly ILogger<DuplicateReferenceAnalyzer> _logger;
 
         public string Name => "Duplicate reference analyzer";
 
-        public DuplicateReferenceAnalyzer(ILogger<DuplicateReferenceAnalyzer> logger)
+        public DuplicateReferenceAnalyzer(IVersionComparer comparer, ILogger<DuplicateReferenceAnalyzer> logger)
         {
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -31,9 +33,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var packages = project.Required().NuGetReferences.PackageReferences.ToLookup(p => p.Name);
             foreach (var duplicates in packages.Where(g => g.Count() > 1))
             {
-                var highestVersion = duplicates.Select(p => p.GetNuGetVersion()).Max();
+                var highestVersion = duplicates.OrderByDescending(p => p.Version, _comparer).First();
 
-                foreach (var package in duplicates.Where(p => p.GetNuGetVersion() != highestVersion))
+                foreach (var package in duplicates.Where(p => p != highestVersion))
                 {
                     _logger.LogInformation("Marking package {NuGetPackage} for removal because it is referenced elsewhere in the project with a higher version", package);
                     state.PackagesToRemove.Add(package);
