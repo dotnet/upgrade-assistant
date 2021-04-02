@@ -44,6 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddSolutionSteps();
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
+            services.AddRazorUpdaterStep();
         }
 
         // This extension only adds default config updaters, but other extensions
