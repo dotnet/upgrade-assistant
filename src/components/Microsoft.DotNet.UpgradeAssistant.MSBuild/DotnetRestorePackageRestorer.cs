@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _runner = runner;
         }
 
-        public async Task<RestoreOutput> RestorePackagesAsync(IUpgradeContext context, IProject project, CancellationToken token)
+        public async Task<bool> RestorePackagesAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
             if (context is null)
             {
@@ -34,26 +34,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(project));
             }
 
-            await RunRestoreAsync(context, project.FileInfo.FullName, token).ConfigureAwait(false);
+            var result = await RunRestoreAsync(context, project.FileInfo.FullName, token).ConfigureAwait(false);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
             // aren't available in a project until after restore is run the first time.
             // https://github.com/NuGet/Home/issues/9150
             await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
 
-            return GetRestoreOutput(project);
-        }
-
-        private static RestoreOutput GetRestoreOutput(IProject project)
-        {
-            // Check for the lock file's existence rather than success since a bad NuGet reference won't
-            // prevent other (valid) packages from being restored and we may still have a (partial) lock file.
-            var lockFilePath = project.LockFilePath;
-
-            // Get the path used for caching NuGet packages
-            var nugetCachePath = project.GetFile().GetPropertyValue("NuGetPackageRoot");
-
-            return new RestoreOutput(lockFilePath, Directory.Exists(nugetCachePath) ? nugetCachePath : null);
+            return result;
         }
 
         private Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token)

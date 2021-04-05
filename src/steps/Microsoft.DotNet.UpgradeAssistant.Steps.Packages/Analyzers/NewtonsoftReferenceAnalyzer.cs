@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return Task.FromResult(false);
             }
 
-            if (project.IsTransitivelyAvailable(NewtonsoftPackageName))
+            if (project.NuGetReferences.IsTransitivelyAvailable(NewtonsoftPackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return Task.FromResult(false);
@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-            var packageReferences = project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
+            var packageReferences = project.Required().NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
             if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {

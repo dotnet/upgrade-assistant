@@ -32,6 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
@@ -60,6 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
+            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -100,6 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.FrameworkReferences).Returns(frameworkReferences);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
+            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -137,6 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.References).Returns(references);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
+            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -167,6 +171,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
+            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -183,21 +188,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         public void TransitiveDependencies(string name, ProjectComponents expected)
         {
             // Arrange
-            const int Count = 10;
             var fixture = new Fixture();
-            var dependencies = fixture.CreateMany<NuGetReference>(Count).ToList();
-            dependencies.Insert(Count / 2, fixture.Create<NuGetReference>() with { Name = name });
 
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(false);
 
-            var tfm = fixture.Create<TargetFrameworkMoniker>();
+            var nugetPackages = mock.Mock<INuGetReferences>();
+            nugetPackages.Setup(p => p.IsTransitivelyAvailable(name)).Returns(true);
+
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
-            project.Setup(p => p.GetTransitivePackageReferences(tfm)).Returns(dependencies);
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { tfm });
+            project.Setup(p => p.NuGetReferences).Returns(nugetPackages.Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 

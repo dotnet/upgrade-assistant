@@ -44,9 +44,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // If the package is referenced transitively, mark for removal
-            foreach (var packageReference in project.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in project.NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
-                if (project.IsTransitiveDependency(packageReference))
+                if (project.NuGetReferences.IsTransitiveDependency(packageReference))
                 {
                     _logger.LogInformation("Marking package {PackageName} for removal because it appears to be a transitive dependency", packageReference.Name);
                     state.PackagesToRemove.Add(packageReference);
