@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var components = ProjectComponents.None;
 
             // Check transitive dependencies
-            var nugetReferences = await project.GetNuGetReferences(token).ConfigureAwait(false);
+            var nugetReferences = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
             if (MSBuildConstants.WinRTPackages.Any(package => nugetReferences.IsTransitivelyAvailable(package)))
             {
                 components |= ProjectComponents.WinRT;

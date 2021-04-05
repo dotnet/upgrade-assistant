@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var references = await project.Required().GetNuGetReferences(token).ConfigureAwait(false);
+            var references = await project.Required().GetNuGetReferencesAsync(token).ConfigureAwait(false);
             var packageReferences = references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
             // If the project doesn't include a reference to the analyzer package, mark it for addition

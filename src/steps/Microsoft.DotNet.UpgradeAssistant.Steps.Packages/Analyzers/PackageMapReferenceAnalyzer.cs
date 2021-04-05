@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
             var allPackageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
             var packageMaps = currentTFM.Any(c => c.IsFramework) ? allPackageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray<NuGetPackageMap>() : allPackageMaps;
-            var references = await project.GetNuGetReferences(token).ConfigureAwait(false);
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
             foreach (var packageReference in references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
@@ -102,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         private async Task AddNetCoreReferences(NuGetPackageMap packageMap, PackageAnalysisState state, IProject project, CancellationToken token)
         {
-            var references = await project.GetNuGetReferences(token).ConfigureAwait(false);
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
             foreach (var newPackage in packageMap.NetCorePackages)
             {

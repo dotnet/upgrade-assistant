@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
-            var references = await project.Required().GetNuGetReferences(token).ConfigureAwait(false);
+            var references = await project.Required().GetNuGetReferencesAsync(token).ConfigureAwait(false);
             var packages = references.PackageReferences.ToLookup(p => p.Name);
 
             foreach (var duplicates in packages.Where(g => g.Count() > 1))

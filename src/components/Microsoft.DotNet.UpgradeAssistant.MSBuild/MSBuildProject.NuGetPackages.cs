@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : INuGetReferences
     {
-        public async ValueTask<INuGetReferences> GetNuGetReferences(CancellationToken token)
+        public async ValueTask<INuGetReferences> GetNuGetReferencesAsync(CancellationToken token)
         {
             if (IsRestored)
             {

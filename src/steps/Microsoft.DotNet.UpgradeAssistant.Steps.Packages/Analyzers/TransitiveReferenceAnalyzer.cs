@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var references = await project.GetNuGetReferences(token).ConfigureAwait(false);
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
             // If the package is referenced transitively, mark for removal
             foreach (var packageReference in references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
