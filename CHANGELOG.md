@@ -3,6 +3,14 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+### Added
+- Bundled latest version of try-convert which adds support for WPF and Unit Test projects written with Visual Basic #403
+
+### Fixed
+- Fixed issue surfacing from floating package references. #371
+
+
 ## Version 0.2.217201 - 2021-03-23  ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.217201))
 ### Added
 - Include try-convert version in upgrade-assistant package #358
