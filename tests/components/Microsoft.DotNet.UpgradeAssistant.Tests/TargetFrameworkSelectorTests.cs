@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extras.Moq;
 using Microsoft.Extensions.Options;
@@ -57,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         [InlineData(new[] { Preview }, UpgradeTarget.Current, ProjectOutputType.Library, ProjectComponents.AspNetCore, Preview)]
         [InlineData(new[] { Net45, Preview }, UpgradeTarget.Current, ProjectOutputType.Library, ProjectComponents.AspNetCore, Preview)]
         [Theory]
-        public void NoDependencies(string[] currentTfms, UpgradeTarget target, ProjectOutputType outputType, ProjectComponents components, string expected)
+        public async Task NoDependencies(string[] currentTfms, UpgradeTarget target, ProjectOutputType outputType, ProjectComponents components, string expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose(b => b.RegisterType<TestTfmComparer>().As<ITargetFrameworkMonikerComparer>());
@@ -74,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             var selector = mock.Create<TargetTFMSelector>();
 
             // Act
-            var tfm = selector.SelectTFM(project.Object);
+            var tfm = await selector.SelectTargetFrameworkAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, tfm.Name);

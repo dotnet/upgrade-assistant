@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -37,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// Chooses the most likely target TFM a project should be retargeted to based on its style, output type, dependencies, and
         /// the user's preference of current or LTS.
         /// </summary>
-        public TargetFrameworkMoniker SelectTFM(IProject project)
+        public Task<TargetFrameworkMoniker> SelectTargetFrameworkAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -71,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             _logger.LogDebug("Recommending TFM {TFM} for project {Project}", tfm, project.FileInfo);
 
             // Ensure we don't downgrade a project
-            return EnsureNoDowngrade(tfm, project.TargetFrameworks);
+            return Task.FromResult(EnsureNoDowngrade(tfm, project.TargetFrameworks));
         }
 
         public TargetFrameworkMoniker EnsureProjectDependenciesNoDowngrade(string tfmName, IProject project)

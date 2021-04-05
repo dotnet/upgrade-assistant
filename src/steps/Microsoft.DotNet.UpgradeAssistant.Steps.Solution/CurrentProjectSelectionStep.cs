@@ -163,7 +163,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 return false;
             }
 
-            var expectedTfm = _tfmSelector.SelectTFM(project);
+            var expectedTfm = await _tfmSelector.SelectTargetFrameworkAsync(project, token);
 
             return project.TargetFrameworks.Any(tfm => _tfmComparer.IsCompatible(tfm, expectedTfm));
         }
