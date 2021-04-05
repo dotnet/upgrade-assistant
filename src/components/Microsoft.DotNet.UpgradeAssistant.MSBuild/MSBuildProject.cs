@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using NuGet.Frameworks;
@@ -77,7 +79,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return ProjectOutputType.Library;
         }
 
-        public ProjectComponents Components => _componentIdentifier.GetComponents(this);
+        public ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token)
+            => _componentIdentifier.GetComponents(this, token);
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
         {

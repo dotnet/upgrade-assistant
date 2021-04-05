@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             project.Setup(p => p.FileInfo).Returns(new FileInfo("./test"));
             if (projectComponents.HasValue)
             {
-                project.Setup(p => p.Components).Returns(projectComponents.Value);
+                project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(projectComponents.Value));
             }
 
             var context = mock.Mock<IUpgradeContext>();

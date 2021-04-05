@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.TargetFrameworks).Returns(currentTfms.Select(t => new TargetFrameworkMoniker(t)).ToArray());
-            project.Setup(p => p.Components).Returns(components);
+            project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(components));
             project.Setup(p => p.OutputType).Returns(outputType);
 
             mock.Create<UpgradeOptions>().UpgradeTarget = target;

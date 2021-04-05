@@ -12,6 +12,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// Chooses the most likely target TFM a project should be retargeted to based on its style, output type, dependencies, and
         /// the user's preference of current or LTS.
         /// </summary>
-        Task<TargetFrameworkMoniker> SelectTargetFrameworkAsync(IProject project, CancellationToken token);
+        ValueTask<TargetFrameworkMoniker> SelectTargetFrameworkAsync(IProject project, CancellationToken token);
     }
 }

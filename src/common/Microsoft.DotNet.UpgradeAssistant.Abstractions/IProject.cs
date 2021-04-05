@@ -3,6 +3,8 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -25,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks { get; }
 
-        ProjectComponents Components { get; }
+        ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token);
 
         ProjectOutputType OutputType { get; }
 

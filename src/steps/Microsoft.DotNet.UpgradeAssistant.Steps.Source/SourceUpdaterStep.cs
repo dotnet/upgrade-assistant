@@ -116,7 +116,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             Logger.LogTrace("Running ASP.NET Core upgrade analyzers on {ProjectName}", project.Name);
 
             // Compile with upgrade analyzers enabled
-            var applicableAnalyzers = GetApplicableAnalyzers(_allAnalyzers, Project);
+            var applicableAnalyzers = await GetApplicableAnalyzers(_allAnalyzers, Project).ToListAsync(token).ConfigureAwait(false);
+
             if (!applicableAnalyzers.Any())
             {
                 Diagnostics = Enumerable.Empty<Diagnostic>();
@@ -142,8 +143,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
         }
 
-        private static IEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project) =>
-            analyzers.Where(a => a.GetType().AppliesToProject(project));
+        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
+            => analyzers.ToAsyncEnumerable()
+                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProject(project, token));
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {

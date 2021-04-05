@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
 using Moq;
@@ -19,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData("UseWindowsForms", "True", ProjectComponents.WinForms | ProjectComponents.WindowsDesktop)]
         [InlineData("UseWindowsForms", "false", ProjectComponents.None)]
         [Theory]
-        public void SdkProperties(string propertyName, string value, ProjectComponents expected)
+        public async Task SdkPropertiesAsync(string propertyName, string value, ProjectComponents expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -38,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = componentIdentifier.GetComponents(project.Object);
+            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -48,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData("Microsoft.NET.Sdk.Web", ProjectComponents.AspNetCore)]
         [InlineData("Microsoft.NET.Sdk.Desktop", ProjectComponents.WindowsDesktop)]
         [Theory]
-        public void SdkTypes(string sdk, ProjectComponents expected)
+        public async Task SdkTypesAsync(string sdk, ProjectComponents expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -66,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = componentIdentifier.GetComponents(project.Object);
+            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -83,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData("PresentationFramework", ProjectComponents.Wpf)]
         [InlineData("WindowsBase", ProjectComponents.Wpf)]
         [Theory]
-        public void SdkFrameworkReferences(string frameworkReference, ProjectComponents expected)
+        public async Task SdkFrameworkReferencesAsync(string frameworkReference, ProjectComponents expected)
         {
             // Arrange
             const int Count = 10;
@@ -107,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = componentIdentifier.GetComponents(project.Object);
+            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -123,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData("PresentationFramework", ProjectComponents.Wpf | ProjectComponents.WindowsDesktop)]
         [InlineData("WindowsBase", ProjectComponents.Wpf | ProjectComponents.WindowsDesktop)]
         [Theory]
-        public void NonSdkReferences(string reference, ProjectComponents expected)
+        public async Task NonSdkReferencesAsync(string reference, ProjectComponents expected)
         {
             // Arrange
             const int Count = 10;
@@ -145,7 +146,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = componentIdentifier.GetComponents(project.Object);
+            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -154,7 +155,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData("", ProjectComponents.None)]
         [InlineData("Microsoft.WebApplication.targets", ProjectComponents.AspNet)]
         [Theory]
-        public void NonSdkImports(string import, ProjectComponents expected)
+        public async Task NonSdkImports(string import, ProjectComponents expected)
         {
             // Arrange
             const int Count = 10;
@@ -176,7 +177,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = componentIdentifier.GetComponents(project.Object);
+            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -185,7 +186,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData("", ProjectComponents.None)]
         [InlineData("Microsoft.Windows.SDK.Contracts", ProjectComponents.WinRT)]
         [Theory]
-        public void TransitiveDependencies(string name, ProjectComponents expected)
+        public async Task TransitiveDependenciesAsync(string name, ProjectComponents expected)
         {
             // Arrange
             var fixture = new Fixture();
@@ -205,7 +206,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = componentIdentifier.GetComponents(project.Object);
+            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);

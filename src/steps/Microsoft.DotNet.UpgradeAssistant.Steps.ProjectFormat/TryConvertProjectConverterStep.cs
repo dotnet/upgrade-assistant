@@ -83,10 +83,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
         }
 
-        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
-            => Task.FromResult(InitializeImpl(context));
-
-        private UpgradeStepInitializeResult InitializeImpl(IUpgradeContext context)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -108,10 +105,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 if (!projectFile.IsSdk)
                 {
                     Logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
+
+                    var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+
                     return new UpgradeStepInitializeResult(
                         UpgradeStepStatus.Incomplete,
                         $"Project {projectFile.FilePath} is not an SDK project. Applying this step will execute the following try-convert command line to convert the project to an SDK-style project: {_runner.GetCommandLine(project)}",
-                        project.Components.HasFlag(ProjectComponents.AspNetCore) ? BuildBreakRisk.High : BuildBreakRisk.Medium);
+                        components.HasFlag(ProjectComponents.AspNetCore) ? BuildBreakRisk.High : BuildBreakRisk.Medium);
                 }
                 else
                 {

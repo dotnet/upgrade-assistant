@@ -3,13 +3,15 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class ComponentIdentifier : IComponentIdentifier
     {
-        public ProjectComponents GetComponents(IProject project)
+        public ValueTask<ProjectComponents> GetComponents(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -26,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 components |= GetSDKProjectComponents(project, file);
             }
 
-            return components;
+            return new ValueTask<ProjectComponents>(components);
         }
 
         // Gets project components based on SDK, properties, and FrameworkReferences

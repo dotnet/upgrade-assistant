@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         {
             var project = new Mock<IProject>();
             project.Setup(p => p.Language).Returns(Language.CSharp);
-            project.Setup(p => p.Components).Returns(ProjectComponents.Wpf);
+            project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.Wpf));
 
             return project.Object;
         }
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
         {
             var project = new Mock<IProject>();
             project.Setup(p => p.Language).Returns(Language.VisualBasic);
-            project.Setup(p => p.Components).Returns(ProjectComponents.Wpf);
+            project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.Wpf));
 
             return project.Object;
         }
