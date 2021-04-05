@@ -44,13 +44,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-            if (project.NuGetReferences.IsTransitivelyAvailable(NewtonsoftPackageName))
+            var references = await project.GetNuGetReferences().ConfigureAwait(false);
+            if (references.IsTransitivelyAvailable(NewtonsoftPackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return state;
             }
 
-            var packageReferences = project.Required().NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
+            var packageReferences = references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
             if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {

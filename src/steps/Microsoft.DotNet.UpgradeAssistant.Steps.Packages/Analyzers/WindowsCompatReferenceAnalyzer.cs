@@ -46,7 +46,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-            if (project.NuGetReferences.IsTransitivelyAvailable(PackageName))
+            var references = await project.GetNuGetReferences().ConfigureAwait(false);
+
+            if (references.IsTransitivelyAvailable(PackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
                 return state;
@@ -60,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-            if (project.TryGetPackageByName(PackageName, out var existing))
+            if (references.TryGetPackageByName(PackageName, out var existing))
             {
                 if (_comparer.Compare(existing.Version, latestVersion.Version) >= 0)
                 {

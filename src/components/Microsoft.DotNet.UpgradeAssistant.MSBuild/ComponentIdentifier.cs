@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class ComponentIdentifier : IComponentIdentifier
     {
-        public ValueTask<ProjectComponents> GetComponents(IProject project, CancellationToken token)
+        public async ValueTask<ProjectComponents> GetComponents(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -22,13 +22,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             // SDK-style projects can target .NET Framework and use GAC-referenced app models,
             // so old project components are checked regardless of SDK status
-            var components = GetGeneralProjectComponents(project, file);
+            var components = await GetGeneralProjectComponentsAsync(project, file).ConfigureAwait(false);
+
             if (file.IsSdk)
             {
                 components |= GetSDKProjectComponents(project, file);
             }
 
-            return new ValueTask<ProjectComponents>(components);
+            return components;
         }
 
         // Gets project components based on SDK, properties, and FrameworkReferences
@@ -82,12 +83,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         // Gets project components based on imports and References
-        private static ProjectComponents GetGeneralProjectComponents(IProject project, IProjectFile file)
+        private static async Task<ProjectComponents> GetGeneralProjectComponentsAsync(IProject project, IProjectFile file)
         {
             var components = ProjectComponents.None;
 
             // Check transitive dependencies
-            if (MSBuildConstants.WinRTPackages.Any(package => project.NuGetReferences.IsTransitivelyAvailable(package)))
+            var nugetReferences = await project.GetNuGetReferences().ConfigureAwait(false);
+            if (MSBuildConstants.WinRTPackages.Any(package => nugetReferences.IsTransitivelyAvailable(package)))
             {
                 components |= ProjectComponents.WinRT;
             }

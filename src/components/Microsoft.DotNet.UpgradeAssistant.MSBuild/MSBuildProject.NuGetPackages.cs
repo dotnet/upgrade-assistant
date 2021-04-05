@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
@@ -14,7 +15,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : INuGetReferences
     {
-        public INuGetReferences NuGetReferences => this;
+        public ValueTask<INuGetReferences> GetNuGetReferences()
+        {
+            return new ValueTask<INuGetReferences>(this);
+        }
 
         public bool IsTransitivelyAvailable(string packageName)
             => TargetFrameworks.Any(tfm => ContainsDependency(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase)));

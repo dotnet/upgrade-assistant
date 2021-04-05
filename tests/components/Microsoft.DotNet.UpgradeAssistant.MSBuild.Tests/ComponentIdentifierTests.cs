@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
-            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
+            project.Setup(p => p.GetNuGetReferences()).ReturnsAsync(mock.Mock<INuGetReferences>().Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
-            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
+            project.Setup(p => p.GetNuGetReferences()).ReturnsAsync(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -103,7 +103,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.FrameworkReferences).Returns(frameworkReferences);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
-            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
+            project.Setup(p => p.GetNuGetReferences()).ReturnsAsync(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -141,7 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.References).Returns(references);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
-            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
+            project.Setup(p => p.GetNuGetReferences()).ReturnsAsync(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -172,7 +172,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
-            project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
+            project.Setup(p => p.GetNuGetReferences()).ReturnsAsync(mock.Mock<INuGetReferences>().Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
@@ -201,7 +201,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
-            project.Setup(p => p.NuGetReferences).Returns(nugetPackages.Object);
+            project.Setup(p => p.GetNuGetReferences()).ReturnsAsync(nugetPackages.Object);
 
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
