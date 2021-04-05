@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         /// </summary>
         /// <param name="project">The project whose NuGet package references should be analyzed.</param>
         /// <param name="state">The current analysis state which will be updated and returned.</param>
+        /// <param name="token">The token used to gracefully cancel this request.</param>
         /// <returns>The analysis state object provided updated based on this analyzer's analysis.</returns>
         Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token);
     }
