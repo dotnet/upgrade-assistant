@@ -12,7 +12,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
     /// <summary>
     /// Unit tests for the NewtonsoftReferenceAnalyzer.
     /// </summary>
-    [Collection(MSBuildStepTestCollection.Name)]
     public class NewtonsoftReferenceAnalyzerTests
     {
         /// <summary>
@@ -26,9 +25,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
             using var mock = AutoMock.GetLoose();
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
             var project = mock.Mock<IProject>();
+            var nugetReferences = mock.Mock<INuGetReferences>();
+            nugetReferences.Setup(n => n.IsTransitivelyAvailable(It.IsAny<string>()))
+                .Returns(false);
+
             project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
             project.Setup(p => p.Components).Returns(ProjectComponents.AspNetCore);
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
+            project.Setup(p => p.NuGetReferences).Returns(nugetReferences.Object);
 
             // Act
             var actual = await analyzer.IsApplicableAsync(project.Object, default).ConfigureAwait(false);
