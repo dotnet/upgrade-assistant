@@ -20,17 +20,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private readonly ILogger _logger;
         private readonly IComponentIdentifier _componentIdentifier;
+        private readonly IPackageRestorer _restorer;
 
         public MSBuildWorkspaceUpgradeContext Context { get; }
 
         public FileInfo FileInfo { get; }
 
-        public MSBuildProject(MSBuildWorkspaceUpgradeContext context, IComponentIdentifier componentIdentifier, FileInfo file, ILogger logger)
+        public MSBuildProject(
+            MSBuildWorkspaceUpgradeContext context,
+            IComponentIdentifier componentIdentifier,
+            IPackageRestorer restorer,
+            FileInfo file,
+            ILogger logger)
         {
             FileInfo = file;
             Context = context;
 
             _componentIdentifier = componentIdentifier;
+            _restorer = restorer;
             _logger = logger;
         }
 

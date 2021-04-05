@@ -17,6 +17,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static bool TryGetPackageByName(this INuGetReferences references, string packageName, [MaybeNullWhen(false)] out NuGetReference nugetReference)
         {
+            if (references is null)
+            {
+                throw new ArgumentNullException(nameof(references));
+            }
+
             var matches = references.PackageReferences.Where(p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase)).OrderByDescending(p => Version.Parse(p.Version));
 
             nugetReference = matches.FirstOrDefault();

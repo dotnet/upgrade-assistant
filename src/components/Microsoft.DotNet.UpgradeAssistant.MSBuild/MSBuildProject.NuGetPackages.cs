@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using NuGet.Frameworks;
@@ -15,9 +16,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : INuGetReferences
     {
-        public ValueTask<INuGetReferences> GetNuGetReferences()
+        public async ValueTask<INuGetReferences> GetNuGetReferences(CancellationToken token)
         {
-            return new ValueTask<INuGetReferences>(this);
+            if (IsRestored)
+            {
+                return this;
+            }
+
+            await _restorer.RestorePackagesAsync(Context, this, token).ConfigureAwait(false);
+
+            return this;
         }
 
         public bool IsTransitivelyAvailable(string packageName)
@@ -67,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private IEnumerable<LockFileTargetLibrary> GetAllDependencies(TargetFrameworkMoniker tfm)
         {
-            if (LockFilePath is null)
+            if (!IsRestored)
             {
                 throw new InvalidOperationException("Project needs to be restored before continuing");
             }
@@ -85,5 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal))
                 .Libraries;
         }
+
+        private bool IsRestored => LockFilePath is null;
     }
 }

@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return state;
             }
 
-            var references = await project.GetNuGetReferences().ConfigureAwait(false);
+            var references = await project.GetNuGetReferences(token).ConfigureAwait(false);
 
             if (references.IsTransitivelyAvailable(PackageName))
             {

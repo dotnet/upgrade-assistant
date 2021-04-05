@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IEnumerable<Reference> FrameworkReferences { get; }
 
-        ValueTask<INuGetReferences> GetNuGetReferences();
+        ValueTask<INuGetReferences> GetNuGetReferences(CancellationToken token);
 
         IEnumerable<Reference> References { get; }
 
