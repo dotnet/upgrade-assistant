@@ -51,13 +51,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 
         [Theory]
         [MemberData(nameof(IsApplicableData))]
-        public void IsApplicableTests(bool projectLoaded, ProjectComponents? projectComponents, IConfigUpdater updater, bool expectedResult)
+        public async Task IsApplicableTests(bool projectLoaded, ProjectComponents? projectComponents, IConfigUpdater updater, bool expectedResult)
         {
             // Arrange
             (var context, var step) = GetMockContextAndStep(new[] { "a" }, projectLoaded, new[] { updater }, projectComponents);
 
             // Act
-            var result = step.IsApplicable(context);
+            var result = await step.IsApplicableAsync(context, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expectedResult, result);

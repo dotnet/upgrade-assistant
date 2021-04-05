@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
         [InlineData(true)]
         [InlineData(false)]
         [Theory]
-        public void IsApplicable(bool isApplicable)
+        public async Task IsApplicable(bool isApplicable)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
             }
 
             // Act
-            var result = step.IsApplicable(context.Object);
+            var result = await step.IsApplicableAsync(context.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(isApplicable, result);

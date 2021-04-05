@@ -44,7 +44,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context is not null && context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p)) && !context.IsComplete;
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        {
+            var result = context is not null && context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p)) && !context.IsComplete;
+
+            return Task.FromResult(result);
+        }
 
         // This upgrade step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IUpgradeContext context) => context?.CurrentProject is null && Status == UpgradeStepStatus.Complete;

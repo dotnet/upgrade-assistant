@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && SubSteps.Any();
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null && SubSteps.Any());
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {

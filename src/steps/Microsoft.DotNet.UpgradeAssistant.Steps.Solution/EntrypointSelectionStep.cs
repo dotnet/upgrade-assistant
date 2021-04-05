@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             return result.Project;
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context)
-            => context is not null && context.EntryPoint is null && !context.IsComplete;
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+            => Task.FromResult(context is not null && context.EntryPoint is null && !context.IsComplete);
     }
 }
