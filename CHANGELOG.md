@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Current
 ### Added
-- Bundled latest version of try-convert which adds support for WPF and Unit Test projects written with Visual Basic #403
+- Added support for WPF and Unit Test projects written with Visual Basic #403
 
 ### Fixed
 - Fixed issue surfacing from floating package references. #371
