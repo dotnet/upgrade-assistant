@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
@@ -14,6 +15,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
     /// </summary>
     public class NewtonsoftReferenceAnalyzerTests
     {
+        const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
+
         /// <summary>
         /// Validates that the analyzer will only be applied when TFM is not net48.
         /// </summary>
@@ -24,21 +27,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
             // Arrange
             using var mock = AutoMock.GetLoose();
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
-            var project = mock.Mock<IProject>();
-            var nugetReferences = mock.Mock<INuGetReferences>();
-            nugetReferences.Setup(n => n.IsTransitivelyAvailable(It.IsAny<string>()))
-                .Returns(false);
-
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
-            project.Setup(p => p.Components).Returns(ProjectComponents.AspNetCore);
-            project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
-            project.Setup(p => p.NuGetReferences).Returns(nugetReferences.Object);
+            var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
+            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+            var packageLoader = CreatePackageLoader(mock);
 
             // Act
-            var actual = await analyzer.IsApplicableAsync(project.Object, default).ConfigureAwait(false);
+            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
 
             // Assert
-            Assert.True(actual, "Expected true because the mock is an ASP.NET Core project");
+            Assert.Contains(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+                Times.Once());
         }
 
         /// <summary>
@@ -50,21 +49,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
+
+            var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
+            var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
+            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+            var packageLoader = CreatePackageLoader(mock);
+
+            // shift project attributes so that it is not applicable
+            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net472") });
             var comparer = mock.Mock<ITargetFrameworkMonikerComparer>();
             comparer.Setup(comparer => comparer.Compare(It.IsAny<TargetFrameworkMoniker>(), It.IsAny<TargetFrameworkMoniker>()))
                 .Returns(-1);
 
-            var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
-            var project = mock.Mock<IProject>();
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net472") });
-            project.Setup(p => p.Components).Returns(ProjectComponents.AspNetCore);
-            project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
-
             // Act
-            var actual = await analyzer.IsApplicableAsync(project.Object, default).ConfigureAwait(false);
+            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
 
             // Assert
-            Assert.False(actual, "Expected false because the mock is an ASP.NET Framework project");
+            Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+                Times.Never());
         }
 
         /// <summary>
@@ -76,17 +79,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
+
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
-            var project = mock.Mock<IProject>();
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
-            project.Setup(p => p.Components).Returns(ProjectComponents.AspNetCore);
+            var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
+            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+            var packageLoader = CreatePackageLoader(mock);
+
+            // shift project attributes so that it is not applicable
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Library);
 
             // Act
-            var actual = await analyzer.IsApplicableAsync(project.Object, default).ConfigureAwait(false);
+            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
 
             // Assert
-            Assert.False(actual, "Expected false because the mock is not exe project");
+            Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+                Times.Never());
         }
 
         /// <summary>
@@ -98,17 +106,58 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
+
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
-            var project = mock.Mock<IProject>();
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
+            var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
+            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+            var packageLoader = CreatePackageLoader(mock);
+
+            // shift project attributes so that it is not applicable
             project.Setup(p => p.Components).Returns(ProjectComponents.Wpf);
-            project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
 
             // Act
-            var actual = await analyzer.IsApplicableAsync(project.Object, default).ConfigureAwait(false);
+            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
 
             // Assert
-            Assert.False(actual, "Expected false because the mock is not an ASP.NET project");
+            Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+                Times.Never());
+        }
+
+        private static async Task<PackageAnalysisState> CreatePackageAnalysisState(AutoMock mock, Mock<IProject> project)
+        {
+            var context = mock.Mock<IUpgradeContext>();
+            context.Setup(c => c.CurrentProject).Returns(project.Object);
+            var restorer = mock.Mock<IPackageRestorer>();
+            restorer.Setup(r => r.RestorePackagesAsync(
+                It.IsAny<IUpgradeContext>(),
+                It.IsAny<IProject>(),
+                It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+
+            return await PackageAnalysisState.CreateAsync(context.Object, restorer.Object, CancellationToken.None).ConfigureAwait(true);
+        }
+
+        private static Mock<IProject> CreateProjectForWhichAnalyzerIsApplicable(AutoMock mock)
+        {
+            var project = mock.Mock<IProject>();
+            var nugetReferences = mock.Mock<INuGetReferences>();
+            nugetReferences.Setup(n => n.IsTransitivelyAvailable(It.IsAny<string>()))
+                .Returns(false);
+
+            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
+            project.Setup(p => p.Components).Returns(ProjectComponents.AspNetCore);
+            project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
+            project.Setup(p => p.NuGetReferences).Returns(nugetReferences.Object);
+
+            return project;
+        }
+
+        private static Mock<IPackageLoader> CreatePackageLoader(AutoMock mock)
+        {
+            var packageLoader = mock.Mock<IPackageLoader>();
+            packageLoader.Setup(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult((NuGetReference?)new NuGetReference(NewtonsoftPackageName, "122.0.0")));
+            return packageLoader;
         }
     }
 }

@@ -29,36 +29,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
         }
 
-        /// <summary>
-        /// Limits the step from being applied to the wrong project types.
-        /// </summary>
-        /// <param name="project">The project whose NuGet package references should be analyzed.</param>
-        /// <param name="token">The token used to gracefully cancel this request.</param>
-        /// <returns>True if the project is a web project targeting ASP.NET Core.</returns>
-        public Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
-        {
-            if (project is null)
-            {
-                throw new ArgumentNullException(nameof(project));
-            }
-
-            // This reference only needs added to ASP.NET Core exes
-            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore)
-                && project.OutputType == ProjectOutputType.Exe
-                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, new TargetFrameworkMoniker("netcoreapp3.0")) < 0)))
-            {
-                return Task.FromResult(false);
-            }
-
-            if (project.NuGetReferences.IsTransitivelyAvailable(NewtonsoftPackageName))
-            {
-                _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
-                return Task.FromResult(false);
-            }
-
-            return Task.FromResult(true);
-        }
-
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
             if (project is null)
@@ -71,8 +41,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!await IsApplicableAsync(project, token).ConfigureAwait(false))
+            // This reference only needs added to ASP.NET Core exes
+            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore)
+                && project.OutputType == ProjectOutputType.Exe
+                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, new TargetFrameworkMoniker("netcoreapp3.0")) < 0)))
             {
+                return state;
+            }
+
+            if (project.NuGetReferences.IsTransitivelyAvailable(NewtonsoftPackageName))
+            {
+                _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return state;
             }
 
