@@ -94,6 +94,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 .Libraries;
         }
 
-        private bool IsRestored => LockFilePath is null;
+        private bool IsRestored => LockFilePath is not null;
     }
 }

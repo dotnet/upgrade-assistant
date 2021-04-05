@@ -28,19 +28,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public IEnumerable<UpgradeStep> AllSteps => _orderer.UpgradeSteps;
 
-        public async Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
+        public Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.EntryPoint is not null)
-            {
-                await _restorer.RestorePackagesAsync(context, context.EntryPoint, token).ConfigureAwait(false);
-            }
-
-            return AllSteps;
+            return Task.FromResult(AllSteps);
         }
 
         /// <summary>
