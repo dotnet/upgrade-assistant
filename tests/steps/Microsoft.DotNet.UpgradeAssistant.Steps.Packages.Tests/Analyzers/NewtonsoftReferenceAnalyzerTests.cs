@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
     /// </summary>
     public class NewtonsoftReferenceAnalyzerTests
     {
-        const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
+        private const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
 
         /// <summary>
         /// Validates that the analyzer will only be applied when TFM is not net48.
