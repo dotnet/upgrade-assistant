@@ -8,14 +8,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public interface IPackageReferencesAnalyzer
     {
-        /// <summary>
-        /// Used to determine if a step should be applied at a specific context.
-        /// </summary>
-        /// <param name="project">The project whose NuGet package references should be analyzed.</param>
-        /// <param name="token">The token used to gracefully cancel this request.</param>
-        /// <returns>True if the analyzer is applicable to the project in its current state.</returns>
-        Task<bool> IsApplicableAsync(IProject project, CancellationToken token);
-
         string Name { get; }
 
         /// <summary>

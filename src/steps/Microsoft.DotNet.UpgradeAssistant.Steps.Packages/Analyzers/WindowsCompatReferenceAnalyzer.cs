@@ -29,33 +29,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public string Name => "Windows Compatibility Pack Analyzer";
 
-        /// <summary>
-        /// Limits the step from being applied to the wrong project types.
-        /// </summary>
-        /// <param name="project">The project whose NuGet package references should be analyzed.</param>
-        /// <param name="token">The token used to gracefully cancel this request.</param>
-        /// <returns>True if the project targets windows and the package is not already transitively available.</returns>
-        public Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
-        {
-            if (project is null)
-            {
-                throw new ArgumentNullException(nameof(project));
-            }
-
-            if (!project.TargetFrameworks.Any(tfm => tfm.IsWindows))
-            {
-                return Task.FromResult(false);
-            }
-
-            if (project.NuGetReferences.IsTransitivelyAvailable(PackageName))
-            {
-                _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
-                return Task.FromResult(false);
-            }
-
-            return Task.FromResult(true);
-        }
-
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
             if (project is null)
@@ -68,8 +41,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!await IsApplicableAsync(project, token).ConfigureAwait(false))
+            if (!project.TargetFrameworks.Any(tfm => tfm.IsWindows))
             {
+                return state;
+            }
+
+            if (project.NuGetReferences.IsTransitivelyAvailable(PackageName))
+            {
+                _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
                 return state;
             }
 

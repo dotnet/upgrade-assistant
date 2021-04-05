@@ -42,20 +42,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(project));
             }
 
-            // This reference only needs added to ASP.NET Core exes
-            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore)
-                && project.OutputType == ProjectOutputType.Exe
-                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, new TargetFrameworkMoniker("netcoreapp3.0")) < 0)))
-            {
-                return Task.FromResult(false);
-            }
-
-            if (project.NuGetReferences.IsTransitivelyAvailable(NewtonsoftPackageName))
-            {
-                _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
-                return Task.FromResult(false);
-            }
-
             return Task.FromResult(true);
         }
 
@@ -71,8 +57,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!await IsApplicableAsync(project, token).ConfigureAwait(false))
+            // This reference only needs added to ASP.NET Core exes
+            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore)
+                && project.OutputType == ProjectOutputType.Exe
+                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, new TargetFrameworkMoniker("netcoreapp3.0")) < 0)))
             {
+                return state;
+            }
+
+            if (project.NuGetReferences.IsTransitivelyAvailable(NewtonsoftPackageName))
+            {
+                _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return state;
             }
 

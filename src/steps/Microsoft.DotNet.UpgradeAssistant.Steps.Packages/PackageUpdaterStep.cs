@@ -203,12 +203,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             foreach (var analyzer in _packageAnalyzers)
             {
                 Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                if (!await analyzer.IsApplicableAsync(projectRoot, token).ConfigureAwait(false))
-                {
-                    Logger.LogDebug("Package {AnalyzerName} is not applicable", analyzer.Name);
-                    continue;
-                }
-
                 _analysisState = await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
                 if (_analysisState.Failed)
                 {

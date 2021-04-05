@@ -32,17 +32,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _analyzerPackageVersion = updaterOptions.Value.UpgradeAnalyzersPackageVersion;
         }
 
-        /// <summary>
-        /// This step is always applicable.
-        /// </summary>
-        /// <param name="project">The project whose NuGet package references should be analyzed.</param>
-        /// <param name="token">The token used to gracefully cancel this request.</param>
-        /// <returns>Always returns true.</returns>
-        public Task<bool> IsApplicableAsync(IProject project, CancellationToken token)
-        {
-            return Task.FromResult(true);
-        }
-
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
             if (state is null)
