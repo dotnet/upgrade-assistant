@@ -96,7 +96,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             // 2. Recurse into sub-steps (if needed)
             // 3. Return the step if it's not completed, or
             //    continue iterating with the next step if it is.
-            await foreach (var step in steps)
+            await foreach (var step in steps.ConfigureAwait(false))
             {
                 token.ThrowIfCancellationRequested();
 
