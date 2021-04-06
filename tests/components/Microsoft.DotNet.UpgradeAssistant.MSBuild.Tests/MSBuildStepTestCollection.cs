@@ -13,6 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     [CollectionDefinition(Name)]
     public class MSBuildStepTestCollection : ICollectionFixture<MSBuildRegistrationFixture>
     {
+        // by design this class must be implemented in every test project that uses the MSBuildRegistrationFixture
+        // https://github.com/xunit/xunit/issues/409
         public const string Name = "Package Step Tests";
     }
 }

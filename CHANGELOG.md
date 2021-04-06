@@ -3,6 +3,15 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+### Added
+- Added support for WPF and Unit Test projects written with Visual Basic [#403](https://github.com/dotnet/upgrade-assistant/pull/403)
+
+### Fixed
+- Fixed issue surfacing from floating package references. [#371](https://github.com/dotnet/upgrade-assistant/pull/371)
+- Microsoft.AspNetCore.Mvc.NewtonsoftJson package should no longer be added to .NET Framework projects [#290](https://github.com/dotnet/upgrade-assistant/pull/390)
+- Fixed issue to ignore disabled NuGet sources. [#396](https://github.com/dotnet/upgrade-assistant/issues/396)
+
 ## Version 0.2.217201 - 2021-03-23  ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.217201))
 ### Added
 - Include try-convert version in upgrade-assistant package #358
