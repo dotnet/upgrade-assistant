@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
 
             // This reference only needs added to ASP.NET Core exes
-            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore)
+            if (!(components.HasFlag(ProjectComponents.AspNetCore)
                 && project.OutputType == ProjectOutputType.Exe
                 && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, _netCore3Moniker) < 0)))
             {
