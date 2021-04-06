@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             token.ThrowIfCancellationRequested();
 
-            var steps = GetStepsForContext(context, AllSteps);
+            var steps = GetStepsForContextAsync(context, AllSteps);
 
             if (!await steps.AnyAsync(cancellationToken: token).ConfigureAwait(false))
             {
@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 return null;
             }
 
-            var nextStep = await GetNextStepAsyncInternal(steps, context, token).ConfigureAwait(false);
+            var nextStep = await GetNextStepInternalAsync(steps, context, token).ConfigureAwait(false);
 
             if (nextStep is null)
             {
@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return nextStep;
         }
 
-        private async Task<UpgradeStep?> GetNextStepAsyncInternal(IAsyncEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token)
+        private async Task<UpgradeStep?> GetNextStepInternalAsync(IAsyncEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -123,8 +123,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
                 if (step.SubSteps.Any())
                 {
-                    var applicableSubSteps = GetStepsForContext(context, step.SubSteps);
-                    var nextSubStep = await GetNextStepAsyncInternal(applicableSubSteps, context, token).ConfigureAwait(false);
+                    var applicableSubSteps = GetStepsForContextAsync(context, step.SubSteps);
+                    var nextSubStep = await GetNextStepInternalAsync(applicableSubSteps, context, token).ConfigureAwait(false);
                     if (nextSubStep is not null)
                     {
                         return nextSubStep;
@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return null;
         }
 
-        private static IAsyncEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context, IEnumerable<UpgradeStep> steps)
+        private static IAsyncEnumerable<UpgradeStep> GetStepsForContextAsync(IUpgradeContext context, IEnumerable<UpgradeStep> steps)
             => steps.ToAsyncEnumerable().WhereAwaitWithCancellation(async (s, token) => await s.IsApplicableAsync(context, token).ConfigureAwait(false));
     }
 }
