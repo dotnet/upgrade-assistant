@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="type">a type that represents an upgrade-assistant feature decorated with <see cref="ExportCodeFixProviderAttribute"/>.</param>
         /// <param name="project">the project currently being upgraded.</param>
-        /// <returns>true if the codefixer is described as matching the project's language. Will also return true for non-codefixer objects.</returns>
+        /// <returns>true if the codefixer should be hidden from the user. Will return false for non-codefixer objects.</returns>
         private static bool DoesCodeFixerFilterThisFeature(Type type, IProject project)
         {
             var analyzerAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ExportCodeFixProviderAttribute).FullName, StringComparison.Ordinal));
@@ -110,24 +110,24 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     if (project.Language == Language.CSharp
                         && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.CSharp, StringComparison.Ordinal))
                     {
-                        return false;
+                        return true;
                     }
 
                     if (project.Language == Language.VisualBasic
                         && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.VisualBasic, StringComparison.Ordinal))
                     {
-                        return false;
+                        return true;
                     }
 
                     if (project.Language == Language.FSharp
                         && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.FSharp, StringComparison.Ordinal))
                     {
-                        return false;
+                        return true;
                     }
                 }
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="type">a type that represents an upgrade-assistant feature decorated with <see cref="ApplicableLanguageAttribute"/>.</param>
         /// <param name="project">the project currently being upgraded.</param>
-        /// <returns>true if the object is described as matching the project's language. Objects not defning the language they support will be true as default.</returns>
+        /// <returns>true if the object should be hidden from the user. Will return false for objects not defning the language they support.</returns>
         private static bool DoesApplicableLanguageFilterThisFeature(Type type, IProject project)
         {
             var applicableLangAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ApplicableLanguageAttribute).FullName, StringComparison.Ordinal));
@@ -147,22 +147,22 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     var applicableLanguage = (Language)applicableLangInt.Value;
                     if (project.Language == Language.CSharp && applicableLanguage != Language.CSharp)
                     {
-                        return false;
+                        return true;
                     }
 
                     if (project.Language == Language.VisualBasic && applicableLanguage != Language.VisualBasic)
                     {
-                        return false;
+                        return true;
                     }
 
                     if (project.Language == Language.FSharp && applicableLanguage != Language.FSharp)
                     {
-                        return false;
+                        return true;
                     }
                 }
             }
 
-            return true;
+            return false;
         }
     }
 }
