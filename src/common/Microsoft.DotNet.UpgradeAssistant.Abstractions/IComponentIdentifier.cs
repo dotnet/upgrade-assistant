@@ -8,6 +8,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IComponentIdentifier
     {
-        ValueTask<ProjectComponents> GetComponents(IProject project, CancellationToken token);
+        ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token);
     }
 }

@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class ComponentIdentifier : IComponentIdentifier
     {
-        public async ValueTask<ProjectComponents> GetComponents(IProject project, CancellationToken token)
+        public async ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {

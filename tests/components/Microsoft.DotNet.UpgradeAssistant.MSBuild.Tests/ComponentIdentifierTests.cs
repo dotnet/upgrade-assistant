@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
+            var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
+            var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -108,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
+            var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -146,7 +146,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
+            var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -177,7 +177,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
+            var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);
@@ -206,7 +206,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var componentIdentifier = mock.Create<ComponentIdentifier>();
 
             // Act
-            var components = await componentIdentifier.GetComponents(project.Object, default).ConfigureAwait(false);
+            var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, components);

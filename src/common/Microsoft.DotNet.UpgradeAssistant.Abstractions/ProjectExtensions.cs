@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return nugetReference is not null;
         }
 
-        public static async ValueTask<bool> AppliesToProject(this Type type, IProject project, CancellationToken token)
+        public static async ValueTask<bool> AppliesToProjectAsync(this Type type, IProject project, CancellationToken token)
         {
             if (type is null)
             {

@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     var packages = ProjectRoot.GetAllPackageReferences();
 
-                    return packages.Select(p => p.AsNuGetReference()).ToList();
+                    return packages.Select(p => p.AsNuGetReference());
                 }
                 else
                 {
@@ -109,8 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return false;
             }
 
-            var packageVersion = packageReference.GetNuGetVersion();
-            if (packageVersion == null)
+            if (!packageReference.TryGetNuGetVersion(out var packageVersion))
             {
                 throw new InvalidOperationException("Package references from a lock file should always have a specific version");
             }

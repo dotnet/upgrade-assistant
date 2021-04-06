@@ -145,7 +145,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
             => analyzers.ToAsyncEnumerable()
-                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProject(project, token));
+                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {

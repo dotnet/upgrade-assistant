@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             // Check the code fix provider for an [ApplicableComponents] attribute
             // If one exists, the step only applies if the project has the indicated components
-            return await _fixProvider.GetType().AppliesToProject(context.CurrentProject, token).ConfigureAwait(false);
+            return await _fixProvider.GetType().AppliesToProjectAsync(context.CurrentProject, token).ConfigureAwait(false);
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

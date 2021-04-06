@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             // Check the config updater for an [ApplicableComponents] attribute
             // If one exists, the step only applies if the project has the indicated components
-            return await _configUpdater.GetType().AppliesToProject(context.CurrentProject, token).ConfigureAwait(false);
+            return await _configUpdater.GetType().AppliesToProjectAsync(context.CurrentProject, token).ConfigureAwait(false);
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)

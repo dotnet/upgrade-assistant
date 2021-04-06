@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         public ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token)
-            => _componentIdentifier.GetComponents(this, token);
+            => _componentIdentifier.GetComponentsAsync(this, token);
 
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
         {
