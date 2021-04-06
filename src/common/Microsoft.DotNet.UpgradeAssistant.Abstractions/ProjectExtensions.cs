@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -62,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             // Check whether the type has an [DiagnosticAnalyzer] attribute
             // If one exists, the type only applies to the project if the language matches
-            if (!await DoesAnalyzerApplyToLanguageAsync(type, project).ConfigureAwait(false))
+            if (!AppliesToLanguage(type, project))
             {
                 return false;
             }
@@ -70,32 +69,100 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return true;
         }
 
-        private static ValueTask<bool> DoesAnalyzerApplyToLanguageAsync(Type type, IProject project)
+        /// <summary>
+        /// Checks to see if the type should be filtered out of the user's view.
+        /// </summary>
+        /// <param name="type">a type that represents an upgrade-assistant feature.</param>
+        /// <param name="project">the project currently being upgraded.</param>
+        /// <returns>true if the object is described as matching the project's language. Objects not defning the language they support will be true as default.</returns>
+        private static bool AppliesToLanguage(Type type, IProject project)
         {
-            foreach (var analyzerType in new Type[] { typeof(DiagnosticAnalyzerAttribute), typeof(ExportCodeFixProviderAttribute) })
+            // check to see if this is a code fixer
+            if (DoesCodeFixerFilterThisFeature(type, project))
             {
-                var analyzerAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(analyzerType.FullName, StringComparison.Ordinal));
-                if (analyzerAttr is not null)
-                {
-                    var applicableLanguage = analyzerAttr.ConstructorArguments.First().Value as string;
-                    if (applicableLanguage is not null && !string.IsNullOrWhiteSpace(applicableLanguage))
-                    {
-                        if (project.Language == Language.CSharp
-                            && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.CSharp, StringComparison.Ordinal))
-                        {
-                            return new ValueTask<bool>(Task.FromResult(false));
-                        }
+                return false;
+            }
 
-                        if (project.Language == Language.VisualBasic
-                            && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.VisualBasic, StringComparison.Ordinal))
-                        {
-                            return new ValueTask<bool>(Task.FromResult(false));
-                        }
+            // check to see if this is a configuration step or other feature using the ApplicableLanguageAttribute
+            if (DoesApplicableLanguageFilterThisFeature(type, project))
+            {
+                return false;
+            }
+
+            // if the attribute is not applied then this type defaults to opt into language support
+            return true;
+        }
+
+        /// <summary>
+        /// Checks to see if the type is a codefixer that should be filtered out of the user's view.
+        /// </summary>
+        /// <param name="type">a type that represents an upgrade-assistant feature decorated with <see cref="ExportCodeFixProviderAttribute"/>.</param>
+        /// <param name="project">the project currently being upgraded.</param>
+        /// <returns>true if the codefixer is described as matching the project's language. Will also return true for non-codefixer objects.</returns>
+        private static bool DoesCodeFixerFilterThisFeature(Type type, IProject project)
+        {
+            var analyzerAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ExportCodeFixProviderAttribute).FullName, StringComparison.Ordinal));
+            if (analyzerAttr is not null)
+            {
+                var applicableLanguage = analyzerAttr.ConstructorArguments.First().Value as string;
+                if (applicableLanguage is not null && !string.IsNullOrWhiteSpace(applicableLanguage))
+                {
+                    if (project.Language == Language.CSharp
+                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.CSharp, StringComparison.Ordinal))
+                    {
+                        return false;
+                    }
+
+                    if (project.Language == Language.VisualBasic
+                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.VisualBasic, StringComparison.Ordinal))
+                    {
+                        return false;
+                    }
+
+                    if (project.Language == Language.FSharp
+                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.FSharp, StringComparison.Ordinal))
+                    {
+                        return false;
                     }
                 }
             }
 
-            return new ValueTask<bool>(Task.FromResult(true));
+            return true;
+        }
+
+        /// <summary>
+        /// Checks to see if the type has an ApplicableLanguageAttribute that should filter the feature out of the user's view.
+        /// </summary>
+        /// <param name="type">a type that represents an upgrade-assistant feature decorated with <see cref="ApplicableLanguageAttribute"/>.</param>
+        /// <param name="project">the project currently being upgraded.</param>
+        /// <returns>true if the object is described as matching the project's language. Objects not defning the language they support will be true as default.</returns>
+        private static bool DoesApplicableLanguageFilterThisFeature(Type type, IProject project)
+        {
+            var applicableLangAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ApplicableLanguageAttribute).FullName, StringComparison.Ordinal));
+            if (applicableLangAttr is not null)
+            {
+                var applicableLangInt = applicableLangAttr.ConstructorArguments.First().Value as int?;
+                if (applicableLangInt.HasValue)
+                {
+                    var applicableLanguage = (Language)applicableLangInt.Value;
+                    if (project.Language == Language.CSharp && applicableLanguage != Language.CSharp)
+                    {
+                        return false;
+                    }
+
+                    if (project.Language == Language.VisualBasic && applicableLanguage != Language.VisualBasic)
+                    {
+                        return false;
+                    }
+
+                    if (project.Language == Language.FSharp && applicableLanguage != Language.FSharp)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }
