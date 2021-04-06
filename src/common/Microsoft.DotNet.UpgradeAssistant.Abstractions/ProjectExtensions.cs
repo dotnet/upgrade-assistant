@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -52,6 +53,28 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
 
                     if (!components.HasFlag(projectComponents))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            // Check whether the type has an [DiagnosticAnalyzer] attribute
+            // If one exists, the type only applies to the project if the language matches
+            var analyzerAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(DiagnosticAnalyzerAttribute).FullName, StringComparison.Ordinal));
+            if (analyzerAttr is not null)
+            {
+                var applicableLanguage = analyzerAttr.ConstructorArguments.First().Value as string;
+                if (applicableLanguage is not null && !string.IsNullOrWhiteSpace(applicableLanguage))
+                {
+                    if (project.Language == Language.CSharp
+                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.CSharp, StringComparison.Ordinal))
+                    {
+                        return false;
+                    }
+
+                    if (project.Language == Language.VisualBasic
+                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.VisualBasic, StringComparison.Ordinal))
                     {
                         return false;
                     }

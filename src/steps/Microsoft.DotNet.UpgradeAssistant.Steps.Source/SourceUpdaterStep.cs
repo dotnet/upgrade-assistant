@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override string Description => "Update source files to change ASP.NET references to ASP.NET Core equivalents";
 
-        public override string Title => "Update C# source";
+        public override string Title => "Update source code";
 
         public override string Id => WellKnownStepIds.SourceUpdaterStepId;
 
