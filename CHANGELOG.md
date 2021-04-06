@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Allows projects to be read if they have multiple TFMs. The tool still can't upgrade them, but it won't block upgrading dependent projects [#379](https://github.com/dotnet/upgrade-assistant/issues/379)
 - Fixed issue surfacing from floating package references [#371](https://github.com/dotnet/upgrade-assistant/pull/371)
-- Microsoft.AspNetCore.Mvc.NewtonsoftJson package should no longer be added to .NET Framework projects [#290](https://github.com/dotnet/upgrade-assistant/pull/390)
+- Microsoft.AspNetCore.Mvc.NewtonsoftJson package should no longer be added to .NET Framework projects [#376](https://github.com/dotnet/upgrade-assistant/issues/376)
 - Fixed issue to ignore disabled NuGet sources [#396](https://github.com/dotnet/upgrade-assistant/issues/396)
 - Ensured restore is run when required [#402](https://github.com/dotnet/upgrade-assistant/issues/402)
 
