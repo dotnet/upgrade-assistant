@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null && SubSteps.Any();
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null && SubSteps.Any());
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -116,7 +116,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             Logger.LogTrace("Running ASP.NET Core upgrade analyzers on {ProjectName}", project.Name);
 
             // Compile with upgrade analyzers enabled
-            var applicableAnalyzers = GetApplicableAnalyzers(_allAnalyzers, Project);
+            var applicableAnalyzers = await GetApplicableAnalyzers(_allAnalyzers, Project).ToListAsync(token).ConfigureAwait(false);
+
             if (!applicableAnalyzers.Any())
             {
                 Diagnostics = Enumerable.Empty<Diagnostic>();
@@ -142,8 +143,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
         }
 
-        private static IEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project) =>
-            analyzers.Where(a => a.GetType().AppliesToProject(project));
+        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzers(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
+            => analyzers.ToAsyncEnumerable()
+                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {

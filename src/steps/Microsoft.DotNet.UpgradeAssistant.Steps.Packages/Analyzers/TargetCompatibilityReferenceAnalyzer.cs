@@ -33,28 +33,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var currentTFM = project.Required().TargetFrameworks;
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
-            foreach (var packageReference in project.Required().NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
-                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, currentTFM, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, project.TargetFrameworks, token).ConfigureAwait(false))
                 {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, currentTFM);
+                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, project.TargetFrameworks);
                     continue;
                 }
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, currentTFM, token).ConfigureAwait(false);
+                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, project.TargetFrameworks, token).ConfigureAwait(false);
                     if (updatedReference == null)
                     {
-                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, currentTFM);
+                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, project.TargetFrameworks);
                     }
                     else
                     {

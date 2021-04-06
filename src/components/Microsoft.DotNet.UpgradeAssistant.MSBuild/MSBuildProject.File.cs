@@ -19,6 +19,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         string IProjectFile.FilePath => FileInfo.FullName;
 
+        IProjectFile IProject.GetFile() => this;
+
         // Don't get the project root from Project.Xml since some upgrade
         // steps may need to work with the project XML while it's not in
         // a completely loadable state (for example, prior to converting

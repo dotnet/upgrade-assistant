@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
+        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -32,10 +32,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
+
             // If the package is referenced transitively, mark for removal
-            foreach (var packageReference in project.NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
-                if (project.NuGetReferences.IsTransitiveDependency(packageReference))
+                if (references.IsTransitiveDependency(packageReference))
                 {
                     _logger.LogInformation("Marking package {PackageName} for removal because it appears to be a transitive dependency", packageReference.Name);
                     state.PackagesToRemove.Add(packageReference);
@@ -43,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 }
             }
 
-            return Task.FromResult(state);
+            return state;
         }
     }
 }

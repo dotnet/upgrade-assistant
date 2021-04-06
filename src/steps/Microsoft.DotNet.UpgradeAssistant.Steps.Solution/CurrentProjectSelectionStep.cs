@@ -44,7 +44,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context is not null && context.CurrentProject is null && context.Projects.Any(p => !IsCompleted(context, p)) && !context.IsComplete;
+        protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        {
+            if (context is null || context.CurrentProject is not null || context.IsComplete)
+            {
+                return false;
+            }
+
+            return await context.Projects.ToAsyncEnumerable()
+                .AnyAwaitAsync(async p => !await IsCompletedAsync(context, p, token).ConfigureAwait(false), token).ConfigureAwait(false);
+        }
 
         // This upgrade step is meant to be run fresh every time a new project needs selected
         protected override bool ShouldReset(IUpgradeContext context) => context?.CurrentProject is null && Status == UpgradeStepStatus.Complete;
@@ -77,8 +86,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _orderedProjects = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).ToArray();
 
             // If all projects related to the entry point project are complete or invalid, then the upgrade is done
-            var completeChecks = _orderedProjects.Select(async p => IsCompleted(context, p) || !await RunChecksAsync(p, token).ConfigureAwait(false));
-            if ((await Task.WhenAll(completeChecks).ConfigureAwait(false)).All(b => b))
+            var allProjectsAreUpgraded = await _orderedProjects.ToAsyncEnumerable()
+                .SelectAwait(async p => await IsCompletedAsync(context, p, token).ConfigureAwait(false) || !await RunChecksAsync(p, token).ConfigureAwait(false))
+                .AllAsync(b => b, token).ConfigureAwait(false);
+
+            if (allProjectsAreUpgraded)
             {
                 Logger.LogInformation("No projects need upgraded for entry point {EntryPoint}", context.EntryPoint.FileInfo);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgraded", BuildBreakRisk.None);
@@ -106,7 +118,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             }
             else
             {
-                if (IsCompleted(context, newCurrentProject))
+                if (await IsCompletedAsync(context, newCurrentProject, token).ConfigureAwait(false))
                 {
                     Logger.LogDebug("Project {Project} does not need upgraded", newCurrentProject.FileInfo);
                 }
@@ -130,7 +142,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var selectedProject = await GetProject(context, IsCompleted, token).ConfigureAwait(false);
+            var selectedProject = await GetProjectAsync(context, token).ConfigureAwait(false);
 
             if (selectedProject is null)
             {
@@ -144,19 +156,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         }
 
         // Consider a project completely upgraded if it is SDK-style and has a TFM equal to (or greater then) the expected one
-        private bool IsCompleted(IUpgradeContext context, IProject project)
+        private async ValueTask<bool> IsCompletedAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
             if (!project.GetFile().IsSdk)
             {
                 return false;
             }
 
-            var expectedTfm = _tfmSelector.SelectTFM(project);
+            var expectedTfm = await _tfmSelector.SelectTargetFrameworkAsync(project, token).ConfigureAwait(false);
 
             return project.TargetFrameworks.Any(tfm => _tfmComparer.IsCompatible(tfm, expectedTfm));
         }
 
-        private async Task<IProject> GetProject(IUpgradeContext context, Func<IUpgradeContext, IProject, bool> isProjectCompleted, CancellationToken token)
+        private async Task<IProject> GetProjectAsync(IUpgradeContext context, CancellationToken token)
         {
             const string SelectProjectQuestion = "Here is the recommended order to upgrade. Select enter to follow this list, or input the project you want to start with.";
 
@@ -179,7 +191,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             async Task<ProjectCommand> CreateProjectCommandAsync(IProject project)
             {
-                return new ProjectCommand(project, isProjectCompleted(context, project), await RunChecksAsync(project, token).ConfigureAwait(false));
+                var projectCompleted = await IsCompletedAsync(context, project, token).ConfigureAwait(false);
+                var checks = await RunChecksAsync(project, token).ConfigureAwait(false);
+
+                return new ProjectCommand(project, projectCompleted, checks);
             }
         }
 

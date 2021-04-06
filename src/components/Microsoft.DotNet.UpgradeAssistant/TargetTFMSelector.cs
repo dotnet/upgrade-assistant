@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -37,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// Chooses the most likely target TFM a project should be retargeted to based on its style, output type, dependencies, and
         /// the user's preference of current or LTS.
         /// </summary>
-        public TargetFrameworkMoniker SelectTFM(IProject project)
+        public async ValueTask<TargetFrameworkMoniker> SelectTargetFrameworkAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -45,26 +47,27 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             var tfmName = GetNetStandardTFM(project);
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
 
             // Projects with web components or an Exe output type should use app TFMs
-            if (project.Components.HasFlag(ProjectComponents.AspNet) || project.Components.HasFlag(ProjectComponents.AspNetCore) || project.OutputType == ProjectOutputType.Exe)
+            if (components.HasFlag(ProjectComponents.AspNet) || components.HasFlag(ProjectComponents.AspNetCore) || project.OutputType == ProjectOutputType.Exe)
             {
                 tfmName = AppTFMBase;
             }
 
             // Projects with Windows Desktop components or a WinExe output type should use a -windows suffix
-            if (project.Components.HasFlag(ProjectComponents.WindowsDesktop) || project.OutputType == ProjectOutputType.WinExe)
+            if (components.HasFlag(ProjectComponents.WindowsDesktop) || project.OutputType == ProjectOutputType.WinExe)
             {
                 tfmName = $"{AppTFMBase}{WindowsSuffix}";
 
-                if (project.Components.HasFlag(ProjectComponents.WinRT))
+                if (components.HasFlag(ProjectComponents.WinRT))
                 {
                     // TODO: Default to this version to ensure everything is supported.
                     tfmName += "10.0.19041.0";
                 }
             }
 
-            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FileInfo, project.Components, project.OutputType);
+            _logger.LogDebug("Considering TFM {TFM} for project {Project} based on its style and output type ({ProjectStyle}, {ProjectOutputType})", tfmName, project.FileInfo, components, project.OutputType);
 
             var tfm = EnsureProjectDependenciesNoDowngrade(tfmName, project);
 

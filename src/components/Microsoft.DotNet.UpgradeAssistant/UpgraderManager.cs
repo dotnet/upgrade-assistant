@@ -28,19 +28,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public IEnumerable<UpgradeStep> AllSteps => _orderer.UpgradeSteps;
 
-        public async Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
+        public Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.EntryPoint is not null)
-            {
-                await _restorer.RestorePackagesAsync(context, context.EntryPoint, token).ConfigureAwait(false);
-            }
-
-            return AllSteps;
+            return Task.FromResult(AllSteps);
         }
 
         /// <summary>
@@ -55,13 +50,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             var steps = GetStepsForContext(context, AllSteps);
 
-            if (!steps.Any())
+            if (!await steps.AnyAsync(cancellationToken: token).ConfigureAwait(false))
             {
                 _logger.LogDebug("No applicable upgrade steps found");
                 return null;
             }
 
-            if (steps.All(s => s.IsDone))
+            if (await steps.AllAsync(s => s.IsDone, cancellationToken: token).ConfigureAwait(false))
             {
                 _logger.LogDebug("All steps have completed");
                 return null;
@@ -86,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return nextStep;
         }
 
-        private async Task<UpgradeStep?> GetNextStepAsyncInternal(IEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token)
+        private async Task<UpgradeStep?> GetNextStepAsyncInternal(IAsyncEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -101,7 +96,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             // 2. Recurse into sub-steps (if needed)
             // 3. Return the step if it's not completed, or
             //    continue iterating with the next step if it is.
-            foreach (var step in steps)
+            await foreach (var step in steps.ConfigureAwait(false))
             {
                 token.ThrowIfCancellationRequested();
 
@@ -145,6 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return null;
         }
 
-        private static IEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context, IEnumerable<UpgradeStep> steps) => steps.Where(s => s.IsApplicable(context));
+        private static IAsyncEnumerable<UpgradeStep> GetStepsForContext(IUpgradeContext context, IEnumerable<UpgradeStep> steps)
+            => steps.ToAsyncEnumerable().WhereAwaitWithCancellation(async (s, token) => await s.IsApplicableAsync(context, token).ConfigureAwait(false));
     }
 }

@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
                     // If there was a problem reading the configuration or the configuration only applies to certain output types
                     // or project types which don't match the project, then continue to the next configuration.
-                    if (templateConfig?.TemplateItems is null || !templateConfig.AppliesToProject(project))
+                    if (templateConfig?.TemplateItems is null || !await templateConfig.AppliesToProject(project, token).ConfigureAwait(false))
                     {
                         _logger.LogDebug("Skipping inapplicable template config file {TemplateConfigFile}", configFile);
                         continue;

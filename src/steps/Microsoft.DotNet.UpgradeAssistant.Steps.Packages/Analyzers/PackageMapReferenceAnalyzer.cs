@@ -48,8 +48,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
             var allPackageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
             var packageMaps = currentTFM.Any(c => c.IsFramework) ? allPackageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray<NuGetPackageMap>() : allPackageMaps;
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
-            foreach (var packageReference in project.NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
             {
                 foreach (var map in packageMaps.Where(m => ContainsPackageReference(m.NetFrameworkPackages, packageReference.Name, packageReference.Version)))
                 {
@@ -101,6 +102,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         private async Task AddNetCoreReferences(NuGetPackageMap packageMap, PackageAnalysisState state, IProject project, CancellationToken token)
         {
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
+
             foreach (var newPackage in packageMap.NetCorePackages)
             {
                 var packageToAdd = newPackage;
@@ -114,7 +117,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     }
                 }
 
-                if (!state.PackagesToAdd.Contains(packageToAdd) && !project.NuGetReferences.PackageReferences.Contains(packageToAdd))
+                if (!state.PackagesToAdd.Contains(packageToAdd) && !references.PackageReferences.Contains(packageToAdd))
                 {
                     _logger.LogInformation("Adding package {PackageName} based on package mapping configuration {PackageMapSet}", packageToAdd.Name, packageMap.PackageSetName);
                     state.PackagesToAdd.Add(packageToAdd);

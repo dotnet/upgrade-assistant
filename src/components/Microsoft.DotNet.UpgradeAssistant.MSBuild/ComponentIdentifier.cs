@@ -3,13 +3,15 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class ComponentIdentifier : IComponentIdentifier
     {
-        public ProjectComponents GetComponents(IProject project)
+        public async ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -20,7 +22,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             // SDK-style projects can target .NET Framework and use GAC-referenced app models,
             // so old project components are checked regardless of SDK status
-            var components = GetGeneralProjectComponents(project, file);
+            var components = await GetGeneralProjectComponentsAsync(project, file, token).ConfigureAwait(false);
+
             if (file.IsSdk)
             {
                 components |= GetSDKProjectComponents(project, file);
@@ -80,12 +83,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         // Gets project components based on imports and References
-        private static ProjectComponents GetGeneralProjectComponents(IProject project, IProjectFile file)
+        private static async ValueTask<ProjectComponents> GetGeneralProjectComponentsAsync(IProject project, IProjectFile file, CancellationToken token)
         {
             var components = ProjectComponents.None;
 
             // Check transitive dependencies
-            if (MSBuildConstants.WinRTPackages.Any(package => project.NuGetReferences.IsTransitivelyAvailable(package)))
+            var nugetReferences = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
+            if (MSBuildConstants.WinRTPackages.Any(package => nugetReferences.IsTransitivelyAvailable(package)))
             {
                 components |= ProjectComponents.WinRT;
             }

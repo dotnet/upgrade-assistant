@@ -3,6 +3,8 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -19,13 +21,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IEnumerable<Reference> FrameworkReferences { get; }
 
-        INuGetReferences NuGetReferences { get; }
+        ValueTask<INuGetReferences> GetNuGetReferencesAsync(CancellationToken token);
 
         IEnumerable<Reference> References { get; }
 
         IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks { get; }
 
-        ProjectComponents Components { get; }
+        ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token);
 
         ProjectOutputType OutputType { get; }
 

@@ -97,7 +97,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="context">The upgrade context to evaluate.</param>
         /// <returns>True if the upgrade step makes sense to evaluate and display for the given context, false otherwise.</returns>
-        protected abstract bool IsApplicableImpl(IUpgradeContext context);
+        /// <param name="token"></param>
+        protected abstract Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token);
 
         /// <summary>
         /// Implementers should use this method to initialize Status and any other state needed.
@@ -200,14 +201,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="context">The upgrade context to evaluate.</param>
         /// <returns>True if the upgrade step makes sense to evaluate and display for the given context, false otherwise.</returns>
-        public virtual bool IsApplicable(IUpgradeContext context)
+        /// <param name="token"></param>
+        public virtual async Task<bool> IsApplicableAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var ret = IsApplicableImpl(context);
+            var ret = await IsApplicableImplAsync(context, token).ConfigureAwait(false);
 
             // If the upgrade step applies, but it was previously initialized against a sufficiently different context, reset
             if (ret && Initialized && ShouldReset(context))

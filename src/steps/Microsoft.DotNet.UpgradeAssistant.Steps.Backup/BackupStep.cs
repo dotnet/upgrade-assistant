@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         }
 
         // The backup step backs up at the project level, so it doesn't apply if no project is selected
-        protected override bool IsApplicableImpl(IUpgradeContext context) => context?.CurrentProject is not null;
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {

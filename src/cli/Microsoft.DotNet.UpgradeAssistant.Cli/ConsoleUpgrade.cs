@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 {
                     token.ThrowIfCancellationRequested();
 
-                    ShowUpgradeSteps(steps, context, step);
+                    await ShowUpgradeStepsAsync(steps, context, token, step);
                     _io.Output.WriteLine();
 
                     var commands = _commandProvider.GetCommands(step, context);
@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        private void ShowUpgradeSteps(IEnumerable<UpgradeStep> steps, IUpgradeContext context, UpgradeStep? currentStep = null, int offset = 0)
+        private async Task ShowUpgradeStepsAsync(IEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token, UpgradeStep? currentStep = null, int offset = 0)
         {
             if (steps is null || !steps.Any())
             {
@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 }
             }
 
-            foreach (var step in steps.Where(s => s.IsApplicable(context)).ToList())
+            await foreach (var step in steps.ToAsyncEnumerable().WhereAwait(async s => await s.IsApplicableAsync(context, token)))
             {
                 // Write indent (if any) and item number
                 var indexStr = offset % 2 == 0
@@ -145,7 +145,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 _io.Output.WriteLine(step.Title);
                 nextStepFound = nextStepFound || step.Status != UpgradeStepStatus.Complete;
 
-                ShowUpgradeSteps(step.SubSteps, context, currentStep, offset + 1);
+                await ShowUpgradeStepsAsync(step.SubSteps, context, token, currentStep, offset + 1);
             }
         }
 

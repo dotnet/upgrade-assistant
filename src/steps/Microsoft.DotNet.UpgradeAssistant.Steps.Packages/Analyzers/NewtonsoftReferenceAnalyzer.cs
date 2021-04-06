@@ -42,21 +42,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+
             // This reference only needs added to ASP.NET Core exes
-            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore)
+            if (!(components.HasFlag(ProjectComponents.AspNetCore)
                 && project.OutputType == ProjectOutputType.Exe
                 && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, _netCore3Moniker) < 0)))
             {
                 return state;
             }
 
-            if (project.NuGetReferences.IsTransitivelyAvailable(NewtonsoftPackageName))
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
+            if (references.IsTransitivelyAvailable(NewtonsoftPackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return state;
             }
 
-            var packageReferences = project.Required().NuGetReferences.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
+            var packageReferences = references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
             if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {

@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
             var packageLoader = CreatePackageLoader(mock);
 
             // shift project attributes so that it is not applicable
-            project.Setup(p => p.Components).Returns(ProjectComponents.Wpf);
+            project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.Wpf));
 
             // Act
             var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
@@ -145,9 +145,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
                 .Returns(false);
 
             project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
-            project.Setup(p => p.Components).Returns(ProjectComponents.AspNetCore);
+            project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.AspNetCore));
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
-            project.Setup(p => p.NuGetReferences).Returns(nugetReferences.Object);
+            project.Setup(p => p.GetNuGetReferencesAsync(default)).Returns(new ValueTask<INuGetReferences>(nugetReferences.Object));
 
             return project;
         }

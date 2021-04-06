@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public virtual string InitializedMessage => "Test upgrade step incomplete";
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) => true;
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(true);
 
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {

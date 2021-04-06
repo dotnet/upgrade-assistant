@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
@@ -14,7 +16,84 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : INuGetReferences
     {
-        public INuGetReferences NuGetReferences => this;
+        public async ValueTask<INuGetReferences> GetNuGetReferencesAsync(CancellationToken token)
+        {
+            if (IsRestored)
+            {
+                return this;
+            }
+
+            await _restorer.RestorePackagesAsync(Context, this, token).ConfigureAwait(false);
+
+            return this;
+        }
+
+        public NugetPackageFormat PackageReferenceFormat
+        {
+            get
+            {
+                if (GetPackagesConfigPath() is not null)
+                {
+                    return NugetPackageFormat.PackageConfig;
+                }
+                else if (ProjectRoot.GetAllPackageReferences().ToList() is IEnumerable<Build.Construction.ProjectItemElement> list && list.Any())
+                {
+                    return NugetPackageFormat.PackageReference;
+                }
+                else
+                {
+                    return NugetPackageFormat.None;
+                }
+            }
+        }
+
+        private string? GetPackagesConfigPath() => FindFiles(ProjectItemType.Content, "packages.config").FirstOrDefault();
+
+        public IEnumerable<NuGetReference> PackageReferences
+        {
+            get
+            {
+                var packagesConfig = GetPackagesConfigPath();
+
+                if (packagesConfig is null)
+                {
+                    var packages = ProjectRoot.GetAllPackageReferences();
+
+                    return packages.Select(p => p.AsNuGetReference());
+                }
+                else
+                {
+                    return PackageConfig.GetPackages(packagesConfig);
+                }
+            }
+        }
+
+        public IEnumerable<NuGetReference> GetTransitivePackageReferences(TargetFrameworkMoniker tfm)
+        {
+            if (PackageReferenceFormat != NugetPackageFormat.PackageReference)
+            {
+                return Enumerable.Empty<NuGetReference>();
+            }
+
+            var parsedTfm = NuGetFramework.Parse(tfm.Name);
+            var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+
+            if (lockFile is null)
+            {
+                throw new ProjectRestoreRequiredException($"Project is not restored: {FileInfo}");
+            }
+
+            var lockFileTarget = lockFile
+                .Targets
+                .FirstOrDefault(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal));
+
+            if (lockFileTarget is null)
+            {
+                throw new ProjectRestoreRequiredException($"Could not find {parsedTfm.DotNetFrameworkName} in {LockFilePath} for {FileInfo}");
+            }
+
+            return lockFileTarget.Libraries.Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
+        }
 
         public bool IsTransitivelyAvailable(string packageName)
             => TargetFrameworks.Any(tfm => ContainsDependency(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase)));
@@ -30,8 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return false;
             }
 
-            var packageVersion = packageReference.GetNuGetVersion();
-            if (packageVersion == null)
+            if (!packageReference.TryGetNuGetVersion(out var packageVersion))
             {
                 throw new InvalidOperationException("Package references from a lock file should always have a specific version");
             }
@@ -63,9 +141,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private IEnumerable<LockFileTargetLibrary> GetAllDependencies(TargetFrameworkMoniker tfm)
         {
-            if (LockFilePath is null)
+            if (!IsRestored)
             {
-                throw new InvalidOperationException("Project needs to be restored before continuing");
+                throw new InvalidOperationException("Project should have already been restored. Please file an issue at https://github.com/dotnet/upgrade-assistant");
             }
 
             // If the LockFilePath is defined but does not exist, there are no libraries
@@ -80,6 +158,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return lockFile.Targets
                 .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal))
                 .Libraries;
+        }
+
+        private bool IsRestored => LockFilePath is not null;
+
+        private string? LockFilePath
+        {
+            get
+            {
+                var lockFilePath = Path.Combine(GetPropertyValue("MSBuildProjectExtensionsPath"), "project.assets.json");
+
+                if (string.IsNullOrEmpty(lockFilePath))
+                {
+                    return null;
+                }
+
+                if (!Path.IsPathFullyQualified(lockFilePath))
+                {
+                    lockFilePath = Path.Combine(FileInfo.DirectoryName ?? string.Empty, lockFilePath);
+                }
+
+                return lockFilePath;
+            }
         }
     }
 }
