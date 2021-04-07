@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -29,6 +28,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return nugetReference is not null;
         }
 
+        /// <summary>
+        /// Checks to see if the type represents something the user should see as part of the upgrade journey.
+        /// </summary>
+        /// <param name="type">A type that represents an upgrade-assistant feature.</param>
+        /// <param name="project">The project currently being upgraded.</param>
+        /// <param name="token">The cancellation token.</param>
+        /// <returns>A valueTask containing a bool. True if this is something the user should see.</returns>
         public static async ValueTask<bool> AppliesToProjectAsync(this Type type, IProject project, CancellationToken token)
         {
             if (type is null)
@@ -72,9 +78,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Checks to see if the type should be filtered out of the user's view.
         /// </summary>
-        /// <param name="type">a type that represents an upgrade-assistant feature.</param>
-        /// <param name="project">the project currently being upgraded.</param>
-        /// <returns>true if the object is described as matching the project's language. Objects not defning the language they support will be true as default.</returns>
+        /// <param name="type">A type that represents an upgrade-assistant feature.</param>
+        /// <param name="project">The project currently being upgraded.</param>
+        /// <returns>True if the object is described as matching the project's language. Objects not defning the language they support will be true as default.</returns>
         private static bool AppliesToLanguage(Type type, IProject project)
         {
             // check to see if this is a code fixer
@@ -96,9 +102,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Checks to see if the type is a codefixer that should be filtered out of the user's view.
         /// </summary>
-        /// <param name="type">a type that represents an upgrade-assistant feature decorated with <see cref="ExportCodeFixProviderAttribute"/>.</param>
-        /// <param name="project">the project currently being upgraded.</param>
-        /// <returns>true if the codefixer should be hidden from the user. Will return false for non-codefixer objects.</returns>
+        /// <param name="type">A type that represents a codefixer <see cref="ExportCodeFixProviderAttribute"/>.</param>
+        /// <param name="project">The project currently being upgraded.</param>
+        /// <returns>True if the codefixer should be hidden from the user. Will return false for non-codefixer objects.</returns>
         private static bool DoesCodeFixerFilterThisFeature(Type type, IProject project)
         {
             var analyzerAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ExportCodeFixProviderAttribute).FullName, StringComparison.Ordinal));
