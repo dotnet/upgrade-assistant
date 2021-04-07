@@ -76,16 +76,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return false;
             }
 
-            var applicableSubsteps = 0;
             foreach (var substep in SubSteps)
             {
                 if (await substep.IsApplicableAsync(context, token).ConfigureAwait(false))
                 {
-                    applicableSubsteps++;
+                    return true;
                 }
             }
 
-            return applicableSubsteps > 0;
+            return false;
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
