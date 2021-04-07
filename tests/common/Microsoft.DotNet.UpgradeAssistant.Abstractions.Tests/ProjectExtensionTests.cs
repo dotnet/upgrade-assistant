@@ -1,13 +1,13 @@
-﻿namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
-{
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Autofac.Extras.Moq;
-    using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
-    using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
-    using Moq;
-    using Xunit;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Autofac.Extras.Moq;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Moq;
+using Xunit;
 
+namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
+{
     /// <summary>
     /// Tests that validate methods in the ProjectExtensions.cs class.
     /// </summary>
@@ -16,10 +16,10 @@
         /// <summary>
         /// Checks to see if AppliesToProjectAsync will show HttpContextCurrentCodeFixer when applicable.
         /// </summary>
-        /// <param name="components">a component of the project being tested.</param>
-        /// <param name="language">the language of the project being tested.</param>
-        /// <param name="expected">the expected test outcome.</param>
-        /// <returns>a task.</returns>
+        /// <param name="components">A component of the project being tested.</param>
+        /// <param name="language">The language of the project being tested.</param>
+        /// <param name="expected">The expected test outcome.</param>
+        /// <returns>A task.</returns>
         [Theory]
         [InlineData(ProjectComponents.AspNetCore, Language.CSharp, true)]
         [InlineData(ProjectComponents.AspNetCore, Language.VisualBasic, false)]
@@ -51,9 +51,9 @@
         /// <summary>
         /// Checks to see if AppliesToProjectAsync will show WebNamespaceConfigUpdater when applicable.
         /// </summary>
-        /// <param name="components">a component of the project being tested.</param>
-        /// <param name="language">the language of the project being tested.</param>
-        /// <param name="expected">the expected test outcome.</param>
+        /// <param name="components">A component of the project being tested.</param>
+        /// <param name="language">The language of the project being tested.</param>
+        /// <param name="expected">The expected test outcome.</param>
         /// <returns>a task.</returns>
         [Theory]
         [InlineData(ProjectComponents.AspNetCore, Language.CSharp, true)]
