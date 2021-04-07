@@ -1,10 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
+using System;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    using System;
-
     /// <summary>
     /// An attribute for marking code fix providers that are only applicable when
     /// the project being upgraded contains certain components.
