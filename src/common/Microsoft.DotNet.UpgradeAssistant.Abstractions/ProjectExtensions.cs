@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -108,32 +109,53 @@ namespace Microsoft.DotNet.UpgradeAssistant
         private static bool DoesCodeFixerFilterThisFeature(Type type, IProject project)
         {
             var analyzerAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ExportCodeFixProviderAttribute).FullName, StringComparison.Ordinal));
-            if (analyzerAttr is not null)
+            if (analyzerAttr is null)
             {
-                var applicableLanguage = analyzerAttr.ConstructorArguments.First().Value as string;
+                // this object is not the type we thought it was, the filter does not apply
+                return false;
+            }
+
+            var supportedLanguages = new List<string>();
+            var firstLanguage = analyzerAttr.ConstructorArguments.First().Value as string;
+            if (firstLanguage is null)
+            {
+                // this object is not the type we thought it was, the filter does not apply
+                return false;
+            }
+
+            supportedLanguages.Add(firstLanguage);
+
+            var additionalLanguages = analyzerAttr.ConstructorArguments.Last().Value as IEnumerable<System.Reflection.CustomAttributeTypedArgument>;
+            if (additionalLanguages is not null)
+            {
+                supportedLanguages.AddRange(additionalLanguages.Select(l => l.Value.ToString()));
+            }
+
+            foreach (var applicableLanguage in supportedLanguages)
+            {
                 if (applicableLanguage is not null && !string.IsNullOrWhiteSpace(applicableLanguage))
                 {
                     if (project.Language == Language.CSharp
-                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.CSharp, StringComparison.Ordinal))
+                        && applicableLanguage.Equals(CodeAnalysis.LanguageNames.CSharp, StringComparison.Ordinal))
                     {
-                        return true;
+                        return false;
                     }
 
                     if (project.Language == Language.VisualBasic
-                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.VisualBasic, StringComparison.Ordinal))
+                        && applicableLanguage.Equals(CodeAnalysis.LanguageNames.VisualBasic, StringComparison.Ordinal))
                     {
-                        return true;
+                        return false;
                     }
 
                     if (project.Language == Language.FSharp
-                        && !applicableLanguage.Equals(CodeAnalysis.LanguageNames.FSharp, StringComparison.Ordinal))
+                        && applicableLanguage.Equals(CodeAnalysis.LanguageNames.FSharp, StringComparison.Ordinal))
                     {
-                        return true;
+                        return false;
                     }
                 }
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
