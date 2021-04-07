@@ -13,18 +13,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public sealed class ApplicableLanguageAttribute : Attribute
     {
         /// <summary>
-        /// Gets the language that a project must contain for the attributed feature to apply.
+        /// Gets a list of valid languages that a project could contain for the attributed feature to apply.
         /// </summary>
-        public Language Language { get; }
+        public Language[] Languages { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicableLanguageAttribute"/> class.
         /// </summary>
-        /// <param name="language">The language that a project must contain for the attributed
-        /// code fix provider to apply to it.</param>
-        public ApplicableLanguageAttribute(Language language)
+        /// <param name="languages">If a projec contains any of the the languages then the attributed
+        /// code fix provider will apply to it.</param>
+        public ApplicableLanguageAttribute(params Language[] languages)
         {
-            Language = language;
+            Languages = languages;
         }
     }
 }

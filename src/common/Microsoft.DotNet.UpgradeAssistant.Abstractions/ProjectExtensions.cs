@@ -167,30 +167,45 @@ namespace Microsoft.DotNet.UpgradeAssistant
         private static bool DoesApplicableLanguageFilterThisFeature(Type type, IProject project)
         {
             var applicableLangAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ApplicableLanguageAttribute).FullName, StringComparison.Ordinal));
-            if (applicableLangAttr is not null)
+            if (applicableLangAttr is null)
             {
-                var applicableLangInt = applicableLangAttr.ConstructorArguments.First().Value as int?;
-                if (applicableLangInt.HasValue)
+                // this object is not the type we thought it was, the filter does not apply
+                return false;
+            }
+
+            var languageNumbers = applicableLangAttr.ConstructorArguments.First().Value as IEnumerable<System.Reflection.CustomAttributeTypedArgument>;
+            if (languageNumbers is null)
+            {
+                // this object is not the type we thought it was, the filter does not apply
+                return false;
+            }
+
+            foreach (var applicableLangInt in languageNumbers.Select(l => l.Value as int?))
+            {
+                if (!applicableLangInt.HasValue)
                 {
-                    var applicableLanguage = (Language)applicableLangInt.Value;
-                    if (project.Language == Language.CSharp && applicableLanguage != Language.CSharp)
-                    {
-                        return true;
-                    }
+                    // this object is not the type we thought it was, the filter does not apply
+                    return false;
+                }
 
-                    if (project.Language == Language.VisualBasic && applicableLanguage != Language.VisualBasic)
-                    {
-                        return true;
-                    }
+                var applicableLanguage = (Language)applicableLangInt;
+                if (project.Language == Language.CSharp && applicableLanguage == Language.CSharp)
+                {
+                    return false;
+                }
 
-                    if (project.Language == Language.FSharp && applicableLanguage != Language.FSharp)
-                    {
-                        return true;
-                    }
+                if (project.Language == Language.VisualBasic && applicableLanguage == Language.VisualBasic)
+                {
+                    return false;
+                }
+
+                if (project.Language == Language.FSharp && applicableLanguage == Language.FSharp)
+                {
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
     }
 }
