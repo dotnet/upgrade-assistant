@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
     /// <summary>
     /// Tests that validate methods in the ProjectExtensions.cs class.
     /// </summary>
-    public class ProjectExtensionTests
+    public class ProjectExtensionsTests
     {
         /// <summary>
         /// Checks to see if AppliesToProjectAsync will show HttpContextCurrentCodeFixer when applicable.
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
                 .Returns(new ValueTask<ProjectComponents>(Task.FromResult(components)));
 
             // Act
-            var actual = await httpCommonCodeFixer.AppliesToProjectAsync(project.Object, default);
+            var actual = await httpCommonCodeFixer.AppliesToProjectAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             if (expected)
@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
                 .Returns(new ValueTask<ProjectComponents>(Task.FromResult(components)));
 
             // Act
-            var actual = await testCodefixer.AppliesToProjectAsync(project.Object, default);
+            var actual = await testCodefixer.AppliesToProjectAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             if (expected)
@@ -106,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
                 .Returns(new ValueTask<ProjectComponents>(Task.FromResult(components)));
 
             // Act
-            var actual = await webNamespaceConfigUpdater.AppliesToProjectAsync(project.Object, default);
+            var actual = await webNamespaceConfigUpdater.AppliesToProjectAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             if (expected)
@@ -141,7 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
                 .Returns(new ValueTask<ProjectComponents>(Task.FromResult(components)));
 
             // Act
-            var actual = await testConfigUpdater.AppliesToProjectAsync(project.Object, default);
+            var actual = await testConfigUpdater.AppliesToProjectAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             if (expected)
