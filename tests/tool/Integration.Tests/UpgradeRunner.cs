@@ -17,7 +17,7 @@ namespace Integration.Tests
 {
     public static class UpgradeRunner
     {
-        public static async Task<bool> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
+        public static async Task<int> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -41,7 +41,7 @@ namespace Integration.Tests
                 EntryPoint = entrypoint,
             };
 
-            var result = await Program.RunUpgradeAsync(options, host => host
+            return await Program.RunUpgradeAsync(options, host => host
                 .ConfigureServices((_, services) =>
                 {
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
@@ -55,8 +55,6 @@ namespace Integration.Tests
                     logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
                 }), cts.Token).ConfigureAwait(false);
-
-            return result == ErrorCodes.Success;
         }
     }
 }

@@ -3,9 +3,10 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Reporting
+namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public record Row(IReadOnlyCollection<object> Data)
+    public interface IVersionComparer : IComparer<string>
     {
+        bool IsMajorChange(string x, string y);
     }
 }

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -53,7 +54,7 @@ namespace Integration.Tests
             // Run upgrade
             var result = await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
 
-            Assert.True(result);
+            Assert.Equal(ErrorCodes.Success, result);
 
             CleanupBuildArtifacts(workingDir);
 

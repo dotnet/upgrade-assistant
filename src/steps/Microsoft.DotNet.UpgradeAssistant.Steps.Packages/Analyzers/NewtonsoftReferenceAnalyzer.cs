@@ -9,19 +9,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
+    /// <summary>
+    /// Increases backward compatibility by using the Newtonsoft Serializer for ASP.NET Core.
+    /// </summary>
     public class NewtonsoftReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
 
+        private readonly TargetFrameworkMoniker _netCore3Moniker = new TargetFrameworkMoniker("netcoreapp3.0");
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<NewtonsoftReferenceAnalyzer> _logger;
+        private readonly ITargetFrameworkMonikerComparer _tfmComparer;
 
         public string Name => "Newtonsoft.Json reference analyzer";
 
-        public NewtonsoftReferenceAnalyzer(IPackageLoader packageLoader, ILogger<NewtonsoftReferenceAnalyzer> logger)
+        public NewtonsoftReferenceAnalyzer(IPackageLoader packageLoader, ILogger<NewtonsoftReferenceAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
         }
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
@@ -36,19 +42,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+
             // This reference only needs added to ASP.NET Core exes
-            if (!(project.Components.HasFlag(ProjectComponents.AspNetCore) && project.OutputType == ProjectOutputType.Exe))
+            if (!(components.HasFlag(ProjectComponents.AspNetCore)
+                && project.OutputType == ProjectOutputType.Exe
+                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, _netCore3Moniker) < 0)))
             {
                 return state;
             }
 
-            if (project.IsTransitivelyAvailable(NewtonsoftPackageName))
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
+            if (references.IsTransitivelyAvailable(NewtonsoftPackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return state;
             }
 
-            var packageReferences = project.Required().PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
+            var packageReferences = references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
             if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {

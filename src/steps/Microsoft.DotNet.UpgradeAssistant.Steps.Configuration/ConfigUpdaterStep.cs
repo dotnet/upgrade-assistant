@@ -55,10 +55,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 
-        protected override bool IsApplicableImpl(IUpgradeContext context) =>
-            context?.CurrentProject is not null &&
-            SubSteps.Any() &&
-            _configFilePaths.Select(p => Path.Combine(context.CurrentProject.FileInfo.DirectoryName, p)).Any(f => File.Exists(f));
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        {
+            var result = context?.CurrentProject is not null &&
+                SubSteps.Any() &&
+                _configFilePaths.Select(p => Path.Combine(context.CurrentProject.FileInfo.DirectoryName, p)).Any(f => File.Exists(f));
+
+            return Task.FromResult(result);
+        }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {

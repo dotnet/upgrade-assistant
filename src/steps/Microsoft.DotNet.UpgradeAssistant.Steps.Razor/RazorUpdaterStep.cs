@@ -75,11 +75,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// are no Razor updaters available.
         /// </summary>
         /// <param name="context">The context to evaluate.</param>
+        /// <param name="token">A token that can be used to cancel execution.</param>
         /// <returns>True if the Razor updater step might apply, false otherwise.</returns>
-        protected override bool IsApplicableImpl(IUpgradeContext context) =>
-            context?.CurrentProject is not null
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) =>
+            Task.FromResult(context?.CurrentProject is not null
             && SubSteps.Any()
-            && GetRazorFileSystem(context.CurrentProject.Required()).EnumerateItems("/").Any();
+            && GetRazorFileSystem(context.CurrentProject.Required()).EnumerateItems("/").Any());
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {

@@ -1,18 +1,29 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
+using System.Diagnostics.CodeAnalysis;
 using NuGet.Versioning;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public static class NuGetExtensions
     {
         public static NuGetVersion? GetNuGetVersion(this NuGetReference nugetRef)
         {
-            if (nugetRef == null)
+            if (nugetRef is null)
             {
-                throw new ArgumentNullException(nameof(nugetRef));
+                throw new System.ArgumentNullException(nameof(nugetRef));
+            }
+
+            return nugetRef.TryGetNuGetVersion(out var result) ? result : null;
+        }
+
+        public static bool TryGetNuGetVersion(this NuGetReference? nugetRef, [MaybeNullWhen(false)] out NuGetVersion result)
+        {
+            if (nugetRef is null)
+            {
+                result = null;
+                return false;
             }
 
             if (nugetRef.HasWildcardVersion)
@@ -24,19 +35,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     // when a range is used
                     if (range.HasMinVersion)
                     {
-                        return range.MinVersion;
+                        result = range.MinVersion;
+                        return true;
                     }
                 }
-
-                return null;
             }
-
-            if (NuGetVersion.TryParse(nugetRef.Version, out var version))
+            else if (NuGetVersion.TryParse(nugetRef.Version, out var version))
             {
-                return version;
+                result = version;
+                return true;
             }
 
-            return null;
+            result = null;
+            return false;
         }
     }
 }

@@ -3,10 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -51,13 +49,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 
         [Theory]
         [MemberData(nameof(IsApplicableData))]
-        public void IsApplicableTests(bool projectLoaded, ProjectComponents? projectComponents, IUpdater<ConfigFile> updater, bool expectedResult)
+        public async Task IsApplicableTests(bool projectLoaded, ProjectComponents? projectComponents, IUpdater<ConfigFile> updater, bool expectedResult)
         {
             // Arrange
             (var context, var step) = GetMockContextAndStep(new[] { "a" }, projectLoaded, new[] { updater }, projectComponents);
 
             // Act
-            var result = step.IsApplicable(context);
+            var result = await step.IsApplicableAsync(context, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expectedResult, result);
@@ -223,7 +221,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             project.Setup(p => p.FileInfo).Returns(new FileInfo("./test"));
             if (projectComponents.HasValue)
             {
-                project.Setup(p => p.Components).Returns(projectComponents.Value);
+                project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(projectComponents.Value));
             }
 
             var context = mock.Mock<IUpgradeContext>();

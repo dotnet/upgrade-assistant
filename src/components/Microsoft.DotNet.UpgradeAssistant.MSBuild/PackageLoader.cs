@@ -15,7 +15,7 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public sealed class PackageLoader : IPackageLoader, IDisposable
     {
@@ -25,6 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private readonly SourceCacheContext _cache;
         private readonly List<PackageSource> _packageSources;
         private readonly ILogger _logger;
+        private readonly string _cachePath;
 
         public IEnumerable<string> PackageSources => _packageSources.Select(s => s.Source);
 
@@ -43,11 +44,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = new SourceCacheContext();
             _packageSources = GetPackageSources(Path.GetDirectoryName(options.ProjectPath));
+
+            var settings = Settings.LoadDefaultSettings(null);
+            _cachePath = SettingsUtility.GetGlobalPackagesFolder(settings);
         }
 
-        public async Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, string cachePath, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
+        public async Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
         {
-            using var packageArchive = await GetPackageArchiveAsync(packageReference, token, cachePath).ConfigureAwait(false);
+            using var packageArchive = await GetPackageArchiveAsync(packageReference, token).ConfigureAwait(false);
 
             if (packageArchive is null)
             {
@@ -139,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             {
                 var nugetSettings = Settings.LoadDefaultSettings(projectDir);
                 var sourceProvider = new PackageSourceProvider(nugetSettings);
-                packageSources.AddRange(sourceProvider.LoadPackageSources());
+                packageSources.AddRange(sourceProvider.LoadPackageSources().Where(e => e.IsEnabled));
             }
 
             if (packageSources.Count == 0)
@@ -210,7 +214,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             return ret;
         }
 
-        private async Task<PackageArchiveReader?> GetPackageArchiveAsync(NuGetReference packageReference, CancellationToken token, string? cachePath = null)
+        private async Task<PackageArchiveReader?> GetPackageArchiveAsync(NuGetReference packageReference, CancellationToken token)
         {
             if (packageReference is null)
             {
@@ -223,9 +227,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             // First look in the local NuGet cache for the archive
-            if (cachePath != null)
+            if (_cachePath is not null)
             {
-                var archivePath = Path.Combine(cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
+                var archivePath = Path.Combine(_cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
                 if (File.Exists(archivePath))
                 {
                     _logger.LogDebug("NuGet package {NuGetPackage} loaded from {PackagePath}", packageReference, archivePath);

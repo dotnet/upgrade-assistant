@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public class TemplateConfiguration
     {
-    // This is a false positive
+        // This is a false positive
 #pragma warning disable CA2227 // Collection properties should be read only
         public Dictionary<string, string>? Replacements { get; init; }
 #pragma warning restore CA2227 // Collection properties should be read only
@@ -22,14 +24,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         public Language? TemplateLanguage { get; set; }
 
-        internal bool AppliesToProject(IProject project)
+        internal async ValueTask<bool> AppliesToProject(IProject project, CancellationToken token)
         {
             if (TemplateOutputType is not null && !TemplateOutputType.Contains(project.OutputType))
             {
                 return false;
             }
 
-            if (TemplateAppliesTo is not null && !TemplateAppliesTo.All(flag => project.Components.HasFlag(flag)))
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+
+            if (TemplateAppliesTo is not null && !TemplateAppliesTo.All(flag => components.HasFlag(flag)))
             {
                 return false;
             }

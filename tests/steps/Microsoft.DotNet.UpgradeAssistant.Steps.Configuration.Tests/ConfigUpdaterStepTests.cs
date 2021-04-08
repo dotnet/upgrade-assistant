@@ -67,13 +67,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         [InlineData(new[] { "DoesNotExist.xml" }, 1, true, false)] // Non-existent config file
         [InlineData(new[] { "TestConfig.xml" }, 0, true, false)] // No config updaters
         [InlineData(new[] { "TestConfig.xml" }, 1, false, false)] // No project loaded
-        public void IsApplicableTests(string[] configPaths, int subStepCount, bool projectLoaded, bool expectedValue)
+        public async Task IsApplicableTests(string[] configPaths, int subStepCount, bool projectLoaded, bool expectedValue)
         {
             // Arrange
             (var context, var step) = GetMockContextAndStep(configPaths, projectLoaded, 0, subStepCount);
 
             // Act
-            var result = step.IsApplicable(context);
+            var result = await step.IsApplicableAsync(context, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expectedValue, result);
