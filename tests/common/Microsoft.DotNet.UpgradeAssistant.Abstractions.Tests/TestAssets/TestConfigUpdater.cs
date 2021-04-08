@@ -11,13 +11,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets
     [ApplicableLanguage(Language.CSharp, Language.FSharp)]
     public class TestConfigUpdater : IConfigUpdater
     {
-        public string Id => throw new System.NotImplementedException();
+        public string Id => throw new System.InvalidOperationException("I am a mock");
 
-        public string Title => throw new System.NotImplementedException();
+        public string Title => throw new System.InvalidOperationException("I am a mock");
 
-        public string Description => throw new System.NotImplementedException();
+        public string Description => throw new System.InvalidOperationException("I am a mock");
 
-        public BuildBreakRisk Risk => throw new System.NotImplementedException();
+        public BuildBreakRisk Risk => throw new System.InvalidOperationException("I am a mock");
 
         public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
         {
