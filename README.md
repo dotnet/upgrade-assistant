@@ -32,6 +32,11 @@ As you upgrade projects from .NET Framework to .NET 5, it will be very useful to
 
 Web scenarios can be especially challenging, so it you are upgrading an ASP.NET app, be sure to read [ASP.NET Core migration documentation](https://docs.microsoft.com/aspnet/core/migration/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
 
+The following tutorials will give you a sense of how to upgrade ASP.NET, Windows Forms, and WPF applications to .NET 5 using the Upgrade Assistant:
+- [Upgrade an ASP.NET MVC App to .NET 5 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-aspnetmvc)
+- [Upgrade a Windows Forms App to .NET 5 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-winforms-framework)
+- [Upgrade a WPF App to .NET 5 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-wpf-framework)
+
 Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook)
 
 [![Porting existing ASP.NET apps to .NET Core by Steve "ardalis" Smith](https://user-images.githubusercontent.com/782127/108890126-2c82f680-75db-11eb-9358-dc0a5d877b6d.png)](https://aka.ms/aspnet-porting-ebook)
