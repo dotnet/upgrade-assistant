@@ -125,34 +125,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             supportedLanguages.Add(firstLanguage);
 
-            var additionalLanguages = analyzerAttr.ConstructorArguments.Last().Value as IEnumerable<System.Reflection.CustomAttributeTypedArgument>;
+            var additionalLanguages = analyzerAttr.ConstructorArguments.LastOrDefault().Value as IEnumerable<System.Reflection.CustomAttributeTypedArgument>;
             if (additionalLanguages is not null)
             {
                 supportedLanguages.AddRange(additionalLanguages.Select(l => l.Value.ToString()));
             }
 
-            foreach (var applicableLanguage in supportedLanguages)
+            if (supportedLanguages.Any(applicableLanguage =>
+                    (project.Language == Language.CSharp && CodeAnalysis.LanguageNames.CSharp.Equals(applicableLanguage, StringComparison.Ordinal))
+                    || (project.Language == Language.VisualBasic && CodeAnalysis.LanguageNames.VisualBasic.Equals(applicableLanguage, StringComparison.Ordinal))
+                    || (project.Language == Language.FSharp && CodeAnalysis.LanguageNames.FSharp.Equals(applicableLanguage, StringComparison.Ordinal))))
             {
-                if (applicableLanguage is not null && !string.IsNullOrWhiteSpace(applicableLanguage))
-                {
-                    if (project.Language == Language.CSharp
-                        && applicableLanguage.Equals(CodeAnalysis.LanguageNames.CSharp, StringComparison.Ordinal))
-                    {
-                        return false;
-                    }
-
-                    if (project.Language == Language.VisualBasic
-                        && applicableLanguage.Equals(CodeAnalysis.LanguageNames.VisualBasic, StringComparison.Ordinal))
-                    {
-                        return false;
-                    }
-
-                    if (project.Language == Language.FSharp
-                        && applicableLanguage.Equals(CodeAnalysis.LanguageNames.FSharp, StringComparison.Ordinal))
-                    {
-                        return false;
-                    }
-                }
+                return false;
             }
 
             return true;
@@ -173,7 +157,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 return false;
             }
 
-            var languageNumbers = applicableLangAttr.ConstructorArguments.First().Value as IEnumerable<System.Reflection.CustomAttributeTypedArgument>;
+            var languageNumbers = applicableLangAttr.ConstructorArguments.FirstOrDefault().Value as IEnumerable<System.Reflection.CustomAttributeTypedArgument>;
             if (languageNumbers is null)
             {
                 // this object is not the type we thought it was, the filter does not apply
@@ -189,17 +173,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 }
 
                 var applicableLanguage = (Language)applicableLangInt;
-                if (project.Language == Language.CSharp && applicableLanguage == Language.CSharp)
-                {
-                    return false;
-                }
-
-                if (project.Language == Language.VisualBasic && applicableLanguage == Language.VisualBasic)
-                {
-                    return false;
-                }
-
-                if (project.Language == Language.FSharp && applicableLanguage == Language.FSharp)
+                if (project.Language == applicableLanguage)
                 {
                     return false;
                 }
