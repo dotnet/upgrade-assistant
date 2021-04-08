@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.assets
+namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.FSharp, Name = "UHOH1 CodeFix Provider")]

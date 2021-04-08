@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.assets
+namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ApplicableLanguage(Language.CSharp, Language.FSharp)]
