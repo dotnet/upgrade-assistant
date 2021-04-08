@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     {
         private RazorProjectEngine? _razorEngine;
 
-        public override string Title => "Update Razor source";
+        public override string Title => "Update Razor files";
 
         public override string Description => "Update Razor files using registered Razor updaters";
 
@@ -45,11 +45,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public ImmutableArray<RazorCodeDocument>? RazorDocuments { get; set; }
+        private ImmutableArray<RazorCodeDocument>? _razorDocuments;
+
+        public ImmutableArray<RazorCodeDocument> RazorDocuments =>
+            _razorDocuments ?? throw new InvalidOperationException("Razor documents are not available until the updater step is initialized or until ProcessRazorDocuments has been called.");
 
         public RazorUpdaterStep(IEnumerable<IUpdater<RazorCodeDocument>> razorUpdaters, ILogger<RazorUpdaterStep> logger)
             : base(logger)
         {
+            if (razorUpdaters is null)
+            {
+                throw new ArgumentNullException(nameof(razorUpdaters));
+            }
+
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
@@ -104,7 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         public override UpgradeStepInitializeResult Reset()
         {
             _razorEngine = null;
-            RazorDocuments = null;
+            _razorDocuments = null;
             return base.Reset();
         }
 
@@ -123,14 +131,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         {
             if (_razorEngine is null)
             {
-                RazorDocuments = null;
+                _razorDocuments = null;
                 Logger.LogError("Razor documents cannot be retrieved prior to initializing RazorUpdaterStep");
                 throw new InvalidOperationException("Razor documents cannot be retrieved prior to initializing RazorUpdaterStep");
             }
 
             var files = _razorEngine.FileSystem.EnumerateItems("/");
             Logger.LogTrace("Generating Razor code documents for {RazorCount} files", files.Count());
-            RazorDocuments = ImmutableArray.CreateRange(files.Select(item => _razorEngine.Process(item)));
+            _razorDocuments = ImmutableArray.CreateRange(files.Select(item => _razorEngine.Process(item)));
         }
 
         private static RazorProjectFileSystem GetRazorFileSystem(IProject project) =>

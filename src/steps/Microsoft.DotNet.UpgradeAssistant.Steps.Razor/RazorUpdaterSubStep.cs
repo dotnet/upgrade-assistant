@@ -53,15 +53,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!_razorUpdaterStep.RazorDocuments.HasValue)
-            {
-                Logger.LogError("Razor documents must be processed before initializing Razor updater sub-steps");
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Razor documents must be processed before initializing Razor updater sub-steps", Risk);
-            }
-
             try
             {
-                return await _updater.IsApplicableAsync(context, _razorUpdaterStep.RazorDocuments.Value, token).ConfigureAwait(false)
+                return await _updater.IsApplicableAsync(context, _razorUpdaterStep.RazorDocuments, token).ConfigureAwait(false)
                     ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Razor updater \"{_updater.Title}\" needs applied", _updater.Risk)
                     : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }
@@ -81,15 +75,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (!_razorUpdaterStep.RazorDocuments.HasValue)
-            {
-                Logger.LogError("Razor documents must be processed before applying Razor updater sub-steps");
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Razor documents must be processed before applying Razor updater sub-steps");
-            }
-
             try
             {
-                if (await _updater.ApplyAsync(context, _razorUpdaterStep.RazorDocuments.Value, token).ConfigureAwait(false))
+                if (await _updater.ApplyAsync(context, _razorUpdaterStep.RazorDocuments, token).ConfigureAwait(false))
                 {
                     // Process Razor documents again after successfully applying an updater in case Razor files have changed
                     _razorUpdaterStep.ProcessRazorDocuments();
