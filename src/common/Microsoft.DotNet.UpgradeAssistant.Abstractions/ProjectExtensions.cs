@@ -116,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             var supportedLanguages = new List<string>();
-            var firstLanguage = analyzerAttr.ConstructorArguments.First().Value as string;
+            var firstLanguage = analyzerAttr.ConstructorArguments.FirstOrDefault().Value as string;
             if (firstLanguage is null)
             {
                 // this object is not the type we thought it was, the filter does not apply
