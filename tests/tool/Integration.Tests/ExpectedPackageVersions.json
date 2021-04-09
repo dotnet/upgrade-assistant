@@ -1,0 +1,4 @@
+{
+  "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "5.0.5",
+  "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers":  "1.0.0"
+}

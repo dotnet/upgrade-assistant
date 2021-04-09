@@ -12,6 +12,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -102,6 +103,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
 
             var hostBuilder = Host.CreateDefaultBuilder()
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureServices((context, services) =>
                 {

@@ -16,7 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<UpgradeAssistantReferenceAnalyzer> _logger;
-        private readonly string? _analyzerPackageVersion;
 
         public string Name => "Upgrade assistant reference analyzer";
 
@@ -29,7 +28,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _analyzerPackageVersion = updaterOptions.Value.UpgradeAnalyzersPackageVersion;
         }
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
@@ -45,12 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // If the project doesn't include a reference to the analyzer package, mark it for addition
             if (!packageReferences.Any(r => AnalyzerPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                // Use the analyzer package version from configuration if specified, otherwise get the latest version.
-                // When looking for the latest analyzer version, use the analyzer package source from configuration
-                // if one is specified, otherwise just use the package sources from the project being analyzed.
-                var analyzerPackage = _analyzerPackageVersion is not null
-                    ? new NuGetReference(AnalyzerPackageName, _analyzerPackageVersion)
-                    : await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, true, null, token).ConfigureAwait(false);
+                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, true, null, token).ConfigureAwait(false);
 
                 if (analyzerPackage is not null)
                 {

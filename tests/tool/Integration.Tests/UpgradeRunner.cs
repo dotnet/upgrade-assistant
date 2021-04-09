@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using Integration.Tests.Integration.Tests;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
@@ -47,14 +49,17 @@ namespace Integration.Tests
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
                     {
                         o.PackageMapPath = "PackageMaps";
-                        o.UpgradeAnalyzersPackageVersion = "1.0.0";
                     });
                 })
-                .ConfigureLogging((ctx, logging) =>
+                .ConfigureContainer<ContainerBuilder>(builder =>
                 {
-                    logging.SetMinimumLevel(LogLevel.Trace);
-                    logging.AddProvider(new TestOutputHelperLoggerProvider(output));
-                }), cts.Token).ConfigureAwait(false);
+                    builder.RegisterType<KnownPackages>()
+                        .SingleInstance()
+                        .AsSelf();
+
+                    builder.RegisterDecorator<InterceptingKnownPackageLoader, IPackageLoader>();
+                }),
+                cts.Token).ConfigureAwait(false);
         }
     }
 }

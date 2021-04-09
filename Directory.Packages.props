@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageVersion Include="Automapper" Version="10.1.1" />
     <PackageVersion Include="Autofac.Extras.Moq" Version="6.0.0" />
+    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageVersion Include="AutoFixture" Version="4.15.0" />
     <PackageVersion Include="coverlet.collector" Version="3.0.2" />
     <PackageVersion Include="Microsoft.Build" Version="16.8.0" />
