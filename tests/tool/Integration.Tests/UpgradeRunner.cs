@@ -58,6 +58,11 @@ namespace Integration.Tests
                         .AsSelf();
 
                     builder.RegisterDecorator<InterceptingKnownPackageLoader, IPackageLoader>();
+                })
+                .ConfigureLogging((ctx, logging) =>
+                {
+                    logging.SetMinimumLevel(LogLevel.Trace);
+                    logging.AddProvider(new TestOutputHelperLoggerProvider(output));
                 }),
                 cts.Token).ConfigureAwait(false);
         }

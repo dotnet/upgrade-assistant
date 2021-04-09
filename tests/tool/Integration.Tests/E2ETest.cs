@@ -86,7 +86,7 @@ namespace Integration.Tests
                 }
                 else if (expectedFiles[i] != actualFiles[i])
                 {
-                    Assert.True(false, $"Was expecting to see the file '{expectedFiles[i]}' but found '{actualFiles[i]}' instead.{Environment.NewLine} For more details see: {actualDir}");
+                    Assert.True(false, $"Was expecting to see the file '{expectedFiles[i]}' but found '{actualFiles[i]}' instead.");
                 }
             }
 
@@ -100,7 +100,7 @@ namespace Integration.Tests
                 }
                 catch (EqualException ex)
                 {
-                    Assert.True(false, $"The contents of \"{file}\" do not match.{Environment.NewLine}{ex.Message}.{Environment.NewLine} For more details see: {actualDir}");
+                    Assert.True(false, $"The contents of \"{file}\" do not match.{Environment.NewLine}{ex.Message}");
                 }
             }
         }
