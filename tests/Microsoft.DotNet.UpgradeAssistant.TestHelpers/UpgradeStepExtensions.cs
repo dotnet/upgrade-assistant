@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Reflection;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Razor;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -17,6 +19,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             method.Invoke(step, new object[] { status });
+        }
+
+        public static void ClearRazorDocuments(this RazorUpdaterStep step)
+        {
+            var field = typeof(RazorUpdaterStep).GetField("_razorDocuments", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (field is null)
+            {
+                throw new InvalidOperationException("Could not find RazorUpdaterStep._razorDocuments field");
+            }
+
+            field.SetValue(step, null);
         }
     }
 }

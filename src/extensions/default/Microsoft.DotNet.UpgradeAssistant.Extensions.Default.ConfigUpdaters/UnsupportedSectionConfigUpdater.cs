@@ -40,11 +40,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _logger = logger;
         }
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             var applied = false;
 
-            foreach (var configFile in configFiles)
+            foreach (var configFile in inputs)
             {
                 var updated = false;
 
@@ -70,9 +70,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             return Task.FromResult(applied);
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
-            foreach (var configFile in configFiles)
+            foreach (var configFile in inputs)
             {
                 if (GetUnsupportedSections(configFile).Any())
                 {

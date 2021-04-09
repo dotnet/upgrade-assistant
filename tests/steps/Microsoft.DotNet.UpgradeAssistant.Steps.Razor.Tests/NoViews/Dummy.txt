@@ -1,0 +1,1 @@
+﻿Place-holder file so that a test folder without cshtml files will be available

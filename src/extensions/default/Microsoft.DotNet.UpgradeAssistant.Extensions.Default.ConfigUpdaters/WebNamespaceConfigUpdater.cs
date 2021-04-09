@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _viewImportsPath = null;
         }
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             }
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             // Find namespace imports in config files
             var namespaces = new List<string>();
-            foreach (var configFile in configFiles)
+            foreach (var configFile in inputs)
             {
                 var namespacesElement = configFile.Contents.XPathSelectElement(NamespacesPath);
                 if (namespacesElement is not null)

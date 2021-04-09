@@ -28,13 +28,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             _isApplicable = isApplicable;
         }
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             ApplyCount++;
             return Task.FromResult(_isApplicable);
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             return Task.FromResult(_isApplicable);
         }

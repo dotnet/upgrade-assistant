@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _appSettings = new Dictionary<string, string>();
         }
 
-        public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -115,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             return true;
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             // Find appSettings elements in the config files
             var appSettings = new Dictionary<string, string>();
-            foreach (var configFile in configFiles)
+            foreach (var configFile in inputs)
             {
                 var appSettingsElement = configFile.Contents.XPathSelectElement(AppSettingsPath);
                 if (appSettingsElement is not null)
