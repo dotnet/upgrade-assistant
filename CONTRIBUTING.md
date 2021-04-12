@@ -6,7 +6,7 @@ One of the easiest ways for you to contribute is to participate in discussions o
 Start a discussion on the [repository issue tracker](https://github.com/dotnet/upgrade-assistant/issues).
 
 ## Bugs and feature requests?
-For non-security related bugs, please [log a new issue](https://github.com/dotnet/upgrade-assistant/issues).
+For non-security related bugs, please [log a new issue](https://github.com/dotnet/upgrade-assistant/issues) or simply click [this link](https://github.com/dotnet/upgrade-assistant/issues/new?assignees=&labels=bug&template=20_bug_report.md).
 
 ## How to submit a PR 
 
@@ -15,7 +15,7 @@ To help you be successful we've put together a few simple rules to follow when y
 
 **Finding an issue to work on**
 
-  We've created a separate bucket of issues, which would be great candidates for community members to contribute to. We mark these issues with `help wanted` label. You can find all these issues [here](https://github.com/dotnet/upgrade-assistant/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
+  We've created a separate bucket of issues, which would be great candidates for community members to contribute to. We mark these issues with the `help wanted` label. You can find all these issues [here](https://github.com/dotnet/upgrade-assistant/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
   
 Within that set, we have additionally marked issues which are good candidates for first-time contributors. Those do not require too much familiarity with the codebase and are more novice-friendly. Those are marked with `good first issue` label. The full list of such issues can be found [here](https://github.com/dotnet/upgrade-assistant/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
   
@@ -23,7 +23,7 @@ If there is some other area not included here where you want to contribute to, f
   
 **Before writing code**
 
-  This can save you a lot of time. We've seen PRs, where customers would solve an issue in a way, which either wouldn't fit into upgrade-assistant because of how it's designed or it would change upgrade-assistant in a way, which is not something we'd like to do. To avoid these situations, we encourage customers to discuss the preferred design with the team first. To do so, file a new `design proposal` issue, link to the issue you'd like to address and provide detailed information about how you'd like to solve a specific problem. We triage issues peridocially and it will not take long for a team member to engage with you on that proposal.
+  This can save you a lot of time. We've seen PRs where customers solve an issue in a way which either wouldn't fit into upgrade-assistant because of how it's designed or would change upgrade-assistant in a way which is not something we'd like to do. To avoid these situations, we encourage customers to discuss the preferred design with the team first. To do so, file a new `design proposal` issue, link to the issue you'd like to address and provide detailed information about how you'd like to solve a specific problem. We triage issues periodically and it will not take long for a team member to engage with you on that proposal.
   When you get an agreement from our team members that the design proposal you have is solid, then go ahead and prepare the PR.
   To file a design proposal, look for the relevant issue in the `New issue` page or simply click [this link](https://github.com/dotnet/upgrade-assistant/issues/new?assignees=&labels=design-proposal&template=10_design_proposal.md):
   ![image](https://user-images.githubusercontent.com/34246760/107969904-41b9ae80-6f65-11eb-8b84-d15e7d94753b.png)
@@ -38,10 +38,10 @@ Before submitting a pull request, make sure that it checks the following require
 - Your code matches the existing syntax conventions within the codebase
 - Your PR is small, focused, and avoids making unrelated changes
   
-If your pull request contains any of the below, it's less likely to be merged.
+If your pull request contains any of the below, it's less likely to be merged:
 
 - Changes that break backward compatibility
-- Changes that are only wanted by one person/company. Changes need to benefit a large enough proportion of upgrade-assistant users.
+- Changes that are only wanted by one person/company. Changes need to benefit a large enough portion of upgrade-assistant users.
 - Changes that add entirely new feature areas without prior agreement
 - Changes that are mostly about refactoring existing code or code style
 - Very large PRs that would take hours to review (remember, we're trying to help lots of people at once). For larger work areas, please discuss with us to find ways of breaking it down into smaller, incremental pieces that can go into separate PRs.
@@ -68,13 +68,11 @@ If you don't know what a pull request is read this article: https://help.github.
 ### Tests
 
 -  Tests need to be provided for every bug/feature that is completed.
--  Tests only need to be present for issues that need to be verified by QA (for example, not tasks)
--  If there is a scenario that is far too hard to test there does not need to be a test for it.
-- "Too hard" is determined by the team as a whole.
+-  Tests only need to be present for issues that are not docs or samples.
 
 ### Feedback
 
-Your pull request will now go through extensive checks by the subject matter experts on our team. Please be patient, while upgrade-assistant team gets through it. Update your pull request according to feedback until it is approved by one of the upgrade-assistant team members. Once the PR is approved, one of the upgrade-assistant team members will merge your PR into the repo.
+Your pull request will now go through extensive checks by the subject matter experts on our team. Please be patient while upgrade-assistant team gets through it. Update your pull request according to feedback until it is approved by one of the upgrade-assistant team members. Once the PR is approved, one of the upgrade-assistant team members will merge your PR into the repo.
 
 ## Code of conduct
 See [CODE-OF-CONDUCT.md](./CODE-OF-CONDUCT.md)
