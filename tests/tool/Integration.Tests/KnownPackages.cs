@@ -10,37 +10,34 @@ using Microsoft.DotNet.UpgradeAssistant;
 
 namespace Integration.Tests
 {
-    namespace Integration.Tests
+    internal class KnownPackages
     {
-        internal class KnownPackages
+        private const string EXPECTED_PACKAGE_VERSIONS = "ExpectedPackageVersions.json";
+        private readonly Dictionary<string, string> _knownValues;
+
+        public KnownPackages()
         {
-            private const string EXPECTED_PACKAGE_VERSIONS = "ExpectedPackageVersions.json";
-            private readonly Dictionary<string, string> _knownValues;
+            var knownVersionsJson = File.ReadAllText(EXPECTED_PACKAGE_VERSIONS);
+            _knownValues = JsonSerializer.Deserialize<Dictionary<string, string>>(knownVersionsJson)
+                ?? throw new InvalidOperationException($"{EXPECTED_PACKAGE_VERSIONS} was not found");
+        }
 
-            public KnownPackages()
+        public bool TryGetValue(string name, [MaybeNullWhen(false)] out NuGetReference nuget)
+        {
+            if (_knownValues is null)
             {
-                var knownVersionsJson = File.ReadAllText(EXPECTED_PACKAGE_VERSIONS);
-                _knownValues = JsonSerializer.Deserialize<Dictionary<string, string>>(knownVersionsJson)
-                    ?? throw new InvalidOperationException($"{EXPECTED_PACKAGE_VERSIONS} was not found");
-            }
-
-            public bool TryGetValue(string name, [MaybeNullWhen(false)] out NuGetReference nuget)
-            {
-                if (_knownValues is null)
-                {
-                    nuget = null;
-                    return false;
-                }
-
-                if (_knownValues.TryGetValue(name, out var specificVersion))
-                {
-                    nuget = new NuGetReference(name, specificVersion.ToString());
-                    return true;
-                }
-
                 nuget = null;
                 return false;
             }
+
+            if (_knownValues.TryGetValue(name, out var specificVersion))
+            {
+                nuget = new NuGetReference(name, specificVersion.ToString());
+                return true;
+            }
+
+            nuget = null;
+            return false;
         }
     }
 }
