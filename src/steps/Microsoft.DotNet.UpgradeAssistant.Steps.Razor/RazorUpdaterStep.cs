@@ -45,10 +45,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             WellKnownStepIds.NextProjectStepId,
         };
 
-        private ImmutableArray<RazorCodeDocument>? _razorDocuments;
+        private Dictionary<string, RazorCodeDocument> _razorDocuments;
 
-        public ImmutableArray<RazorCodeDocument> RazorDocuments =>
-            _razorDocuments ?? throw new InvalidOperationException("Razor documents are not available until the updater step is initialized or until ProcessRazorDocuments has been called.");
+        public ImmutableArray<RazorCodeDocument> RazorDocuments => ImmutableArray.CreateRange(_razorDocuments.Values);
 
         public RazorUpdaterStep(IEnumerable<IUpdater<RazorCodeDocument>> razorUpdaters, ILogger<RazorUpdaterStep> logger)
             : base(logger)
@@ -62,6 +61,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             {
                 throw new ArgumentNullException(nameof(logger));
             }
+
+            _razorDocuments = new Dictionary<string, RazorCodeDocument>();
 
             // Add a sub-step for each Razor updater
             SubSteps = new List<UpgradeStep>(razorUpdaters.Select(updater => new RazorUpdaterSubStep(this, updater, logger)));
@@ -96,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 RazorExtensions.Register(builder);
             });
 
-            ProcessRazorDocuments();
+            ProcessRazorDocuments(null);
 
             foreach (var step in SubSteps)
             {
@@ -113,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         public override UpgradeStepInitializeResult Reset()
         {
             _razorEngine = null;
-            _razorDocuments = null;
+            _razorDocuments.Clear();
             return base.Reset();
         }
 
@@ -128,18 +129,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 : Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Razor updaters need applied"));
         }
 
-        public void ProcessRazorDocuments()
+        public void ProcessRazorDocuments(IEnumerable<string>? relativePathsToProcess)
         {
             if (_razorEngine is null)
             {
-                _razorDocuments = null;
                 Logger.LogError("Razor documents cannot be retrieved prior to initializing RazorUpdaterStep");
                 throw new InvalidOperationException("Razor documents cannot be retrieved prior to initializing RazorUpdaterStep");
             }
 
             var files = _razorEngine.FileSystem.EnumerateItems("/");
+            if (relativePathsToProcess is not null)
+            {
+                files = files.Where(f => relativePathsToProcess.Contains(f.RelativePhysicalPath));
+            }
+
             Logger.LogTrace("Generating Razor code documents for {RazorCount} files", files.Count());
-            _razorDocuments = ImmutableArray.CreateRange(files.Select(item => _razorEngine.Process(item)));
+
+            foreach (var file in files)
+            {
+                _razorDocuments[file.RelativePhysicalPath] = _razorEngine.Process(file);
+            }
         }
 
         private static RazorProjectFileSystem GetRazorFileSystem(IProject project) =>

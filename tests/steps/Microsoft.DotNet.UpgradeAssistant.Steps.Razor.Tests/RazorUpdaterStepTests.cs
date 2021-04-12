@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 s => Assert.Equal("RazorUpdater #2", s));
             Assert.Equal(UpgradeStepStatus.Unknown, step.Status);
             Assert.False(step.IsDone);
-            Assert.Throws<InvalidOperationException>(() => step.RazorDocuments);
+            Assert.Empty(step.RazorDocuments);
         }
 
         [Fact]
@@ -160,12 +160,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             using var mock = GetMock(true, projectPath, 0, 1);
             var step = mock.Create<RazorUpdaterStep>();
             var context = mock.Mock<IUpgradeContext>();
-            Assert.Throws<InvalidOperationException>(() => step.ProcessRazorDocuments());
+            Assert.Throws<InvalidOperationException>(() => step.ProcessRazorDocuments(null));
             await step.InitializeAsync(context.Object, CancellationToken.None).ConfigureAwait(true);
             step.ClearRazorDocuments();
 
             // Act
-            step.ProcessRazorDocuments();
+            step.ProcessRazorDocuments(null);
 
             // Assert
             // Confirm that RazorDocuments are correctly populated
@@ -185,7 +185,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             step.Reset();
 
             // Assert
-            Assert.Throws<InvalidOperationException>(() => step.ProcessRazorDocuments());
+            Assert.Throws<InvalidOperationException>(() => step.ProcessRazorDocuments(null));
             Assert.Equal(UpgradeStepStatus.Unknown, step.Status);
             Assert.Equal(string.Empty, step.StatusDetails);
             Assert.Equal(BuildBreakRisk.Unknown, step.Risk);

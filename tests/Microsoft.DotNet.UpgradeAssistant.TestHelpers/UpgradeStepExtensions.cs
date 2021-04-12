@@ -2,7 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Razor;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -30,7 +32,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 throw new InvalidOperationException("Could not find RazorUpdaterStep._razorDocuments field");
             }
 
-            field.SetValue(step, null);
+            var documents = field.GetValue(step) as Dictionary<string, RazorCodeDocument>;
+            documents?.Clear();
         }
     }
 }

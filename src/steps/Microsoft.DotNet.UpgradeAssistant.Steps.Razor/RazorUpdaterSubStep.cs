@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Check the updater for an [ApplicableComponents] attribute
             // If one exists, the step only applies if the project has the indicated components
-            return  await _updater.GetType().AppliesToProjectAsync(context.CurrentProject, token);
+            return await _updater.GetType().AppliesToProjectAsync(context.CurrentProject, token).ConfigureAwait(false);
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
@@ -79,8 +79,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             {
                 if (await _updater.ApplyAsync(context, _razorUpdaterStep.RazorDocuments, token).ConfigureAwait(false))
                 {
+                    // TODO : Get the updated documents from the updater and only process those documents
+
                     // Process Razor documents again after successfully applying an updater in case Razor files have changed
-                    _razorUpdaterStep.ProcessRazorDocuments();
+                    _razorUpdaterStep.ProcessRazorDocuments(null);
 
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
                 }
