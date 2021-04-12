@@ -67,7 +67,7 @@ If you don't know what a pull request is read this article: https://help.github.
 
 ### Tests
 
--  Tests need to be provided for every bug/feature that is completed.
+-  Tests need to be provided for every bug/feature that is completed. [Tests](/tests) in upgrade-assistant use [XUnit](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-dotnet-test), [AutoMock](https://autofac.org/apidoc/html/6C60CE20.htm), and [AutoFixture](https://github.com/AutoFixture/AutoFixture/wiki/Cheat-Sheet) for testing/mocking/data generation.
 -  Tests only need to be present for issues that are not docs or samples.
 
 ### Feedback
