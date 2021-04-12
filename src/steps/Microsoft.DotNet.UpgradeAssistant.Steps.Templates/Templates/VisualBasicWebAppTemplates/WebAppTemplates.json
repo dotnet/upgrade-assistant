@@ -4,7 +4,7 @@
   },
   "TemplateItems": [
     {
-      "Path": "Program.cs",
+      "Path": "Program.vb",
       "Type": "Compile",
       "Keywords": [
         "Main",
@@ -12,7 +12,7 @@
       ]
     },
     {
-      "Path": "Startup.cs",
+      "Path": "Startup.vb",
       "Type": "Compile",
       "Keywords": [
         "Configure",
@@ -33,7 +33,7 @@
   "TemplateOutputType": [
     "Exe"
   ],
-  "TemplateLanguage": "CSharp",
+  "TemplateLanguage": "VisualBasic",
   "TemplateAppliesTo": [
     "AspNetCore"
   ]
