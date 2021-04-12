@@ -63,7 +63,7 @@ namespace Integration.Tests
                 _logger.LogError("Unexpected check for newer version: {Name}, {Version}", reference.Name, reference.Version);
             }
 
-            return latest;
+            return latest ?? Array.Empty<NuGetReference>();
         }
     }
 }
