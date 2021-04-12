@@ -5,9 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Integration.Tests.Integration.Tests;
 using Microsoft.DotNet.UpgradeAssistant;
-using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.Logging;
 
 namespace Integration.Tests
