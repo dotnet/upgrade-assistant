@@ -14,18 +14,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
     {
         private readonly IPackageRestorer _restorer;
         private readonly IUserInput _userInput;
-        private readonly bool _isNonInteractiveMode;
-        private readonly string _entryPoint;
+        private readonly UpgradeOptions _options;
+        private readonly IEntrypointResolver _entrypointResolver;
 
         public EntrypointSelectionStep(
             UpgradeOptions options,
+            IEntrypointResolver entrypointResolver,
             IPackageRestorer restorer,
             IUserInput userInput,
             ILogger<EntrypointSelectionStep> logger)
             : base(logger)
         {
-            _isNonInteractiveMode = options?.NonInteractive ?? throw new ArgumentNullException(nameof(options));
-            _entryPoint = options?.EntryPoint ?? string.Empty;
+            _options = options;
+            _entrypointResolver = entrypointResolver ?? throw new ArgumentNullException(nameof(entrypointResolver));
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
         }
@@ -43,6 +44,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (context.EntryPoints.Any())
+            {
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Entrypoint already set.");
+            }
+
             var selectedProject = await GetEntrypointAsync(context, token).ConfigureAwait(false);
 
             if (selectedProject is null)
@@ -51,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             }
             else
             {
-                context.SetEntryPoint(selectedProject);
+                context.EntryPoints = new[] { selectedProject };
                 await _restorer.RestorePackagesAsync(context, selectedProject, token).ConfigureAwait(false);
 
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
@@ -68,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.EntryPoint is not null)
+            if (context.EntryPoints.Any())
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Project is already selected.", BuildBreakRisk.None);
             }
@@ -78,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             if (projects.Count == 1)
             {
                 var project = projects[0];
-                context.SetEntryPoint(project);
+                context.EntryPoints = new[] { project };
 
                 Logger.LogInformation("Setting entrypoint to only project in solution: {Project}", project.FileInfo);
 
@@ -90,49 +96,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             if (!context.InputIsSolution)
             {
                 var project = projects.First(i => i.FileInfo.Name.Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase));
-                context.SetEntryPoint(project);
+                context.EntryPoints = new[] { project };
 
                 Logger.LogInformation("Setting entrypoint to user selected project: {Project}", project.FileInfo);
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
             }
 
-            if (!string.IsNullOrEmpty(_entryPoint))
+            context.EntryPoints = _entrypointResolver.GetEntrypoints(context.Projects, _options.EntryPoint);
+
+            if (context.EntryPoints.Any())
             {
-                var entryPointProject = projects.FirstOrDefault(i => i.FileInfo.Name.Equals(_entryPoint, StringComparison.OrdinalIgnoreCase));
-                if (entryPointProject is not null)
-                {
-                    context.SetEntryPoint(entryPointProject);
-                    Logger.LogInformation("Setting entrypoint to user selected project in solution: {Project}", _entryPoint);
-
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
-                }
-                else
-                {
-                    Logger.LogInformation("Invalid Entry-Point Project specified : {Project}", _entryPoint);
-                }
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
             }
-
-#pragma warning disable CA1508 // Avoid dead conditional code
-            if (context.EntryPoint is null && _isNonInteractiveMode)
-#pragma warning restore CA1508 // Avoid dead conditional code
+            else
             {
-                throw new UpgradeException("Entry Point needs to be provided when more than 1 projects present in a non-interative mode. There are 2 ways of providing an entry-point :\n" +
-                    "a) Execute upgrade-assistant in interactive mode up until select entry point step and re-run upgrade-assistant in non-interactive mode \n" +
-                    "b) Execute upgrade-assistant in non-interactive mode with valid value for --entry-point");
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "No entrypoint was selected. Solutions require an entrypoint to proceed.", BuildBreakRisk.None);
             }
-
-            return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No entryproint is selected.", BuildBreakRisk.None);
         }
 
         private async ValueTask<IProject> GetEntrypointAsync(IUpgradeContext context, CancellationToken token)
         {
             const string EntrypointQuestion = "Please select the project you run. We will then analyze the dependencies and identify the recommended order to upgrade projects.";
-
-            if (context.EntryPoint is not null)
-            {
-                return context.EntryPoint;
-            }
 
             var allProjects = context.Projects.OrderBy(p => p.GetRoslynProject().Name).Select(ProjectCommand.Create).ToList();
             var result = await _userInput.ChooseAsync(EntrypointQuestion, allProjects, token).ConfigureAwait(false);
@@ -141,6 +126,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
-            => Task.FromResult(context is not null && context.EntryPoint is null && !context.IsComplete);
+            => Task.FromResult(context is not null && !context.EntryPoints.Any() && !context.IsComplete);
     }
 }

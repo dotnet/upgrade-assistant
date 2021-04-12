@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -16,7 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public bool SkipBackup { get; set; }
 
-        public string? EntryPoint { get; set; } = string.Empty;
+        // Name must be EntryPoint and not plural as the name of the argument that it binds to is `--entry-point`
+        public IReadOnlyCollection<string> EntryPoint { get; set; } = Array.Empty<string>();
 
         public bool Verbose { get; set; }
 

@@ -113,9 +113,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 var displayedProjectInfo = false;
 
-                if (context.EntryPoint is not null)
+                foreach (var entrypoint in context.EntryPoints)
                 {
-                    _io.Output.WriteLine($"Entrypoint: {context.EntryPoint.FileInfo}");
+                    _io.Output.WriteLine($"Entrypoint: {entrypoint.FileInfo}");
                     displayedProjectInfo = true;
                 }
 
