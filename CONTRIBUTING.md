@@ -40,7 +40,7 @@ Before submitting a pull request, make sure that it checks the following require
   
 If your pull request contains any of the below, it's less likely to be merged:
 
-- Changes that break backward compatibility
+- Changes that break existing functionality.
 - Changes that are only wanted by one person/company. Changes need to benefit a large enough portion of upgrade-assistant users.
 - Changes that add entirely new feature areas without prior agreement
 - Changes that are mostly about refactoring existing code or code style
