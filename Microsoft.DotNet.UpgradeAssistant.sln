@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30509.190
@@ -109,7 +109,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8B8F1470-B862-4BF8-B41D-F078D43277FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests - Copy\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests.csproj", "{16141B3F-F785-4CFD-9FD2-67E9D76C4827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests.csproj", "{16141B3F-F785-4CFD-9FD2-67E9D76C4827}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
