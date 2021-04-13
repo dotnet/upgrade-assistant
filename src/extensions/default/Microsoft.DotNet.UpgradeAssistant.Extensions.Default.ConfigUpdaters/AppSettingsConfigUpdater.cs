@@ -154,7 +154,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             // Check for existing appSettings.json files for app settings
             foreach (var setting in appSettings)
             {
-                if (!jsonConfigFiles.Any(s => !string.IsNullOrEmpty(s.Configuration[setting.Key])))
+                if (!jsonConfigFiles.Any(s => !string.IsNullOrEmpty(s.Configuration[setting.Key]))
+                    && !_appSettings.ContainsKey(setting.Key))
                 {
                     _appSettings.Add(setting.Key, setting.Value);
                 }
