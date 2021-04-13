@@ -67,8 +67,14 @@ If you don't know what a pull request is read this article: https://help.github.
 
 ### Tests
 
--  Tests need to be provided for every bug/feature that is completed. [Tests](/tests) in upgrade-assistant use [XUnit](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-dotnet-test), [AutoMock](https://autofac.org/apidoc/html/6C60CE20.htm), and [AutoFixture](https://github.com/AutoFixture/AutoFixture/wiki/Cheat-Sheet) for testing/mocking/data generation.
--  Tests only need to be present for issues that are not docs or samples.
+[Tests](/tests) in upgrade-assistant follow the following pattern:
+
+- Testing Framework used is [XUnit](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-dotnet-test).
+- Mocking Framework used is [AutoMock](https://autofaccn.readthedocs.io/en/latest/integration/moq.html).
+- Data generation Framework used is [AutoFixture](https://github.com/AutoFixture/AutoFixture/wiki/Cheat-Sheet).
+
+Tests need to be provided for every bug/feature(except docs or samples) that is completed.
+
 
 ### Feedback
 
