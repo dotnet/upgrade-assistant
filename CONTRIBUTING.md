@@ -51,7 +51,7 @@ A core contributor will review your pull request and provide feedback. To ensure
 
 ### Resources to help you get started
 Here are some resources to help you get started on how to contribute code or new content.
-* Look at the [Contributor documentation](/docs/README.md) to get started on building the source code on your own.
+* Look at the [Contributor documentation](/README.md) to get started on building the source code on your own.
 * ["Help wanted" issues](https://github.com/dotnet/upgrade-assistant/labels/help%20wanted) - these issues are up for grabs. Comment on an issue if you want to create a fix.
 * ["Good first issue" issues](https://github.com/dotnet/upgrade-assistant/labels/good%20first%20issue) - we think these are a good for newcomers.
 
@@ -70,7 +70,7 @@ If you don't know what a pull request is read this article: https://help.github.
 [Tests](/tests) in upgrade-assistant follow the following pattern:
 
 - Testing Framework used is [XUnit](https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-dotnet-test).
-- Mocking Framework used is [AutoMock](https://autofaccn.readthedocs.io/en/latest/integration/moq.html).
+- Mocking Framework used is [Moq](https://github.com/Moq/moq4) (with [AutoMock](https://autofaccn.readthedocs.io/en/latest/integration/moq.html)).
 - Data generation Framework used is [AutoFixture](https://github.com/AutoFixture/AutoFixture/wiki/Cheat-Sheet).
 
 Tests need to be provided for every bug/feature(except docs or samples) that is completed.

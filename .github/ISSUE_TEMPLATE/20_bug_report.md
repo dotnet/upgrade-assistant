@@ -23,3 +23,4 @@ Include the exception you get when facing this issue
 ### Further technical details
 - Windows version and bitness info (32-bit or 64-bit)
 - Include the output of `dotnet --list-sdks`
+- Include the output of `upgrade-assistant --version`
