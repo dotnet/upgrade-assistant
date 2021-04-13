@@ -90,7 +90,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             try
             {
-                return await _configUpdater.IsApplicableAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
+                return await IsApplicableAsync(context, token).ConfigureAwait(false)
+                    && await _configUpdater.IsApplicableAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
                     ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Config updater \"{_configUpdater.Title}\" needs applied", _configUpdater.Risk)
                     : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }
