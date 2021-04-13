@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -29,15 +30,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             context.IsComplete = true;
+            context.EntryPoints = Enumerable.Empty<IProject>();
+
             return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Upgrade complete"));
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Finalize upgrade", BuildBreakRisk.None));
+            if (!context.EntryPoints.Any())
+            {
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Upgrade completed", BuildBreakRisk.None));
+            }
+            else
+            {
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Finalize upgrade", BuildBreakRisk.None));
+            }
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
-            => Task.FromResult(context.CurrentProject is null);
+            => Task.FromResult(context.CurrentProject is null && context.EntryPoints.Any());
     }
 }

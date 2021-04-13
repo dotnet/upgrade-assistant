@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
         [InlineData(new string[] { }, new string[] { }, new string[] { })]
         [InlineData(new[] { "file1" }, new[] { "*" }, new[] { "file1" })]
         [InlineData(new[] { "file1" }, new[] { "f" }, new string[] { })]
+        [InlineData(new[] { "file1" }, new string[] { }, new string[] { })]
         [InlineData(new[] { "file1" }, new[] { "i*" }, new string[] { })]
         [InlineData(new[] { "file1" }, new[] { "i*", "f*" }, new[] { "file1" })]
         [InlineData(new[] { "file1", "other" }, new[] { "i*", "f*" }, new[] { "file1" })]

@@ -25,23 +25,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             matcher.AddIncludePatterns(names);
 
-            var count = 0;
-            var firstProject = default(IProject);
-
             foreach (var project in projects)
             {
-                firstProject = count == 0 ? project : null;
-
                 if (matcher.Match(project.FileInfo.Name).HasMatches)
                 {
-                    count++;
                     yield return project;
                 }
-            }
-
-            if (names.Count == 0 && firstProject is not null)
-            {
-                yield return firstProject;
             }
         }
     }

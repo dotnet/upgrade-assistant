@@ -109,9 +109,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
             }
-            else
+            else if (!_userInput.IsInteractive)
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "No entrypoint was selected. Solutions require an entrypoint to proceed.", BuildBreakRisk.None);
+            }
+            else
+            {
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "No entrypoint was selected. Solutions require an entrypoint to proceed.", BuildBreakRisk.None);
             }
         }
 

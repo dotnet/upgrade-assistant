@@ -134,5 +134,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
             Assert.Equal(UpgradeStepStatus.Complete, step.Status);
             Assert.Collection(context.Object.EntryPoints, e => Assert.Equal(e, selectedProject));
         }
+
+        [InlineData(true, UpgradeStepStatus.Incomplete)]
+        [InlineData(false, UpgradeStepStatus.Failed)]
+        [Theory]
+        public async Task InitializeTestsInSolutionNoSelection(bool isInteractive, UpgradeStepStatus status)
+        {
+            // Arrange
+            using var mock = AutoMock.GetLoose();
+
+            mock.Mock<IUserInput>().Setup(u => u.IsInteractive).Returns(isInteractive);
+
+            var context = mock.Mock<IUpgradeContext>();
+            context.Setup(c => c.InputIsSolution).Returns(true);
+            context.SetupProperty(t => t.EntryPoints);
+            context.Setup(c => c.Projects).Returns(Enumerable.Empty<IProject>());
+            context.Object.EntryPoints = Enumerable.Empty<IProject>();
+
+            var step = mock.Create<EntrypointSelectionStep>();
+
+            // Act
+            await step.InitializeAsync(context.Object, default).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(status, step.Status);
+            Assert.Empty(context.Object.EntryPoints);
+        }
     }
 }
