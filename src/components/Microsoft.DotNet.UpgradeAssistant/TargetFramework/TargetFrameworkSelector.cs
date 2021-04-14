@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             }
 
             var appBase = _upgradeTarget == UpgradeTarget.Current ? _currentTFMBase : _ltsTFMBase;
-            var current = GetNetStandardTFM(project);
+            var current = GetDefaultTargetFrameworkMoniker(project);
             var appBaseTfm = new TargetFrameworkMoniker(appBase);
 
             var updater = new FilterState(_comparer, project, current, appBaseTfm)
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             return updater.Current;
         }
 
-        private static TargetFrameworkMoniker GetNetStandardTFM(IProject project)
+        private static TargetFrameworkMoniker GetDefaultTargetFrameworkMoniker(IProject project)
         {
             foreach (var currentTfm in project.TargetFrameworks)
             {

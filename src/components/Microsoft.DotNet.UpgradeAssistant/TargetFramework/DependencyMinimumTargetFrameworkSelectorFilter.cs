@@ -7,11 +7,16 @@ using System.Linq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 {
-    public class SatisifiesProjectDependenciesTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
+    /// <summary>
+    /// An implementation of <see cref="ITargetFrameworkSelectorFilter"/> that ensures that the target framework is at least
+    /// as high as the minimum of each of a project's dependencies. If we did not check for this, then a project may not be
+    /// able to reference its dependencies anymore.
+    /// </summary>
+    public class DependencyMinimumTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
     {
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
 
-        public SatisifiesProjectDependenciesTargetFrameworkSelectorFilter(ITargetFrameworkMonikerComparer comparer)
+        public DependencyMinimumTargetFrameworkSelectorFilter(ITargetFrameworkMonikerComparer comparer)
         {
             _tfmComparer = comparer;
         }
