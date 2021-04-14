@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             _diagnostics = Enumerable.Empty<Diagnostic>();
         }
 
-        public async Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
+        public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -50,10 +50,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             await GetDiagnosticsAsync(context, inputs, token).ConfigureAwait(false);
 
-            return _diagnostics.Any();
+            return new FileUpdaterResult(_diagnostics.Any(), _diagnostics.Select(d => d.Location.GetMappedLineSpan().Path).Distinct());
         }
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
+        public Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
         {
             throw new NotImplementedException();
         }
@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // Filter diagnostics to those that can be addressed by available code fix providers and that are located in generated Razor source
             // Also only return each mapped location once since files like _ViewImports that are included in multiple generated files may have many diagnostics
             // referring to the same original location.
-            var comparer = new MappedLocationAndIDComparer();
+            var comparer = new LocationAndIDComparer(true);
             _diagnostics = allDiagnostics
                 .Where(d => d.Location.IsInSource &&
                        inputs.Select(i => $"{i.Source.FilePath}.cs").Contains(d.Location.SourceTree.FilePath) &&
