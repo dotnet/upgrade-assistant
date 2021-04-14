@@ -19,6 +19,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Autofac" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Serilog" />
