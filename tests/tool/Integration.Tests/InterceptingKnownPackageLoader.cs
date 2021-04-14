@@ -19,7 +19,9 @@ namespace Integration.Tests
         private readonly KnownPackages _packages;
         private readonly IPackageLoader _other;
         private readonly ILogger<InterceptingKnownPackageLoader> _logger;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private static Dictionary<string, string> _unknownPackages;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public InterceptingKnownPackageLoader(KnownPackages packages, IPackageLoader other, ILogger<InterceptingKnownPackageLoader> logger)
         {
