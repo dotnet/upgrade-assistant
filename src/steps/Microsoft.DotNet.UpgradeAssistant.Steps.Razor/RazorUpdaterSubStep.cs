@@ -55,8 +55,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             try
             {
-                return await _updater.IsApplicableAsync(context, _razorUpdaterStep.RazorDocuments, token).ConfigureAwait(false)
-                    ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Razor updater \"{_updater.Title}\" needs applied", _updater.Risk)
+                var updaterResult = (FileUpdaterResult)(await _updater.IsApplicableAsync(context, _razorUpdaterStep.RazorDocuments, token).ConfigureAwait(false));
+                return updaterResult.Result
+                    ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Razor updater \"{_updater.Title}\" needs applied to {string.Join(", ", updaterResult.FilePaths)}", _updater.Risk)
                     : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -77,12 +78,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             try
             {
-                if (await _updater.ApplyAsync(context, _razorUpdaterStep.RazorDocuments, token).ConfigureAwait(false))
+                var updaterResult = (FileUpdaterResult)(await _updater.ApplyAsync(context, _razorUpdaterStep.RazorDocuments, token).ConfigureAwait(false));
+                if (updaterResult.Result)
                 {
-                    // TODO : Get the updated documents from the updater and only process those documents
-
                     // Process Razor documents again after successfully applying an updater in case Razor files have changed
-                    _razorUpdaterStep.ProcessRazorDocuments(null);
+                    _razorUpdaterStep.ProcessRazorDocuments(updaterResult.FilePaths);
 
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
                 }
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogError(exc, "Unexpected exception while apply Razor updater \"{RazorUpdater}\"", _updater.Title);
+                Logger.LogError(exc, "Unexpected exception while applying Razor updater \"{RazorUpdater}\"", _updater.Title);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while applying Razor updater \"{_updater.Title}\": {exc}");
             }
         }

@@ -25,10 +25,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             Risk = risk;
         }
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token) =>
+        public Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token) =>
             throw new NotImplementedException();
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token) =>
+        public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token) =>
             throw new NotImplementedException();
     }
 }

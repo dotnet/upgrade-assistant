@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _appSettings = new Dictionary<string, string>();
         }
 
-        public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
+        public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -112,10 +112,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 await file.SaveAsync(token).ConfigureAwait(false);
             }
 
-            return true;
+            return new DefaultUpdaterResult(true);
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
+        public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -168,7 +168,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             var result = _appSettings.Count > 0;
 
-            return Task.FromResult(result);
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(result));
         }
     }
 }

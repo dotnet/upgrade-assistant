@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             try
             {
-                return await _configUpdater.ApplyAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
+                return (await _configUpdater.ApplyAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)).Result
                     ? new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty)
                     : new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to apply config updater \"{_configUpdater.Title}\"");
             }
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             try
             {
-                return await _configUpdater.IsApplicableAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
+                return (await _configUpdater.IsApplicableAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)).Result
                     ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Config updater \"{_configUpdater.Title}\" needs applied", _configUpdater.Risk)
                     : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }

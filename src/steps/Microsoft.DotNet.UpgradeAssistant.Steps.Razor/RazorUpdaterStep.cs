@@ -78,10 +78,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="context">The context to evaluate.</param>
         /// <param name="token">A token that can be used to cancel execution.</param>
         /// <returns>True if the Razor updater step might apply, false otherwise.</returns>
-        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) =>
-            Task.FromResult(context?.CurrentProject is not null
-            && SubSteps.Any()
-            && GetRazorFileSystem(context.CurrentProject.Required()).EnumerateItems("/").Any());
+        protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        {
+            // The RazorUpdaterStep is only applicable when a project is loaded
+            if (context?.CurrentProject is null)
+            {
+                return false;
+            }
+
+            // The RazorUpdaterStep is only applicable when the project contans Razor files to update
+            if (!GetRazorFileSystem(context.CurrentProject.Required()).EnumerateItems("/").Any())
+            {
+                return false;
+            }
+
+            // The RazorUpdaterStep is applicable if it contains at least one applicable substep
+            foreach (var subStep in SubSteps)
+            {
+                if (await subStep.IsApplicableAsync(context, token).ConfigureAwait(false))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -97,6 +118,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 RazorExtensions.Register(builder);
             });
 
+            // Process all Razor documents initially
+            // SubSteps can call ProcessRazorDocuments with specific files that have changed later to re-process specific documents
             ProcessRazorDocuments(null);
 
             foreach (var step in SubSteps)
@@ -129,7 +152,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 : Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Razor updaters need applied"));
         }
 
-        public void ProcessRazorDocuments(IEnumerable<string>? relativePathsToProcess)
+        /// <summary>
+        /// Processes Razor documents, generating Razor syntax trees and generated code.
+        /// </summary>
+        /// <param name="pathsToProcess">Absolute paths of the Razor documents to process or null to process all Razor documents in the project.</param>
+        public void ProcessRazorDocuments(IEnumerable<string>? pathsToProcess)
         {
             if (_razorEngine is null)
             {
@@ -138,9 +165,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             var files = _razorEngine.FileSystem.EnumerateItems("/");
-            if (relativePathsToProcess is not null)
+            if (pathsToProcess is not null)
             {
-                files = files.Where(f => relativePathsToProcess.Contains(f.RelativePhysicalPath));
+                files = files.Where(f => pathsToProcess.Contains(f.PhysicalPath));
             }
 
             Logger.LogTrace("Generating Razor code documents for {RazorCount} files", files.Count());

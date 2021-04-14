@@ -17,8 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         BuildBreakRisk Risk { get; }
 
-        Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<T> inputs, CancellationToken token);
+        Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<T> inputs, CancellationToken token);
 
-        Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<T> inputs, CancellationToken token);
+        Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<T> inputs, CancellationToken token);
     }
 }
