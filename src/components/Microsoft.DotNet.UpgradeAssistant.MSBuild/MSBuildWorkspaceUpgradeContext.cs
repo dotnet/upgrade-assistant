@@ -67,15 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _restorer = restorer;
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            var vsPath = vsFinder.GetLatestVisualStudioPath();
-
-            if (vsPath is null)
-            {
-                throw new UpgradeException("Could not find a Visual Studio install to use for upgrade.");
-            }
-
-            _vsPath = vsPath;
+            _vsPath = vsFinder.GetLatestVisualStudioPath();
 
             GlobalProperties = CreateProperties();
             ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
