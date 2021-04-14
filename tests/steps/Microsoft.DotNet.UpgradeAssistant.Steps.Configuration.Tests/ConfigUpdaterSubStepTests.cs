@@ -38,18 +38,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         [Fact]
         public void NegativeCtorTests()
         {
-            var goodParent = new ConfigUpdaterStep(Enumerable.Empty<IConfigUpdater>(), new ConfigUpdaterOptions(), new NullLogger<ConfigUpdaterStep>());
+            var goodParent = new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new ConfigUpdaterOptions(), new NullLogger<ConfigUpdaterStep>());
             var badParent = new TestUpgradeStep("Test step");
 
-            Assert.Throws<ArgumentNullException>("parentStep", () => new ConfigUpdaterSubStep(null!, new Mock<IConfigUpdater>().Object, new NullLogger<ConfigUpdaterStep>()));
-            Assert.Throws<ArgumentNullException>("parentStep", () => new ConfigUpdaterSubStep(badParent, new Mock<IConfigUpdater>().Object, new NullLogger<ConfigUpdaterStep>()));
+            Assert.Throws<ArgumentNullException>("parentStep", () => new ConfigUpdaterSubStep(null!, new Mock<IUpdater<ConfigFile>>().Object, new NullLogger<ConfigUpdaterStep>()));
+            Assert.Throws<ArgumentNullException>("parentStep", () => new ConfigUpdaterSubStep(badParent, new Mock<IUpdater<ConfigFile>>().Object, new NullLogger<ConfigUpdaterStep>()));
             Assert.Throws<ArgumentNullException>("configUpdater", () => new ConfigUpdaterSubStep(goodParent, null!, new NullLogger<ConfigUpdaterStep>()));
-            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterSubStep(goodParent, new Mock<IConfigUpdater>().Object, null!));
+            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterSubStep(goodParent, new Mock<IUpdater<ConfigFile>>().Object, null!));
         }
 
         [Theory]
         [MemberData(nameof(IsApplicableData))]
-        public async Task IsApplicableTests(bool projectLoaded, ProjectComponents? projectComponents, IConfigUpdater updater, bool expectedResult)
+        public async Task IsApplicableTests(bool projectLoaded, ProjectComponents? projectComponents, IUpdater<ConfigFile> updater, bool expectedResult)
         {
             // Arrange
             (var context, var step) = GetMockContextAndStep(new[] { "a" }, projectLoaded, new[] { updater }, projectComponents);
@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         public async Task InitializeTests(BuildBreakRisk risk, bool isApplicable, bool failingUpdater, UpgradeStepStatus expectedStatus)
         {
             // Arrange
-            IConfigUpdater updater = failingUpdater
+            IUpdater<ConfigFile> updater = failingUpdater
                 ? new FailingConfigUpdater(risk)
                 : new TestConfigUpdater(risk, isApplicable);
             (var context, var step) = GetMockContextAndStep(new[] { "TestConfig.xml" }, true, new[] { updater });
@@ -187,7 +187,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
                 }
             }
 
-            IConfigUpdater GetUpdater(bool succeeds) =>
+            IUpdater<ConfigFile> GetUpdater(bool succeeds) =>
                 failingUpdater ? new FailingConfigUpdater(BuildBreakRisk.High) : new TestConfigUpdater(BuildBreakRisk.Medium, succeeds);
         }
 
@@ -201,7 +201,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 
         private static (IUpgradeContext C, ConfigUpdaterSubStep S) GetMockContextAndStep(string[] configPaths,
                                                                                          bool projectLoaded,
-                                                                                         IConfigUpdater[] updaters,
+                                                                                         IUpdater<ConfigFile>[] updaters,
                                                                                          ProjectComponents? projectComponents = null)
         {
             using var mock = AutoMock.GetLoose(cfg =>
@@ -213,7 +213,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 
                 foreach (var updater in updaters)
                 {
-                    cfg.RegisterInstance(updater).As<IConfigUpdater>();
+                    cfg.RegisterInstance(updater).As<IUpdater<ConfigFile>>();
                 }
             });
 

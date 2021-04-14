@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             WellKnownStepIds.NextProjectStepId
         };
 
-        public ConfigUpdaterStep(IEnumerable<IConfigUpdater> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
+        public ConfigUpdaterStep(IEnumerable<IUpdater<ConfigFile>> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
             if (configUpdaters is null)

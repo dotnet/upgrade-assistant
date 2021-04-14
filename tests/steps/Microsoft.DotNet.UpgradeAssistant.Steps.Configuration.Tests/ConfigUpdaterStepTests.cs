@@ -57,8 +57,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         public void NegativeCtorTests()
         {
             Assert.Throws<ArgumentNullException>("configUpdaters", () => new ConfigUpdaterStep(null!, new ConfigUpdaterOptions(), new NullLogger<ConfigUpdaterStep>()));
-            Assert.Throws<ArgumentNullException>("configUpdaterOptions", () => new ConfigUpdaterStep(Enumerable.Empty<IConfigUpdater>(), null!, new NullLogger<ConfigUpdaterStep>()));
-            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterStep(Enumerable.Empty<IConfigUpdater>(), new ConfigUpdaterOptions(), null!));
+            Assert.Throws<ArgumentNullException>("configUpdaterOptions", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), null!, new NullLogger<ConfigUpdaterStep>()));
+            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new ConfigUpdaterOptions(), null!));
         }
 
         [Theory]
@@ -193,17 +193,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         {
             if (completeCount + incompleteCount == 0)
             {
-                builder.RegisterInstance(Enumerable.Empty<IConfigUpdater>());
+                builder.RegisterInstance(Enumerable.Empty<IUpdater<ConfigFile>>());
             }
             else
             {
                 for (var i = 0; i < completeCount + incompleteCount; i++)
                 {
-                    var mock = new Mock<IConfigUpdater>();
+                    var mock = new Mock<IUpdater<ConfigFile>>();
                     mock.Setup(c => c.Id).Returns($"ConfigUpdater #{i}");
                     mock.Setup(c => c.IsApplicableAsync(It.IsAny<IUpgradeContext>(),
                                                         It.IsAny<ImmutableArray<ConfigFile>>(),
-                                                        It.IsAny<CancellationToken>())).Returns(Task.FromResult(i >= completeCount));
+                                                        It.IsAny<CancellationToken>())).Returns(Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(i >= completeCount)));
                     mock.Setup(c => c.Risk).Returns(BuildBreakRisk.Medium);
                     builder.RegisterMock(mock);
                 }

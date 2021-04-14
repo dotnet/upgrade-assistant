@@ -129,7 +129,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return;
             }
 
-            Logger.LogTrace("Running ASP.NET Core upgrade analyzers on {ProjectName}", project.Name);
+            Logger.LogTrace("Running upgrade analyzers on {ProjectName}", project.Name);
 
             // Compile with upgrade analyzers enabled
             var applicableAnalyzers = await GetApplicableAnalyzersAsync(_allAnalyzers, Project).ToListAsync(token).ConfigureAwait(false);
