@@ -13,7 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public string ProjectPath => Project.FullName;
 
-        public string[] Extension { get; set; } = Array.Empty<string>();
+        // Name must be Extension and not plural as the name of the argument that it binds to is `--extension`
+        public IReadOnlyCollection<string> Extension { get; set; } = Array.Empty<string>();
 
         public bool SkipBackup { get; set; }
 
