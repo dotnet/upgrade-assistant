@@ -86,15 +86,16 @@ Options:
                                                source control since this tool will make
                                                large changes to both the project and
                                                source files.
-  -e, --extension <extension>                  Specifies a .NET Upgrade Assistant
+  --extension <extension>                      Specifies a .NET Upgrade Assistant
                                                extension package to include. This could
                                                be an ExtensionManifest.json file, a
                                                directory containing an
                                                ExtensionManifest.json file, or a zip
                                                archive containing an extension. This
                                                option can be specified multiple times.
-  --entry-point <entry-point>                  Provides the entry-point project to start
-                                               the upgrade process.
+  -e, --entry-point <entry-point>              Provides the entry-point project to start
+                                               the upgrade process. This may include
+                                               globbing patterns such as '*' for match.
   -v, --verbose                                Enable verbose diagnostics
   --non-interactive                            Automatically select each first option in
                                                non-interactive mode.
@@ -103,7 +104,6 @@ Options:
                                                mode.
   --version                                    Show version information
   -?, -h, --help                               Show help and usage information
-
 ```
 
 >**:warning:** The primary usage of upgrade-assistant is to be used in interactive mode, giving users control over changes/upgrades done to their projects. Usage of upgrade-assistant with --non-interactive mode can leave projects in a broken state and users are advised to use at their own discretion. **:warning:**

@@ -15,5 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             where T : UpgradeCommand;
 
         Task<bool> WaitToProceedAsync(CancellationToken token);
+
+        bool IsInteractive { get; }
     }
 }

@@ -18,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _waitPeriod = TimeSpan.FromSeconds(options.NonInteractiveWait);
         }
 
+        public bool IsInteractive => false;
+
         public Task<string?> AskUserAsync(string currentPath)
         {
             throw new NotImplementedException("User input cannot be selected in non-interactive mode");

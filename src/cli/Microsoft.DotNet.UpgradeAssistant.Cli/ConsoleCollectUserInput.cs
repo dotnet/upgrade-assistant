@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public bool IsInteractive => true;
+
         public Task<string?> AskUserAsync(string prompt)
         {
             _io.Output.WriteLine(prompt);
