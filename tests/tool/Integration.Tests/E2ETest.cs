@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
 using Xunit.Abstractions;
@@ -53,6 +54,8 @@ namespace Integration.Tests
 
             // Run upgrade
             var result = await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+
+            InterceptingKnownPackageLoader.AssertOnlyKnownPackagesWereReferenced(workingDir);
 
             Assert.Equal(ErrorCodes.Success, result);
 

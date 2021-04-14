@@ -13,7 +13,7 @@ namespace Integration.Tests
     /// <summary>
     /// Used for testing, this class provides a place to define the data that overrides details provided by NuGet.
     /// </summary>
-    internal class KnownPackages
+    public class KnownPackages
     {
         private const string EXPECTED_PACKAGE_VERSIONS = "ExpectedPackageVersions.json";
         private readonly Dictionary<string, string> _knownValues;
