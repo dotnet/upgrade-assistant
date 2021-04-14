@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
+    [ApplicableLanguage(Language.CSharp)]
     public class WebNamespaceConfigUpdater : IUpdater<ConfigFile>
     {
         private const string NamespacesPath = "/configuration/system.web.webPages.razor/pages/namespaces";

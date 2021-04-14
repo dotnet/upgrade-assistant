@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override string Description => "Update source files to change ASP.NET references to ASP.NET Core equivalents";
 
-        public override string Title => "Update C# source";
+        public override string Title => "Update source code";
 
         public override string Id => WellKnownStepIds.SourceUpdaterStepId;
 
@@ -69,7 +69,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
             _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
-        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null && SubSteps.Any());
+        protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        {
+            if (context?.CurrentProject is null)
+            {
+                return false;
+            }
+
+            foreach (var substep in SubSteps)
+            {
+                if (await substep.IsApplicableAsync(context, token).ConfigureAwait(false))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {

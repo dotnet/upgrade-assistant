@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
@@ -21,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
 
-        private FileInfo? _entryPointPath;
+        private List<FileInfo>? _entryPointPaths;
         private FileInfo? _projectPath;
 
         private MSBuildWorkspace? _workspace;
@@ -67,15 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _restorer = restorer;
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            var vsPath = vsFinder.GetLatestVisualStudioPath();
-
-            if (vsPath is null)
-            {
-                throw new UpgradeException("Could not find a Visual Studio install to use for upgrade.");
-            }
-
-            _vsPath = vsPath;
+            _vsPath = vsFinder.GetLatestVisualStudioPath();
 
             GlobalProperties = CreateProperties();
             ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
@@ -104,20 +97,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return project;
         }
 
-        public IProject? EntryPoint
+        public IEnumerable<IProject> EntryPoints
         {
             get
             {
-                if (_entryPointPath is null)
+                if (_entryPointPaths is null)
                 {
-                    return null;
+                    yield break;
                 }
 
-                return GetOrAddProject(_entryPointPath);
+                foreach (var path in _entryPointPaths)
+                {
+                    yield return GetOrAddProject(path);
+                }
+            }
+
+            set
+            {
+                _entryPointPaths = value.Select(v => v.FileInfo).ToList();
             }
         }
-
-        public void SetEntryPoint(IProject? entryPoint) => _entryPointPath = entryPoint?.FileInfo;
 
         public IEnumerable<IProject> Projects
         {
