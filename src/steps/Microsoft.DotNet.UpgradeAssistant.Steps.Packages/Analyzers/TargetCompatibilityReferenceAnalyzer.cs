@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     public class TargetCompatibilityReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private readonly IPackageLoader _packageLoader;
-        private readonly ITargetTFMSelector _tfmSelector;
+        private readonly ITargetFrameworkSelector _tfmSelector;
         private readonly IVersionComparer _comparer;
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
 
@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public TargetCompatibilityReferenceAnalyzer(
             IPackageLoader packageLoader,
-            ITargetTFMSelector tfmSelector,
+            ITargetFrameworkSelector tfmSelector,
             IVersionComparer comparer,
             ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {

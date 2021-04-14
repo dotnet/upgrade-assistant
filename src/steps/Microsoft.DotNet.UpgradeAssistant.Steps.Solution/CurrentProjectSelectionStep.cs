@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         private readonly IEnumerable<IUpgradeReadyCheck> _checks;
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
-        private readonly ITargetTFMSelector _tfmSelector;
+        private readonly ITargetFrameworkSelector _tfmSelector;
         private IProject[]? _orderedProjects;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             IEnumerable<IUpgradeReadyCheck> checks,
             IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
-            ITargetTFMSelector tfmSelector,
+            ITargetFrameworkSelector tfmSelector,
             ILogger<CurrentProjectSelectionStep> logger)
             : base(logger)
         {

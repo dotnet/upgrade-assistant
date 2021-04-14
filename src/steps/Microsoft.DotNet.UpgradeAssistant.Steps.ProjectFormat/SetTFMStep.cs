@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class SetTFMStep : UpgradeStep
     {
         private readonly IPackageRestorer _restorer;
-        private readonly ITargetTFMSelector _tfmSelector;
+        private readonly ITargetFrameworkSelector _tfmSelector;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public SetTFMStep(IPackageRestorer restorer, ITargetTFMSelector tfmSelector, ILogger<SetTFMStep> logger)
+        public SetTFMStep(IPackageRestorer restorer, ITargetFrameworkSelector tfmSelector, ILogger<SetTFMStep> logger)
             : base(logger)
         {
             _restorer = restorer;
