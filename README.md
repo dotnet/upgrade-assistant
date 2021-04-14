@@ -46,6 +46,7 @@ Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https:
 ### Prerequisites
 
 1. This tool uses MSBuild to work with project files. Make sure that a recent version of MSBuild is installed. An easy way to do this is to [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
+2. This tool requires that your project builds. This may include installing [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) to ensure build SDKs (such as for web applications, etc) are available.
 
 ### Installation steps
 
@@ -86,15 +87,16 @@ Options:
                                                source control since this tool will make
                                                large changes to both the project and
                                                source files.
-  -e, --extension <extension>                  Specifies a .NET Upgrade Assistant
+  --extension <extension>                      Specifies a .NET Upgrade Assistant
                                                extension package to include. This could
                                                be an ExtensionManifest.json file, a
                                                directory containing an
                                                ExtensionManifest.json file, or a zip
                                                archive containing an extension. This
                                                option can be specified multiple times.
-  --entry-point <entry-point>                  Provides the entry-point project to start
-                                               the upgrade process.
+  -e, --entry-point <entry-point>              Provides the entry-point project to start
+                                               the upgrade process. This may include
+                                               globbing patterns such as '*' for match.
   -v, --verbose                                Enable verbose diagnostics
   --non-interactive                            Automatically select each first option in
                                                non-interactive mode.
@@ -103,7 +105,6 @@ Options:
                                                mode.
   --version                                    Show version information
   -?, -h, --help                               Show help and usage information
-
 ```
 
 >**:warning:** The primary usage of upgrade-assistant is to be used in interactive mode, giving users control over changes/upgrades done to their projects. Usage of upgrade-assistant with --non-interactive mode can leave projects in a broken state and users are advised to use at their own discretion. **:warning:**
@@ -147,12 +148,9 @@ Concepts referred to in this repository which may have unclear meaning are expla
 ## Roadmap
 Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to .NET 5 and beyond in the [roadmap](docs/roadmap.md).
 
-## Feedback and Issues
-As you use the tool to upgrade your apps to .NET 5, please share your thoughts with us. If you have a suggestion for a new feature or idea, we want to know!
-And, of course, if you find an issue or need help, please log an issue.
+## Engage, Contribute and Give Feedback
+Some of the best ways to contribute are to use the tool to upgrade your apps to .NET 5, file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
 
-[Share your feedback with us or report an issue](https://github.com/dotnet/upgrade-assistant/issues)
-
-The repo will be open for code contributions very soon.
+Check out the [contributing](/CONTRIBUTING.md) page for more details on the best places to log issues, start discussions, PR process etc.
 
 Happy upgrading to .NET 5!

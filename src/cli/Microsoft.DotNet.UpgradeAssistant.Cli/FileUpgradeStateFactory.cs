@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -38,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             if (state is not null)
             {
-                context.SetEntryPoint(FindProject(state.EntryPoint));
+                context.EntryPoints = state.EntryPoints.Select(e => FindProject(e)).Where(e => e != null)!;
                 context.SetCurrentProject(FindProject(state.CurrentProject));
             }
 
@@ -88,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             var state = new UpgradeState
             {
-                EntryPoint = NormalizePath(context.EntryPoint?.FileInfo),
+                EntryPoints = context.EntryPoints.Select(e => NormalizePath(e.FileInfo)),
                 CurrentProject = NormalizePath(context.CurrentProject?.FileInfo),
             };
 
@@ -105,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             public string? CurrentProject { get; set; }
 
-            public string? EntryPoint { get; set; }
+            public IEnumerable<string> EntryPoints { get; set; } = Enumerable.Empty<string>();
 
             public bool IsComplete { get; set; }
         }

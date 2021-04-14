@@ -10,6 +10,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public static void AddSolutionSteps(this IServiceCollection services)
         {
+            services.AddSingleton<IEntrypointResolver, EntrypointResolver>();
+
             services.AddUpgradeStep<CurrentProjectSelectionStep>();
             services.AddUpgradeStep<NextProjectStep>();
             services.AddUpgradeStep<FinalizeSolutionStep>();

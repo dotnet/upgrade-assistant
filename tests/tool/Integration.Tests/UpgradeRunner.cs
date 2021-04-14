@@ -38,7 +38,7 @@ namespace Integration.Tests
                 Project = project,
                 NonInteractive = true,
                 NonInteractiveWait = 0,
-                EntryPoint = entrypoint,
+                EntryPoint = new[] { entrypoint },
             };
 
             return await Program.RunUpgradeAsync(options, host => host

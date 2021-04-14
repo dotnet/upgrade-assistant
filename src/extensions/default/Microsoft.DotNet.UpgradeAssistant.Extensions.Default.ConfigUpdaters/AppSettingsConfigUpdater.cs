@@ -156,7 +156,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             {
                 if (!jsonConfigFiles.Any(s => !string.IsNullOrEmpty(s.Configuration[setting.Key])))
                 {
-                    _appSettings.Add(setting.Key, setting.Value);
+                    _appSettings[setting.Key] = setting.Value;
                 }
                 else
                 {
