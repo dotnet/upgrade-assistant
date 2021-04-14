@@ -1,4 +1,8 @@
 {
+  "Hyak.Common": "1.0.2",
+  "MahApps.Metro": "1.6.5",
   "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "5.0.5",
-  "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers": "1.0.0"
+  "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers": "1.0.0",
+  "Microsoft.Windows.Compatibility": "5.0.2",
+  "Nito.AsyncEx": "4.0.1"
 }
