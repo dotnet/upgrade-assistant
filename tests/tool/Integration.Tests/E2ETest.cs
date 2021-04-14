@@ -33,6 +33,7 @@ namespace Integration.Tests
         public E2ETest(ITestOutputHelper output)
         {
             _output = output;
+            InterceptingKnownPackageLoader.ResetUnknownPackages();
         }
 
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]

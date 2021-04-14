@@ -16,20 +16,17 @@ namespace Integration.Tests
 {
     public class InterceptingKnownPackageLoader : IPackageLoader
     {
+        private static Dictionary<string, string> _unknownPackages = new Dictionary<string, string>();
+
         private readonly KnownPackages _packages;
         private readonly IPackageLoader _other;
         private readonly ILogger<InterceptingKnownPackageLoader> _logger;
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        private static Dictionary<string, string> _unknownPackages;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public InterceptingKnownPackageLoader(KnownPackages packages, IPackageLoader other, ILogger<InterceptingKnownPackageLoader> logger)
         {
             _packages = packages ?? throw new ArgumentNullException(nameof(packages));
             _other = other ?? throw new ArgumentNullException(nameof(other));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _unknownPackages = new Dictionary<string, string>();
         }
 
         public IEnumerable<string> PackageSources => _other.PackageSources;
@@ -73,6 +70,11 @@ namespace Integration.Tests
             }
 
             return latest ?? Array.Empty<NuGetReference>();
+        }
+
+        public static void ResetUnknownPackages()
+        {
+            _unknownPackages.Clear();
         }
 
         public static void AssertOnlyKnownPackagesWereReferenced(string actualDirectory)
