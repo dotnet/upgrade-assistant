@@ -94,7 +94,8 @@ Options:
                                                archive containing an extension. This
                                                option can be specified multiple times.
   -e, --entry-point <entry-point>              Provides the entry-point project to start
-                                               the upgrade process.
+                                               the upgrade process. This may include
+                                               globbing patterns such as '*' for match.
   -v, --verbose                                Enable verbose diagnostics
   --non-interactive                            Automatically select each first option in
                                                non-interactive mode.
