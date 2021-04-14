@@ -111,7 +111,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             }
             else if (!_userInput.IsInteractive)
             {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "No entrypoint was selected. Solutions require an entrypoint to proceed.", BuildBreakRisk.None);
+                const string Message = "Entry Point needs to be provided when more than 1 projects present in a non-interactive mode. There are 2 ways of providing an entry-point :\n" +
+                    "a) Execute upgrade-assistant in interactive mode up until select entry point step and re-run upgrade-assistant in non-interactive mode \n" +
+                    "b) Execute upgrade-assistant in non-interactive mode with valid value for --entry-point";
+
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, Message, BuildBreakRisk.None);
             }
             else
             {
