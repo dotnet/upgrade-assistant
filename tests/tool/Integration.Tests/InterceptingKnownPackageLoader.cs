@@ -65,7 +65,8 @@ namespace Integration.Tests
 
             if (latest is not null)
             {
-                _unknownPackages[reference.Name] = reference.Version;
+                var latestReference = latest.Last();
+                _unknownPackages[latestReference.Name] = latestReference.Version;
                 _logger.LogError("Unexpected check for newer version: {Name}, {Version}", reference.Name, reference.Version);
             }
 
