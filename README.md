@@ -147,12 +147,9 @@ Concepts referred to in this repository which may have unclear meaning are expla
 ## Roadmap
 Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to .NET 5 and beyond in the [roadmap](docs/roadmap.md).
 
-## Feedback and Issues
-As you use the tool to upgrade your apps to .NET 5, please share your thoughts with us. If you have a suggestion for a new feature or idea, we want to know!
-And, of course, if you find an issue or need help, please log an issue.
+## Engage, Contribute and Give Feedback
+Some of the best ways to contribute are to use the tool to upgrade your apps to .NET 5, file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
 
-[Share your feedback with us or report an issue](https://github.com/dotnet/upgrade-assistant/issues)
-
-The repo will be open for code contributions very soon.
+Check out the [contributing](/CONTRIBUTING.md) page for more details on the best places to log issues, start discussions, PR process etc.
 
 Happy upgrading to .NET 5!
