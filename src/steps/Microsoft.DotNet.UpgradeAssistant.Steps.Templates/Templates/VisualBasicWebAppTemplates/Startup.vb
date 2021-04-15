@@ -26,12 +26,7 @@ Public Class Startup
 
         If (env.IsDevelopment()) Then
             app.UseDeveloperExceptionPage()
-        Else
-            ' The default HSTS value Is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts()
         End If
-
-        app.UseHttpsRedirection()
 
         app.UseFileServer()
         app.UseRouting()
