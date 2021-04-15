@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Templates\**\*.cs" />
+    <None Remove="Templates\**\*.vb" />
     <None Remove="Templates\**\*.json" />
     <Content Include="Templates\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
