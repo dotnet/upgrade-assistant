@@ -11,7 +11,7 @@ Module Program
         CreateHostBuilder(args).Build().Run()
     End Sub
 
-    Public Function CreateHostBuilder(args() As String) As IHostBuilder
+    Public Function CreateHostBuilder(args As String()) As IHostBuilder
         Return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(
                Sub(webBuilder)
                    webBuilder.UseStartup(Of Startup)()
