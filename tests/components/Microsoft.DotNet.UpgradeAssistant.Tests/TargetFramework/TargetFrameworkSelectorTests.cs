@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         {
             private readonly TargetFrameworkMoniker _tfm;
 
-            public ITargetFrameworkSelectorFilterState State { get; private set; }
+            public ITargetFrameworkSelectorFilterState State { get; private set; } = null!;
 
             public TestFilter(TargetFrameworkMoniker tfm)
             {
