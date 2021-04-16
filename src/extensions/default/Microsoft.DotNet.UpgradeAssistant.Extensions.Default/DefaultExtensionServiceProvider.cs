@@ -44,15 +44,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddSolutionSteps();
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
+            services.AddRazorUpdaterStep();
         }
 
         // This extension only adds default config updaters, but other extensions
         // can register additional updaters, as needed.
         private static void AddConfigUpdaters(IServiceCollection services)
         {
-            services.AddScoped<IConfigUpdater, AppSettingsConfigUpdater>();
-            services.AddScoped<IConfigUpdater, UnsupportedSectionConfigUpdater>();
-            services.AddScoped<IConfigUpdater, WebNamespaceConfigUpdater>();
+            services.AddScoped<IUpdater<ConfigFile>, AppSettingsConfigUpdater>();
+            services.AddScoped<IUpdater<ConfigFile>, UnsupportedSectionConfigUpdater>();
+            services.AddScoped<IUpdater<ConfigFile>, WebNamespaceConfigUpdater>();
         }
 
         // This extension only adds default analyzers and code fix providers, but other extensions

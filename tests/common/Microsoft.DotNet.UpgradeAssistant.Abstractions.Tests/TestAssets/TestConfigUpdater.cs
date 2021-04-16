@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ApplicableLanguage(Language.CSharp, Language.FSharp)]
-    public class TestConfigUpdater : IConfigUpdater
+    public class TestConfigUpdater : IUpdater<ConfigFile>
     {
         public string Id => throw new System.InvalidOperationException("I am a mock");
 
@@ -19,12 +19,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets
 
         public BuildBreakRisk Risk => throw new System.InvalidOperationException("I am a mock");
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             throw new System.NotImplementedException();
         }

@@ -5,9 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Current
 
+### Added
+- Multiple entrypoints can now be added by using globbing and multiple instances of the `--entry-point` argument [#425](https://github.com/dotnet/upgrade-assistant/pull/425) 
+
 ### Fixed
 - UpgradeSteps should be filtered based on project components [#255](https://github.com/dotnet/upgrade-assistant/issues/255)
 - Do not add _ViewImports.cshtml to VB projects [#378](https://github.com/dotnet/upgrade-assistant/issues/378)
+
+### Breaking change
+- The commandline argument `-e` is now shorthand for `--entry-point` rather than `--extension` [#425](https://github.com/dotnet/upgrade-assistant/pull/425) 
 
 ## Version 0.2.220602 - 2021-04-06 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.220602))
 ### Added

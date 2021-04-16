@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
-    public class AppSettingsConfigUpdater : IConfigUpdater
+    public class AppSettingsConfigUpdater : IUpdater<ConfigFile>
     {
         private const string AppSettingsPath = "/configuration/appSettings";
         private const string AddSettingElementName = "add";
@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _appSettings = new Dictionary<string, string>();
         }
 
-        public async Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -112,10 +112,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 await file.SaveAsync(token).ConfigureAwait(false);
             }
 
-            return true;
+            return new DefaultUpdaterResult(true);
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             // Find appSettings elements in the config files
             var appSettings = new Dictionary<string, string>();
-            foreach (var configFile in configFiles)
+            foreach (var configFile in inputs)
             {
                 var appSettingsElement = configFile.Contents.XPathSelectElement(AppSettingsPath);
                 if (appSettingsElement is not null)
@@ -156,7 +156,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             {
                 if (!jsonConfigFiles.Any(s => !string.IsNullOrEmpty(s.Configuration[setting.Key])))
                 {
-                    _appSettings.Add(setting.Key, setting.Value);
+                    _appSettings[setting.Key] = setting.Value;
                 }
                 else
                 {
@@ -168,7 +168,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             var result = _appSettings.Count > 0;
 
-            return Task.FromResult(result);
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(result));
         }
     }
 }

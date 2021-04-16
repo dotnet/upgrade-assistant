@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ApplicableLanguage(Language.CSharp)]
-    public class WebNamespaceConfigUpdater : IConfigUpdater
+    public class WebNamespaceConfigUpdater : IUpdater<ConfigFile>
     {
         private const string NamespacesPath = "/configuration/system.web.webPages.razor/pages/namespaces";
         private const string AddElementName = "add";
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _viewImportsPath = null;
         }
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -77,16 +77,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 File.WriteAllLines(path, viewImportsContents);
                 _logger.LogInformation("View imports written to {ViewImportsPath}", path);
 
-                return Task.FromResult(true);
+                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(true));
             }
             catch (IOException exc)
             {
                 _logger.LogError(exc, "Unexpected exception accessing _ViewImports");
-                return Task.FromResult(false);
+                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(false));
             }
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             // Find namespace imports in config files
             var namespaces = new List<string>();
-            foreach (var configFile in configFiles)
+            foreach (var configFile in inputs)
             {
                 var namespacesElement = configFile.Contents.XPathSelectElement(NamespacesPath);
                 if (namespacesElement is not null)
@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 
             _namespacesToUpgrade = namespaces.Distinct().Where(ns => !alreadyImportedNamespaces.Contains(ns));
             _logger.LogInformation("{NamespaceCount} web page namespace imports need upgraded: {Namespaces}", _namespacesToUpgrade.Count(), string.Join(", ", _namespacesToUpgrade));
-            return Task.FromResult(_namespacesToUpgrade.Any());
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(_namespacesToUpgrade.Any()));
         }
     }
 }

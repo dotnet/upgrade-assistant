@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IConfigUpdater
+    public interface IUpdater<T>
     {
         string Id { get; }
 
@@ -17,8 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         BuildBreakRisk Risk { get; }
 
-        Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token);
+        Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<T> inputs, CancellationToken token);
 
-        Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token);
+        Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<T> inputs, CancellationToken token);
     }
 }
