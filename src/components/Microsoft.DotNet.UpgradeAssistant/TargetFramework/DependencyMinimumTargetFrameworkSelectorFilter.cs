@@ -30,19 +30,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
             foreach (var dep in tfm.Project.ProjectReferences)
             {
-                EnsureNoDowngrade(tfm, dep.TargetFrameworks);
-            }
-        }
+                var min = dep.TargetFrameworks.OrderBy(t => t, _tfmComparer)
+                    .Where(tfm => !tfm.IsFramework)
+                    .FirstOrDefault();
 
-        private void EnsureNoDowngrade(ITargetFrameworkSelectorFilterState tfm, IEnumerable<TargetFrameworkMoniker> others)
-        {
-            var min = others.OrderBy(t => t, _tfmComparer)
-                .Where(tfm => !tfm.IsFramework)
-                .FirstOrDefault();
-
-            if (min is not null)
-            {
-                if (_tfmComparer.Compare(min, tfm.Current) > 0)
+                if (min is not null)
                 {
                     tfm.TryUpdate(min);
                 }
