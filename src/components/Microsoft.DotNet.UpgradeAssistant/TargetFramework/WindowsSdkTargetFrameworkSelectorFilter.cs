@@ -24,10 +24,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
         private static bool TryGetMoniker(ITargetFrameworkSelectorFilterState updater, [MaybeNullWhen(false)] out string tfm)
         {
+            // ToDo: We should be able to manipulate specific parts of the TFM
+            var current = updater.Current;
+
+            if (current.IsNetStandard)
+            {
+                current = updater.AppBase;
+            }
+
             // Projects with Windows Desktop components or a WinExe output type should use a -windows suffix
             if (updater.Components.HasFlag(ProjectComponents.WindowsDesktop) || updater.Project.OutputType == ProjectOutputType.WinExe)
             {
-                tfm = $"{updater.Current}{WindowsSuffix}";
+                tfm = $"{current}{WindowsSuffix}";
 
                 if (updater.Components.HasFlag(ProjectComponents.WinRT))
                 {
