@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return Compare(dependent, dependency);
         }
 
-        private int Compare(NuGetFramework dependent, NuGetFramework dependency)
+        private static int Compare(NuGetFramework dependent, NuGetFramework dependency)
         {
             if (dependent.Equals(dependency))
             {
