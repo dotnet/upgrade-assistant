@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
@@ -28,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             // Projects with Windows Desktop components or a WinExe output type should use a -windows suffix
             if (updater.Components.HasFlag(ProjectComponents.WindowsDesktop) || updater.Project.OutputType == ProjectOutputType.WinExe)
             {
-                tfm = $"{updater.AppBase}{WindowsSuffix}";
+                tfm = $"{updater.Current}{WindowsSuffix}";
 
                 if (updater.Components.HasFlag(ProjectComponents.WinRT))
                 {

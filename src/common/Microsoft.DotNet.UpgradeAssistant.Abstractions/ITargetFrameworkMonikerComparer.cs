@@ -15,5 +15,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <param name="other">The TFM of the dependency.</param>
         /// <returns>True if the dependency is compatible with the dependent TFM, false otherwise.</returns>
         bool IsCompatible(TargetFrameworkMoniker tfm, TargetFrameworkMoniker other);
+
+        /// <summary>
+        /// Merges two TFMs, while accounting for platforms and version, to a single version that can be targeted by both.
+        /// </summary>
+        /// <param name="tfm1">The first TFM</param>
+        /// <param name="tfm2">The second TFM</param>
+        /// <returns>A merged TFM. For example, passing <c>net5.0-windows</c> and <c>net6.0</c> will result in <c>net6.0-windows</c>.</returns>
+        TargetFrameworkMoniker Merge(TargetFrameworkMoniker tfm1, TargetFrameworkMoniker tfm2);
     }
 }

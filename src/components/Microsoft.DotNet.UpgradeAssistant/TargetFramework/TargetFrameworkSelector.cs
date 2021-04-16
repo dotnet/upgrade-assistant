@@ -71,15 +71,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
         private class FilterState : ITargetFrameworkSelectorFilterState
         {
+            private readonly ITargetFrameworkMonikerComparer _comparer;
+
             public FilterState(ITargetFrameworkMonikerComparer comparer, IProject project, TargetFrameworkMoniker current, TargetFrameworkMoniker appbase)
             {
-                Comparer = comparer;
+                _comparer = comparer;
                 Project = project;
                 Current = current;
                 AppBase = appbase;
             }
-
-            public ITargetFrameworkMonikerComparer Comparer { get; }
 
             public TargetFrameworkMoniker Current { get; private set; }
 
@@ -91,13 +91,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
             public bool TryUpdate(TargetFrameworkMoniker tfm)
             {
-                if (Comparer.Compare(tfm, Current) > 0)
-                {
-                    Current = tfm;
-                    return true;
-                }
+                Current = _comparer.Merge(Current, tfm);
 
-                return false;
+                return Current != tfm;
             }
         }
     }

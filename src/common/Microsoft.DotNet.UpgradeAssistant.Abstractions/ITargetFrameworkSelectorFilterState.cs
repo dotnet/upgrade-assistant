@@ -13,8 +13,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         ProjectComponents Components { get; }
 
-        ITargetFrameworkMonikerComparer Comparer { get; }
-
         bool TryUpdate(TargetFrameworkMoniker tfm);
     }
 }
