@@ -7,6 +7,7 @@
 #pragma warning disable CA1019 // Define accessors for attribute arguments
 #pragma warning disable SA1649 // File name should match first type name
 #pragma warning disable SA1642 // Constructor summary documentation should begin with standard text
+#pragma warning disable SA1101 // Prefix local calls with this
 
 namespace System.Diagnostics.CodeAnalysis
 {
