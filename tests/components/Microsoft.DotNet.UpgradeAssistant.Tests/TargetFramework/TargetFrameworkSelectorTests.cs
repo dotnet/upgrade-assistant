@@ -10,17 +10,12 @@ using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Microsoft.Extensions.Options;
 using Xunit;
 
+using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
+
 namespace Microsoft.DotNet.UpgradeAssistant.Tests
 {
     public class TargetFrameworkSelectorTests
     {
-        private const string Current = "net0.0current";
-        private const string Preview = "net0.0laterpreview";
-        private const string LTS = "net0.0lts";
-        private const string NetStandard20 = "netstandard2.0";
-        private const string NetStandard21 = "netstandard2.1";
-        private const string Net45 = "net45";
-
         private readonly TFMSelectorOptions _options = new TFMSelectorOptions
         {
             CurrentTFMBase = Current,
@@ -30,10 +25,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         [Fact]
         public void VerifyTestTfms()
         {
-            Assert.True(new TargetFrameworkMoniker(Current).IsNetCore);
-            Assert.True(new TargetFrameworkMoniker(LTS).IsNetCore);
-            Assert.True(new TargetFrameworkMoniker(Preview).IsNetCore);
-            Assert.True(new TargetFrameworkMoniker(NetStandard20).IsNetStandard);
+            Assert.True(ParseTfm(Current).IsNetCore);
+            Assert.True(ParseTfm(LTS).IsNetCore);
+            Assert.True(ParseTfm(Preview).IsNetCore);
+            Assert.True(ParseTfm(NetStandard20).IsNetStandard);
         }
 
         [InlineData(new[] { NetStandard20 }, NetStandard20, UpgradeTarget.Current, ProjectComponents.None)]
@@ -63,12 +58,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(filter).As<ITargetFrameworkSelectorFilter>());
 
             var project = mock.Mock<IProject>();
-            project.Setup(p => p.TargetFrameworks).Returns(currentTfms.Select(t => new TargetFrameworkMoniker(t)).ToArray());
+            project.Setup(p => p.TargetFrameworks).Returns(currentTfms.Select(t => ParseTfm(t)).ToArray());
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(components));
 
             mock.Create<UpgradeOptions>().UpgradeTarget = target;
             mock.Mock<IOptions<TFMSelectorOptions>>().Setup(o => o.Value).Returns(_options);
-            mock.Mock<ITargetFrameworkMonikerComparer>().Setup(c => c.TryMerge(new TargetFrameworkMoniker(current), tfm, out finalTfm)).Returns(true);
+
+            var moniker = mock.Mock<ITargetFrameworkMonikerComparer>();
+            moniker.Setup(c => c.TryMerge(new TargetFrameworkMoniker(current), tfm, out finalTfm)).Returns(true);
+            moniker.SetupTryParse();
 
             var appBase = target == UpgradeTarget.Current ? _options.CurrentTFMBase : _options.LTSTFMBase;
 

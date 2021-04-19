@@ -7,6 +7,7 @@
     <PackageVersion Include="coverlet.collector" Version="3.0.2" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="5.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageVersion Include="Microsoft.Build" Version="16.8.0" />
     <PackageVersion Include="Microsoft.Build.Framework" Version="16.8.0" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.4.1" />

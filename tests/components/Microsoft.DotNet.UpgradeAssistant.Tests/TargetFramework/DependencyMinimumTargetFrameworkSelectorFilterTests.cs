@@ -9,17 +9,12 @@ using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Moq;
 using Xunit;
 
+using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
+
 namespace Microsoft.DotNet.UpgradeAssistant.Tests
 {
     public class DependencyMinimumTargetFrameworkSelectorFilterTests
     {
-        private const string Current = "net0.0current";
-        private const string Preview = "net0.0laterpreview";
-        private const string LTS = "net0.0lts";
-        private const string NetStandard20 = "netstandard2.0";
-        private const string NetStandard21 = "netstandard2.1";
-        private const string Net45 = "net45";
-
         [InlineData(new string[] { }, new string[] { }, null)]
         [InlineData(new[] { NetStandard20 }, new[] { NetStandard20 }, NetStandard20)]
         [InlineData(new[] { NetStandard21 }, new[] { NetStandard20 }, NetStandard21)]
@@ -40,10 +35,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             using var mock = AutoMock.GetLoose(b => b.RegisterType<TestTfmComparer>().As<ITargetFrameworkMonikerComparer>());
 
             var depProject1 = new Mock<IProject>();
-            depProject1.Setup(p => p.TargetFrameworks).Returns(dep1Tfms.Select(t => new TargetFrameworkMoniker(t)).ToArray());
+            depProject1.Setup(p => p.TargetFrameworks).Returns(dep1Tfms.Select(t => ParseTfm(t)).ToArray());
 
             var depProject2 = new Mock<IProject>();
-            depProject2.Setup(p => p.TargetFrameworks).Returns(dep2tfms.Select(t => new TargetFrameworkMoniker(t)).ToArray());
+            depProject2.Setup(p => p.TargetFrameworks).Returns(dep2tfms.Select(t => ParseTfm(t)).ToArray());
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.ProjectReferences).Returns(new[] { depProject1.Object, depProject2.Object });
@@ -58,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
 
             // Assert
             var count = expected is null ? Times.Never() : Times.AtLeastOnce();
-            var tfm = expected is null ? null : new TargetFrameworkMoniker(expected);
+            var tfm = expected is null ? null : ParseTfm(expected);
             state.Verify(s => s.TryUpdate(tfm!), count);
         }
 
@@ -89,6 +84,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             }
 
             public bool TryMerge(TargetFrameworkMoniker tfm1, TargetFrameworkMoniker tfm2, out TargetFrameworkMoniker result)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool TryParse(string input, out TargetFrameworkMoniker tfm)
             {
                 throw new NotImplementedException();
             }

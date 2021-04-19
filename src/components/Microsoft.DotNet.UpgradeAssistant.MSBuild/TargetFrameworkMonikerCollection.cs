@@ -12,17 +12,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private const string SdkSingleTargetFramework = "TargetFramework";
         private const string SdkMultipleTargetFrameworks = "TargetFrameworks";
 
+        private readonly ITargetFrameworkMonikerComparer _comparer;
         private readonly IProjectFile _projectFile;
 
         private string[]? _tfms;
 
-        public TargetFrameworkMonikerCollection(IProjectFile projectFile)
+        public TargetFrameworkMonikerCollection(IProjectFile projectFile, ITargetFrameworkMonikerComparer comparer)
         {
             if (projectFile is null)
             {
                 throw new ArgumentNullException(nameof(projectFile));
             }
 
+            _comparer = comparer;
             _projectFile = projectFile;
         }
 
@@ -73,7 +75,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             foreach (var tfm in RawValues)
             {
-                yield return new TargetFrameworkMoniker(tfm);
+                if (_comparer.TryParse(tfm, out var parsed))
+                {
+                    yield return parsed;
+                }
             }
         }
 

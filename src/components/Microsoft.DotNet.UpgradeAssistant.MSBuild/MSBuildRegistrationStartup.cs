@@ -65,6 +65,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                             _instance = msBuildInstances
                                 .OrderByDescending(m => m.Version)
+                                .Where(m => m.Version.Major != 6)
+                                .Where(m => m.Version.Build != 300)
                                 .First();
                             _logger.LogInformation("MSBuild registered from {MSBuildPath}", _instance.MSBuildPath);
 

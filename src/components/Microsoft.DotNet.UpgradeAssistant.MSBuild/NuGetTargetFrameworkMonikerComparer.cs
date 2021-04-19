@@ -112,14 +112,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 _ => null,
             };
 
-            var newFramework = (platform, version) switch
+            var frameworkName = (maxFramework.Framework, maxFramework.Version) switch
             {
-                (string p, Version v) => new NuGetFramework(maxFramework.Framework, maxFramework.Version, p, v),
-                (string p, null) => new NuGetFramework(maxFramework.Framework, maxFramework.Version, p, new Version(0, 0, 0, 0)),
-                _ => new NuGetFramework(maxFramework.Framework, maxFramework.Version),
+                (".NETCoreApp", Version v) when v >= TargetFrameworkMoniker.Net50.FrameworkVersion => "net",
+                (string f, _) => f
             };
 
-            result = new TargetFrameworkMoniker(newFramework.GetShortFolderName());
+            result = new TargetFrameworkMoniker(frameworkName, maxFramework.Version)
+            {
+                Platform = platform,
+                PlatformVersion = version,
+            }.Normalize();
             return true;
 
             static string? GetPlatform(NuGetFramework f1, NuGetFramework f2)
@@ -167,6 +170,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             return Compare(tfm, other) >= 0;
+        }
+
+        public bool TryParse(string input, [MaybeNullWhen(false)] out TargetFrameworkMoniker tfm)
+        {
+            var parsed = NuGetFramework.Parse(input);
+
+            if (parsed.IsUnsupported)
+            {
+                tfm = null;
+                return false;
+            }
+
+            tfm = new TargetFrameworkMoniker(parsed.Framework, parsed.Version)
+            {
+                Platform = parsed.Platform,
+                PlatformVersion = parsed.PlatformVersion,
+            }.Normalize();
+            return true;
         }
     }
 }

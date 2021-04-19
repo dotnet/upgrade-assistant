@@ -1,76 +1,79 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
+
+using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
     [Collection(MSBuildStepTestCollection.Name)]
     public class TargetFrameworkIdentifierTests
     {
-        [InlineData("net5.0", "netcoreapp3.1", true)]
-        [InlineData("net5.0", "net5.0", true)]
-        [InlineData("net5.0", "netstandard2.0", true)]
-        [InlineData("net5.0", "netstandard1.0", true)]
-        [InlineData("net5.0", "netstandard2.1", true)]
-        [InlineData("net5.0", "net48", false)]
-        [InlineData("net5.0", "net471", false)]
-        [InlineData("net5.0", "net47", false)]
-        [InlineData("net5.0", "net45", false)]
-        [InlineData("netcoreapp3.1", "netcoreapp3.1", true)]
-        [InlineData("netcoreapp3.1", "net5.0", false)]
-        [InlineData("netcoreapp3.1", "netstandard2.0", true)]
-        [InlineData("netcoreapp3.1", "netstandard1.0", true)]
-        [InlineData("netcoreapp3.1", "netstandard2.1", true)]
-        [InlineData("netcoreapp3.1", "net48", false)]
-        [InlineData("netcoreapp3.1", "net471", false)]
-        [InlineData("netcoreapp3.1", "net47", false)]
-        [InlineData("netcoreapp3.1", "net45", false)]
-        [InlineData("net48", "netcoreapp3.1", false)]
-        [InlineData("net471", "netcoreapp3.1", false)]
-        [InlineData("net471", "net5.0", false)]
-        [InlineData("net471", "netstandard2.0", false)]
-        [InlineData("net461", "netstandard2.0", false)]
-        [InlineData("net46", "netstandard2.0", false)]
+        [InlineData(Net50, NetCoreApp31, true)]
+        [InlineData(Net50, Net50, true)]
+        [InlineData(Net50, NetStandard20, true)]
+        [InlineData(Net50, NetStandard10, true)]
+        [InlineData(Net50, NetStandard21, true)]
+        [InlineData(Net50, Net48, false)]
+        [InlineData(Net50, Net471, false)]
+        [InlineData(Net50, Net47, false)]
+        [InlineData(Net50, Net45, false)]
+        [InlineData(NetCoreApp31, NetCoreApp31, true)]
+        [InlineData(NetCoreApp31, Net50, false)]
+        [InlineData(NetCoreApp31, NetStandard20, true)]
+        [InlineData(NetCoreApp31, NetStandard10, true)]
+        [InlineData(NetCoreApp31, NetStandard21, true)]
+        [InlineData(NetCoreApp31, Net48, false)]
+        [InlineData(NetCoreApp31, Net471, false)]
+        [InlineData(NetCoreApp31, Net47, false)]
+        [InlineData(NetCoreApp31, Net45, false)]
+        [InlineData(Net48, NetCoreApp31, false)]
+        [InlineData(Net471, NetCoreApp31, false)]
+        [InlineData(Net471, Net50, false)]
+        [InlineData(Net471, NetStandard20, false)]
+        [InlineData(Net461, NetStandard20, false)]
         [Theory]
         public void IsCoreCompatibleSDKTargetFramework(string target, string tfm, bool isCompatible)
         {
             var tfmComparer = new NuGetTargetFrameworkMonikerComparer(new NullLogger<NuGetTargetFrameworkMonikerComparer>());
-            var result = tfmComparer.IsCompatible(new TargetFrameworkMoniker(target), new TargetFrameworkMoniker(tfm));
+            var result = tfmComparer.IsCompatible(ParseTfm(target), ParseTfm(tfm));
 
             Assert.Equal(isCompatible, result);
         }
 
         [InlineData(null, null, 0)]
-        [InlineData(null, "netcoreapp3.1", -1)]
-        [InlineData("netcoreapp3.1", null, 1)]
-        [InlineData("net5.0", "netcoreapp3.1", 1)]
-        [InlineData("net5.0", "net5.0", 0)]
-        [InlineData("net5.0", "netstandard2.0", 1)]
-        [InlineData("net5.0", "netstandard1.0", 1)]
-        [InlineData("net5.0", "netstandard2.1", 1)]
-        [InlineData("net5.0", "net48", -1)]
-        [InlineData("net5.0", "net471", -1)]
-        [InlineData("net5.0", "net47", -1)]
-        [InlineData("net5.0", "net45", -1)]
-        [InlineData("netcoreapp3.1", "netcoreapp3.1", 0)]
-        [InlineData("netcoreapp3.1", "net5.0", -1)]
-        [InlineData("netcoreapp3.1", "netstandard2.0", 1)]
-        [InlineData("netcoreapp3.1", "netstandard1.0", 1)]
-        [InlineData("netcoreapp3.1", "netstandard2.1", 1)]
-        [InlineData("netcoreapp3.1", "net48", -1)]
-        [InlineData("netcoreapp3.1", "net471", -1)]
-        [InlineData("netcoreapp3.1", "net47", -1)]
-        [InlineData("netcoreapp3.1", "net45", -1)]
-        [InlineData("net48", "netcoreapp3.1", -1)]
-        [InlineData("net471", "netcoreapp3.1", -1)]
-        [InlineData("net471", "net5.0", -1)]
-        [InlineData("net471", "netstandard2.0", -1)]
-        [InlineData("net461", "netstandard2.0", -1)]
-        [InlineData("net46", "netstandard2.0", -1)]
+        [InlineData(null, NetCoreApp31, -1)]
+        [InlineData(NetCoreApp31, null, 1)]
+        [InlineData(Net50, NetCoreApp31, 1)]
+        [InlineData(Net50, Net50, 0)]
+        [InlineData(Net50, NetStandard20, 1)]
+        [InlineData(Net50, NetStandard10, 1)]
+        [InlineData(Net50, NetStandard21, 1)]
+        [InlineData(Net50, Net48, -1)]
+        [InlineData(Net50, Net471, -1)]
+        [InlineData(Net50, Net47, -1)]
+        [InlineData(Net50, Net45, -1)]
+        [InlineData(NetCoreApp31, NetCoreApp31, 0)]
+        [InlineData(NetCoreApp31, Net50, -1)]
+        [InlineData(NetCoreApp31, NetStandard20, 1)]
+        [InlineData(NetCoreApp31, NetStandard10, 1)]
+        [InlineData(NetCoreApp31, NetStandard21, 1)]
+        [InlineData(NetCoreApp31, Net48, -1)]
+        [InlineData(NetCoreApp31, Net471, -1)]
+        [InlineData(NetCoreApp31, Net47, -1)]
+        [InlineData(NetCoreApp31, Net45, -1)]
+        [InlineData(Net48, NetCoreApp31, -1)]
+        [InlineData(Net471, NetCoreApp31, -1)]
+        [InlineData(Net471, Net50, -1)]
+        [InlineData(Net471, NetStandard20, -1)]
+        [InlineData(Net461, NetStandard20, -1)]
+        [InlineData(Net46, NetStandard20, -1)]
         [Theory]
         public void TfmCompare(string target, string tfm, int expected)
         {
@@ -80,23 +83,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             Assert.Equal(expected, result);
 
             static TargetFrameworkMoniker? Create(string? input)
-                => input is null ? null : new TargetFrameworkMoniker(input);
+                => input is null ? null : ParseTfm(input);
         }
 
-        [InlineData("net6.0-windows", "net5.0-windows", "net6.0")]
-        [InlineData("net6.0-windows", "net6.0", "net5.0-windows")]
-        [InlineData("net6.0-windows", "net5.0", "net6.0-windows")]
-        [InlineData("net6.0-windows10.0.5", "net5.0", "net6.0-windows10.0.5")]
-        [InlineData("net6.0-windows10.0.5", "net5.0-windows10.0.5", "net6.0")]
-        [InlineData("net6.0-windows10.1.5", "net5.0-windows10.1.5", "net6.0-windows10.0.5")]
-        [InlineData("net6.0-windows10.1.5", "net5.0-windows10.1.5", "net6.0-windows10.1.5")]
-        [InlineData("net6.0-windows", "net6.0-windows", "net5.0-windows")]
+        [InlineData(Net60_Windows, Net50_Windows, Net60)]
+        [InlineData(Net60_Windows, Net60, Net50_Windows)]
+        [InlineData(Net60_Windows, Net50, Net60_Windows)]
+        [InlineData(Net60_Windows_10_0_5, Net50, Net60_Windows_10_0_5)]
+        [InlineData(Net60_Windows_10_0_5, Net50_Windows_10_0_5, Net60)]
+        [InlineData(Net60_Windows_10_1_5, Net50_Windows_10_1_5, Net60_Windows_10_0_5)]
+        [InlineData(Net60_Windows_10_1_5, Net50_Windows_10_1_5, Net60_Windows_10_1_5)]
+        [InlineData(Net60_Windows, Net60_Windows, Net50_Windows)]
         [InlineData(null, "net6.0-linux", "net5.0-windows")]
-        [InlineData("net6.0", "net5.0", "net6.0")]
-        [InlineData("net5.0", "net462", "net5.0")]
-        [InlineData("net5.0", "net5.0", "netstandard2.0")]
-        [InlineData("netstandard2.0", "netstandard2.0", "netstandard2.0")]
-        [InlineData("netstandard2.1", "netstandard2.0", "netstandard2.1")]
+        [InlineData(Net60, Net50, Net60)]
+        [InlineData(Net50, Net462, Net50)]
+        [InlineData(Net50, Net50, NetStandard20)]
+        [InlineData(NetStandard20, NetStandard20, NetStandard20)]
+        [InlineData(NetStandard21, NetStandard20, NetStandard21)]
         [Theory]
         public void MergeTests(string expected, string tfm1, string tfm2)
         {

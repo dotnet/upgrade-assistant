@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
         private readonly IPackageRestorer _restorer;
+        private readonly ITargetFrameworkMonikerComparer _comparer;
         private readonly IComponentIdentifier _componentIdentifier;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly string? _vsPath;
@@ -50,6 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             UpgradeOptions options,
             IVisualStudioFinder vsFinder,
             IPackageRestorer restorer,
+            ITargetFrameworkMonikerComparer comparer,
             IComponentIdentifier componentIdentifier,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
@@ -66,6 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
             InputPath = options.ProjectPath;
             _restorer = restorer;
+            _comparer = comparer;
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _vsPath = vsFinder.GetLatestVisualStudioPath();
@@ -90,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifier, _restorer, path, _logger);
+            var project = new MSBuildProject(this, _componentIdentifier, _restorer, _comparer, path, _logger);
 
             _projectCache.Add(path.FullName, project);
 

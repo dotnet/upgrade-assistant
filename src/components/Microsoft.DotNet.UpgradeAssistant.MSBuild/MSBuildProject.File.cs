@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IEnumerable<string> Imports => ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
 
-        public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this).SetTargetFramework(tfm);
+        public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this, _comparer).SetTargetFramework(tfm);
 
         public void AddPackages(IEnumerable<NuGetReference> references)
         {
