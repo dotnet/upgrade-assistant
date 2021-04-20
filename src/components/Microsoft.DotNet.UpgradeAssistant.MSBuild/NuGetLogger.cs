@@ -3,10 +3,10 @@
 
 using System;
 using System.Threading.Tasks;
-using NuGet.Common;
 using Microsoft.Extensions.Logging;
-using LogLevel = NuGet.Common.LogLevel;
+using NuGet.Common;
 using ILogger = NuGet.Common.ILogger;
+using LogLevel = NuGet.Common.LogLevel;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
@@ -21,6 +21,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void Log(ILogMessage message)
         {
+            if (message is null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+
             var logLevel = message.Level switch
             {
                 LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
@@ -28,7 +33,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 LogLevel.Minimal => Microsoft.Extensions.Logging.LogLevel.Information,
                 LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Debug,
                 LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Debug,
-                LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Trace
+                LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Trace,
+                _ => Microsoft.Extensions.Logging.LogLevel.Debug
             };
 
             _logger.Log(logLevel, $"[NuGet] {message.Message}");
