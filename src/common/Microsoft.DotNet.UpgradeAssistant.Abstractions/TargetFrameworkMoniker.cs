@@ -30,7 +30,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static readonly TargetFrameworkMoniker Net48 = Net45 with { FrameworkVersion = new Version(4, 8) };
         public static readonly TargetFrameworkMoniker Net50 = NetCoreApp30 with { Framework = Net, FrameworkVersion = new Version(5, 0) };
         public static readonly TargetFrameworkMoniker Net50_Windows = Net50 with { Platform = Platforms.Windows };
+        public static readonly TargetFrameworkMoniker Net50_Linux = Net50 with { Platform = Platforms.Linux };
         public static readonly TargetFrameworkMoniker Net60 = Net50 with { FrameworkVersion = new Version(6, 0) };
+        public static readonly TargetFrameworkMoniker Net60_Linux = Net60 with { Platform = Platforms.Linux };
         public static readonly TargetFrameworkMoniker Net60_Windows = Net60 with { Platform = Platforms.Windows };
 #pragma warning restore CA1707 // Identifiers should not contain underscores
 
@@ -38,6 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static class Platforms
         {
             public const string Windows = "windows";
+            public const string Linux = "linux";
         }
 #pragma warning restore CA1034 // Nested types should not be visible
 

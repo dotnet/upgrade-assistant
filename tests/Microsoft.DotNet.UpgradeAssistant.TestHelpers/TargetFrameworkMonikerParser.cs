@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Moq;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -63,12 +64,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
             { Net50_Windows_10_0_19041_0, TargetFrameworkMoniker.Net50_Windows with { PlatformVersion = new Version(10, 0, 19041, 0) } },
             { Net60, TargetFrameworkMoniker.Net60 },
             { Net60_Windows, TargetFrameworkMoniker.Net60_Windows },
+            { Net60_Linux, TargetFrameworkMoniker.Net60_Linux },
             { Net60_Windows_10_0_5, TargetFrameworkMoniker.Net60_Windows with { PlatformVersion = new Version(10, 0, 5) } },
             { Net60_Windows_10_1_5, TargetFrameworkMoniker.Net60_Windows with { PlatformVersion = new Version(10, 1, 5) } },
             { Net60_Windows_10_0_19041_0, TargetFrameworkMoniker.Net60_Windows with { PlatformVersion = new Version(10, 0, 19041, 0) } },
         };
 
-        public static TargetFrameworkMoniker ParseTfm(string input) => _map[input];
+        [return: NotNullIfNotNull("input")]
+        public static TargetFrameworkMoniker? ParseTfm(string? input) => input is null ? null : _map[input];
 
         public static void SetupTryParse(this Mock<ITargetFrameworkMonikerComparer> mock)
         {
