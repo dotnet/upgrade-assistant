@@ -60,7 +60,7 @@ namespace Integration.Tests
 
             CleanupBuildArtifacts(workingDir);
 
-            AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages ,workingDir);
+            AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages, workingDir);
             await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
 
             if (Directory.Exists(workingDir))
