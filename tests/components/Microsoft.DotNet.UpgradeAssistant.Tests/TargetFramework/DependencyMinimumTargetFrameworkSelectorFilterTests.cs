@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
                 throw new NotImplementedException();
             }
 
-            public TargetFrameworkMoniker Merge(TargetFrameworkMoniker tfm1, TargetFrameworkMoniker tfm2)
+            public bool TryMerge(TargetFrameworkMoniker tfm1, TargetFrameworkMoniker tfm2, out TargetFrameworkMoniker result)
             {
                 throw new NotImplementedException();
             }
