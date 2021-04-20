@@ -16,9 +16,11 @@ using Xunit.Abstractions;
 
 namespace Integration.Tests
 {
-    public static class UpgradeRunner
+    public class UpgradeRunner
     {
-        public static async Task<int> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
+        public UnknownPackages UnknownPackages { get; set; } = new UnknownPackages();
+
+        public async Task<int> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -56,6 +58,7 @@ namespace Integration.Tests
                         .SingleInstance()
                         .AsSelf();
 
+                    builder.RegisterInstance(UnknownPackages);
                     builder.RegisterDecorator<InterceptingKnownPackageLoader, IPackageLoader>();
                 })
                 .ConfigureLogging((ctx, logging) =>

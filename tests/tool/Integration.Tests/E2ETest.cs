@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
 using Xunit.Abstractions;
@@ -33,7 +33,6 @@ namespace Integration.Tests
         public E2ETest(ITestOutputHelper output)
         {
             _output = output;
-            InterceptingKnownPackageLoader.ResetUnknownPackages();
         }
 
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
@@ -52,22 +51,39 @@ namespace Integration.Tests
             // Copy the scenario files to the temporary directory
             var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioPath);
             await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
+            var upgradeRunner = new UpgradeRunner();
 
             // Run upgrade
-            var result = await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
-
-            InterceptingKnownPackageLoader.AssertOnlyKnownPackagesWereReferenced(workingDir);
+            var result = await upgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
 
             Assert.Equal(ErrorCodes.Success, result);
 
             CleanupBuildArtifacts(workingDir);
 
+            AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages ,workingDir);
             await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
 
             if (Directory.Exists(workingDir))
             {
                 Directory.Delete(workingDir, true);
             }
+        }
+
+        private void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
+        {
+            if (!unknownPackages.Keys.Any())
+            {
+                return;
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+            };
+            var uknownPackageStr = JsonSerializer.Serialize(unknownPackages, options);
+            var outputFile = Path.Combine(actualDirectory, "UnknownPackages.json");
+            File.WriteAllText(outputFile, uknownPackageStr);
+            Assert.False(true, $"Integration tests tried to access NuGet.{Environment.NewLine}The list of packages not yet \"pinned\" has been written to:{Environment.NewLine}{outputFile}");
         }
 
         private async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
