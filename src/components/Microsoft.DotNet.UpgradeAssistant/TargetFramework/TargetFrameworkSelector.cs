@@ -104,6 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
                 if (_comparer.TryMerge(Current, tfm, out var result))
                 {
                     var wasChanged = Current != result;
+                    Current = result;
                     return wasChanged;
                 }
 
