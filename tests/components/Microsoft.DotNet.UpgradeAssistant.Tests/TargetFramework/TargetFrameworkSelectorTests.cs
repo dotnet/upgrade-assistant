@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             mock.Mock<IOptions<TFMSelectorOptions>>().Setup(o => o.Value).Returns(_options);
 
             var moniker = mock.Mock<ITargetFrameworkMonikerComparer>();
-            moniker.Setup(c => c.TryMerge(new TargetFrameworkMoniker(current), tfm, out finalTfm)).Returns(true);
+            moniker.Setup(c => c.TryMerge(ParseTfm(current), tfm, out finalTfm)).Returns(true);
             moniker.SetupTryParse();
 
             var appBase = target == UpgradeTarget.Current ? _options.CurrentTFMBase : _options.LTSTFMBase;

@@ -122,7 +122,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 Platform = platform,
                 PlatformVersion = version,
-            }.Normalize();
+            };
             return true;
 
             static string? GetPlatform(NuGetFramework f1, NuGetFramework f2)
@@ -186,7 +186,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 Platform = parsed.Platform,
                 PlatformVersion = parsed.PlatformVersion,
-            }.Normalize();
+            };
             return true;
         }
     }

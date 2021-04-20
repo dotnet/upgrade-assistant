@@ -30,6 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public const string Net50_Windows_10_0_19041_0 = "net5.0-windows10.0.19041.0";
         public const string Net60 = "net6.0";
         public const string Net60_Windows = "net6.0-windows";
+        public const string Net60_Linux = "net6.0-linux";
         public const string Net60_Windows_10_0_5 = "net6.0-windows10.0.5";
         public const string Net60_Windows_10_1_5 = "net6.0-windows10.1.5";
         public const string Net60_Windows_10_0_19041_0 = "net6.0-windows10.0.19041.0";
