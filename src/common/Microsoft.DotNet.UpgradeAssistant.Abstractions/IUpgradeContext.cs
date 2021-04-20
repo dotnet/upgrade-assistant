@@ -27,6 +27,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         bool UpdateSolution(Solution updatedSolution);
 
+        string? BackupLocation { get; set; }
+
         IDictionary<string, string> GlobalProperties { get; }
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);

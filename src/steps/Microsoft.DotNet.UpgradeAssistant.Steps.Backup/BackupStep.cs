@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         private readonly IUserInput _userInput;
 
         private string? _projectDir;
-        private string? _backupPath;
+        private string? _defaultBackupPath;
 
         public override string Description => $"Back up the current project to another directory";
 
@@ -55,19 +55,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
 
             _projectDir = context.CurrentProject.Required().FileInfo.DirectoryName;
-            _backupPath ??= GetDefaultBackupPath(_projectDir);
+            _defaultBackupPath = GetDefaultBackupPath(_projectDir);
 
             if (_skipBackup)
             {
                 Logger.LogDebug("Backup upgrade step initalized as complete (backup skipped)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
-            else if (_backupPath is null)
+            else if ((context.BackupLocation ?? _defaultBackupPath) is null)
             {
                 Logger.LogDebug("No backup path specified");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
             }
-            else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
+            else if (File.Exists(Path.Combine(context.BackupLocation ?? _defaultBackupPath, FlagFileName)))
             {
                 Logger.LogDebug("Backup upgrade step initalized as complete (already done)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
@@ -81,6 +81,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (_skipBackup)
             {
                 Logger.LogInformation("Skipping backup");
@@ -107,6 +112,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Existing backup found");
             }
 
+            context.BackupLocation = backupPath;
+
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, backupPath);
             try
             {
@@ -132,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         public override UpgradeStepInitializeResult Reset()
         {
-            _backupPath = null;
+            _defaultBackupPath = null;
             return base.Reset();
         }
 
@@ -141,7 +148,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             var customPath = default(string);
             var commands = new[]
             {
-                UpgradeCommand.Create($"Use default path [{_backupPath}]"),
+                UpgradeCommand.Create($"Use default path [{_defaultBackupPath}]"),
                 UpgradeCommand.Create("Enter custom path", async (ctx, token) =>
                 {
                     customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:").ConfigureAwait(false);
@@ -157,7 +164,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 {
                     // customPath may be set in the lambda above.
 #pragma warning disable CA1508 // Avoid dead conditional code
-                    return customPath ?? _backupPath;
+                    return customPath ?? _defaultBackupPath;
 #pragma warning restore CA1508 // Avoid dead conditional code
                 }
             }

@@ -219,6 +219,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        public string? BackupLocation { get; set; }
+
         public void SetCurrentProject(IProject? project)
         {
             _projectPath = project?.FileInfo;
