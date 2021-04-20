@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
@@ -16,16 +17,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
         private readonly ITargetFrameworkMonikerComparer _comparer;
         private readonly IEnumerable<ITargetFrameworkSelectorFilter> _selectors;
+        private readonly ILogger<TargetFrameworkSelector> _logger;
 
         private readonly string _currentTFMBase;
         private readonly string _ltsTFMBase;
 
         private readonly UpgradeTarget _upgradeTarget;
 
-        public TargetFrameworkSelector(UpgradeOptions options, ITargetFrameworkMonikerComparer comparer, IOptions<TFMSelectorOptions> selectorOptions, IEnumerable<ITargetFrameworkSelectorFilter> selectors)
+        public TargetFrameworkSelector(
+            UpgradeOptions options,
+            ITargetFrameworkMonikerComparer comparer,
+            IOptions<TFMSelectorOptions> selectorOptions,
+            IEnumerable<ITargetFrameworkSelectorFilter> selectors,
+            ILogger<TargetFrameworkSelector> logger)
         {
             _comparer = comparer;
             _selectors = selectors;
+            _logger = logger;
 
             _currentTFMBase = selectorOptions?.Value.CurrentTFMBase ?? DefaultCurrentTFMBase;
             _ltsTFMBase = selectorOptions?.Value.LTSTFMBase ?? DefaultLTSTFMBase;
@@ -43,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             var current = GetDefaultTargetFrameworkMoniker(project);
             var appBaseTfm = new TargetFrameworkMoniker(appBase);
 
-            var updater = new FilterState(_comparer, project, current, appBaseTfm)
+            var updater = new FilterState(_comparer, project, current, appBaseTfm, _logger)
             {
                 Components = await project.GetComponentsAsync(token).ConfigureAwait(false),
             };
@@ -72,13 +80,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
         private class FilterState : ITargetFrameworkSelectorFilterState
         {
             private readonly ITargetFrameworkMonikerComparer _comparer;
+            private readonly ILogger _logger;
 
-            public FilterState(ITargetFrameworkMonikerComparer comparer, IProject project, TargetFrameworkMoniker current, TargetFrameworkMoniker appbase)
+            public FilterState(ITargetFrameworkMonikerComparer comparer, IProject project, TargetFrameworkMoniker current, TargetFrameworkMoniker appbase, ILogger logger)
             {
                 _comparer = comparer;
                 Project = project;
                 Current = current;
                 AppBase = appbase;
+                _logger = logger;
             }
 
             public TargetFrameworkMoniker Current { get; private set; }
@@ -91,9 +101,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
             public bool TryUpdate(TargetFrameworkMoniker tfm)
             {
-                Current = _comparer.Merge(Current, tfm);
+                if (_comparer.TryMerge(Current, tfm, out var result))
+                {
+                    var wasChanged = Current != result;
+                    return wasChanged;
+                }
 
-                return Current != tfm;
+                _logger.LogWarning("Could not merge incoming TFM update from {Current} to {Next}", Current, tfm);
+
+                return false;
             }
         }
     }

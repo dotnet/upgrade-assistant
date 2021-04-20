@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using NuGet.Frameworks;
 
@@ -72,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             };
         }
 
-        public TargetFrameworkMoniker Merge(TargetFrameworkMoniker tfm1, TargetFrameworkMoniker tfm2)
+        public bool TryMerge(TargetFrameworkMoniker tfm1, TargetFrameworkMoniker tfm2, [MaybeNullWhen(false)] out TargetFrameworkMoniker result)
         {
             if (tfm1 is null)
             {
@@ -90,7 +91,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // We can only combine if the platform is the same or at least one is null.
             if (!IsPlatformSameOrNull(nugetTfm1, nugetTfm2))
             {
-                throw new InvalidOperationException("Cannot merge two target frameworks with different platforms");
+                result = null;
+                return false;
             }
 
             var platform = GetPlatform(nugetTfm1, nugetTfm2);
@@ -117,7 +119,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 _ => new NuGetFramework(maxFramework.Framework, maxFramework.Version),
             };
 
-            return new TargetFrameworkMoniker(newFramework.GetShortFolderName());
+            result = new TargetFrameworkMoniker(newFramework.GetShortFolderName());
+            return true;
 
             static string? GetPlatform(NuGetFramework f1, NuGetFramework f2)
             {

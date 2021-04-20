@@ -91,6 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData("net6.0-windows10.1.5", "net5.0-windows10.1.5", "net6.0-windows10.0.5")]
         [InlineData("net6.0-windows10.1.5", "net5.0-windows10.1.5", "net6.0-windows10.1.5")]
         [InlineData("net6.0-windows", "net6.0-windows", "net5.0-windows")]
+        [InlineData(null, "net6.0-linux", "net5.0-windows")]
         [InlineData("net6.0", "net5.0", "net6.0")]
         [InlineData("net5.0", "net462", "net5.0")]
         [InlineData("net5.0", "net5.0", "netstandard2.0")]
@@ -104,10 +105,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var comparer = mock.Create<NuGetTargetFrameworkMonikerComparer>();
 
             // Act
-            var result = comparer.Merge(new TargetFrameworkMoniker(tfm1), new TargetFrameworkMoniker(tfm2));
+            var didMerge = comparer.TryMerge(new TargetFrameworkMoniker(tfm1), new TargetFrameworkMoniker(tfm2), out var result);
 
             // Assert
-            Assert.Equal(new TargetFrameworkMoniker(expected), result);
+            if (expected is not null)
+            {
+                Assert.True(didMerge);
+                Assert.Equal(new TargetFrameworkMoniker(expected), result);
+            }
+            else
+            {
+                Assert.False(didMerge);
+                Assert.Null(result);
+            }
         }
     }
 }
