@@ -7,6 +7,7 @@
     <PackageReference Include="NuGet.ProjectModel" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.Frameworks" ExcludeAssets="runtime" />
     <PackageReference Include="NuGet.Configuration" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Credentials" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
     <PackageReference Include="Microsoft.Extensions.Options" />

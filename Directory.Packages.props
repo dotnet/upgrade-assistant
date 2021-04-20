@@ -37,6 +37,7 @@
     <PackageVersion Include="NSubstitute" Version="4.2.2" />
     <PackageVersion Include="NuGet.Common" Version="5.8.0" />
     <PackageVersion Include="NuGet.Configuration" Version="5.8.0" />
+    <PackageVersion Include="NuGet.Credentials" Version="5.8.0" />
     <PackageVersion Include="NuGet.DependencyResolver.Core" Version="5.8.0" />
     <PackageVersion Include="NuGet.LibraryModel" Version="5.8.0" />
     <PackageVersion Include="NuGet.Frameworks" Version="5.8.0" />

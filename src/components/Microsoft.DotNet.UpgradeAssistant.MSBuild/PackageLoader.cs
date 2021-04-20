@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -25,15 +26,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly SourceCacheContext _cache;
         private readonly List<PackageSource> _packageSources;
         private readonly ILogger _logger;
+        private readonly NuGet.Common.ILogger _nugetLogger;
         private readonly string _cachePath;
+        private readonly IDictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
 
         public IEnumerable<string> PackageSources => _packageSources.Select(s => s.Source);
 
-        public PackageLoader(UpgradeOptions options, ILogger<PackageLoader> logger)
+        public PackageLoader(UpgradeOptions options, ILogger<PackageLoader> logger, IUserInput userInput)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
+            }
+
+            if (userInput is null)
+            {
+                throw new ArgumentNullException(nameof(userInput));
             }
 
             if (options.ProjectPath is null)
@@ -42,8 +50,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _nugetLogger = new NuGetLogger(logger);
             _cache = new SourceCacheContext();
             _packageSources = GetPackageSources(Path.GetDirectoryName(options.ProjectPath));
+            _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
+
+            NuGetCredentials.ConfigureCredentialService(userInput.IsInteractive, _nugetLogger);
 
             var settings = Settings.LoadDefaultSettings(null);
             _cachePath = SettingsUtility.GetGlobalPackagesFolder(settings);
@@ -75,15 +87,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // Query each package source for listed versions of the given package name
             foreach (var source in _packageSources)
             {
-                var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
                 try
                 {
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(reference.Name, includePrerelease: true, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
+                    var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(reference.Name, includePrerelease: true, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
                     versions.AddRange(searchResults.Select(r => r.Identity.Version));
                 }
                 catch (NuGetProtocolException)
                 {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to a NuGet protocol error", source.Source);
+                }
+                catch (HttpRequestException exc)
+                {
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to an HTTP error ({StatusCode})", source.Source, exc.StatusCode);
                 }
             }
 
@@ -92,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var currentVersion = reference.GetNuGetVersion();
             var filteredVersions = versions.Distinct().Where(v => v > currentVersion);
             var versionsToReturn = latestMinorAndBuildOnly
-                ? filteredVersions.GroupBy(v => v.Major).Select(g => g.Max()!)
+                ? filteredVersions.GroupBy(v => v.Major).Select(v => v.Where(v => !v.IsPrerelease).Max() ?? v.Max()!)
                 : filteredVersions;
 
             _logger.LogDebug("Found versions for package {PackageName}: {PackageVersions}", reference.Name, versionsToReturn);
@@ -107,10 +123,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // Query each package source for listed versions of the given package name
             foreach (var source in packageSources?.Select(p => new PackageSource(p)) ?? _packageSources)
             {
-                var metadata = await Repository.Factory.GetCoreV3(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
                 try
                 {
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: includePreRelease, includeUnlisted: false, _cache, NuGet.Common.NullLogger.Instance, token)).ConfigureAwait(false);
+                    var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: includePreRelease, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
                     var highestVersionResult = searchResults.Select(r => r.Identity.Version).Max(v => v);
                     if (highestVersionResult is null)
                     {
@@ -124,7 +140,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
                 catch (NuGetProtocolException)
                 {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource}", source.Source);
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to a NuGet protocol error", source.Source);
+                }
+                catch (HttpRequestException exc)
+                {
+                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to an HTTP error ({StatusCode})", source.Source, exc.StatusCode);
                 }
             }
 
@@ -245,12 +265,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var packageVersion = packageReference.GetNuGetVersion();
             foreach (var source in _packageSources)
             {
-                var repo = Repository.Factory.GetCoreV3(source);
+                var repo = GetSourceRepository(source);
                 var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
-                if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, NuGet.Common.NullLogger.Instance, token).ConfigureAwait(false))
+                if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
                 {
                     var memoryStream = new MemoryStream();
-                    if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, memoryStream, _cache, NuGet.Common.NullLogger.Instance, token).ConfigureAwait(false))
+                    if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, memoryStream, _cache, _nugetLogger, token).ConfigureAwait(false))
                     {
                         _logger.LogDebug("Package {NuGetPackage} download from feed {NuGetFeed}", packageReference, source.Source);
                         return new PackageArchiveReader(memoryStream, false);
@@ -270,6 +290,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void Dispose()
         {
             _cache?.Dispose();
+        }
+
+        private SourceRepository GetSourceRepository(PackageSource source)
+        {
+            if (!_sourceRepositoryCache.TryGetValue(source, out var repository))
+            {
+                repository = Repository.Factory.GetCoreV3(source);
+                _sourceRepositoryCache[source] = repository;
+            }
+
+            return repository;
         }
     }
 }

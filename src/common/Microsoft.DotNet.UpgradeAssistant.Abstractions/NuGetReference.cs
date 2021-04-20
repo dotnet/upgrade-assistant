@@ -7,6 +7,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public record NuGetReference(string Name, string Version)
     {
+        public bool IsPrerelease => Version.Contains("-");
+
         public bool HasWildcardVersion => Version.EndsWith("*", StringComparison.OrdinalIgnoreCase);
 
         public override string ToString()
