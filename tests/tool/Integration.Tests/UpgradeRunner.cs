@@ -18,7 +18,7 @@ namespace Integration.Tests
 {
     public class UpgradeRunner
     {
-        public UnknownPackages UnknownPackages { get; set; } = new UnknownPackages();
+        public UnknownPackages UnknownPackages { get; } = new UnknownPackages();
 
         public async Task<int> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
         {

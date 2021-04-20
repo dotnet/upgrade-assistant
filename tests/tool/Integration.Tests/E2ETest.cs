@@ -69,7 +69,7 @@ namespace Integration.Tests
             }
         }
 
-        private void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
+        private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
         {
             if (!unknownPackages.Keys.Any())
             {
