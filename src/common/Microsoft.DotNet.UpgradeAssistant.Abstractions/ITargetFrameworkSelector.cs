@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface ITargetTFMSelector
+    public interface ITargetFrameworkSelector
     {
         /// <summary>
         /// Chooses the most likely target TFM a project should be retargeted to based on its style, output type, dependencies, and
