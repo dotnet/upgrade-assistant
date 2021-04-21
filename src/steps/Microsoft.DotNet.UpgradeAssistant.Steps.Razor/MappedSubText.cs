@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         {
             if (document is null)
             {
-                throw new System.ArgumentNullException(nameof(document));
+                throw new ArgumentNullException(nameof(document));
             }
 
             var syntaxRoot = await document.GetSyntaxRootAsync(token).ConfigureAwait(false);
