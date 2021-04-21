@@ -7,7 +7,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public record TargetFrameworkMoniker(string Name)
     {
+        public static TargetFrameworkMoniker NetStandard20 { get; } = new TargetFrameworkMoniker("netstandard2.0");
+
         private const string NetStandardNamePrefix = "netstandard";
+
         private const string NetPrefix = "net";
 
         public override string ToString() => Name;
