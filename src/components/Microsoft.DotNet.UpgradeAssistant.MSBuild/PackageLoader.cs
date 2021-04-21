@@ -32,16 +32,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IEnumerable<string> PackageSources => _packageSources.Select(s => s.Source);
 
-        public PackageLoader(UpgradeOptions options, ILogger<PackageLoader> logger, IUserInput userInput)
+        public PackageLoader(UpgradeOptions options, ILogger<PackageLoader> logger)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
-            }
-
-            if (userInput is null)
-            {
-                throw new ArgumentNullException(nameof(userInput));
             }
 
             if (options.ProjectPath is null)
@@ -54,8 +49,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _cache = new SourceCacheContext();
             _packageSources = GetPackageSources(Path.GetDirectoryName(options.ProjectPath));
             _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
-
-            NuGetCredentials.ConfigureCredentialService(userInput.IsInteractive, _nugetLogger);
 
             var settings = Settings.LoadDefaultSettings(null);
             _cachePath = SettingsUtility.GetGlobalPackagesFolder(settings);

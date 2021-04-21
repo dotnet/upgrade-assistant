@@ -7,6 +7,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public record NuGetReference(string Name, string Version)
     {
+        // Hyphens in semantic versioning indicate a pre-release version (https://semver.org/spec/v2.0.0.html#spec-item-9)
         public bool IsPrerelease => Version.Contains("-");
 
         public bool HasWildcardVersion => Version.EndsWith("*", StringComparison.OrdinalIgnoreCase);

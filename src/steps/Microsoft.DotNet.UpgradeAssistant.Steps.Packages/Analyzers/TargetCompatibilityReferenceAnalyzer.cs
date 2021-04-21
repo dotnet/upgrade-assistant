@@ -72,6 +72,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                             state.PossibleBreakingChangeRecommended = true;
                         }
 
+                        if (updatedReference.IsPrerelease)
+                        {
+                            _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", project.TargetFrameworks));
+                        }
+
                         state.PackagesToRemove.Add(packageReference);
                         state.PackagesToAdd.Add(updatedReference);
                     }
