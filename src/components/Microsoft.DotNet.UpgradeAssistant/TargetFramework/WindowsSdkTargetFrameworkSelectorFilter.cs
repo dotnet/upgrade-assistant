@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
                 if (updater.Components.HasFlag(ProjectComponents.WinRT))
                 {
                     // TODO: Default to this version to ensure everything is supported.
-                    tfm = tfm with { PlatformVersion = new Version(10, 0, 19041, 0) };
+                    tfm = tfm with { PlatformVersion = TargetFrameworkMoniker.Net50_Windows_10_0_19041_0.PlatformVersion };
                 }
 
                 return true;

@@ -61,7 +61,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
         {
             get
             {
+                // These are variations that may occur from various NuGet parsing APIs for the framework. We expect TargetFrameworkMoniker to normalize these.
                 yield return new object[] { new TargetFrameworkMoniker(".NETFramework", new Version(4, 5, 0)), Net45 };
+                yield return new object[] { new TargetFrameworkMoniker(".NETFramework", new Version(4, 5, 0)) { Platform = TargetFrameworkMoniker.Platforms.Windows, PlatformVersion = new Version(1, 0) }, Net45 };
                 yield return new object[] { new TargetFrameworkMoniker(".NETCoreApp", new Version(5, 0)), Net50 };
                 yield return new object[] { new TargetFrameworkMoniker("net", new Version(5, 0, 0)), Net50 };
                 yield return new object[] { TargetFrameworkMoniker.Net50 with { Platform = string.Empty }, Net50 };
@@ -75,6 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
         [Theory]
         public void AlternateNamesTests(TargetFrameworkMoniker tfm, string expected)
         {
+            Assert.Equal(ParseTfm(expected), tfm);
             Assert.Equal(expected, tfm.ToString());
         }
 

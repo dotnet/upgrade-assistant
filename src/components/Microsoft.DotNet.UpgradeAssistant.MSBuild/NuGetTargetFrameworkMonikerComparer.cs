@@ -112,13 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 _ => null,
             };
 
-            var frameworkName = (maxFramework.Framework, maxFramework.Version) switch
-            {
-                (".NETCoreApp", Version v) when v >= TargetFrameworkMoniker.Net50.FrameworkVersion => "net",
-                (string f, _) => f
-            };
-
-            result = new TargetFrameworkMoniker(frameworkName, maxFramework.Version)
+            result = new TargetFrameworkMoniker(maxFramework.Framework, maxFramework.Version)
             {
                 Platform = platform,
                 PlatformVersion = version,

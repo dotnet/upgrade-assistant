@@ -1,9 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -13,7 +10,7 @@ using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
     [Collection(MSBuildStepTestCollection.Name)]
-    public class TargetFrameworkIdentifierTests
+    public class NuGetTargetFrameworkMonikerComparerTests
     {
         [InlineData(Net50, NetCoreApp31, true)]
         [InlineData(Net50, Net50, true)]
@@ -93,6 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         [InlineData(Net60_Windows_10_0_5, Net50_Windows_10_0_5, Net60)]
         [InlineData(Net60_Windows_10_1_5, Net50_Windows_10_1_5, Net60_Windows_10_0_5)]
         [InlineData(Net60_Windows_10_1_5, Net50_Windows_10_1_5, Net60_Windows_10_1_5)]
+        [InlineData(Net60_Windows_10_1_5, Net60_Windows_10_0_5, Net50_Windows_10_1_5)]
         [InlineData(Net60_Windows, Net60_Windows, Net50_Windows)]
         [InlineData(null, Net60_Linux, Net50_Windows)]
         [InlineData(Net60, Net50, Net60)]
