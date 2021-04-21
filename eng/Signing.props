@@ -4,6 +4,8 @@
     are already signed. However, they must be signed with a 3rd party certificate.
   -->
   <ItemGroup>
+    <FileSignInfo Include="Autofac.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="Autofac.Extensions.DependencyInjection.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="AutoMapper.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Newtonsoft.Json.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.dll" CertificateName="3PartySHA2" />

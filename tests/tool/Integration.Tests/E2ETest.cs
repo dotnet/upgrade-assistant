@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
@@ -50,20 +51,39 @@ namespace Integration.Tests
             // Copy the scenario files to the temporary directory
             var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioPath);
             await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
+            var upgradeRunner = new UpgradeRunner();
 
             // Run upgrade
-            var result = await UpgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+            var result = await upgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
 
             Assert.Equal(ErrorCodes.Success, result);
 
             CleanupBuildArtifacts(workingDir);
 
+            AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages, workingDir);
             await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
 
             if (Directory.Exists(workingDir))
             {
                 Directory.Delete(workingDir, true);
             }
+        }
+
+        private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
+        {
+            if (!unknownPackages.Keys.Any())
+            {
+                return;
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+            };
+            var uknownPackageStr = JsonSerializer.Serialize(unknownPackages, options);
+            var outputFile = Path.Combine(actualDirectory, "UnknownPackages.json");
+            File.WriteAllText(outputFile, uknownPackageStr);
+            Assert.False(true, $"Integration tests tried to access NuGet.{Environment.NewLine}The list of packages not yet \"pinned\" has been written to:{Environment.NewLine}{outputFile}");
         }
 
         private async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
@@ -86,7 +106,7 @@ namespace Integration.Tests
                 }
                 else if (expectedFiles[i] != actualFiles[i])
                 {
-                    Assert.True(false, $"Was expecting to see the file '{expectedFiles[i]}' but found '{actualFiles[i]}' instead");
+                    Assert.True(false, $"Was expecting to see the file '{expectedFiles[i]}' but found '{actualFiles[i]}' instead.");
                 }
             }
 
