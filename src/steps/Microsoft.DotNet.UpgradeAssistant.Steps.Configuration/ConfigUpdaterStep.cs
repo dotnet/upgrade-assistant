@@ -14,6 +14,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
     public class ConfigUpdaterStep : UpgradeStep
     {
+        private readonly IEnumerable<ConfigUpdaterSubStep> _allSteps;
+
         private readonly string[] _configFilePaths;
 
         public ImmutableArray<ConfigFile> ConfigFiles { get; private set; }
@@ -38,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             WellKnownStepIds.NextProjectStepId
         };
 
-        public ConfigUpdaterStep(IEnumerable<IConfigUpdater> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
+        public ConfigUpdaterStep(IEnumerable<IUpdater<ConfigFile>> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
             if (configUpdaters is null)
@@ -52,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             }
 
             _configFilePaths = (configUpdaterOptions.ConfigFilePaths ?? Enumerable.Empty<string>()).ToArray();
-            SubSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
+            SubSteps = _allSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
@@ -78,6 +80,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             ConfigFiles = ImmutableArray.CreateRange(configPaths.Select(p => new ConfigFile(p)));
             Logger.LogDebug("Loaded {ConfigCount} config files", ConfigFiles.Length);
 
+            await FilterSubStepsByIsApplicableAsync(context, token).ConfigureAwait(false);
+
             foreach (var step in SubSteps)
             {
                 await step.InitializeAsync(context, token).ConfigureAwait(false);
@@ -88,6 +92,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             return incompleteSubSteps == 0
                 ? new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No config updaters need applied", BuildBreakRisk.None)
                 : new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} config updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
+        }
+
+        private async Task FilterSubStepsByIsApplicableAsync(IUpgradeContext context, CancellationToken token)
+        {
+            var applicableSubSteps = new List<ConfigUpdaterSubStep>();
+            foreach (var substep in _allSteps)
+            {
+                if (await substep.IsApplicableAsync(context, token).ConfigureAwait(false))
+                {
+                    applicableSubSteps.Add(substep);
+                }
+            }
+
+            SubSteps = applicableSubSteps;
+        }
+
+        public override UpgradeStepInitializeResult Reset()
+        {
+            SubSteps = _allSteps;
+            return base.Reset();
         }
 
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)

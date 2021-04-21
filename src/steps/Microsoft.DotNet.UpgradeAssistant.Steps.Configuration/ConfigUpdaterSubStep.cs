@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
     public class ConfigUpdaterSubStep : UpgradeStep
     {
         private readonly ConfigUpdaterStep _parentStep;
-        private readonly IConfigUpdater _configUpdater;
+        private readonly IUpdater<ConfigFile> _configUpdater;
 
         public override string Id => _configUpdater.Id;
 
@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
         public override string Title => _configUpdater.Title;
 
-        public ConfigUpdaterSubStep(UpgradeStep parentStep, IConfigUpdater configUpdater, ILogger logger)
+        public ConfigUpdaterSubStep(UpgradeStep parentStep, IUpdater<ConfigFile> configUpdater, ILogger logger)
             : base(logger)
         {
             _parentStep = (ParentStep = parentStep) as ConfigUpdaterStep ?? throw new ArgumentNullException(nameof(parentStep));
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             try
             {
-                return await _configUpdater.ApplyAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
+                return (await _configUpdater.ApplyAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)).Result
                     ? new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty)
                     : new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to apply config updater \"{_configUpdater.Title}\"");
             }
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             try
             {
-                return await _configUpdater.IsApplicableAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)
+                return (await _configUpdater.IsApplicableAsync(context, _parentStep.ConfigFiles, token).ConfigureAwait(false)).Result
                     ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Config updater \"{_configUpdater.Title}\" needs applied", _configUpdater.Risk)
                     : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }

@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         private readonly IEnumerable<IUpgradeReadyCheck> _checks;
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
-        private readonly ITargetTFMSelector _tfmSelector;
+        private readonly ITargetFrameworkSelector _tfmSelector;
         private IProject[]? _orderedProjects;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             IEnumerable<IUpgradeReadyCheck> checks,
             IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
-            ITargetTFMSelector tfmSelector,
+            ITargetFrameworkSelector tfmSelector,
             ILogger<CurrentProjectSelectionStep> logger)
             : base(logger)
         {
@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.EntryPoint is null)
+            if (!context.EntryPoints.Any())
             {
                 throw new InvalidOperationException("Entrypoint must be set before using this step");
             }
@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             }
 
             // Get the projects we care about based on the entry point project
-            _orderedProjects = context.EntryPoint.PostOrderTraversal(p => p.ProjectReferences).ToArray();
+            _orderedProjects = context.EntryPoints.PostOrderTraversal(p => p.ProjectReferences).ToArray();
 
             // If all projects related to the entry point project are complete or invalid, then the upgrade is done
             var allProjectsAreUpgraded = await _orderedProjects.ToAsyncEnumerable()
@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (allProjectsAreUpgraded)
             {
-                Logger.LogInformation("No projects need upgraded for entry point {EntryPoint}", context.EntryPoint.FileInfo);
+                Logger.LogInformation("No projects need upgraded for selected entrypoint");
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgraded", BuildBreakRisk.None);
             }
 

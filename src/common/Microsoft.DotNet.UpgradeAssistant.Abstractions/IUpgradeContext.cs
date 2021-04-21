@@ -15,9 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         bool IsComplete { get; set; }
 
-        IProject? EntryPoint { get; }
-
-        void SetEntryPoint(IProject? entryPoint);
+        IEnumerable<IProject> EntryPoints { get; set; }
 
         IProject? CurrentProject { get; }
 

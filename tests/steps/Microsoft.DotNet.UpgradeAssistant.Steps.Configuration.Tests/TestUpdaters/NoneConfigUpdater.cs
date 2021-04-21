@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
 {
     [ApplicableComponents(ProjectComponents.None)]
-    public class NoneConfigUpdater : IConfigUpdater
+    public class NoneConfigUpdater : IUpdater<ConfigFile>
     {
         private readonly bool _isApplicable;
 
@@ -28,15 +28,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             _isApplicable = isApplicable;
         }
 
-        public Task<bool> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             ApplyCount++;
-            return Task.FromResult(_isApplicable);
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(_isApplicable));
         }
 
-        public Task<bool> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> configFiles, CancellationToken token)
+        public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
-            return Task.FromResult(_isApplicable);
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(_isApplicable));
         }
     }
 }
