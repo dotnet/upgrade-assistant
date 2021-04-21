@@ -44,10 +44,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
 #pragma warning restore CA1034 // Nested types should not be visible
 
-        private string? _platform;
-        private Version? _platformVersion;
-        private string _framework;
-        private Version _frameworkVersion;
+        private readonly string? _platform;
+        private readonly Version? _platformVersion;
+        private readonly string _framework;
+        private readonly Version _frameworkVersion;
 
         public TargetFrameworkMoniker(string framework, Version frameworkVersion)
         {
