@@ -123,12 +123,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 if (_analysisState.PackagesToAdd.Count > 0)
                 {
-                    Logger.LogInformation($"Packages to be addded:\n{string.Join("\n", _analysisState.PackagesToAdd.Distinct())}");
+                    Logger.LogInformation($"Packages to be added:\n{string.Join("\n", _analysisState.PackagesToAdd.Distinct())}");
                 }
 
                 if (_analysisState.FrameworkReferencesToAdd.Count > 0)
                 {
-                    Logger.LogInformation($"Framework references to be addded:\n{string.Join("\n", _analysisState.FrameworkReferencesToAdd.Distinct())}");
+                    Logger.LogInformation($"Framework references to be added:\n{string.Join("\n", _analysisState.FrameworkReferencesToAdd.Distinct())}");
                 }
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analysisState.ReferencesToRemove.Distinct().Count()} references need removed, {_analysisState.PackagesToRemove.Distinct().Count()} packages need removed, and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
