@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Multiple entrypoints can now be added by using globbing and multiple instances of the `--entry-point` argument [#425](https://github.com/dotnet/upgrade-assistant/pull/425) 
+- NuGet credential providers will now be used, if present (may require running in interactive mode) [#448](https://github.com/dotnet/upgrade-assistant/pull/448) 
 
 ### Fixed
 - UpgradeSteps should be filtered based on project components [#255](https://github.com/dotnet/upgrade-assistant/issues/255)

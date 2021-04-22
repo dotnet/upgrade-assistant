@@ -113,8 +113,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             public IEnumerable<string> EntryPoints { get; set; } = Enumerable.Empty<string>();
 
-            public bool IsComplete { get; set; }
-
             public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
         }
     }
