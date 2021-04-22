@@ -72,6 +72,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                             state.PossibleBreakingChangeRecommended = true;
                         }
 
+                        if (updatedReference.IsPrerelease)
+                        {
+                            _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", project.TargetFrameworks));
+                        }
+
                         state.PackagesToRemove.Add(packageReference);
                         state.PackagesToAdd.Add(updatedReference);
                     }
@@ -84,17 +89,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFramework, CancellationToken token)
         {
             var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, true, token).ConfigureAwait(false);
+            NuGetReference? prereleaseCandidate = null;
 
             foreach (var newerPackage in latestMinorVersions)
             {
                 if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, targetFramework, token).ConfigureAwait(false))
                 {
                     _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, targetFramework);
-                    return newerPackage;
+
+                    // Only return a pre-release version if it's the only newer major version that supports the necessary TFM
+                    if (newerPackage.IsPrerelease)
+                    {
+                        if (prereleaseCandidate is null)
+                        {
+                            prereleaseCandidate = newerPackage;
+                        }
+                    }
+                    else
+                    {
+                        return newerPackage;
+                    }
                 }
             }
 
-            return null;
+            return prereleaseCandidate;
         }
     }
 }

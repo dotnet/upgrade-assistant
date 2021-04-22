@@ -107,8 +107,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             public string? CurrentProject { get; set; }
 
             public IEnumerable<string> EntryPoints { get; set; } = Enumerable.Empty<string>();
-
-            public bool IsComplete { get; set; }
         }
     }
 }
