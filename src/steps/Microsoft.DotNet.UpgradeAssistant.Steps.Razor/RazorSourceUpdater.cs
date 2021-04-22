@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.Language;
@@ -24,6 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         private readonly IEnumerable<DiagnosticAnalyzer> _analyzers;
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
         private readonly ILogger<RazorSourceUpdater> _logger;
+        private static readonly Regex UsingBlockRegex = new Regex(@"^(\s*using\s+(?<namespace>.+?);+\s*)+$", RegexOptions.Compiled);
+        private static readonly Regex UsingNamespaceRegex = new Regex(@"using\s+(?<namespace>.+?);", RegexOptions.Compiled);
 
         public string Id => typeof(RazorSourceUpdater).FullName!;
 
@@ -138,8 +141,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 var originalSubTextGroups = (await MappedSubText.GetMappedSubTextsAsync(originalDocument, token).ConfigureAwait(false)).ToLookup(m => m.SourceLocation);
                 var updatedSubTextGroups = (await MappedSubText.GetMappedSubTextsAsync(updatedDocument, token).ConfigureAwait(false)).ToLookup(m => m.SourceLocation);
 
-                var candidateReplacements = new List<TextReplacement>();
-
                 foreach (var originalGroup in originalSubTextGroups)
                 {
                     var updatedGroup = updatedSubTextGroups[originalGroup.Key] ?? Enumerable.Empty<MappedSubText>();
@@ -147,13 +148,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     // If both groups have the same number of elements, then they pair in order
                     if (originalGroup.Count() == updatedGroup.Count())
                     {
-                        candidateReplacements.AddRange(originalGroup.Zip(updatedGroup, (original, updated) => new TextReplacement(original, updated.Text)));
+                        AddReplacementCandidates(replacements, originalGroup.Zip(updatedGroup, (original, updated) => new TextReplacement(original, updated.Text)));
                     }
 
                     // If the updated group is empty, then the original elements all pair with empty source text
                     else if (!updatedGroup.Any())
                     {
-                        candidateReplacements.AddRange(originalGroup.Select(m => new TextReplacement(m, SourceText.From(string.Empty))));
+                        AddReplacementCandidates(replacements, originalGroup.Select(m => new TextReplacement(m, SourceText.From(string.Empty))));
                     }
 
                     // This is the tricky one. If there are less updated code blocks than original code blocks, it will be necesary to guess which original code blocks
@@ -165,19 +166,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                         {
                             var bestMatch = originalList.OrderBy(m => updatedText.GetChangeRanges(m.Text).Sum(r => r.Span.Length)).First();
                             originalList.Remove(bestMatch);
-                            candidateReplacements.Add(new TextReplacement(bestMatch, updatedText));
+                            AddReplacementCandidates(replacements, new[] { new TextReplacement(bestMatch, updatedText) });
                         }
 
                         // Add remaining original code blocks paired with empty source text
-                        candidateReplacements.AddRange(originalList.Select(m => new TextReplacement(m, SourceText.From(string.Empty))));
+                        AddReplacementCandidates(replacements, originalList.Select(m => new TextReplacement(m, SourceText.From(string.Empty))));
                     }
                 }
-
-                // Ignore any code block pairings without text changes
-                replacements.AddRange(candidateReplacements.Where(c => !c.NewText.ContentEquals(c.OriginalText.Text)));
             }
 
             return replacements;
+
+            static void AddReplacementCandidates(List<TextReplacement> replacements, IEnumerable<TextReplacement> candidates)
+            {
+                replacements.AddRange(candidates.Where(c => !c.NewText.ContentEquals(c.OriginalText.Text)));
+            }
         }
 
         private void ApplyMappedCodeChanges(IList<TextReplacement> replacements, ImmutableArray<RazorCodeDocument> razorDocuments)
@@ -212,22 +215,75 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                         // Trim the string that's being replaced because code from Razor code blocks will include a couple extra spaces (to make room for @{)
                         // compared to the source that actually appeared in the cshtml file.
                         var original = originalText.Substring(change.Span.Start, change.Span.Length).TrimStart();
+                        var updated = change.NewText?.TrimStart();
 
-                        // If the original text was completely removed, also search for implicit and explicit Razor expression syntax (@ or @()) so that it will be cleaned up, too
-                        if (original.Equals(originalText.TrimStart(), StringComparison.Ordinal) && string.IsNullOrWhiteSpace(change.NewText))
+                        // Clean up diff
+                        CleanTextDiff(ref original, ref updated);
+
+                        // If new text is being added, insert it with correct Razor transition syntax
+                        if (string.IsNullOrWhiteSpace(original))
                         {
-                            var implicitExpression = $"@{original.Replace(";", string.Empty)}";
-                            var explicitExpression = $"@({original.Replace(";", string.Empty)})";
-                            documentText.Replace(implicitExpression, string.Empty, startOffset, endOffset - startOffset);
-                            documentText.Replace(explicitExpression, string.Empty, startOffset, endOffset - startOffset);
-                        }
+                            // Using statements are inserted with special implicit Razor expression syntax
+                            if (UsingBlockRegex.IsMatch(updated))
+                            {
+                                var formattedDeclarations = new StringBuilder();
+                                var usingStatementMatches = UsingNamespaceRegex.Matches(updated);
+                                foreach (Match match in usingStatementMatches)
+                                {
+                                    formattedDeclarations.AppendLine($"@using {match.Groups["namespace"].Value}");
+                                }
 
-                        documentText.Replace(original, change.NewText?.TrimStart() ?? string.Empty, startOffset, endOffset - startOffset);
+                                documentText.Insert(startOffset, formattedDeclarations.ToString());
+                            }
+                            else
+                            {
+                                documentText.Insert(startOffset, $"@{{ {updated} }}");
+                            }
+                        }
+                        else
+                        {
+                            // If the original text was completely removed, also search for implicit and explicit Razor expression syntax (@ or @()) so that it will be cleaned up, too
+                            if (original.Equals(originalText.TrimStart(), StringComparison.Ordinal) && string.IsNullOrWhiteSpace(updated))
+                            {
+                                var implicitExpression = $"@{original.Replace(";", string.Empty)}";
+                                var explicitExpression = $"@({original.Replace(";", string.Empty).Trim()})";
+                                documentText.Replace(implicitExpression, string.Empty, startOffset, endOffset - startOffset);
+                                documentText.Replace(explicitExpression, string.Empty, startOffset, endOffset - startOffset);
+                            }
+
+                            documentText.Replace(original, updated ?? string.Empty, startOffset, endOffset - startOffset);
+                        }
                     }
                 }
 
                 File.WriteAllText(replacementGroup.Key, documentText.ToString());
             }
+        }
+
+        // SourceText.GetTextChanges doesn't do a great job of finding minimal diffs
+        // For example "abbb" -> "cbbb" may report diffs of abbb->cbbb instead of a->c
+        // This clean-up method at least removes common leading and trailing characters
+        private static void CleanTextDiff(ref string original, ref string? updated)
+        {
+            if (updated is null)
+            {
+                return;
+            }
+
+            var index = 0;
+            while (index < original.Length && index < updated.Length && original[index] == updated[index])
+            {
+                index++;
+            }
+
+            var endIndex = 0;
+            while (endIndex > -original.Length && endIndex > -updated.Length && original[original.Length - 1 + endIndex] == updated[updated.Length - 1 + endIndex])
+            {
+                endIndex--;
+            }
+
+            original = original.Substring(index, Math.Max(0, original.Length + endIndex - index));
+            updated = updated.Substring(index, Math.Max(0, updated.Length + endIndex - index));
         }
 
         private static int GetLineOffset(RazorCodeDocument razorDoc, int startingLine)

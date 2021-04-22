@@ -32,8 +32,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             var ret = new List<MappedSubText>();
             var documentText = await document.GetTextAsync(token).ConfigureAwait(false);
-            MappedSubText? currentMappedSubText = null;
+
             var subTextStart = 0;
+
+            // The initial mapped subtext will map everything before the first #line to offset 0 to allow
+            // for code that's added prior to the first actual map
+            var currentMappedSubText = document.FilePath?.Contains(".cshtml.cs") ?? false
+                ? new MappedSubText(documentText, document.FilePath.Replace(".cshtml.cs", ".cshtml"), 1)
+                : null;
+
             var lineDirectives = syntaxRoot.DescendantNodes(_ => true, true).OfType<LineDirectiveTriviaSyntax>();
             foreach (var directive in lineDirectives)
             {
