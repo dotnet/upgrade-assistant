@@ -10,6 +10,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DiffPlex;
+using DiffPlex.Chunkers;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -25,6 +27,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         private readonly IEnumerable<DiagnosticAnalyzer> _analyzers;
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
         private readonly ILogger<RazorSourceUpdater> _logger;
+        private readonly IChunker _chunker;
+        private readonly IDiffer _differ;
         private static readonly Regex UsingBlockRegex = new Regex(@"^(\s*using\s+(?<namespace>.+?);+\s*)+$", RegexOptions.Compiled);
         private static readonly Regex UsingNamespaceRegex = new Regex(@"using\s+(?<namespace>.+?);", RegexOptions.Compiled);
 
@@ -41,6 +45,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             _analyzers = analyzers?.OrderBy(a => a.SupportedDiagnostics.First().Id) ?? throw new ArgumentNullException(nameof(analyzers));
             _codeFixProviders = codeFixProviders?.OrderBy(c => c.FixableDiagnosticIds.First()) ?? throw new ArgumentNullException(nameof(codeFixProviders));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _chunker = new CharacterChunker();
+            _differ = new Differ();
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
@@ -158,13 +164,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     }
 
                     // This is the tricky one. If there are less updated code blocks than original code blocks, it will be necesary to guess which original code blocks
-                    // pair with the remaining updated code blocks based on test similarity.
+                    // pair with the remaining updated code blocks based on text similarity.
                     else
                     {
                         var originalList = originalGroup.ToList();
                         foreach (var updatedText in updatedGroup.Select(m => m.Text))
                         {
-                            var bestMatch = originalList.OrderBy(m => updatedText.GetChangeRanges(m.Text).Sum(r => r.Span.Length)).First();
+                            var bestMatch = originalList.OrderBy(m =>
+                            {
+                                var diff = _differ.CreateDiffs(m.Text.ToString(), updatedText.ToString(), true, false, _chunker);
+                                return diff.DiffBlocks.Any() ? diff.DiffBlocks.Select(b => b.DeleteCountA + b.InsertCountB).Max() : 0;
+                            }).First();
                             originalList.Remove(bestMatch);
                             AddReplacementCandidates(replacements, new[] { new TextReplacement(bestMatch, updatedText) });
                         }
