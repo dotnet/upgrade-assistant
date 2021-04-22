@@ -27,10 +27,29 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         bool UpdateSolution(Solution updatedSolution);
 
-        string? BackupLocation { get; set; }
-
         IDictionary<string, string> GlobalProperties { get; }
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
+
+        /// <summary>
+        /// Returns a property value stored in the context.
+        /// </summary>
+        /// <param name="propertyName">Name identifier for the property.</param>
+        /// <returns>The property value.</returns>
+        string? TryGetPropertyValue(string propertyName);
+
+        /// <summary>
+        /// Stores a property value to the context.
+        /// </summary>
+        /// <param name="propertyName">Name identifier for the property.</param>
+        /// <param name="value">The property value to store.</param>
+        /// <param name="persistent">Whether to persist the value when the program terminates.</param>
+        void SetPropertyValue(string propertyName, string value, bool persistent);
+
+        /// <summary>
+        /// Returns persistent properties for storage.
+        /// </summary>
+        /// <returns>All defined persistent properties.</returns>
+        Dictionary<string, string> GetPersistentProperties();
     }
 }

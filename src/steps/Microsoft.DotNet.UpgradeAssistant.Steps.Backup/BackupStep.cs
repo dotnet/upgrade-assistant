@@ -13,6 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
     public class BackupStep : UpgradeStep
     {
         private const string FlagFileName = "upgrade.backup";
+        private const string BackupPropertyName = "BackupLocation";
 
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
@@ -57,17 +58,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             _projectDir = context.CurrentProject.Required().FileInfo.DirectoryName;
             _defaultBackupPath = GetDefaultBackupPath(_projectDir);
 
+            var backupLocation = context.TryGetPropertyValue(BackupPropertyName) ?? _defaultBackupPath;
+
             if (_skipBackup)
             {
                 Logger.LogDebug("Backup upgrade step initalized as complete (backup skipped)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
-            else if ((context.BackupLocation ?? _defaultBackupPath) is null)
+            else if (_defaultBackupPath is null)
             {
                 Logger.LogDebug("No backup path specified");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
             }
-            else if (File.Exists(Path.Combine(context.BackupLocation ?? _defaultBackupPath, FlagFileName)))
+            else if (File.Exists(Path.Combine(backupLocation, FlagFileName)))
             {
                 Logger.LogDebug("Backup upgrade step initalized as complete (already done)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
@@ -112,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Existing backup found");
             }
 
-            context.BackupLocation = backupPath;
+            context.SetPropertyValue(BackupPropertyName, backupPath, true);
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, backupPath);
             try

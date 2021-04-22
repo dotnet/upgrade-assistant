@@ -21,6 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
+        private Dictionary<string, (bool Persistent, string PropertyValue)> _propertyStorage;
 
         private List<FileInfo>? _entryPointPaths;
         private FileInfo? _projectPath;
@@ -69,6 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _vsPath = vsFinder.GetLatestVisualStudioPath();
+            _propertyStorage = new Dictionary<string, (bool, string)>();
 
             GlobalProperties = CreateProperties();
             ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
@@ -219,7 +221,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public string? BackupLocation { get; set; }
+        public string? TryGetPropertyValue(string propertyName)
+        {
+            if (_propertyStorage.TryGetValue(propertyName, out var value))
+            {
+                return value.PropertyValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void SetPropertyValue(string propertyName, string value, bool persistent)
+        {
+            _propertyStorage[propertyName] = (persistent, value);
+        }
+
+        public Dictionary<string, string> GetPersistentProperties()
+        {
+            return _propertyStorage.Where(p => p.Value.Persistent)
+                .ToDictionary(k => k.Key, v => v.Value.PropertyValue);
+        }
 
         public void SetCurrentProject(IProject? project)
         {

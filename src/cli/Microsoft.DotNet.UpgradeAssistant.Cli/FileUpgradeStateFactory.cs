@@ -41,7 +41,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 context.EntryPoints = state.EntryPoints.Select(e => FindProject(e)).Where(e => e != null)!;
                 context.SetCurrentProject(FindProject(state.CurrentProject));
-                context.BackupLocation = state.BackupLocation;
+                foreach (var item in state.Properties)
+                {
+                    context.SetPropertyValue(item.Key, item.Value, true);
+                }
             }
 
             IProject? FindProject(string? path)
@@ -92,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 EntryPoints = context.EntryPoints.Select(e => NormalizePath(e.FileInfo)),
                 CurrentProject = NormalizePath(context.CurrentProject?.FileInfo),
-                BackupLocation = context.BackupLocation
+                Properties = context.GetPersistentProperties()
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
@@ -112,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             public bool IsComplete { get; set; }
 
-            public string? BackupLocation { get; set; }
+            public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
         }
     }
 }
