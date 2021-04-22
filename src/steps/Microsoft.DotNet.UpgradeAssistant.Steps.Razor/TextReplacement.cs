@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
-    public class TextReplacement: IEquatable<TextReplacement>
+    public class TextReplacement : IEquatable<TextReplacement>
     {
         public MappedSubText OriginalText { get; }
 
@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             NewText = newText ?? throw new ArgumentNullException(nameof(newText));
         }
 
-        public bool Equals(TextReplacement other) =>
+        public bool Equals(TextReplacement? other) =>
             other != null &&
             NewText.ContentEquals(other.NewText) &&
             OriginalText.Equals(other.OriginalText);

@@ -209,50 +209,44 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     // Stop looking for replacements at the start of the first line after the indicated line plus the number of lines in the indicated text
                     var endOffset = GetLineOffset(razorDoc, replacement.OriginalText.StartingLine + replacement.OriginalText.Text.Lines.Count);
 
-                    var originalText = replacement.OriginalText.Text.ToString();
-                    foreach (var change in replacement.NewText.GetTextChanges(replacement.OriginalText.Text))
+                    // Trim the string that's being replaced because code from Razor code blocks will include a couple extra spaces (to make room for @{)
+                    // compared to the source that actually appeared in the cshtml file.
+                    var originalText = replacement.OriginalText.Text.ToString().TrimStart();
+                    var updatedText = replacement.NewText.ToString().TrimStart();
+                    MinimizeReplacement(ref originalText, ref updatedText);
+
+                    // If new text is being added, insert it with correct Razor transition syntax
+                    if (string.IsNullOrWhiteSpace(originalText))
                     {
-                        // Trim the string that's being replaced because code from Razor code blocks will include a couple extra spaces (to make room for @{)
-                        // compared to the source that actually appeared in the cshtml file.
-                        var original = originalText.Substring(change.Span.Start, change.Span.Length).TrimStart();
-                        var updated = change.NewText?.TrimStart();
-
-                        // Clean up diff
-                        CleanTextDiff(ref original, ref updated);
-
-                        // If new text is being added, insert it with correct Razor transition syntax
-                        if (string.IsNullOrWhiteSpace(original))
+                        // Using statements are inserted with special implicit Razor expression syntax
+                        if (UsingBlockRegex.IsMatch(updatedText))
                         {
-                            // Using statements are inserted with special implicit Razor expression syntax
-                            if (UsingBlockRegex.IsMatch(updated))
+                            var formattedDeclarations = new StringBuilder();
+                            var usingStatementMatches = UsingNamespaceRegex.Matches(updatedText);
+                            foreach (Match match in usingStatementMatches)
                             {
-                                var formattedDeclarations = new StringBuilder();
-                                var usingStatementMatches = UsingNamespaceRegex.Matches(updated);
-                                foreach (Match match in usingStatementMatches)
-                                {
-                                    formattedDeclarations.AppendLine($"@using {match.Groups["namespace"].Value}");
-                                }
+                                formattedDeclarations.AppendLine($"@using {match.Groups["namespace"].Value}");
+                            }
 
-                                documentText.Insert(startOffset, formattedDeclarations.ToString());
-                            }
-                            else
-                            {
-                                documentText.Insert(startOffset, $"@{{ {updated} }}");
-                            }
+                            documentText.Insert(startOffset, formattedDeclarations.ToString());
                         }
                         else
                         {
-                            // If the original text was completely removed, also search for implicit and explicit Razor expression syntax (@ or @()) so that it will be cleaned up, too
-                            if (original.Equals(originalText.TrimStart(), StringComparison.Ordinal) && string.IsNullOrWhiteSpace(updated))
-                            {
-                                var implicitExpression = $"@{original.Replace(";", string.Empty)}";
-                                var explicitExpression = $"@({original.Replace(";", string.Empty).Trim()})";
-                                documentText.Replace(implicitExpression, string.Empty, startOffset, endOffset - startOffset);
-                                documentText.Replace(explicitExpression, string.Empty, startOffset, endOffset - startOffset);
-                            }
-
-                            documentText.Replace(original, updated ?? string.Empty, startOffset, endOffset - startOffset);
+                            documentText.Insert(startOffset, $"@{{ {updatedText} }}");
                         }
+                    }
+                    else
+                    {
+                        // If the original text was completely removed, also search for implicit and explicit Razor expression syntax (@ or @()) so that it will be cleaned up, too
+                        if (string.IsNullOrWhiteSpace(updatedText))
+                        {
+                            var implicitExpression = $"@{originalText.Replace(";", string.Empty)}";
+                            var explicitExpression = $"@({originalText.Replace(";", string.Empty).Trim()})";
+                            documentText.Replace(implicitExpression, updatedText, startOffset, endOffset - startOffset);
+                            documentText.Replace(explicitExpression, updatedText, startOffset, endOffset - startOffset);
+                        }
+
+                        documentText.Replace(originalText, updatedText, startOffset, endOffset - startOffset);
                     }
                 }
 
@@ -260,10 +254,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
         }
 
-        // SourceText.GetTextChanges doesn't do a great job of finding minimal diffs
-        // For example "abbb" -> "cbbb" may report diffs of abbb->cbbb instead of a->c
-        // This clean-up method at least removes common leading and trailing characters
-        private static void CleanTextDiff(ref string original, ref string? updated)
+        // Removes leading and trailing portions of original and updated that are the same
+        private static void MinimizeReplacement(ref string original, ref string? updated)
         {
             if (updated is null)
             {
