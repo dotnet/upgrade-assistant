@@ -10,45 +10,69 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DiffPlex;
-using DiffPlex.Chunkers;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
+    /// <summary>
+    /// An updater for RazorCodeDocuments which applies Roslyn analyzers and code fix providers to the source within the documents.
+    /// </summary>
     public class RazorSourceUpdater : IUpdater<RazorCodeDocument>
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _analyzers;
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
+        private readonly ITextMatcher _textMatcher;
         private readonly ILogger<RazorSourceUpdater> _logger;
-        private readonly IChunker _chunker;
-        private readonly IDiffer _differ;
         private static readonly Regex UsingBlockRegex = new Regex(@"^(\s*using\s+(?<namespace>.+?);+\s*)+$", RegexOptions.Compiled);
         private static readonly Regex UsingNamespaceRegex = new Regex(@"using\s+(?<namespace>.+?);", RegexOptions.Compiled);
 
+        /// <summary>
+        /// Gets a unique identifier for this updater.
+        /// </summary>
         public string Id => typeof(RazorSourceUpdater).FullName!;
 
+        /// <summary>
+        /// Gets a short user-friendly title for this updater.
+        /// </summary>
         public string Title => "Apply code fixes to Razor documents";
 
+        /// <summary>
+        /// Gets a user-friendly description of this updater's function.
+        /// </summary>
         public string Description => "Update code within Razor documents to fix diagnostics according to registered Roslyn analyzers and code fix providers";
 
+        /// <summary>
+        /// Gets a value indicating the risk that this updater will introduce build breaks when applied.
+        /// </summary>
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
 
-        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<RazorSourceUpdater> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RazorSourceUpdater"/> class.
+        /// </summary>
+        /// <param name="analyzers">Analyzers to use when analyzing source code in the Razor documents.</param>
+        /// <param name="codeFixProviders">Code fix providers to use when fixing diagnostics found in the Razor documents.</param>
+        /// <param name="textMatcher">The text matching service to use for correlating old sections of text in Razor documents with updated texts.</param>
+        /// <param name="logger">An ILogger to log diagnostics.</param>
+        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ITextMatcher textMatcher, ILogger<RazorSourceUpdater> logger)
         {
             _analyzers = analyzers?.OrderBy(a => a.SupportedDiagnostics.First().Id) ?? throw new ArgumentNullException(nameof(analyzers));
             _codeFixProviders = codeFixProviders?.OrderBy(c => c.FixableDiagnosticIds.First()) ?? throw new ArgumentNullException(nameof(codeFixProviders));
+            _textMatcher = textMatcher ?? throw new ArgumentNullException(nameof(textMatcher));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _chunker = new CharacterChunker();
-            _differ = new Differ();
         }
 
+        /// <summary>
+        /// Determines whether or not there are diagnostics in Razor documents in the context's current project that this updater can address.
+        /// </summary>
+        /// <param name="context">The upgrade context containing the project to analyze.</param>
+        /// <param name="inputs">The Razor documents within the context's current project that should be analyzed for possible source updates.</param>
+        /// <param name="token">A cancellation token.</param>
+        /// <returns>True if the Razor documents contain diagnostics that this updater can address, false otherwise.</returns>
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
         {
             if (context is null)
@@ -71,6 +95,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             return new FileUpdaterResult(mappedDiagnostics.Any(), diagnosticsByFile.Select(g => g.Key));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="inputs"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
         {
             if (context is null)
@@ -126,7 +157,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 _logger.LogWarning("Completing Razor source updates with {DiagnosticCount} diagnostics still unaddressed", diagnosticsCount);
             }
 
-            return new FileUpdaterResult(true, textReplacements.Select(r => r.OriginalText.FilePath).Distinct());
+            return new FileUpdaterResult(true, textReplacements.Select(r => r.FilePath).Distinct());
         }
 
         private async Task<IList<TextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)
@@ -141,62 +172,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     continue;
                 }
 
-                // We want to correlate the mapped code blocks in the original document with corresponding ones in the updated document.
-                // Unfortunately, this is non-trivial because some code blocks may have been removed and, in other cases, multiple code blocks
-                // can have the same source location.
-                var originalSubTextGroups = (await MappedSubText.GetMappedSubTextsAsync(originalDocument, token).ConfigureAwait(false)).ToLookup(m => m.SourceLocation);
-                var updatedSubTextGroups = (await MappedSubText.GetMappedSubTextsAsync(updatedDocument, token).ConfigureAwait(false)).ToLookup(m => m.SourceLocation);
+                var mappedFilePath = originalDocument.FilePath?.Replace(".cshtml.cs", ".cshtml");
+                var originalSubTextGroups = (await MappedSubText.GetMappedSubTextsAsync(originalDocument, mappedFilePath, token).ConfigureAwait(false)).ToLookup(m => m.SourceLocation);
+                var updatedSubTextGroups = (await MappedSubText.GetMappedSubTextsAsync(updatedDocument, mappedFilePath, token).ConfigureAwait(false)).ToLookup(m => m.SourceLocation);
 
                 foreach (var originalGroup in originalSubTextGroups)
                 {
-                    var updatedGroup = updatedSubTextGroups[originalGroup.Key] ?? Enumerable.Empty<MappedSubText>();
-
-                    // If both groups have the same number of elements, then they pair in order
-                    if (originalGroup.Count() == updatedGroup.Count())
-                    {
-                        AddReplacementCandidates(replacements, originalGroup.Zip(updatedGroup, (original, updated) => new TextReplacement(original, updated.Text)));
-                    }
-
-                    // If the updated group is empty, then the original elements all pair with empty source text
-                    else if (!updatedGroup.Any())
-                    {
-                        AddReplacementCandidates(replacements, originalGroup.Select(m => new TextReplacement(m, SourceText.From(string.Empty))));
-                    }
-
-                    // This is the tricky one. If there are less updated code blocks than original code blocks, it will be necesary to guess which original code blocks
-                    // pair with the remaining updated code blocks based on text similarity.
-                    else
-                    {
-                        var originalList = originalGroup.ToList();
-                        foreach (var updatedText in updatedGroup.Select(m => m.Text))
-                        {
-                            var bestMatch = originalList.OrderBy(m =>
-                            {
-                                var diff = _differ.CreateDiffs(m.Text.ToString(), updatedText.ToString(), true, false, _chunker);
-                                return diff.DiffBlocks.Any() ? diff.DiffBlocks.Select(b => b.DeleteCountA + b.InsertCountB).Max() : 0;
-                            }).First();
-                            originalList.Remove(bestMatch);
-                            AddReplacementCandidates(replacements, new[] { new TextReplacement(bestMatch, updatedText) });
-                        }
-
-                        // Add remaining original code blocks paired with empty source text
-                        AddReplacementCandidates(replacements, originalList.Select(m => new TextReplacement(m, SourceText.From(string.Empty))));
-                    }
+                    var updatedText = updatedSubTextGroups[originalGroup.Key]?.Select(t => t.Text.ToString()) ?? Enumerable.Empty<string>();
+                    replacements.AddRange(_textMatcher.MatchOrderedSubTexts(originalGroup, updatedText));
                 }
             }
 
             return replacements;
-
-            static void AddReplacementCandidates(List<TextReplacement> replacements, IEnumerable<TextReplacement> candidates)
-            {
-                replacements.AddRange(candidates.Where(c => !c.NewText.ContentEquals(c.OriginalText.Text)));
-            }
         }
 
         private void ApplyMappedCodeChanges(IList<TextReplacement> replacements, ImmutableArray<RazorCodeDocument> razorDocuments)
         {
             // Load each file with replacements into memory and update based on replacements
-            var replacementsByFile = replacements.Distinct().OrderByDescending(t => t.OriginalText.StartingLine).GroupBy(t => t.OriginalText.FilePath);
+            var replacementsByFile = replacements.Distinct().OrderByDescending(t => t.StartingLine).GroupBy(t => t.FilePath);
             foreach (var replacementGroup in replacementsByFile)
             {
                 // Although we can (and do) read the document directly from disk, getting the RazorCodeDocument is useful because it provides
@@ -211,17 +204,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
                 foreach (var replacement in replacementGroup)
                 {
-                    _logger.LogInformation("Updating source code in Razor document {FilePath} at line {Line}", replacement.OriginalText.FilePath, replacement.OriginalText.StartingLine);
+                    _logger.LogInformation("Updating source code in Razor document {FilePath} at line {Line}", replacement.FilePath, replacement.StartingLine);
 
                     // Start looking for replacements at the start of the indicated line
-                    var startOffset = GetLineOffset(razorDoc, replacement.OriginalText.StartingLine);
+                    var startOffset = GetLineOffset(razorDoc, replacement.StartingLine);
 
                     // Stop looking for replacements at the start of the first line after the indicated line plus the number of lines in the indicated text
-                    var endOffset = GetLineOffset(razorDoc, replacement.OriginalText.StartingLine + replacement.OriginalText.Text.Lines.Count);
+                    var endOffset = GetLineOffset(razorDoc, replacement.StartingLine + replacement.OriginalText.Lines.Count);
 
                     // Trim the string that's being replaced because code from Razor code blocks will include a couple extra spaces (to make room for @{)
                     // compared to the source that actually appeared in the cshtml file.
-                    var originalText = replacement.OriginalText.Text.ToString().TrimStart();
+                    var originalText = replacement.OriginalText.ToString().TrimStart();
                     var updatedText = replacement.NewText.ToString().TrimStart();
                     MinimizeReplacement(ref originalText, ref updatedText);
 

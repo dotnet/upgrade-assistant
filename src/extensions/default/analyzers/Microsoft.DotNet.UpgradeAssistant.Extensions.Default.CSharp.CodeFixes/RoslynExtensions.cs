@@ -26,7 +26,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             }
 
             var anyUsings = documentRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal));
-            var result = anyUsings ? documentRoot : documentRoot.AddUsings(UsingDirective(ParseName(namespaceName)));
+            var usingDirective = UsingDirective(ParseName(namespaceName).WithLeadingTrivia(Whitespace(" ")));
+            var result = anyUsings ? documentRoot : documentRoot.AddUsings(usingDirective);
 
             return result;
         }

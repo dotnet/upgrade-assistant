@@ -12,6 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static IServiceCollection AddRazorUpdaterStep(this IServiceCollection services) =>
             services
             .AddUpgradeStep<RazorUpdaterStep>()
-            .AddTransient<IUpdater<RazorCodeDocument>, RazorSourceUpdater>();
+            .AddTransient<IUpdater<RazorCodeDocument>, RazorSourceUpdater>()
+            .AddTransient<ITextMatcher, DefaultTextMatcher>();
     }
 }

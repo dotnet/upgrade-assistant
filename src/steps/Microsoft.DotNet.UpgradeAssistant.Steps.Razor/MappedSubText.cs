@@ -13,11 +13,24 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
+    /// <summary>
+    /// Represents a portion of a source file that maps to a location in a different source file.
+    /// </summary>
     public sealed record MappedSubText(SourceText Text, string FilePath, int StartingLine)
     {
+        /// <summary>
+        /// Gets the location of the mapped source text in the mapped file as a string with format "FilePath@FirstLineNumber".
+        /// </summary>
         public string SourceLocation => $"{FilePath}@{StartingLine}";
 
-        public static async Task<IEnumerable<MappedSubText>> GetMappedSubTextsAsync(Document document, CancellationToken token)
+        /// <summary>
+        /// Gets all mapped source sections of a given Roslyn document based on #line pragmas.
+        /// </summary>
+        /// <param name="document">The document to look for mapped sections in.</param>
+        /// <param name="defaultMapPath">The file path that code prior to the first #line pragma should map to or null to not map this code.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>An enumerable of mapped source sections containing the source text that is mapped and the location that source came from in the mapped file.</returns>
+        public static async Task<IEnumerable<MappedSubText>> GetMappedSubTextsAsync(Document document, string? defaultMapPath, CancellationToken token)
         {
             if (document is null)
             {
@@ -35,11 +48,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             var subTextStart = 0;
 
-            // The initial mapped subtext will map everything before the first #line to offset 0 to allow
-            // for code that's added prior to the first actual map
-            var currentMappedSubText = document.FilePath?.Contains(".cshtml.cs") ?? false
-                ? new MappedSubText(documentText, document.FilePath.Replace(".cshtml.cs", ".cshtml"), 1)
-                : null;
+            // If the user has specified a file that code prior to the first #line should map to, then
+            // create and initial mapped subtext that maps everything before the first #line to offset 0
+            // to allow for code that's added prior to the first actual map.
+            var currentMappedSubText = defaultMapPath is null
+                ? null
+                : new MappedSubText(documentText, defaultMapPath, 0);
 
             var lineDirectives = syntaxRoot.DescendantNodes(_ => true, true).OfType<LineDirectiveTriviaSyntax>();
             foreach (var directive in lineDirectives)
@@ -68,11 +82,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             return ret;
         }
 
+        /// <inheritdoc/>
         public bool Equals(MappedSubText other) =>
             other != null &&
             Text.ContentEquals(other.Text) &&
             SourceLocation.Equals(other.SourceLocation, StringComparison.Ordinal);
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             var hashcode = default(HashCode);
