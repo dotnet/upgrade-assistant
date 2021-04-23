@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
+        private readonly IUpgradeContextProperties _properties;
 
         public override string Description => $"Back up the current project to another directory";
 
@@ -35,11 +36,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public BackupStep(UpgradeOptions options, ILogger<BackupStep> logger, IUserInput userInput)
+        public BackupStep(UpgradeOptions options, ILogger<BackupStep> logger, IUserInput userInput, IUpgradeContextProperties properties)
             : base(logger)
         {
             _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
+            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
         }
 
         // The backup step backs up at the project level, so it doesn't apply if no project is selected
@@ -53,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
 
             var projectDir = GetProjectDir(context);
-            var backupLocation = context.TryGetPropertyValue(BackupPropertyName) ?? GetDefaultBackupPath(projectDir);
+            var backupLocation = _properties.GetPropertyValue(BackupPropertyName) ?? GetDefaultBackupPath(projectDir);
 
             if (_skipBackup)
             {
@@ -67,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
             else if (File.Exists(Path.Combine(backupLocation, FlagFileName)))
             {
-                Logger.LogDebug("Backup upgrade step initalized as complete (already done)");
+                Logger.LogDebug("Backup upgrade step initalized as complete (already done). Backup is stored at {BackupLocation}", backupLocation);
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
             }
             else
@@ -106,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Existing backup found");
             }
 
-            context.SetPropertyValue(BackupPropertyName, backupPath, true);
+            _properties.SetPropertyValue(BackupPropertyName, backupPath, true);
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", projectDir, backupPath);
             try
@@ -133,18 +135,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         public override UpgradeStepInitializeResult Reset()
         {
-            //TODO: Remove 
+            _properties.RemovePropertyValue(BackupPropertyName);
             return base.Reset();
         }
 
         private async Task<string?> ChooseBackupPath(IUpgradeContext context, CancellationToken token)
         {
             var projectDir = GetProjectDir(context);
-
+            var defaultPath = GetDefaultBackupPath(projectDir);
             var customPath = default(string);
+
             var commands = new[]
             {
-                UpgradeCommand.Create($"Use default path [{GetDefaultBackupPath(projectDir)}]"),
+                UpgradeCommand.Create($"Use default path [{defaultPath}]"),
                 UpgradeCommand.Create("Enter custom path", async (ctx, token) =>
                 {
                     customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:").ConfigureAwait(false);
@@ -160,7 +163,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 {
                     // customPath may be set in the lambda above.
 #pragma warning disable CA1508 // Avoid dead conditional code
-                    return customPath ?? projectDir;
+                    return customPath ?? defaultPath;
 #pragma warning restore CA1508 // Avoid dead conditional code
                 }
             }

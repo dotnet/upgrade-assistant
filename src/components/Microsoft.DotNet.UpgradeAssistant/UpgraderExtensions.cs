@@ -12,19 +12,20 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static void AddStepManagement(this IServiceCollection services)
         {
             services.AddScoped<UpgraderManager>();
+            services.AddSingleton<IUpgradeContextProperties, UpgradeContextProperties>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
             services.AddReadinessChecks();
             services.AddTargetFrameworkSelectors();
         }
 
-        public static void AddReadinessChecks(this IServiceCollection services)
+        private static void AddReadinessChecks(this IServiceCollection services)
         {
             services.AddTransient<IUpgradeReadyCheck, CanLoadProjectFile>();
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
             services.AddTransient<IUpgradeReadyCheck, TargetFrameworkCheck>();
         }
 
-        public static void AddTargetFrameworkSelectors(this IServiceCollection services)
+        private static void AddTargetFrameworkSelectors(this IServiceCollection services)
         {
             services.AddTransient<ITargetFrameworkSelector, TargetFrameworkSelector>();
 

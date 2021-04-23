@@ -16,8 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         private readonly string _path;
         private readonly ILogger<FileUpgradeStateFactory> _logger;
+        private readonly IUpgradeContextProperties _properties;
 
-        public FileUpgradeStateFactory(UpgradeOptions options, ILogger<FileUpgradeStateFactory> logger)
+        public FileUpgradeStateFactory(
+            UpgradeOptions options,
+            ILogger<FileUpgradeStateFactory> logger,
+            IUpgradeContextProperties properties)
         {
             if (options is null)
             {
@@ -25,7 +29,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
 
             _path = Path.Combine(options.Project.DirectoryName!, ".upgrade-assistant");
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
         }
 
         public async Task LoadStateAsync(IUpgradeContext context, CancellationToken token)
@@ -43,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 context.SetCurrentProject(FindProject(state.CurrentProject));
                 foreach (var item in state.Properties)
                 {
-                    context.SetPropertyValue(item.Key, item.Value, true);
+                    _properties.SetPropertyValue(item.Key, item.Value, true);
                 }
             }
 
@@ -95,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 EntryPoints = context.EntryPoints.Select(e => NormalizePath(e.FileInfo)),
                 CurrentProject = NormalizePath(context.CurrentProject?.FileInfo),
-                Properties = context.GetPersistentProperties()
+                Properties = _properties.GetPersistentPropertyValues().ToDictionary(k => k.Key, v => v.Value)
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
