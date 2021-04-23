@@ -17,7 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly string _path;
         private readonly ILogger<FileUpgradeStateFactory> _logger;
 
-        public FileUpgradeStateFactory(UpgradeOptions options, ILogger<FileUpgradeStateFactory> logger)
+        public FileUpgradeStateFactory(
+            UpgradeOptions options,
+            ILogger<FileUpgradeStateFactory> logger)
         {
             if (options is null)
             {
@@ -25,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
 
             _path = Path.Combine(options.Project.DirectoryName!, ".upgrade-assistant");
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task LoadStateAsync(IUpgradeContext context, CancellationToken token)
@@ -41,6 +43,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 context.EntryPoints = state.EntryPoints.Select(e => FindProject(e)).Where(e => e != null)!;
                 context.SetCurrentProject(FindProject(state.CurrentProject));
+                foreach (var item in state.Properties)
+                {
+                    context.Properties.SetPropertyValue(item.Key, item.Value, true);
+                }
             }
 
             IProject? FindProject(string? path)
@@ -91,6 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 EntryPoints = context.EntryPoints.Select(e => NormalizePath(e.FileInfo)),
                 CurrentProject = NormalizePath(context.CurrentProject?.FileInfo),
+                Properties = context.Properties.GetPersistentPropertyValues().ToDictionary(k => k.Key, v => v.Value)
             };
 
             await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
@@ -107,6 +114,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             public string? CurrentProject { get; set; }
 
             public IEnumerable<string> EntryPoints { get; set; } = Enumerable.Empty<string>();
+
+            public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
         }
     }
 }

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,9 +21,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ITargetFrameworkMonikerComparer _comparer;
         private readonly IComponentIdentifier _componentIdentifier;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
+        private readonly IUpgradeContextProperties _properties;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
-
         private List<FileInfo>? _entryPointPaths;
         private FileInfo? _projectPath;
 
@@ -53,7 +54,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             IPackageRestorer restorer,
             ITargetFrameworkMonikerComparer comparer,
             IComponentIdentifier componentIdentifier,
-            ILogger<MSBuildWorkspaceUpgradeContext> logger)
+            ILogger<MSBuildWorkspaceUpgradeContext> logger,
+            IUpgradeContextProperties properties)
         {
             if (options is null)
             {
@@ -71,6 +73,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _comparer = comparer;
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
+
             _vsPath = vsFinder.GetLatestVisualStudioPath();
 
             GlobalProperties = CreateProperties();
@@ -221,6 +225,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return GetOrAddProject(_projectPath);
             }
         }
+
+        public IUpgradeContextProperties Properties => _properties;
 
         public void SetCurrentProject(IProject? project)
         {
