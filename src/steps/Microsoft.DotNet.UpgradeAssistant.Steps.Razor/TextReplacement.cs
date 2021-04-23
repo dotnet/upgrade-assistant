@@ -27,11 +27,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
         public override int GetHashCode()
         {
-            // https://stackoverflow.com/a/1646913
-            var hash = 17;
-            hash = (hash * 31) + NewText.ToString().GetHashCode();
-            hash = (hash * 31) + OriginalText.GetHashCode();
-            return hash;
+            var hashcode = default(HashCode);
+            hashcode.Add(NewText.ToString(), StringComparer.Ordinal);
+            hashcode.Add(OriginalText);
+            return hashcode.ToHashCode();
         }
     }
 }
