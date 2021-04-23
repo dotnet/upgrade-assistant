@@ -18,9 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
 
-        private string? _projectDir;
-        private string? _defaultBackupPath;
-
         public override string Description => $"Back up the current project to another directory";
 
         public override string Title => "Back up project";
@@ -55,17 +52,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _projectDir = context.CurrentProject.Required().FileInfo.DirectoryName;
-            _defaultBackupPath = GetDefaultBackupPath(_projectDir);
-
-            var backupLocation = context.TryGetPropertyValue(BackupPropertyName) ?? _defaultBackupPath;
+            var projectDir = GetProjectDir(context);
+            var backupLocation = context.TryGetPropertyValue(BackupPropertyName) ?? GetDefaultBackupPath(projectDir);
 
             if (_skipBackup)
             {
                 Logger.LogDebug("Backup upgrade step initalized as complete (backup skipped)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
-            else if (_defaultBackupPath is null)
+            else if (backupLocation is null)
             {
                 Logger.LogDebug("No backup path specified");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
@@ -78,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             else
             {
                 Logger.LogDebug("Backup upgrade step initialized as incomplete");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
             }
         }
 
@@ -103,11 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location");
             }
 
-            if (_projectDir is null)
-            {
-                Logger.LogDebug("No project specified");
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a valid project selected");
-            }
+            var projectDir = GetProjectDir(context);
 
             if (Status == UpgradeStepStatus.Complete)
             {
@@ -117,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             context.SetPropertyValue(BackupPropertyName, backupPath, true);
 
-            Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, backupPath);
+            Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", projectDir, backupPath);
             try
             {
                 Directory.CreateDirectory(backupPath);
@@ -127,7 +118,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to create backup directory {backupPath}");
                 }
 
-                await CopyDirectoryAsync(_projectDir, backupPath).ConfigureAwait(false);
+                await CopyDirectoryAsync(projectDir, backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
                 File.WriteAllText(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})");
                 Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
@@ -142,16 +133,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         public override UpgradeStepInitializeResult Reset()
         {
-            _defaultBackupPath = null;
+            //TODO: Remove 
             return base.Reset();
         }
 
         private async Task<string?> ChooseBackupPath(IUpgradeContext context, CancellationToken token)
         {
+            var projectDir = GetProjectDir(context);
+
             var customPath = default(string);
             var commands = new[]
             {
-                UpgradeCommand.Create($"Use default path [{_defaultBackupPath}]"),
+                UpgradeCommand.Create($"Use default path [{GetDefaultBackupPath(projectDir)}]"),
                 UpgradeCommand.Create("Enter custom path", async (ctx, token) =>
                 {
                     customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:").ConfigureAwait(false);
@@ -167,7 +160,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 {
                     // customPath may be set in the lambda above.
 #pragma warning disable CA1508 // Avoid dead conditional code
-                    return customPath ?? _defaultBackupPath;
+                    return customPath ?? projectDir;
 #pragma warning restore CA1508 // Avoid dead conditional code
                 }
             }
@@ -223,6 +216,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             Logger.LogDebug("Using backup path {BackupPath}", candidatePath);
             return candidatePath;
+        }
+
+        private static string GetProjectDir(IUpgradeContext context)
+        {
+            return context.CurrentProject.Required().FileInfo.DirectoryName;
         }
 
         private static bool IsPathValid(string candidatePath) => !Directory.Exists(candidatePath) || File.Exists(Path.Combine(candidatePath, FlagFileName));
