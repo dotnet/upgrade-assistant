@@ -10,6 +10,7 @@
     <PackageVersion Include="DiffPlex" Version="1.6.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="5.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageVersion Include="Microsoft.Build" Version="16.8.0" />
     <PackageVersion Include="Microsoft.Build.Framework" Version="16.8.0" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.4.1" />
@@ -40,6 +41,7 @@
     <PackageVersion Include="NSubstitute" Version="4.2.2" />
     <PackageVersion Include="NuGet.Common" Version="5.8.0" />
     <PackageVersion Include="NuGet.Configuration" Version="5.8.0" />
+    <PackageVersion Include="NuGet.Credentials" Version="5.8.0" />
     <PackageVersion Include="NuGet.DependencyResolver.Core" Version="5.8.0" />
     <PackageVersion Include="NuGet.LibraryModel" Version="5.8.0" />
     <PackageVersion Include="NuGet.Frameworks" Version="5.8.0" />

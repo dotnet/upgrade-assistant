@@ -7,27 +7,29 @@ using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Moq;
 using Xunit;
 
+using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
+
 namespace Microsoft.DotNet.UpgradeAssistant.Tests
 {
     public class WindowsSdkTargetFrameworkSelectorFilterTests
     {
-        [InlineData(ProjectComponents.None, ProjectOutputType.Exe, "", false)]
-        [InlineData(ProjectComponents.AspNet, ProjectOutputType.Exe, "", false)]
-        [InlineData(ProjectComponents.AspNetCore, ProjectOutputType.Exe, "", false)]
-        [InlineData(ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, "-windows", true)]
-        [InlineData(ProjectComponents.None, ProjectOutputType.WinExe, "-windows", true)]
-        [InlineData(ProjectComponents.AspNet | ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, "-windows", true)]
-        [InlineData(ProjectComponents.WinForms | ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, "-windows", true)]
-        [InlineData(ProjectComponents.WinRT | ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, "-windows10.0.19041.0", true)]
+        [InlineData(ProjectComponents.None, ProjectOutputType.Exe, Net50, Net50, false)]
+        [InlineData(ProjectComponents.AspNet, ProjectOutputType.Exe, Net50, Net50, false)]
+        [InlineData(ProjectComponents.AspNetCore, ProjectOutputType.Exe, Net50, Net50, false)]
+        [InlineData(ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, Net50, Net50_Windows, true)]
+        [InlineData(ProjectComponents.None, ProjectOutputType.WinExe, Net50, Net50_Windows, true)]
+        [InlineData(ProjectComponents.AspNet | ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, Net50, Net50_Windows, true)]
+        [InlineData(ProjectComponents.WinForms | ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, Net50, Net50_Windows, true)]
+        [InlineData(ProjectComponents.WinRT | ProjectComponents.WindowsDesktop, ProjectOutputType.Exe, Net50, Net50_Windows_10_0_19041_0, true)]
         [Theory]
-        public void ProcessTests(ProjectComponents components, ProjectOutputType outputType, string expectedSuffix, bool tryUpdate)
+        public void ProcessTests(ProjectComponents components, ProjectOutputType outputType, string startingTfmString, string expectedTfmString, bool tryUpdate)
         {
             // Arrange
             var fixture = new Fixture();
             using var mock = AutoMock.GetLoose();
 
-            var tfm = fixture.Create<TargetFrameworkMoniker>();
-            var expectedTfm = new TargetFrameworkMoniker(tfm.Name + expectedSuffix);
+            var tfm = ParseTfm(startingTfmString);
+            var expectedTfm = ParseTfm(expectedTfmString);
 
             var project = new Mock<IProject>();
             project.Setup(p => p.OutputType).Returns(outputType);
