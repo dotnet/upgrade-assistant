@@ -6,6 +6,8 @@ using System.Linq;
 using Autofac.Extras.Moq;
 using Xunit;
 
+using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
+
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
     [Collection(MSBuildStepTestCollection.Name)]
@@ -20,10 +22,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
         public void ThrowsOnNull()
         {
             // Assert
-            Assert.Throws<ArgumentNullException>(() => new TargetFrameworkMonikerCollection(null!));
+            Assert.Throws<ArgumentNullException>(() => new TargetFrameworkMonikerCollection(null!, null!));
         }
 
-        [InlineData("net5.0")]
+        [InlineData(Net50)]
         [Theory]
         public void SdkStyleSingle(string tfm)
         {
@@ -35,16 +37,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(string.Empty);
             project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(tfm);
 
+            mock.Mock<ITargetFrameworkMonikerComparer>().SetupTryParse();
+
             // Act
-            var collection = new TargetFrameworkMonikerCollection(project.Object);
+            var collection = mock.Create<TargetFrameworkMonikerCollection>();
 
             // Assert
             Assert.Equal(1, collection.Count);
             Assert.Collection(collection, t => Assert.Equal(tfm, t.Name));
         }
 
-        [InlineData("net5.0", new[] { "net5.0" })]
-        [InlineData("net5.0;netstandard2.0", new[] { "net5.0", "netstandard2.0" })]
+        [InlineData(Net50, new[] { Net50 })]
+        [InlineData(Net50 + ";" + NetStandard20, new[] { Net50, NetStandard20 })]
         [Theory]
         public void SdkStyleMultiple(string value, string[] expected)
         {
@@ -56,15 +60,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(string.Empty);
             project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(value);
 
+            mock.Mock<ITargetFrameworkMonikerComparer>().SetupTryParse();
+
             // Act
-            var collection = new TargetFrameworkMonikerCollection(project.Object);
+            var collection = mock.Create<TargetFrameworkMonikerCollection>();
 
             // Assert
             Assert.Equal(expected.Length, collection.Count);
             Assert.Equal(expected, collection.Select(t => t.Name).ToArray());
         }
 
-        [InlineData("v4.5", "net45")]
+        [InlineData("v4.5", Net45)]
         [Theory]
         public void NonSdkStyle(string version, string expected)
         {
@@ -75,8 +81,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.IsSdk).Returns(false);
             project.Setup(p => p.GetPropertyValue(NonSdkSingleTargetFrameworkName)).Returns(version);
 
+            var moniker = mock.Mock<ITargetFrameworkMonikerComparer>();
+            var parsed = ParseTfm(expected);
+            moniker.Setup(s => s.TryParse(expected, out parsed)).Returns(true);
+
             // Act
-            var collection = new TargetFrameworkMonikerCollection(project.Object);
+            var collection = mock.Create<TargetFrameworkMonikerCollection>();
 
             // Assert
             Assert.Equal(1, collection.Count);
@@ -93,10 +103,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             project.Setup(p => p.IsSdk).Returns(false);
 
             // Act
-            var collection = new TargetFrameworkMonikerCollection(project.Object);
+            var collection = mock.Create<TargetFrameworkMonikerCollection>();
 
             // Assert
-            Assert.Throws<InvalidOperationException>(() => collection.SetTargetFramework(new TargetFrameworkMoniker("netstandard2.0")));
+            Assert.Throws<InvalidOperationException>(() => collection.SetTargetFramework(TargetFrameworkMoniker.NetStandard20));
         }
 
         [Fact]
@@ -107,17 +117,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var project = mock.Mock<IProjectFile>();
             project.Setup(p => p.IsSdk).Returns(true);
-            project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns("net45");
+            project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(Net45);
             project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(string.Empty);
 
-            var collection = new TargetFrameworkMonikerCollection(project.Object);
-            var tfm = "netstandard2.0";
+            var collection = mock.Create<TargetFrameworkMonikerCollection>();
+            var tfm = TargetFrameworkMoniker.NetStandard20;
 
             // Act
-            collection.SetTargetFramework(new TargetFrameworkMoniker(tfm));
+            collection.SetTargetFramework(tfm);
 
             // Assert
-            project.Verify(p => p.SetPropertyValue(SdkSingleTargetFramework, tfm));
+            project.Verify(p => p.SetPropertyValue(SdkSingleTargetFramework, tfm.ToString()));
         }
 
         [Fact]
@@ -129,16 +139,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             var project = mock.Mock<IProjectFile>();
             project.Setup(p => p.IsSdk).Returns(true);
             project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(string.Empty);
-            project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns("net45");
+            project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(Net45);
 
-            var collection = new TargetFrameworkMonikerCollection(project.Object);
-            var tfm = "netstandard2.0";
+            var collection = mock.Create<TargetFrameworkMonikerCollection>();
+            var tfm = TargetFrameworkMoniker.NetStandard20;
 
             // Act
-            collection.SetTargetFramework(new TargetFrameworkMoniker(tfm));
+            collection.SetTargetFramework(tfm);
 
             // Assert
-            project.Verify(p => p.SetPropertyValue(SdkMultipleTargetFrameworkName, tfm));
+            project.Verify(p => p.SetPropertyValue(SdkMultipleTargetFrameworkName, tfm.ToString()));
         }
     }
 }

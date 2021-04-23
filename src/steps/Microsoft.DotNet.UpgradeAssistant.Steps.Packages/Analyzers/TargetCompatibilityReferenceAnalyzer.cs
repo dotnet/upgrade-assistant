@@ -13,7 +13,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     public class TargetCompatibilityReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private readonly IPackageLoader _packageLoader;
-        private readonly ITargetFrameworkSelector _tfmSelector;
         private readonly IVersionComparer _comparer;
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
 
@@ -21,12 +20,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public TargetCompatibilityReferenceAnalyzer(
             IPackageLoader packageLoader,
-            ITargetFrameworkSelector tfmSelector,
             IVersionComparer comparer,
             ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
-            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

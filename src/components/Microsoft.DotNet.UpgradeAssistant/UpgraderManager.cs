@@ -12,16 +12,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public class UpgraderManager
     {
-        private readonly IPackageRestorer _restorer;
         private readonly IUpgradeStepOrderer _orderer;
         private readonly ILogger _logger;
 
         public UpgraderManager(
-            IPackageRestorer restorer,
             IUpgradeStepOrderer orderer,
             ILogger<UpgraderManager> logger)
         {
-            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
