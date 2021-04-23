@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
     public class UpdateContextPropertiesTests
     {
         [Fact]
-        public async Task GetAndSetWork()
+        public void GetAndSetWork()
         {
             var properties = new UpgradeContextProperties();
             var propertyKey = "Property:Key";
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         }
 
         [Fact]
-        public async Task GetAndSetPersistentWorks()
+        public void GetAndSetPersistentWorks()
         {
             var properties = new UpgradeContextProperties();
             Assert.Empty(properties.GetPersistentPropertyValues());
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         }
 
         [Fact]
-        public async Task GetAllWorks()
+        public void GetAllWorks()
         {
             var properties = new UpgradeContextProperties();
             Assert.Empty(properties.GetAllPropertyValues());
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         }
 
         [Fact]
-        public async Task RemoveWorks()
+        public void RemoveWorks()
         {
             var properties = new UpgradeContextProperties();
             var propertyKey = "foo";

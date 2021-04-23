@@ -17,7 +17,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
-        private readonly IUpgradeContextProperties _properties;
 
         public override string Description => $"Back up the current project to another directory";
 
@@ -41,7 +40,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
         {
             _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
-            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
         }
 
         // The backup step backs up at the project level, so it doesn't apply if no project is selected
@@ -55,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
 
             var projectDir = GetProjectDir(context);
-            var backupLocation = _properties.GetPropertyValue(BackupPropertyName) ?? GetDefaultBackupPath(projectDir);
+            var backupLocation = context.Properties.GetPropertyValue(BackupPropertyName) ?? GetDefaultBackupPath(projectDir);
 
             if (_skipBackup)
             {
@@ -108,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Existing backup found");
             }
 
-            _properties.SetPropertyValue(BackupPropertyName, backupPath, true);
+            context.Properties.SetPropertyValue(BackupPropertyName, backupPath, true);
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", projectDir, backupPath);
             try
@@ -131,12 +129,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 Logger.LogError(exc, "Unexpected exception while creating backup");
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while creating backup");
             }
-        }
-
-        public override UpgradeStepInitializeResult Reset()
-        {
-            _properties.RemovePropertyValue(BackupPropertyName);
-            return base.Reset();
         }
 
         private async Task<string?> ChooseBackupPath(IUpgradeContext context, CancellationToken token)

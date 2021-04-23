@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static void AddStepManagement(this IServiceCollection services)
         {
             services.AddScoped<UpgraderManager>();
-            services.AddSingleton<IUpgradeContextProperties, UpgradeContextProperties>();
+            services.AddTransient<IUpgradeContextProperties, UpgradeContextProperties>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
             services.AddReadinessChecks();
             services.AddTargetFrameworkSelectors();
