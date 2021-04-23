@@ -112,7 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             {
                 // StreamSourceDoc.Lines is 0-based but line directives (as used in MappedSubText) are 1-based,
                 // so subtract one from i.
-                offset += lines[i - 1].Length;
+                offset += lines[i - 1].Length + Environment.NewLine.Length;
             }
 
             return offset;
