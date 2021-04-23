@@ -43,13 +43,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 throw new ArgumentNullException(nameof(obj));
             }
 
-            // https://stackoverflow.com/a/1646913
-            var hash = 17;
-            hash = (hash * 31) + obj.Id.GetHashCode();
-            hash = (hash * 31) + (_useMappedLocations
-                ? obj.Location.GetMappedLineSpan().GetHashCode()
-                : obj.Location.GetHashCode());
-            return hash;
+            var hashcode = default(HashCode);
+            hashcode.Add(obj.Id, StringComparer.Ordinal);
+            if (_useMappedLocations)
+            {
+                hashcode.Add(obj.Location.GetMappedLineSpan());
+            }
+            else
+            {
+                hashcode.Add(obj.Location);
+            }
+
+            return hashcode.ToHashCode();
         }
     }
 }
