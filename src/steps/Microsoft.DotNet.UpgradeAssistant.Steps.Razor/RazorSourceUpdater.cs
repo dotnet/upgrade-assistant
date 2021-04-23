@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.Language;
@@ -27,9 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         private readonly IEnumerable<DiagnosticAnalyzer> _analyzers;
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
         private readonly ITextMatcher _textMatcher;
+        private readonly ITextReplacer _textReplacer;
         private readonly ILogger<RazorSourceUpdater> _logger;
-        private static readonly Regex UsingBlockRegex = new Regex(@"^(\s*using\s+(?<namespace>.+?);+\s*)+$", RegexOptions.Compiled);
-        private static readonly Regex UsingNamespaceRegex = new Regex(@"using\s+(?<namespace>.+?);", RegexOptions.Compiled);
 
         /// <summary>
         /// Gets a unique identifier for this updater.
@@ -58,11 +55,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="codeFixProviders">Code fix providers to use when fixing diagnostics found in the Razor documents.</param>
         /// <param name="textMatcher">The text matching service to use for correlating old sections of text in Razor documents with updated texts.</param>
         /// <param name="logger">An ILogger to log diagnostics.</param>
-        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ITextMatcher textMatcher, ILogger<RazorSourceUpdater> logger)
+        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ITextMatcher textMatcher, ITextReplacer textReplacer, ILogger<RazorSourceUpdater> logger)
         {
             _analyzers = analyzers?.OrderBy(a => a.SupportedDiagnostics.First().Id) ?? throw new ArgumentNullException(nameof(analyzers));
             _codeFixProviders = codeFixProviders?.OrderBy(c => c.FixableDiagnosticIds.First()) ?? throw new ArgumentNullException(nameof(codeFixProviders));
             _textMatcher = textMatcher ?? throw new ArgumentNullException(nameof(textMatcher));
+            _textReplacer = textReplacer ?? throw new ArgumentNullException(nameof(textReplacer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -96,12 +94,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         }
 
         /// <summary>
-        /// 
+        /// Update source code in Razor documents using Roslyn analyzers and code fix providers.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="inputs"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
+        /// <param name="context">The upgrade context with the current project containing Razor documents.</param>
+        /// <param name="inputs">The Razor documents to update.</param>
+        /// <param name="token">A cancellation token.</param>
+        /// <returns>A FileUpdaterResult indicating which documents were updated.</returns>
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
         {
             if (context is null)
@@ -137,7 +135,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 var newDiagnosticCount = diagnostics.Count();
                 if (diagnosticsCount == newDiagnosticCount)
                 {
-                    _logger.LogWarning("Diagnostics could not be fixed as expected. This may be caused by the project being in a bad state (did NuGet packages restore correctly?) or by errors in analyzers or code fix providers related to diagnosticsL {DiagnosticIds}.", string.Join(", ", diagnostics.Select(d => d.Id).Distinct()));
+                    _logger.LogWarning("Diagnostics could not be fixed as expected. This may be caused by the project being in a bad state (did NuGet packages restore correctly?) or by errors in analyzers or code fix providers related to diagnostics: {DiagnosticIds}.", string.Join(", ", diagnostics.Select(d => d.Id).Distinct()));
                     break;
                 }
                 else
@@ -146,10 +144,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
             }
 
-            // Update cshtml based on changes made to generated source code
-            _logger.LogDebug("Updating Razor documents based on changes made by code fix providers");
+            // Identify changed code sections
             var textReplacements = await GetReplacements(originalProject, project.Documents.Where(d => generatedFilePaths.Contains(d.FilePath)), token).ConfigureAwait(false);
-            ApplyMappedCodeChanges(textReplacements, inputs);
+
+            // Update cshtml based on changes made to generated source code
+            // These are applied after finding all of them so that they can be applied in reverse line order
+            _logger.LogDebug("Applying {ReplacemenCount} updates to Razor documents based on changes made by code fix providers", textReplacements.Count);
+            _textReplacer.ApplyTextReplacements(textReplacements);
             await FixUpProjectFileAsync(context, token).ConfigureAwait(false);
 
             if (diagnosticsCount > 0)
@@ -162,7 +163,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
         private async Task<IList<TextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)
         {
-            List<TextReplacement> replacements = new List<TextReplacement>();
+            var replacements = new List<TextReplacement>();
             foreach (var updatedDocument in updatedDocuments)
             {
                 var originalDocument = originalProject.GetDocument(updatedDocument.Id);
@@ -184,115 +185,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             return replacements;
-        }
-
-        private void ApplyMappedCodeChanges(IList<TextReplacement> replacements, ImmutableArray<RazorCodeDocument> razorDocuments)
-        {
-            // Load each file with replacements into memory and update based on replacements
-            var replacementsByFile = replacements.Distinct().OrderByDescending(t => t.StartingLine).GroupBy(t => t.FilePath);
-            foreach (var replacementGroup in replacementsByFile)
-            {
-                // Although we can (and do) read the document directly from disk, getting the RazorCodeDocument is useful because it provides
-                // a simpler mechanism of translating line offsets to absolute offsets
-                var razorDoc = razorDocuments.FirstOrDefault(d => d.Source.FilePath.Equals(replacementGroup.Key, StringComparison.OrdinalIgnoreCase));
-                if (razorDoc is null)
-                {
-                    throw new InvalidOperationException($"No Razor document found for generated source file {replacementGroup.Key}");
-                }
-
-                var documentText = new StringBuilder(File.ReadAllText(replacementGroup.Key));
-
-                foreach (var replacement in replacementGroup)
-                {
-                    _logger.LogInformation("Updating source code in Razor document {FilePath} at line {Line}", replacement.FilePath, replacement.StartingLine);
-
-                    // Start looking for replacements at the start of the indicated line
-                    var startOffset = GetLineOffset(razorDoc, replacement.StartingLine);
-
-                    // Stop looking for replacements at the start of the first line after the indicated line plus the number of lines in the indicated text
-                    var endOffset = GetLineOffset(razorDoc, replacement.StartingLine + replacement.OriginalText.Lines.Count);
-
-                    // Trim the string that's being replaced because code from Razor code blocks will include a couple extra spaces (to make room for @{)
-                    // compared to the source that actually appeared in the cshtml file.
-                    var originalText = replacement.OriginalText.ToString().TrimStart();
-                    var updatedText = replacement.NewText.ToString().TrimStart();
-                    MinimizeReplacement(ref originalText, ref updatedText);
-
-                    // If new text is being added, insert it with correct Razor transition syntax
-                    if (string.IsNullOrWhiteSpace(originalText))
-                    {
-                        // Using statements are inserted with special implicit Razor expression syntax
-                        if (UsingBlockRegex.IsMatch(updatedText))
-                        {
-                            var formattedDeclarations = new StringBuilder();
-                            var usingStatementMatches = UsingNamespaceRegex.Matches(updatedText);
-                            foreach (Match match in usingStatementMatches)
-                            {
-                                formattedDeclarations.AppendLine($"@using {match.Groups["namespace"].Value}");
-                            }
-
-                            documentText.Insert(startOffset, formattedDeclarations.ToString());
-                        }
-                        else
-                        {
-                            documentText.Insert(startOffset, $"@{{ {updatedText} }}");
-                        }
-                    }
-                    else
-                    {
-                        // If the original text was completely removed, also search for implicit and explicit Razor expression syntax (@ or @()) so that it will be cleaned up, too
-                        if (string.IsNullOrWhiteSpace(updatedText))
-                        {
-                            var implicitExpression = $"@{originalText.Replace(";", string.Empty)}";
-                            var explicitExpression = $"@({originalText.Replace(";", string.Empty).Trim()})";
-                            documentText.Replace(implicitExpression, updatedText, startOffset, endOffset - startOffset);
-                            documentText.Replace(explicitExpression, updatedText, startOffset, endOffset - startOffset);
-                        }
-
-                        documentText.Replace(originalText, updatedText, startOffset, endOffset - startOffset);
-                    }
-                }
-
-                File.WriteAllText(replacementGroup.Key, documentText.ToString());
-            }
-        }
-
-        // Removes leading and trailing portions of original and updated that are the same
-        private static void MinimizeReplacement(ref string original, ref string? updated)
-        {
-            if (updated is null)
-            {
-                return;
-            }
-
-            var index = 0;
-            while (index < original.Length && index < updated.Length && original[index] == updated[index])
-            {
-                index++;
-            }
-
-            var endIndex = 0;
-            while (endIndex > -original.Length && endIndex > -updated.Length && original[original.Length - 1 + endIndex] == updated[updated.Length - 1 + endIndex])
-            {
-                endIndex--;
-            }
-
-            original = original.Substring(index, Math.Max(0, original.Length + endIndex - index));
-            updated = updated.Substring(index, Math.Max(0, updated.Length + endIndex - index));
-        }
-
-        private static int GetLineOffset(RazorCodeDocument razorDoc, int startingLine)
-        {
-            var offset = 0;
-
-            for (var i = 1; i < startingLine && i <= razorDoc.Source.Lines.Count; i++)
-            {
-                // StreamSourceDoc.Lines is 0-based but line directives (as used in MappedSubText) are 1-based,
-                // so subtract one from i.
-                offset += razorDoc.Source.Lines.GetLineLength(i - 1);
-            }
-
-            return offset;
         }
 
         private static string GetGeneratedFilePath(RazorCodeDocument doc) => $"{doc.Source.FilePath}.cs";

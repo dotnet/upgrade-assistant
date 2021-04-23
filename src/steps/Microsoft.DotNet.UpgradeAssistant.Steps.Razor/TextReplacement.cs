@@ -7,7 +7,8 @@ using Microsoft.CodeAnalysis.Text;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
     /// <summary>
-    /// Represents a proposed text replacement in a file.
+    /// Represents a proposed text replacement in a file. These are stored so that replacements can
+    /// be identified in generated C# and then applied (in reverse line order) in cshtml documents.
     /// </summary>
     public class TextReplacement : IEquatable<TextReplacement>
     {

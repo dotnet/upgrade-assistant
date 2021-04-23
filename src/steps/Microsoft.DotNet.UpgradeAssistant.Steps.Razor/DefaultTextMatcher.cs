@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DiffPlex;
-using DiffPlex.Chunkers;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
@@ -20,11 +19,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTextMatcher"/> class.
+        /// <param name="differ">The IDiffer implementation to use for determining which text replacements correspond with original text in ambiguous cases.</param>
+        /// <param name="chunker">The IChunker to be used with the differ.</param>
         /// </summary>
-        public DefaultTextMatcher()
+        public DefaultTextMatcher(IDiffer differ, IChunker chunker)
         {
-            _chunker = new CharacterChunker();
-            _differ = new Differ();
+            _chunker = chunker ?? throw new ArgumentNullException(nameof(chunker));
+            _differ = differ ?? throw new ArgumentNullException(nameof(differ));
         }
 
         /// <summary>
@@ -37,12 +38,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         {
             if (originalTexts is null)
             {
-                throw new System.ArgumentNullException(nameof(originalTexts));
+                throw new ArgumentNullException(nameof(originalTexts));
             }
 
             if (newTexts is null)
             {
-                throw new System.ArgumentNullException(nameof(newTexts));
+                throw new ArgumentNullException(nameof(newTexts));
             }
 
             if (newTexts.Count() > originalTexts.Count())
