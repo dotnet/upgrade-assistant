@@ -49,7 +49,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
             var appBase = _upgradeTarget == UpgradeTarget.Current ? _currentTFMBase : _ltsTFMBase;
             var current = GetDefaultTargetFrameworkMoniker(project);
-            var appBaseTfm = new TargetFrameworkMoniker(appBase);
+
+            if (!_comparer.TryParse(appBase, out var appBaseTfm))
+            {
+                throw new InvalidOperationException("Invalid app base TFM");
+            }
 
             var updater = new FilterState(_comparer, project, current, appBaseTfm, _logger)
             {

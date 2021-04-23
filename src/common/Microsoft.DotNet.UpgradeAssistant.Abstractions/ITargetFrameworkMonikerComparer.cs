@@ -25,5 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <param name="result">A merged TFM. For example, passing <c>net5.0-windows</c> and <c>net6.0</c> will result in <c>net6.0-windows</c>.</param>
         /// <returns>Whether the merge was successful.</returns>
         bool TryMerge(TargetFrameworkMoniker tfm1, TargetFrameworkMoniker tfm2, [MaybeNullWhen(false)] out TargetFrameworkMoniker result);
+
+        bool TryParse(string input, [MaybeNullWhen(false)] out TargetFrameworkMoniker tfm);
     }
 }

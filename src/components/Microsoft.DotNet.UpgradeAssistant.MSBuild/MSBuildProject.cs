@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ILogger _logger;
         private readonly IComponentIdentifier _componentIdentifier;
         private readonly IPackageRestorer _restorer;
+        private readonly ITargetFrameworkMonikerComparer _comparer;
 
         public MSBuildWorkspaceUpgradeContext Context { get; }
 
@@ -28,6 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             MSBuildWorkspaceUpgradeContext context,
             IComponentIdentifier componentIdentifier,
             IPackageRestorer restorer,
+            ITargetFrameworkMonikerComparer comparer,
             FileInfo file,
             ILogger logger)
         {
@@ -36,6 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _componentIdentifier = componentIdentifier;
             _restorer = restorer;
+            _comparer = comparer;
             _logger = logger;
         }
 
@@ -106,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public IEnumerable<Reference> References =>
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
-        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks => new TargetFrameworkMonikerCollection(this);
+        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks => new TargetFrameworkMonikerCollection(this, _comparer);
 
         public override bool Equals(object? obj)
         {
