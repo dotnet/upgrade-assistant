@@ -258,11 +258,11 @@ dotnet_diagnostic.SA1502.severity = none
 # CA1303: Do not pass literals as localized parameters
 dotnet_diagnostic.CA1303.severity = none
 
-# CA1600: Elements should be documented
-dotnet_diagnostic.CA1600.severity = none
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
 
-# CA1601: Partial elements should be documented
-dotnet_diagnostic.CA1601.severity = none
+# SA1601: Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = none
 
 # SA1633: The file header is missing or not located at the top of the file
 dotnet_diagnostic.SA1633.severity = none

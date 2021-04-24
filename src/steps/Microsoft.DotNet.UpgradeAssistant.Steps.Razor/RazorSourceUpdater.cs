@@ -54,6 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="analyzers">Analyzers to use when analyzing source code in the Razor documents.</param>
         /// <param name="codeFixProviders">Code fix providers to use when fixing diagnostics found in the Razor documents.</param>
         /// <param name="textMatcher">The text matching service to use for correlating old sections of text in Razor documents with updated texts.</param>
+        /// <param name="textReplacer">The text replacing service to use for updating replaced texts in the Razor documents.</param>
         /// <param name="logger">An ILogger to log diagnostics.</param>
         public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ITextMatcher textMatcher, ITextReplacer textReplacer, ILogger<RazorSourceUpdater> logger)
         {
