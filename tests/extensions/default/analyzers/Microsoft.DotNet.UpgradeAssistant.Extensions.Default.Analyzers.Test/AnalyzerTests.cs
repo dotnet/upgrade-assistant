@@ -145,6 +145,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                     new ExpectedDiagnostic("UA0012", new TextSpan(4089, 39)),
                     new ExpectedDiagnostic("UA0012", new TextSpan(4943, 39))
                 }
+            },
+            {
+                "UA0013",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0013", new TextSpan(2249, 28), Language.VisualBasic)
+                }
             }
         };
 
@@ -171,12 +178,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [InlineData("UA0009")]
         [InlineData("UA0010")]
         [InlineData("UA0012")]
+        [InlineData("UA0013")]
         [Theory]
         public async Task UpgradeAnalyzers(string diagnosticId)
         {
-            var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.cs", diagnosticId).ConfigureAwait(false);
+            foreach (var language in new[] { Language.CSharp, Language.FSharp, Language.VisualBasic })
+            {
+                var fileExtension = language switch
+                {
+                    Language.CSharp => ".vb",
+                    Language.FSharp => ".fs",
+                    Language.VisualBasic => ".vb",
+                    _ => throw new System.NotImplementedException() // CS8509
+                };
 
-            AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[diagnosticId]);
+                var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.{fileExtension}", diagnosticId).ConfigureAwait(false);
+                AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language));
+            }
         }
 
         [InlineData("UA0001")]
@@ -203,13 +221,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
             Assert.Equal(expectedText, fixedText);
         }
 
-        private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, ExpectedDiagnostic[] expectedDiagnostics)
+        private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, IEnumerable<ExpectedDiagnostic> expectedDiagnostics)
         {
-            Assert.Equal(expectedDiagnostics.Length, diagnostics.Count());
+            Assert.Equal(expectedDiagnostics.Count(), diagnostics.Count());
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
-                Assert.True(expectedDiagnostics[count++].Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics[count - 1].SourceSpan}; actually at {d.Location.SourceSpan}");
+                Assert.True(expectedDiagnostics.ElementAt(count++).Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics.ElementAt(count - 1).SourceSpan}; actually at {d.Location.SourceSpan}");
             }
         }
     }
