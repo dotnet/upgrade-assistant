@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -44,9 +45,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private void AnalyzeSymbols(SymbolAnalysisContext context)
         {
-            if (context.Symbol.ContainingNamespace.ToString().Equals(SourceSymbolNamespace, StringComparison.OrdinalIgnoreCase))
+            var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
+
+            // Find just the named type symbols with names containing lowercase letters.
+
+            if (namedTypeSymbol.Name.ToCharArray().Any(char.IsLower))
             {
-                var diagnostic = Diagnostic.Create(Rule, context.Symbol.Locations[0]);
+                // For all such symbols, produce a diagnostic.
+                var diagnostic = Diagnostic.Create(Rule, namedTypeSymbol.Locations[0], namedTypeSymbol.Name);
+
                 context.ReportDiagnostic(diagnostic);
             }
         }
