@@ -63,11 +63,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                                 _logger.LogDebug("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
                             }
 
-                            _instance = msBuildInstances
-                                .OrderByDescending(m => m.Version)
-                                .First();
-                            _logger.LogInformation("MSBuild registered from {MSBuildPath}", _instance.MSBuildPath);
+                            var orderedInstances = msBuildInstances
+                                .OrderByDescending(m => m.Version);
 
+                            _instance = orderedInstances.FirstOrDefault(vsi => !vsi.MSBuildPath.Contains("preview", StringComparison.OrdinalIgnoreCase))
+                                ?? orderedInstances.First();
+                            _logger.LogInformation("MSBuild registered from {MSBuildPath}", _instance.MSBuildPath);
                             MSBuildLocator.RegisterInstance(_instance);
                             AssemblyLoadContext.Default.Resolving += ResolveAssembly;
                         }
