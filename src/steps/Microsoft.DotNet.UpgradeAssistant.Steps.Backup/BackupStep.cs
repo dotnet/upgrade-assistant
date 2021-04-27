@@ -107,13 +107,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 ? Path.Combine(baseBackupPath, Path.GetFileName(projectDir))
                 : baseBackupPath);
 
+            context.Properties.SetPropertyValue(BaseBackupPropertyName, context.InputIsSolution ? baseBackupPath : backupPath, true);
+
             if (File.Exists(Path.Combine(backupPath, FlagFileName)))
             {
                 Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", backupPath);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Backup already exists at {backupPath}; nothing to do ");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Backup already exists at {backupPath}; nothing to do");
             }
-
-            context.Properties.SetPropertyValue(BaseBackupPropertyName, baseBackupPath, true);
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", projectDir, backupPath);
             try

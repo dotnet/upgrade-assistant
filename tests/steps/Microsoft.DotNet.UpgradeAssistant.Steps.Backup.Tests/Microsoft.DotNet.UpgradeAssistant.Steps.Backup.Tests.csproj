@@ -13,9 +13,11 @@
   <ItemGroup>
     <None Remove="TestAssets\A.backup.0\A.txt" />
     <None Remove="TestAssets\A.backup\A\A.txt" />
+    <None Remove="TestAssets\A\Project1\A.txt" />
     <None Remove="TestAssets\B.backup\B.0\B.txt" />
     <None Remove="TestAssets\B.backup\B.0\upgrade.backup" />
     <None Remove="TestAssets\B.backup\B\B.txt" />
+    <None Remove="TestAssets\B\Project1\B.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac.Extras.Moq" />
