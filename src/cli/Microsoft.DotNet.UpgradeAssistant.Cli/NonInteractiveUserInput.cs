@@ -9,18 +9,23 @@ using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    internal class NonInteractiveUserInput : IUserInput
+    public class NonInteractiveUserInput : IUserInput
     {
         private readonly TimeSpan _waitPeriod;
 
         public NonInteractiveUserInput(UpgradeOptions options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _waitPeriod = TimeSpan.FromSeconds(options.NonInteractiveWait);
         }
 
         public bool IsInteractive => false;
 
-        public Task<string?> AskUserAsync(string currentPath)
+        public Task<string?> AskUserAsync(string prompt)
         {
             throw new NotImplementedException("User input cannot be selected in non-interactive mode");
         }
