@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Moq;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
@@ -29,8 +30,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             projectPath = Path.GetFullPath(Path.Combine("TestAssets", projectPath));
             expectedBackupPath = Path.GetFullPath(Path.Combine("TestAssets", expectedBackupPath));
 
-            using var mock = GetMock(GetDefaultNonInteractiveOptions(), inputPath, projectPath);
-            var context = mock.Mock<IUpgradeContext>();
+            using var mock = GetMock(GetDefaultNonInteractiveOptions());
+            var context = GetContext(mock, inputPath, projectPath);
             var step = mock.Create<BackupStep>();
             var expectedStatus = backupComplete ? UpgradeStepStatus.Complete : UpgradeStepStatus.Incomplete;
             var expectedStatusDetails = backupComplete
@@ -38,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
                 : $"No existing backup found. Applying this step will copy the contents of {Path.GetDirectoryName(projectPath)} (including subfolders) to {expectedBackupPath}";
 
             // Act
-            await step.InitializeAsync(context.Object, CancellationToken.None).ConfigureAwait(true);
+            await step.InitializeAsync(context, CancellationToken.None).ConfigureAwait(true);
             var status = step.Status;
             var statusDetails = step.StatusDetails;
 
@@ -66,8 +67,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             expectedBaseBackupPath = Path.GetFullPath(Path.Combine("TestAssets", expectedBaseBackupPath));
             expectedBackupPath = Path.GetFullPath(Path.Combine("TestAssets", expectedBackupPath));
 
-            using var mock = GetMock(GetDefaultNonInteractiveOptions(), inputPath, projectPath);
-            var context = mock.Mock<IUpgradeContext>();
+            using var mock = GetMock(GetDefaultNonInteractiveOptions());
+            var context = GetContext(mock, inputPath, projectPath);
             var step = mock.Create<BackupStep>();
             step.SetStatus(UpgradeStepStatus.Incomplete);
             var expectedStatus = UpgradeStepStatus.Complete;
@@ -78,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             // Act
             try
             {
-                await step.ApplyAsync(context.Object, CancellationToken.None).ConfigureAwait(true);
+                await step.ApplyAsync(context, CancellationToken.None).ConfigureAwait(true);
                 var status = step.Status;
                 var statusDetails = step.StatusDetails;
 
@@ -107,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
                 SkipBackup = false,
             };
 
-        private static AutoMock GetMock(UpgradeOptions options, string inputPath, string? projectPath)
+        private static AutoMock GetMock(UpgradeOptions options)
         {
             var mock = AutoMock.GetLoose(cfg =>
             {
@@ -116,7 +117,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
                 cfg.RegisterType<NonInteractiveUserInput>().As<IUserInput>();
             });
 
-            var context = mock.Mock<IUpgradeContext>();
+            return mock;
+        }
+
+        private static IUpgradeContext GetContext(AutoMock mock, string inputPath, string? projectPath)
+        {
+            var context = new Mock<IUpgradeContext>();
             context.Setup(c => c.InputPath).Returns(inputPath);
             context.Setup(c => c.InputIsSolution).Returns(Path.GetExtension(inputPath).Equals(".sln", StringComparison.OrdinalIgnoreCase));
             context.Setup(c => c.Properties).Returns(mock.Container.Resolve<IUpgradeContextProperties>());
@@ -128,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
                 context.Setup(c => c.CurrentProject).Returns(project.Object);
             }
 
-            return mock;
+            return context.Object;
         }
     }
 }
