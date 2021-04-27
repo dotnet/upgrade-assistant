@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
     public class BackupStep : UpgradeStep
     {
         private const string FlagFileName = "upgrade.backup";
-        private const string BackupPropertyName = "BackupLocation";
+        private const string BaseBackupPropertyName = "BaseBackupLocation";
 
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
@@ -53,7 +53,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
 
             var projectDir = GetProjectDir(context);
-            var backupLocation = context.Properties.GetPropertyValue(BackupPropertyName) ?? GetDefaultBackupPath(projectDir);
+            var baseBackupLocation = context.Properties.GetPropertyValue(BaseBackupPropertyName) ?? GetDefaultBaseBackupPath(context.InputPath);
+            var backupLocation = EnsureValidPath(context.InputIsSolution
+                ? Path.Combine(baseBackupLocation, Path.GetFileName(projectDir))
+                : baseBackupLocation);
 
             if (_skipBackup)
             {
@@ -68,12 +71,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             else if (File.Exists(Path.Combine(backupLocation, FlagFileName)))
             {
                 Logger.LogDebug("Backup upgrade step initalized as complete (already done). Backup is stored at {BackupLocation}", backupLocation);
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Existing backup found at {backupLocation}", BuildBreakRisk.None));
             }
             else
             {
-                Logger.LogDebug("Backup upgrade step initialized as incomplete");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
+                Logger.LogDebug("Backup upgrade step initialized as incomplete; will backup to {BackupLocation}", backupLocation);
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {projectDir} (including subfolders) to {backupLocation}", BuildBreakRisk.None));
             }
         }
 
@@ -90,9 +93,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, "Backup skipped");
             }
 
-            var backupPath = await ChooseBackupPath(context, token).ConfigureAwait(false);
+            var baseBackupPath = await ChooseBackupPath(context, token).ConfigureAwait(false);
 
-            if (backupPath is null)
+            if (baseBackupPath is null)
             {
                 Logger.LogDebug("No backup path specified");
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location");
@@ -100,13 +103,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             var projectDir = GetProjectDir(context);
 
-            if (Status == UpgradeStepStatus.Complete)
+            var backupPath = EnsureValidPath(context.InputIsSolution
+                ? Path.Combine(baseBackupPath, Path.GetFileName(projectDir))
+                : baseBackupPath);
+
+            context.Properties.SetPropertyValue(BaseBackupPropertyName, context.InputIsSolution ? baseBackupPath : backupPath, true);
+
+            if (File.Exists(Path.Combine(backupPath, FlagFileName)))
             {
                 Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", backupPath);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Existing backup found");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Backup already exists at {backupPath}; nothing to do");
             }
-
-            context.Properties.SetPropertyValue(BackupPropertyName, backupPath, true);
 
             Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", projectDir, backupPath);
             try
@@ -122,7 +129,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 var completedTime = DateTimeOffset.UtcNow;
                 File.WriteAllText(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})");
                 Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Backup completed successfully");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project backed up to {backupPath}");
             }
             catch (IOException exc)
             {
@@ -133,8 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         private async Task<string?> ChooseBackupPath(IUpgradeContext context, CancellationToken token)
         {
-            var projectDir = GetProjectDir(context);
-            var defaultPath = GetDefaultBackupPath(projectDir);
+            var defaultPath = GetDefaultBaseBackupPath(context.InputPath);
             var customPath = default(string);
 
             var commands = new[]
@@ -196,17 +202,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
         }
 
-        private string GetDefaultBackupPath(string projectDir)
-        {
-            Logger.LogDebug("Determining backup path");
+        private static string GetDefaultBaseBackupPath(string inputPath) => $"{Path.GetDirectoryName(inputPath).TrimEnd('\\', '/')}.backup";
 
-            var candidateBasePath = $"{projectDir.TrimEnd('\\', '/')}.backup";
-            var candidatePath = candidateBasePath;
+        private string EnsureValidPath(string path)
+        {
+            var candidatePath = path;
+            Logger.LogDebug("Determining backup path");
             var iteration = 0;
             while (!IsPathValid(candidatePath))
             {
                 Logger.LogDebug("Unable to use backup path {CandidatePath}", candidatePath);
-                candidatePath = $"{candidateBasePath}.{iteration++}";
+                candidatePath = $"{path}.{iteration++}";
             }
 
             Logger.LogDebug("Using backup path {BackupPath}", candidatePath);
