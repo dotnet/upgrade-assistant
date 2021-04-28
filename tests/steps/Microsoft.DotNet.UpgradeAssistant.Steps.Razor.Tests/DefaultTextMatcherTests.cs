@@ -14,6 +14,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
     public class DefaultTextMatcherTests
     {
         [Fact]
+        public void CtorNegativeTests()
+        {
+            Assert.Throws<ArgumentNullException>("differ", () => new DefaultTextMatcher(null!, new CharacterChunker()));
+            Assert.Throws<ArgumentNullException>("chunker", () => new DefaultTextMatcher(new Differ(), null!));
+        }
+
+        [Fact]
         public void MatchOrderedSubTextsNegativeTests()
         {
             var matcher = new DefaultTextMatcher(new Differ(), new CharacterChunker());
@@ -63,6 +70,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         new TextReplacement(SourceText.From("A"), SourceText.From("C"), "A.txt", 10),
                         new TextReplacement(SourceText.From("B"), SourceText.From(string.Empty), "B.txt", 2),
                         new TextReplacement(SourceText.From("B"), SourceText.From("D"), "B.txt", 2),
+                    }
+                },
+
+                // All texts removed
+                new object[]
+                {
+                    new MappedSubText[] { GetSubText("A", "A.txt", 10), GetSubText("B", "B.txt", 2), GetSubText("C", "B.txt", 2) },
+                    Array.Empty<string>(),
+                    new TextReplacement[]
+                    {
+                        new TextReplacement(SourceText.From("A"), SourceText.From(string.Empty), "A.txt", 10),
+                        new TextReplacement(SourceText.From("B"), SourceText.From(string.Empty), "B.txt", 2),
+                        new TextReplacement(SourceText.From("C"), SourceText.From(string.Empty), "B.txt", 2),
                     }
                 },
 

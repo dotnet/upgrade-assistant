@@ -36,6 +36,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="replacements">The text replacements to apply.</param>
         public void ApplyTextReplacements(IList<TextReplacement> replacements)
         {
+            if (replacements is null)
+            {
+                throw new ArgumentNullException(nameof(replacements));
+            }
+
             // Load each file with replacements into memory and update based on replacements
             var replacementsByFile = replacements.Distinct().OrderByDescending(t => t.StartingLine).GroupBy(t => t.FilePath);
             foreach (var replacementGroup in replacementsByFile)
