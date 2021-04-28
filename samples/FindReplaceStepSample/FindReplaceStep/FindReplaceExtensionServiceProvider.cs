@@ -33,7 +33,7 @@ namespace FindReplaceStep
                 throw new ArgumentNullException(nameof(serviceConfiguration));
             }
 
-            return serviceConfiguration.ServiceCollection.AddScoped<UpgradeStep, FindReplaceUpgradeStep>();
+            return serviceConfiguration.ServiceCollection.AddUpgradeStep<FindReplaceUpgradeStep>();
         }
     }
 }
