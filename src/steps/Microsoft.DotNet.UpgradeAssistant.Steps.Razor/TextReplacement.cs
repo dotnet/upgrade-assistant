@@ -68,8 +68,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <returns>True of the other TextReplacement is equal to this one, false otherwise.</returns>
         public bool Equals(TextReplacement? other) =>
             other != null &&
+            FilePath.Equals(other.FilePath, StringComparison.OrdinalIgnoreCase) &&
+            StartingLine == other.StartingLine &&
             NewText.ContentEquals(other.NewText) &&
-            OriginalText.Equals(other.OriginalText);
+            OriginalText.ContentEquals(other.OriginalText);
 
         /// <inheritdoc/>
         public override bool Equals(object obj) => Equals(obj as TextReplacement);
@@ -78,8 +80,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         public override int GetHashCode()
         {
             var hashcode = default(HashCode);
+            hashcode.Add(StartingLine);
+            hashcode.Add(FilePath, StringComparer.OrdinalIgnoreCase);
             hashcode.Add(NewText.ToString(), StringComparer.Ordinal);
-            hashcode.Add(OriginalText);
+            hashcode.Add(OriginalText.ToString(), StringComparer.Ordinal);
             return hashcode.ToHashCode();
         }
     }
