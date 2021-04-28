@@ -20,6 +20,7 @@ namespace FindReplaceStep
     {
         private const string FindReplaceOptionsSectionName = "FindReplaceOptions";
 
+        // A mapping for file paths to the strings in that file to be replaced.
         private Dictionary<string, IEnumerable<string>>? _neededReplacements;
 
         /// <summary>
@@ -43,6 +44,8 @@ namespace FindReplaceStep
                 throw new ArgumentNullException(nameof(aggregateExtension));
             }
 
+            // Reading configuration from AggregateExtension allows us to read configuration both from this extension's
+            // manifest as well as from other extensions' manifests which may wish to further refine the behavior of this one.
             StringsToReplace = aggregateExtension.GetOptions<FindReplaceOptions>(FindReplaceOptionsSectionName)?.Replacements
                 ?? throw new InvalidOperationException("No replacement strings configured");
         }
@@ -108,9 +111,12 @@ namespace FindReplaceStep
                 var keysFound = stringsToReplace.Where(s => contents.Contains(s));
                 if (keysFound.Any())
                 {
+                    Logger.LogDebug("Found {ReplacementCount} distinct strings needing replacement in {Path}", keysFound.Count(), itemPath);
                     _neededReplacements.Add(itemPath, keysFound);
                 }
             }
+
+            Logger.LogInformation("Found {FileCount} files needing string replacements", _neededReplacements.Count);
 
             // Return an appropriate UpgradeStepInitializeResult based on whether any replacements are needed
             return Task.FromResult(_neededReplacements.Any()
@@ -135,12 +141,14 @@ namespace FindReplaceStep
 
             if (_neededReplacements is null)
             {
+                Logger.LogError("Could not apply FindReplaceStep because the step has not been properly initialized");
                 return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "FindReplaceStep cannot be applied before it is initialized"));
             }
 
             // Apply the necessary changes for this upgrade step
             foreach (var path in _neededReplacements.Keys)
             {
+                Logger.LogTrace("Replacing strings in {FilePath}", path);
                 var replacements = _neededReplacements[path];
                 var contents = File.ReadAllText(path);
                 foreach (var key in replacements)
@@ -151,7 +159,8 @@ namespace FindReplaceStep
                 File.WriteAllText(path, contents);
             }
 
-            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Strings replaced in {_neededReplacements.Keys} files"));
+            Logger.LogInformation("Strings replaced in {Count} files", _neededReplacements.Keys.Count);
+            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Strings replaced in {_neededReplacements.Keys.Count} files"));
         }
 
         // ***** ***** *****
