@@ -32,18 +32,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var references = await project.Required().GetNuGetReferencesAsync(token).ConfigureAwait(false);
+            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
             var packageReferences = references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
 
             // If the project doesn't include a reference to the analyzer package, mark it for addition
             if (!packageReferences.Any(r => AnalyzerPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, true, null, token).ConfigureAwait(false);
+                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, project.TargetFrameworks, true, token).ConfigureAwait(false);
 
                 if (analyzerPackage is not null)
                 {

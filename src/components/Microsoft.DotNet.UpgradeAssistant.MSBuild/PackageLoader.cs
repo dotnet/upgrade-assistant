@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -68,23 +69,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return targetFrameworks.All(tfm => packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(tfm.Name), f)));
         }
 
-        public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, bool latestMinorAndBuildOnly, CancellationToken token)
+        public Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, bool latestMinorAndBuildOnly, CancellationToken token)
         {
             if (reference is null)
             {
                 throw new ArgumentNullException(nameof(reference));
             }
 
-            var versions = new List<NuGetVersion>();
+            return SearchByNameAsync(reference.Name, tfms, currentVersion: reference.GetNuGetVersion(), latestMinorAndBuildOnly: latestMinorAndBuildOnly, token: token);
+        }
 
-            // Query each package source for listed versions of the given package name
+        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, bool includePreRelease, CancellationToken token)
+        {
+            var result = await SearchByNameAsync(packageName, tfms, includePreRelease, token: token).ConfigureAwait(false);
+
+            return result.FirstOrDefault();
+        }
+
+        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, bool includePrerelease = false, NuGetVersion? currentVersion = null, bool latestMinorAndBuildOnly = false, CancellationToken token = default)
+        {
+            var results = new List<IPackageSearchMetadata>();
+
             foreach (var source in _packageSources)
             {
                 try
                 {
                     var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(reference.Name, includePrerelease: true, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
-                    versions.AddRange(searchResults.Select(r => r.Identity.Version));
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(name, includePrerelease: includePrerelease, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
+
+                    results.AddRange(searchResults);
                 }
                 catch (NuGetProtocolException)
                 {
@@ -96,57 +109,64 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
             }
 
-            // Filter to only include versions higher than the user's current version and,
-            // optionally, only the highest minor/build for each major version
-            var currentVersion = reference.GetNuGetVersion();
-            var filteredVersions = versions.Distinct().Where(v => v > currentVersion);
-            var versionsToReturn = latestMinorAndBuildOnly
-                ? filteredVersions.GroupBy(v => v.Major).Select(v => v.Where(v => !v.IsPrerelease).Max() ?? v.Max()!)
-                : filteredVersions;
+            var tfmSet = ImmutableHashSet.CreateRange(tfms.Select(t => NuGetFramework.Parse(t.Name)));
 
-            _logger.LogDebug("Found versions for package {PackageName}: {PackageVersions}", reference.Name, versionsToReturn);
-
-            return versionsToReturn.OrderBy(v => v).Select(v => reference with { Version = v.ToNormalizedString() });
+            return FilterSearchResults(name, results, tfmSet, currentVersion, latestMinorAndBuildOnly);
         }
 
-        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, bool includePreRelease, string[]? packageSources, CancellationToken token)
+        private static IEnumerable<NuGetReference> FilterSearchResults(string name, List<IPackageSearchMetadata> searchResults, ImmutableHashSet<NuGetFramework> tfms, NuGetVersion? currentVersion = null, bool latestMinorAndBuildOnly = false)
         {
-            NuGetVersion? highestVersion = null;
-
-            // Query each package source for listed versions of the given package name
-            foreach (var source in packageSources?.Select(p => new PackageSource(p)) ?? _packageSources)
+            if (searchResults.Count == 0)
             {
-                try
-                {
-                    var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: includePreRelease, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
-                    var highestVersionResult = searchResults.Select(r => r.Identity.Version).Max(v => v);
-                    if (highestVersionResult is null)
-                    {
-                        continue;
-                    }
+                return Enumerable.Empty<NuGetReference>();
+            }
 
-                    if (highestVersion is null || highestVersionResult > highestVersion)
-                    {
-                        highestVersion = highestVersionResult;
-                    }
-                }
-                catch (NuGetProtocolException)
+            var results = searchResults
+                .Where(r => currentVersion is null ? true : r.Identity.Version > currentVersion);
+
+            if (latestMinorAndBuildOnly)
+            {
+                var max = results
+                    .GroupBy(r => r.Identity.Version)
+                    .Max(t => t.Key);
+
+                if (results is null)
                 {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to a NuGet protocol error", source.Source);
-                }
-                catch (HttpRequestException exc)
-                {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to an HTTP error ({StatusCode})", source.Source, exc.StatusCode);
+                    return Enumerable.Empty<NuGetReference>();
                 }
             }
 
-            if (highestVersion is null)
+            var groupResult = results
+                .OrderByDescending(r => r.Identity.Version)
+                .GroupBy(r =>
+                {
+                    var unsupported = tfms;
+
+                    foreach (var dep in r.DependencySets)
+                    {
+                        foreach (var t in unsupported)
+                        {
+                            if (DefaultCompatibilityProvider.Instance.IsCompatible(dep.TargetFramework, t))
+                            {
+                                unsupported = unsupported.Remove(t);
+                            }
+                        }
+                    }
+
+                    return unsupported.Count;
+                })
+                .OrderBy(g => g.Key)
+                .FirstOrDefault();
+
+            if (groupResult is null)
             {
-                return null;
+                return Enumerable.Empty<NuGetReference>();
             }
 
-            return new NuGetReference(packageName, highestVersion.ToFullString());
+            return groupResult
+                .Select(r => r.Identity.Version)
+                .OrderBy(v => v)
+                .Select(v => new NuGetReference(name, v.ToNormalizedString()));
         }
 
         private List<PackageSource> GetPackageSources(string? projectDir)

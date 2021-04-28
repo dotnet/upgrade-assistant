@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using Microsoft.DotNet.UpgradeAssistant.Checks;
 using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,13 +10,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class UpgraderExtensions
     {
-        public static void AddStepManagement(this IServiceCollection services)
+        public static void AddStepManagement(this IServiceCollection services, Action<DefaultTfmOptions> options)
         {
             services.AddScoped<UpgraderManager>();
             services.AddTransient<IUpgradeContextProperties, UpgradeContextProperties>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
             services.AddReadinessChecks();
             services.AddTargetFrameworkSelectors();
+            services.AddOptions<DefaultTfmOptions>()
+                .Configure(options)
+                .ValidateDataAnnotations();
         }
 
         private static void AddReadinessChecks(this IServiceCollection services)

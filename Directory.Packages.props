@@ -55,7 +55,7 @@
     <PackageVersion Include="Serilog.Sinks.File" Version="4.1.0" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.321" />
     <PackageVersion Include="System.Collections.Immutable" Version="5.0.0" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta1.20371.2" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta1.21216.1" />
     <PackageVersion Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
     <PackageVersion Include="System.Linq.Async" Version="5.0.0" />
     <PackageVersion Include="System.Reactive" Version="5.0.0" />

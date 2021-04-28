@@ -83,16 +83,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return state;
         }
 
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFramework, CancellationToken token)
+        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
         {
-            var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, true, token).ConfigureAwait(false);
+            var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, tfms, true, token).ConfigureAwait(false);
             NuGetReference? prereleaseCandidate = null;
 
             foreach (var newerPackage in latestMinorVersions)
             {
-                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, targetFramework, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, tfms, token).ConfigureAwait(false))
                 {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, targetFramework);
+                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, tfms);
 
                     // Only return a pre-release version if it's the only newer major version that supports the necessary TFM
                     if (newerPackage.IsPrerelease)
