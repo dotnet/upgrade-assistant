@@ -33,12 +33,19 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
 
         public bool Match(string input)
-            => _match switch
+        {
+            if (input is null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+
+            return _match switch
             {
                 Regex regex => regex.IsMatch(Path.GetFileName(input)),
-                string str => str.EndsWith(input, StringComparison.OrdinalIgnoreCase),
+                string str => input.EndsWith(str, StringComparison.OrdinalIgnoreCase),
                 _ => throw new NotImplementedException(),
             };
+        }
 
         public static implicit operator ProjectItemMatcher(Regex regex)
             => new(regex);
