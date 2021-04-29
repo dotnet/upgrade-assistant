@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using Microsoft.Build.Execution;
 using Microsoft.DotNet.UpgradeAssistant.Fixtures;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
@@ -13,7 +14,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         public RestoreTestProjectFixture()
             : base()
         {
-            EnsurePackagesRestored(TestHelper.TestProjectPath);
+            foreach (var lang in new[] { Language.CSharp, Language.VisualBasic, Language.FSharp })
+            {
+                var projectLanguage = lang.GetFileExtension();
+                var path = TestHelper.TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
+                EnsurePackagesRestored(path);
+            }
         }
 
         private static void EnsurePackagesRestored(string? projectPath)

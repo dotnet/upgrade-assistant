@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -15,11 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     {
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
-
-        private const string SourceSymbolNamespace = "System.Web.Http";
-        private const string SourceSymbolName = "ApiController";
-        private const string TargetSymbolNamespace = "System.Web.Http";
-        private const string TargetSymbolName = "Controller";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiControllerDescription), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiControllerDescription), Resources.ResourceManager, typeof(Resources));
@@ -46,16 +42,41 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         private void AnalyzeSymbols(SymbolAnalysisContext context)
         {
             var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
+            var baseType = namedTypeSymbol.BaseType;
+
+            if (baseType is null)
+            {
+                return;
+            }
+
+            if (baseType.TypeKind == TypeKind.Error)
+            {
+                // not sure how concerned to be that MoviesController registers as a TypeKind.Error rather than a TypeKind.Class
+                int x = 4;
+            }
 
             // Find just the named type symbols with names containing lowercase letters.
-
-            if (namedTypeSymbol.Name.ToCharArray().Any(char.IsLower))
+            if (baseType.ToDisplayString().Equals("System.Web.Http.ApiController", StringComparison.Ordinal))
             {
                 // For all such symbols, produce a diagnostic.
                 var diagnostic = Diagnostic.Create(Rule, namedTypeSymbol.Locations[0], namedTypeSymbol.Name);
 
                 context.ReportDiagnostic(diagnostic);
             }
+        }
+
+        public static Project AddMetadataReferences(Project project)
+        {
+            if (project is null)
+            {
+                return project!;
+            }
+
+            // todo - still an open question about how we locate metadatareferences
+            const string assemblyFolder = @"C:\deleteMe\";
+            var assemblyPath = Path.Combine(assemblyFolder, $"System.Web.Http.dll");
+
+            return project.AddMetadataReference(MetadataReference.CreateFromFile(assemblyPath));
         }
     }
 }

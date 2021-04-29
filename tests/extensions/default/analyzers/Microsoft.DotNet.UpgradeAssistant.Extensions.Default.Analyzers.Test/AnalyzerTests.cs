@@ -150,7 +150,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0013",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0013", new TextSpan(2249, 28), Language.VisualBasic)
+                    new ExpectedDiagnostic("UA0013", new TextSpan(74, 16)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(256, 16)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(76, 16), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(299, 16), Language.VisualBasic)
                 }
             }
         };
@@ -184,16 +187,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         {
             foreach (var language in new[] { Language.CSharp, Language.FSharp, Language.VisualBasic })
             {
-                var fileExtension = language switch
+                var expectedDiagnostics = ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language);
+                if (!expectedDiagnostics.Any())
                 {
-                    Language.CSharp => ".vb",
-                    Language.FSharp => ".fs",
-                    Language.VisualBasic => ".vb",
-                    _ => throw new System.NotImplementedException() // CS8509
-                };
+                    // nothing to see here, move along
+                    continue;
+                }
 
-                var diagnostics = await TestHelper.GetDiagnosticsAsync($"{diagnosticId}.{fileExtension}", diagnosticId).ConfigureAwait(false);
-                AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language));
+                var fileExtension = language.GetFileExtension();
+                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, $"{diagnosticId}.{fileExtension}", diagnosticId).ConfigureAwait(false);
+                AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
             }
         }
 
@@ -227,7 +230,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
-                Assert.True(expectedDiagnostics.ElementAt(count++).Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics.ElementAt(count - 1).SourceSpan}; actually at {d.Location.SourceSpan}");
+                var expected = $"{expectedDiagnostics.ElementAt(count).SourceSpan}";
+                var actual = $"{d.Location.SourceSpan}";
+                Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}; actually at {d.Location.SourceSpan}");
+                count++;
             }
         }
     }

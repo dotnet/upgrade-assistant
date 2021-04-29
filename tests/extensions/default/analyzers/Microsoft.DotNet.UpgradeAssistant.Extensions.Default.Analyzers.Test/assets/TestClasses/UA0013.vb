@@ -1,4 +1,5 @@
 ﻿Imports System.Web.Http
+Imports System.Collections.Generic
 
 Public Class ValuesController
     Inherits ApiController
@@ -9,6 +10,14 @@ Public Class ValuesController
     End Function
 End Class
 
+Public Class MoviesController
+    Inherits System.Web.Http.ApiController
+
+    ' GET api/movies
+    Public Function GetMovies() As IEnumerable(Of String)
+        Return New String() {"Star Wars", "Iron Man", "Star Trek"}
+    End Function
+End Class
 
 Public Class NotAWebController
     Inherits Foo.ApiController

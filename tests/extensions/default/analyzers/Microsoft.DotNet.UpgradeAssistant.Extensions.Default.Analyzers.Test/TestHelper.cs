@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
@@ -23,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     {
         // Path relative from .\bin\debug\net5.0
         // TODO : Make this configurable so the test can pass from other working dirs
-        internal const string TestProjectPath = @"assets\TestProject.csproj";
+        internal const string TestProjectPath = @"assets\TestProject.{lang}proj";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
@@ -52,7 +53,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             new UsingSystemWebCodeFixer(),
             new UrlHelperCodeFixer());
 
-        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
+        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
+        {
+            return GetDiagnosticsAsync(Language.CSharp, documentPath, diagnosticIds);
+        }
+
+        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(Language lang, string documentPath, params string[] diagnosticIds)
         {
             if (documentPath is null)
             {
@@ -60,13 +66,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             using var workspace = MSBuildWorkspace.Create();
-            var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
+            var projectLanguage = lang.GetFileExtension();
+            var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
+            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
             return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
 
         private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, params string[] diagnosticIds)
         {
             var analyzersToUse = AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
+
+            project = SourceUpdaterStep.AddMetadataReferences(project);
+
             var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
 
             if (compilation is null)
