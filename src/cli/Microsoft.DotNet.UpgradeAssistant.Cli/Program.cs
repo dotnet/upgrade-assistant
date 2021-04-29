@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -111,6 +112,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddHostedService<ConsoleRunner>();
 
                     services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
+
+                    services.AddSingleton(sp =>
+                    {
+                        return new MSBuildPathLocator
+                        {
+                            MSBuildPath = MSBuildRegistrationStartup.GetMSBuildPath()
+                        };
+                    });
 
                     services.AddMsBuild();
                     services.AddSingleton(options);

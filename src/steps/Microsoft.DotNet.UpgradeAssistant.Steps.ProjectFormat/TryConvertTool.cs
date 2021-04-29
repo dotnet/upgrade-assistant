@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string StorePath = ".store/try-convert";
-        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -p \"{0}\"";
+        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -m {0} -p \"{1}\"";
         private static readonly string[] ErrorMessages = new[]
         {
             "This project has custom imports that are not accepted by try-convert",
@@ -42,8 +42,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
 
             Path = tryConvertOptionsAccessor.Value.TryConvertPath;
+            MSBuildPath = tryConvertOptionsAccessor.Value.MSBuildPath;
             Version = GetVersion();
         }
+
+        public string MSBuildPath { get; }
 
         public string Path { get; }
 
@@ -100,6 +103,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private static string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.Required().FileInfo);
+        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, MSBuildPath, project.Required().FileInfo);
     }
 }

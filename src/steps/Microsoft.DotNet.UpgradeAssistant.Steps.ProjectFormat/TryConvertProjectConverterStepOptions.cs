@@ -9,5 +9,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     {
         [Required]
         public string TryConvertPath { get; set; } = null!;
+
+        [Required]
+        public string MSBuildPath { get; set; } = null!;
     }
 }

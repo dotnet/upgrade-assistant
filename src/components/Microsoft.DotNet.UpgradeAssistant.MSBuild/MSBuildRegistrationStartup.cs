@@ -31,6 +31,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger = logger;
         }
 
+        public static string GetMSBuildPath()
+        {
+            return _instance.MSBuildPath;
+        }
+
         public Task<bool> StartupAsync(CancellationToken token)
         {
             RegisterMSBuildInstance();
