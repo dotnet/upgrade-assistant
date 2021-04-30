@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Fixtures
         public MSBuildRegistrationFixture()
         {
             // Register MSBuild
-            var msBuildRegistrar = new MSBuildRegistrationStartup(new NullLogger<MSBuildRegistrationStartup>());
+            var msBuildRegistrar = new MSBuildRegistrationStartup(new NullLogger<MSBuildRegistrationStartup>(), new MSBuildPathLocator());
             msBuildRegistrar.RegisterMSBuildInstance();
         }
     }
