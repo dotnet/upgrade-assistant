@@ -3,6 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Fixed
+- VB Win Forms projects should keep import for 'System.Windows.Forms' [#474](https://github.com/dotnet/upgrade-assistant/pull/474)
+
 ## Version 0.2.222702 - 2021-04-27 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.222702))
 
 ### Added
