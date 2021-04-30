@@ -8,10 +8,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Fixtures
 {
     public class MSBuildRegistrationFixture
     {
+        public static readonly MSBuildPathLocatorInterceptor Locator = new MSBuildPathLocatorInterceptor();
+
         public MSBuildRegistrationFixture()
         {
             // Register MSBuild
-            var msBuildRegistrar = new MSBuildRegistrationStartup(new NullLogger<MSBuildRegistrationStartup>(), new MSBuildPathLocator());
+            var msBuildRegistrar = new MSBuildRegistrationStartup(new NullLogger<MSBuildRegistrationStartup>(), Locator);
             msBuildRegistrar.RegisterMSBuildInstance();
         }
     }
