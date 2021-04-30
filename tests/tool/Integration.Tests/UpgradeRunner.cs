@@ -44,7 +44,7 @@ namespace Integration.Tests
                 EntryPoint = new[] { entrypoint },
             };
 
-            return await Program.RunUpgradeAsync(options, host => host
+            var status = await Program.RunUpgradeAsync(options, host => host
                 .ConfigureServices((_, services) =>
                 {
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
@@ -67,6 +67,13 @@ namespace Integration.Tests
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
                 }),
                 cts.Token).ConfigureAwait(false);
+
+            if (cts.Token.IsCancellationRequested)
+            {
+                throw new TimeoutException("The integration test could not complete successfully");
+            }
+
+            return status;
         }
     }
 }

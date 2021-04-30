@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string StorePath = ".store/try-convert";
-        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -m {0} -p \"{1}\"";
+        private const string TryConvertArgumentsFormat = "--no-backup -m \"{0}\" --force-web-conversion --keep-current-tfms -p \"{1}\"";
         private static readonly string[] ErrorMessages = new[]
         {
             "This project has custom imports that are not accepted by try-convert",
@@ -42,8 +42,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
 
             Path = tryConvertOptionsAccessor.Value.TryConvertPath;
-            MSBuildPath = tryConvertOptionsAccessor.Value.MSBuildPath;
+            MSBuildPath = HandleEscapeCharacters(tryConvertOptionsAccessor.Value.MSBuildPath);
             Version = GetVersion();
+        }
+
+        /// <summary>
+        /// Path to MSBuild is often located in "Program Files" folder. We wrap the path with quotes
+        /// to handle the space as continuous argument and must also handle the backslash escape characters.
+        /// </summary>
+        private static string HandleEscapeCharacters(string folderPath)
+        {
+            return folderPath.Replace("\\", "\\\\");
         }
 
         public string MSBuildPath { get; }
