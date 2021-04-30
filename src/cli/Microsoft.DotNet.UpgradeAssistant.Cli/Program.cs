@@ -113,14 +113,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
 
-                    services.AddSingleton(sp =>
-                    {
-                        return new MSBuildPathLocator
-                        {
-                            MSBuildPath = MSBuildRegistrationStartup.GetMSBuildPath()
-                        };
-                    });
-
                     services.AddMsBuild();
                     services.AddSingleton(options);
                     services.AddExtensions(context.Configuration, options.Extension);
