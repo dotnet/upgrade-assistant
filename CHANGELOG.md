@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## Future
 
 ### Added
-- A new command line option (`--target-tfm-support` to select the support model of LTS/Preview/Current that is desired [#41](https://github.com/dotnet/upgrade-assistant/issues/41)
+- A new command line option (`--target-tfm-support` to select the support model of LTS/Preview/Current that is desired [#469](https://github.com/dotnet/upgrade-assistant/pull/469)
 
 ## Version 0.2.222702 - 2021-04-27 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.222702))
 

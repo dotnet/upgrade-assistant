@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,7 +52,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, project.TargetFrameworks, token).ConfigureAwait(false);
+                    var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, project.TargetFrameworks, true, token).ConfigureAwait(false);
+                    var updatedReference = newerVersions.FirstOrDefault();
+
                     if (updatedReference == null)
                     {
                         _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, project.TargetFrameworks);
@@ -81,35 +82,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             return state;
-        }
-
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
-        {
-            var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, tfms, true, token).ConfigureAwait(false);
-            NuGetReference? prereleaseCandidate = null;
-
-            foreach (var newerPackage in latestMinorVersions)
-            {
-                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, tfms, token).ConfigureAwait(false))
-                {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, tfms);
-
-                    // Only return a pre-release version if it's the only newer major version that supports the necessary TFM
-                    if (newerPackage.IsPrerelease)
-                    {
-                        if (prereleaseCandidate is null)
-                        {
-                            prereleaseCandidate = newerPackage;
-                        }
-                    }
-                    else
-                    {
-                        return newerPackage;
-                    }
-                }
-            }
-
-            return prereleaseCandidate;
         }
     }
 }

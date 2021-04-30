@@ -9,8 +9,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IPackageLoader
     {
-        IEnumerable<string> PackageSources { get; }
-
         Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token);
 
         Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, bool latestMinorAndBuildOnly, CancellationToken token);

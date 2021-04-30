@@ -26,8 +26,6 @@ namespace Integration.Tests
             _unknownPackages = unknownPackages ?? throw new ArgumentNullException(nameof(unknownPackages));
         }
 
-        public IEnumerable<string> PackageSources => _other.PackageSources;
-
         public Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
         {
             return _other.DoesPackageSupportTargetFrameworksAsync(packageReference, targetFrameworks, token);
