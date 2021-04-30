@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddSingleton<ITryConvertTool, TryConvertTool>();
 
             return services.AddOptions<TryConvertProjectConverterStepOptions>()
-                .PostConfigure<MSBuildPathLocator>((options, locator) =>
+                .PostConfigure(options =>
                 {
                     var path = Environment.ExpandEnvironmentVariables(options.TryConvertPath);
 
@@ -29,7 +29,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     }
 
                     options.TryConvertPath = path;
-                    options.MSBuildPath = locator.MSBuildPath!;
                 })
                 .ValidateDataAnnotations();
         }

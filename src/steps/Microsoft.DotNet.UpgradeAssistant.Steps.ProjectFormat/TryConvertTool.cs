@@ -29,12 +29,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         };
 
         private readonly IProcessRunner _runner;
+        private readonly MSBuildPathLocator _locator;
 
         public TryConvertTool(
             IProcessRunner runner,
-            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor)
+            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor,
+            MSBuildPathLocator locator)
         {
-            _runner = runner;
+            _runner = runner ?? throw new ArgumentNullException(nameof(runner));
+            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
 
             if (tryConvertOptionsAccessor is null)
             {
@@ -42,20 +45,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
 
             Path = tryConvertOptionsAccessor.Value.TryConvertPath;
-            MSBuildPath = HandleEscapeCharacters(tryConvertOptionsAccessor.Value.MSBuildPath);
             Version = GetVersion();
         }
-
-        /// <summary>
-        /// Path to MSBuild is often located in "Program Files" folder. We wrap the path with quotes
-        /// to handle the space as continuous argument and must also handle the backslash escape characters.
-        /// </summary>
-        private static string HandleEscapeCharacters(string folderPath)
-        {
-            return folderPath.Replace("\\", "\\\\");
-        }
-
-        public string MSBuildPath { get; }
 
         public string Path { get; }
 
@@ -65,6 +56,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public string GetCommandLine(IProject project)
             => Invariant($"{Path} {GetArguments(project.Required())}");
+
+        private string? GetMSBuildPath()
+        {
+            return _locator.MSBuildPath?.Replace("\\", "\\\\");
+        }
 
         public Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
@@ -112,6 +108,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, MSBuildPath, project.Required().FileInfo);
+        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, GetMSBuildPath(), project.Required().FileInfo);
     }
 }

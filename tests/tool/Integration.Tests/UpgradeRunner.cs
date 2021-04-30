@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Microsoft.DotNet.UpgradeAssistant.Fixtures;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -54,6 +55,9 @@ namespace Integration.Tests
                 })
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
+                    builder.RegisterInstance(MSBuildRegistrationFixture.Locator);
+                    builder.RegisterDecorator<MSBuildPathLocatorInterceptor, MSBuildPathLocator>();
+
                     builder.RegisterType<KnownPackages>()
                         .SingleInstance()
                         .AsSelf();

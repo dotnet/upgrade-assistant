@@ -3,6 +3,9 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
+    /// <summary>
+    /// Provides access to the MSBuildPath. This value is set by MSBuildRegistrationStartup.
+    /// </summary>
     public class MSBuildPathLocator
     {
         public string? MSBuildPath { get; set; }
