@@ -21,7 +21,7 @@ The existing default in Upgrade-Assistant is "upgrade" mode but once the analyze
 
  # Implementation Details
 
- ## Nuget package dependecy analysis:
+ ## NuGet package dependency analysis:
    If a referenced NuGet package in the project isn't compatible with the target .NET version, Upgrade-Assistant already has capabilities built-in to determine the first major version that is compatible to the target .NET version by using existing Nuget APIs. Upgrade-Assistant also already has logic built-in to determine transitive dependencies that needs to be removed while upgrading to .NET Core.
 
 ## Loose-Assembly Analysis:
