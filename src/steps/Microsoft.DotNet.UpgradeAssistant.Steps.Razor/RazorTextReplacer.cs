@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// Updates source code in Razor documents based on provider TextReplacements, accounting for Razor source code transition syntax.
         /// </summary>
         /// <param name="replacements">The text replacements to apply.</param>
-        public void ApplyTextReplacements(IList<TextReplacement> replacements)
+        public void ApplyTextReplacements(IEnumerable<TextReplacement> replacements)
         {
             if (replacements is null)
             {
@@ -45,30 +45,46 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             var replacementsByFile = replacements.Distinct().OrderByDescending(t => t.StartingLine).GroupBy(t => t.FilePath);
             foreach (var replacementGroup in replacementsByFile)
             {
-                // Read the document as lines instead of all as one string because replacements
-                // include line offsets.
-                var documentLines = File.ReadAllLines(replacementGroup.Key);
-                var documentText = new StringBuilder();
-                foreach (var line in documentLines)
-                {
-                    documentText.AppendLine(line);
-                }
+                var documentTextStr = File.ReadAllText(replacementGroup.Key);
+                var lineOffsets = GetLineOffsets(documentTextStr).ToArray();
+                var documentText = new StringBuilder(documentTextStr);
 
                 foreach (var replacement in replacementGroup)
                 {
                     _logger.LogInformation("Updating source code in Razor document {FilePath} at line {Line}", replacement.FilePath, replacement.StartingLine);
 
+                    // If the original text doesn't fit in the lines of the original document, then the replacement is invalid
+                    if (replacement.StartingLine + replacement.OriginalText.Lines.Count >= lineOffsets.Length)
+                    {
+                        continue;
+                    }
+
                     // Start looking for replacements at the start of the indicated line
-                    var startOffset = GetLineOffset(documentLines, replacement.StartingLine);
+                    var startOffset = lineOffsets[replacement.StartingLine];
 
                     // Stop looking for replacements at the start of the first line after the indicated line plus the number of lines in the indicated text
-                    var endOffset = GetLineOffset(documentLines, replacement.StartingLine + replacement.OriginalText.Lines.Count);
+                    var endOffset = lineOffsets[replacement.StartingLine + replacement.OriginalText.Lines.Count];
 
                     // Trim the string that's being replaced because code from Razor code blocks will include a couple extra spaces (to make room for @{)
                     // compared to the source that actually appeared in the cshtml file.
                     var originalText = replacement.OriginalText.ToString().TrimStart();
                     var updatedText = replacement.NewText.ToString().TrimStart();
-                    MinimizeReplacement(ref originalText, ref updatedText);
+
+                    // Generally, it's not necessary to minimize replacements since the text should be the same in both documents
+                    // However, in the specific case of text being added before the first #line pragma in a Razor doc, it's possible
+                    // that C# unrelated to the original document will show up with the replaced text, so minimize replacements only
+                    // in the case that text is being inserted before the original first line.
+                    if (replacement.StartingLine == 0)
+                    {
+                        MinimizeReplacement(ref originalText, ref updatedText);
+                    }
+
+                    // If the changed text ends with a semi-colon, trim it since the semi-colon won't appear in implicit Razor expressions
+                    if (originalText.Trim().EndsWith(";", StringComparison.Ordinal) && updatedText.Trim().EndsWith(";", StringComparison.Ordinal))
+                    {
+                        originalText = originalText.Trim().Trim(';');
+                        updatedText = updatedText.Trim().Trim(';');
+                    }
 
                     // If new text is being added, insert it with correct Razor transition syntax
                     if (string.IsNullOrWhiteSpace(originalText))
@@ -97,8 +113,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                         {
                             var implicitExpression = $"@{originalText.Replace(";", string.Empty)}";
                             var explicitExpression = $"@({originalText.Replace(";", string.Empty).Trim()})";
+
                             documentText.Replace(implicitExpression, updatedText, startOffset, endOffset - startOffset);
+                            endOffset = Math.Min(endOffset, documentText.Length);
+
                             documentText.Replace(explicitExpression, updatedText, startOffset, endOffset - startOffset);
+                            endOffset = Math.Min(endOffset, documentText.Length);
                         }
 
                         documentText.Replace(originalText, updatedText, startOffset, endOffset - startOffset);
@@ -109,18 +129,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
         }
 
-        private static int GetLineOffset(string[] lines, int startingLine)
+        private static IEnumerable<int> GetLineOffsets(string text)
         {
-            var offset = 0;
+            // Pre-line 1
+            yield return 0;
 
-            for (var i = 1; i < startingLine && i <= lines.Length; i++)
+            // Line 1
+            if (text.Any())
             {
-                // StreamSourceDoc.Lines is 0-based but line directives (as used in MappedSubText) are 1-based,
-                // so subtract one from i.
-                offset += lines[i - 1].Length + Environment.NewLine.Length;
+                yield return 0;
             }
 
-            return offset;
+            // Subsequent lines
+            for (var i = 0; i < text.Length; i++)
+            {
+                if (text[i] == '\n')
+                {
+                    yield return i + 1;
+                }
+            }
+
+            // EOF
+            yield return text.Length;
         }
 
         // Removes leading and trailing portions of original and updated that are the same
