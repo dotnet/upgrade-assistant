@@ -1,28 +1,35 @@
 # Roadmap
-
 This tool is just one piece of a bigger journey we’re on to streamline the journey to upgrade your apps from .NET Framework to .NET 5 and beyond.
+This list is not an exhaustive list of all features and support coming – but rather the ones most requested and/or prioritized to keep your upgrades on track. If there’s anything missing from this list that you expect to see or you’re having difficulty with in your upgrade, please let us know via an [issues](https://github.com/dotnet/upgrade-assistant/issues).
 
-Below is a preview of some of the areas we want to focus on in that journey and also areas we want to invest in for this tool. If there’s anything missing from this proposed list that you expected to see or you’re having difficulty with in your upgrade, please let us know via an [issue]( https://github.com/dotnet/upgrade-assistant/issues).
-
-This list is not meant to be exhaustive of all features and [issues](https://github.com/dotnet/upgrade-assistant/issues) that could be supported, just a high level overview.
+The priority or state for an issue can change at any time.
 
 **1. Pre-migration analysis**
 
-Example areas:
-- Up front checks for technologies that might not be supported in .NET 5+ or could make the upgrade effort large in cost (links to docs, options available, best practices, etc.).
-- More visibility into NuGet dependencies (e.g. newer versions, do they support .NET 5+?)
-- Recommendations for TFM (target frameworks) to move to
+Take a look at the design doc for [design details](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md) and phases of implementation.
+
+- **Committed**
+  - [Loose assemblies analysis](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#loose-assembly-analysis)
+  -	More visibility into [NuGet dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#nuget-package-dependecy-analysis) (e.g. newer versions, do they support .NET 5+?), transitive dependencies, and [inter-project dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#inter-project-dependencies)
+- **On Deck**
+  -	[Up front checks for technologies that might not be supported in .NET 5+](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#surface-unsupported-api-categories) or could make the upgrade effort large in cost (links to docs, options available, best practices, etc.).
 
 **2. Upgrade**
 
-Example areas:
-- Multitargeting support for specific and multiple target frameworks
-- Identify areas of an app that might require manual changes
-- Add more ASP.NET app analyzers for code fixes 
-- Add Windows app analyzers for code fixes
-- Update non-C# source like cshtml, xaml, vb, etc.
-- Post-migration details with all the changes made and brings attention to any potentially breaking changes
-- Even more ideas listed in the repo [issues](https://github.com/dotnet/upgrade-assistant/issues)
+- **Committed**
+  - [Choose between LTS (long-term servicing), Current (.NET 5) or Preview (.NET 6 Preview) for the target .NET version](https://github.com/dotnet/upgrade-assistant/issues/41)
+  - [Add more ASP.NET app analyzers for code fixes](https://github.com/dotnet/upgrade-assistant/issues/55)
+  - Update non-C# source:
+    - [VB](https://github.com/dotnet/upgrade-assistant/issues/270)
+    - [Cshtml](https://github.com/dotnet/upgrade-assistant/issues/57)
+  - Ability to update NuGet dependencies update across a solution instead of project at a time to avoid conflicting cross-dependencies
+
+- **On Deck**
+  - [GC Config Settings](https://github.com/dotnet/upgrade-assistant/issues/399)
+  - Post-migration details with all the changes made and brings attention to any potentially breaking changes
+  - Multitargeting support for specific and multiple target frameworks
+  - Web Forms support
+  - Even more ideas listed in the repo [issues](https://github.com/dotnet/upgrade-assistant/issues)
 
 **3. Tooling support**
 
