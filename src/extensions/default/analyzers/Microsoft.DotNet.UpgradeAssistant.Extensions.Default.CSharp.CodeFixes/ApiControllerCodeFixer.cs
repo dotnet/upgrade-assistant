@@ -9,6 +9,8 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
+using cs = Microsoft.CodeAnalysis.CSharp;
+using vb = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
@@ -46,12 +48,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.ApiControllerTitle,
-                    cancellationToken => ReplaceUnsafeDeserializationAsync(context.Document, node, cancellationToken),
+                    cancellationToken => ReplaceBaseClass(context.Document, node, cancellationToken),
                     nameof(CodeFixResources.ApiControllerTitle)),
                 context.Diagnostics);
         }
 
-        private async Task<Document> ReplaceUnsafeDeserializationAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private async Task<Document> ReplaceBaseClass(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var project = document.Project;
             var slnEditor = new SolutionEditor(project.Solution);
@@ -65,8 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
         private static void ReplaceController(SyntaxNode node, DocumentEditor docEditor)
         {
-            if (node.IsKind(CodeAnalysis.VisualBasic.SyntaxKind.QualifiedName)
-                            || node.IsKind(CodeAnalysis.CSharp.SyntaxKind.QualifiedName))
+            if (IsQualifiedNameSyntax(node))
             {
                 var namespaceIdentifier = docEditor.Generator.IdentifierName(GoodNamespace);
                 var classNameIdentifier = docEditor.Generator.IdentifierName(GoodClassName);
@@ -78,6 +79,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 var controllerIdentifierSyntax = docEditor.Generator.IdentifierName($"{GoodNamespace}.{GoodClassName}");
                 docEditor.ReplaceNode(node, controllerIdentifierSyntax);
             }
+        }
+
+        private static bool IsQualifiedNameSyntax(SyntaxNode node)
+        {
+            return node.IsKind(vb.SyntaxKind.QualifiedName) || node.IsKind(cs.SyntaxKind.QualifiedName);
         }
     }
 }

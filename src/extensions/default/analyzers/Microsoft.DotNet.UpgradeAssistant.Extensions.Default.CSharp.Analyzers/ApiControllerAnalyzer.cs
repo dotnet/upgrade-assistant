@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using cs = Microsoft.CodeAnalysis.CSharp;
+using vb = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
@@ -38,8 +40,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeNode, CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType);
-            context.RegisterSyntaxNodeAction(AnalyzeNode, CodeAnalysis.VisualBasic.SyntaxKind.InheritsStatement);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, cs.SyntaxKind.SimpleBaseType);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, vb.SyntaxKind.InheritsStatement);
         }
 
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
@@ -66,16 +68,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             context.ReportDiagnostic(diagnostic);
         }
 
+        /// <summary>
+        /// Uses syntax analysis to highlight the correct part of the node. At this point
+        /// the context.Node looks like 'Inherits System.Web.Http.ApiController' and we
+        /// do not want to highlight the VisualBasic.SyntaxKind.InheritsKeyword
+        /// </summary>
+        /// <param name="context"></param>
         private static void ReportVisualBasicSyntax(SyntaxNodeAnalysisContext context)
         {
             var baseClass = context.Node.DescendantNodes()
-                .OfType<CodeAnalysis.VisualBasic.Syntax.QualifiedNameSyntax>()
+                .OfType<vb.Syntax.QualifiedNameSyntax>()
                 .FirstOrDefault() as SyntaxNode;
 
             if (baseClass is null)
             {
                 baseClass = context.Node.DescendantNodes()
-                .OfType<CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>()
+                .OfType<vb.Syntax.IdentifierNameSyntax>()
                 .FirstOrDefault();
             }
 
