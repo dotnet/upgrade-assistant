@@ -16,4 +16,4 @@ UA0009 | Upgrade | Warning | HelperResultAnalyzer
 UA0010 | Upgrade | Warning | AllowHtmlAttributeAnalyzer
 UA0011 | Upgrade | Warning | SystemDeploymentAnalyzer
 UA0012 | Upgrade | Warning | BinaryFormatterUnsafeDeserializeAnalyzer
-UA0013 | Upgrade | Error | ApiControllerAnalyzer
+UA0013 | Upgrade | Warning | ApiControllerAnalyzer

@@ -120,6 +120,9 @@
   <data name="AllowHtmlAttributeTitle" xml:space="preserve">
     <value>Remove [AllowHtml] attribute</value>
   </data>
+  <data name="ApiControllerTitle" xml:space="preserve">
+    <value>Replace with Microsoft.AspNetCore.Mvc.Controller</value>
+  </data>
   <data name="BinaryFormatterUnsafeDeserializeTitle" xml:space="preserve">
     <value>Replace with BinaryFormatter.Deserialize</value>
   </data>

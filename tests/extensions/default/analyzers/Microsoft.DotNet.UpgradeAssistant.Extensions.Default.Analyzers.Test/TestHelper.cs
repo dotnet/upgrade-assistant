@@ -42,6 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new AllowHtmlAttributeCodeFixer(),
+            new ApiControllerCodeFixer(),
             new BinaryFormatterUnsafeDeserializeCodeFixer(),
             new FilterCodeFixer(),
             new HelperResultCodeFixer(),
@@ -93,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .Where(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal));
         }
 
-        public static async Task<Document?> GetSourceAsync(string documentPath)
+        public static async Task<Document?> GetSourceAsync(Language lang, string documentPath)
         {
             if (documentPath is null)
             {
@@ -101,11 +102,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             using var workspace = MSBuildWorkspace.Create();
-            var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
+            var projectLanguage = lang.GetFileExtension();
+            var path = TestProjectPath.Replace("{lang}", $"Fixed.{projectLanguage}", StringComparison.OrdinalIgnoreCase);
+            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
+            
             return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
         }
 
-        public static async Task<Document> FixSourceAsync(string documentPath, string diagnosticId)
+        public static async Task<Document> FixSourceAsync(Language lang, string documentPath, string diagnosticId)
         {
             if (documentPath is null)
             {
@@ -113,7 +117,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             using var workspace = MSBuildWorkspace.Create();
-            var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
+            var projectLanguage = lang.GetFileExtension();
+            var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
+            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
             var projectId = project.Id;
 
             var diagnosticFixed = false;

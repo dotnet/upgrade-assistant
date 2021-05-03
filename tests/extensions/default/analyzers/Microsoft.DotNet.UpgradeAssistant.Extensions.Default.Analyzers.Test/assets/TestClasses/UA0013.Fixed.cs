@@ -1,15 +1,36 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-using System;
+﻿using System.Web.Http;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.assets.TestClasses
+namespace TestProject.TestClasses
 {
-    class UA0013
+    public class ValuesController : Microsoft.AspNetCore.Mvc.Controller
     {
+        // GET api/values
+        public IEnumerable<string> GetValues()
+        {
+            return new[] { "value1", "value2" };
+        }
+    }
+
+    public class MoviesController : Microsoft.AspNetCore.Mvc.Controller
+    {
+        // GET api/values
+        public IEnumerable<string> GetValues()
+        {
+            return new[] { "Star Wars", "Iron Man", "Star Trek" };
+        }
+    }
+
+    public class NotAWebController : Foo.ApiController
+    {
+
+    }
+}
+
+namespace Foo
+{
+    public class ApiController
+    {
+
     }
 }

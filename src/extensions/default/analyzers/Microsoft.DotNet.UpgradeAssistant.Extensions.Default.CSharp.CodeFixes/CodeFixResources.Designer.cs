@@ -71,6 +71,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes 
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace with Microsoft.AspNetCore.Mvc.Controller.
+        /// </summary>
+        internal static string ApiControllerTitle {
+            get {
+                return ResourceManager.GetString("ApiControllerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with BinaryFormatter.Deserialize.
         /// </summary>
         internal static string BinaryFormatterUnsafeDeserializeTitle {

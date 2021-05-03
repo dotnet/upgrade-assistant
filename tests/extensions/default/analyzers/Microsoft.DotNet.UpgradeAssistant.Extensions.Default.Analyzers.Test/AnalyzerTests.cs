@@ -150,10 +150,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0013",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0013", new TextSpan(93, 13)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(275, 29)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(107, 13), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(330, 29), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(135, 13)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(349, 29)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(153, 13), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(405, 29), Language.VisualBasic),
                 }
             },
         };
@@ -215,14 +215,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [Theory]
         public async Task UpgradeCodeFixer(string diagnosticId)
         {
-            var fixedSource = await TestHelper.FixSourceAsync($"{diagnosticId}.cs", diagnosticId).ConfigureAwait(false);
-            var expectedSource = await TestHelper.GetSourceAsync($"{diagnosticId}.Fixed.cs").ConfigureAwait(false);
+            foreach (var language in new[] { Language.CSharp, Language.VisualBasic })
+            {
+                var expectedDiagnostics = ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language);
+                if (!expectedDiagnostics.Any())
+                {
+                    // nothing to see here, move along
+                    continue;
+                }
 
-            Assert.NotNull(expectedSource);
+                var extension = language.GetFileExtension();
+                var fixedSource = await TestHelper.FixSourceAsync(language, $"{diagnosticId}.{extension}", diagnosticId).ConfigureAwait(false);
+                var expectedSource = await TestHelper.GetSourceAsync(language, $"{diagnosticId}.Fixed.{extension}").ConfigureAwait(false);
 
-            var expectedText = (await expectedSource!.GetTextAsync().ConfigureAwait(false)).ToString();
-            var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
-            Assert.Equal(expectedText, fixedText);
+                Assert.NotNull(expectedSource);
+
+                var expectedText = (await expectedSource!.GetTextAsync().ConfigureAwait(false)).ToString();
+                var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+                Assert.Equal(expectedText, fixedText);
+            }
         }
 
         private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, IEnumerable<ExpectedDiagnostic> expectedDiagnostics)
