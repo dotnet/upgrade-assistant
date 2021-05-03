@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         public RestoreTestProjectFixture()
             : base()
         {
-            foreach (var lang in new[] { Language.CSharp, Language.VisualBasic, Language.FSharp })
+            foreach (var lang in new[] { Language.CSharp, Language.VisualBasic })
             {
                 var projectLanguage = lang.GetFileExtension();
                 var path = TestHelper.TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);

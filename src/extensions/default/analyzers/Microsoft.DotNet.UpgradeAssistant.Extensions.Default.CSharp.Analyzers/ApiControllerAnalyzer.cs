@@ -17,6 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
 
+        public const string BadNamespace = "System.Web.Http";
+        public const string BadClassName = "ApiController";
+
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiControllerDescription), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiControllerDescription), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ApiControllerDescription), Resources.ResourceManager, typeof(Resources));
@@ -35,34 +38,49 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            // SymbolKind.NamedType (e.g. class)
-            context.RegisterSymbolAction(AnalyzeSymbols, SymbolKind.NamedType);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType);
+            context.RegisterSyntaxNodeAction(AnalyzeNode, CodeAnalysis.VisualBasic.SyntaxKind.InheritsStatement);
         }
 
-        private void AnalyzeSymbols(SymbolAnalysisContext context)
+        private void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-            var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
-            var baseType = namedTypeSymbol.BaseType;
+            var namedTypeSymbol = context.ContainingSymbol as INamedTypeSymbol;
 
-            if (baseType is null)
+            if (namedTypeSymbol != null && namedTypeSymbol.BaseType != null
+                && namedTypeSymbol.BaseType.ToDisplayString().Equals($"{BadNamespace}.{BadClassName}", StringComparison.Ordinal))
             {
-                return;
+                if (context.Compilation.Language == LanguageNames.CSharp)
+                {
+                    ReportCSharpSyntax(context);
+                }
+                else if (context.Compilation.Language == LanguageNames.VisualBasic)
+                {
+                    ReportVisualBasicSyntax(context);
+                }
+            }
+        }
+
+        private static void ReportCSharpSyntax(SyntaxNodeAnalysisContext context)
+        {
+            var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), context.Node.ToString());
+            context.ReportDiagnostic(diagnostic);
+        }
+
+        private static void ReportVisualBasicSyntax(SyntaxNodeAnalysisContext context)
+        {
+            var baseClass = context.Node.DescendantNodes()
+                .OfType<CodeAnalysis.VisualBasic.Syntax.QualifiedNameSyntax>()
+                .FirstOrDefault() as SyntaxNode;
+
+            if (baseClass is null)
+            {
+                baseClass = context.Node.DescendantNodes()
+                .OfType<CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>()
+                .FirstOrDefault();
             }
 
-            if (baseType.TypeKind == TypeKind.Error)
-            {
-                // not sure how concerned to be that MoviesController registers as a TypeKind.Error rather than a TypeKind.Class
-                int x = 4;
-            }
-
-            // Find just the named type symbols with names containing lowercase letters.
-            if (baseType.ToDisplayString().Equals("System.Web.Http.ApiController", StringComparison.Ordinal))
-            {
-                // For all such symbols, produce a diagnostic.
-                var diagnostic = Diagnostic.Create(Rule, namedTypeSymbol.Locations[0], namedTypeSymbol.Name);
-
-                context.ReportDiagnostic(diagnostic);
-            }
+            var diagnostic = Diagnostic.Create(Rule, baseClass.GetLocation(), baseClass.ToString());
+            context.ReportDiagnostic(diagnostic);
         }
 
         public static Project AddMetadataReferences(Project project)

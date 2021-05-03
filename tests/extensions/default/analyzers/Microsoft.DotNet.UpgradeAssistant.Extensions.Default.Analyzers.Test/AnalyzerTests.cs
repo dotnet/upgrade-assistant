@@ -143,19 +143,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                     new ExpectedDiagnostic("UA0012", new TextSpan(2249, 28)),
                     new ExpectedDiagnostic("UA0012", new TextSpan(3162, 28)),
                     new ExpectedDiagnostic("UA0012", new TextSpan(4089, 39)),
-                    new ExpectedDiagnostic("UA0012", new TextSpan(4943, 39))
+                    new ExpectedDiagnostic("UA0012", new TextSpan(4943, 39)),
                 }
             },
             {
                 "UA0013",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0013", new TextSpan(74, 16)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(256, 16)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(76, 16), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(299, 16), Language.VisualBasic)
+                    new ExpectedDiagnostic("UA0013", new TextSpan(93, 13)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(275, 29)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(107, 13), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(330, 29), Language.VisualBasic),
                 }
-            }
+            },
         };
 
         // No diagnostics expected to show up
@@ -185,7 +185,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [Theory]
         public async Task UpgradeAnalyzers(string diagnosticId)
         {
-            foreach (var language in new[] { Language.CSharp, Language.FSharp, Language.VisualBasic })
+            foreach (var language in new[] { Language.CSharp, Language.VisualBasic })
             {
                 var expectedDiagnostics = ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language);
                 if (!expectedDiagnostics.Any())
@@ -211,6 +211,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
         [InlineData("UA0009")]
         [InlineData("UA0010")]
         [InlineData("UA0012")]
+        [InlineData("UA0013")]
         [Theory]
         public async Task UpgradeCodeFixer(string diagnosticId)
         {
@@ -232,7 +233,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
             {
                 var expected = $"{expectedDiagnostics.ElementAt(count).SourceSpan}";
                 var actual = $"{d.Location.SourceSpan}";
-                Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}; actually at {d.Location.SourceSpan}");
+                Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected {expectedDiagnostics.ElementAt(count).Language} diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}; actually at {d.Location.SourceSpan}");
                 count++;
             }
         }
