@@ -86,14 +86,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         public bool Equals(MappedSubText other) =>
             other != null &&
             Text.ContentEquals(other.Text) &&
-            SourceLocation.Equals(other.SourceLocation, StringComparison.Ordinal);
+            SourceLocation.Equals(other.SourceLocation, StringComparison.OrdinalIgnoreCase);
 
         /// <inheritdoc/>
         public override int GetHashCode()
         {
             var hashcode = default(HashCode);
             hashcode.Add(Text.ToString(), StringComparer.Ordinal);
-            hashcode.Add(SourceLocation, StringComparer.Ordinal);
+            hashcode.Add(SourceLocation, StringComparer.OrdinalIgnoreCase);
             return hashcode.ToHashCode();
         }
     }

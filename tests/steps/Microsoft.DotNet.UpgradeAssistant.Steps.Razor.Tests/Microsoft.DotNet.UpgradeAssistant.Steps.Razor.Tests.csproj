@@ -10,8 +10,22 @@
     <Content Include="**/*.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Remove="InvalidViews\Invalid.cshtml" />
-    <Content Include="NoViews\Dummy.txt">
+    <Content Include="**/*.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="MappedSubTextTestData.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="RazorUpdaterStepViews\TestViews\Simple.cshtml" />
+    <None Remove="RazorUpdaterStepViews\TestViews\View.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="MappedSubTextTestData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
