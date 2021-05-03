@@ -60,11 +60,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         }
 
         [Theory]
-        [InlineData("TestViews/Test.csproj", 0, 2, true, true)] // Vanilla positive case
-        [InlineData("TestViews/Test.csproj", 1, 1, false, false)] // Not applicable if no project is loaded
-        [InlineData("TestViews/Test.csproj", 0, 0, true, false)] // Not applicable if there are no updaters
-        [InlineData("NoViews/Test.csproj", 0, 1, true, false)] // Not applicable if there are no Razor pages
-        [InlineData("Test.csproj", 1, 0, true, true)] // Applicable even with only complete updaters (updater status is not checked)
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", 0, 2, true, true)] // Vanilla positive case
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", 1, 1, false, false)] // Not applicable if no project is loaded
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", 0, 0, true, false)] // Not applicable if there are no updaters
+        [InlineData("RazorUpdaterStepViews/NoViews/Test.csproj", 0, 1, true, false)] // Not applicable if there are no Razor pages
+        [InlineData("RazorUpdaterStepViews/Test.csproj", 1, 0, true, true)] // Applicable even with only complete updaters (updater status is not checked)
         public async Task IsApplicableTests(string projectPath, int completeUpdaterCount, int incompleteUpdaterCount, bool projectLoaded, bool expected)
         {
             // Arrange
