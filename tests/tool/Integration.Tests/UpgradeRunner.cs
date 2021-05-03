@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Microsoft.DotNet.UpgradeAssistant.MSBuildPath;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,7 +45,7 @@ namespace Integration.Tests
                 EntryPoint = new[] { entrypoint },
             };
 
-            return await Program.RunUpgradeAsync(options, host => host
+            var status = await Program.RunUpgradeAsync(options, host => host
                 .ConfigureServices((_, services) =>
                 {
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
@@ -54,6 +55,9 @@ namespace Integration.Tests
                 })
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
+                    builder.RegisterInstance(MSBuildPathInstance.Locator);
+                    builder.RegisterDecorator<MSBuildPathLocatorInterceptor, MSBuildPathLocator>();
+
                     builder.RegisterType<KnownPackages>()
                         .SingleInstance()
                         .AsSelf();
@@ -67,6 +71,13 @@ namespace Integration.Tests
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
                 }),
                 cts.Token).ConfigureAwait(false);
+
+            if (cts.Token.IsCancellationRequested)
+            {
+                throw new TimeoutException("The integration test could not complete successfully");
+            }
+
+            return status;
         }
     }
 }
