@@ -60,9 +60,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
             var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
 
-            #region ReplaceApiController
+            ReplaceController(node, docEditor);
+
+            return docEditor.GetChangedDocument();
+        }
+
+        private static void ReplaceController(SyntaxNode node, DocumentEditor docEditor)
+        {
             if (node.IsKind(CodeAnalysis.VisualBasic.SyntaxKind.QualifiedName)
-                || node.IsKind(CodeAnalysis.CSharp.SyntaxKind.QualifiedName))
+                            || node.IsKind(CodeAnalysis.CSharp.SyntaxKind.QualifiedName))
             {
                 var namespaceIdentifier = docEditor.Generator.IdentifierName(GoodNamespace);
                 var classNameIdentifier = docEditor.Generator.IdentifierName(GoodClassName);
@@ -74,9 +80,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 var controllerIdentifierSyntax = docEditor.Generator.IdentifierName($"{GoodNamespace}.{GoodClassName}");
                 docEditor.ReplaceNode(node, controllerIdentifierSyntax);
             }
-            #endregion
-
-            return docEditor.GetChangedDocument();
         }
     }
 }
