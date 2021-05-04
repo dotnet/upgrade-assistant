@@ -27,7 +27,7 @@ upgrade-assistant some-project.vbproj --extension .\path\to\UpgradeAssistantChem
 ### Decoupling the data
 Initially, any data needed will be provided with the extension. This data would be what is used to map the fingerprints to actual packages. They often range around the 100mb-200mb range for useful data, but could be potentially larger if desired.
 
-However, it may be nice to decouple the data from the actual extension itself so they can be updated independently. In order to support his, Upgrade Assistant should provide a way for steps/extensions to provide step-dependent data. This could be something that a step could register it as having, and then Upgrade Assistant could provide commands such as the following:
+However, it may be nice to decouple the data from the actual extension itself so they can be updated independently. In order to support this, Upgrade Assistant should provide a way for steps/extensions to provide step-dependent data. This could be something that a step could register it as having, and then Upgrade Assistant could provide commands such as the following:
 
 - `upgrade-assistnat manage-data list`: List registered data sources
 - `upgrade-assistant manage-data update --name [name]`: Update a registered data source (managed by the step itself)
