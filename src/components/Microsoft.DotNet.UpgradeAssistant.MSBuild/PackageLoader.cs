@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             var result = await SearchByNameAsync(packageName, tfms, includePreRelease, token: token).ConfigureAwait(false);
 
-            return result.FirstOrDefault();
+            return result.LastOrDefault();
         }
 
         private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, bool includePrerelease = false, NuGetVersion? currentVersion = null, bool latestMinorAndBuildOnly = false, CancellationToken token = default)
@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var tfmSet = ImmutableHashSet.CreateRange(tfms.Select(t => NuGetFramework.Parse(t.Name)));
 
             var results = searchResults
-                .Where(r => currentVersion is null ? true : r.Identity.Version > currentVersion);
+                .Where(r => currentVersion is null || r.Identity.Version > currentVersion);
 
             if (latestMinorAndBuildOnly)
             {
