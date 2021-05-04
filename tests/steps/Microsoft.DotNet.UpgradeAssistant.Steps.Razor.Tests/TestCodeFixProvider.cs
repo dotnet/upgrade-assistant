@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             }
         }
 
-        private async Task<Document> ReplaceNodeAsync(Document document, SyntaxNode node, CancellationToken ct)
+        private static async Task<Document> ReplaceNodeAsync(Document document, SyntaxNode node, CancellationToken ct)
         {
             var editor = await DocumentEditor.CreateAsync(document, ct).ConfigureAwait(false);
             editor.ReplaceNode(node, node.WithTrailingTrivia(SyntaxFactory.ParseTrailingTrivia(" /* Test! */").AddRange(node.GetTrailingTrivia())));

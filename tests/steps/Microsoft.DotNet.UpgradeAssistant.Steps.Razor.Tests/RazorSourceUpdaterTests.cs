@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         new[]
                         {
                             new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "assembly: global::Microsoft.AspNetCore"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\r\n        <p>\")"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\\r\\n        <p>\")"),
                         },
                     },
                     new[]
@@ -196,7 +196,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             Assert.Collection(result.FilePaths.OrderBy(f => f), expectedUpdatedFiles.OrderBy(f => f).Select<string, Action<string>>(expected => actual => Assert.Equal(expected, actual)).ToArray());
             Assert.True(resultWithoutDocs.Result);
             Assert.Empty(resultWithoutDocs.FilePaths);
-            Assert.Collection(replacements, expectedReplacements.Select<TextReplacement, Action<TextReplacement>>(e => a => Assert.Equal(e, a)).ToArray());
+            Assert.Collection(replacements, expectedReplacements.Select<TextReplacement, Action<TextReplacement>>(e => a =>
+            {
+                if (string.IsNullOrEmpty(e.OriginalText.ToString()) && string.IsNullOrEmpty(e.NewText.ToString()))
+                {
+                    Assert.Equal(e.FilePath, a.FilePath);
+                    Assert.Equal(e.StartingLine, a.StartingLine);
+                }
+                else
+                {
+                    Assert.Equal(e, a);
+                }
+            }).ToArray());
         }
 
         public static IEnumerable<object[]> ApplyData =>
@@ -228,6 +239,69 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
                     new[] { new TextReplacement(SourceText.From("      Write(Model[0]);\r\n"), SourceText.From("      Write(Model[0] /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6) }
                 },
+
+                // Diagnostic mapped to shared Razor file
+                new object[]
+                {
+                    new[]
+                    {
+                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;") },
+                    },
+                    new[] { GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml") },
+                    new[] { new TextReplacement(SourceText.From("using Microsoft.AspNetCore.Mvc;\r\n"), SourceText.From("using Microsoft.AspNetCore.Mvc; /* Test! */\r\n"), GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1) }
+                },
+
+                // Diagnostic in unmapped portions of generated files
+                new object[]
+                {
+                    new[]
+                    {
+                        new[]
+                        {
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "assembly: global::Microsoft.AspNetCore"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\\r\\n        <p>\")"),
+                        },
+                    },
+                    new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
+                    new[]
+                    {
+                        // The first one *does* generate a replacement because it represents text being prepended to the beginning of the source file
+                        // Don't check the actual text, though, since it will include file path-specific values that will change
+                        new TextReplacement(SourceText.From(string.Empty), SourceText.From(string.Empty), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 0),
+                    }
+                },
+
+                // Diagnostics in multiple files (from multiple analyzers)
+                new object[]
+                {
+                    new[]
+                    {
+                        new[]
+                        {
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]"),
+                        },
+                        new[]
+                        {
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[1]"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "DateTime.Now.ToString()"),
+                        }
+                    },
+                    new[]
+                    {
+                        GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"),
+                        GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"),
+                        GetFullPath("RazorUpdaterStepViews\\TestViews\\Simple.cshtml"),
+                    },
+                    new[]
+                    {
+                        new TextReplacement(SourceText.From("using Microsoft.AspNetCore.Mvc;\r\n"), SourceText.From("using Microsoft.AspNetCore.Mvc; /* Test! */\r\n"), GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1),
+                        new TextReplacement(SourceText.From(" Write(DateTime.Now.ToString());\r\n"), SourceText.From(" Write(DateTime.Now.ToString() /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\Simple.cshtml"), 1),
+                        new TextReplacement(SourceText.From("      Write(Model[0]);\r\n"), SourceText.From("      Write(Model[0] /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6),
+                        new TextReplacement(SourceText.From("      Write(Model[1]);\r\n"), SourceText.From("      Write(Model[1] /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 18),
+                    }
+                }
             };
 
         private static AutoMock GetMock(string? projectPath, LocationLookup[][] diagnosticLocations)
@@ -259,9 +333,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                                     (start, end) = (index, index + lookup.Keyword.Length);
                                 }
 
-                                var location = Location.Create(x.Tree, TextSpan.FromBounds(start, end));
-                                var diagnostic = Diagnostic.Create(descriptor, location);
-                                x.ReportDiagnostic(diagnostic);
+                                // If the 'test' trivia hasn't been added by the code fix yet, report a diagnostic
+                                var line = x.Tree.GetText().Lines.GetLineFromPosition(start);
+                                var lineText = x.Tree.GetText().GetSubText(line.Span).ToString();
+                                if (!lineText.Contains("Test!", StringComparison.Ordinal))
+                                {
+                                    var location = Location.Create(x.Tree, TextSpan.FromBounds(start, end));
+                                    var diagnostic = Diagnostic.Create(descriptor, location);
+                                    x.ReportDiagnostic(diagnostic);
+                                }
                             }
                         }));
                         builder.RegisterMock(analyzer);
@@ -298,8 +378,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             await updaterStep.InitializeAsync(mock.Mock<IUpgradeContext>().Object, CancellationToken.None).ConfigureAwait(true);
             return updaterStep.RazorDocuments;
         }
-
-        private static Location GetLocation(string path, int start, int end) => Location.Create(path, TextSpan.FromBounds(start, end), new LinePositionSpan(LinePosition.Zero, LinePosition.Zero));
 
         private static string GetFullPath(string path) =>
             Path.IsPathFullyQualified(path)

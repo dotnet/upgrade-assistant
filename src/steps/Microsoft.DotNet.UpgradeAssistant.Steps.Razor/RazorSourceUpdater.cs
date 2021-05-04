@@ -147,10 +147,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Identify changed code sections
             var textReplacements = await GetReplacements(originalProject, project.Documents.Where(d => generatedFilePaths.Contains(d.FilePath)), token).ConfigureAwait(false);
+            var z = project.Documents.Where(d => generatedFilePaths.Contains(d.FilePath)).Select(d => d.GetTextAsync().Result.ToString()).ToArray();
 
             // Update cshtml based on changes made to generated source code
             // These are applied after finding all of them so that they can be applied in reverse line order
-            _logger.LogDebug("Applying {ReplacemenCount} updates to Razor documents based on changes made by code fix providers", textReplacements.Count);
+            _logger.LogDebug("Applying {ReplacementCount} updates to Razor documents based on changes made by code fix providers", textReplacements.Count());
             _textReplacer.ApplyTextReplacements(textReplacements);
             await FixUpProjectFileAsync(context, token).ConfigureAwait(false);
 
@@ -162,7 +163,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             return new FileUpdaterResult(true, textReplacements.Select(r => r.FilePath).Distinct());
         }
 
-        private async Task<IList<TextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)
+        private async Task<IEnumerable<TextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)
         {
             var replacements = new List<TextReplacement>();
             foreach (var updatedDocument in updatedDocuments)
@@ -185,7 +186,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
             }
 
-            return replacements;
+            return replacements.Distinct();
         }
 
         private static string GetGeneratedFilePath(RazorCodeDocument doc) => $"{doc.Source.FilePath}.cs";

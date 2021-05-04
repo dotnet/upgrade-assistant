@@ -16,15 +16,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     /// </summary>
     public class RazorTextReplacer : ITextReplacer
     {
-        private static readonly Regex UsingBlockRegex = new Regex(@"^(\s*using\s+(?<namespace>.+?);+\s*)+$", RegexOptions.Compiled);
-        private static readonly Regex UsingNamespaceRegex = new Regex(@"using\s+(?<namespace>.+?);", RegexOptions.Compiled);
+        private static readonly Regex UsingBlockRegex = new(@"^(\s*using\s+(?<namespace>.+?);+\s*)+$", RegexOptions.Compiled);
+        private static readonly Regex UsingNamespaceRegex = new(@"using\s+(?<namespace>.+?);", RegexOptions.Compiled);
 
         private readonly ILogger<RazorTextReplacer> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RazorTextReplacer"/> class.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="logger">Logger for logging diagnostics.</param>
         public RazorTextReplacer(ILogger<RazorTextReplacer> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
