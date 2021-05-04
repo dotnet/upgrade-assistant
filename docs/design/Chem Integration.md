@@ -32,7 +32,7 @@ However, it may be nice to decouple the data from the actual extension itself so
 - `upgrade-assistnat manage-data list`: List registered data sources
 - `upgrade-assistant manage-data update --name [name]`: Update a registered data source (managed by the step itself)
 
-There are potentially many questions here as to handle the data. This is provided solely as a way to demonstrate a potential way to decouple the data required. Initially, the data will be included with the extension, but potentially have optional indexes (or indexes that carry more data and are much larger) will require some sort of way to manage the data.
+There are potentially many questions here as to how to handle the data. This is provided solely as a way to demonstrate a potential way to decouple the data required. Initially, the data will be included with the extension, but potentially have optional indexes (or indexes that carry more data and are much larger) will require some sort of way to manage the data.
 
 ## Challenges
 
