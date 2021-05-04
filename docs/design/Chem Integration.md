@@ -1,6 +1,6 @@
 # Loose binary identification with Upgrade Assistant
 
-It is not uncommon in large code bases to have a collection of dependencies that have been persisted as only the `.dll` files with no known provenance. These files are considered "loose binaries". This makes it challenging to identify which binary is being used, especially when a different target (ie .NET Standard) is needed. In order to solve this, this document proposes integration with a data source that can help match these loose assemblies to known NuGet packages.
+It is not uncommon in large code bases to have a collection of dependencies that have been persisted as only the `.dll` files with no known provenance. These files are considered "loose binaries". This makes it challenging to identify what a binary is while upgrading where an updated version is often needed to support .NET Standard/Core/5. In order to solve this, this document proposes integration with a data source that can help match these loose assemblies to known NuGet packages.
 
 Chem is a tool developed internally to gain insights from the ecosystem of code attached to .NET. As a result of the data that it gathers, it is able to match loose assemblies with their probable origins.  As customers are looking to move to .NET 5, this may pose a challenge as these versions are highly likely to be .NET Framework compilations that may not work as expected on newer platforms. Often, these libraries have NuGet packages now and newer versions that could work on newer platforms.
 
@@ -11,7 +11,7 @@ The algorithm used to match the binaries makes use of fingerprints that may be u
 - File contents (and hashes thereof)
 - and others
 
-Work has already been done to generate a database of known packages along these and other identity dimensions. This data can then be used to generate potential indexes that could be used from within Upgrade Assistant to identify along this potential dimensions, both for notification and even to update a project file to reference the NuGet package rather than the loose assembly.
+Work has already been done to generate a database of known packages along these and other identity dimensions. This data can then be used to generate potential indexes that could be used from within Upgrade Assistant to identify along these potential dimensions, both for notification and even to update a project file to reference the NuGet package rather than the loose assembly.
 
 ## User Experience
 
