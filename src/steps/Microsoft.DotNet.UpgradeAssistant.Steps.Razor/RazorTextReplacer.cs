@@ -154,7 +154,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         }
 
         // Removes leading and trailing portions of original and updated that are the same
-        private static void MinimizeReplacement(ref string original, ref string? updated)
+        private static void MinimizeReplacement(ref string original, ref string updated)
         {
             if (updated is null)
             {

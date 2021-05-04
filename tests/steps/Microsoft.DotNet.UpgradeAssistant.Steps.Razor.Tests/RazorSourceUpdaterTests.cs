@@ -12,7 +12,6 @@ using Autofac;
 using Autofac.Extras.Moq;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
@@ -27,24 +26,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         [Fact]
         public void CtorNegativeTests()
         {
-            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", Array.Empty<Location[]>());
+            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", Array.Empty<LocationLookup[]>());
             var analyzers = mock.Container.Resolve<IEnumerable<DiagnosticAnalyzer>>();
+            var textMatcher = mock.Container.Resolve<ITextMatcher>();
             var codeFixProviders = mock.Container.Resolve<IEnumerable<CodeFixProvider>>();
-            var textMatcher = mock.Mock<ITextMatcher>();
             var textReplacer = mock.Mock<ITextReplacer>();
             var logger = mock.Mock<ILogger<RazorSourceUpdater>>();
 
-            Assert.Throws<ArgumentNullException>("analyzers", () => new RazorSourceUpdater(null!, codeFixProviders, textMatcher.Object, textReplacer.Object, logger.Object));
-            Assert.Throws<ArgumentNullException>("codeFixProviders", () => new RazorSourceUpdater(analyzers, null!, textMatcher.Object, textReplacer.Object, logger.Object));
+            Assert.Throws<ArgumentNullException>("analyzers", () => new RazorSourceUpdater(null!, codeFixProviders, textMatcher, textReplacer.Object, logger.Object));
+            Assert.Throws<ArgumentNullException>("codeFixProviders", () => new RazorSourceUpdater(analyzers, null!, textMatcher, textReplacer.Object, logger.Object));
             Assert.Throws<ArgumentNullException>("textMatcher", () => new RazorSourceUpdater(analyzers, codeFixProviders, null!, textReplacer.Object, logger.Object));
-            Assert.Throws<ArgumentNullException>("textReplacer", () => new RazorSourceUpdater(analyzers, codeFixProviders, textMatcher.Object, null!, logger.Object));
-            Assert.Throws<ArgumentNullException>("logger", () => new RazorSourceUpdater(analyzers, codeFixProviders, textMatcher.Object, textReplacer.Object, null!));
+            Assert.Throws<ArgumentNullException>("textReplacer", () => new RazorSourceUpdater(analyzers, codeFixProviders, textMatcher, null!, logger.Object));
+            Assert.Throws<ArgumentNullException>("logger", () => new RazorSourceUpdater(analyzers, codeFixProviders, textMatcher, textReplacer.Object, null!));
         }
 
         [Fact]
         public void PropertyTests()
         {
-            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", Array.Empty<Location[]>());
+            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", Array.Empty<LocationLookup[]>());
             var updater = mock.Create<RazorSourceUpdater>();
 
             Assert.Equal("Microsoft.DotNet.UpgradeAssistant.Steps.Razor.RazorSourceUpdater", updater.Id);
@@ -56,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         [Fact]
         public async Task IsApplicableNegativeTests()
         {
-            using var mock = GetMock(null, Array.Empty<Location[]>());
+            using var mock = GetMock(null, Array.Empty<LocationLookup[]>());
             var updater = mock.Create<RazorSourceUpdater>();
 
             await Assert.ThrowsAsync<ArgumentNullException>("context", () => updater.IsApplicableAsync(null!, ImmutableArray.Create<RazorCodeDocument>(), CancellationToken.None)).ConfigureAwait(true);
@@ -65,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
 
         [Theory]
         [MemberData(nameof(IsApplicableData))]
-        public async Task IsApplicableTests(Location[][] diagnosticLocations, string[] expectedApplicableFilePaths)
+        public async Task IsApplicableTests(LocationLookup[][] diagnosticLocations, string[] expectedApplicableFilePaths)
         {
             // Arrange
             using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", diagnosticLocations);
@@ -74,11 +73,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             var updater = mock.Create<RazorSourceUpdater>();
 
             // Act
-            var result = (FileUpdaterResult)(await updater.IsApplicableAsync(context.Object, ImmutableArray.CreateRange(razorDocs), CancellationToken.None).ConfigureAwait(true));
+            var result = (FileUpdaterResult)await updater.IsApplicableAsync(context.Object, ImmutableArray.CreateRange(razorDocs), CancellationToken.None).ConfigureAwait(true);
+            var resultWithoutDocs = (FileUpdaterResult)await updater.IsApplicableAsync(context.Object, ImmutableArray.Create<RazorCodeDocument>(), CancellationToken.None).ConfigureAwait(true);
 
             // Assert
             Assert.Equal(expectedApplicableFilePaths.Any(), result.Result);
             Assert.Collection(result.FilePaths.OrderBy(f => f), expectedApplicableFilePaths.OrderBy(f => f).Select<string, Action<string>>(expected => actual => Assert.Equal(expected, actual)).ToArray());
+            Assert.False(resultWithoutDocs.Result);
+            Assert.Empty(resultWithoutDocs.FilePaths);
         }
 
         public static IEnumerable<object[]> IsApplicableData =>
@@ -87,14 +89,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 // No diagnostcs reported
                 new object[]
                 {
-                    Array.Empty<Location[]>(),
+                    Array.Empty<LocationLookup[]>(),
                     Array.Empty<string>(),
                 },
 
                 // Diagnostics in non-Razor files
                 new object[]
                 {
-                    new[] { new[] { GetLocation("Foo.cs", 10, 15) } },
+                    new[] { new[] { new LocationLookup("Foo.cs", null, 10, 15) } },
                     Array.Empty<string>(),
                 },
 
@@ -103,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new[]
                     {
-                        new[] { GetLocation("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", 2087, 2103) },
+                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]") },
                     },
                     new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
                 },
@@ -113,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new[]
                     {
-                        new[] { GetLocation("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", 889, 920) },
+                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;") },
                     },
                     new[] { GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml") },
                 },
@@ -125,8 +127,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     {
                         new[]
                         {
-                            GetLocation("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", 10, 15),
-                            GetLocation("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", 1855, 1867),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "assembly: global::Microsoft.AspNetCore"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\r\n        <p>\")"),
                         },
                     },
                     new[]
@@ -142,14 +144,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     {
                         new[]
                         {
-                            GetLocation("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", 889, 920),
-                            GetLocation("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", 2088, 2089),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]"),
                         },
                         new[]
                         {
-                            GetLocation("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", 3030, 3038),
-                            GetLocation("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", 895, 926),
-                            GetLocation("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", 1747, 1778),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[1]"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "DateTime.Now.ToString()"),
                         }
                     },
                     new[]
@@ -161,10 +163,78 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 }
             };
 
-        private static AutoMock GetMock(string? projectPath, Location[][] diagnosticLocations)
+        [Fact]
+        public async Task ApplyNegativeTests()
+        {
+            using var mock = GetMock(null, Array.Empty<LocationLookup[]>());
+            var updater = mock.Create<RazorSourceUpdater>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>("context", () => updater.ApplyAsync(null!, ImmutableArray.Create<RazorCodeDocument>(), CancellationToken.None)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => updater.ApplyAsync(mock.Mock<IUpgradeContext>().Object, ImmutableArray.Create<RazorCodeDocument>(), CancellationToken.None)).ConfigureAwait(true);
+        }
+
+        [Theory]
+        [MemberData(nameof(ApplyData))]
+        public async Task ApplyTests(LocationLookup[][] diagnosticLocations, string[] expectedUpdatedFiles, TextReplacement[] expectedReplacements)
+        {
+            // Arrange
+            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", diagnosticLocations);
+            var razorDocs = await GetRazorCodeDocumentsAsync(mock).ConfigureAwait(true);
+            var context = mock.Mock<IUpgradeContext>();
+            var updater = mock.Create<RazorSourceUpdater>();
+            var replacements = new List<TextReplacement>();
+            var textReplacer = mock.Mock<ITextReplacer>();
+            textReplacer.Setup(r => r.ApplyTextReplacements(It.IsAny<IEnumerable<TextReplacement>>()))
+                .Callback<IEnumerable<TextReplacement>>(newReplacements => replacements.AddRange(newReplacements));
+
+            // Act
+            var result = (FileUpdaterResult)await updater.ApplyAsync(context.Object, ImmutableArray.CreateRange(razorDocs), CancellationToken.None).ConfigureAwait(true);
+            var resultWithoutDocs = (FileUpdaterResult)await updater.ApplyAsync(context.Object, ImmutableArray.Create<RazorCodeDocument>(), CancellationToken.None).ConfigureAwait(true);
+
+            // Assert
+            Assert.True(result.Result);
+            Assert.Collection(result.FilePaths.OrderBy(f => f), expectedUpdatedFiles.OrderBy(f => f).Select<string, Action<string>>(expected => actual => Assert.Equal(expected, actual)).ToArray());
+            Assert.True(resultWithoutDocs.Result);
+            Assert.Empty(resultWithoutDocs.FilePaths);
+            Assert.Collection(replacements, expectedReplacements.Select<TextReplacement, Action<TextReplacement>>(e => a => Assert.Equal(e, a)).ToArray());
+        }
+
+        public static IEnumerable<object[]> ApplyData =>
+            new List<object[]>
+            {
+                // No diagnostcs reported
+                new object[]
+                {
+                    Array.Empty<LocationLookup[]>(),
+                    Array.Empty<string>(),
+                    Array.Empty<TextReplacement>(),
+                },
+
+                // Diagnostics in non-Razor files
+                new object[]
+                {
+                    new[] { new[] { new LocationLookup("Foo.cs", null, 10, 15) } },
+                    Array.Empty<string>(),
+                    Array.Empty<TextReplacement>(),
+                },
+
+                // Diagnostic in Razor file
+                new object[]
+                {
+                    new[]
+                    {
+                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]") },
+                    },
+                    new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
+                    new[] { new TextReplacement(SourceText.From("      Write(Model[0]);\r\n"), SourceText.From("      Write(Model[0] /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6) }
+                },
+            };
+
+        private static AutoMock GetMock(string? projectPath, LocationLookup[][] diagnosticLocations)
         {
             var mock = AutoMock.GetLoose(builder =>
             {
+                builder.RegisterType<DefaultTextMatcher>().As<ITextMatcher>();
                 var analyzers = new List<DiagnosticAnalyzer>();
                 var codeFixProviders = new List<CodeFixProvider>();
 
@@ -178,25 +248,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         analyzer.Setup(a => a.SupportedDiagnostics).Returns(ImmutableArray.Create(descriptor));
                         analyzer.Setup(a => a.Initialize(It.IsAny<AnalysisContext>())).Callback<AnalysisContext>(context => context.RegisterSyntaxTreeAction(x =>
                         {
-                            foreach (var location in locations.Where(l => GetFullPath(l.GetLineSpan().Path).Equals(x.Tree.FilePath, StringComparison.Ordinal)))
+                            foreach (var lookup in locations.Where(l => GetFullPath(l.Path).Equals(x.Tree.FilePath, StringComparison.Ordinal)))
                             {
-                                var diagnostic = Diagnostic.Create(descriptor, Location.Create(x.Tree, location.SourceSpan));
+                                var start = lookup.StartOffset;
+                                var end = lookup.EndOffset;
+
+                                if (lookup.Keyword is not null)
+                                {
+                                    var index = x.Tree.GetText().ToString().IndexOf(lookup.Keyword, StringComparison.Ordinal);
+                                    (start, end) = (index, index + lookup.Keyword.Length);
+                                }
+
+                                var location = Location.Create(x.Tree, TextSpan.FromBounds(start, end));
+                                var diagnostic = Diagnostic.Create(descriptor, location);
                                 x.ReportDiagnostic(diagnostic);
                             }
                         }));
                         builder.RegisterMock(analyzer);
 
-                        var codeFixProvider = new Mock<CodeFixProvider>();
-                        codeFixProvider.Setup(x => x.FixableDiagnosticIds).Returns(ImmutableArray.Create(descriptor.Id));
-                        codeFixProvider.Setup(x => x.RegisterCodeFixesAsync(It.IsAny<CodeFixContext>())).Callback<CodeFixContext>(context =>
-                        {
-                            context.RegisterCodeFix(CodeAction.Create($"Fix {descriptor.Id}", ct =>
-                            {
-                                // TODO
-                                return Task.FromResult(context.Document);
-                            }), context.Diagnostics);
-                        });
-                        builder.RegisterMock(codeFixProvider);
+                        builder.RegisterInstance<CodeFixProvider>(new TestCodeFixProvider(new[] { descriptor.Id }));
                     }
                 }
                 else
@@ -206,8 +276,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 }
             });
 
+            var projectFile = mock.Mock<IProjectFile>();
             var project = projectPath is not null ? mock.Mock<IProject>() : null;
             project?.Setup(p => p.FileInfo).Returns(new FileInfo(projectPath!));
+            project?.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project?.Setup(p => p.GetRoslynProject()).Returns(() =>
             {
                 var ws = new AdhocWorkspace();
