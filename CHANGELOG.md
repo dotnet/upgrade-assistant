@@ -5,13 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Current
 
+### Added
+- A new command line option (`--target-tfm-support` to select the support model of LTS/Preview/Current that is desired [#469](https://github.com/dotnet/upgrade-assistant/pull/469)
+
 ### Fixed
 - VB Win Forms projects should keep import for 'System.Windows.Forms' [#474](https://github.com/dotnet/upgrade-assistant/pull/474)
 
 ## Version 0.2.222702 - 2021-04-27 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.222702))
 
 ### Added
-- Multiple entrypoints can now be added by using globbing and multiple instances of the `--entry-point` argument [#425](https://github.com/dotnet/upgrade-assistant/pull/425) 
+- Multiple entrypoints can now be added by using globbing and multiple instances of the `--entry-point` argument [#425](https://github.com/dotnet/upgrade-assistant/pull/425)
 - NuGet credential providers will now be used, if present (may require running in interactive mode) [#448](https://github.com/dotnet/upgrade-assistant/pull/448) 
 - Source analyzers and code fix providers are now applied to source embedded in Razor documents [#455](https://github.com/dotnet/upgrade-assistant/pull/455)
 

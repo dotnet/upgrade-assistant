@@ -34,7 +34,7 @@
     <PackageReference Include="Castle.Windsor" Version="4.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.3" />
     <PackageReference Include="Microsoft.Rest.ClientRuntime.Azure" Version="3.3.7" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="1.0.0">
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.222702">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Hyak.Common" Version="1.2.2" />

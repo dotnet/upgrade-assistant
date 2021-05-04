@@ -82,29 +82,25 @@ Arguments:
   <project>
 
 Options:
-  --skip-backup                                Disables backing up the project. This is
-                                               not recommended unless the project is in
-                                               source control since this tool will make
-                                               large changes to both the project and
-                                               source files.
-  --extension <extension>                      Specifies a .NET Upgrade Assistant
-                                               extension package to include. This could
-                                               be an ExtensionManifest.json file, a
-                                               directory containing an
-                                               ExtensionManifest.json file, or a zip
-                                               archive containing an extension. This
-                                               option can be specified multiple times.
-  -e, --entry-point <entry-point>              Provides the entry-point project to start
-                                               the upgrade process. This may include
-                                               globbing patterns such as '*' for match.
-  -v, --verbose                                Enable verbose diagnostics
-  --non-interactive                            Automatically select each first option in
-                                               non-interactive mode.
-  --non-interactive-wait                       Wait the supplied seconds before moving
-  <non-interactive-wait>                       on to the next option in non-interactive
-                                               mode.
-  --version                                    Show version information
-  -?, -h, --help                               Show help and usage information
+  --skip-backup                                  Disables backing up the project. This is not recommended unless the
+                                                 project is in source control since this tool will make large changes
+                                                 to both the project and source files.
+  --extension <extension>                        Specifies a .NET Upgrade Assistant extension package to include. This
+                                                 could be an ExtensionManifest.json file, a directory containing an
+                                                 ExtensionManifest.json file, or a zip archive containing an extension.
+                                                 This option can be specified multiple times.
+  -e, --entry-point <entry-point>                Provides the entry-point project to start the upgrade process. This
+                                                 may include globbing patterns such as '*' for match.
+  -v, --verbose                                  Enable verbose diagnostics
+  --non-interactive                              Automatically select each first option in non-interactive mode.
+  --non-interactive-wait <non-interactive-wait>  Wait the supplied seconds before moving on to the next option in
+                                                 non-interactive mode.
+  --target-tfm-support <Current|LTS|Preview>     Select if you would like the Long Term Support (LTS), Current, or
+                                                 Preview TFM. See
+                                                 https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
+                                                 details for what these mean.
+  --version                                      Show version information
+  -?, -h, --help                                 Show help and usage information
 ```
 
 >**:warning:** The primary usage of upgrade-assistant is to be used in interactive mode, giving users control over changes/upgrades done to their projects. Usage of upgrade-assistant with --non-interactive mode can leave projects in a broken state and users are advised to use at their own discretion. **:warning:**

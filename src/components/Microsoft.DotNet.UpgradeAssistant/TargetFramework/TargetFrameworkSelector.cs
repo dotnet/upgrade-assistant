@@ -12,32 +12,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 {
     public class TargetFrameworkSelector : ITargetFrameworkSelector
     {
-        private const string DefaultCurrentTFMBase = "net5.0";
-        private const string DefaultLTSTFMBase = "net5.0";
-
         private readonly ITargetFrameworkMonikerComparer _comparer;
+        private readonly DefaultTfmOptions _selectorOptions;
         private readonly IEnumerable<ITargetFrameworkSelectorFilter> _selectors;
         private readonly ILogger<TargetFrameworkSelector> _logger;
-
-        private readonly string _currentTFMBase;
-        private readonly string _ltsTFMBase;
 
         private readonly UpgradeTarget _upgradeTarget;
 
         public TargetFrameworkSelector(
             UpgradeOptions options,
             ITargetFrameworkMonikerComparer comparer,
-            IOptions<TFMSelectorOptions> selectorOptions,
+            IOptions<DefaultTfmOptions> selectorOptions,
             IEnumerable<ITargetFrameworkSelectorFilter> selectors,
             ILogger<TargetFrameworkSelector> logger)
         {
             _comparer = comparer;
+            _selectorOptions = selectorOptions?.Value ?? throw new ArgumentNullException(nameof(selectorOptions));
             _selectors = selectors;
             _logger = logger;
 
-            _currentTFMBase = selectorOptions?.Value.CurrentTFMBase ?? DefaultCurrentTFMBase;
-            _ltsTFMBase = selectorOptions?.Value.LTSTFMBase ?? DefaultLTSTFMBase;
-            _upgradeTarget = options?.UpgradeTarget ?? throw new ArgumentNullException(nameof(options));
+            _upgradeTarget = options?.TargetTfmSupport ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async ValueTask<TargetFrameworkMoniker> SelectTargetFrameworkAsync(IProject project, CancellationToken token)
@@ -47,7 +41,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
                 throw new ArgumentNullException(nameof(project));
             }
 
-            var appBase = _upgradeTarget == UpgradeTarget.Current ? _currentTFMBase : _ltsTFMBase;
+            var appBase = _upgradeTarget switch
+            {
+                UpgradeTarget.Current => _selectorOptions.Current,
+                UpgradeTarget.Preview => _selectorOptions.Preview,
+                UpgradeTarget.LTS => _selectorOptions.LTS,
+                _ => _selectorOptions.LTS,
+            };
+
             var current = GetDefaultTargetFrameworkMoniker(project);
 
             if (!_comparer.TryParse(appBase, out var appBaseTfm))

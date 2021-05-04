@@ -1,12 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
-    public enum UpgradeTarget
+    public class NuGetDownloaderOptions
     {
-        LTS,
-        Current,
-        Preview
+        public string? CachePath { get; set; }
     }
 }

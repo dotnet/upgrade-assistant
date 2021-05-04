@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, false, null, token).ConfigureAwait(false);
+                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, project.TargetFrameworks, false, token).ConfigureAwait(false);
 
                 if (newtonsoftPackage is not null)
                 {
