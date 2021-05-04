@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         {
             Current = Current,
             LTS = LTS,
+            Preview = Preview,
         };
 
         [Fact]
