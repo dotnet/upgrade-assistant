@@ -191,7 +191,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 const string Title = "Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.\n\n" +
                                    "This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.\n\n" +
-                                   "This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in .NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.\n";
+                                   "This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to the project will highlight the remaining changes needed after the tool runs.\n";
                 WriteHeading(Title, null);
             }
         }
