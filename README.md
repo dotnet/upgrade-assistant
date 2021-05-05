@@ -144,6 +144,7 @@ Concepts referred to in this repository which may have unclear meaning are expla
 | Step    | A step can define commands that can perform actions on the project. Each step implements `UpgradeStep`. The upgrade process comprises a series of steps that are visited in turn. Examples include the 'Update package versions step' or the 'Project backup step'|
 | Command | A command is an action that can be invoked by a user. Examples include a command to apply the current step or a command to change the backup location.|
 | Project Components | AppModel-specific components that a project may depend on. The most common are `WindowsDesktop` components (for WPF and WinForms scenarios) and `Web` (for ASP.NET scenarios) |
+| Loose assemblies | Binaries (`.dll` files) that are in the repo and not governed by a packaging system (such as NuGet) |
 
 ## Roadmap
 Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to .NET 5 and beyond in the [roadmap](docs/roadmap.md).

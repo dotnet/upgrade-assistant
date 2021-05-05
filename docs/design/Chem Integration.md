@@ -2,8 +2,6 @@
 
 It is not uncommon in large code bases to have a collection of dependencies that have been persisted as only the `.dll` files with no known provenance. These files are considered "loose binaries". This makes it challenging to identify what a binary is while upgrading where an updated version is often needed to support .NET Standard/Core/5. In order to solve this, this document proposes integration with a data source that can help match these loose assemblies to known NuGet packages.
 
-Chem is a tool developed internally to gain insights from the ecosystem of code attached to .NET. As a result of the data that it gathers, it is able to match loose assemblies with their probable origins.  As customers are looking to move to .NET 5, this may pose a challenge as these versions are highly likely to be .NET Framework compilations that may not work as expected on newer platforms. Often, these libraries have NuGet packages now and newer versions that could work on newer platforms.
-
 The algorithm used to match the binaries makes use of fingerprints that may be useful in identifying what it may be:
 
 - Assembly name
@@ -20,10 +18,10 @@ The main scenario this will focus on is one where a project has downloaded an as
 - Identify what package the dependency came from
 - Update a project file to reference the NuGet package rather than a binary reference
 
-The expected UX for this will be to implement it as an extension that a user can opt into. As a user, in order to run the Chem integration, they will obtain the extension (ie `UpgradeAssitantChem.zip`) and then run as they normally would:
+The expected UX for this will be to implement it as an extension that a user can opt into. As a user, in order to run the extension, they will obtain the extension (ie `UpgradeAssitant-Loose-Assembly-Identification.zip`) and then run as they normally would:
 
 ```
-upgrade-assistant some-project.vbproj --extension .\path\to\UpgradeAssistantChem.zip
+upgrade-assistant some-project.vbproj --extension .\path\to\UpgradeAssitant-Loose-Assembly-Identification.zip
 ```
 
 ### Decoupling the data
@@ -55,9 +53,9 @@ Below are the main work items that will be explored broken into two sprints. The
 - As a user, I know which loose assemblies do not have any available matches (#485)
 
 ### Sprint 2
-- As a user, I can update my chem data index independently of the extension (#486)
+- As a user, I can update my loose assembly data index independently of the extension (#486)
 - As a user, I can manage data steps need at a global level (#487)
-- As a user, I can receive recommendations from chem using multiple indexes (#488)
+- As a user, I can receive recommendations from multiple indexes for loose assembly identification (#488)
 
 ## Out of scope/Future Work
 
@@ -66,4 +64,4 @@ Some work that are currently not in scope:
 - Custom feeds (such as AzDO, Artifactory, file system, etc). NuGet.org will be the focus of the initial spike
 - Providing tooling to generate custom indexes
 - Identifying any security concerns with switching to NuGet packages. We may want to explore identifying if a package has a security concern, but it's still probably the same binary.
-- Hosting the chem lookup in any sort of service. This design is to integrate Chem in as simply as possible without external dependencies.
+- Hosting the lookup in any sort of service. This design is to integrate the analysis in as simply as possible without external dependencies.
