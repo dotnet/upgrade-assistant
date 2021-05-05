@@ -5,10 +5,10 @@ using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using cs = Microsoft.CodeAnalysis.CSharp;
-using vb = Microsoft.CodeAnalysis.VisualBasic;
+using Microsoft.CodeAnalysis.Editing;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
@@ -40,55 +40,61 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeNode, cs.SyntaxKind.SimpleBaseType);
-            context.RegisterSyntaxNodeAction(AnalyzeNode, vb.SyntaxKind.InheritsStatement);
+            context.RegisterSymbolAction(AnalyzeSymbols, SymbolKind.NamedType);
         }
 
-        private void AnalyzeNode(SyntaxNodeAnalysisContext context)
+        private void AnalyzeSymbols(SymbolAnalysisContext context)
         {
-            var namedTypeSymbol = context.ContainingSymbol as INamedTypeSymbol;
+            var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
+            var baseType = namedTypeSymbol.BaseType;
 
-            if (namedTypeSymbol != null && namedTypeSymbol.BaseType != null
-                && namedTypeSymbol.BaseType.ToDisplayString().Equals($"{BadNamespace}.{BadClassName}", StringComparison.Ordinal))
+            if (baseType is null)
             {
-                if (context.Compilation.Language == LanguageNames.CSharp)
+                return;
+            }
+
+            // Find just the named type symbols with names containing lowercase letters.
+            if (baseType.ToDisplayString().Equals("System.Web.Http.ApiController", StringComparison.Ordinal))
+            {
+                // For all such symbols, produce a diagnostic.
+                var node = namedTypeSymbol.DeclaringSyntaxReferences[0];
+
+                var generator = GetSyntaxGenerator(context, node).Result;
+
+                var baseAndInterfaceNodes = generator.GetBaseAndInterfaceTypes(node.GetSyntax());
+
+                if (baseAndInterfaceNodes is null || baseAndInterfaceNodes.Count == 0)
                 {
-                    ReportCSharpSyntax(context);
+                    // The symbol aligns with the ClassStatementSyntax in VB, which does not have a child node
+                    // The InerhitsStatementSyntax belongs to the parent
+                    baseAndInterfaceNodes = generator.GetBaseAndInterfaceTypes(node.GetSyntax().Parent);
                 }
-                else if (context.Compilation.Language == LanguageNames.VisualBasic)
-                {
-                    ReportVisualBasicSyntax(context);
-                }
+
+                var diagnostic = Diagnostic.Create(Rule, baseAndInterfaceNodes[0].GetLocation(), namedTypeSymbol.Name);
+                context.ReportDiagnostic(diagnostic);
             }
         }
 
-        private static void ReportCSharpSyntax(SyntaxNodeAnalysisContext context)
+        private static async Task<SyntaxGenerator> GetSyntaxGenerator(SymbolAnalysisContext context, SyntaxReference node)
         {
-            var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), context.Node.ToString());
-            context.ReportDiagnostic(diagnostic);
-        }
+            // Access to document in DiagnosticAnalyzer? use a workspace
+            // https://github.com/dotnet/roslyn/issues/15730
+            using var workspace = new AdhocWorkspace();
+            var solutionInfo = SolutionInfo.Create(SolutionId.CreateNewId(), VersionStamp.Create());
+            workspace.AddSolution(solutionInfo);
 
-        /// <summary>
-        /// Uses syntax analysis to highlight the correct part of the node. At this point
-        /// the context.Node looks like 'Inherits System.Web.Http.ApiController' and we
-        /// do not want to highlight the VisualBasic.SyntaxKind.InheritsKeyword
-        /// </summary>
-        /// <param name="context"></param>
-        private static void ReportVisualBasicSyntax(SyntaxNodeAnalysisContext context)
-        {
-            var baseClass = context.Node.DescendantNodes()
-                .OfType<vb.Syntax.QualifiedNameSyntax>()
-                .FirstOrDefault() as SyntaxNode;
+            var projectInfo = ProjectInfo.Create(ProjectId.CreateNewId(), VersionStamp.Default, "Foo", "Foo", context.Compilation.Language);
+            workspace.AddProject(projectInfo);
 
-            if (baseClass is null)
-            {
-                baseClass = context.Node.DescendantNodes()
-                .OfType<vb.Syntax.IdentifierNameSyntax>()
-                .FirstOrDefault();
-            }
+            var sourceText = node.SyntaxTree.GetText();
 
-            var diagnostic = Diagnostic.Create(Rule, baseClass.GetLocation(), baseClass.ToString());
-            context.ReportDiagnostic(diagnostic);
+            workspace.AddDocument(projectInfo.Id, "Foo", sourceText);
+
+            var slnEditor = new SolutionEditor(workspace.CurrentSolution);
+
+            var theDoc = workspace.CurrentSolution.Projects.First().Documents.First();
+            var docEditor = await slnEditor.GetDocumentEditorAsync(theDoc.Id).ConfigureAwait(false);
+            return docEditor.Generator;
         }
 
         public static Project AddMetadataReferences(Project project)
