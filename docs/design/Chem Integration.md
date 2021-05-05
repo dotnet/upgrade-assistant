@@ -41,6 +41,9 @@ There are a number of challenges with this, as it is completely based on heurist
 - If an assembly was never published in a package on NuGet.org, it will never show up in the available indexes
 - Private builds of projects may not match external builds
 - Currently only planning on supporting packages from NuGet.org so loose assemblies from a company's internal teams will not be found. May be included in future work.
+- Some loose assemblies may be "ride-along" in packages that they do not actually belong to (ie Newtonsoft.Json is included in a number of packages)
+- Early NuGet days had evolving best practice
+- NetStandard and other modern patterns are represented as bifurcations in package publish (ex. Foo and Foo.NetStandard packages)
 
 ## Planned Work
 
