@@ -60,11 +60,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         }
 
         [Theory]
-        [InlineData("TestViews/Test.csproj", 0, 2, true, true)] // Vanilla positive case
-        [InlineData("TestViews/Test.csproj", 1, 1, false, false)] // Not applicable if no project is loaded
-        [InlineData("TestViews/Test.csproj", 0, 0, true, false)] // Not applicable if there are no updaters
-        [InlineData("NoViews/Test.csproj", 0, 1, true, false)] // Not applicable if there are no Razor pages
-        [InlineData("Test.csproj", 1, 0, true, true)] // Applicable even with only complete updaters (updater status is not checked)
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", 0, 2, true, true)] // Vanilla positive case
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", 1, 1, false, false)] // Not applicable if no project is loaded
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", 0, 0, true, false)] // Not applicable if there are no updaters
+        [InlineData("RazorUpdaterStepViews/NoViews/Test.csproj", 0, 1, true, false)] // Not applicable if there are no Razor pages
+        [InlineData("RazorUpdaterStepViews/Test.csproj", 1, 0, true, true)] // Applicable even with only complete updaters (updater status is not checked)
         public async Task IsApplicableTests(string projectPath, int completeUpdaterCount, int incompleteUpdaterCount, bool projectLoaded, bool expected)
         {
             // Arrange
@@ -88,11 +88,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         }
 
         [Theory]
-        [InlineData("Test.csproj", 0, 2, true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // Vanilla positive case
-        [InlineData("TestViews/Test.csproj", 2, 2, false, new[] { "Simple.cshtml", "View.cshtml" })] // Mixed complete and incomplete updaters and no _ViewImports
-        [InlineData("Test.csproj", 2, 0, true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // Test with no incomplete updaters
-        [InlineData("NoViews/Test.csproj", 2, 2, true, new string[0])] // Test with no Razor documents
-        [InlineData("Test.csproj", 0, 0, true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // No sub-steps
+        [InlineData("RazorUpdaterStepViews/Test.csproj", 0, 2, true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // Vanilla positive case
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", 2, 2, false, new[] { "Simple.cshtml", "View.cshtml", })] // Mixed complete and incomplete updaters and no _ViewImports
+        [InlineData("RazorUpdaterStepViews/Test.csproj", 2, 0, true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // Test with no incomplete updaters
+        [InlineData("RazorUpdaterStepViews/NoViews/Test.csproj", 2, 2, true, new string[0])] // Test with no Razor documents
+        [InlineData("RazorUpdaterStepViews/Test.csproj", 0, 0, true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // No sub-steps
         public async Task InitializeTests(string projectPath, int completeUpdaterCount, int incompleteUpdaterCount, bool expectImports, string[] expectedFiles)
         {
             // Arrange
@@ -150,9 +150,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         }
 
         [Theory]
-        [InlineData("Test.csproj", true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // Vanilla positive case
-        [InlineData("TestViews/Test.csproj", false, new[] { "Simple.cshtml", "View.cshtml" })] // No _ViewImports
-        [InlineData("NoViews/Test.csproj", false, new string[0])] // No Razor documents
+        [InlineData("RazorUpdaterStepViews/Test.csproj", true, new[] { "_ViewImports.cshtml", "Invalid.cshtml", "Simple.cshtml", "View.cshtml" })] // Vanilla positive case
+        [InlineData("RazorUpdaterStepViews/TestViews/Test.csproj", false, new[] { "Simple.cshtml", "View.cshtml" })] // No _ViewImports
+        [InlineData("RazorUpdaterStepViews/NoViews/Test.csproj", false, new string[0])] // No Razor documents
 
         public async Task ProcessRazorDocumentsTests(string projectPath, bool expectImports, string[] expectedFiles)
         {
