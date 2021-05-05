@@ -28,7 +28,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
-            new ApiControllerAnalyzer(),
+            new ApiControllerAnalyzerCSharp(),
+            new ApiControllerAnalyzerVisualBasic(),
             new BinaryFormatterUnsafeDeserializeAnalyzer(),
             new FilterAnalyzer(),
             new HelperResultAnalyzer(),
