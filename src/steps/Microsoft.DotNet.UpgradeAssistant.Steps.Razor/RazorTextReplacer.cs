@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     _logger.LogInformation("Updating source code in Razor document {FilePath} at line {Line}", replacement.FilePath, replacement.StartingLine);
 
                     // If the original text doesn't fit in the lines of the original document, then the replacement is invalid
-                    if (replacement.StartingLine + replacement.OriginalText.Lines.Count >= lineOffsets.Length)
+                    if (replacement.StartingLine + GetLineCount(replacement.OriginalText) >= lineOffsets.Length)
                     {
                         continue;
                     }
@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     var startOffset = lineOffsets[replacement.StartingLine];
 
                     // Stop looking for replacements at the start of the first line after the indicated line plus the number of lines in the indicated text
-                    var endOffset = lineOffsets[replacement.StartingLine + replacement.OriginalText.Lines.Count];
+                    var endOffset = lineOffsets[replacement.StartingLine + GetLineCount(replacement.OriginalText)];
 
                     // Trim the string that's being replaced because code from Razor code blocks will include a couple extra spaces (to make room for @{)
                     // compared to the source that actually appeared in the cshtml file.
@@ -129,6 +129,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
         }
 
+        private static int GetLineCount(string input) => input.Split('\n').Length;
+
         private static IEnumerable<int> GetLineOffsets(string text)
         {
             // Pre-line 1
@@ -141,12 +143,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             // Subsequent lines
-            for (var i = 0; i < text.Length; i++)
+            var index = text.IndexOf('\n');
+            while (index > -1)
             {
-                if (text[i] == '\n')
-                {
-                    yield return i + 1;
-                }
+                yield return index + 1;
+                index = text.IndexOf('\n', index + 1);
             }
 
             // EOF

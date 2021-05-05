@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using Microsoft.CodeAnalysis.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
@@ -25,20 +24,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <summary>
         /// Gets the original text that is to be replaced.
         /// </summary>
-        public SourceText OriginalText { get; }
+        public string OriginalText { get; }
 
         /// <summary>
         /// Gets the new text to replace the original texts with.
         /// </summary>
-        public SourceText NewText { get; }
+        public string NewText { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextReplacement"/> class, getting the original text, file path, and starting line from an original MappedSubText.
         /// </summary>
         /// <param name="originalText">A MappedSubText containing the original text and original text location.</param>
         /// <param name="newText">The new text to replace the original text with.</param>
-        public TextReplacement(MappedSubText originalText, SourceText newText)
-            : this(originalText?.Text ?? throw new ArgumentNullException(nameof(originalText)), newText, originalText.FilePath, originalText.StartingLine)
+        public TextReplacement(MappedSubText originalText, string newText)
+            : this(originalText?.Text.ToString() ?? throw new ArgumentNullException(nameof(originalText)), newText, originalText.FilePath, originalText.StartingLine)
         { }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="newText">The text to replace the original text with.</param>
         /// <param name="filePath">The path to the file text should be replaced in.</param>
         /// <param name="startingLine">The line number the original text starts on.</param>
-        public TextReplacement(SourceText originalText, SourceText newText, string filePath, int startingLine)
+        public TextReplacement(string originalText, string newText, string filePath, int startingLine)
         {
             if (string.IsNullOrEmpty(filePath))
             {
@@ -70,8 +69,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             other != null &&
             FilePath.Equals(other.FilePath, StringComparison.OrdinalIgnoreCase) &&
             StartingLine == other.StartingLine &&
-            NewText.ContentEquals(other.NewText) &&
-            OriginalText.ContentEquals(other.OriginalText);
+            NewText.Equals(other.NewText, StringComparison.Ordinal) &&
+            OriginalText.Equals(other.OriginalText, StringComparison.Ordinal);
 
         /// <inheritdoc/>
         public override bool Equals(object obj) => Equals(obj as TextReplacement);
@@ -82,8 +81,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             var hashcode = default(HashCode);
             hashcode.Add(StartingLine);
             hashcode.Add(FilePath, StringComparer.OrdinalIgnoreCase);
-            hashcode.Add(NewText.ToString(), StringComparer.Ordinal);
-            hashcode.Add(OriginalText.ToString(), StringComparer.Ordinal);
+            hashcode.Add(NewText, StringComparer.Ordinal);
+            hashcode.Add(OriginalText, StringComparer.Ordinal);
             return hashcode.ToHashCode();
         }
     }

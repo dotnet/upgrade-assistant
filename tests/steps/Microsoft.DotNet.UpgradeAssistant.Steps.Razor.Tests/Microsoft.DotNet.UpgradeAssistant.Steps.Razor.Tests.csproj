@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="**/*.cshtml" />
     <Content Include="**/*.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -17,14 +18,6 @@
 
   <ItemGroup>
     <Compile Remove="MappedSubTextTestData.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="RazorUpdaterStepViews\TestViews\Simple.cshtml" />
-    <None Remove="RazorUpdaterStepViews\TestViews\View.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="MappedSubTextTestData.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

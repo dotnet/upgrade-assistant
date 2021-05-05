@@ -237,7 +237,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]") },
                     },
                     new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
-                    new[] { new TextReplacement(SourceText.From("      Write(Model[0]);\r\n"), SourceText.From("      Write(Model[0] /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6) }
+                    new[] { new TextReplacement("      Write(Model[0]);\r\n", "      Write(Model[0] /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6) }
                 },
 
                 // Diagnostic mapped to shared Razor file
@@ -248,7 +248,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;") },
                     },
                     new[] { GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml") },
-                    new[] { new TextReplacement(SourceText.From("using Microsoft.AspNetCore.Mvc;\r\n"), SourceText.From("using Microsoft.AspNetCore.Mvc; /* Test! */\r\n"), GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1) }
+                    new[] { new TextReplacement("using Microsoft.AspNetCore.Mvc;\r\n", "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n", GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1) }
                 },
 
                 // Diagnostic in unmapped portions of generated files
@@ -267,7 +267,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     {
                         // The first one *does* generate a replacement because it represents text being prepended to the beginning of the source file
                         // Don't check the actual text, though, since it will include file path-specific values that will change
-                        new TextReplacement(SourceText.From(string.Empty), SourceText.From(string.Empty), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 0),
+                        new TextReplacement(string.Empty, string.Empty, GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 0),
                     }
                 },
 
@@ -296,10 +296,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     },
                     new[]
                     {
-                        new TextReplacement(SourceText.From("using Microsoft.AspNetCore.Mvc;\r\n"), SourceText.From("using Microsoft.AspNetCore.Mvc; /* Test! */\r\n"), GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1),
-                        new TextReplacement(SourceText.From(" Write(DateTime.Now.ToString());\r\n"), SourceText.From(" Write(DateTime.Now.ToString() /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\Simple.cshtml"), 1),
-                        new TextReplacement(SourceText.From("      Write(Model[0]);\r\n"), SourceText.From("      Write(Model[0] /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6),
-                        new TextReplacement(SourceText.From("      Write(Model[1]);\r\n"), SourceText.From("      Write(Model[1] /* Test! */);\r\n"), GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 18),
+                        new TextReplacement("using Microsoft.AspNetCore.Mvc;\r\n", "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n", GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1),
+                        new TextReplacement(" Write(DateTime.Now.ToString());\r\n", " Write(DateTime.Now.ToString() /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\Simple.cshtml"), 1),
+                        new TextReplacement("      Write(Model[0]);\r\n", "      Write(Model[0] /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6),
+                        new TextReplacement("      Write(Model[1]);\r\n", "      Write(Model[1] /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 18),
                     }
                 }
             };

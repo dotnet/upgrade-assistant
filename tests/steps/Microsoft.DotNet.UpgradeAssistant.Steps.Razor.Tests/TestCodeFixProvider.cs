@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -26,6 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         }
 
         public override ImmutableArray<string> FixableDiagnosticIds => _diagnosticIds;
+
+        public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
@@ -48,7 +48,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         $"Fix {diagnostic.Id}",
-                        ct => ReplaceNodeAsync(context.Document, node, ct)),
+                        ct => ReplaceNodeAsync(context.Document, node, ct),
+                        $"Fix {diagnostic.Id}"),
                     context.Diagnostics);
             }
         }

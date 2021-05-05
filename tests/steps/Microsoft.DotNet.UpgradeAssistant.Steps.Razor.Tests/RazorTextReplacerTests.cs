@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autofac.Extras.Moq;
-using Microsoft.CodeAnalysis.Text;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
@@ -86,9 +85,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     "VanillaReplacements",
                     new TextReplacement[]
                     {
-                        new TextReplacement(SourceText.From("ToString()"), SourceText.From("ToAnotherString()"), GetPath("Simple.cshtml"), 1),
-                        new TextReplacement(SourceText.From("Model[1]"), SourceText.From("Model[2]"), GetPath("View.cshtml"), 18),
-                        new TextReplacement(SourceText.From("if(Model != null && Model.Length > 1)"), SourceText.From("if(Model is not null)"), GetPath("View.cshtml"), 15)
+                        new TextReplacement("ToString()", "ToAnotherString()", GetPath("Simple.cshtml"), 1),
+                        new TextReplacement("Model[1]", "Model[2]", GetPath("View.cshtml"), 18),
+                        new TextReplacement("if(Model != null && Model.Length > 1)", "if(Model is not null)", GetPath("View.cshtml"), 15)
                     }
                 },
 
@@ -99,8 +98,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     new TextReplacement[]
                     {
                         new TextReplacement(
-                            SourceText.From("{\r\n    <div>\r\n        <p>@Model[1]</p>\r\n    </div>\r\n}\r\n"),
-                            SourceText.From("<h1>\r\n    Hi!\r\n</h1>"),
+                            "{\r\n    <div>\r\n        <p>@Model[1]</p>\r\n    </div>\r\n}\r\n",
+                            "<h1>\r\n    Hi!\r\n</h1>",
                             GetPath("View.cshtml"),
                             16)
                     }
@@ -112,8 +111,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     "InapplicableReplacement",
                     new TextReplacement[]
                     {
-                        new TextReplacement(SourceText.From("DateTime"), SourceText.From("DateTimeOffset"), GetPath("Simple.cshtml"), 2),
-                        new TextReplacement(SourceText.From("<div>\r\n "), SourceText.From("<div>\r\n"), GetPath("View.cshtml"), 9),
+                        new TextReplacement("DateTime", "DateTimeOffset", GetPath("Simple.cshtml"), 2),
+                        new TextReplacement("<div>\r\n ", "<div>\r\n", GetPath("View.cshtml"), 9),
                     }
                 },
 
@@ -123,8 +122,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     "NewTextAtStart",
                     new TextReplacement[]
                     {
-                        new TextReplacement(SourceText.From("Something inapplicable"), SourceText.From("using Foo;\r\nSomething inapplicable"), GetPath("Simple.cshtml"), 0),
-                        new TextReplacement(SourceText.From(string.Empty), SourceText.From("Test"), GetPath("View.cshtml"), 0),
+                        new TextReplacement("Something inapplicable", "using Foo;\r\nSomething inapplicable", GetPath("Simple.cshtml"), 0),
+                        new TextReplacement(string.Empty, "Test", GetPath("View.cshtml"), 0),
                     }
                 },
 
@@ -134,10 +133,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     "RemoveCodeBlock",
                     new TextReplacement[]
                     {
-                        new TextReplacement(SourceText.From("DateTime.Now.ToString();"), SourceText.From(string.Empty), GetPath("Simple.cshtml"), 1),
-                        new TextReplacement(SourceText.From("using Foo;"), SourceText.From(string.Empty), GetPath("View2.cshtml"), 1),
-                        new TextReplacement(SourceText.From("Model[0]"), SourceText.From(string.Empty), GetPath("View2.cshtml"), 7),
-                        new TextReplacement(SourceText.From("\r\n        var x = 0;\r\n"), SourceText.From(string.Empty), GetPath("View2.cshtml"), 23),
+                        new TextReplacement("DateTime.Now.ToString();", string.Empty, GetPath("Simple.cshtml"), 1),
+                        new TextReplacement("using Foo;", string.Empty, GetPath("View2.cshtml"), 1),
+                        new TextReplacement("Model[0]", string.Empty, GetPath("View2.cshtml"), 7),
+                        new TextReplacement("\r\n        var x = 0;\r\n", string.Empty, GetPath("View2.cshtml"), 23),
                     }
                 },
 
@@ -147,9 +146,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     "RemovePartialCodeBlock",
                     new TextReplacement[]
                     {
-                        new TextReplacement(SourceText.From(".ToString();"), SourceText.From(";"), GetPath("Simple.cshtml"), 1),
-                        new TextReplacement(SourceText.From(" Foo"), SourceText.From(string.Empty), GetPath("View2.cshtml"), 1),
-                        new TextReplacement(SourceText.From("Model[0];"), SourceText.From("Model;"), GetPath("View2.cshtml"), 7),
+                        new TextReplacement(".ToString();", ";", GetPath("Simple.cshtml"), 1),
+                        new TextReplacement(" Foo", string.Empty, GetPath("View2.cshtml"), 1),
+                        new TextReplacement("Model[0];", "Model;", GetPath("View2.cshtml"), 7),
                     }
                 }
             };
