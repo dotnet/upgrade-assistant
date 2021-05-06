@@ -265,20 +265,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             foreach (var source in _packageSources.Value)
             {
                 var repo = GetSourceRepository(source);
-                var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
-                if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
+                try
                 {
-                    var memoryStream = new MemoryStream();
-                    if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, memoryStream, _cache, _nugetLogger, token).ConfigureAwait(false))
+                    var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
+                    if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
                     {
-                        _logger.LogDebug("Package {NuGetPackage} download from feed {NuGetFeed}", packageReference, source.Source);
-                        return new PackageArchiveReader(memoryStream, false);
+                        var memoryStream = new MemoryStream();
+                        if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, memoryStream, _cache, _nugetLogger, token).ConfigureAwait(false))
+                        {
+                            _logger.LogDebug("Package {NuGetPackage} downloaded from feed {NuGetFeed}", packageReference, source.Source);
+                            return new PackageArchiveReader(memoryStream, false);
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Failed to download package {NuGetPackage} from source {NuGetFeed}", packageReference, source.Source);
+                            memoryStream.Close();
+                        }
                     }
-                    else
-                    {
-                        _logger.LogDebug("Failed to download package {NuGetPackage} from feed {NuGetFeed}", packageReference, source.Source);
-                        memoryStream.Close();
-                    }
+                }
+                catch (NuGetProtocolException)
+                {
+                    _logger.LogWarning("Failed to get package finder from source {PackageSource} due to a NuGet protocol error, skipping this source", source.Source);
                 }
             }
 
