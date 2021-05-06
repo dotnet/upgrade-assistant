@@ -4,7 +4,7 @@ This list is not an exhaustive list of all features and support coming – but r
 
 The priority or state for an issue can change at any time.
 
-**1. Pre-migration analysis**
+**1. Pre-Upgrade analysis**
 
 Take a look at the design doc for [design details](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md) and phases of implementation.
 
