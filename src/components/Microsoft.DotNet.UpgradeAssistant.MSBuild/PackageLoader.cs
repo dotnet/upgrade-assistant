@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.Packaging;
@@ -20,38 +22,47 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public sealed class PackageLoader : IPackageLoader, IDisposable
     {
-        private const string DefaultPackageSource = "https://api.nuget.org/v3/index.json";
         private const int MaxRetries = 3;
 
         private readonly SourceCacheContext _cache;
-        private readonly List<PackageSource> _packageSources;
-        private readonly ILogger _logger;
+        private readonly Lazy<IEnumerable<PackageSource>> _packageSources;
+        private readonly ILogger<PackageLoader> _logger;
         private readonly NuGet.Common.ILogger _nugetLogger;
-        private readonly string _cachePath;
-        private readonly IDictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
+        private readonly Dictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
+        private readonly NuGetDownloaderOptions _options;
 
-        public IEnumerable<string> PackageSources => _packageSources.Select(s => s.Source);
-
-        public PackageLoader(UpgradeOptions options, ILogger<PackageLoader> logger)
+        public PackageLoader(
+            UpgradeOptions upgradeOptions,
+            INuGetPackageSourceFactory sourceFactory,
+            ILogger<PackageLoader> logger,
+            IOptions<NuGetDownloaderOptions> options)
         {
+            if (upgradeOptions is null)
+            {
+                throw new ArgumentNullException(nameof(upgradeOptions));
+            }
+
+            if (sourceFactory is null)
+            {
+                throw new ArgumentNullException(nameof(sourceFactory));
+            }
+
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            if (options.ProjectPath is null)
+            if (upgradeOptions.ProjectPath is null)
             {
-                throw new ArgumentException("Project path must be set in UpgradeOptions", nameof(options));
+                throw new ArgumentException("Project path must be set in UpgradeOptions", nameof(upgradeOptions));
             }
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _nugetLogger = new NuGetLogger(logger);
             _cache = new SourceCacheContext();
-            _packageSources = GetPackageSources(Path.GetDirectoryName(options.ProjectPath));
+            _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(Path.GetDirectoryName(upgradeOptions.ProjectPath)));
             _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
-
-            var settings = Settings.LoadDefaultSettings(null);
-            _cachePath = SettingsUtility.GetGlobalPackagesFolder(settings);
+            _options = options.Value;
         }
 
         public async Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
@@ -68,23 +79,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return targetFrameworks.All(tfm => packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(tfm.Name), f)));
         }
 
-        public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, bool latestMinorAndBuildOnly, CancellationToken token)
+        public Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, bool latestMinorAndBuildOnly, CancellationToken token)
         {
             if (reference is null)
             {
                 throw new ArgumentNullException(nameof(reference));
             }
 
-            var versions = new List<NuGetVersion>();
+            return SearchByNameAsync(reference.Name, tfms, currentVersion: reference.GetNuGetVersion(), latestMinorAndBuildOnly: latestMinorAndBuildOnly, token: token);
+        }
 
-            // Query each package source for listed versions of the given package name
-            foreach (var source in _packageSources)
+        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, bool includePreRelease, CancellationToken token)
+        {
+            var result = await SearchByNameAsync(packageName, tfms, includePreRelease, token: token).ConfigureAwait(false);
+
+            return result.LastOrDefault();
+        }
+
+        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, bool includePrerelease = false, NuGetVersion? currentVersion = null, bool latestMinorAndBuildOnly = false, CancellationToken token = default)
+        {
+            var results = new List<IPackageSearchMetadata>();
+
+            foreach (var source in _packageSources.Value)
             {
                 try
                 {
                     var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(reference.Name, includePrerelease: true, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
-                    versions.AddRange(searchResults.Select(r => r.Identity.Version));
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(name, includePrerelease: includePrerelease, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
+
+                    results.AddRange(searchResults);
                 }
                 catch (NuGetProtocolException)
                 {
@@ -96,76 +119,59 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
             }
 
-            // Filter to only include versions higher than the user's current version and,
-            // optionally, only the highest minor/build for each major version
-            var currentVersion = reference.GetNuGetVersion();
-            var filteredVersions = versions.Distinct().Where(v => v > currentVersion);
-            var versionsToReturn = latestMinorAndBuildOnly
-                ? filteredVersions.GroupBy(v => v.Major).Select(v => v.Where(v => !v.IsPrerelease).Max() ?? v.Max()!)
-                : filteredVersions;
-
-            _logger.LogDebug("Found versions for package {PackageName}: {PackageVersions}", reference.Name, versionsToReturn);
-
-            return versionsToReturn.OrderBy(v => v).Select(v => reference with { Version = v.ToNormalizedString() });
+            return FilterSearchResults(name, results, tfms, currentVersion, latestMinorAndBuildOnly);
         }
 
-        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, bool includePreRelease, string[]? packageSources, CancellationToken token)
+        public static IEnumerable<NuGetReference> FilterSearchResults(
+            string name,
+            IReadOnlyCollection<IPackageSearchMetadata> searchResults,
+            IEnumerable<TargetFrameworkMoniker> tfms,
+            NuGetVersion? currentVersion = null,
+            bool latestMinorAndBuildOnly = false)
         {
-            NuGetVersion? highestVersion = null;
-
-            // Query each package source for listed versions of the given package name
-            foreach (var source in packageSources?.Select(p => new PackageSource(p)) ?? _packageSources)
+            if (searchResults is null || searchResults.Count == 0)
             {
-                try
-                {
-                    var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(packageName, includePrerelease: includePreRelease, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
-                    var highestVersionResult = searchResults.Select(r => r.Identity.Version).Max(v => v);
-                    if (highestVersionResult is null)
+                return Enumerable.Empty<NuGetReference>();
+            }
+
+            var tfmSet = ImmutableHashSet.CreateRange(tfms.Select(t => NuGetFramework.Parse(t.Name)));
+
+            var results = searchResults
+                .Where(r => currentVersion is null || r.Identity.Version > currentVersion);
+
+            if (latestMinorAndBuildOnly)
+            {
+                results = results
+                    .GroupBy(r => r.Identity.Version.Major)
+                    .SelectMany(r =>
                     {
-                        continue;
+                        var max = r.Max(t => t.Identity.Version);
+
+                        return r.Where(t => t.Identity.Version == max);
+                    });
+            }
+
+            return results
+                .Where(r =>
+                {
+                    var unsupported = tfmSet;
+
+                    foreach (var dep in r.DependencySets)
+                    {
+                        foreach (var t in unsupported)
+                        {
+                            if (DefaultCompatibilityProvider.Instance.IsCompatible(t, dep.TargetFramework))
+                            {
+                                unsupported = unsupported.Remove(t);
+                            }
+                        }
                     }
 
-                    if (highestVersion is null || highestVersionResult > highestVersion)
-                    {
-                        highestVersion = highestVersionResult;
-                    }
-                }
-                catch (NuGetProtocolException)
-                {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to a NuGet protocol error", source.Source);
-                }
-                catch (HttpRequestException exc)
-                {
-                    _logger.LogWarning("Failed to get package versions from source {PackageSource} due to an HTTP error ({StatusCode})", source.Source, exc.StatusCode);
-                }
-            }
-
-            if (highestVersion is null)
-            {
-                return null;
-            }
-
-            return new NuGetReference(packageName, highestVersion.ToFullString());
-        }
-
-        private List<PackageSource> GetPackageSources(string? projectDir)
-        {
-            var packageSources = new List<PackageSource>();
-            if (projectDir != null)
-            {
-                var nugetSettings = Settings.LoadDefaultSettings(projectDir);
-                var sourceProvider = new PackageSourceProvider(nugetSettings);
-                packageSources.AddRange(sourceProvider.LoadPackageSources().Where(e => e.IsEnabled));
-            }
-
-            if (packageSources.Count == 0)
-            {
-                packageSources.Add(new PackageSource(DefaultPackageSource));
-            }
-
-            _logger.LogDebug("Found package sources: {PackageSources}", packageSources);
-            return packageSources;
+                    return unsupported.IsEmpty;
+                })
+                .Select(r => r.Identity.Version)
+                .OrderBy(v => v)
+                .Select(v => new NuGetReference(name, v.ToNormalizedString()));
         }
 
         private async Task<T> CallWithRetryAsync<T>(Func<Task<T>> func)
@@ -240,9 +246,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             // First look in the local NuGet cache for the archive
-            if (_cachePath is not null)
+            if (_options.CachePath is string cachePath)
             {
-                var archivePath = Path.Combine(_cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
+                var archivePath = Path.Combine(cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
                 if (File.Exists(archivePath))
                 {
                     _logger.LogDebug("NuGet package {NuGetPackage} loaded from {PackagePath}", packageReference, archivePath);
@@ -256,7 +262,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             // Attempt to download the package from the sources
             var packageVersion = packageReference.GetNuGetVersion();
-            foreach (var source in _packageSources)
+            foreach (var source in _packageSources.Value)
             {
                 var repo = GetSourceRepository(source);
                 var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);

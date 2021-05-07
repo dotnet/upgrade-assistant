@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DiffPlex;
-using Microsoft.CodeAnalysis.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
@@ -19,9 +18,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTextMatcher"/> class.
+        /// </summary>
         /// <param name="differ">The IDiffer implementation to use for determining which text replacements correspond with original text in ambiguous cases.</param>
         /// <param name="chunker">The IChunker to be used with the differ.</param>
-        /// </summary>
         public DefaultTextMatcher(IDiffer differ, IChunker chunker)
         {
             _chunker = chunker ?? throw new ArgumentNullException(nameof(chunker));
@@ -60,13 +59,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // If both groups have the same number of elements, then they pair in order
             if (originalTexts.Count() == newTexts.Count())
             {
-                AddReplacementCandidates(replacements, originalTexts.Zip(newTexts, (original, updated) => new TextReplacement(original, SourceText.From(updated))));
+                AddReplacementCandidates(replacements, originalTexts.Zip(newTexts, (original, updated) => new TextReplacement(original, updated)));
             }
 
             // If there are no new texts, then the original elements all pair with empty source text
             else if (!newTexts.Any())
             {
-                AddReplacementCandidates(replacements, originalTexts.Select(t => new TextReplacement(t, SourceText.From(string.Empty))));
+                AddReplacementCandidates(replacements, originalTexts.Select(t => new TextReplacement(t, string.Empty)));
             }
 
             // This is the tricky one. If there are less updated code blocks than original code blocks, it will be necesary to guess which original code blocks
@@ -85,17 +84,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// </summary>
         private static void AddReplacementCandidates(List<TextReplacement> replacements, IEnumerable<TextReplacement> candidates)
         {
-            replacements.AddRange(candidates.Where(c => !c.NewText.ContentEquals(c.OriginalText)));
+            replacements.AddRange(candidates.Where(c => !c.NewText.Equals(c.OriginalText, StringComparison.Ordinal)));
         }
 
         /// <summary>
-        /// Recursively enumerate all the possible ways the source and updated texts can match
+        /// Recursively enumerate all the possible ways the source and updated texts can match.
         /// </summary>
         private static IEnumerable<IEnumerable<TextReplacement>> GetAllPossiblePairings(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts)
         {
             if (originalTexts.Count() == newTexts.Count())
             {
-                yield return originalTexts.Zip(newTexts, (original, updated) => new TextReplacement(original, SourceText.From(updated)));
+                yield return originalTexts.Zip(newTexts, (original, updated) => new TextReplacement(original, updated));
             }
             else
             {
@@ -112,7 +111,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         }
 
         /// <summary>
-        /// Finds the total size of diff (sum or all inserts and deletes) between old and new texts in an enumerable of text replacements
+        /// Finds the total size of diff (sum or all inserts and deletes) between old and new texts in an enumerable of text replacements.
         /// </summary>
         private int GetTotalDiffSize(IEnumerable<TextReplacement> replacements) =>
             replacements.Sum(r =>

@@ -7,6 +7,7 @@ using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
+using NuGet.Configuration;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -16,20 +17,34 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static void AddMsBuild(this IServiceCollection services)
         {
+            services.AddSingleton<MSBuildPathLocator>();
             services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
             services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
             services.AddTransient<IUpgradeStartup, MSBuildRegistrationStartup>();
             services.AddSingleton<IUpgradeContextFactory, MSBuildUpgradeContextFactory>();
             services.AddSingleton<IComponentIdentifier, ComponentIdentifier>();
-            services.AddSingleton<IPackageLoader, PackageLoader>();
-            services.AddSingleton<IVersionComparer, NuGetVersionComparer>();
-            services.AddSingleton<IUpgradeStartup, NuGetCredentialsStartup>();
 
             // Instantiate the upgrade context with a func to avoid needing MSBuild types prior to MSBuild registration
             services.AddTransient<MSBuildWorkspaceUpgradeContext>();
             services.AddTransient<IUpgradeContext>(sp => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
             services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
+
+            services.AddNuGet();
+        }
+
+        private static void AddNuGet(this IServiceCollection services)
+        {
+            services.AddSingleton<IPackageLoader, PackageLoader>();
+            services.AddSingleton<IVersionComparer, NuGetVersionComparer>();
             services.AddTransient<ITargetFrameworkMonikerComparer, NuGetTargetFrameworkMonikerComparer>();
+            services.AddSingleton<IUpgradeStartup, NuGetCredentialsStartup>();
+            services.AddSingleton<INuGetPackageSourceFactory, NuGetPackageSourceFactory>();
+            services.AddOptions<NuGetDownloaderOptions>()
+                .Configure(options =>
+                {
+                    var settings = Settings.LoadDefaultSettings(null);
+                    options.CachePath = SettingsUtility.GetGlobalPackagesFolder(settings);
+                });
         }
 
         // TEMPORARY WORKAROUND

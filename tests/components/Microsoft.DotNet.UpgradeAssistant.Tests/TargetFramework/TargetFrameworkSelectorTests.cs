@@ -16,10 +16,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
 {
     public class TargetFrameworkSelectorTests
     {
-        private readonly TFMSelectorOptions _options = new TFMSelectorOptions
+        private readonly DefaultTfmOptions _options = new DefaultTfmOptions
         {
-            CurrentTFMBase = Current,
-            LTSTFMBase = LTS,
+            Current = Current,
+            LTS = LTS,
+            Preview = Preview,
         };
 
         [Fact]
@@ -61,14 +62,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             project.Setup(p => p.TargetFrameworks).Returns(currentTfms.Select(t => ParseTfm(t)).ToArray());
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(components));
 
-            mock.Create<UpgradeOptions>().UpgradeTarget = target;
-            mock.Mock<IOptions<TFMSelectorOptions>>().Setup(o => o.Value).Returns(_options);
+            mock.Create<UpgradeOptions>().TargetTfmSupport = target;
+            mock.Mock<IOptions<DefaultTfmOptions>>().Setup(o => o.Value).Returns(_options);
 
             var moniker = mock.Mock<ITargetFrameworkMonikerComparer>();
             moniker.Setup(c => c.TryMerge(ParseTfm(current), tfm, out finalTfm)).Returns(true);
             moniker.SetupTryParse();
 
-            var appBase = target == UpgradeTarget.Current ? _options.CurrentTFMBase : _options.LTSTFMBase;
+            var appBase = target == UpgradeTarget.Current ? _options.Current : _options.LTS;
 
             var selector = mock.Create<TargetFrameworkSelector>();
 

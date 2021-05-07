@@ -7,6 +7,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
     public interface ITextReplacer
     {
-        void ApplyTextReplacements(IList<TextReplacement> replacements);
+        void ApplyTextReplacements(IEnumerable<TextReplacement> replacements);
     }
 }

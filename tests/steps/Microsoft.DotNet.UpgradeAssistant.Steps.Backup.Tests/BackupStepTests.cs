@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -101,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
         }
 
         private static UpgradeOptions GetDefaultNonInteractiveOptions() =>
-            new UpgradeOptions
+            new()
             {
                 NonInteractive = true,
                 NonInteractiveWait = 0,

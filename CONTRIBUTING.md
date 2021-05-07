@@ -80,5 +80,8 @@ Tests need to be provided for every bug/feature(except docs or samples) that is 
 
 Your pull request will now go through extensive checks by the subject matter experts on our team. Please be patient while upgrade-assistant team gets through it. Update your pull request according to feedback until it is approved by one of the upgrade-assistant team members. Once the PR is approved, one of the upgrade-assistant team members will merge your PR into the repo.
 
+### Dev Environment FAQ
+The tool may produce long file paths during build, in order to not run into PathTooLongException either change the LongPathsEnabled setting under registry or build upgrade-assistant from a folder location with a shorter path.
+
 ## Code of conduct
 See [CODE-OF-CONDUCT.md](./CODE-OF-CONDUCT.md)

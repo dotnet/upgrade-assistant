@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 var packageToAdd = newPackage;
                 if (packageToAdd.HasWildcardVersion)
                 {
-                    var reference = await _packageLoader.GetLatestVersionAsync(packageToAdd.Name, false, null, token).ConfigureAwait(false);
+                    var reference = await _packageLoader.GetLatestVersionAsync(packageToAdd.Name, project.TargetFrameworks, false, token).ConfigureAwait(false);
 
                     if (reference is not null)
                     {

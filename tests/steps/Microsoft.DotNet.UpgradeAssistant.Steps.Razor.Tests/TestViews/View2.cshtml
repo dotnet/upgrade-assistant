@@ -1,0 +1,25 @@
+﻿@using Foo
+@model string[]
+
+@if(Model != null && Model.Length > 0)
+{
+    <div>
+        <p>@(Model[0])</p>
+    </div>
+}
+
+<div>
+    <h1>Hello world!</h1>
+    <p>This is the body</p>
+</div>
+
+@if(Model != null && Model.Length > 1)
+{
+    <div>
+        <p>@Model[1]</p>
+    </div>
+}
+
+@{
+    var x = 0;
+}

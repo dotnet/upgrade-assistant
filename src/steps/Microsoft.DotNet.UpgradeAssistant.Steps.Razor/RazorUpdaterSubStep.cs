@@ -12,8 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
     internal class RazorUpdaterSubStep : UpgradeStep
     {
-        private RazorUpdaterStep _razorUpdaterStep;
-        private IUpdater<RazorCodeDocument> _updater;
+        private readonly RazorUpdaterStep _razorUpdaterStep;
+        private readonly IUpdater<RazorCodeDocument> _updater;
 
         public override string Id => _updater.Id;
 
@@ -103,6 +103,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <summary>
         /// Apply upgrade and update Status as necessary.
         /// </summary>
+        /// <param name="context">The upgrade context to apply this step to.</param>
+        /// <param name="token">A cancellation token.</param>
         /// <returns>True if the upgrade step was successfully applied or false if upgrade failed.</returns>
         public override async Task<bool> ApplyAsync(IUpgradeContext context, CancellationToken token)
         {

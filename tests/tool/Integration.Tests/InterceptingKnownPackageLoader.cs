@@ -26,21 +26,19 @@ namespace Integration.Tests
             _unknownPackages = unknownPackages ?? throw new ArgumentNullException(nameof(unknownPackages));
         }
 
-        public IEnumerable<string> PackageSources => _other.PackageSources;
-
         public Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
         {
             return _other.DoesPackageSupportTargetFrameworksAsync(packageReference, targetFrameworks, token);
         }
 
-        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, bool includePreRelease, string[]? packageSources, CancellationToken token)
+        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, bool includePreRelease, CancellationToken token)
         {
             if (_packages.TryGetValue(packageName, out var known))
             {
                 return known;
             }
 
-            var latest = await _other.GetLatestVersionAsync(packageName, includePreRelease, packageSources, token).ConfigureAwait(false);
+            var latest = await _other.GetLatestVersionAsync(packageName, tfms, includePreRelease, token).ConfigureAwait(false);
 
             if (latest is not null)
             {
@@ -51,14 +49,14 @@ namespace Integration.Tests
             return latest;
         }
 
-        public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, bool latestMinorAndBuildOnly, CancellationToken token)
+        public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, bool latestMinorAndBuildOnly, CancellationToken token)
         {
             if (_packages.TryGetValue(reference.Name, out var known))
             {
                 return new NuGetReference[] { known };
             }
 
-            var latest = await _other.GetNewerVersionsAsync(reference, latestMinorAndBuildOnly, token).ConfigureAwait(false);
+            var latest = await _other.GetNewerVersionsAsync(reference, tfms, latestMinorAndBuildOnly, token).ConfigureAwait(false);
 
             if (latest is not null)
             {
@@ -67,7 +65,7 @@ namespace Integration.Tests
                 _logger.LogError("Unexpected check for newer version: {Name}, {Version}", reference.Name, reference.Version);
             }
 
-            return latest ?? Array.Empty<NuGetReference>();
+            return latest ?? Enumerable.Empty<NuGetReference>();
         }
     }
 }
