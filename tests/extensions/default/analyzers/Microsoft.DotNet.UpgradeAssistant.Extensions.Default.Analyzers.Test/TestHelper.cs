@@ -28,8 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
-            new ApiControllerAnalyzerCSharp(),
-            new ApiControllerAnalyzerVisualBasic(),
+            new ApiControllerAnalyzer(),
             new BinaryFormatterUnsafeDeserializeAnalyzer(),
             new FilterAnalyzer(),
             new HelperResultAnalyzer(),
@@ -106,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var projectLanguage = lang.GetFileExtension();
             var path = TestProjectPath.Replace("{lang}", $"Fixed.{projectLanguage}", StringComparison.OrdinalIgnoreCase);
             var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
-            
+
             return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
         }
 
@@ -121,6 +120,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var projectLanguage = lang.GetFileExtension();
             var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
             var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
+
+            project = SourceUpdaterStep.AddMetadataReferences(project);
+
             var projectId = project.Id;
 
             var diagnosticFixed = false;

@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
-    public abstract class ApiControllerAnalyzer : DiagnosticAnalyzer
+    public class ApiControllerAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
@@ -60,7 +60,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
         }
 
-        protected abstract void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node);
+        private void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node)
+        {
+            var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), node.ToString());
+            context.ReportDiagnostic(diagnostic);
+        }
 
         public static Project AddMetadataReferences(Project project)
         {

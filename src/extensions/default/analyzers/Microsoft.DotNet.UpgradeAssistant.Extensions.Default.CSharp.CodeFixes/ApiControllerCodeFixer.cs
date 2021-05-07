@@ -1,16 +1,18 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
-using cs = Microsoft.CodeAnalysis.CSharp;
-using vb = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
@@ -53,37 +55,60 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 context.Diagnostics);
         }
 
+        /// <summary>
+        /// Built with the assumption that the <paramref name="node"/> is a class that inherits from ApiController.
+        /// </summary>
+        /// <param name="document">The document that contains a class to fix.</param>
+        /// <param name="node">A class that inherits from ApiController.</param>
+        /// <param name="cancellationToken">May request cancellation.</param>
+        /// <returns>A document where at least one ApiController was removed.</returns>
         private async Task<Document> ReplaceBaseClass(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
-            var project = document.Project;
-            var slnEditor = new SolutionEditor(project.Solution);
+            var generator = SyntaxGenerator.GetGenerator(document);
+            var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
-            var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
+            var mvcBaseType = generator.QualifiedName(
+                CreateMvcNamespace(generator),
+                generator.IdentifierName(GoodClassName))
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
-            ReplaceController(node, docEditor);
+            // VB and C# only allow 1 parent class and it must be the first in the list
+            var baseType = GetBaseType(node, generator);
 
-            return docEditor.GetChangedDocument();
+            var newRoot = generator.ReplaceNode(root, baseType, mvcBaseType);
+
+            var newDocument = document.WithSyntaxRoot(newRoot);
+
+            newDocument = await ImportAdder.AddImportsAsync(newDocument, Simplifier.AddImportsAnnotation, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            return newDocument;
         }
 
-        private static void ReplaceController(SyntaxNode node, DocumentEditor docEditor)
+        private static SyntaxNode GetBaseType(SyntaxNode node, SyntaxGenerator generator)
         {
-            if (IsQualifiedNameSyntax(node))
+            var types = generator.GetBaseAndInterfaceTypes(node);
+            if (types != null && types.Count > 0)
             {
-                var namespaceIdentifier = docEditor.Generator.IdentifierName(GoodNamespace);
-                var classNameIdentifier = docEditor.Generator.IdentifierName(GoodClassName);
-                var controllerIdentifierSyntax = docEditor.Generator.QualifiedName(namespaceIdentifier, classNameIdentifier);
-                docEditor.ReplaceNode(node, controllerIdentifierSyntax);
+                return types[0];
             }
-            else
-            {
-                var controllerIdentifierSyntax = docEditor.Generator.IdentifierName($"{GoodNamespace}.{GoodClassName}");
-                docEditor.ReplaceNode(node, controllerIdentifierSyntax);
-            }
+
+            types = generator.GetBaseAndInterfaceTypes(node.Parent);
+            return types[0];
         }
 
-        private static bool IsQualifiedNameSyntax(SyntaxNode node)
+        private static SyntaxNode CreateMvcNamespace(SyntaxGenerator generator)
         {
-            return node.IsKind(vb.SyntaxKind.QualifiedName) || node.IsKind(cs.SyntaxKind.QualifiedName);
+            return generator.QualifiedName(CreateAspNetCoreNamesapce(generator), generator.IdentifierName("Mvc"));
+        }
+
+        private static SyntaxNode CreateAspNetCoreNamesapce(SyntaxGenerator generator)
+        {
+            return generator.QualifiedName(CreateMicrosoftNamesapce(generator), generator.IdentifierName("AspNetCore"));
+        }
+
+        private static SyntaxNode CreateMicrosoftNamesapce(SyntaxGenerator generator)
+        {
+            return generator.IdentifierName("Microsoft");
         }
     }
 }

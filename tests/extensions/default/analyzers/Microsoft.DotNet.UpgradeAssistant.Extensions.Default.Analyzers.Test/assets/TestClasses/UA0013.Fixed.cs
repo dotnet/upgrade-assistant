@@ -1,9 +1,10 @@
 ﻿using System.Web.Http;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TestProject.TestClasses
 {
-    public class ValuesController : Microsoft.AspNetCore.Mvc.Controller
+    public class ValuesController : Controller
     {
         // GET api/values
         public IEnumerable<string> GetValues()
@@ -12,7 +13,7 @@ namespace TestProject.TestClasses
         }
     }
 
-    public class MoviesController : Microsoft.AspNetCore.Mvc.Controller
+    public class MoviesController : Controller
     {
         // GET api/values
         public IEnumerable<string> GetValues()
