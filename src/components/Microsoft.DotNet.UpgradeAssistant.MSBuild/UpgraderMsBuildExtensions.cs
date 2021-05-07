@@ -45,6 +45,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     var settings = Settings.LoadDefaultSettings(null);
                     options.CachePath = SettingsUtility.GetGlobalPackagesFolder(settings);
                 });
+
+            // Register the extension locator via a factory because NuGet types (IExtensionLocator)
+            // can't be referenced until the MSBuild locator has run.
+            services.AddTransient<NuGetExtensionLocatorFactory>();
         }
 
         // TEMPORARY WORKAROUND

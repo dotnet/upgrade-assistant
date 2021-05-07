@@ -18,27 +18,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class NuGetCredentialsStartup : IUpgradeStartup
     {
-        private readonly ISettings _nugetSettings;
+        private readonly string _inputPath;
+        private readonly NuGetExtensionLocatorFactory _extensionLocatorFactory;
         private readonly IUserInput _userInput;
         private readonly ILogger<NuGetCredentialsStartup> _logger;
 
-        public NuGetCredentialsStartup(UpgradeOptions upgradeOptions, IUserInput userInput, ILogger<NuGetCredentialsStartup> logger)
+        public NuGetCredentialsStartup(UpgradeOptions upgradeOptions, NuGetExtensionLocatorFactory extensionLocatorFactory, IUserInput userInput, ILogger<NuGetCredentialsStartup> logger)
         {
-            if (upgradeOptions is null)
-            {
-                throw new ArgumentNullException(nameof(upgradeOptions));
-            }
-
-            _nugetSettings = Settings.LoadDefaultSettings(Path.GetDirectoryName(upgradeOptions.ProjectPath));
+            _inputPath = upgradeOptions?.ProjectPath ?? throw new ArgumentNullException(nameof(upgradeOptions));
+            _extensionLocatorFactory = extensionLocatorFactory ?? throw new ArgumentNullException(nameof(extensionLocatorFactory));
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public Task<bool> StartupAsync(CancellationToken token)
         {
+            // TODO : Do we need to change plugin discovery root?
+            // PluginDiscoveryUtility.InternalPluginDiscoveryRoot = new Lazy<string>(() => PluginDiscoveryUtility.GetInternalPluginRelativeToMSBuildDirectory(msbuildDirectory.Value.Path));
+
             if (HttpHandlerResourceV3.CredentialService == null)
             {
                 _logger.LogDebug("Registering NuGet credential providers");
+                PreviewFeatureSettings.DefaultCredentialsAfterCredentialProviders = true;
                 var credentialService = new CredentialService(
                         providers: new AsyncLazy<IEnumerable<ICredentialProvider>>(async () => await GetCredentialProvidersAsync().ConfigureAwait(false)),
                         nonInteractive: !_userInput.IsInteractive,
@@ -52,26 +53,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private async Task<IEnumerable<ICredentialProvider>> GetCredentialProvidersAsync()
         {
-            // TODO : Expand to be more like https://github.com/NuGet/NuGet.Client/blob/17c4f841ff61d27fe6b57cf45ceef16037062635/src/NuGet.Clients/NuGet.CommandLine/Commands/Command.cs#L209
+            // Setup NuGet variables here instead of in ctor because NuGet.Configuration can't be loaded until after all
+            // startup actions have executed.
             var logger = new NuGetLogger(_logger);
-            var ret = new List<ICredentialProvider>();
+            var settings = Settings.LoadDefaultSettings(Path.GetDirectoryName(_inputPath));
+            var sourceProvider = new PackageSourceProvider(settings);
 
-            var pluginProviders = new PluginCredentialProviderBuilder(null! /* TODO */, _nugetSettings, logger).BuildAll(NuGetVerbosity.Normal);
-            ret.AddRange(pluginProviders);
+            var ret = new List<ICredentialProvider>
+            {
+                new SettingsCredentialProvider(sourceProvider, logger)
+            };
 
-            var securePluginProviders = new SecurePluginCredentialProviderBuilder(PluginManager.Instance, true, new NuGetLogger(_logger));
-            ret.AddRange(await securePluginProviders.BuildAllAsync().ConfigureAwait(false));
+            var securePluginProviders = await new SecurePluginCredentialProviderBuilder(PluginManager.Instance, false, new NuGetLogger(_logger)).BuildAllAsync().ConfigureAwait(false);
+            ret.AddRange(securePluginProviders);
 
-            if (ret.Any() && PreviewFeatureSettings.DefaultCredentialsAfterCredentialProviders)
+            if (PreviewFeatureSettings.DefaultCredentialsAfterCredentialProviders)
             {
                 ret.Add(new DefaultNetworkCredentialsCredentialProvider());
             }
 
-            ret.Add(new ConsoleCredentialProvider(logger));
+            var pluginProviders = new PluginCredentialProviderBuilder(_extensionLocatorFactory.CreateLocator(), GetDefaultSettings(), logger).BuildAll(NuGetVerbosity.Debug);
+            ret.AddRange(pluginProviders);
 
-            _logger.LogDebug("Using NuGet credential providers: {Providers}", string.Join(", ", pluginProviders.Select(p => p.Id)));
+            ret.Add(new ConsoleCredentialProvider());
 
-            return pluginProviders;
+            _logger.LogDebug("Using NuGet credential providers: {Providers}", string.Join(", ", ret.Select(p => p.Id)));
+
+            return ret;
         }
+
+        private ISettings GetDefaultSettings() => Settings.LoadDefaultSettings(Path.GetDirectoryName(_inputPath));
     }
 }
