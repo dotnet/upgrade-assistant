@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return result?.OverallResult == BuildResultCode.Success;
         }
 
-        private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new ProjectInstance(project.FileInfo.FullName, context.GlobalProperties, toolsVersion: null);
+        private static ProjectInstance CreateProjectInstance(IUpgradeContext context, IProject project) => new(project.FileInfo.FullName, context.GlobalProperties, toolsVersion: null);
 
         public BuildResult? RestorePackages(ProjectInstance projectInstance)
         {

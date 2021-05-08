@@ -112,6 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 catch (NuGetProtocolException)
                 {
                     _logger.LogWarning("Failed to get package versions from source {PackageSource} due to a NuGet protocol error", source.Source);
+                    _logger.LogInformation("If NuGet packages are coming from an authenticated source, Upgrade Assistant requires a .NET Core-compatible v2 credential provider be installed. To authenticate with an Azure DevOps NuGet source, for example, see https://github.com/microsoft/artifacts-credprovider#setup");
                 }
                 catch (HttpRequestException exc)
                 {
@@ -286,6 +287,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 catch (NuGetProtocolException)
                 {
                     _logger.LogWarning("Failed to get package finder from source {PackageSource} due to a NuGet protocol error, skipping this source", source.Source);
+                    _logger.LogInformation("If NuGet packages are coming from an authenticated source, Upgrade Assistant requires a .NET Core-compatible v2 credential provider be installed. To authenticate with an Azure DevOps NuGet source, for example, see https://github.com/microsoft/artifacts-credprovider#setup");
                 }
             }
 

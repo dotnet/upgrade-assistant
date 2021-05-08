@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -18,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public int SuccessCode { get; init; }
 
-        public bool Quiet { get; init; }
+        public Func<string, LogLevel> GetMessageLogLevel { get; init; } = msg => msg.Contains("Error") ? LogLevel.Error : LogLevel.Information;
 
         public IEnumerable<KeyValuePair<string, string>> EnvironmentVariables { get; init; } = Enumerable.Empty<KeyValuePair<string, string>>();
 
