@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
@@ -36,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
 
             // Assert
             Assert.Contains(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Once());
         }
 
@@ -56,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
             var packageLoader = CreatePackageLoader(mock);
 
             // shift project attributes so that it is not applicable
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net472") });
+            project.Setup(p => p.TargetFrameworks).Returns(new[] { TargetFrameworkMoniker.Net472 });
             var comparer = mock.Mock<ITargetFrameworkMonikerComparer>();
             comparer.Setup(comparer => comparer.Compare(It.IsAny<TargetFrameworkMoniker>(), It.IsAny<TargetFrameworkMoniker>()))
                 .Returns(-1);
@@ -66,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
 
             // Assert
             Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
 
@@ -93,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
 
             // Assert
             Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
 
@@ -120,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
 
             // Assert
             Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
 
@@ -144,7 +145,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
             nugetReferences.Setup(n => n.IsTransitivelyAvailable(It.IsAny<string>()))
                 .Returns(false);
 
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { new TargetFrameworkMoniker("net5.0") });
+            project.Setup(p => p.TargetFrameworks).Returns(new[] { TargetFrameworkMoniker.Net50 });
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.AspNetCore));
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
             project.Setup(p => p.GetNuGetReferencesAsync(default)).Returns(new ValueTask<INuGetReferences>(nugetReferences.Object));
@@ -155,7 +156,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
         private static Mock<IPackageLoader> CreatePackageLoader(AutoMock mock)
         {
             var packageLoader = mock.Mock<IPackageLoader>();
-            packageLoader.Setup(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
+            packageLoader.Setup(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult((NuGetReference?)new NuGetReference(NewtonsoftPackageName, "122.0.0")));
             return packageLoader;
         }

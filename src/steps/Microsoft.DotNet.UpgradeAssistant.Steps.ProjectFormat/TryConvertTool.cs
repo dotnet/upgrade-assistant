@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string StorePath = ".store/try-convert";
-        private const string TryConvertArgumentsFormat = "--no-backup --force-web-conversion --keep-current-tfms -p \"{0}\"";
+        private const string TryConvertArgumentsFormat = "--no-backup -m \"{0}\" --force-web-conversion --keep-current-tfms -p \"{1}\"";
         private static readonly string[] ErrorMessages = new[]
         {
             "This project has custom imports that are not accepted by try-convert",
@@ -29,12 +29,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         };
 
         private readonly IProcessRunner _runner;
+        private readonly MSBuildPathLocator _locator;
 
         public TryConvertTool(
             IProcessRunner runner,
-            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor)
+            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor,
+            MSBuildPathLocator locator)
         {
-            _runner = runner;
+            _runner = runner ?? throw new ArgumentNullException(nameof(runner));
+            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
 
             if (tryConvertOptionsAccessor is null)
             {
@@ -53,6 +56,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public string GetCommandLine(IProject project)
             => Invariant($"{Path} {GetArguments(project.Required())}");
+
+        private string? GetMSBuildPath()
+        {
+            return _locator.MSBuildPath?.Replace("\\", "\\\\");
+        }
 
         public Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
@@ -100,6 +108,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private static string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, project.Required().FileInfo);
+        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, GetMSBuildPath(), project.Required().FileInfo);
     }
 }

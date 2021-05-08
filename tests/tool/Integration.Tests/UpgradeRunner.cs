@@ -5,8 +5,10 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Microsoft.DotNet.UpgradeAssistant.MSBuildPath;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,9 +17,11 @@ using Xunit.Abstractions;
 
 namespace Integration.Tests
 {
-    public static class UpgradeRunner
+    public class UpgradeRunner
     {
-        public static async Task<int> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
+        public UnknownPackages UnknownPackages { get; } = new UnknownPackages();
+
+        public async Task<int> UpgradeAsync(string inputPath, string entrypoint, ITestOutputHelper output, TimeSpan maxDuration)
         {
             if (string.IsNullOrEmpty(inputPath))
             {
@@ -41,20 +45,39 @@ namespace Integration.Tests
                 EntryPoint = new[] { entrypoint },
             };
 
-            return await Program.RunUpgradeAsync(options, host => host
+            var status = await Program.RunUpgradeAsync(options, host => host
                 .ConfigureServices((_, services) =>
                 {
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
                     {
                         o.PackageMapPath = "PackageMaps";
-                        o.UpgradeAnalyzersPackageVersion = "1.0.0";
                     });
+                })
+                .ConfigureContainer<ContainerBuilder>(builder =>
+                {
+                    builder.RegisterInstance(MSBuildPathInstance.Locator);
+                    builder.RegisterDecorator<MSBuildPathLocatorInterceptor, MSBuildPathLocator>();
+
+                    builder.RegisterType<KnownPackages>()
+                        .SingleInstance()
+                        .AsSelf();
+
+                    builder.RegisterInstance(UnknownPackages);
+                    builder.RegisterDecorator<InterceptingKnownPackageLoader, IPackageLoader>();
                 })
                 .ConfigureLogging((ctx, logging) =>
                 {
                     logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
-                }), cts.Token).ConfigureAwait(false);
+                }),
+                cts.Token).ConfigureAwait(false);
+
+            if (cts.Token.IsCancellationRequested)
+            {
+                throw new TimeoutException("The integration test could not complete successfully");
+            }
+
+            return status;
         }
     }
 }

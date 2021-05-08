@@ -16,7 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     {
         private const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
 
-        private readonly TargetFrameworkMoniker _netCore3Moniker = new TargetFrameworkMoniker("netcoreapp3.0");
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<NewtonsoftReferenceAnalyzer> _logger;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
@@ -47,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // This reference only needs added to ASP.NET Core exes
             if (!(components.HasFlag(ProjectComponents.AspNetCore)
                 && project.OutputType == ProjectOutputType.Exe
-                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, _netCore3Moniker) < 0)))
+                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, TargetFrameworkMoniker.NetCoreApp30) < 0)))
             {
                 return state;
             }
@@ -63,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, false, null, token).ConfigureAwait(false);
+                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, project.TargetFrameworks, false, token).ConfigureAwait(false);
 
                 if (newtonsoftPackage is not null)
                 {

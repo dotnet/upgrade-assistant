@@ -7,13 +7,14 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
-using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -103,6 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
 
             var hostBuilder = Host.CreateDefaultBuilder()
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureServices((context, services) =>
                 {
@@ -131,7 +133,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton<IProcessRunner, ProcessRunner>();
                     services.AddSingleton<ErrorCodeAccessor>();
 
-                    services.AddStepManagement();
+                    services.AddStepManagement(context.Configuration.GetSection("DefaultTargetFrameworks").Bind);
                 });
 
             var host = configure(hostBuilder).UseConsoleLifetime(options =>
@@ -179,29 +181,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private class HelpWithHeader : HelpBuilder
         {
             public HelpWithHeader(IConsole console)
-                : base(console, maxWidth: 90)
+                : base(console, maxWidth: ConsoleUtils.Width)
             {
             }
 
-            public override void Write(ICommand command)
+            protected override void AddSynopsis(ICommand command)
             {
                 ShowHeader();
 
-                WriteString("Makes a best-effort attempt to upgrade .NET Framework projects to .NET 5.");
-                WriteString("This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.");
-                WriteString("This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in .NET Core. Analyzers added to the project will highlight the remaining changes needed after the tool runs.");
-
-                base.Write(command);
-            }
-
-            private void WriteString(string input)
-            {
-                foreach (var line in SplitText(input, MaxWidth))
-                {
-                    Console.Out.WriteLine(line);
-                }
-
-                Console.Out.WriteLine();
+                const string Title = "Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.\n\n" +
+                                   "This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.\n\n" +
+                                   "This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to the project will highlight the remaining changes needed after the tool runs.\n";
+                WriteHeading(Title, null);
             }
         }
 
@@ -216,6 +207,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
             command.AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option in non-interactive mode."));
             command.AddOption(new Option<int>(new[] { "--non-interactive-wait" }, "Wait the supplied seconds before moving on to the next option in non-interactive mode."));
+            command.AddOption(new Option<UpgradeTarget>(new[] { "--target-tfm-support" }, "Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean."));
         }
 
 #if ANALYZE_COMMAND

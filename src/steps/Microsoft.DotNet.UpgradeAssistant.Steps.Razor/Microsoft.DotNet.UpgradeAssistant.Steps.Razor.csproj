@@ -10,8 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DiffPlex" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Language" />
+    <PackageReference Include="Microsoft.Bcl.Hashcode" />
     <PackageReference Include="Microsoft.CodeAnalysis.Razor" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
   </ItemGroup>

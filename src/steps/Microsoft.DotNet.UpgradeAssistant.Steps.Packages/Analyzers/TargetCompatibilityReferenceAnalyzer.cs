@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     public class TargetCompatibilityReferenceAnalyzer : IPackageReferencesAnalyzer
     {
         private readonly IPackageLoader _packageLoader;
-        private readonly ITargetTFMSelector _tfmSelector;
         private readonly IVersionComparer _comparer;
         private readonly ILogger<TargetCompatibilityReferenceAnalyzer> _logger;
 
@@ -21,12 +19,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public TargetCompatibilityReferenceAnalyzer(
             IPackageLoader packageLoader,
-            ITargetTFMSelector tfmSelector,
             IVersionComparer comparer,
             ILogger<TargetCompatibilityReferenceAnalyzer> logger)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
-            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -56,7 +52,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var updatedReference = await GetUpdatedPackageVersionAsync(packageReference, project.TargetFrameworks, token).ConfigureAwait(false);
+                    var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, project.TargetFrameworks, true, token).ConfigureAwait(false);
+                    var updatedReference = newerVersions.FirstOrDefault();
+
                     if (updatedReference == null)
                     {
                         _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, project.TargetFrameworks);
@@ -72,6 +70,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                             state.PossibleBreakingChangeRecommended = true;
                         }
 
+                        if (updatedReference.IsPrerelease)
+                        {
+                            _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", project.TargetFrameworks));
+                        }
+
                         state.PackagesToRemove.Add(packageReference);
                         state.PackagesToAdd.Add(updatedReference);
                     }
@@ -79,22 +82,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             return state;
-        }
-
-        private async Task<NuGetReference?> GetUpdatedPackageVersionAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFramework, CancellationToken token)
-        {
-            var latestMinorVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, true, token).ConfigureAwait(false);
-
-            foreach (var newerPackage in latestMinorVersions)
-            {
-                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newerPackage, targetFramework, token).ConfigureAwait(false))
-                {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", newerPackage, targetFramework);
-                    return newerPackage;
-                }
-            }
-
-            return null;
         }
     }
 }

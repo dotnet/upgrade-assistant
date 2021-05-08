@@ -13,12 +13,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
     public class BackupStep : UpgradeStep
     {
         private const string FlagFileName = "upgrade.backup";
+        private const string BaseBackupPropertyName = "BaseBackupLocation";
 
         private readonly bool _skipBackup;
         private readonly IUserInput _userInput;
-
-        private string? _projectDir;
-        private string? _backupPath;
 
         public override string Description => $"Back up the current project to another directory";
 
@@ -37,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public BackupStep(UpgradeOptions options, ILogger<BackupStep> logger, IUserInput userInput)
+        public BackupStep(UpgradeOptions options, ILogger<BackupStep> logger, IUserInput userInput, IUpgradeContextProperties properties)
             : base(logger)
         {
             _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));
@@ -54,60 +52,70 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _projectDir = context.CurrentProject.Required().FileInfo.DirectoryName;
-            _backupPath ??= GetDefaultBackupPath(_projectDir);
+            var projectDir = GetProjectDir(context);
+            var baseBackupLocation = context.Properties.GetPropertyValue(BaseBackupPropertyName) ?? GetDefaultBaseBackupPath(context.InputPath);
+            var backupLocation = EnsureValidPath(context.InputIsSolution
+                ? Path.Combine(baseBackupLocation, Path.GetFileName(projectDir))
+                : baseBackupLocation);
 
             if (_skipBackup)
             {
                 Logger.LogDebug("Backup upgrade step initalized as complete (backup skipped)");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Backup skipped", BuildBreakRisk.None));
             }
-            else if (_backupPath is null)
+            else if (backupLocation is null)
             {
                 Logger.LogDebug("No backup path specified");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location", BuildBreakRisk.None));
             }
-            else if (File.Exists(Path.Combine(_backupPath, FlagFileName)))
+            else if (File.Exists(Path.Combine(backupLocation, FlagFileName)))
             {
-                Logger.LogDebug("Backup upgrade step initalized as complete (already done)");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Existing backup found", BuildBreakRisk.None));
+                Logger.LogDebug("Backup upgrade step initalized as complete (already done). Backup is stored at {BackupLocation}", backupLocation);
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Existing backup found at {backupLocation}", BuildBreakRisk.None));
             }
             else
             {
-                Logger.LogDebug("Backup upgrade step initialized as incomplete");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {_projectDir} (including subfolders) to another folder.", BuildBreakRisk.None));
+                Logger.LogDebug("Backup upgrade step initialized as incomplete; will backup to {BackupLocation}", backupLocation);
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"No existing backup found. Applying this step will copy the contents of {projectDir} (including subfolders) to {backupLocation}", BuildBreakRisk.None));
             }
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (_skipBackup)
             {
                 Logger.LogInformation("Skipping backup");
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, "Backup skipped");
             }
 
-            var backupPath = await ChooseBackupPath(context, token).ConfigureAwait(false);
+            var baseBackupPath = await ChooseBackupPath(context, token).ConfigureAwait(false);
 
-            if (backupPath is null)
+            if (baseBackupPath is null)
             {
                 Logger.LogDebug("No backup path specified");
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location");
             }
 
-            if (_projectDir is null)
-            {
-                Logger.LogDebug("No project specified");
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a valid project selected");
-            }
+            var projectDir = GetProjectDir(context);
 
-            if (Status == UpgradeStepStatus.Complete)
+            var backupPath = EnsureValidPath(context.InputIsSolution
+                ? Path.Combine(baseBackupPath, Path.GetFileName(projectDir))
+                : baseBackupPath);
+
+            context.Properties.SetPropertyValue(BaseBackupPropertyName, context.InputIsSolution ? baseBackupPath : backupPath, true);
+
+            if (File.Exists(Path.Combine(backupPath, FlagFileName)))
             {
                 Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", backupPath);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Existing backup found");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Backup already exists at {backupPath}; nothing to do");
             }
 
-            Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", _projectDir, backupPath);
+            Logger.LogInformation("Backing up {ProjectDir} to {BackupPath}", projectDir, backupPath);
             try
             {
                 Directory.CreateDirectory(backupPath);
@@ -117,11 +125,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to create backup directory {backupPath}");
                 }
 
-                await CopyDirectoryAsync(_projectDir, backupPath).ConfigureAwait(false);
+                await CopyDirectoryAsync(projectDir, backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
                 File.WriteAllText(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})");
                 Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Backup completed successfully");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project backed up to {backupPath}");
             }
             catch (IOException exc)
             {
@@ -130,18 +138,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
         }
 
-        public override UpgradeStepInitializeResult Reset()
-        {
-            _backupPath = null;
-            return base.Reset();
-        }
-
         private async Task<string?> ChooseBackupPath(IUpgradeContext context, CancellationToken token)
         {
+            var defaultPath = GetDefaultBaseBackupPath(context.InputPath);
             var customPath = default(string);
+
             var commands = new[]
             {
-                UpgradeCommand.Create($"Use default path [{_backupPath}]"),
+                UpgradeCommand.Create($"Use default path [{defaultPath}]"),
                 UpgradeCommand.Create("Enter custom path", async (ctx, token) =>
                 {
                     customPath = await _userInput.AskUserAsync("Please enter a custom path for backups:").ConfigureAwait(false);
@@ -157,7 +161,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 {
                     // customPath may be set in the lambda above.
 #pragma warning disable CA1508 // Avoid dead conditional code
-                    return customPath ?? _backupPath;
+                    return customPath ?? defaultPath;
 #pragma warning restore CA1508 // Avoid dead conditional code
                 }
             }
@@ -198,21 +202,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
         }
 
-        private string GetDefaultBackupPath(string projectDir)
-        {
-            Logger.LogDebug("Determining backup path");
+        private static string GetDefaultBaseBackupPath(string inputPath) => $"{Path.GetDirectoryName(inputPath).TrimEnd('\\', '/')}.backup";
 
-            var candidateBasePath = $"{projectDir.TrimEnd('\\', '/')}.backup";
-            var candidatePath = candidateBasePath;
+        private string EnsureValidPath(string path)
+        {
+            var candidatePath = path;
+            Logger.LogDebug("Determining backup path");
             var iteration = 0;
             while (!IsPathValid(candidatePath))
             {
                 Logger.LogDebug("Unable to use backup path {CandidatePath}", candidatePath);
-                candidatePath = $"{candidateBasePath}.{iteration++}";
+                candidatePath = $"{path}.{iteration++}";
             }
 
             Logger.LogDebug("Using backup path {BackupPath}", candidatePath);
             return candidatePath;
+        }
+
+        private static string GetProjectDir(IUpgradeContext context)
+        {
+            return context.CurrentProject.Required().FileInfo.DirectoryName;
         }
 
         private static bool IsPathValid(string candidatePath) => !Directory.Exists(candidatePath) || File.Exists(Path.Combine(candidatePath, FlagFileName));

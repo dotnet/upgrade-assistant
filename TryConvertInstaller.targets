@@ -9,7 +9,7 @@
       <!-- By default, NuGet will not include files starting with '.' or ending with '.nupkg'. Since we are including try-convert via dotnet tools, some of the files fit into this. -->
       <NoDefaultExcludes>true</NoDefaultExcludes>
       <ToolsDirectory>$(MSBuildThisFileDirectory).tools\</ToolsDirectory>
-      <TryConvertVersion>0.7.217901</TryConvertVersion>
+      <TryConvertVersion>0.7.222801</TryConvertVersion>
       <TryConvertDirectory>$(ToolsDirectory)try-convert\$(TryConvertVersion)\</TryConvertDirectory>
     </PropertyGroup>
 

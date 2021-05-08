@@ -25,10 +25,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private static VisualStudioInstance? _instance;
 
         private readonly ILogger _logger;
+        private readonly MSBuildPathLocator _locator;
 
-        public MSBuildRegistrationStartup(ILogger<MSBuildRegistrationStartup> logger)
+        public MSBuildRegistrationStartup(ILogger<MSBuildRegistrationStartup> logger, MSBuildPathLocator locator)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
         }
 
         public Task<bool> StartupAsync(CancellationToken token)
@@ -63,11 +65,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                                 _logger.LogDebug("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
                             }
 
-                            _instance = msBuildInstances
-                                .OrderByDescending(m => m.Version)
-                                .First();
-                            _logger.LogInformation("MSBuild registered from {MSBuildPath}", _instance.MSBuildPath);
+                            var orderedInstances = msBuildInstances
+                                .OrderByDescending(m => m.Version);
 
+                            _instance = orderedInstances.FirstOrDefault(vsi => !vsi.MSBuildPath.Contains("preview", StringComparison.OrdinalIgnoreCase))
+                                ?? orderedInstances.First();
+                            _logger.LogInformation("MSBuild registered from {MSBuildPath}", _instance.MSBuildPath);
+                            _locator.MSBuildPath = _instance.MSBuildPath;
                             MSBuildLocator.RegisterInstance(_instance);
                             AssemblyLoadContext.Default.Resolving += ResolveAssembly;
                         }

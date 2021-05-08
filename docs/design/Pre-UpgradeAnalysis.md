@@ -21,7 +21,7 @@ The existing default in Upgrade-Assistant is "upgrade" mode but once the analyze
 
  # Implementation Details
 
- ## Nuget package dependecy analysis:
+ ## NuGet package dependency analysis:
    If a referenced NuGet package in the project isn't compatible with the target .NET version, Upgrade-Assistant already has capabilities built-in to determine the first major version that is compatible to the target .NET version by using existing Nuget APIs. Upgrade-Assistant also already has logic built-in to determine transitive dependencies that needs to be removed while upgrading to .NET Core.
 
 ## Loose-Assembly Analysis:
@@ -85,7 +85,7 @@ Add loose assembly analysis capability to upgrade-assistant.
 
 **Cost** : M (contingent on Phase I completion)
 
-## Phase III:
+## Phase V:
 A scaled out solution for larger codebases:
 - Solution for decentralized data store model 
 - Add a visualization component.
@@ -94,7 +94,7 @@ One of the possible imlementation methods is using a container like docker.
 
 **Cost** : XL (Contingent on Phase II completion. The cost may come down depending on possible re-use of internal dockerized data storage and visualization solution).
 
-## Phase IV / Future:
+## Phase VI / Future:
 - Support for analyzing and / or upgrading a solution from the data visualization component.
 - Internal tool, Chem, into a modern service with a public end-point that upgrade-assistant / any tool can post a request with computed hash and receive a response from the service.
 - Assembly-level dependency analysis between services for dependency graph.

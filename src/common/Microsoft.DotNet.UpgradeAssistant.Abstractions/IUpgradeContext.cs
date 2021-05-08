@@ -30,5 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         IDictionary<string, string> GlobalProperties { get; }
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
+
+        IUpgradeContextProperties Properties { get; }
     }
 }
