@@ -115,6 +115,13 @@ If you're just starting to look at .NET 5.0 and would like to understand more ab
 2. [.NET Core porting documentation](https://docs.microsoft.com/dotnet/core/porting/)
 3. [Documentation of features not available on .NET Core](https://docs.microsoft.com/dotnet/core/porting/net-framework-tech-unavailable)
 
+### Authenticated NuGet sources
+
+As part of upgrading a project, Upgrade Assistant will need to both restore the project's NuGet packages and query configured NuGet sources for information on updated packages. If a project depends on authenticated NuGet sources, some extra steps may be necessary for Upgrade Assistant to work correctly:
+
+1. Upgrade Assistant requires that a v2 .NET Core-compatible NuGet credential provider be installed on the computer if authenticated NuGet sources are used. For example, if you are using authenticated Azure DevOps NuGet feeds, follow [these instructions](https://github.com/microsoft/artifacts-credprovider#setup) to setup a compatible credential provider.
+2. You may need to run Upgrade Assistant in interactive mode (which is the default execution mode) in order to authenticate the NuGet sources. After authenticating once, non-interactive mode can be used as the credentials are cached. 
+
 ### Extensibility
 The Upgrade Assistant has an extension system that make it easy for you to customize many of the upgrade steps without having to rebuild the tool. See how you can extend the tool [here](docs/extensibility.md).
 
