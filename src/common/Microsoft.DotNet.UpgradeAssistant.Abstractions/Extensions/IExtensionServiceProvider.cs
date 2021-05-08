@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public interface IExtensionServiceProvider
@@ -16,9 +14,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// IPackageReferenceAnalyzers will cause upgrade steps that use those types to pick up the
         /// new implementations.
         /// </summary>
-        /// <param name="serviceConfiguration">The extension's service configuration, including the service collection
+        /// <param name="services">The extension's service configuration, including the service collection
         /// to register services into and configuration from the extension's ExtensionManifest.json file.</param>
-        /// <returns>The service collection updated with services Upgrade Assistant should use.</returns>
-        IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration);
+        void AddServices(IExtensionServiceCollection services);
     }
 }

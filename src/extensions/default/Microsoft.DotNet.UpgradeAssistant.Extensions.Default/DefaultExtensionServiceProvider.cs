@@ -15,36 +15,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public class DefaultExtensionServiceProvider : IExtensionServiceProvider
     {
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
 
-        public IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration)
+        public void AddServices(IExtensionServiceCollection services)
         {
-            if (serviceConfiguration is null)
+            if (services is null)
             {
-                throw new System.ArgumentNullException(nameof(serviceConfiguration));
+                throw new System.ArgumentNullException(nameof(services));
             }
 
-            AddUpgradeSteps(serviceConfiguration.ServiceCollection, serviceConfiguration.ExtensionConfiguration);
-            AddConfigUpdaters(serviceConfiguration.ServiceCollection);
-            AddAnalyzersAndCodeFixProviders(serviceConfiguration.ServiceCollection);
-            AddPackageReferenceAnalyzers(serviceConfiguration.ServiceCollection);
-
-            return serviceConfiguration.ServiceCollection;
+            AddUpgradeSteps(services, services.Configuration);
+            AddConfigUpdaters(services.Services);
+            AddAnalyzersAndCodeFixProviders(services.Services);
+            AddPackageReferenceAnalyzers(services.Services);
         }
 
-        private static void AddUpgradeSteps(IServiceCollection services, IConfiguration configuration)
+        private static void AddUpgradeSteps(IExtensionServiceCollection services, IConfiguration configuration)
         {
-            services.AddBackupStep();
+            services.Services.AddBackupStep();
             services.AddConfigUpdaterStep();
-            services.AddPackageUpdaterStep()
-                .Bind(configuration.GetSection(PackageUpdaterStepOptionsSection));
-            services.AddProjectFormatSteps()
+            services.AddPackageUpdaterStep();
+            services.Services.AddProjectFormatSteps()
                 .Bind(configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-            services.AddSolutionSteps();
-            services.AddSourceUpdaterStep();
+            services.Services.AddSolutionSteps();
+            services.Services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
-            services.AddRazorUpdaterStep();
+            services.Services.AddRazorUpdaterStep();
         }
 
         // This extension only adds default config updaters, but other extensions

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 {
@@ -40,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             WellKnownStepIds.NextProjectStepId
         };
 
-        public ConfigUpdaterStep(IEnumerable<IUpdater<ConfigFile>> configUpdaters, ConfigUpdaterOptions configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
+        public ConfigUpdaterStep(IEnumerable<IUpdater<ConfigFile>> configUpdaters, IOptions<ConfigUpdaterOptions> configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
             if (configUpdaters is null)
@@ -53,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(configUpdaterOptions));
             }
 
-            _configFilePaths = (configUpdaterOptions.ConfigFilePaths ?? Enumerable.Empty<string>()).ToArray();
+            _configFilePaths = configUpdaterOptions.Value?.ConfigFilePaths ?? Array.Empty<string>();
             SubSteps = _allSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 

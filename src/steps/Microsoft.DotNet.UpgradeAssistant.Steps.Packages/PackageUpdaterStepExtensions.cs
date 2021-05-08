@@ -1,20 +1,29 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.IO;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class PackageUpdaterStepExtensions
     {
-        public static OptionsBuilder<PackageUpdaterOptions> AddPackageUpdaterStep(this IServiceCollection services)
+        private const string PackageMapExtension = "*.json";
+        private const string PackageUpdaterOptionsSectionName = "PackageUpdater";
+
+        public static void AddPackageUpdaterStep(this IExtensionServiceCollection services)
         {
-            services.AddSingleton<PackageMapProvider>();
-            services.AddUpgradeStep<PackageUpdaterPreTFMStep>();
-            services.AddUpgradeStep<PackageUpdaterStep>();
-            return services.AddOptions<PackageUpdaterOptions>();
+            if (services is null)
+            {
+                throw new System.ArgumentNullException(nameof(services));
+            }
+
+            services.Services.AddUpgradeStep<PackageUpdaterPreTFMStep>();
+            services.Services.AddUpgradeStep<PackageUpdaterStep>();
+
+            services.AddExtensionOption<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
+                .MapFiles<NuGetPackageMap>(t => Path.Combine(t.PackageMapPath, PackageMapExtension), isArray: true);
         }
     }
 }
