@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         public abstract IEnumerable<IdentifierMapping> IdentifierMappings { get; }
 
-        public override void Initialize(AnalysisContext context)
+        public override void Initialize(AnalyzeContext context)
         {
             if (context is null)
             {

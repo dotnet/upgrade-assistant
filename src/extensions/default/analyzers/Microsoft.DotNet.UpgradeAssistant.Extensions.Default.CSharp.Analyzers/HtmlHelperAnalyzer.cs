@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         private const string AspNetCoreHtmlHelperName = "Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper";
         private const string AspNetCoreIHtmlHelperName = "Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper";
 
-        public override void Initialize(AnalysisContext context)
+        public override void Initialize(AnalyzeContext context)
         {
             if (context is null)
             {

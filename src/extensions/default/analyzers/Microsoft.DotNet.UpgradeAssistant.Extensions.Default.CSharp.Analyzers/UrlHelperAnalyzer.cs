@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         private const string AspNetCoreUrlHelperName = "Microsoft.AspNetCore.Mvc.Routing.UrlHelper";
         private const string AspNetCoreIUrlHelperName = "Microsoft.AspNetCore.Mvc.IUrlHelper";
 
-        public override void Initialize(AnalysisContext context)
+        public override void Initialize(AnalyzeContext context)
         {
             if (context is null)
             {

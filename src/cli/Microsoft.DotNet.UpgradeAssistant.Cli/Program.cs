@@ -7,14 +7,15 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
+using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -42,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Name = GetProcessName(),
             };
 
-#if ANALYZE_COMMAND
+
             var upgradeCmd = new Command("upgrade");
             ConfigureUpgradeCommand(upgradeCmd);
             root.AddCommand(upgradeCmd);
@@ -50,9 +51,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             var analyzeCmd = new Command("analyze");
             ConfigureAnalyzeCommand(analyzeCmd);
             root.AddCommand(analyzeCmd);
-#else
-            ConfigureUpgradeCommand(root);
-#endif
 
             return new CommandLineBuilder(root)
                 .UseDefaults()
@@ -66,6 +64,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 return current.ProcessName;
             }
         }
+
+        public static Task<int> RunAnalysisAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
+    => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
+    {
+        services.AddScoped<IAppCommand, ConsoleAnalyze>();
+        services.AddAnalysis();
+    }), token);
 
         public static Task<int> RunUpgradeAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
             => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
@@ -104,7 +109,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
 
             var hostBuilder = Host.CreateDefaultBuilder()
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureServices((context, services) =>
                 {
@@ -207,18 +211,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
             command.AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option in non-interactive mode."));
             command.AddOption(new Option<int>(new[] { "--non-interactive-wait" }, "Wait the supplied seconds before moving on to the next option in non-interactive mode."));
-            command.AddOption(new Option<UpgradeTarget>(new[] { "--target-tfm-support" }, "Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean."));
         }
 
-#if ANALYZE_COMMAND
+
         private static void ConfigureAnalyzeCommand(Command command)
         {
-            command.Handler = CommandHandler.Create<UpgradeOptions>(RunAnalysisAsync);
+            command.Handler = CommandHandler.Create<UpgradeOptions, CancellationToken>((options, token) => RunAnalysisAsync(options, host => EnableLogging(options, host), token));
 
             command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
-            command.AddOption(new Option<string[]>(new[] { "--extension", "-e" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
+            command.AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--extension" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
+            command.AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--entry-point", "-e" }, "Provides the entry-point project to start the upgrade process. This may include globbing patterns such as '*' for match."));
         }
-#endif
+
     }
 }

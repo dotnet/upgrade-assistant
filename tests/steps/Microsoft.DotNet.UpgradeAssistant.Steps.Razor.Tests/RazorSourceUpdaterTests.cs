@@ -320,7 +320,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         var descriptor = new DiagnosticDescriptor($"Test{i}", $"Test diagnostic {i}", $"Test message {i}", "Test", DiagnosticSeverity.Warning, true);
                         var locations = diagnosticLocations[i];
                         analyzer.Setup(a => a.SupportedDiagnostics).Returns(ImmutableArray.Create(descriptor));
-                        analyzer.Setup(a => a.Initialize(It.IsAny<AnalysisContext>())).Callback<AnalysisContext>(context => context.RegisterSyntaxTreeAction(x =>
+                        analyzer.Setup(a => a.Initialize(It.IsAny<AnalyzeContext>())).Callback<AnalyzeContext>(context => context.RegisterSyntaxTreeAction(x =>
                         {
                             foreach (var lookup in locations.Where(l => GetFullPath(l.Path).Equals(x.Tree.FilePath, StringComparison.Ordinal)))
                             {

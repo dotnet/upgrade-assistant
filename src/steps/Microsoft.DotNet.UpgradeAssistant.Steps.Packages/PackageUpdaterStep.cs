@@ -27,6 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
+        private readonly IPackageAnalyzer _packageAnalyzer;
 
         private PackageAnalysisState? _analysisState;
 
@@ -73,6 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _analysisState = null;
+            _packageAnalyzer = new PackageAnalyzer(_packageRestorer, _packageAnalyzers, logger);
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
@@ -86,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             try
             {
-                if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
+                if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
@@ -123,12 +125,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 if (_analysisState.PackagesToAdd.Count > 0)
                 {
-                    Logger.LogInformation($"Packages to be added:\n{string.Join("\n", _analysisState.PackagesToAdd.Distinct())}");
+                    Logger.LogInformation($"Packages to be addded:\n{string.Join("\n", _analysisState.PackagesToAdd.Distinct())}");
                 }
 
                 if (_analysisState.FrameworkReferencesToAdd.Count > 0)
                 {
-                    Logger.LogInformation($"Framework references to be added:\n{string.Join("\n", _analysisState.FrameworkReferencesToAdd.Distinct())}");
+                    Logger.LogInformation($"Framework references to be addded:\n{string.Join("\n", _analysisState.FrameworkReferencesToAdd.Distinct())}");
                 }
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analysisState.ReferencesToRemove.Distinct().Count()} references need removed, {_analysisState.PackagesToRemove.Distinct().Count()} packages need removed, and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
@@ -169,7 +171,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         count++;
 
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
+                        if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
                         {
                             return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
                         }
@@ -186,32 +188,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}");
             }
-        }
-
-        private async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, CancellationToken token)
-        {
-            _analysisState = await PackageAnalysisState.CreateAsync(context, _packageRestorer, token).ConfigureAwait(false);
-            var projectRoot = context.CurrentProject;
-
-            if (projectRoot is null)
-            {
-                Logger.LogError("No project available");
-                return false;
-            }
-
-            // Iterate through all package references in the project file
-            foreach (var analyzer in _packageAnalyzers)
-            {
-                Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                _analysisState = await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
-                if (_analysisState.Failed)
-                {
-                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}", analyzer.Name);
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

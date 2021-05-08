@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+
 #if !NET5_0_OR_GREATER
 
 #pragma warning disable SA1402 // File may only contain a single type
