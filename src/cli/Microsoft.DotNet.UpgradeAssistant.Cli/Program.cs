@@ -95,9 +95,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         }
 
         private static Task<int> RunCommandAsync(
-            UpgradeOptions options,
-            Func<IHostBuilder, IHostBuilder> configure,
-            CancellationToken token)
+    UpgradeOptions options,
+    Func<IHostBuilder, IHostBuilder> configure,
+    CancellationToken token)
         {
             ConsoleUtils.Clear();
 
@@ -109,6 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
 
             var hostBuilder = Host.CreateDefaultBuilder()
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureServices((context, services) =>
                 {
