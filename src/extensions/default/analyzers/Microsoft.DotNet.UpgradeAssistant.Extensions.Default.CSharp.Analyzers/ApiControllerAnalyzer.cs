@@ -3,15 +3,12 @@
 
 using System;
 using System.Collections.Immutable;
-using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
-    [ApplicableComponents(ProjectComponents.AspNetCore)]
-    [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
-    public class ApiControllerAnalyzer : DiagnosticAnalyzer
+    public abstract class ApiControllerAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
@@ -55,29 +52,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             {
                 // For all such symbols, produce a diagnostic.
                 var node = namedTypeSymbol.DeclaringSyntaxReferences[0].GetSyntax();
-
+                ReportDiagnostic(context, node);
+            }
+            else if (baseType.ToDisplayString().Equals("ApiController", StringComparison.Ordinal) && baseType.TypeKind == TypeKind.Error)
+            {
+                // In this scenario we don't know where ApiController came from because the type is Error
+                var node = namedTypeSymbol.DeclaringSyntaxReferences[0].GetSyntax();
                 ReportDiagnostic(context, node);
             }
         }
 
-        private void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node)
-        {
-            var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), node.ToString());
-            context.ReportDiagnostic(diagnostic);
-        }
-
-        public static Project AddMetadataReferences(Project project)
-        {
-            if (project is null)
-            {
-                return project!;
-            }
-
-            // todo - still an open question about how we locate metadatareferences
-            const string assemblyFolder = @"C:\deleteMe\";
-            var assemblyPath = Path.Combine(assemblyFolder, $"System.Web.Http.dll");
-
-            return project.AddMetadataReference(MetadataReference.CreateFromFile(assemblyPath));
-        }
+        protected abstract void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node);
     }
 }

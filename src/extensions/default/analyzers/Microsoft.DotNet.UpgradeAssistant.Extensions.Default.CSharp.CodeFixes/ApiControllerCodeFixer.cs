@@ -1,10 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -56,10 +53,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
         }
 
         /// <summary>
-        /// Built with the assumption that the <paramref name="node"/> is a class that inherits from ApiController.
+        /// Built with the assumption that the <paramref name="node"/> is a IdentifierNameSyntax or QualifiedNameSyntax that indicates an ApiController BaseType.
         /// </summary>
         /// <param name="document">The document that contains a class to fix.</param>
-        /// <param name="node">A class that inherits from ApiController.</param>
+        /// <param name="node">A class that is ApiController.</param>
         /// <param name="cancellationToken">May request cancellation.</param>
         /// <returns>A document where at least one ApiController was removed.</returns>
         private async Task<Document> ReplaceBaseClass(Document document, SyntaxNode node, CancellationToken cancellationToken)
@@ -72,28 +69,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 generator.IdentifierName(GoodClassName))
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
-            // VB and C# only allow 1 parent class and it must be the first in the list
-            var baseType = GetBaseType(node, generator);
-
-            var newRoot = generator.ReplaceNode(root, baseType, mvcBaseType);
+            var newRoot = generator.ReplaceNode(root, node, mvcBaseType);
 
             var newDocument = document.WithSyntaxRoot(newRoot);
 
             newDocument = await ImportAdder.AddImportsAsync(newDocument, Simplifier.AddImportsAnnotation, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return newDocument;
-        }
-
-        private static SyntaxNode GetBaseType(SyntaxNode node, SyntaxGenerator generator)
-        {
-            var types = generator.GetBaseAndInterfaceTypes(node);
-            if (types != null && types.Count > 0)
-            {
-                return types[0];
-            }
-
-            types = generator.GetBaseAndInterfaceTypes(node.Parent);
-            return types[0];
         }
 
         private static SyntaxNode CreateMvcNamespace(SyntaxGenerator generator)

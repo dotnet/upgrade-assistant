@@ -140,8 +140,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
             else
             {
-                project = AddMetadataReferences(project);
-
                 var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
                 if (compilation is null)
                 {
@@ -159,13 +157,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                     Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
                 }
             }
-        }
-
-        public static Project AddMetadataReferences(Project project)
-        {
-            project = Extensions.Default.CSharp.Analyzers.ApiControllerAnalyzer.AddMetadataReferences(project);
-
-            return project;
         }
 
         private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)

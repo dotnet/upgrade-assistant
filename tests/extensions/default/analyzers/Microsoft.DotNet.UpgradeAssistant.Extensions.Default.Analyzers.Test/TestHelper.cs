@@ -15,7 +15,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
@@ -28,7 +27,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
-            new ApiControllerAnalyzer(),
+            new ApiControllerAnalyzerCSharp(),
+            new ApiControllerAnalyzerVisualBasic(),
             new BinaryFormatterUnsafeDeserializeAnalyzer(),
             new FilterAnalyzer(),
             new HelperResultAnalyzer(),
@@ -77,8 +77,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         {
             var analyzersToUse = AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
 
-            project = SourceUpdaterStep.AddMetadataReferences(project);
-
             var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
 
             if (compilation is null)
@@ -120,8 +118,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var projectLanguage = lang.GetFileExtension();
             var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
             var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
-
-            project = SourceUpdaterStep.AddMetadataReferences(project);
 
             var projectId = project.Id;
 

@@ -22,14 +22,14 @@ Namespace TestProject.TestClasses
     End Class
 
     Public Class NotAWebController2
-        Inherits Foo.ApiController2
+        Inherits Foo.ApiController
 
     End Class
 
 End Namespace
 
 Namespace Foo
-    Public Class ApiController2
+    Public Class ApiController
 
     End Class
 End Namespace
