@@ -117,7 +117,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests.csproj", "{61A3EF4A-68CC-442E-87EC-F05B874A4C98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Analysis", "Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj", "{5427E5F2-295F-4A96-A4D6-03546AF85BA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Analysis", "src\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj", "{5427E5F2-295F-4A96-A4D6-03546AF85BA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
