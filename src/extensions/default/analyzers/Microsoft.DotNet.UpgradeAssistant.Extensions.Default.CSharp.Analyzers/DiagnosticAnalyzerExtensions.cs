@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
         }
 
-        public static void RegisterMemberAccess(this AnalyzeContext context, Action<InvocationAnalysisContext> action)
+        public static void RegisterMemberAccess(this AnalysisContext context, Action<InvocationAnalysisContext> action)
         {
             var operationKinds = new[]
             {

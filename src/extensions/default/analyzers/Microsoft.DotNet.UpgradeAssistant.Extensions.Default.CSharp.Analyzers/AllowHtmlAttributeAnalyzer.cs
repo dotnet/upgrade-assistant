@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private static readonly string[] DisallowedNames = new[] { "AllowHtml", "AllowHtmlAttribute" };
 
-        public override void Initialize(AnalyzeContext context)
+        public override void Initialize(AnalysisContext context)
         {
             if (context is null)
             {
