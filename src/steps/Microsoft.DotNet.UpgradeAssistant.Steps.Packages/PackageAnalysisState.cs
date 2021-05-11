@@ -2,73 +2,41 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    public class PackageAnalysisState
+    internal class PackageAnalysisState : IDependencyAnalysisState
     {
-        public IList<Reference> FrameworkReferencesToAdd { get; }
-
-        public IList<Reference> FrameworkReferencesToRemove { get; }
-
-        public IList<NuGetReference> PackagesToAdd { get; }
-
-        public IList<NuGetReference> PackagesToRemove { get; }
-
-        public IList<Reference> ReferencesToRemove { get; }
-
-        public bool Failed { get; set; }
-
-        public bool PossibleBreakingChangeRecommended { get; set; }
-
-        public bool ChangesRecommended =>
-            FrameworkReferencesToAdd.Any()
-            || FrameworkReferencesToRemove.Any()
-            || PackagesToAdd.Any()
-            || PackagesToRemove.Any()
-            || ReferencesToRemove.Any();
-
-        private PackageAnalysisState()
+        public PackageAnalysisState(IProject project, INuGetReferences nugetReferences)
         {
-            FrameworkReferencesToAdd = new List<Reference>();
-            FrameworkReferencesToRemove = new List<Reference>();
-            PackagesToRemove = new List<NuGetReference>();
-            PackagesToAdd = new List<NuGetReference>();
-            ReferencesToRemove = new List<Reference>();
-            Failed = false;
-            PossibleBreakingChangeRecommended = false;
+            FrameworkReferences = new PackageCollection<Reference>(project.FrameworkReferences, SetRisk);
+            Packages = new PackageCollection<NuGetReference>(nugetReferences.PackageReferences, SetRisk);
+            References = new PackageCollection<Reference>(project.References, SetRisk);
+
+            void SetRisk(BuildBreakRisk risk)
+            {
+                if (risk != BuildBreakRisk.None)
+                {
+                    PossibleBreakingChangeRecommended = true;
+                }
+            }
         }
 
-        /// <summary>
-        /// Creates a new analysis state object for a given upgrade context. This involves restoring packages for the context's current project.
-        /// </summary>
-        /// <param name="context">The upgrade context to create an analysis state for.</param>
-        /// <param name="packageRestorer">The package restorer to use to restore packages for the context's project and generate a lock file.</param>
-        /// <returns>A new PackageAnalysisState instance for the specified context.</returns>
-        public static async Task<PackageAnalysisState> CreateAsync(IUpgradeContext context, IPackageRestorer packageRestorer, CancellationToken token)
-        {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+        public PackageCollection<Reference> FrameworkReferences { get; }
 
-            if (packageRestorer is null)
-            {
-                throw new ArgumentNullException(nameof(packageRestorer));
-            }
+        IDependencyCollection<Reference> IDependencyAnalysisState.FrameworkReferences => FrameworkReferences;
 
-            if (context.CurrentProject is null)
-            {
-                throw new InvalidOperationException("Target TFM must be set before analyzing package references");
-            }
+        public PackageCollection<NuGetReference> Packages { get; }
 
-            await packageRestorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
+        IDependencyCollection<NuGetReference> IDependencyAnalysisState.Packages => Packages;
 
-            return new PackageAnalysisState();
-        }
+        public PackageCollection<Reference> References { get; }
+
+        IDependencyCollection<Reference> IDependencyAnalysisState.References => References;
+
+        public bool PossibleBreakingChangeRecommended { get; private set; }
+
+        public bool ChangesRecommended => FrameworkReferences.HasChanges || Packages.HasChanges || References.HasChanges;
     }
 }
