@@ -44,6 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(project));
             }
 
+            _logger.LogDebug("Restoring packages for {ProjectPath} with dotnet restore", project.FileInfo.FullName);
             var result = await RunRestoreAsync(context, project.FileInfo.FullName, token).ConfigureAwait(false);
 
             // Reload the project because, by design, NuGet properties (like NuGetPackageRoot)
@@ -54,12 +55,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return result;
         }
 
-        private Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token)
-        {
-            // Run `dotnet restore` using quiet mode since some warnings and errors are
-            // expected. As long as a lock file is produced (which is checked elsewhere),
-            // the tool was successful enough.
-            return _runner.RunProcessAsync(new ProcessInfo
+        // Run `dotnet restore` using quiet mode since some warnings and errors are
+        // expected. As long as a lock file is produced (which is checked elsewhere),
+        // the tool was successful enough.
+        private Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token) =>
+            _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = "dotnet",
                 Arguments = _userInput.IsInteractive ? Invariant($"restore --interactive \"{path}\"") : Invariant($"restore \"{path}\""),
@@ -68,8 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 // dotnet-restore does not need to receive user input to authenticate, so the only thing
                 // necessary to enable interactive auth is to make sure that necessary messages are displayed to users.
-                GetMessageLogLevel = message => MessagesToDisplay.Any(m => message.Contains(m, StringComparison.Ordinal)) ? LogLevel.Information : LogLevel.Debug,
+                GetMessageLogLevel = (_, message) => MessagesToDisplay.Any(m => message.Contains(m, StringComparison.Ordinal)) ? LogLevel.Information : LogLevel.Debug,
             }, token);
-        }
     }
 }

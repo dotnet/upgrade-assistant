@@ -19,7 +19,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public int SuccessCode { get; init; }
 
-        public Func<string, LogLevel> GetMessageLogLevel { get; init; } = msg => msg.Contains("Error") ? LogLevel.Error : LogLevel.Information;
+        /// <summary>
+        /// Gets a func that determines what log level should be used to log a message. The func takes a boolean indicating
+        /// whether the message is from stderr and a string containing the text of the message.
+        /// </summary>
+        public Func<bool, string, LogLevel> GetMessageLogLevel { get; init; } = (isStdErr, _) => isStdErr ? LogLevel.Error : LogLevel.Information;
 
         public IEnumerable<KeyValuePair<string, string>> EnvironmentVariables { get; init; } = Enumerable.Empty<KeyValuePair<string, string>>();
 

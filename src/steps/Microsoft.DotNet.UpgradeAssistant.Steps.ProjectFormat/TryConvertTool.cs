@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using static System.FormattableString;
@@ -75,6 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 Arguments = GetArguments(project.Required()),
                 EnvironmentVariables = context.GlobalProperties,
                 IsErrorFilter = data => ErrorMessages.Any(data.Contains),
+                GetMessageLogLevel = (isStdErr, msg) => (isStdErr || ErrorMessages.Any(msg.Contains)) ? LogLevel.Error : LogLevel.Information
             }, token);
         }
 
