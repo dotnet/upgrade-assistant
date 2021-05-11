@@ -59,8 +59,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             using var registration = token.Register(() => tcs.SetCanceled());
 
             process.Exited += (_, __) => tcs.SetResult(true);
-            process.OutputDataReceived += args.Quiet ? QuietOutputReceived : OutputReceived;
-            process.ErrorDataReceived += args.Quiet ? QuietOutputReceived : OutputReceived;
+            process.OutputDataReceived += OutputReceived;
+            process.ErrorDataReceived += ErrorReceived;
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -69,14 +69,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             if (process.ExitCode != args.SuccessCode)
             {
-                if (args.Quiet)
-                {
-                    _logger.LogDebug("[{Tool}] Exited with non-success code: {ExitCode}", args.DisplayName, process.ExitCode);
-                }
-                else
-                {
-                    _logger.LogError("[{Tool}] Exited with non-success code: {ExitCode}", args.DisplayName, process.ExitCode);
-                }
+                var message = "[{Tool}] Error: Exited with non-success code: {ExitCode}";
+                _logger.Log(args.GetMessageLogLevel(true, message), message, args.DisplayName, process.ExitCode);
 
                 return false;
             }
@@ -89,21 +83,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             return true;
 
-            void OutputReceived(object sender, DataReceivedEventArgs e)
-            {
-                if (!string.IsNullOrWhiteSpace(e.Data))
-                {
-                    CheckForErrors(e.Data);
-                    _logger.LogInformation("[{Tool}] {Data}", args.DisplayName, e.Data);
-                }
-            }
+            void OutputReceived(object sender, DataReceivedEventArgs e) => ProcessMessage(false, e.Data);
 
-            void QuietOutputReceived(object sender, DataReceivedEventArgs e)
+            void ErrorReceived(object sender, DataReceivedEventArgs e) => ProcessMessage(true, e.Data);
+
+            void ProcessMessage(bool isStdErr, string message)
             {
-                if (!string.IsNullOrWhiteSpace(e.Data))
+                if (!string.IsNullOrWhiteSpace(message))
                 {
-                    CheckForErrors(e.Data);
-                    _logger.LogDebug("[{Tool}] {Data}", args.DisplayName, e.Data);
+                    CheckForErrors(message);
+                    _logger.Log(args.GetMessageLogLevel(isStdErr, message), "[{Tool}] {Data}", args.DisplayName, message);
                 }
             }
 
