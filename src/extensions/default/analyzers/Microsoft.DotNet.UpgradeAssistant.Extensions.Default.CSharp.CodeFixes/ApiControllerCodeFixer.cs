@@ -91,19 +91,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             return types[0];
         }
 
-        private static SyntaxNode CreateMvcNamespace(SyntaxGenerator generator)
-        {
-            return generator.QualifiedName(CreateAspNetCoreNamesapce(generator), generator.IdentifierName("Mvc"));
-        }
+        private static SyntaxNode CreateMvcNamespace(SyntaxGenerator generator) => generator.QualifiedName(CreateAspNetCoreNamesapce(generator), generator.IdentifierName("Mvc"));
 
-        private static SyntaxNode CreateAspNetCoreNamesapce(SyntaxGenerator generator)
-        {
-            return generator.QualifiedName(CreateMicrosoftNamesapce(generator), generator.IdentifierName("AspNetCore"));
-        }
+        private static SyntaxNode CreateAspNetCoreNamesapce(SyntaxGenerator generator) => generator.QualifiedName(CreateMicrosoftNamesapce(generator), generator.IdentifierName("AspNetCore"));
 
-        private static SyntaxNode CreateMicrosoftNamesapce(SyntaxGenerator generator)
-        {
-            return generator.IdentifierName("Microsoft");
-        }
+        private static SyntaxNode CreateMicrosoftNamesapce(SyntaxGenerator generator) => generator.IdentifierName("Microsoft");
     }
 }
