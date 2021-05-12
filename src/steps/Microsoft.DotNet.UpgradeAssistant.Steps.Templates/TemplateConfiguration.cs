@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
-    public class TemplateConfiguration
+    public class TemplateConfiguration : IFileOption
     {
         // This is a false positive
 #pragma warning disable CA2227 // Collection properties should be read only
@@ -23,6 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
         public ProjectComponents[]? TemplateAppliesTo { get; set; }
 
         public Language? TemplateLanguage { get; set; }
+
+        public IFileProvider Files { get; set; }
 
         internal async ValueTask<bool> AppliesToProject(IProject project, CancellationToken token)
         {

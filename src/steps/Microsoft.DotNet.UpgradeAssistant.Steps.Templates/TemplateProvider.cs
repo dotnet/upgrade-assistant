@@ -14,14 +14,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
     public class TemplateProvider
     {
-        private readonly ICollection<FileOption<TemplateConfiguration>> _options;
+        private readonly ICollection<TemplateConfiguration> _options;
         private readonly ILogger<TemplateProvider> _logger;
 
         public bool IsEmpty => _options.Count == 0;
 
-        public IEnumerable<string> TemplateConfigFileNames => _options.SelectMany(o => o.Value.TemplateItems).Select(t => t.Path);
+        public IEnumerable<string> TemplateConfigFileNames => _options.SelectMany(o => o.TemplateItems).Select(t => t.Path);
 
-        public TemplateProvider(IOptions<OptionCollection<FileOption<TemplateConfiguration>>> options, ILogger<TemplateProvider> logger)
+        public TemplateProvider(IOptions<OptionCollection<TemplateConfiguration>> options, ILogger<TemplateProvider> logger)
         {
             if (options is null)
             {
@@ -42,14 +42,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             {
                 // If there was a problem reading the configuration or the configuration only applies to certain output types
                 // or project types which don't match the project, then continue to the next configuration.
-                if (templateConfig.Value.TemplateItems is null || !await templateConfig.Value.AppliesToProject(project, token).ConfigureAwait(false))
+                if (templateConfig.TemplateItems is null || !await templateConfig.AppliesToProject(project, token).ConfigureAwait(false))
                 {
                     continue;
                 }
 
-                foreach (var templateItem in templateConfig.Value.TemplateItems)
+                foreach (var templateItem in templateConfig.TemplateItems)
                 {
-                    templates[templateItem.Path] = new RuntimeItemSpec(templateItem, templateConfig.Files, templateConfig.Value.Replacements ?? new Dictionary<string, string>());
+                    templates[templateItem.Path] = new RuntimeItemSpec(templateItem, templateConfig.Files, templateConfig.Replacements ?? new Dictionary<string, string>());
                 }
             }
 

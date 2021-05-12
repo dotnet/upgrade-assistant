@@ -27,6 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return new AggregateExtensionConfigureOptions<TOption>(sectionName, extensions);
             });
 
+            // Used to provide file provider for mapping files since not all options may implement IFileOption
             Services.AddTransient<IConfigureOptions<OptionCollection<FileOption<TOption>>>>(ctx =>
             {
                 var extensions = ctx.GetRequiredService<IEnumerable<IExtension>>();

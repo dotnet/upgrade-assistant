@@ -78,8 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public TestService(
           IOptions<SomeOptions> options, 
-          IOptions<OptionCollection<SomeOptions>> collection,
-          IOptions<OptionCollection<FileOption<SomeOptions>>> withFiles)
+          IOptions<OptionCollection<SomeOptions>> collection)
         {
         }
     }
@@ -90,11 +89,36 @@ Where each of these are various forms of the same options:
 
 - `IOptions<SomeOptions>` is a single instance where each source is layered on top of the other
 - `IOptions<OptionCollection<SomeOptions>>` is a collection of all of the options from each of the extensions
-- `IOptions<OptionCollection<FileOption<SomeOption>>>` is a collection of all of the options for each extension with an accompanying `IFileProvider` that allows access to files within that extension. This is useful of the options map to files within the extension.
+
+### Accessing extension files
+If you would like to be able to access the backing file structure, ensure your option type implements `IFileOption`:
+
+```csharp
+using Microsoft.Extensions.Options;
+
+namespace Microsoft.DotNet.UpgradeAssistant
+{
+    public class SomeOptions : IFileOption
+    {
+      public IFileProvider Files { get; set; }
+    }
+
+    public class TestService
+    {
+        public TestService(IOptions<SomeOptions> options)
+        {
+          // Can access files from where this option originated in case there are file paths in the options that need to be resolved
+          var files = options.Files;
+        }
+    }
+}
+```
+
+The `.Files` property will contain a scoped file provider to the directory of the extension to access files referenced within the options.
 
 ### Mapping custom configuration to files
 
-Often, an extension will allow for a list of files to be used to map to other types (see the PackageUpdater or TemplateUpdater steps for full examples):
+Often, an extension will allow for a list of files to be used to map to other types (see the PackageUpdater or TemplateUpdater steps for full examples). Since this is a common pattern, there is a helper to enable this mapping to a resolved option:
 
 ```csharp
 using System.Collections.Generic;
@@ -125,7 +149,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 As in the above section, this mapped file may be retrieved through various `IOptions<>` access patterns:
 
 - `IOptions<OptionCollection<SomeOtherOption>>` is a collection of all of the options from each of the extensions
-- `IOptions<OptionCollection<FileOption<SomeOtherOption>>>` is a collection of all of the options for each extension with an accompanying `IFileProvider` that allows access to files within that extension. This is useful of the options map to files within the extension.
+
+There is no way to access a single option, but only a collection of all the options from all the extensions. As stated above, if `SomeOtherOption : IFileOption`, then it would have access to a scoped file provider for that extension.
 
 ### Custom NuGet package mapping configuration
 

@@ -36,13 +36,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         }
 
         public void Configure(OptionCollection<TOption> options)
-            => Configure(options, static (_, o) => o);
+             => Configure(options, AddFiles);
 
         public void Configure(OptionCollection<FileOption<TOption>> options)
             => Configure(options, static (e, o) => new FileOption<TOption>
             {
                 Files = e.Files,
-                Value = o
+                Value = AddFiles(e, o)
             });
 
         private void Configure<T>(OptionCollection<T> options, Func<IExtension, TOption, T> factory)
@@ -56,6 +56,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     options.Value.Add(factory(extension, newOptions));
                 }
             }
+        }
+
+        private static TOption AddFiles(IExtension extension, TOption options)
+        {
+            if (options is IFileOption fileOption)
+            {
+                fileOption.Files = extension.Files;
+            }
+
+            return options;
         }
 
         private static Mapper GetMapper()

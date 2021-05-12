@@ -39,13 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 return configureOptionsFactory(factory, isArray);
             });
-
-            _services.Services.AddTransient<IConfigureOptions<OptionCollection<FileOption<TTo>>>>(ctx =>
-            {
-                var configureOptionsFactory = ctx.GetRequiredService<ExtensionMappedConfigurationFactory<TTo>>();
-
-                return configureOptionsFactory(factory, isArray);
-            });
         }
     }
 }

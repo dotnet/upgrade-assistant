@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal class ExtensionMappedFileConfigureOptions<TOption, TTo> : IConfigureOptions<OptionCollection<TTo>>, IConfigureOptions<OptionCollection<FileOption<TTo>>>
+    internal class ExtensionMappedFileConfigureOptions<TOption, TTo> : IConfigureOptions<OptionCollection<TTo>>
     {
         private readonly Func<TOption, IEnumerable<string>> _factory;
         private readonly bool _isArray;
@@ -35,12 +35,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         }
 
         public void Configure(OptionCollection<TTo> options)
-            => Configure(options, static (_, t) => t);
-
-        public void Configure(OptionCollection<FileOption<TTo>> options)
-            => Configure(options, static (files, other) => new FileOption<TTo> { Files = files, Value = other });
-
-        private void Configure<TInput>(OptionCollection<TInput> options, Func<IFileProvider, TTo, TInput> converter)
         {
             foreach (var other in _options.Value.Value)
             {
@@ -54,7 +48,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                         foreach (var obj in ReadAll(fileInfo))
                         {
-                            options.Value.Add(converter(newFileProvider, obj));
+                            if (obj is IFileOption fileOption)
+                            {
+                                fileOption.Files = newFileProvider;
+                            }
+
+                            options.Value.Add(obj);
                         }
                     }
                 }
