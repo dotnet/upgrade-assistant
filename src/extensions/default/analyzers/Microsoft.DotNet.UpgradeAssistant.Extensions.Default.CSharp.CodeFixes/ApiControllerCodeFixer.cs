@@ -69,13 +69,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 generator.IdentifierName(GoodClassName))
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
-            var newRoot = generator.ReplaceNode(root, node, mvcBaseType);
+            var baseType = GetBaseType(node, generator);
+
+            var newRoot = generator.ReplaceNode(root, baseType, mvcBaseType);
 
             var newDocument = document.WithSyntaxRoot(newRoot);
 
             newDocument = await ImportAdder.AddImportsAsync(newDocument, Simplifier.AddImportsAnnotation, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return newDocument;
+        }
+
+        private static SyntaxNode GetBaseType(SyntaxNode node, SyntaxGenerator generator)
+        {
+            var types = generator.GetBaseAndInterfaceTypes(node);
+            if (types == null || types.Count == 0)
+            {
+                types = generator.GetBaseAndInterfaceTypes(node.Parent);
+            }
+
+            return types[0];
         }
 
         private static SyntaxNode CreateMvcNamespace(SyntaxGenerator generator)

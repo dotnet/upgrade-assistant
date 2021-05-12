@@ -8,7 +8,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
-    public abstract class ApiControllerAnalyzer : DiagnosticAnalyzer
+    [ApplicableComponents(ProjectComponents.AspNetCore)]
+    [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
+    public class ApiControllerAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
@@ -63,9 +65,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private static bool IsBaseTypeAQualifiedReferenceToApiController(INamedTypeSymbol baseType)
         {
-            return baseType.ToDisplayString().Equals($"{ApiControllerClassName}.{ApiControllerClassName}", StringComparison.Ordinal);
+            return baseType.ToDisplayString().Equals($"{ApiControllerNamespace}.{ApiControllerClassName}", StringComparison.Ordinal);
         }
 
-        protected abstract void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node);
+        private static void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node)
+        {
+            // Note that we choose to report the diagnostic on the ClassStatementSyntax from the namedTypeSymbol because
+            // this simplifies the code maintenance for the Analyzer with the potential cost of a lower UX when running the analyzer in VS
+            //
+            // This is in contrast to reporting the diagnostic on the BaseTypeSyntax and highlighting ApiController specifically
+            // 1. namedTypeSymbol.baseType does not have a DeclaringSyntaxReferences[0] that is in the code. The reference is in the metadata.
+            // 2. highlighting the baseType means syntax analysis which we would implement in a language specific way in a child class
+            var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), node.ToString());
+            context.ReportDiagnostic(diagnostic);
+        }
     }
 }

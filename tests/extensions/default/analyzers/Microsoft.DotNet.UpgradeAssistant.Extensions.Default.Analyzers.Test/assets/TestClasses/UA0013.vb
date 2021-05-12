@@ -8,7 +8,9 @@ Namespace TestProject.TestClasses
 
         ' GET api/values
         Public Function GetValues() As IEnumerable(Of String)
-            Return New String() {"value1", "value2"}
+            Dim fooService1 = New NotAWebController2()
+
+            Return fooService
         End Function
     End Class
 
@@ -23,6 +25,10 @@ Namespace TestProject.TestClasses
 
     Public Class NotAWebController2
         Inherits Foo.ApiController
+
+        Public Function GetValues() As IEnumerable(Of String)
+            Return New String() {"value1", "value2"}
+        End Function
 
     End Class
 
