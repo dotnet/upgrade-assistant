@@ -77,18 +77,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public class TestService
     {
         public TestService(
-          IOptions<SomeOptions> options, 
+          // Get a merged set of options from all extensions
+          IOptions<SomeOptions> options,
+
+          // Get options from each extension as separate options
           IOptions<ICollection<SomeOptions>> collection)
         {
         }
     }
 }
 ```
-
-Where each of these are various forms of the same options:
-
-- `IOptions<SomeOptions>` is a single instance where each source is layered on top of the other
-- `IOptions<OptionCollection<SomeOptions>>` is a collection of all of the options from each of the extensions
 
 ### Accessing extension files
 If you would like to be able to access the backing file structure, ensure your option type implements `IFileOption`:
@@ -105,10 +103,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
     public class TestService
     {
-        public TestService(IOptions<SomeOptions> options)
+        public TestService(
+          // Get options for each extension with a scope file provider
+          IOptions<ICollection<SomeOptions>> options)
         {
-          // Can access files from where this option originated in case there are file paths in the options that need to be resolved
-          var files = options.Files;
         }
     }
 }
@@ -126,6 +124,15 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
+    public class SomeOptions
+    {
+        public IEnumerable<string> Files { get; set; }
+    }
+
+    public class SomeOtherOption
+    {
+    }
+
     public class TestExtension : IExtensionServiceProvider
     {
         public void AddServices(IExtensionServiceCollection services)
@@ -135,20 +142,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
     }
 
-    public class SomeOptions
+    public class TestService
     {
-        public IEnumerable<string> Files { get; set; }
-    }
-
-    public class SomeOtherOption
-    {
+        public TestService(
+          // Get the mapped options from each extension
+          IOptions<ICollection<SomeOtherOption>> options)
+        {
+        }
     }
 }
 ```
-
-As in the above section, this mapped file may be retrieved through various `IOptions<>` access patterns:
-
-- `IOptions<OptionCollection<SomeOtherOption>>` is a collection of all of the options from each of the extensions
 
 There is no way to access a single option, but only a collection of all the options from all the extensions. As stated above, if `SomeOtherOption : IFileOption`, then it would have access to a scoped file provider for that extension.
 
