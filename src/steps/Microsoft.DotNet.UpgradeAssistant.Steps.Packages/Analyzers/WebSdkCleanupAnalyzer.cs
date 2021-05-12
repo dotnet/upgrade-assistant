@@ -5,8 +5,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {

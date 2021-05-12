@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 {
     public interface IDependencyCollection<T> : IEnumerable<T>
     {
