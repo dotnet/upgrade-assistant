@@ -28,6 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
+        private IPackageAnalyzer _packageAnalyzer;
 
         private DependencyAnalysisState? _analysisState;
 
@@ -74,6 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _analysisState = null;
+            _packageAnalyzer = new PackageAnalyzer(_packageRestorer, _packageAnalyzers, logger);
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
@@ -87,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             try
             {
-                if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
+                if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
@@ -164,7 +166,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         count++;
 
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
+                        if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
                         {
                             return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
                         }
@@ -181,46 +183,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}");
             }
-        }
-
-        private async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, CancellationToken token)
-        {
-            if (context.CurrentProject is null)
-            {
-                return false;
-            }
-
-            await _packageRestorer.RestorePackagesAsync(context, context.CurrentProject, token).ConfigureAwait(false);
-            var nugetReferences = await context.CurrentProject.GetNuGetReferencesAsync(token).ConfigureAwait(false);
-
-            _analysisState = new DependencyAnalysisState(context.CurrentProject, nugetReferences);
-
-            var projectRoot = context.CurrentProject;
-
-            if (projectRoot is null)
-            {
-                Logger.LogError("No project available");
-                return false;
-            }
-
-            // Iterate through all package references in the project file
-            foreach (var analyzer in _packageAnalyzers)
-            {
-                Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                try
-                {
-                    await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
-                }
-#pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception e)
-#pragma warning restore CA1031 // Do not catch general exception types
-                {
-                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

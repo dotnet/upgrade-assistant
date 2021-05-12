@@ -9,7 +9,7 @@ using Microsoft.DotNet.UpgradeAssistant.Packages;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    internal class DependencyCollection<T> : IDependencyCollection<T>
+    public class DependencyCollection<T> : IDependencyCollection<T>
     {
         private readonly IEnumerable<T> _initial;
         private readonly Action<BuildBreakRisk> _setRisk;
