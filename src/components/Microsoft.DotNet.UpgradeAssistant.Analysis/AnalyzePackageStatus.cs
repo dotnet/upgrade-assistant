@@ -41,7 +41,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
                 {
                     Logger.LogCritical("Package Analysis Failed for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
-
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types

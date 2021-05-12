@@ -9,11 +9,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public class AnalyzeContext
     {
-        private IUpgradeContext _context;
-
         public AnalyzeContext(IUpgradeContext context)
         {
-            _context = context;
+            UpgradeContext = context;
         }
 
         public IUpgradeContext UpgradeContext { get; }
