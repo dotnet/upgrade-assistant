@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
 
-        private PackageAnalysisState? _analysisState;
+        private DependencyAnalysisState? _analysisState;
 
         public override string Description => "Update package references to versions compatible with the target framework";
 
@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 return new UpgradeStepInitializeResult(
                     UpgradeStepStatus.Incomplete,
-                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
+                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", _analysisState.Risk);
             }
         }
 
@@ -193,7 +193,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             await _packageRestorer.RestorePackagesAsync(context, context.CurrentProject, token).ConfigureAwait(false);
             var nugetReferences = await context.CurrentProject.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
-            _analysisState = new PackageAnalysisState(context.CurrentProject, nugetReferences);
+            _analysisState = new DependencyAnalysisState(context.CurrentProject, nugetReferences);
 
             var projectRoot = context.CurrentProject;
 

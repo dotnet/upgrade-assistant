@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                         }
 
                         state.Packages.Remove(packageReference);
-                        state.Packages.Add(updatedReference, isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.None);
+                        state.Packages.Add(updatedReference, isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
                     }
                 }
             }

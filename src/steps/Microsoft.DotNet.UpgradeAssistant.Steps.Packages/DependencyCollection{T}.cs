@@ -9,12 +9,12 @@ using Microsoft.DotNet.UpgradeAssistant.Packages;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    internal class PackageCollection<T> : IDependencyCollection<T>
+    internal class DependencyCollection<T> : IDependencyCollection<T>
     {
         private readonly IEnumerable<T> _initial;
         private readonly Action<BuildBreakRisk> _setRisk;
 
-        public PackageCollection(IEnumerable<T> initial, Action<BuildBreakRisk> setRisk)
+        public DependencyCollection(IEnumerable<T> initial, Action<BuildBreakRisk> setRisk)
         {
             _initial = initial;
             _setRisk = setRisk;
@@ -26,14 +26,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         bool IDependencyCollection<T>.Add(T item, BuildBreakRisk risk)
         {
-            _setRisk(risk);
-            return Additions.Add(item);
+            if (Additions.Add(item))
+            {
+                _setRisk(risk);
+                return true;
+            }
+
+            return false;
         }
 
         bool IDependencyCollection<T>.Remove(T item, BuildBreakRisk risk)
         {
-            _setRisk(risk);
-            return Deletions.Add(item);
+            if (Deletions.Add(item))
+            {
+                _setRisk(risk);
+                return true;
+            }
+
+            return false;
         }
 
         public IEnumerator<T> GetEnumerator()
