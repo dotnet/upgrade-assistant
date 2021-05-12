@@ -13,8 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
 
-        public const string BadNamespace = "System.Web.Http";
-        public const string BadClassName = "ApiController";
+        public const string ApiControllerNamespace = "System.Web.Http";
+        public const string ApiControllerClassName = "ApiController";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiControllerDescription), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiControllerDescription), Resources.ResourceManager, typeof(Resources));
@@ -47,19 +47,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 return;
             }
 
-            // Find just the named type symbols with names containing lowercase letters.
-            if (baseType.ToDisplayString().Equals("System.Web.Http.ApiController", StringComparison.Ordinal))
+            if (IsBaseTypeAQualifiedReferenceToApiController(baseType)
+                || IsBaseTypeAnImplicitReferenceToApiController(baseType))
             {
                 // For all such symbols, produce a diagnostic.
                 var node = namedTypeSymbol.DeclaringSyntaxReferences[0].GetSyntax();
                 ReportDiagnostic(context, node);
             }
-            else if (baseType.ToDisplayString().Equals("ApiController", StringComparison.Ordinal) && baseType.TypeKind == TypeKind.Error)
-            {
-                // In this scenario we don't know where ApiController came from because the type is Error
-                var node = namedTypeSymbol.DeclaringSyntaxReferences[0].GetSyntax();
-                ReportDiagnostic(context, node);
-            }
+        }
+
+        private static bool IsBaseTypeAnImplicitReferenceToApiController(INamedTypeSymbol baseType)
+        {
+            return baseType.ToDisplayString().Equals(ApiControllerClassName, StringComparison.Ordinal) && baseType.TypeKind == TypeKind.Error;
+        }
+
+        private static bool IsBaseTypeAQualifiedReferenceToApiController(INamedTypeSymbol baseType)
+        {
+            return baseType.ToDisplayString().Equals($"{ApiControllerClassName}.{ApiControllerClassName}", StringComparison.Ordinal);
         }
 
         protected abstract void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node);
