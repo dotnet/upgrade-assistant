@@ -26,6 +26,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         bool IDependencyCollection<T>.Add(T item, BuildBreakRisk risk)
         {
+            if (_initial.Contains(item))
+            {
+                return false;
+            }
+
             if (Additions.Add(item))
             {
                 _setRisk(risk);
@@ -37,6 +42,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         bool IDependencyCollection<T>.Remove(T item, BuildBreakRisk risk)
         {
+            if (!_initial.Contains(item))
+            {
+                return false;
+            }
+
             if (Deletions.Add(item))
             {
                 _setRisk(risk);
