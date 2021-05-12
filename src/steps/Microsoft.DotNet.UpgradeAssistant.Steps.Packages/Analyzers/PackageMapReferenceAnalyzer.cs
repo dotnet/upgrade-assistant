@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         public string Name => "Package map reference analyzer";
 
         public PackageMapReferenceAnalyzer(
-            IOptions<ICollection<NuGetPackageMap>> packageMaps,
+            IOptions<ICollection<NuGetPackageMap[]>> packageMaps,
             IPackageLoader packageLoader,
             IVersionComparer comparer,
             ILogger<PackageMapReferenceAnalyzer> logger)
@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(packageMaps));
             }
 
-            _packageMaps = packageMaps.Value;
+            _packageMaps = packageMaps.Value.SelectMany(p => p);
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.Services.AddUpgradeStep<PackageUpdaterStep>();
 
             services.AddExtensionOption<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
-                .MapFiles<NuGetPackageMap>(t => Path.Combine(t.PackageMapPath, PackageMapExtension), isArray: true);
+                .MapFiles<NuGetPackageMap[]>(t => Path.Combine(t.PackageMapPath, PackageMapExtension));
         }
     }
 }

@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public void AddServices(IExtensionServiceCollection services)
         {
             services.AddExtensionOption<SomeOptions>("sectionName")
-                .MapFiles<SomeOtherOption>(o => o.Files, isArray: true);
+                .MapFiles<SomeOtherOption>(o => o.Files);
         }
     }
 

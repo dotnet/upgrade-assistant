@@ -18,8 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// </summary>
         /// <typeparam name="TTo">Type mapped file should be deserialized to.</typeparam>
         /// <param name="factory">Method to retrieve file paths.</param>
-        /// <param name="isArray">An option if the supplied object is an array. If <c>false</c>, only a single instance will be expected in the file.</param>
-        void MapFiles<TTo>(Func<TOption, IEnumerable<string>> factory, bool isArray);
+        void MapFiles<TTo>(Func<TOption, IEnumerable<string>> factory);
 
         /// <summary>
         /// Maps file paths given in <typeparamref name="TOption"/> to options of <typeparamref name="TTo"/>.
@@ -30,7 +29,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// </summary>
         /// <typeparam name="TTo">Type mapped file should be deserialized to.</typeparam>
         /// <param name="factory">Method to retrieve file path.</param>
-        /// <param name="isArray">An option if the supplied object is an array. If <c>false</c>, only a single instance will be expected in the file.</param>
-        void MapFiles<TTo>(Func<TOption, string?> factory, bool isArray);
+        void MapFiles<TTo>(Func<TOption, string?> factory);
     }
 }

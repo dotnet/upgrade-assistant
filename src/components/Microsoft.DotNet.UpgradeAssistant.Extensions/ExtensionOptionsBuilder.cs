@@ -19,17 +19,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             _services = services;
         }
 
-        public void MapFiles<TTo>(Func<TOption, string?> factory, bool isArray)
+        public void MapFiles<TTo>(Func<TOption, string?> factory)
             => MapFiles<TTo>(o =>
             {
                 var result = factory(o);
 
                 return result is null ? Enumerable.Empty<string>() : new[] { result };
-            }, isArray);
+            });
 
-        private delegate ExtensionMappedFileConfigureOptions<TOption, TTo> ExtensionMappedConfigurationFactory<TTo>(Func<TOption, IEnumerable<string>> factory, bool isArray);
+        private delegate ExtensionMappedFileConfigureOptions<TOption, TTo> ExtensionMappedConfigurationFactory<TTo>(Func<TOption, IEnumerable<string>> factory);
 
-        public void MapFiles<TTo>(Func<TOption, IEnumerable<string>> factory, bool isArray)
+        public void MapFiles<TTo>(Func<TOption, IEnumerable<string>> factory)
         {
             // The default options factory cannot create an instance of ICollection<>
             _services.Services.AddTransient<IOptionsFactory<ICollection<TTo>>, CollectionOptionsFactory<TTo>>();
@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 var configureOptionsFactory = ctx.GetRequiredService<ExtensionMappedConfigurationFactory<TTo>>();
 
-                return configureOptionsFactory(factory, isArray);
+                return configureOptionsFactory(factory);
             });
         }
     }

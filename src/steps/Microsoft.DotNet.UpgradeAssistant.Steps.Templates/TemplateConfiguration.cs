@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         public Language? TemplateLanguage { get; set; }
 
-        public IFileProvider Files { get; set; }
+        public IFileProvider Files { get; set; } = null!;
 
         internal async ValueTask<bool> AppliesToProject(IProject project, CancellationToken token)
         {

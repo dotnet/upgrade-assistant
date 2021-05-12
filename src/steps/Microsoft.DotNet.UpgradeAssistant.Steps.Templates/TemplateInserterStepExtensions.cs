@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.Services.AddOptions<JsonSerializerOptions>()
                 .Configure(o => o.Converters.Add(new JsonStringProjectItemTypeConverter()));
             services.AddExtensionOption<TemplateInserterOptions>(TemplateInserterOptionsSectionName)
-                .MapFiles<TemplateConfiguration>(t => t.TemplateConfigFiles, isArray: false);
+                .MapFiles<TemplateConfiguration>(t => t.TemplateConfigFiles);
 
             return services.Services;
         }
