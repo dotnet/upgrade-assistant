@@ -3,10 +3,10 @@
 
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
