@@ -11,6 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public interface IPackageAnalyzer
     {
-        public Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, PackageAnalysisState? analysisState, CancellationToken token);
+        public Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, DependencyAnalysisState? analysisState, CancellationToken token);
     }
 }

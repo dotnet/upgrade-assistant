@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
@@ -13,12 +14,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     public class PackageAnalyzer : IPackageAnalyzer
     {
         private readonly IPackageRestorer _packageRestorer;
-        private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
+        private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
 
         protected ILogger Logger { get; }
 
         public PackageAnalyzer(IPackageRestorer packageRestorer,
-            IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
+            IEnumerable<IDependencyAnalyzer> packageAnalyzers,
             ILogger logger)
         {
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
@@ -26,9 +27,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             Logger = logger;
         }
 
-        public async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, PackageAnalysisState? analysisState, CancellationToken token)
+        public async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, DependencyAnalysisState? analysisState, CancellationToken token)
         {
-            analysisState = await PackageAnalysisState.CreateAsync(context, _packageRestorer, token).ConfigureAwait(false);
+            if (context?.CurrentProject is null)
+            {
+                return false;
+            }
+
+            await _packageRestorer.RestorePackagesAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+            var nugetReferences = await context.CurrentProject.GetNuGetReferencesAsync(token).ConfigureAwait(false);
+
+            analysisState = new DependencyAnalysisState(context.CurrentProject, nugetReferences);
+
             var projectRoot = context.CurrentProject;
 
             if (projectRoot is null)
@@ -41,10 +51,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             foreach (var analyzer in _packageAnalyzers)
             {
                 Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                analysisState = await analyzer.AnalyzeAsync(projectRoot, analysisState, token).ConfigureAwait(false);
-                if (analysisState.Failed)
+                try
                 {
-                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}", analyzer.Name);
+                    await analyzer.AnalyzeAsync(projectRoot, analysisState, token).ConfigureAwait(false);
+                }
+#pragma warning disable CA1031 // Do not catch general exception types
+                catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
+                {
+                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
                     return false;
                 }
             }

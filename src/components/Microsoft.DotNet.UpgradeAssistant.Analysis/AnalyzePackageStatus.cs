@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.Logging;
 
@@ -10,15 +11,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
     public class AnalyzePackageStatus : IAnalyzeResultProvider
     {
         private readonly IPackageRestorer _packageRestorer;
-        private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
+        private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
         private readonly IPackageAnalyzer _packageAnalyzer;
 
-        private PackageAnalysisState? _analysisState;
+        private DependencyAnalysisState? _analysisState;
 
         protected ILogger Logger { get; }
 
         public AnalyzePackageStatus(IPackageRestorer packageRestorer,
-            IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
+            IEnumerable<IDependencyAnalyzer> packageAnalyzers,
             ILogger<AnalyzePackageStatus> logger)
         {
             Logger = logger;

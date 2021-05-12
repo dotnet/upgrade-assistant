@@ -28,6 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
+        private IPackageAnalyzer _packageAnalyzer;
 
         private DependencyAnalysisState? _analysisState;
 
@@ -182,46 +183,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}");
             }
-        }
-
-        private async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, CancellationToken token)
-        {
-            if (context.CurrentProject is null)
-            {
-                return false;
-            }
-
-            await _packageRestorer.RestorePackagesAsync(context, context.CurrentProject, token).ConfigureAwait(false);
-            var nugetReferences = await context.CurrentProject.GetNuGetReferencesAsync(token).ConfigureAwait(false);
-
-            _analysisState = new DependencyAnalysisState(context.CurrentProject, nugetReferences);
-
-            var projectRoot = context.CurrentProject;
-
-            if (projectRoot is null)
-            {
-                Logger.LogError("No project available");
-                return false;
-            }
-
-            // Iterate through all package references in the project file
-            foreach (var analyzer in _packageAnalyzers)
-            {
-                Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                try
-                {
-                    await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
-                }
-#pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception e)
-#pragma warning restore CA1031 // Do not catch general exception types
-                {
-                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }

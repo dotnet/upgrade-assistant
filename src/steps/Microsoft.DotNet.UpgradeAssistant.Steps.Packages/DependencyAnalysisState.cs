@@ -6,7 +6,7 @@ using Microsoft.DotNet.UpgradeAssistant.Packages;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    internal class DependencyAnalysisState : IDependencyAnalysisState
+    public class DependencyAnalysisState : IDependencyAnalysisState
     {
         public DependencyAnalysisState(IProject project, INuGetReferences nugetReferences)
         {
