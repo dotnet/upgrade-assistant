@@ -5,11 +5,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
-    public class TargetCompatibilityReferenceAnalyzer : IPackageReferencesAnalyzer
+    public class TargetCompatibilityReferenceAnalyzer : IDependencyAnalyzer
     {
         private readonly IPackageLoader _packageLoader;
         private readonly IVersionComparer _comparer;
@@ -27,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -41,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
-            foreach (var packageReference in references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in state.Packages)
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
                 if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, project.TargetFrameworks, token).ConfigureAwait(false))
@@ -67,7 +68,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                         if (isMajorChange)
                         {
                             _logger.LogWarning("Package {NuGetPackage} has been upgraded across major versions ({OldVersion} -> {NewVersion}) which may introduce breaking changes", packageReference.Name, packageReference.Version, updatedReference.Version);
-                            state.PossibleBreakingChangeRecommended = true;
                         }
 
                         if (updatedReference.IsPrerelease)
@@ -75,13 +75,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                             _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", project.TargetFrameworks));
                         }
 
-                        state.PackagesToRemove.Add(packageReference);
-                        state.PackagesToAdd.Add(updatedReference);
+                        state.Packages.Remove(packageReference);
+                        state.Packages.Add(updatedReference, isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
                     }
                 }
             }
-
-            return state;
         }
     }
 }
