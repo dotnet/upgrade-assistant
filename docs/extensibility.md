@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         public TestService(
           IOptions<SomeOptions> options, 
-          IOptions<OptionCollection<SomeOptions>> collection)
+          IOptions<ICollection<SomeOptions>> collection)
         {
         }
     }

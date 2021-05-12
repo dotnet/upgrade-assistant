@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
         public string Name => "Package map reference analyzer";
 
         public PackageMapReferenceAnalyzer(
-            IOptions<OptionCollection<NuGetPackageMap>> packageMaps,
+            IOptions<ICollection<NuGetPackageMap>> packageMaps,
             IPackageLoader packageLoader,
             IVersionComparer comparer,
             ILogger<PackageMapReferenceAnalyzer> logger)
@@ -33,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(packageMaps));
             }
 
-            _packageMaps = packageMaps.Value.Value;
+            _packageMaps = packageMaps.Value;
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

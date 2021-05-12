@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -21,14 +20,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         public IEnumerable<string> TemplateConfigFileNames => _options.SelectMany(o => o.TemplateItems).Select(t => t.Path);
 
-        public TemplateProvider(IOptions<OptionCollection<TemplateConfiguration>> options, ILogger<TemplateProvider> logger)
+        public TemplateProvider(IOptions<ICollection<TemplateConfiguration>> options, ILogger<TemplateProvider> logger)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _options = options.Value.Value;
+            _options = options.Value;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

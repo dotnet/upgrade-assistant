@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal class AggregateExtensionConfigureOptions<TOption> : IConfigureOptions<TOption>, IConfigureOptions<OptionCollection<TOption>>, IConfigureOptions<OptionCollection<FileOption<TOption>>>
+    internal class AggregateExtensionConfigureOptions<TOption> : IConfigureOptions<TOption>, IConfigureOptions<ICollection<TOption>>, IConfigureOptions<ICollection<FileOption<TOption>>>
         where TOption : class, new()
     {
         private readonly string _sectionName;
@@ -35,17 +35,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
         }
 
-        public void Configure(OptionCollection<TOption> options)
+        public void Configure(ICollection<TOption> options)
              => Configure(options, AddFiles);
 
-        public void Configure(OptionCollection<FileOption<TOption>> options)
+        public void Configure(ICollection<FileOption<TOption>> options)
             => Configure(options, static (e, o) => new FileOption<TOption>
             {
                 Files = e.Files,
                 Value = AddFiles(e, o)
             });
 
-        private void Configure<T>(OptionCollection<T> options, Func<IExtension, TOption, T> factory)
+        private void Configure<T>(ICollection<T> options, Func<IExtension, TOption, T> factory)
         {
             foreach (var extension in _extensions)
             {
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 if (newOptions is not null)
                 {
-                    options.Value.Add(factory(extension, newOptions));
+                    options.Add(factory(extension, newOptions));
                 }
             }
         }

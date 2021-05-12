@@ -12,19 +12,19 @@ using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal class ExtensionMappedFileConfigureOptions<TOption, TTo> : IConfigureOptions<OptionCollection<TTo>>
+    internal class ExtensionMappedFileConfigureOptions<TOption, TTo> : IConfigureOptions<ICollection<TTo>>
     {
         private readonly Func<TOption, IEnumerable<string>> _factory;
         private readonly bool _isArray;
         private readonly JsonSerializerOptions _serializerOptions;
-        private readonly IOptions<OptionCollection<FileOption<TOption>>> _options;
+        private readonly IOptions<ICollection<FileOption<TOption>>> _options;
         private readonly ILogger<ExtensionMappedFileConfigureOptions<TOption, TTo>> _logger;
 
         public ExtensionMappedFileConfigureOptions(
             Func<TOption, IEnumerable<string>> factory,
             bool isArray,
             IOptions<JsonSerializerOptions> serializerOptions,
-            IOptions<OptionCollection<FileOption<TOption>>> options,
+            IOptions<ICollection<FileOption<TOption>>> options,
             ILogger<ExtensionMappedFileConfigureOptions<TOption, TTo>> logger)
         {
             _factory = factory;
@@ -34,9 +34,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             _logger = logger;
         }
 
-        public void Configure(OptionCollection<TTo> options)
+        public void Configure(ICollection<TTo> options)
         {
-            foreach (var other in _options.Value.Value)
+            foreach (var other in _options.Value)
             {
                 foreach (var path in _factory(other.Value))
                 {
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                                 fileOption.Files = newFileProvider;
                             }
 
-                            options.Value.Add(obj);
+                            options.Add(obj);
                         }
                     }
                 }

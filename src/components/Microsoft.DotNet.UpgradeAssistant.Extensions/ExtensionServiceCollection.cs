@@ -8,11 +8,18 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    public record ExtensionServiceConfiguration(IServiceCollection Services, IConfiguration Configuration) : IExtensionServiceCollection
+    public record ExtensionServiceCollection(IServiceCollection Services, IConfiguration Configuration) : IExtensionServiceCollection
     {
         public IExtensionOptionsBuilder<TOption> AddExtensionOption<TOption>(string sectionName)
             where TOption : class, new()
         {
+            // Register options first so our custom factory isn't overwritten
+            Services.AddOptions();
+
+            // The default options factory cannot create an instance of ICollection<>
+            Services.AddTransient<IOptionsFactory<ICollection<TOption>>, CollectionOptionsFactory<TOption>>();
+            Services.AddTransient<IOptionsFactory<ICollection<FileOption<TOption>>>, CollectionOptionsFactory<FileOption<TOption>>>();
+
             Services.AddTransient<IConfigureOptions<TOption>>(ctx =>
             {
                 var extensions = ctx.GetRequiredService<IEnumerable<IExtension>>();
@@ -20,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return new AggregateExtensionConfigureOptions<TOption>(sectionName, extensions);
             });
 
-            Services.AddTransient<IConfigureOptions<OptionCollection<TOption>>>(ctx =>
+            Services.AddTransient<IConfigureOptions<ICollection<TOption>>>(ctx =>
             {
                 var extensions = ctx.GetRequiredService<IEnumerable<IExtension>>();
 
@@ -28,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             });
 
             // Used to provide file provider for mapping files since not all options may implement IFileOption
-            Services.AddTransient<IConfigureOptions<OptionCollection<FileOption<TOption>>>>(ctx =>
+            Services.AddTransient<IConfigureOptions<ICollection<FileOption<TOption>>>>(ctx =>
             {
                 var extensions = ctx.GetRequiredService<IEnumerable<IExtension>>();
 

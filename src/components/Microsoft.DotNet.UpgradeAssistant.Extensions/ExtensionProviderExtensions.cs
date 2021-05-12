@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                     foreach (var sp in serviceProviders)
                     {
-                        sp.AddServices(new ExtensionServiceConfiguration(services, extensionConfiguration));
+                        sp.AddServices(new ExtensionServiceCollection(services, extensionConfiguration));
                     }
                 }
                 catch (FileLoadException)

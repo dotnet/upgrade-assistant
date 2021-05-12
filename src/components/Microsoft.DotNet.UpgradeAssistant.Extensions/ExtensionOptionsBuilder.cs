@@ -12,9 +12,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal class ExtensionOptionsBuilder<TOption> : IExtensionOptionsBuilder<TOption>
     {
-        private readonly ExtensionServiceConfiguration _services;
+        private readonly ExtensionServiceCollection _services;
 
-        public ExtensionOptionsBuilder(ExtensionServiceConfiguration services)
+        public ExtensionOptionsBuilder(ExtensionServiceCollection services)
         {
             _services = services;
         }
@@ -31,9 +31,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public void MapFiles<TTo>(Func<TOption, IEnumerable<string>> factory, bool isArray)
         {
+            // The default options factory cannot create an instance of ICollection<>
+            _services.Services.AddTransient<IOptionsFactory<ICollection<TTo>>, CollectionOptionsFactory<TTo>>();
+
             _services.Services.TryAddTransient(typeof(ExtensionMappedFileConfigureOptions<,>));
 
-            _services.Services.AddTransient<IConfigureOptions<OptionCollection<TTo>>>(ctx =>
+            _services.Services.AddTransient<IConfigureOptions<ICollection<TTo>>>(ctx =>
             {
                 var configureOptionsFactory = ctx.GetRequiredService<ExtensionMappedConfigurationFactory<TTo>>();
 
