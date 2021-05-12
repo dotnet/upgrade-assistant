@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -26,9 +27,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private const int MaxAnalysisIterations = 3;
 
         private readonly IPackageRestorer _packageRestorer;
-        private readonly IEnumerable<IPackageReferencesAnalyzer> _packageAnalyzers;
+        private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
 
-        private PackageAnalysisState? _analysisState;
+        private DependencyAnalysisState? _analysisState;
 
         public override string Description => "Update package references to versions compatible with the target framework";
 
@@ -55,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public PackageUpdaterStep(
             IPackageRestorer packageRestorer,
-            IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
+            IEnumerable<IDependencyAnalyzer> packageAnalyzers,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
@@ -95,32 +96,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
             else
             {
-                if (_analysisState.ReferencesToRemove.Count > 0)
+                LogDetails("References to be removed: {References}", _analysisState.References.Deletions);
+                LogDetails("References to be added: {References}", _analysisState.References.Additions);
+                LogDetails("Packages to be removed: {Packages}", _analysisState.Packages.Deletions);
+                LogDetails("Packages to be added: {Packages}", _analysisState.Packages.Additions);
+                LogDetails("Framework references to be added: {FrameworkReference}", _analysisState.FrameworkReferences.Additions);
+                LogDetails("Framework references to be removed: {FrameworkReference}", _analysisState.FrameworkReferences.Deletions);
+
+                void LogDetails<T>(string name, ICollection<T> collection)
                 {
-                    Logger.LogInformation($"References to be removed:\n{string.Join("\n", _analysisState.ReferencesToRemove.Distinct())}");
+                    if (collection.Count > 0)
+                    {
+                        Logger.LogInformation(name, string.Join(Environment.NewLine, collection));
+                    }
                 }
 
-                if (_analysisState.PackagesToRemove.Count > 0)
-                {
-                    Logger.LogInformation($"Packages to be removed:\n{string.Join("\n", _analysisState.PackagesToRemove.Distinct())}");
-                }
-
-                if (_analysisState.FrameworkReferencesToRemove.Count > 0)
-                {
-                    Logger.LogInformation($"Framework references to be removed:\n{string.Join("\n", _analysisState.FrameworkReferencesToRemove.Distinct())}");
-                }
-
-                if (_analysisState.PackagesToAdd.Count > 0)
-                {
-                    Logger.LogInformation($"Packages to be added:\n{string.Join("\n", _analysisState.PackagesToAdd.Distinct())}");
-                }
-
-                if (_analysisState.FrameworkReferencesToAdd.Count > 0)
-                {
-                    Logger.LogInformation($"Framework references to be added:\n{string.Join("\n", _analysisState.FrameworkReferencesToAdd.Distinct())}");
-                }
-
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analysisState.ReferencesToRemove.Distinct().Count()} references need removed, {_analysisState.PackagesToRemove.Distinct().Count()} packages need removed, and {_analysisState.PackagesToAdd.Distinct().Count()} packages need added", _analysisState.PossibleBreakingChangeRecommended ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
+                return new UpgradeStepInitializeResult(
+                    UpgradeStepStatus.Incomplete,
+                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", _analysisState.Risk);
             }
         }
 
@@ -148,11 +141,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                     if (_analysisState is not null)
                     {
-                        projectFile.RemoveReferences(_analysisState.ReferencesToRemove.Distinct());
-                        projectFile.RemovePackages(_analysisState.PackagesToRemove.Distinct());
-                        projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferencesToRemove.Distinct());
-                        projectFile.AddPackages(_analysisState.PackagesToAdd.Distinct());
-                        projectFile.AddFrameworkReferences(_analysisState.FrameworkReferencesToAdd.Distinct());
+                        projectFile.RemoveReferences(_analysisState.References.Deletions);
+
+                        projectFile.RemovePackages(_analysisState.Packages.Deletions);
+                        projectFile.AddPackages(_analysisState.Packages.Additions);
+
+                        projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferences.Deletions);
+                        projectFile.AddFrameworkReferences(_analysisState.FrameworkReferences.Additions);
 
                         await projectFile.SaveAsync(token).ConfigureAwait(false);
                         count++;
@@ -179,7 +174,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, CancellationToken token)
         {
-            _analysisState = await PackageAnalysisState.CreateAsync(context, _packageRestorer, token).ConfigureAwait(false);
+            if (context.CurrentProject is null)
+            {
+                return false;
+            }
+
+            await _packageRestorer.RestorePackagesAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+            var nugetReferences = await context.CurrentProject.GetNuGetReferencesAsync(token).ConfigureAwait(false);
+
+            _analysisState = new DependencyAnalysisState(context.CurrentProject, nugetReferences);
+
             var projectRoot = context.CurrentProject;
 
             if (projectRoot is null)
@@ -192,10 +196,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             foreach (var analyzer in _packageAnalyzers)
             {
                 Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                _analysisState = await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
-                if (_analysisState.Failed)
+                try
                 {
-                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}", analyzer.Name);
+                    await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
+                }
+#pragma warning disable CA1031 // Do not catch general exception types
+                catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
+                {
+                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
                     return false;
                 }
             }

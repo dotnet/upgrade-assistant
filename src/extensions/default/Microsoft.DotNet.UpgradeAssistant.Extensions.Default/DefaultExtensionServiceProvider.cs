@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Microsoft.Extensions.Configuration;
@@ -89,13 +90,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         private static void AddPackageReferenceAnalyzers(IServiceCollection services)
         {
             // Add package analyzers (note that the order matters as the analyzers are run in the order registered)
-            services.AddTransient<IPackageReferencesAnalyzer, DuplicateReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, TransitiveReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, PackageMapReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, TargetCompatibilityReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, UpgradeAssistantReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, WindowsCompatReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, NewtonsoftReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, DuplicateReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, TransitiveReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, PackageMapReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, TargetCompatibilityReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, UpgradeAssistantReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, WindowsCompatReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, NewtonsoftReferenceAnalyzer>();
         }
     }
 }
