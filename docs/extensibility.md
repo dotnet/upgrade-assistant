@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public class TestService
     {
         public TestService(
-          // Get options for each extension with a scope file provider
+          // Get options for each extension with a scoped file provider
           IOptions<ICollection<SomeOptions>> options)
         {
         }
@@ -112,7 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 }
 ```
 
-The `.Files` property will contain a scoped file provider to the directory of the extension to access files referenced within the options.
+The `SomeOptions.Files` property will contain a scoped file provider to the directory of the extension to access files referenced within the options.
 
 ### Mapping custom configuration to files
 
