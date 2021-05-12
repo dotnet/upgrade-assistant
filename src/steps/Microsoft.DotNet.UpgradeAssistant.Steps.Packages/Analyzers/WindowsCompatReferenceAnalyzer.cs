@@ -5,11 +5,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
-    public class WindowsCompatReferenceAnalyzer : IPackageReferencesAnalyzer
+    public class WindowsCompatReferenceAnalyzer : IDependencyAnalyzer
     {
         private const string PackageName = "Microsoft.Windows.Compatibility";
 
@@ -29,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public string Name => "Windows Compatibility Pack Analyzer";
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -43,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             if (!project.TargetFrameworks.Any(tfm => tfm.IsWindows))
             {
-                return state;
+                return;
             }
 
             var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
@@ -51,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             if (references.IsTransitivelyAvailable(PackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
-                return state;
+                return;
             }
 
             var latestVersion = await _loader.GetLatestVersionAsync(PackageName, project.TargetFrameworks, false, token).ConfigureAwait(false);
@@ -59,24 +60,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             if (latestVersion is null)
             {
                 _logger.LogWarning("Could not find {PackageName}", latestVersion);
-                return state;
+                return;
             }
 
             if (references.TryGetPackageByName(PackageName, out var existing))
             {
                 if (_comparer.Compare(existing.Version, latestVersion.Version) >= 0)
                 {
-                    return state;
+                    return;
                 }
 
-                state.PackagesToRemove.Add(existing);
+                state.Packages.Remove(existing);
             }
 
             _logger.LogInformation("Adding {PackageName} {Version}", PackageName, latestVersion.Version);
 
-            state.PackagesToAdd.Add(new NuGetReference(PackageName, latestVersion.Version));
-
-            return state;
+            state.Packages.Add(new NuGetReference(PackageName, latestVersion.Version));
         }
     }
 }

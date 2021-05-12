@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
-    public class PackageMapReferenceAnalyzer : IPackageReferencesAnalyzer
+    public class PackageMapReferenceAnalyzer : IDependencyAnalyzer
     {
         private readonly ILogger<PackageMapReferenceAnalyzer> _logger;
         private readonly PackageMapProvider _packageMapProvider;
@@ -31,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -50,29 +51,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var packageMaps = currentTFM.Any(c => c.IsFramework) ? allPackageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray<NuGetPackageMap>() : allPackageMaps;
             var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
-            foreach (var packageReference in references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r)))
+            foreach (var packageReference in state.Packages)
             {
                 foreach (var map in packageMaps.Where(m => ContainsPackageReference(m.NetFrameworkPackages, packageReference.Name, packageReference.Version)))
                 {
-                    state.PossibleBreakingChangeRecommended = true;
                     _logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
-                    state.PackagesToRemove.Add(packageReference);
+                    state.Packages.Remove(packageReference, BuildBreakRisk.Medium);
                     await AddNetCoreReferences(map, state, project, token).ConfigureAwait(false);
                 }
             }
 
-            foreach (var reference in project.References.Where(r => !state.ReferencesToRemove.Contains(r)))
+            foreach (var reference in project.References)
             {
                 foreach (var map in packageMaps.Where(m => m.ContainsAssemblyReference(reference.Name)))
                 {
-                    state.PossibleBreakingChangeRecommended = true;
                     _logger.LogInformation("Marking assembly reference {ReferenceName} for removal based on package mapping configuration {PackageMapSet}", reference.Name, map.PackageSetName);
-                    state.ReferencesToRemove.Add(reference);
+                    state.References.Remove(reference, BuildBreakRisk.Medium);
                     await AddNetCoreReferences(map, state, project, token).ConfigureAwait(false);
                 }
             }
-
-            return state;
         }
 
         /// <summary>
@@ -100,10 +97,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return _comparer.Compare(version, reference.Version) <= 0;
         }
 
-        private async Task AddNetCoreReferences(NuGetPackageMap packageMap, PackageAnalysisState state, IProject project, CancellationToken token)
+        private async Task AddNetCoreReferences(NuGetPackageMap packageMap, IDependencyAnalysisState state, IProject project, CancellationToken token)
         {
-            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
-
             foreach (var newPackage in packageMap.NetCorePackages)
             {
                 var packageToAdd = newPackage;
@@ -117,19 +112,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     }
                 }
 
-                if (!state.PackagesToAdd.Contains(packageToAdd) && !references.PackageReferences.Contains(packageToAdd))
+                if (state.Packages.Add(packageToAdd))
                 {
                     _logger.LogInformation("Adding package {PackageName} based on package mapping configuration {PackageMapSet}", packageToAdd.Name, packageMap.PackageSetName);
-                    state.PackagesToAdd.Add(packageToAdd);
                 }
             }
 
             foreach (var frameworkReference in packageMap.NetCoreFrameworkReferences)
             {
-                if (!state.FrameworkReferencesToAdd.Contains(frameworkReference) && !project.FrameworkReferences.Contains(frameworkReference))
+                if (state.FrameworkReferences.Add(frameworkReference))
                 {
                     _logger.LogInformation("Adding framework reference {FrameworkReference} based on package mapping configuration {PackageMapSet}", frameworkReference.Name, packageMap.PackageSetName);
-                    state.FrameworkReferencesToAdd.Add(frameworkReference);
                 }
             }
         }

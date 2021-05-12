@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Packages;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
@@ -12,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     /// <summary>
     /// Increases backward compatibility by using the Newtonsoft Serializer for ASP.NET Core.
     /// </summary>
-    public class NewtonsoftReferenceAnalyzer : IPackageReferencesAnalyzer
+    public class NewtonsoftReferenceAnalyzer : IDependencyAnalyzer
     {
         private const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
 
@@ -29,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -48,26 +49,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 && project.OutputType == ProjectOutputType.Exe
                 && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, TargetFrameworkMoniker.NetCoreApp30) < 0)))
             {
-                return state;
+                return;
             }
 
             var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
             if (references.IsTransitivelyAvailable(NewtonsoftPackageName))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
-                return state;
+                return;
             }
 
-            var packageReferences = references.PackageReferences.Where(r => !state.PackagesToRemove.Contains(r));
-
-            if (!packageReferences.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
+            if (!state.Packages.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, project.TargetFrameworks, false, token).ConfigureAwait(false);
 
                 if (newtonsoftPackage is not null)
                 {
                     _logger.LogInformation("Reference to Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs added", NewtonsoftPackageName, newtonsoftPackage.Version);
-                    state.PackagesToAdd.Add(newtonsoftPackage);
+                    state.Packages.Add(newtonsoftPackage);
                 }
                 else
                 {
@@ -78,8 +77,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             {
                 _logger.LogDebug("Reference to Newtonsoft package ({NewtonsoftPackageName}) already exists", NewtonsoftPackageName);
             }
-
-            return state;
         }
     }
 }
