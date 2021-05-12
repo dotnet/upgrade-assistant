@@ -112,6 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 catch (NuGetProtocolException)
                 {
                     _logger.LogWarning("Failed to get package versions from source {PackageSource} due to a NuGet protocol error", source.Source);
+                    _logger.LogInformation("If NuGet packages are coming from an authenticated source, Upgrade Assistant requires a .NET Core-compatible v2 credential provider be installed. To authenticate with an Azure DevOps NuGet source, for example, see https://github.com/microsoft/artifacts-credprovider#setup");
                 }
                 catch (HttpRequestException exc)
                 {
@@ -265,20 +266,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             foreach (var source in _packageSources.Value)
             {
                 var repo = GetSourceRepository(source);
-                var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
-                if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
+                try
                 {
-                    var memoryStream = new MemoryStream();
-                    if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, memoryStream, _cache, _nugetLogger, token).ConfigureAwait(false))
+                    var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
+                    if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
                     {
-                        _logger.LogDebug("Package {NuGetPackage} download from feed {NuGetFeed}", packageReference, source.Source);
-                        return new PackageArchiveReader(memoryStream, false);
+                        var memoryStream = new MemoryStream();
+                        if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, memoryStream, _cache, _nugetLogger, token).ConfigureAwait(false))
+                        {
+                            _logger.LogDebug("Package {NuGetPackage} downloaded from feed {NuGetFeed}", packageReference, source.Source);
+                            return new PackageArchiveReader(memoryStream, false);
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Failed to download package {NuGetPackage} from source {NuGetFeed}", packageReference, source.Source);
+                            memoryStream.Close();
+                        }
                     }
-                    else
-                    {
-                        _logger.LogDebug("Failed to download package {NuGetPackage} from feed {NuGetFeed}", packageReference, source.Source);
-                        memoryStream.Close();
-                    }
+                }
+                catch (NuGetProtocolException)
+                {
+                    _logger.LogWarning("Failed to get package finder from source {PackageSource} due to a NuGet protocol error, skipping this source", source.Source);
+                    _logger.LogInformation("If NuGet packages are coming from an authenticated source, Upgrade Assistant requires a .NET Core-compatible v2 credential provider be installed. To authenticate with an Azure DevOps NuGet source, for example, see https://github.com/microsoft/artifacts-credprovider#setup");
                 }
             }
 

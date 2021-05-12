@@ -3,7 +3,7 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Current
+## Version 0.2.226201 - 2021-05-12 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.226201))
 
 ### Added
 - A new command line option (`--target-tfm-support` to select the support model of LTS/Preview/Current that is desired [#469](https://github.com/dotnet/upgrade-assistant/pull/469)
