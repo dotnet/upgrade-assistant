@@ -41,26 +41,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             if (analyzerAttr is null)
             {
                 // this object is not the type we thought it was, the filter does not apply
-                return Enumerable.Empty<string>();
+                yield break;
             }
 
-            var supportedLanguages = new List<string>();
             var firstLanguage = analyzerAttr.ConstructorArguments.FirstOrDefault().Value as string;
             if (firstLanguage is null)
             {
                 // this object is not the type we thought it was, the filter does not apply
-                return Enumerable.Empty<string>();
+                yield break;
             }
 
-            supportedLanguages.Add(firstLanguage);
+            yield return firstLanguage;
 
             var additionalLanguages = analyzerAttr.ConstructorArguments.LastOrDefault().Value as IEnumerable<System.Reflection.CustomAttributeTypedArgument>;
             if (additionalLanguages is not null)
             {
-                supportedLanguages.AddRange(additionalLanguages.Select(l => l.Value.ToString()));
+                foreach (var additionalLanguage in additionalLanguages)
+                {
+                    yield return additionalLanguage.Value.ToString();
+                }
             }
-
-            return supportedLanguages;
         }
     }
 }
