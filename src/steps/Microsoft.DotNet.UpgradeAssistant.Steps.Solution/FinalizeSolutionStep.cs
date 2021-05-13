@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,9 +12,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
     internal class FinalizeSolutionStep : UpgradeStep
     {
-        public FinalizeSolutionStep(ILogger<FinalizeSolutionStep> logger)
+        private readonly IUserInput _userInput;
+        private readonly UpgradeOptions _upgradeOptions;
+
+        public FinalizeSolutionStep(IUserInput userInput, UpgradeOptions upgradeOptions, ILogger<FinalizeSolutionStep> logger)
             : base(logger)
         {
+            _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
+            _upgradeOptions = upgradeOptions ?? throw new ArgumentNullException(nameof(upgradeOptions));
         }
 
         public override IEnumerable<string> DependsOn { get; } = new[]
@@ -27,12 +33,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override string Id => WellKnownStepIds.FinalizeSolutionStepId;
 
-        protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (_userInput.IsInteractive && !_upgradeOptions.PersistState.HasValue)
+            {
+                const string FileStateQuestion =
+                    "For subsequent upgrades state is persisted in an .upgrade-assistant file, are you okay with that?";
+
+                var choices = UpgradeCommand.CreateFromEnum<CommandChoice>();
+                var result = await _userInput.ChooseAsync(FileStateQuestion, choices, token).ConfigureAwait(false);
+
+                if (result.Value is CommandChoice.Yes)
+                {
+                    _upgradeOptions.PersistState = true;
+                    context.GlobalProperties["PersistState"] = bool.TrueString;
+                }
+            }
+
             context.IsComplete = true;
             context.EntryPoints = Enumerable.Empty<IProject>();
 
-            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Upgrade complete"));
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Upgrade complete");
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

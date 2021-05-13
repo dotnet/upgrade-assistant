@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             if (state is not null)
             {
-                context.EntryPoints = state.EntryPoints.Select(e => FindProject(e)).Where(e => e != null)!;
+                context.EntryPoints = state.EntryPoints.Select(FindProject).Where(e => e != null)!;
                 context.SetCurrentProject(FindProject(state.CurrentProject));
                 foreach (var item in state.Properties)
                 {
@@ -88,11 +89,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(context));
             }
 
-            _logger.LogInformation("Saving upgrade progress file at {Path}", _path);
-
-            using var stream = File.OpenWrite(_path);
-            stream.SetLength(0);
-
             var state = new UpgradeState
             {
                 EntryPoints = context.EntryPoints.Select(e => NormalizePath(e.FileInfo)),
@@ -100,7 +96,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Properties = context.Properties.GetPersistentPropertyValues().ToDictionary(k => k.Key, v => v.Value)
             };
 
-            await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
+            if (state is { Empty: true })
+            {
+                _logger.LogInformation("No state to save");
+            }
+            else if (context.GlobalProperties.TryGetValue("PersistState", out var persistStateStr) &&
+                bool.TryParse(persistStateStr, out var persistState) && persistState)
+            {
+                _logger.LogInformation("Saving upgrade progress file at {Path}", _path);
+
+                using var stream = File.OpenWrite(_path);
+                stream.SetLength(0);
+
+                await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
+            }
+            else
+            {
+                _logger.LogDebug("The user has opted out of persisting state.");
+            }
         }
 
         private static string NormalizePath(FileInfo? file) => file is null ? string.Empty : file.Name;
@@ -109,13 +122,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private class UpgradeState
         {
-            public string Build { get; set; } = Constants.Version;
+            public string Build { get; init; } = Constants.Version;
 
-            public string? CurrentProject { get; set; }
+            public string? CurrentProject { get; init; }
 
-            public IEnumerable<string> EntryPoints { get; set; } = Enumerable.Empty<string>();
+            public IEnumerable<string> EntryPoints { get; init; } = Enumerable.Empty<string>();
 
-            public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
+            public Dictionary<string, string> Properties { get; init; } = new Dictionary<string, string>();
+
+            [JsonIgnore]
+            public bool Empty =>
+                CurrentProject is null or { Length: 0 } &&
+                !EntryPoints.Any() &&
+                Properties is { Count: 0 };
         }
     }
 }

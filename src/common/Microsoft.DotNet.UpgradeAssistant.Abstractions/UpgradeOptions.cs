@@ -28,5 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public int NonInteractiveWait { get; set; } = 2;
 
         public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.Current;
+
+        public bool? PersistState { get; set; }
     }
 }

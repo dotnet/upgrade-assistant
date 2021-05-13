@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, "Backup skipped");
             }
 
-            var baseBackupPath = await ChooseBackupPath(context, token).ConfigureAwait(false);
+            var baseBackupPath = await ChooseBackupPathAsync(context, token).ConfigureAwait(false);
 
             if (baseBackupPath is null)
             {
@@ -138,7 +138,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
         }
 
-        private async Task<string?> ChooseBackupPath(IUpgradeContext context, CancellationToken token)
+        private async Task<string?> ChooseBackupPathAsync(IUpgradeContext context, CancellationToken token)
         {
             var defaultPath = GetDefaultBaseBackupPath(context.InputPath);
             var customPath = default(string);

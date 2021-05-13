@@ -78,11 +78,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             var logSettings = new LogSettings(options.Verbose);
 
             return host
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton(logSettings);
-                })
-                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
+                .ConfigureServices(services => services.AddSingleton(logSettings))
+                .UseSerilog((_, loggerConfiguration) => loggerConfiguration
                     .Enrich.FromLogContext()
                     .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
                     .WriteTo.Console(levelSwitch: logSettings.Console)
@@ -208,6 +205,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             command.AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option in non-interactive mode."));
             command.AddOption(new Option<int>(new[] { "--non-interactive-wait" }, "Wait the supplied seconds before moving on to the next option in non-interactive mode."));
             command.AddOption(new Option<UpgradeTarget>(new[] { "--target-tfm-support" }, "Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean."));
+            command.AddOption(new Option<bool?>(new[] { "--persist-state" }, "Save files like .upgrade-assistant to disk"));
         }
 
 #if ANALYZE_COMMAND

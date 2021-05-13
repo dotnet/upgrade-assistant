@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
         {
             var result = context?.CurrentProject is not null &&
                 SubSteps.Any() &&
-                _configFilePaths.Select(p => Path.Combine(context.CurrentProject.FileInfo.DirectoryName, p)).Any(f => File.Exists(f));
+                _configFilePaths.Select(p => Path.Combine(context.CurrentProject.FileInfo.DirectoryName, p)).Any(File.Exists);
 
             return Task.FromResult(result);
         }
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
 
             var project = context.CurrentProject.Required();
 
-            var configPaths = _configFilePaths.Select(p => Path.Combine(project.FileInfo.DirectoryName, p)).Where(p => File.Exists(p));
+            var configPaths = _configFilePaths.Select(p => Path.Combine(project.FileInfo.DirectoryName, p)).Where(File.Exists);
             Logger.LogDebug("Loading config files: {ConfigFiles}", string.Join(", ", configPaths));
             ConfigFiles = ImmutableArray.CreateRange(configPaths.Select(p => new ConfigFile(p)));
             Logger.LogDebug("Loaded {ConfigCount} config files", ConfigFiles.Length);
