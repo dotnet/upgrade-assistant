@@ -141,7 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (target is null)
             {
-                _logger.LogError("Target is stil unavailable after restore. Please verify that the project has been restored.");
+                _logger.LogError("Target is still unavailable after restore. Please verify that the project has been restored.");
                 throw new UpgradeException("Cannot find targets. Please ensure that the project is fully restored.");
             }
 
