@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Packages;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
 
-        protected ILogger Logger { get; }
+        private readonly ILogger _logger;
 
         public PackageAnalyzer(IPackageRestorer packageRestorer,
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
@@ -24,10 +24,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
-            Logger = logger;
+            _logger = logger;
         }
 
-        public async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, DependencyAnalysisState? analysisState, CancellationToken token)
+        public async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, IDependencyAnalysisState? analysisState, CancellationToken token)
         {
             if (context?.CurrentProject is null)
             {
@@ -43,14 +43,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             if (projectRoot is null)
             {
-                Logger.LogError("No project available");
+                _logger.LogError("No project available");
                 return false;
             }
 
             // Iterate through all package references in the project file
             foreach (var analyzer in _packageAnalyzers)
             {
-                Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
+                _logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
                 try
                 {
                     await analyzer.AnalyzeAsync(projectRoot, analysisState, token).ConfigureAwait(false);
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types
                 {
-                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
+                    _logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
                     return false;
                 }
             }

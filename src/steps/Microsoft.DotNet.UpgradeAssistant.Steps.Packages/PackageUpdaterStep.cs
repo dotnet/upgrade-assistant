@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
-        private IPackageAnalyzer _packageAnalyzer;
+        private readonly IPackageAnalyzer _packageAnalyzer;
 
         private DependencyAnalysisState? _analysisState;
 
@@ -58,6 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             IOptions<PackageUpdaterOptions> updaterOptions,
             IPackageRestorer packageRestorer,
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
+            IPackageAnalyzer packageAnalyzer,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
@@ -74,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _analysisState = null;
-            _packageAnalyzer = new PackageAnalyzer(_packageRestorer, _packageAnalyzers, logger);
+            _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);

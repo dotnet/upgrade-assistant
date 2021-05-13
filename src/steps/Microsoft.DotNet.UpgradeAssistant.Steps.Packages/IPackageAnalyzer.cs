@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public interface IPackageAnalyzer
     {
-        public Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, DependencyAnalysisState? analysisState, CancellationToken token);
+        Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, IDependencyAnalysisState? analysisState, CancellationToken token);
     }
 }
