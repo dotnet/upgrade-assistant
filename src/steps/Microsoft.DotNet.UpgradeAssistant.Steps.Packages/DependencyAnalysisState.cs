@@ -6,7 +6,7 @@ using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    public class DependencyAnalysisState : IDependencyAnalysisState
+    public sealed class DependencyAnalysisState : IDependencyAnalysisState
     {
         public DependencyAnalysisState(IProject project, INuGetReferences nugetReferences)
         {
@@ -30,15 +30,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
         }
 
-        public DependencyCollection<Reference> FrameworkReferences { get; }
+        internal DependencyCollection<Reference> FrameworkReferences { get; }
 
         IDependencyCollection<Reference> IDependencyAnalysisState.FrameworkReferences => FrameworkReferences;
 
-        public DependencyCollection<NuGetReference> Packages { get; }
+        internal DependencyCollection<NuGetReference> Packages { get; }
 
         IDependencyCollection<NuGetReference> IDependencyAnalysisState.Packages => Packages;
 
-        public DependencyCollection<Reference> References { get; }
+        internal DependencyCollection<Reference> References { get; }
 
         IDependencyCollection<Reference> IDependencyAnalysisState.References => References;
 

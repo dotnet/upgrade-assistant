@@ -9,7 +9,7 @@ using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    public sealed class DependencyCollection<T> : IDependencyCollection<T>
+    internal class DependencyCollection<T> : IDependencyCollection<T>
     {
         private readonly IEnumerable<T> _initial;
         private readonly Action<BuildBreakRisk> _setRisk;
@@ -76,8 +76,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public bool HasChanges => Additions.Any() || Deletions.Any();
 
-        IReadOnlyCollection<T> IDependencyCollection<T>.Additions => Additions.ToList<T>();
+        IReadOnlyCollection<T> IDependencyCollection<T>.Additions => Additions;
 
-        IReadOnlyCollection<T> IDependencyCollection<T>.Deletions => Deletions.ToList<T>();
+        IReadOnlyCollection<T> IDependencyCollection<T>.Deletions => Deletions;
     }
 }
