@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public static class LanguageExtensions
     {
