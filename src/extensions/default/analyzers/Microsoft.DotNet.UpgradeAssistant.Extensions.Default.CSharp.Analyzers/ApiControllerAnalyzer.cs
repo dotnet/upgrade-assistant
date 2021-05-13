@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             // the first descendent of BaseListSyntax will be a SimpleBaseTypeSyntax for CS
             var baseTypeNode = context.Node.DescendantNodes().First();
 
-            if (baseTypeNode.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType))
+            if (baseTypeNode.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType) && baseTypeNode.DescendantNodes().Any())
             {
                 // In CSharp syntax, the SimpleBaseTypeSyntax the first child and we want the QualifiedNameSyntax or IdentifierNameSyntax
                 // resolving this node must be done before we check for symbol info

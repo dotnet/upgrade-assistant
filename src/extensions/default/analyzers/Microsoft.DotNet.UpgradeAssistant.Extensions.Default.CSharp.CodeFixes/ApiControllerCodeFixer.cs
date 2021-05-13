@@ -44,7 +44,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 // When the analyzer runs it selects a portion of the code to be fixed by this class.
                 // In CSharp syntax, the SimpleBaseTypeSyntax is at the same location as the QualifiedNameSyntax or IdentifierNameSyntax
                 // since we just found this node by text location, we need to adjust what we selected to match our assumption for CSharp
-                node = node.DescendantNodes().First();
+                node = node.DescendantNodes().FirstOrDefault();
+            }
+
+            if (node is null)
+            {
+                return;
             }
 
             // Register a code action that will invoke the fix.
