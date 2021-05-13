@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -10,12 +11,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
     {
         string Name { get; }
 
+        IFileProvider Files { get; }
+
         T? GetOptions<T>(string sectionName);
-
-        Stream? GetFile(string path);
-
-        IEnumerable<string> GetFiles(string path, string searchPattern);
-
-        IEnumerable<string> GetFiles(string path);
     }
 }

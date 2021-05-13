@@ -54,22 +54,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         };
 
         public PackageUpdaterStep(
-            IOptions<PackageUpdaterOptions> updaterOptions,
             IPackageRestorer packageRestorer,
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
-            if (updaterOptions is null)
-            {
-                throw new ArgumentNullException(nameof(updaterOptions));
-            }
-
-            if (logger is null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _analysisState = null;
