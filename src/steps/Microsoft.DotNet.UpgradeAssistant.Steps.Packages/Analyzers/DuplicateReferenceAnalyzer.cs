@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
+        public Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (state is null)
             {
@@ -31,8 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
-            var references = await project.Required().GetNuGetReferencesAsync(token).ConfigureAwait(false);
-            var packages = references.PackageReferences.ToLookup(p => p.Name);
+            var packages = project.Required().NuGetReferences.PackageReferences.ToLookup(p => p.Name);
 
             foreach (var duplicates in packages.Where(g => g.Count() > 1))
             {
@@ -44,6 +43,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     state.Packages.Remove(package);
                 }
             }
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -54,7 +54,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
             var packageMaps = currentTFM.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
-            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
             foreach (var packageReference in state.Packages)
             {

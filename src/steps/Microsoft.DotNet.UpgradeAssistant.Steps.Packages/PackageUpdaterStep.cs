@@ -179,9 +179,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             await _packageRestorer.RestorePackagesAsync(context, context.CurrentProject, token).ConfigureAwait(false);
-            var nugetReferences = await context.CurrentProject.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
-            _analysisState = new DependencyAnalysisState(context.CurrentProject, nugetReferences);
+            _analysisState = new DependencyAnalysisState(context.CurrentProject, context.CurrentProject.NuGetReferences);
 
             var projectRoot = context.CurrentProject;
 

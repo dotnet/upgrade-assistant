@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -11,10 +13,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IEnumerable<NuGetReference> PackageReferences { get; }
 
-        IEnumerable<NuGetReference> GetTransitivePackageReferences(TargetFrameworkMoniker tfm);
+        IAsyncEnumerable<NuGetReference> GetTransitivePackageReferencesAsync(TargetFrameworkMoniker tfm, CancellationToken token);
 
-        bool IsTransitivelyAvailable(string packageName);
+        ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token);
 
-        bool IsTransitiveDependency(NuGetReference nugetReference);
+        ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token);
     }
 }
