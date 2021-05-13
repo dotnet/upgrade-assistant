@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static OptionsBuilder<PackageUpdaterOptions> AddPackageUpdaterStep(this IServiceCollection services)
         {
             services.AddSingleton<PackageMapProvider>();
-            services.AddSingleton<IPackageAnalyzer, PackageAnalyzer>();
+            services.AddSingleton<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
             services.AddUpgradeStep<PackageUpdaterPreTFMStep>();
             services.AddUpgradeStep<PackageUpdaterStep>();
             return services.AddOptions<PackageUpdaterOptions>();

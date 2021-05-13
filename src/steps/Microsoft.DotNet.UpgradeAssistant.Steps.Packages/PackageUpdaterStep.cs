@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
-        private readonly IPackageAnalyzer _packageAnalyzer;
+        private readonly IDependencyAnalyzerRunner _packageAnalyzer;
 
         private DependencyAnalysisState? _analysisState;
 
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             IOptions<PackageUpdaterOptions> updaterOptions,
             IPackageRestorer packageRestorer,
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
-            IPackageAnalyzer packageAnalyzer,
+            IDependencyAnalyzerRunner packageAnalyzer,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
@@ -89,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             try
             {
-                if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
+                if (!await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, _analysisState, token).ConfigureAwait(false))
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
@@ -166,7 +166,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         count++;
 
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
+                        if (!await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, _analysisState, token).ConfigureAwait(false))
                         {
                             return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
                         }
