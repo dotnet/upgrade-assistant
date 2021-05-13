@@ -15,7 +15,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static void AddPackageUpdaterStep(this IExtensionServiceCollection services)
         {
-
             if (services is null)
             {
                 throw new System.ArgumentNullException(nameof(services));

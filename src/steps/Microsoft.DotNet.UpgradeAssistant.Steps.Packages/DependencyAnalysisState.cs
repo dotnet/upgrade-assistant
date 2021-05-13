@@ -10,8 +10,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     {
         public DependencyAnalysisState(IProject project, INuGetReferences nugetReferences)
         {
-            FrameworkReferences = new DependencyCollection<Reference>(project.FrameworkReferences, SetRisk);
-            Packages = new DependencyCollection<NuGetReference>(nugetReferences.PackageReferences, SetRisk);
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            if (nugetReferences is null)
+            {
+                throw new ArgumentNullException(nameof(nugetReferences));
+            }
+
+            FrameworkReferences = new DependencyCollection<Reference>(initial: project.FrameworkReferences, setRisk: SetRisk);
+            Packages = new DependencyCollection<NuGetReference>(initial: nugetReferences.PackageReferences, setRisk: SetRisk);
             References = new DependencyCollection<Reference>(project.References, SetRisk);
 
             void SetRisk(BuildBreakRisk risk)
