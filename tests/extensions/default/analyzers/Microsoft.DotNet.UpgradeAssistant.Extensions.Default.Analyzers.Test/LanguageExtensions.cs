@@ -13,7 +13,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             {
                 Language.CSharp => "cs",
                 Language.VisualBasic => "vb",
-                Language.FSharp => "fs",
                 _ => throw new NotImplementedException()
             };
         }
