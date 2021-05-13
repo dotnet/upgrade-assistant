@@ -106,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 LogDetails("Framework references to be added: {FrameworkReference}", _analysisState.FrameworkReferences.Additions);
                 LogDetails("Framework references to be removed: {FrameworkReference}", _analysisState.FrameworkReferences.Deletions);
 
-                void LogDetails<T>(string name, ICollection<T> collection)
+                void LogDetails<T>(string name, IReadOnlyCollection<T> collection)
                 {
                     if (collection.Count > 0)
                     {

@@ -11,8 +11,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 
         bool Remove(T item, BuildBreakRisk risk = BuildBreakRisk.None);
 
-        HashSet<T> Additions { get; }
+        IReadOnlyCollection<T> Additions { get; }
 
-        HashSet<T> Deletions { get; }
+        IReadOnlyCollection<T> Deletions { get; }
     }
 }
