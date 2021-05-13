@@ -156,9 +156,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
 
             return lockFile.Targets
-                .FirstOrDefault(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal))
-                ?.Libraries
-                ?? Array.Empty<LockFileTargetLibrary>();
+                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal))
+                .Libraries;
         }
 
         private bool IsRestored => LockFilePath is not null;

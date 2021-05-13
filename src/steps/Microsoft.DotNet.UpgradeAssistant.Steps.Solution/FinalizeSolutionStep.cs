@@ -29,6 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
+            // Finalizing will remove any progress tracked by Upgrade Assistant.
             context.IsComplete = true;
             context.EntryPoints = Enumerable.Empty<IProject>();
 
