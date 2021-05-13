@@ -4,12 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TestProject.TestClasses
 {
-    public class ValuesController : Controller
+    public partial class ValuesController : Controller
     {
         // GET api/values
         public IEnumerable<string> GetValues()
         {
             return new[] { "value1", "value2" };
+        }
+    }
+
+    public partial class ValuesController
+    {
+        // GET api/morevalues
+        public IEnumerable<string> GetMoreValues()
+        {
+            return new[] { "value3", "value4" };
         }
     }
 

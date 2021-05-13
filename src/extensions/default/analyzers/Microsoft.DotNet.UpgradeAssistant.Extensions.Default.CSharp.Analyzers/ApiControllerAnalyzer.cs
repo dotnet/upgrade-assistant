@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -37,50 +38,73 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSymbolAction(AnalyzeSymbols, SymbolKind.NamedType);
+            // noted that highlighting the syntax makes it easier to handle partial class scenarios because
+            // the analyzer will be limited to scenarios where a base type has been defined via syntax
+            context.RegisterSyntaxNodeAction(AnalyzeSyntax, CodeAnalysis.CSharp.SyntaxKind.BaseList);
+            context.RegisterSyntaxNodeAction(AnalyzeSyntax, CodeAnalysis.VisualBasic.SyntaxKind.InheritsStatement);
         }
 
-        private void AnalyzeSymbols(SymbolAnalysisContext context)
+        private void AnalyzeSyntax(SyntaxNodeAnalysisContext context)
         {
-            var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
-            var baseType = namedTypeSymbol.BaseType;
+            var node = context.Node; // an ImportStatementSyntax for VB or a BaseListSyntax for CS
 
-            if (baseType is null)
+            if (!node.DescendantNodes().Any())
             {
                 return;
             }
 
-            if (IsBaseTypeAQualifiedReferenceToApiController(baseType)
-                || IsBaseTypeAnImplicitReferenceToApiController(baseType))
+            // the first descendent of ImportStatementSyntax will be a QualifiedNameSyntax or IdentifierNameSyntax for VB
+            // the first descendent of BaseListSyntax will be a SimpleBaseTypeSyntax for CS
+            var baseTypeNode = context.Node.DescendantNodes().First();
+
+            if (baseTypeNode.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType))
+            {
+                // In CSharp syntax, the SimpleBaseTypeSyntax the first child and we want the QualifiedNameSyntax or IdentifierNameSyntax
+                // resolving this node must be done before we check for symbol info
+                baseTypeNode = baseTypeNode.DescendantNodes().First();
+            }
+
+            var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseTypeNode).Symbol as INamedTypeSymbol;
+            if (baseTypeSymbol is not null
+                && !IsBaseTypeAQualifiedReferenceToApiController(baseTypeSymbol.ToDisplayString()))
+            {
+                // we found a symbol, and the symbol information tells us this isn't an ApiController
+                // bail out
+
+                // note: at this point of upgrade assistant's workflow we are expecting the System.Web.Http reference
+                // to have been removed so if we didn't find the symbol, that's okay
+                return;
+            }
+
+            if (IsBaseTypeAQualifiedReferenceToApiController(baseTypeNode.ToString())
+                || IsBaseTypeAnImplicitReferenceToApiController(baseTypeNode.ToString()))
             {
                 // For all such symbols, produce a diagnostic.
-                var node = namedTypeSymbol.DeclaringSyntaxReferences[0].GetSyntax();
-                ReportDiagnostic(context, node);
+                var diagnostic = Diagnostic.Create(Rule, baseTypeNode.GetLocation(), baseTypeNode.ToString());
+                context.ReportDiagnostic(diagnostic);
             }
         }
 
-        private static bool IsBaseTypeAnImplicitReferenceToApiController(INamedTypeSymbol baseType)
+        /// <summary>
+        /// Checks to see if an instance of ApiController is found.
+        /// </summary>
+        /// <param name="baseTypeString">the content of a syntax node.</param>
+        /// <returns>true if the string is equal to ApiController.</returns>
+        private static bool IsBaseTypeAnImplicitReferenceToApiController(string baseTypeString)
         {
-            return baseType.ToDisplayString().Equals(ApiControllerClassName, StringComparison.Ordinal) && baseType.TypeKind == TypeKind.Error;
+            return baseTypeString.Equals(ApiControllerClassName, StringComparison.Ordinal);
         }
 
-        private static bool IsBaseTypeAQualifiedReferenceToApiController(INamedTypeSymbol baseType)
+        /// <summary>
+        /// Checks to see if an instance of System.Web.Http.ApiController is found.
+        /// </summary>
+        /// <param name="baseTypeString">the content of a syntax node.</param>
+        /// <returns>true if the string is equal to System.Web.Http.ApiController.</returns>
+        private static bool IsBaseTypeAQualifiedReferenceToApiController(string baseTypeString)
         {
             // remembering to be cautious that string operations are immutable. We create a unique constant for this conditional
             // to prevent situations where evaluating this analyzer on large solutions could lead to excessive garbage collection.
-            return baseType.ToDisplayString().Equals(ApiControllerQualifiedName, StringComparison.Ordinal);
-        }
-
-        private static void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node)
-        {
-            // Note that we choose to report the diagnostic on the ClassStatementSyntax from the namedTypeSymbol because
-            // this simplifies the code maintenance for the Analyzer with the potential cost of a lower UX when running the analyzer in VS
-            //
-            // This is in contrast to reporting the diagnostic on the BaseTypeSyntax and highlighting ApiController specifically
-            // 1. namedTypeSymbol.baseType does not have a DeclaringSyntaxReferences[0] that is in the code. The reference is in the metadata.
-            // 2. highlighting the baseType means syntax analysis which we would implement in a language specific way in a child class
-            var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), node.ToString());
-            context.ReportDiagnostic(diagnostic);
+            return baseTypeString.Equals(ApiControllerQualifiedName, StringComparison.Ordinal);
         }
     }
 }

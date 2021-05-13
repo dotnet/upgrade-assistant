@@ -2,7 +2,7 @@
 
 namespace TemplateMvc.Services
 {
-    public class PrinterApi : ApiController
+    public class EmailApi : ApiController
     {
         public string Foo()
         {

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -38,6 +39,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
             var node = root.FindNode(context.Span);
 
+            if (node.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType))
+            {
+                // When the analyzer runs it selects a portion of the code to be fixed by this class.
+                // In CSharp syntax, the SimpleBaseTypeSyntax is at the same location as the QualifiedNameSyntax or IdentifierNameSyntax
+                // since we just found this node by text location, we need to adjust what we selected to match our assumption for CSharp
+                node = node.DescendantNodes().First();
+            }
+
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
@@ -60,30 +69,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
             var mvcBaseType = generator.QualifiedName(
-                QualifiedNameBuilder.BuildQualifiedSyntax(generator, GoodNamespace),
-                generator.IdentifierName(GoodClassName))
+                    QualifiedNameBuilder.BuildQualifiedSyntax(generator, GoodNamespace),
+                    generator.IdentifierName(GoodClassName))
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
-            var baseType = GetBaseType(node, generator);
-
-            var newRoot = generator.ReplaceNode(root, baseType, mvcBaseType);
+            var newRoot = generator.ReplaceNode(root, node, mvcBaseType);
 
             var newDocument = document.WithSyntaxRoot(newRoot);
 
             newDocument = await ImportAdder.AddImportsAsync(newDocument, Simplifier.AddImportsAnnotation, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return newDocument;
-        }
-
-        private static SyntaxNode GetBaseType(SyntaxNode node, SyntaxGenerator generator)
-        {
-            var types = generator.GetBaseAndInterfaceTypes(node);
-            if (types == null || types.Count == 0)
-            {
-                types = generator.GetBaseAndInterfaceTypes(node.Parent);
-            }
-
-            return types[0];
         }
     }
 }

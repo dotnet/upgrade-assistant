@@ -3,12 +3,21 @@ using System.Collections.Generic;
 
 namespace TestProject.TestClasses
 {
-    public class ValuesController : ApiController
+    public partial class ValuesController : ApiController
     {
         // GET api/values
         public IEnumerable<string> GetValues()
         {
             return new[] { "value1", "value2" };
+        }
+    }
+
+    public partial class ValuesController
+    {
+        // GET api/morevalues
+        public IEnumerable<string> GetMoreValues()
+        {
+            return new[] { "value3", "value4" };
         }
     }
 
