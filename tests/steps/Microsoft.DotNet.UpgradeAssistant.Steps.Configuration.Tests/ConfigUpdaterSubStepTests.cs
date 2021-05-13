@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -38,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         [Fact]
         public void NegativeCtorTests()
         {
-            var goodParent = new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new ConfigUpdaterOptions(), new NullLogger<ConfigUpdaterStep>());
+            var goodParent = new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new Mock<IOptions<ConfigUpdaterOptions>>().Object, new NullLogger<ConfigUpdaterStep>());
             var badParent = new TestUpgradeStep("Test step");
 
             Assert.Throws<ArgumentNullException>("parentStep", () => new ConfigUpdaterSubStep(null!, new Mock<IUpdater<ConfigFile>>().Object, new NullLogger<ConfigUpdaterStep>()));

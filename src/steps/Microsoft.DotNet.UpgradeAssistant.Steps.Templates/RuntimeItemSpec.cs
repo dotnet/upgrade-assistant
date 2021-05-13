@@ -3,8 +3,9 @@
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 {
@@ -14,12 +15,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
     /// </summary>
     internal record RuntimeItemSpec : ItemSpec
     {
-        public RuntimeItemSpec(ItemSpec baseItem, IExtension extension, string templateFilePath, Dictionary<string, string> replacements)
+        private readonly IFileProvider _files;
+
+        public RuntimeItemSpec(ItemSpec baseItem, IFileProvider files, Dictionary<string, string> replacements)
             : base(baseItem.Type, baseItem.Path, baseItem.Keywords.ToArray())
         {
-            Extension = extension;
+            _files = files;
             Replacements = ImmutableDictionary.CreateRange(replacements);
-            TemplateFilePath = templateFilePath;
         }
 
         /// <summary>
@@ -28,14 +30,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
         /// </summary>
         public ImmutableDictionary<string, string>? Replacements { get; }
 
-        /// <summary>
-        /// Gets the relative path of the template file within the extension.
-        /// </summary>
-        public string TemplateFilePath { get; }
+        public Stream? OpenRead()
+        {
+            if (_files is null)
+            {
+                return null;
+            }
 
-        /// <summary>
-        /// Gets the extension the item comes from.
-        /// </summary>
-        public IExtension Extension { get; }
+            return _files.GetFileInfo(Path).CreateReadStream();
+        }
     }
 }

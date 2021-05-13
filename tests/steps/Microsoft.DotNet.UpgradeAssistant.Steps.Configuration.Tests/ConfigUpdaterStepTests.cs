@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using Autofac;
 using Autofac.Extras.Moq;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -24,11 +25,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
             // Arrange
             using var mock = AutoMock.GetLoose(cfg =>
             {
-                cfg.RegisterInstance(new ConfigUpdaterOptions
-                {
-                    ConfigFilePaths = new[] { "a", "b" }
-                });
                 RegisterConfigUpdaters(cfg, 0, 2);
+            });
+
+            mock.Mock<IOptions<ConfigUpdaterOptions>>().Setup(o => o.Value).Returns(new ConfigUpdaterOptions
+            {
+                ConfigFilePaths = new[] { "a", "b" }
             });
 
             // Act
@@ -56,9 +58,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         [Fact]
         public void NegativeCtorTests()
         {
-            Assert.Throws<ArgumentNullException>("configUpdaters", () => new ConfigUpdaterStep(null!, new ConfigUpdaterOptions(), new NullLogger<ConfigUpdaterStep>()));
+            Assert.Throws<ArgumentNullException>("configUpdaters", () => new ConfigUpdaterStep(null!, new Mock<IOptions<ConfigUpdaterOptions>>().Object, new NullLogger<ConfigUpdaterStep>()));
             Assert.Throws<ArgumentNullException>("configUpdaterOptions", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), null!, new NullLogger<ConfigUpdaterStep>()));
-            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new ConfigUpdaterOptions(), null!));
+            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new Mock<IOptions<ConfigUpdaterOptions>>().Object, null!));
         }
 
         [Theory]
@@ -174,16 +176,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         {
             using var mock = AutoMock.GetLoose(cfg =>
             {
-                cfg.RegisterInstance(new ConfigUpdaterOptions
-                {
-                    ConfigFilePaths = configPaths
-                });
                 RegisterConfigUpdaters(cfg, completeConfigUpdaterCount, incompleteConfigUpdaterCount);
             });
+
+            mock.Mock<IOptions<ConfigUpdaterOptions>>().Setup(o => o.Value).Returns(new ConfigUpdaterOptions
+            {
+                ConfigFilePaths = configPaths
+            });
+
             var project = mock.Mock<IProject>();
             project.Setup(p => p.FileInfo).Returns(new FileInfo("./test"));
+
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.CurrentProject).Returns(projectLoaded ? project.Object : null);
+
             var step = mock.Create<ConfigUpdaterStep>();
 
             return (context.Object, step);
