@@ -28,10 +28,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _io.Output.WriteLine(prompt);
             _io.Output.Write(Prompt);
 
-            return _io.Input.ReadLineAsync();
+            return Task.FromResult(_io.Input.ReadLine());
         }
 
-        public async Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
+        public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
             where T : UpgradeCommand
         {
             if (commands is null)
@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(commands));
             }
 
-            await _io.Output.WriteLineAsync(message);
+            _io.Output.WriteLine(message);
 
             var possible = new Dictionary<int, T>();
 
@@ -48,12 +48,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 if (command.IsEnabled)
                 {
                     var index = possible.Count + 1;
-                    await _io.Output.WriteLineAsync($" {index,3}. {command.CommandText}");
+                    _io.Output.WriteLine($" {index,3}. {command.CommandText}");
                     possible.Add(index, command);
                 }
                 else
                 {
-                    await _io.Output.WriteLineAsync($"   {command.CommandText}");
+                    _io.Output.WriteLine($"   {command.CommandText}");
                 }
             }
 
@@ -61,29 +61,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 token.ThrowIfCancellationRequested();
 
-                await _io.Output.WriteAsync(Prompt);
+                _io.Output.Write(Prompt);
 
-                var result = await _io.Input.ReadLineAsync();
+                var result = _io.Input.ReadLine();
 
                 if (result is null)
                 {
                     throw new OperationCanceledException();
                 }
 
-                var selectedCommandText = result.Trim(' ', '.', '\t');
+                var selectedCommandText = result.AsSpan().Trim(" .\t");
 
-                if (selectedCommandText is { Length: 0 })
+                if (selectedCommandText.IsEmpty)
                 {
                     if (possible.TryGetValue(1, out var defaultSelected))
                     {
-                        return defaultSelected;
+                        return Task.FromResult(defaultSelected);
                     }
                 }
                 else if (int.TryParse(selectedCommandText, out var selectedCommandIndex))
                 {
                     if (possible.TryGetValue(selectedCommandIndex, out var selected))
                     {
-                        return selected;
+                        return Task.FromResult(selected);
                     }
                 }
 
@@ -95,9 +95,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         {
             Console.WriteLine("Please press enter to continue...");
 
-            return Console.ReadLine() is not null
-                ? Task.FromResult(true)
-                : Task.FromResult(false);
+            if (Console.ReadLine() is not null)
+            {
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
         }
     }
 }
