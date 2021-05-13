@@ -100,8 +100,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 _logger.LogInformation("No state to save");
             }
-            else if (context.GlobalProperties.TryGetValue("PersistState", out var persistStateStr) &&
-                bool.TryParse(persistStateStr, out var persistState) && persistState)
+            else if (context.IsComplete)
+            {
+                try
+                {
+                    if (File.Exists(_path))
+                    {
+                        _logger.LogInformation("Deleting upgrade progress file at {Path}", _path);
+                        File.Delete(_path);
+                    }
+                }
+                catch (Exception ex)
+                when (ex is IOException or UnauthorizedAccessException or PathTooLongException)
+                {
+                    _logger.LogError("Unable to delete: {Path}, {Error}", _path, ex);
+                }
+            }
+            else
             {
                 _logger.LogInformation("Saving upgrade progress file at {Path}", _path);
 
@@ -109,10 +124,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 stream.SetLength(0);
 
                 await JsonSerializer.SerializeAsync(stream, state, cancellationToken: token).ConfigureAwait(false);
-            }
-            else
-            {
-                _logger.LogDebug("The user has opted out of persisting state.");
             }
         }
 
