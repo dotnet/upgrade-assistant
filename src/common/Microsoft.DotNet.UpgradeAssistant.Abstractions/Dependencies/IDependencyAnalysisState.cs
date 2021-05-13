@@ -13,8 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 
         bool IsValid { get; }
 
-        bool ChangesRecommended { get; }
+        bool AreChangesRecommended { get; }
 
-        public BuildBreakRisk Risk { get; set; }
+        BuildBreakRisk Risk { get; }
     }
 }

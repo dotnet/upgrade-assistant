@@ -63,8 +63,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
-            _analysisState = null;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
+            _analysisState = null;
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}", BuildBreakRisk.Unknown);
             }
 
-            if (_analysisState is null || !_analysisState.ChangesRecommended)
+            if (_analysisState is null || !_analysisState.AreChangesRecommended)
             {
                 Logger.LogInformation("No package updates needed");
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
@@ -163,7 +163,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         }
                     }
                 }
-                while (_analysisState is not null && _analysisState.ChangesRecommended);
+                while (_analysisState is not null && _analysisState.AreChangesRecommended);
 
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
             }

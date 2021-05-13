@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public BuildBreakRisk Risk { get; set; }
 
-        public bool ChangesRecommended => FrameworkReferences.HasChanges || Packages.HasChanges || References.HasChanges;
+        public bool AreChangesRecommended => FrameworkReferences.HasChanges || Packages.HasChanges || References.HasChanges;
 
         public bool IsValid { get; set; }
     }
