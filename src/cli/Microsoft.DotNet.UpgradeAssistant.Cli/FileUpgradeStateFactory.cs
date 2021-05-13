@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             if (state is not null)
             {
-                context.EntryPoints = state.EntryPoints.Select(FindProject).Where(e => e != null)!;
+                context.EntryPoints = state.EntryPoints.Select(e => FindProject(e)).Where(e => e != null)!;
                 context.SetCurrentProject(FindProject(state.CurrentProject));
                 foreach (var item in state.Properties)
                 {
@@ -104,6 +104,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 try
                 {
+                    // When the .NET Upgrade Assistant is done with all steps,
+                    // meaning all projects have been upgraded - delete the state.
                     if (File.Exists(_path))
                     {
                         _logger.LogInformation("Deleting upgrade progress file at {Path}", _path);

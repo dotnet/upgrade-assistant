@@ -78,8 +78,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             var logSettings = new LogSettings(options.Verbose);
 
             return host
-                .ConfigureServices(services => services.AddSingleton(logSettings))
-                .UseSerilog((_, loggerConfiguration) => loggerConfiguration
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton(logSettings);
+                })
+                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
                     .Enrich.FromLogContext()
                     .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
                     .WriteTo.Console(levelSwitch: logSettings.Console)
