@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
@@ -121,8 +122,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 // Break if there are no packages in the project. Otherwise, we end up performing restores too often.
                 if (!PackageReferences.Any())
                 {
+                    _logger.LogDebug("Skipping restore as no package references exist in project file {Path}", FileInfo.FullName);
                     yield break;
                 }
+
+                _logger.LogDebug("Attempting a restore to retrieve missing lock file data {Path}", FileInfo.FullName);
 
                 await _restorer.RestorePackagesAsync(Context, this, token).ConfigureAwait(false);
 
@@ -137,7 +141,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (target is null)
             {
-                throw new InvalidOperationException("Cannot find targets. Please ensure that the project is fully restored.");
+                _logger.LogError("Target is stil unavailable after restore. Please verify that the project has been restored.");
+                throw new UpgradeException("Cannot find targets. Please ensure that the project is fully restored.");
             }
 
             foreach (var library in target.Libraries)
