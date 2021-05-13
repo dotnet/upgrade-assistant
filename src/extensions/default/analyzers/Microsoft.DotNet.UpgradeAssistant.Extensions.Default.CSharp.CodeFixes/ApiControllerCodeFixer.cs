@@ -36,12 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return;
             }
 
-            var node = root.FindNode(context.Span, false, true);
-
-            if (node is null)
-            {
-                return;
-            }
+            var node = root.FindNode(context.Span);
 
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
