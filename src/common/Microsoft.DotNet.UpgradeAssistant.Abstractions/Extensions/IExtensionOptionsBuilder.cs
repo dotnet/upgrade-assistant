@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public interface IExtensionOptionsBuilder<TOption>
+        where TOption : class, new()
     {
         /// <summary>
         /// Maps file paths given in <typeparamref name="TOption"/> to options of <typeparamref name="TTo"/>.

@@ -11,12 +11,15 @@ using Microsoft.Extensions.Options;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal class ExtensionOptionsBuilder<TOption> : IExtensionOptionsBuilder<TOption>
+        where TOption : class, new()
     {
         private readonly ExtensionServiceCollection _services;
+        private readonly string _sectionName;
 
-        public ExtensionOptionsBuilder(ExtensionServiceCollection services)
+        public ExtensionOptionsBuilder(ExtensionServiceCollection services, string sectionName)
         {
             _services = services;
+            _sectionName = sectionName;
         }
 
         public void MapFiles<TTo>(Func<TOption, string?> factory)
@@ -33,6 +36,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         {
             // The default options factory cannot create an instance of ICollection<>
             _services.Services.AddTransient<IOptionsFactory<ICollection<TTo>>, CollectionOptionsFactory<TTo>>();
+            _services.Services.AddTransient<IOptionsFactory<ICollection<FileOption<TOption>>>, CollectionOptionsFactory<FileOption<TOption>>>();
+
+            // Since not all TOption instances will implement IFileOption, this is to ensure we are able to access an IFileProvider from the extension
+            _services.Services.AddTransient<IConfigureOptions<ICollection<FileOption<TOption>>>>(ctx =>
+            {
+                var extensions = ctx.GetRequiredService<IEnumerable<IExtension>>();
+
+                return new AggregateExtensionConfigureOptions<TOption>(_sectionName, extensions);
+            });
 
             _services.Services.TryAddTransient(typeof(ExtensionMappedFileConfigureOptions<,>));
 

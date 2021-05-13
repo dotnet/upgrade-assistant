@@ -18,7 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             // The default options factory cannot create an instance of ICollection<>
             Services.AddTransient<IOptionsFactory<ICollection<TOption>>, CollectionOptionsFactory<TOption>>();
-            Services.AddTransient<IOptionsFactory<ICollection<FileOption<TOption>>>, CollectionOptionsFactory<FileOption<TOption>>>();
 
             Services.AddTransient<IConfigureOptions<TOption>>(ctx =>
             {
@@ -34,15 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return new AggregateExtensionConfigureOptions<TOption>(sectionName, extensions);
             });
 
-            // Used to provide file provider for mapping files since not all options may implement IFileOption
-            Services.AddTransient<IConfigureOptions<ICollection<FileOption<TOption>>>>(ctx =>
-            {
-                var extensions = ctx.GetRequiredService<IEnumerable<IExtension>>();
-
-                return new AggregateExtensionConfigureOptions<TOption>(sectionName, extensions);
-            });
-
-            return new ExtensionOptionsBuilder<TOption>(this);
+            return new ExtensionOptionsBuilder<TOption>(this, sectionName);
         }
     }
 }

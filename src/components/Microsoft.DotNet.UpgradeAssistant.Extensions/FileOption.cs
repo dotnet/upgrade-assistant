@@ -5,7 +5,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    public class FileOption<T>
+    internal class FileOption<T>
     {
         public IFileProvider Files { get; set; } = default!;
 
