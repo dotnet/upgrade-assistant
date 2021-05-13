@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             FrameworkReferences = new DependencyCollection<Reference>(initial: project.FrameworkReferences, setRisk: SetRisk);
             Packages = new DependencyCollection<NuGetReference>(initial: nugetReferences.PackageReferences, setRisk: SetRisk);
             References = new DependencyCollection<Reference>(project.References, SetRisk);
-
+            IsValid = true;
             void SetRisk(BuildBreakRisk risk)
             {
                 Risk = (BuildBreakRisk)Math.Max((int)Risk, (int)risk);
@@ -42,8 +42,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         IDependencyCollection<Reference> IDependencyAnalysisState.References => References;
 
-        public BuildBreakRisk Risk { get; private set; }
+        public BuildBreakRisk Risk { get; set; }
 
         public bool ChangesRecommended => FrameworkReferences.HasChanges || Packages.HasChanges || References.HasChanges;
+
+        public bool IsValid { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
 
-        private DependencyAnalysisState? _analysisState;
+        private IDependencyAnalysisState? _analysisState;
 
         public override string Description => "Update package references to versions compatible with the target framework";
 
@@ -78,7 +78,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             try
             {
-                if (!await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, _analysisState, token).ConfigureAwait(false))
+                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                if (!_analysisState.IsValid)
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
@@ -115,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 return new UpgradeStepInitializeResult(
                     UpgradeStepStatus.Incomplete,
-                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", _analysisState.Risk);
+                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", Risk: _analysisState.Risk);
             }
         }
 
@@ -155,7 +156,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         count++;
 
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        if (!await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, _analysisState, token).ConfigureAwait(false))
+                        _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                        if (!_analysisState.IsValid)
                         {
                             return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
                         }

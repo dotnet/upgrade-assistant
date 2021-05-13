@@ -27,18 +27,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _logger = logger;
         }
 
-        public async Task<bool> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, IDependencyAnalysisState? analysisState, CancellationToken token)
+        public async Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, CancellationToken token)
         {
             if (projectRoot is null)
             {
                 _logger.LogError("No project available");
-                return false;
+                throw new ArgumentNullException(nameof(projectRoot));
             }
 
             await _packageRestorer.RestorePackagesAsync(context, projectRoot, token).ConfigureAwait(false);
             var nugetReferences = await projectRoot.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
-            analysisState = new DependencyAnalysisState(projectRoot, nugetReferences);
+            var analysisState = new DependencyAnalysisState(projectRoot, nugetReferences);
 
             // Iterate through all package references in the project file
             foreach (var analyzer in _packageAnalyzers)
@@ -53,11 +53,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 #pragma warning restore CA1031 // Do not catch general exception types
                 {
                     _logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
-                    return false;
+                    analysisState.IsValid = false;
                 }
             }
 
-            return true;
+            return analysisState;
         }
     }
 }
