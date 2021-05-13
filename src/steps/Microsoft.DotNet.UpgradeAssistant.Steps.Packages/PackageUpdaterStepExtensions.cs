@@ -22,8 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.Services.AddUpgradeStep<PackageUpdaterPreTFMStep>();
             services.Services.AddUpgradeStep<PackageUpdaterStep>();
-            services.AddSingleton<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
-            services.AddSingleton<PackageMapProvider>();
+            services.Services.AddSingleton<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
 
             services.AddExtensionOption<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
                 .MapFiles<NuGetPackageMap[]>(t => Path.Combine(t.PackageMapPath, PackageMapExtension));
