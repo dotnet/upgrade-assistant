@@ -59,13 +59,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
         /// <param name="node">A class that is ApiController.</param>
         /// <param name="cancellationToken">May request cancellation.</param>
         /// <returns>A document where at least one ApiController was removed.</returns>
-        private async Task<Document> ReplaceBaseClass(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private static async Task<Document> ReplaceBaseClass(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var generator = SyntaxGenerator.GetGenerator(document);
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
             var mvcBaseType = generator.QualifiedName(
-                CreateMvcNamespace(generator),
+                QualifiedNameBuilder.BuildQualifiedSyntax(generator, GoodNamespace),
                 generator.IdentifierName(GoodClassName))
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
@@ -90,11 +90,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
             return types[0];
         }
-
-        private static SyntaxNode CreateMvcNamespace(SyntaxGenerator generator) => generator.QualifiedName(CreateAspNetCoreNamesapce(generator), generator.IdentifierName("Mvc"));
-
-        private static SyntaxNode CreateAspNetCoreNamesapce(SyntaxGenerator generator) => generator.QualifiedName(CreateMicrosoftNamesapce(generator), generator.IdentifierName("AspNetCore"));
-
-        private static SyntaxNode CreateMicrosoftNamesapce(SyntaxGenerator generator) => generator.IdentifierName("Microsoft");
     }
 }

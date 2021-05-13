@@ -8,7 +8,7 @@ Namespace TestProject.TestClasses
 
         ' GET api/values
         Public Function GetValues() As IEnumerable(Of String)
-            Dim fooService1 = New NotAWebController2()
+            Dim fooService = New NotAWebController2()
 
             Return fooService
         End Function
