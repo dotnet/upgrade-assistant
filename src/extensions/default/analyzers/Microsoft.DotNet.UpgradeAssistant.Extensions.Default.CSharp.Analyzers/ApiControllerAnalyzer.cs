@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
 
+        public const string ApiControllerQualifiedName = ApiControllerNamespace + "." + ApiControllerClassName;
         public const string ApiControllerNamespace = "System.Web.Http";
         public const string ApiControllerClassName = "ApiController";
 
@@ -65,7 +66,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 
         private static bool IsBaseTypeAQualifiedReferenceToApiController(INamedTypeSymbol baseType)
         {
-            return baseType.ToDisplayString().Equals($"{ApiControllerNamespace}.{ApiControllerClassName}", StringComparison.Ordinal);
+            // remembering to be cautious that string operations are immutable. We create a unique constant for this conditional
+            // to prevent situations where evaluating this analyzer on large solutions could lead to excessive garbage collection.
+            return baseType.ToDisplayString().Equals(ApiControllerQualifiedName, StringComparison.Ordinal);
         }
 
         private static void ReportDiagnostic(SymbolAnalysisContext context, SyntaxNode node)
