@@ -12,10 +12,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         where TOption : class, new()
     {
         private readonly string _sectionName;
-        private readonly IEnumerable<IExtension> _extensions;
+        private readonly IEnumerable<ExtensionInstance> _extensions;
         private readonly Lazy<Mapper> _mapper;
 
-        public AggregateExtensionConfigureOptions(string sectionName, IEnumerable<IExtension> extensions)
+        public AggregateExtensionConfigureOptions(string sectionName, IEnumerable<ExtensionInstance> extensions)
         {
             _sectionName = sectionName;
             _extensions = extensions;
@@ -41,11 +41,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public void Configure(ICollection<FileOption<TOption>> options)
             => Configure(options, static (e, o) => new FileOption<TOption>
             {
-                Files = e.Files,
+                Files = e.FileProvider,
                 Value = AddFiles(e, o)
             });
 
-        private void Configure<T>(ICollection<T> options, Func<IExtension, TOption, T> factory)
+        private void Configure<T>(ICollection<T> options, Func<ExtensionInstance, TOption, T> factory)
         {
             foreach (var extension in _extensions)
             {
@@ -58,11 +58,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
         }
 
-        private static TOption AddFiles(IExtension extension, TOption options)
+        private static TOption AddFiles(ExtensionInstance extension, TOption options)
         {
             if (options is IFileOption fileOption)
             {
-                fileOption.Files = extension.Files;
+                fileOption.Files = extension.FileProvider;
             }
 
             return options;

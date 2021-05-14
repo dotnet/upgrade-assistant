@@ -27,8 +27,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
+        private readonly IDependencyAnalyzerRunner _packageAnalyzer;
 
-        private DependencyAnalysisState? _analysisState;
+        private IDependencyAnalysisState? _analysisState;
 
         public override string Description => "Update package references to versions compatible with the target framework";
 
@@ -56,11 +57,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         public PackageUpdaterStep(
             IPackageRestorer packageRestorer,
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
+            IDependencyAnalyzerRunner packageAnalyzer,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
+            _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
         }
 
@@ -75,7 +78,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             try
             {
-                if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
+                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                if (!_analysisState.IsValid)
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
@@ -88,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}", BuildBreakRisk.Unknown);
             }
 
-            if (_analysisState is null || !_analysisState.ChangesRecommended)
+            if (_analysisState is null || !_analysisState.AreChangesRecommended)
             {
                 Logger.LogInformation("No package updates needed");
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
@@ -102,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 LogDetails("Framework references to be added: {FrameworkReference}", _analysisState.FrameworkReferences.Additions);
                 LogDetails("Framework references to be removed: {FrameworkReference}", _analysisState.FrameworkReferences.Deletions);
 
-                void LogDetails<T>(string name, ICollection<T> collection)
+                void LogDetails<T>(string name, IReadOnlyCollection<T> collection)
                 {
                     if (collection.Count > 0)
                     {
@@ -112,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 return new UpgradeStepInitializeResult(
                     UpgradeStepStatus.Incomplete,
-                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", _analysisState.Risk);
+                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", Risk: _analysisState.Risk);
             }
         }
 
@@ -152,13 +156,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         count++;
 
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        if (!await RunPackageAnalyzersAsync(context, token).ConfigureAwait(false))
+                        _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                        if (!_analysisState.IsValid)
                         {
                             return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
                         }
                     }
                 }
-                while (_analysisState is not null && _analysisState.ChangesRecommended);
+                while (_analysisState is not null && _analysisState.AreChangesRecommended);
 
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
             }
@@ -169,45 +174,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}");
             }
-        }
-
-        private async Task<bool> RunPackageAnalyzersAsync(IUpgradeContext context, CancellationToken token)
-        {
-            if (context.CurrentProject is null)
-            {
-                return false;
-            }
-
-            await _packageRestorer.RestorePackagesAsync(context, context.CurrentProject, token).ConfigureAwait(false);
-
-            _analysisState = new DependencyAnalysisState(context.CurrentProject, context.CurrentProject.NuGetReferences);
-
-            var projectRoot = context.CurrentProject;
-
-            if (projectRoot is null)
-            {
-                Logger.LogError("No project available");
-                return false;
-            }
-
-            // Iterate through all package references in the project file
-            foreach (var analyzer in _packageAnalyzers)
-            {
-                Logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
-                try
-                {
-                    await analyzer.AnalyzeAsync(projectRoot, _analysisState, token).ConfigureAwait(false);
-                }
-#pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception e)
-#pragma warning restore CA1031 // Do not catch general exception types
-                {
-                    Logger.LogCritical("Package analysis failed (analyzer {AnalyzerName}: {Message}", analyzer.Name, e.Message);
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }
