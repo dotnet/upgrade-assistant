@@ -54,6 +54,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
 
             var baseTypeNode = GetBaseTypeFromSyntax(context.Node);
+            if (baseTypeNode is null)
+            {
+                // this import statement does not have a syntax that declares the ApiController as a baseType
+                return;
+            }
 
             var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseTypeNode).Symbol as INamedTypeSymbol;
             if (baseTypeSymbol is not null
@@ -67,15 +72,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 return;
             }
 
-            // intentionally using .ToString() and not .ToFullString() to avoid Trivia on the node
-            // intentionally using string here because the syntax is shared between the two languages
-            if (IsBaseTypeAQualifiedReferenceToApiController(baseTypeNode.ToString())
-                || IsBaseTypeAnImplicitReferenceToApiController(baseTypeNode.ToString()))
-            {
-                // For all such symbols, produce a diagnostic.
-                var diagnostic = Diagnostic.Create(Rule, baseTypeNode.GetLocation(), baseTypeNode.ToString());
-                context.ReportDiagnostic(diagnostic);
-            }
+            // For all such symbols, produce a diagnostic.
+            var diagnostic = Diagnostic.Create(Rule, baseTypeNode.GetLocation(), baseTypeNode.ToString());
+            context.ReportDiagnostic(diagnostic);
         }
 
         /// <summary>
@@ -83,22 +82,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         /// </summary>
         /// <param name="importOrBaseListSyntax">Expected to be an ImportStatementSyntax for VB or a BaseListSyntax for CS.</param>
         /// <returns>Null, QualifiedNameSyntaxNode, or IdentifierNameSyntaxNode.</returns>
-        public static SyntaxNode GetBaseTypeFromSyntax(SyntaxNode importOrBaseListSyntax)
+        public static SyntaxNode? GetBaseTypeFromSyntax(SyntaxNode importOrBaseListSyntax)
         {
             if (importOrBaseListSyntax is null)
             {
                 throw new ArgumentNullException(nameof(importOrBaseListSyntax));
             }
 
-            // the first descendent of ImportStatementSyntax will be a QualifiedNameSyntax or IdentifierNameSyntax for VB
-            // the first descendent of BaseListSyntax will be a SimpleBaseTypeSyntax for CS
-            var baseTypeNode = importOrBaseListSyntax.DescendantNodes().First();
-            if (baseTypeNode.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType) && baseTypeNode.DescendantNodes().Any())
+            if (importOrBaseListSyntax.IsQualifiedName() || importOrBaseListSyntax.IsIdentifierName())
             {
-                // In CSharp syntax, the SimpleBaseTypeSyntax the first child and we want the QualifiedNameSyntax or IdentifierNameSyntax
-                // resolving this node must be done before we check for symbol info
-                baseTypeNode = baseTypeNode.DescendantNodes().First();
+                return importOrBaseListSyntax;
             }
+            else if (!importOrBaseListSyntax.IsBaseTypeSyntax())
+            {
+                return null;
+            }
+
+            var baseTypeNode = importOrBaseListSyntax.DescendantNodes(descendIntoChildren: node => true)
+                .Where(node => node.IsQualifiedName() || node.IsIdentifierName())
+
+                // intentionally using .ToString() and not .ToFullString() to avoid Trivia on the node
+                // intentionally using string here because the syntax is shared between the two languages
+                .Where(node => IsBaseTypeAQualifiedReferenceToApiController(node.ToString())
+                    || IsBaseTypeAnImplicitReferenceToApiController(node.ToString()))
+                .FirstOrDefault();
 
             return baseTypeNode;
         }

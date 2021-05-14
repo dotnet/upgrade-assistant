@@ -37,12 +37,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return;
             }
 
-            var node = root.FindNode(context.Span);
+            var baseTypeNode = ApiControllerAnalyzer.GetBaseTypeFromSyntax(root.FindNode(context.Span));
 
-            var baseTypeNode = ApiControllerAnalyzer.GetBaseTypeFromSyntax(node);
-
-            if (node is null)
+            if (baseTypeNode is null)
             {
+                // should never happen, but prevents an exception if there is a scenario I didn't remember
                 return;
             }
 
@@ -50,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             context.RegisterCodeFix(
                 CodeAction.Create(
                     CodeFixResources.ApiControllerTitle,
-                    cancellationToken => ReplaceBaseClass(context.Document, node, cancellationToken),
+                    cancellationToken => ReplaceBaseClass(context.Document, baseTypeNode, cancellationToken),
                     nameof(CodeFixResources.ApiControllerTitle)),
                 context.Diagnostics);
         }
