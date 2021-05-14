@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         public static void AddAnalysis(this IServiceCollection services)
         {
             services.AddTransient<IAnalyzeResultProvider, AnalyzePackageStatus>();
-            services.AddTransient<IPackageAnalyzer, PackageAnalyzer>();
+            services.AddTransient<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
         }
     }
 }
