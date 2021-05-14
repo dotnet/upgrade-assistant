@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers 
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;ApiController&apos; should be replaced with &apos;Microsoft.AspNetCore.Mvc.Controller&apos;.
+        ///   Looks up a localized string similar to &apos;ApiController&apos; should be replaced with &apos;Microsoft.AspNetCore.Mvc.Controller&apos;..
         /// </summary>
         internal static string ApiControllerDescription {
             get {

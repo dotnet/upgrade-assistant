@@ -127,7 +127,7 @@
     <value>[AllowHtmlAttribute] should be removed</value>
   </data>
   <data name="ApiControllerDescription" xml:space="preserve">
-    <value>'ApiController' should be replaced with 'Microsoft.AspNetCore.Mvc.Controller'</value>
+    <value>'ApiController' should be replaced with 'Microsoft.AspNetCore.Mvc.Controller'.</value>
   </data>
   <data name="ApiControllerMessageFormat" xml:space="preserve">
     <value>'ApiController' should be replaced with 'Microsoft.AspNetCore.Mvc.Controller'</value>
