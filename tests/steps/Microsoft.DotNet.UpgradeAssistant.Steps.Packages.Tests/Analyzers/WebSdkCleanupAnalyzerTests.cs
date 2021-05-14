@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Moq;
 using Xunit;
 
@@ -47,17 +48,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            (var project, var state) = await GetMockProjectAndPackageState(mock, sdk, frameworkReferences?.Select(r => new Reference(r))).ConfigureAwait(true);
+
+            var dependency = new Mock<IDependencyCollection<Reference>>();
+
+            var state = new Mock<IDependencyAnalysisState>();
+            state.Setup(s => s.FrameworkReferences).Returns(dependency.Object);
+
+            var project = GetMockProjectAndPackageState(mock, sdk, frameworkReferences?.Select(r => new Reference(r)));
             var analyzer = mock.Create<WebSdkCleanupAnalyzer>();
 
             // Act
-            var finalState = await analyzer.AnalyzeAsync(project, state, CancellationToken.None).ConfigureAwait(true);
+            await analyzer.AnalyzeAsync(project, state.Object, CancellationToken.None).ConfigureAwait(true);
 
             // Assert
-            Assert.Equal(state, finalState);
-            Assert.Collection(
-                state.FrameworkReferencesToRemove,
-                expectedReferencesToRemove.Select<string, Action<Reference>>(e => r => Assert.Equal(e, r.Name)).ToArray());
+            foreach (var expected in expectedReferencesToRemove)
+            {
+                dependency.Verify(d => d.Remove(new Reference(expected), BuildBreakRisk.None));
+            }
         }
 
         [Fact]
@@ -65,15 +72,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            (var project, var state) = await GetMockProjectAndPackageState(mock).ConfigureAwait(true);
+
+            var dependency = new Mock<IDependencyCollection<Reference>>();
+
+            var state = new Mock<IDependencyAnalysisState>();
+            state.Setup(s => s.FrameworkReferences).Returns(dependency.Object);
+
+            var project = GetMockProjectAndPackageState(mock);
             var analyzer = mock.Create<WebSdkCleanupAnalyzer>();
 
             // Act / Assert
             await Assert.ThrowsAsync<ArgumentNullException>("state", () => analyzer.AnalyzeAsync(project, null!, CancellationToken.None)).ConfigureAwait(true);
-            await Assert.ThrowsAsync<InvalidOperationException>(() => analyzer.AnalyzeAsync(null!, state, CancellationToken.None)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => analyzer.AnalyzeAsync(null!, state.Object, CancellationToken.None)).ConfigureAwait(true);
         }
 
-        private static async Task<(IProject Project, PackageAnalysisState State)> GetMockProjectAndPackageState(AutoMock mock, string? sdk = null, IEnumerable<Reference>? frameworkReferences = null)
+        private static IProject GetMockProjectAndPackageState(AutoMock mock, string? sdk = null, IEnumerable<Reference>? frameworkReferences = null)
         {
             var projectRoot = mock.Mock<IProjectFile>();
             projectRoot.Setup(r => r.IsSdk).Returns(sdk is not null);
@@ -90,16 +103,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
             project.Setup(p => p.GetFile()).Returns(projectRoot.Object);
             project.Setup(p => p.FrameworkReferences).Returns(frameworkReferences!);
 
-            var context = mock.Mock<IUpgradeContext>();
-            context.Setup(c => c.CurrentProject).Returns(project.Object);
-
-            var restorer = mock.Mock<IPackageRestorer>();
-            restorer.Setup(r => r.RestorePackagesAsync(
-                It.IsAny<IUpgradeContext>(),
-                It.IsAny<IProject>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
-
-            return (project.Object, await PackageAnalysisState.CreateAsync(context.Object, restorer.Object, CancellationToken.None).ConfigureAwait(true));
+            return project.Object;
         }
     }
 }

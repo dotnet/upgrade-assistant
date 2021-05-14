@@ -3,10 +3,10 @@
 
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,36 +15,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public class DefaultExtensionServiceProvider : IExtensionServiceProvider
     {
-        private const string PackageUpdaterStepOptionsSection = "PackageUpdater";
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
 
-        public IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration)
+        public void AddServices(IExtensionServiceCollection services)
         {
-            if (serviceConfiguration is null)
+            if (services is null)
             {
-                throw new System.ArgumentNullException(nameof(serviceConfiguration));
+                throw new System.ArgumentNullException(nameof(services));
             }
 
-            AddUpgradeSteps(serviceConfiguration.ServiceCollection, serviceConfiguration.ExtensionConfiguration);
-            AddConfigUpdaters(serviceConfiguration.ServiceCollection);
-            AddAnalyzersAndCodeFixProviders(serviceConfiguration.ServiceCollection);
-            AddPackageReferenceAnalyzers(serviceConfiguration.ServiceCollection);
-
-            return serviceConfiguration.ServiceCollection;
+            AddUpgradeSteps(services, services.Configuration);
+            AddConfigUpdaters(services.Services);
+            AddAnalyzersAndCodeFixProviders(services.Services);
+            AddPackageReferenceAnalyzers(services.Services);
         }
 
-        private static void AddUpgradeSteps(IServiceCollection services, IConfiguration configuration)
+        private static void AddUpgradeSteps(IExtensionServiceCollection services, IConfiguration configuration)
         {
-            services.AddBackupStep();
+            services.Services.AddBackupStep();
             services.AddConfigUpdaterStep();
-            services.AddPackageUpdaterStep()
-                .Bind(configuration.GetSection(PackageUpdaterStepOptionsSection));
-            services.AddProjectFormatSteps()
+            services.AddPackageUpdaterStep();
+            services.Services.AddProjectFormatSteps()
                 .Bind(configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-            services.AddSolutionSteps();
-            services.AddSourceUpdaterStep();
+            services.Services.AddSolutionSteps();
+            services.Services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
-            services.AddRazorUpdaterStep();
+            services.Services.AddRazorUpdaterStep();
         }
 
         // This extension only adds default config updaters, but other extensions
@@ -95,13 +91,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         private static void AddPackageReferenceAnalyzers(IServiceCollection services)
         {
             // Add package analyzers (note that the order matters as the analyzers are run in the order registered)
-            services.AddTransient<IPackageReferencesAnalyzer, DuplicateReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, TransitiveReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, PackageMapReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, TargetCompatibilityReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, UpgradeAssistantReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, WindowsCompatReferenceAnalyzer>();
-            services.AddTransient<IPackageReferencesAnalyzer, NewtonsoftReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, DuplicateReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, TransitiveReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, PackageMapReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, TargetCompatibilityReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, UpgradeAssistantReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, WindowsCompatReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, NewtonsoftReferenceAnalyzer>();
         }
     }
 }

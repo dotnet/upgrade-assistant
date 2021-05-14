@@ -2,8 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
@@ -30,11 +30,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         };
 
         public PackageUpdaterPreTFMStep(
-            IOptions<PackageUpdaterOptions> updaterOptions,
             IPackageRestorer packageRestorer,
-            IEnumerable<IPackageReferencesAnalyzer> packageAnalyzers,
+            IEnumerable<IDependencyAnalyzer> packageAnalyzers,
+            IDependencyAnalyzerRunner dependencyAnalyzerRunner,
             ILogger<PackageUpdaterPreTFMStep> logger)
-            : base(updaterOptions, packageRestorer, packageAnalyzers, logger)
+            : base(packageRestorer, packageAnalyzers, dependencyAnalyzerRunner, logger)
         {
         }
     }

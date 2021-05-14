@@ -27,7 +27,7 @@ To create an Upgrade Assistant extension, you will need to start with a manifest
 }
 ```
 
-To use an extension at runtime, either use the -e argument to point to the extension's manifest file (or directory where the manifest file is located) or set the environment variable "UpgradeAssistantExtensionPaths" to a semicolon-delimited list of paths to probe for extensions.
+To use an extension at runtime, either use the `--extension` argument to point to the extension's manifest file (or directory where the manifest file is located) or set the environment variable "UpgradeAssistantExtensionPaths" to a semicolon-delimited list of paths to probe for extensions.
 
 ### Custom upgrade steps, source updaters, and config updaters
 
@@ -38,6 +38,122 @@ The ExtensionServiceProviders element of the extension manifest contains an arra
 3. `IConfigUpdater` implementations. Upgrade Assistant's config updater step uses any registered `IConfigUpdater` services to make project updates based on config files (app.config, web.config). Therefore, by registering their own `IConfigUpdater` implementations, extenders can customize how config-related upgrades are made by Upgrade Assistant.
 4. `IPackageReferencesAnalyzer` implementations. For more information on how the package updater step works, see the next section of this document. If providing custom package mapping configuration is insufficient, however, extenders can register their own implementations of `IPackageReferenceAnalzyer` to more completely customize how NuGet package references are updated.
 5. Any other services that might be needed by Upgrade Assistant steps (either the default steps or those added by extensions). Extenders can register services that their own upgrade steps will need or services that will be used by other upgrade steps and Upgrade Assistant will make sure any services registered in an `IExtensionServiceProvider` implementation will be made available at runtime.
+
+### Registering Custom Configuration
+
+An extension can register configuration options that can then be added to by other extensions. This can be done similar to the following:
+
+```csharp
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
+
+namespace Microsoft.DotNet.UpgradeAssistant
+{
+    public class TestExtension : IExtensionServiceProvider
+    {
+        public void AddServices(IExtensionServiceCollection services)
+        {
+            services.AddExtensionOption<SomeOptions>("sectionName");
+        }
+    }
+
+    public class SomeOptions
+    {
+    }
+}
+```
+
+This can then be used in a couple of ways:
+
+```csharp
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.Extensions.Options;
+
+namespace Microsoft.DotNet.UpgradeAssistant
+{
+    public class SomeOptions
+    {
+    }
+
+    public class TestService
+    {
+        public TestService(
+          // Get a merged set of options from all extensions
+          IOptions<SomeOptions> options,
+
+          // Get options from each extension as separate options
+          IOptions<ICollection<SomeOptions>> collection)
+        {
+        }
+    }
+}
+```
+
+### Accessing extension files
+If you would like to be able to access the backing file structure, ensure your option type implements `IFileOption`:
+
+```csharp
+using Microsoft.Extensions.Options;
+
+namespace Microsoft.DotNet.UpgradeAssistant
+{
+    public class SomeOptions : IFileOption
+    {
+      public IFileProvider Files { get; set; }
+    }
+
+    public class TestService
+    {
+        public TestService(
+          // Get options for each extension with a scoped file provider
+          IOptions<ICollection<SomeOptions>> options)
+        {
+        }
+    }
+}
+```
+
+The `SomeOptions.Files` property will contain a scoped file provider to the directory of the extension to access files referenced within the options.
+
+### Mapping custom configuration to files
+
+Often, an extension will allow for a list of files to be used to map to other types (see the PackageUpdater or TemplateUpdater steps for full examples). Since this is a common pattern, there is a helper to enable this mapping to a resolved option:
+
+```csharp
+using System.Collections.Generic;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
+
+namespace Microsoft.DotNet.UpgradeAssistant
+{
+    public class SomeOptions
+    {
+        public IEnumerable<string> Files { get; set; }
+    }
+
+    public class SomeOtherOption
+    {
+    }
+
+    public class TestExtension : IExtensionServiceProvider
+    {
+        public void AddServices(IExtensionServiceCollection services)
+        {
+            services.AddExtensionOption<SomeOptions>("sectionName")
+                .MapFiles<SomeOtherOption>(o => o.Files);
+        }
+    }
+
+    public class TestService
+    {
+        public TestService(
+          // Get the mapped options from each extension
+          IOptions<ICollection<SomeOtherOption>> options)
+        {
+        }
+    }
+}
+```
+
+There is no way to access a single option, but only a collection of all the options from all the extensions. As stated above, if `SomeOtherOption : IFileOption`, then it would have access to a scoped file provider for that extension.
 
 ### Custom NuGet package mapping configuration
 

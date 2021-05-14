@@ -2,9 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Moq;
 using Xunit;
@@ -17,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
     public class NewtonsoftReferenceAnalyzerTests
     {
         private const string NewtonsoftPackageName = "Microsoft.AspNetCore.Mvc.NewtonsoftJson";
+        private const string NewtonsoftPackageNameVersion = "122.0.0";
 
         /// <summary>
         /// Validates that the analyzer will only be applied when TFM is not net48.
@@ -29,14 +32,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
             using var mock = AutoMock.GetLoose();
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
             var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
-            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+
+            var packages = new Mock<IDependencyCollection<NuGetReference>>();
+            packages.As<IEnumerable<NuGetReference>>().Setup(s => s.GetEnumerator()).Returns(Enumerable.Empty<NuGetReference>().GetEnumerator());
+
+            var packageState = new Mock<IDependencyAnalysisState>();
+            packageState.Setup(p => p.Packages).Returns(packages.Object);
+
             var packageLoader = CreatePackageLoader(mock);
 
             // Act
-            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
-            Assert.Contains(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packages.Verify(p => p.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None));
             packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Once());
         }
@@ -53,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
 
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
             var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
-            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+            var packageState = new Mock<IDependencyAnalysisState>();
             var packageLoader = CreatePackageLoader(mock);
 
             // shift project attributes so that it is not applicable
@@ -63,10 +72,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
                 .Returns(-1);
 
             // Act
-            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
-            Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
             packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
@@ -83,17 +92,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
 
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
             var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
-            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+            var packageState = new Mock<IDependencyAnalysisState>();
             var packageLoader = CreatePackageLoader(mock);
 
             // shift project attributes so that it is not applicable
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Library);
 
             // Act
-            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
-            Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
             packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
@@ -110,32 +119,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
 
             var analyzer = mock.Create<NewtonsoftReferenceAnalyzer>();
             var project = CreateProjectForWhichAnalyzerIsApplicable(mock);
-            var packageState = await CreatePackageAnalysisState(mock, project).ConfigureAwait(false);
+            var packageState = new Mock<IDependencyAnalysisState>();
             var packageLoader = CreatePackageLoader(mock);
 
             // shift project attributes so that it is not applicable
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.Wpf));
 
             // Act
-            var actual = await analyzer.AnalyzeAsync(project.Object, packageState, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
-            Assert.DoesNotContain(actual.PackagesToAdd, (package) => package.Name.Equals(NewtonsoftPackageName, System.StringComparison.Ordinal));
+            packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
             packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
                 Times.Never());
-        }
-
-        private static async Task<PackageAnalysisState> CreatePackageAnalysisState(AutoMock mock, Mock<IProject> project)
-        {
-            var context = mock.Mock<IUpgradeContext>();
-            context.Setup(c => c.CurrentProject).Returns(project.Object);
-            var restorer = mock.Mock<IPackageRestorer>();
-            restorer.Setup(r => r.RestorePackagesAsync(
-                It.IsAny<IUpgradeContext>(),
-                It.IsAny<IProject>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
-
-            return await PackageAnalysisState.CreateAsync(context.Object, restorer.Object, CancellationToken.None).ConfigureAwait(true);
         }
 
         private static Mock<IProject> CreateProjectForWhichAnalyzerIsApplicable(AutoMock mock)
@@ -157,7 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
         {
             var packageLoader = mock.Mock<IPackageLoader>();
             packageLoader.Setup(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult((NuGetReference?)new NuGetReference(NewtonsoftPackageName, "122.0.0")));
+                .Returns(Task.FromResult((NuGetReference?)new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion)));
             return packageLoader;
         }
     }

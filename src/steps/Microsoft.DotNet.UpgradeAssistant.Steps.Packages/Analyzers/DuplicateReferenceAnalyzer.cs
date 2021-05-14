@@ -5,11 +5,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
-    public class DuplicateReferenceAnalyzer : IPackageReferencesAnalyzer
+    public class DuplicateReferenceAnalyzer : IDependencyAnalyzer
     {
         private readonly IVersionComparer _comparer;
         private readonly ILogger<DuplicateReferenceAnalyzer> _logger;
@@ -22,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (state is null)
             {
@@ -40,11 +41,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 foreach (var package in duplicates.Where(p => p != highestVersion))
                 {
                     _logger.LogInformation("Marking package {NuGetPackage} for removal because it is referenced elsewhere in the project with a higher version", package);
-                    state.PackagesToRemove.Add(package);
+                    state.Packages.Remove(package);
                 }
             }
-
-            return state;
         }
     }
 }

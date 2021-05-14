@@ -5,11 +5,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
-    public class WebSdkCleanupAnalyzer : IPackageReferencesAnalyzer
+    public class WebSdkCleanupAnalyzer : IDependencyAnalyzer
     {
         private const string AspNetCoreFrameworkReference = "Microsoft.AspNetCore.App";
         private const string WebSdk = "Microsoft.NET.Sdk.Web";
@@ -23,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<PackageAnalysisState> AnalyzeAsync(IProject project, PackageAnalysisState state, CancellationToken token)
+        public Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (state is null)
             {
@@ -38,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // and the framework reference are present.
             if (!projectRoot.IsSdk || !projectRoot.Sdk.Equals(WebSdk, StringComparison.OrdinalIgnoreCase))
             {
-                return Task.FromResult(state);
+                return Task.CompletedTask;
             }
 
             var aspNetCoreReference = project.FrameworkReferences?.FirstOrDefault(f => f.Name.Equals(AspNetCoreFrameworkReference, StringComparison.OrdinalIgnoreCase));
@@ -46,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             if (aspNetCoreReference is not null)
             {
                 _logger.LogInformation("Removing framework reference Microsoft.AspNetCore.App it is already included as part of the Microsoft.NET.Sdk.Web SDK");
-                state.FrameworkReferencesToRemove.Add(aspNetCoreReference);
+                state.FrameworkReferences.Remove(aspNetCoreReference);
             }
 
             return Task.FromResult(state);

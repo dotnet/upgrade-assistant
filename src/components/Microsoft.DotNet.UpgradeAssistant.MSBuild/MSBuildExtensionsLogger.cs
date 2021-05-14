@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Build.Framework;
 using Microsoft.Extensions.Logging;
+
 using ILogger = Microsoft.Build.Framework.ILogger;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
@@ -12,13 +13,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private const string MSBuildLogPrefix = "[MSBuild] ";
 
-        private readonly Extensions.Logging.ILogger _internalLogger;
+        private readonly Microsoft.Extensions.Logging.ILogger _internalLogger;
 
         public LoggerVerbosity Verbosity { get; set; }
 
         public string? Parameters { get; set; }
 
-        public MSBuildExtensionsLogger(Extensions.Logging.ILogger internalLogger, LoggerVerbosity verbosity)
+        public MSBuildExtensionsLogger(Microsoft.Extensions.Logging.ILogger internalLogger, LoggerVerbosity verbosity)
         {
             _internalLogger = internalLogger ?? throw new ArgumentNullException(nameof(internalLogger));
             Verbosity = verbosity;

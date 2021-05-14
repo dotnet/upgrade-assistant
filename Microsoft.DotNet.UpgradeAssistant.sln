@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30509.190
@@ -69,7 +69,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj", "{D8806C9D-8C2E-4EF3-8016-F3ED83902493}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions", "src\extensions\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj", "{F3C03589-20A5-4D6E-A2C5-4143A11F03B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions", "src\components\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj", "{F3C03589-20A5-4D6E-A2C5-4143A11F03B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cli", "cli", "{72016889-9414-472E-AC99-17B0876B8F06}"
 EndProject
@@ -105,9 +105,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.csproj", "{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj", "{117FFF7E-019E-400E-9F51-A4F7F9F3195D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj", "{117FFF7E-019E-400E-9F51-A4F7F9F3195D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests.csproj", "{D41E4E00-B3F2-4F31-B890-C27F9E997B71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests.csproj", "{D41E4E00-B3F2-4F31-B890-C27F9E997B71}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests", "tests\common\Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests\Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.csproj", "{C0E07F03-E689-4FEB-BDFC-039633ECD11C}"
 EndProject
@@ -115,7 +115,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8B8F14
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests.csproj", "{16141B3F-F785-4CFD-9FD2-67E9D76C4827}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests.csproj", "{61A3EF4A-68CC-442E-87EC-F05B874A4C98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests.csproj", "{61A3EF4A-68CC-442E-87EC-F05B874A4C98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -525,7 +525,7 @@ Global
 		{326A3938-5C0B-4280-9175-7E059679731B} = {1BA017ED-6BA7-42F0-BC5E-613495A55A6B}
 		{9F99DC5B-DAD0-4C43-BFFF-8027E4077334} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
 		{D8806C9D-8C2E-4EF3-8016-F3ED83902493} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
-		{F3C03589-20A5-4D6E-A2C5-4143A11F03B3} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
+		{F3C03589-20A5-4D6E-A2C5-4143A11F03B3} = {28247E7B-243D-4901-B26A-7A7615EBADDC}
 		{72016889-9414-472E-AC99-17B0876B8F06} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{AA22EE67-3BBE-49A2-8868-531FE68FE162} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{76CD255A-B5BB-4CB2-91C4-EDEA98C61289} = {3FC16DAB-215C-422B-9130-61D566695463}
