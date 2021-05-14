@@ -76,6 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 return;
             }
 
+            // intentionally using .ToString() and not .ToFullString() to avoid Trivia on the node
             if (IsBaseTypeAQualifiedReferenceToApiController(baseTypeNode.ToString())
                 || IsBaseTypeAnImplicitReferenceToApiController(baseTypeNode.ToString()))
             {
