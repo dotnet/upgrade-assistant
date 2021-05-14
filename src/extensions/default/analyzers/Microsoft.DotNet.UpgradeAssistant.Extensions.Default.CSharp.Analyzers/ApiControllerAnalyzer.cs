@@ -53,16 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 return;
             }
 
-            // the first descendent of ImportStatementSyntax will be a QualifiedNameSyntax or IdentifierNameSyntax for VB
-            // the first descendent of BaseListSyntax will be a SimpleBaseTypeSyntax for CS
-            var baseTypeNode = context.Node.DescendantNodes().First();
-
-            if (baseTypeNode.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType) && baseTypeNode.DescendantNodes().Any())
-            {
-                // In CSharp syntax, the SimpleBaseTypeSyntax the first child and we want the QualifiedNameSyntax or IdentifierNameSyntax
-                // resolving this node must be done before we check for symbol info
-                baseTypeNode = baseTypeNode.DescendantNodes().First();
-            }
+            var baseTypeNode = GetBaseTypeFromSyntax(context.Node);
 
             var baseTypeSymbol = context.SemanticModel.GetSymbolInfo(baseTypeNode).Symbol as INamedTypeSymbol;
             if (baseTypeSymbol is not null
@@ -77,6 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
 
             // intentionally using .ToString() and not .ToFullString() to avoid Trivia on the node
+            // intentionally using string here because the syntax is shared between the two languages
             if (IsBaseTypeAQualifiedReferenceToApiController(baseTypeNode.ToString())
                 || IsBaseTypeAnImplicitReferenceToApiController(baseTypeNode.ToString()))
             {
@@ -84,6 +76,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 var diagnostic = Diagnostic.Create(Rule, baseTypeNode.GetLocation(), baseTypeNode.ToString());
                 context.ReportDiagnostic(diagnostic);
             }
+        }
+
+        /// <summary>
+        /// Handles language aware selection of QualifiedNameSyntax or IdentifierNameSyntaxNode from current context.
+        /// </summary>
+        /// <param name="importOrBaseListSyntax">Expected to be an ImportStatementSyntax for VB or a BaseListSyntax for CS.</param>
+        /// <returns>Null, QualifiedNameSyntaxNode, or IdentifierNameSyntaxNode.</returns>
+        public static SyntaxNode GetBaseTypeFromSyntax(SyntaxNode importOrBaseListSyntax)
+        {
+            if (importOrBaseListSyntax is null)
+            {
+                throw new ArgumentNullException(nameof(importOrBaseListSyntax));
+            }
+
+            // the first descendent of ImportStatementSyntax will be a QualifiedNameSyntax or IdentifierNameSyntax for VB
+            // the first descendent of BaseListSyntax will be a SimpleBaseTypeSyntax for CS
+            var baseTypeNode = importOrBaseListSyntax.DescendantNodes().First();
+            if (baseTypeNode.IsKind(CodeAnalysis.CSharp.SyntaxKind.SimpleBaseType) && baseTypeNode.DescendantNodes().Any())
+            {
+                // In CSharp syntax, the SimpleBaseTypeSyntax the first child and we want the QualifiedNameSyntax or IdentifierNameSyntax
+                // resolving this node must be done before we check for symbol info
+                baseTypeNode = baseTypeNode.DescendantNodes().First();
+            }
+
+            return baseTypeNode;
         }
 
         /// <summary>
