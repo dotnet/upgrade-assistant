@@ -18,10 +18,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public void RaiseNotification(Notification notification)
         {
-            //_list.add(notification);
+            // _list.add(notification);
         }
 
-        //public void RaiseError(Notification notification);
+        // public void RaiseError(Notification notification);
     }
 
     public class Notification
