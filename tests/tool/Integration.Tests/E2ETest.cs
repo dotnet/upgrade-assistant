@@ -35,7 +35,7 @@ namespace Integration.Tests
             _output = output;
         }
 
-        [InlineData("AspNetSample/csharp", "TemplateMvc.sln", "TemplateMvc.csproj")]
+        [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("PCL", "SamplePCL.csproj", "")]
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]

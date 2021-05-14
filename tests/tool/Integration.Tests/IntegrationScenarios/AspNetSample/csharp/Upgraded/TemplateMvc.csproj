@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.222702">
       <PrivateAssets>all</PrivateAssets>
@@ -34,13 +35,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.5" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MyControllerLibrary\MyControllerLibrary.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="bootstrap" Version="3.4.1" />
     <PackageReference Include="jQuery" Version="3.4.1" />
     <PackageReference Include="jQuery.Validation" Version="1.17.0" />
-    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" Version="3.2.11" />
     <PackageReference Include="Modernizr" Version="2.8.3" />
   </ItemGroup>
