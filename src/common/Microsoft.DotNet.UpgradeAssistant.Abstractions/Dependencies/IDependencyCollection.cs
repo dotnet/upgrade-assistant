@@ -10,5 +10,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
         bool Add(T item, BuildBreakRisk risk = BuildBreakRisk.None);
 
         bool Remove(T item, BuildBreakRisk risk = BuildBreakRisk.None);
+
+        IReadOnlyCollection<T> Additions { get; }
+
+        IReadOnlyCollection<T> Deletions { get; }
     }
 }

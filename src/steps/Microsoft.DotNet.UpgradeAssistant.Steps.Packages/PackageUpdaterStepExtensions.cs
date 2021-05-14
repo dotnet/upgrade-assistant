@@ -4,6 +4,7 @@
 using System.IO;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -21,6 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.Services.AddUpgradeStep<PackageUpdaterPreTFMStep>();
             services.Services.AddUpgradeStep<PackageUpdaterStep>();
+            services.Services.AddTransient<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
 
             services.AddExtensionOption<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
                 .MapFiles<NuGetPackageMap[]>(t => Path.Combine(t.PackageMapPath, PackageMapExtension));
