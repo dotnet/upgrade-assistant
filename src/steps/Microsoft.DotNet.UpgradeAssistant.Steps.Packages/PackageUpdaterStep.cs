@@ -27,9 +27,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
-        private IPackageAnalyzer _packageAnalyzer;
+        private readonly IDependencyAnalyzerRunner _packageAnalyzer;
 
-        private DependencyAnalysisState? _analysisState;
+        private IDependencyAnalysisState? _analysisState;
 
         public override string Description => "Update package references to versions compatible with the target framework";
 
@@ -57,13 +57,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         public PackageUpdaterStep(
             IPackageRestorer packageRestorer,
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
+            IDependencyAnalyzerRunner packageAnalyzer,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
+            _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
-            _packageAnalyzer = new PackageAnalyzer(_packageRestorer, _packageAnalyzers, logger);
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
@@ -77,7 +78,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             try
             {
-                if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
+                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                if (!_analysisState.IsValid)
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
                 }
@@ -90,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}", BuildBreakRisk.Unknown);
             }
 
-            if (_analysisState is null || !_analysisState.ChangesRecommended)
+            if (_analysisState is null || !_analysisState.AreChangesRecommended)
             {
                 Logger.LogInformation("No package updates needed");
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
@@ -104,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 LogDetails("Framework references to be added: {FrameworkReference}", _analysisState.FrameworkReferences.Additions);
                 LogDetails("Framework references to be removed: {FrameworkReference}", _analysisState.FrameworkReferences.Deletions);
 
-                void LogDetails<T>(string name, ICollection<T> collection)
+                void LogDetails<T>(string name, IReadOnlyCollection<T> collection)
                 {
                     if (collection.Count > 0)
                     {
@@ -114,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 return new UpgradeStepInitializeResult(
                     UpgradeStepStatus.Incomplete,
-                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", _analysisState.Risk);
+                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", Risk: _analysisState.Risk);
             }
         }
 
@@ -154,13 +156,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         count++;
 
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        if (!await _packageAnalyzer.RunPackageAnalyzersAsync(context, _analysisState, token).ConfigureAwait(false))
+                        _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                        if (!_analysisState.IsValid)
                         {
                             return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
                         }
                     }
                 }
-                while (_analysisState is not null && _analysisState.ChangesRecommended);
+                while (_analysisState is not null && _analysisState.AreChangesRecommended);
 
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
             }

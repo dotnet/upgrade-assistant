@@ -6,34 +6,46 @@ using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    public class DependencyAnalysisState : IDependencyAnalysisState
+    public sealed class DependencyAnalysisState : IDependencyAnalysisState
     {
         public DependencyAnalysisState(IProject project, INuGetReferences nugetReferences)
         {
-            FrameworkReferences = new DependencyCollection<Reference>(project.FrameworkReferences, SetRisk);
-            Packages = new DependencyCollection<NuGetReference>(nugetReferences.PackageReferences, SetRisk);
-            References = new DependencyCollection<Reference>(project.References, SetRisk);
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
 
+            if (nugetReferences is null)
+            {
+                throw new ArgumentNullException(nameof(nugetReferences));
+            }
+
+            FrameworkReferences = new DependencyCollection<Reference>(initial: project.FrameworkReferences, setRisk: SetRisk);
+            Packages = new DependencyCollection<NuGetReference>(initial: nugetReferences.PackageReferences, setRisk: SetRisk);
+            References = new DependencyCollection<Reference>(project.References, SetRisk);
+            IsValid = true;
             void SetRisk(BuildBreakRisk risk)
             {
                 Risk = (BuildBreakRisk)Math.Max((int)Risk, (int)risk);
             }
         }
 
-        public DependencyCollection<Reference> FrameworkReferences { get; }
+        internal DependencyCollection<Reference> FrameworkReferences { get; }
 
         IDependencyCollection<Reference> IDependencyAnalysisState.FrameworkReferences => FrameworkReferences;
 
-        public DependencyCollection<NuGetReference> Packages { get; }
+        internal DependencyCollection<NuGetReference> Packages { get; }
 
         IDependencyCollection<NuGetReference> IDependencyAnalysisState.Packages => Packages;
 
-        public DependencyCollection<Reference> References { get; }
+        internal DependencyCollection<Reference> References { get; }
 
         IDependencyCollection<Reference> IDependencyAnalysisState.References => References;
 
-        public BuildBreakRisk Risk { get; private set; }
+        public BuildBreakRisk Risk { get; set; }
 
-        public bool ChangesRecommended => FrameworkReferences.HasChanges || Packages.HasChanges || References.HasChanges;
+        public bool AreChangesRecommended => FrameworkReferences.HasChanges || Packages.HasChanges || References.HasChanges;
+
+        public bool IsValid { get; set; }
     }
 }

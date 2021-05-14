@@ -10,5 +10,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
         IDependencyCollection<NuGetReference> Packages { get; }
 
         IDependencyCollection<Reference> References { get; }
+
+        bool IsValid { get; }
+
+        bool AreChangesRecommended { get; }
+
+        BuildBreakRisk Risk { get; }
     }
 }

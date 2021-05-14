@@ -75,5 +75,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public bool HasChanges => Additions.Any() || Deletions.Any();
+
+        IReadOnlyCollection<T> IDependencyCollection<T>.Additions => Additions;
+
+        IReadOnlyCollection<T> IDependencyCollection<T>.Deletions => Deletions;
     }
 }
