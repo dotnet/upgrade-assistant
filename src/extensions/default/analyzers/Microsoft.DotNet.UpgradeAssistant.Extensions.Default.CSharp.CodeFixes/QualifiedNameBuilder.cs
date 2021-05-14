@@ -36,14 +36,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             return BuildQualifiedSyntax(generator, qualifiedName.Split('.'));
         }
 
-        private static SyntaxNode BuildQualifiedSyntax(SyntaxGenerator generator, string[] nameSegments)
+        private static SyntaxNode BuildQualifiedSyntax(SyntaxGenerator generator, Span<string> nameSegments)
         {
             if (generator is null)
             {
                 throw new ArgumentNullException(nameof(generator));
             }
 
-            if (nameSegments is null || nameSegments.Length == 0)
+            if (nameSegments.Length == 0)
             {
                 throw new ArgumentNullException(nameof(nameSegments));
             }
@@ -52,8 +52,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return generator.IdentifierName(nameSegments[0]);
             }
 
-            var rightNode = generator.IdentifierName(nameSegments.Last());
-            var leftNode = BuildQualifiedSyntax(generator, nameSegments.Take(nameSegments.Length - 1).ToArray());
+            var rightNode = generator.IdentifierName(nameSegments[nameSegments.Length - 1]);
+            var leftNode = BuildQualifiedSyntax(generator, nameSegments.Slice(0, nameSegments.Length - 1));
             return generator.QualifiedName(leftNode, rightNode);
         }
     }
