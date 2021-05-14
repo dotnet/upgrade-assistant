@@ -67,13 +67,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             _templateProvider = templateProvider ?? throw new ArgumentNullException(nameof(templateProvider));
             _itemsToAdd = new Dictionary<string, RuntimeItemSpec>();
 
-            if (!_templateProvider.TemplateConfigFileNames.Any())
+            if (_templateProvider.IsEmpty)
             {
                 Logger.LogWarning("No template configuration files provided; no template files will be added to project");
             }
         }
 
-        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null && _templateProvider.TemplateConfigFileNames.Any());
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null && !_templateProvider.IsEmpty);
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -137,11 +137,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 {
                     var tokenReplacements = ResolveTokenReplacements(item.Replacements, projectFile);
 #pragma warning disable CA2000 // Dispose objects before losing scope
-                    using var templateStream = item.Extension.GetFile(item.TemplateFilePath);
+                    using var templateStream = item.OpenRead();
                     if (templateStream is null)
                     {
-                        Logger.LogCritical("Expected template {TemplatePath} not found in extension {Extension}", item.Path, item.Extension.Name);
-                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
+                        Logger.LogCritical("Expected template {TemplatePath} not found", item.Path);
+                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found");
                     }
 
                     using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
@@ -151,11 +151,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 }
                 catch (IOException exc)
                 {
-                    Logger.LogCritical(exc, "Expected template {TemplatePath} not found in extension {Extension}", item.Path, item.Extension.Name);
-                    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found in extension {item.Extension.Name}");
+                    Logger.LogCritical(exc, "Expected template {TemplatePath}", item.Path);
+                    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found");
                 }
 
-                Logger.LogInformation("Added template file {ItemName} from {Extension}", item.Path, item.Extension.Name);
+                Logger.LogInformation("Added template file {ItemName}", item.Path);
             }
 
             // After adding the items on disk, reload the workspace and check whether they were picked up automatically or not

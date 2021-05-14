@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,6 +36,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
+
+            services.AddSerializer();
 
             var extensionPathString = configuration[UpgradeAssistantExtensionPathsSettingName];
             var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
@@ -76,8 +80,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     Console.WriteLine($"ERROR: Extension {e} not found; ignoring extension {e}");
                 }
             }
+        }
 
-            services.AddSingleton<AggregateExtension>();
+        private static void AddSerializer(this IServiceCollection services)
+        {
+            services.AddOptions<JsonSerializerOptions>()
+                .Configure(o =>
+                {
+                    o.AllowTrailingCommas = true;
+                    o.ReadCommentHandling = JsonCommentHandling.Skip;
+                    o.Converters.Add(new JsonStringEnumConverter());
+                });
         }
 
         private static void RegisterExtensionServices(IServiceCollection services, IExtension extension, IConfiguration extensionConfiguration)
@@ -92,7 +105,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 try
                 {
-                    using var assemblyStream = extension.GetFile(path);
+                    var fileInfo = extension.Files.GetFileInfo(path);
+
+                    if (!fileInfo.Exists)
+                    {
+                        Console.WriteLine($"ERROR: Could not find extension service provider assembly {path} in extension {extension.Name}");
+                        continue;
+                    }
+
+                    using var assemblyStream = fileInfo.CreateReadStream();
+
                     if (assemblyStream is null)
                     {
                         Console.WriteLine($"ERROR: Could not find extension service provider assembly {path} in extension {extension.Name}");
@@ -112,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                     foreach (var sp in serviceProviders)
                     {
-                        sp.AddServices(new ExtensionServiceConfiguration(services, extensionConfiguration));
+                        sp.AddServices(new ExtensionServiceCollection(services, extensionConfiguration));
                     }
                 }
                 catch (FileLoadException)

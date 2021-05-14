@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
-using Microsoft.DotNet.UpgradeAssistant.Packages;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Moq;
 using Xunit;

@@ -6,27 +6,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Packages;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     public class PackageMapReferenceAnalyzer : IDependencyAnalyzer
     {
         private readonly ILogger<PackageMapReferenceAnalyzer> _logger;
-        private readonly PackageMapProvider _packageMapProvider;
+        private readonly IEnumerable<NuGetPackageMap> _packageMaps;
         private readonly IPackageLoader _packageLoader;
         private readonly IVersionComparer _comparer;
 
         public string Name => "Package map reference analyzer";
 
         public PackageMapReferenceAnalyzer(
-            PackageMapProvider packageMapProvider,
+            IOptions<ICollection<NuGetPackageMap[]>> packageMaps,
             IPackageLoader packageLoader,
             IVersionComparer comparer,
             ILogger<PackageMapReferenceAnalyzer> logger)
         {
-            _packageMapProvider = packageMapProvider ?? throw new ArgumentNullException(nameof(packageMapProvider));
+            if (packageMaps is null)
+            {
+                throw new ArgumentNullException(nameof(packageMaps));
+            }
+
+            _packageMaps = packageMaps.Value.SelectMany(p => p);
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -47,8 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var currentTFM = project.TargetFrameworks;
 
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
-            var allPackageMaps = await _packageMapProvider.GetPackageMapsAsync(token).ToArrayAsync(token).ConfigureAwait(false);
-            var packageMaps = currentTFM.Any(c => c.IsFramework) ? allPackageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray<NuGetPackageMap>() : allPackageMaps;
+            var packageMaps = currentTFM.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
             var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
 
             foreach (var packageReference in state.Packages)

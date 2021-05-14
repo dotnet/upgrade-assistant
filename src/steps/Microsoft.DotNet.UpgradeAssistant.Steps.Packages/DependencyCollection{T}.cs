@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.DotNet.UpgradeAssistant.Packages;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {

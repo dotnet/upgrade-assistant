@@ -4,7 +4,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Packages
+namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 {
     public interface IDependencyAnalyzer
     {
