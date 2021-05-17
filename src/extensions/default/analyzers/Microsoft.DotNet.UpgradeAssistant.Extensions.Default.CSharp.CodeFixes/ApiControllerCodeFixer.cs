@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return;
             }
 
-            var baseTypeNode = ApiControllerAnalyzer.GetBaseTypeFromSyntax(root.FindNode(context.Span));
+            var baseTypeNode = root.FindNode(context.Span).GetSyntaxIdentifierForBaseType();
 
             if (baseTypeNode is null)
             {

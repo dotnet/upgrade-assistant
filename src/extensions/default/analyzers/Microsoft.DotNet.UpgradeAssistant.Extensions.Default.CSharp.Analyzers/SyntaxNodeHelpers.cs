@@ -1,12 +1,41 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     public static class SyntaxNodeHelpers
     {
+        /// <summary>
+        /// Handles language aware selection of QualifiedNameSyntax or IdentifierNameSyntaxNode from current context.
+        /// </summary>
+        /// <param name="importOrBaseListSyntax">Shuold be an ImportStatementSyntax for VB or a BaseListSyntax for CS.</param>
+        /// <returns>Null, QualifiedNameSyntaxNode, or IdentifierNameSyntaxNode.</returns>
+        public static SyntaxNode? GetSyntaxIdentifierForBaseType(this SyntaxNode importOrBaseListSyntax)
+        {
+            if (importOrBaseListSyntax is null)
+            {
+                return null;
+            }
+
+            if (importOrBaseListSyntax.IsQualifiedName() || importOrBaseListSyntax.IsIdentifierName())
+            {
+                return importOrBaseListSyntax;
+            }
+            else if (!importOrBaseListSyntax.IsBaseTypeSyntax())
+            {
+                return null;
+            }
+
+            var baseTypeNode = importOrBaseListSyntax.DescendantNodes(descendIntoChildren: node => true)
+                .FirstOrDefault(node => node.IsQualifiedName() || node.IsIdentifierName());
+
+            return baseTypeNode;
+        }
+
         /// <summary>
         /// A language agnostic specification that checks if a node is a QualifiedName.
         /// </summary>

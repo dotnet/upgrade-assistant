@@ -82,32 +82,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         /// </summary>
         /// <param name="importOrBaseListSyntax">Expected to be an ImportStatementSyntax for VB or a BaseListSyntax for CS.</param>
         /// <returns>Null, QualifiedNameSyntaxNode, or IdentifierNameSyntaxNode.</returns>
-        public static SyntaxNode? GetBaseTypeFromSyntax(SyntaxNode importOrBaseListSyntax)
+        private static SyntaxNode? GetBaseTypeFromSyntax(SyntaxNode importOrBaseListSyntax)
         {
-            if (importOrBaseListSyntax is null)
-            {
-                throw new ArgumentNullException(nameof(importOrBaseListSyntax));
-            }
+            var baseType = importOrBaseListSyntax.GetSyntaxIdentifierForBaseType();
 
-            if (importOrBaseListSyntax.IsQualifiedName() || importOrBaseListSyntax.IsIdentifierName())
-            {
-                return importOrBaseListSyntax;
-            }
-            else if (!importOrBaseListSyntax.IsBaseTypeSyntax())
+            if (baseType is null)
             {
                 return null;
             }
 
-            var baseTypeNode = importOrBaseListSyntax.DescendantNodes(descendIntoChildren: node => true)
-                .Where(node => node.IsQualifiedName() || node.IsIdentifierName())
+            if (IsBaseTypeAQualifiedReferenceToApiController(baseType.ToString())
+                || IsBaseTypeAnImplicitReferenceToApiController(baseType.ToString()))
+            {
+                return baseType;
+            }
 
-                // intentionally using .ToString() and not .ToFullString() to avoid Trivia on the node
-                // intentionally using string here because the syntax is shared between the two languages
-                .Where(node => IsBaseTypeAQualifiedReferenceToApiController(node.ToString())
-                    || IsBaseTypeAnImplicitReferenceToApiController(node.ToString()))
-                .FirstOrDefault();
-
-            return baseTypeNode;
+            return null;
         }
 
         /// <summary>
