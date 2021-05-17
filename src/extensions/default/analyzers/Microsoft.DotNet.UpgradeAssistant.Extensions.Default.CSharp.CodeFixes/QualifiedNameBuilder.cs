@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             return BuildQualifiedSyntax(generator, qualifiedName.Split('.'));
         }
 
-        private static SyntaxNode BuildQualifiedSyntax(SyntaxGenerator generator, Span<string> nameSegments)
+        private static SyntaxNode BuildQualifiedSyntax(SyntaxGenerator generator, ReadOnlySpan<string> nameSegments)
         {
             if (generator is null)
             {
