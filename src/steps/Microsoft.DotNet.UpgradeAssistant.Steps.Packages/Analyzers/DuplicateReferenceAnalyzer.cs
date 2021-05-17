@@ -25,15 +25,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             if (state is null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
             // If the package is referenced more than once (bizarrely, this happens one of our test inputs), only keep the highest version
-            var packages = project.Required().NuGetReferences.PackageReferences.ToLookup(p => p.Name);
+            var packages = project.NuGetReferences
+                .PackageReferences
+                .ToLookup(p => p.Name)
+                .Where(g => g.Count() > 1);
 
-            foreach (var duplicates in packages.Where(g => g.Count() > 1))
+            foreach (var duplicates in packages)
             {
                 var highestVersion = duplicates.OrderByDescending(p => p.Version, _comparer).First();
 
