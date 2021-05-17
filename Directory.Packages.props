@@ -20,6 +20,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="3.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Razor" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="3.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.9.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.9.0" />

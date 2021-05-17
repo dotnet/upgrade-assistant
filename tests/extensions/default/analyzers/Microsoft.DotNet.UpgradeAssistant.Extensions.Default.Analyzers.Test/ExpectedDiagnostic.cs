@@ -13,10 +13,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
 
         public TextSpan SourceSpan { get; }
 
-        public ExpectedDiagnostic(string id, TextSpan sourceSpan)
+        public Language Language { get; }
+
+        public ExpectedDiagnostic(string id, TextSpan sourceSpan, Language lang = Language.CSharp)
         {
             Id = id;
             SourceSpan = sourceSpan;
+            Language = lang;
         }
 
         public bool Matches(Diagnostic diagnostic) => (diagnostic?.Id.Equals(Id, StringComparison.Ordinal) ?? false) && diagnostic.Location.SourceSpan.Equals(SourceSpan);
