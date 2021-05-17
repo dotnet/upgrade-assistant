@@ -4,6 +4,7 @@
 using System;
 using Microsoft.DotNet.UpgradeAssistant.Checks;
 using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
+using Microsoft.DotNet.UpgradeAssistant.VisualBasic;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -15,8 +16,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddScoped<UpgraderManager>();
             services.AddTransient<IUpgradeContextProperties, UpgradeContextProperties>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
+
             services.AddReadinessChecks();
+            services.AddVisualBasic();
             services.AddTargetFrameworkSelectors();
+
             services.AddOptions<DefaultTfmOptions>()
                 .Configure(options)
                 .ValidateDataAnnotations();
@@ -37,6 +41,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<ITargetFrameworkSelectorFilter, WebProjectTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, WindowsSdkTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, ExecutableTargetFrameworkSelectorFilter>();
+        }
+
+        private static void AddVisualBasic(this IServiceCollection services)
+        {
+            services.AddTransient<ITargetFrameworkSelectorFilter, MyNamespaceTargetFrameworkSelectorFilter>();
         }
     }
 }
