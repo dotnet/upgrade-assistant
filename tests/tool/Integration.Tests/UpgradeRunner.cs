@@ -46,7 +46,7 @@ namespace Integration.Tests
             };
 
             var status = await Program.RunUpgradeAsync(options, host => host
-                .ConfigureServices((_, services) =>
+                .ConfigureServices(services =>
                 {
                     services.AddOptions<PackageUpdaterOptions>().Configure(o =>
                     {
