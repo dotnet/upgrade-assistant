@@ -7,14 +7,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public static class LanguageExtensions
     {
-        public static string GetFileExtension(this Language lang)
+        public static string GetFileExtension(this Language lang) => lang switch
         {
-            return lang switch
-            {
-                Language.CSharp => "cs",
-                Language.VisualBasic => "vb",
-                _ => throw new NotImplementedException()
-            };
-        }
+            Language.CSharp => "cs",
+            Language.VisualBasic => "vb",
+            _ => throw new NotImplementedException()
+        };
     }
 }
