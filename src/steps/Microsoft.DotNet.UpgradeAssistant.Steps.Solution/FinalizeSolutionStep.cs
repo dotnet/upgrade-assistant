@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override string Title => "Finalize upgrade";
 
-        public override string Description => "All projects have been upgraded, and the .upgrade-assistant state file has been deleted. Please review any changes and test accordingly.";
+        public override string Description => "All projects have been upgraded as much as the tool is capable at the moment. Please review any changes and test accordingly. By finalizing the solution, any state tracked by Upgrade Assistant will be removed and future sessions will recalculate any potential progress that has been made.";
 
         public override string Id => WellKnownStepIds.FinalizeSolutionStepId;
 
