@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         public override string Title => "Finalize upgrade";
 
-        public override string Description => "All projects have been upgraded. Please review any changes and test accordingly.";
+        public override string Description => "All projects have been upgraded, and the .upgrade-assistant state file has been deleted. Please review any changes and test accordingly.";
 
         public override string Id => WellKnownStepIds.FinalizeSolutionStepId;
 
@@ -38,13 +38,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            if (!context.EntryPoints.Any())
+            if (context.EntryPoints.Any())
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Upgrade completed", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Finalize upgrade and delete .upgrade-assistant file", BuildBreakRisk.None));
             }
             else
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Finalize upgrade", BuildBreakRisk.None));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Upgrade completed", BuildBreakRisk.None));
             }
         }
 
