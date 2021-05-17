@@ -12,22 +12,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic
     /// on usage of <c>MyType</c> in Visual Basic projects.
     /// </summary>
     /// <see cref="https://docs.microsoft.com/en-us/dotnet/visual-basic/developing-apps/development-with-my/how-my-depends-on-project-type"/>
-    public class MyNamespaceTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
+    public class MyTypeTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
     {
-        private readonly ILogger<MyNamespaceTargetFrameworkSelectorFilter> _logger;
+        private readonly ILogger<MyTypeTargetFrameworkSelectorFilter> _logger;
         private readonly HashSet<string> _windowsMyTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "Windows",
             "WindowsForms",
         };
 
-        public MyNamespaceTargetFrameworkSelectorFilter(ILogger<MyNamespaceTargetFrameworkSelectorFilter> logger)
+        public MyTypeTargetFrameworkSelectorFilter(ILogger<MyTypeTargetFrameworkSelectorFilter> logger)
         {
             _logger = logger;
         }
 
         public void Process(ITargetFrameworkSelectorFilterState tfm)
         {
+            if (tfm is null)
+            {
+                throw new ArgumentNullException(nameof(tfm));
+            }
+
             var myType = tfm.Project.GetFile().GetPropertyValue("MyType");
 
             if (_windowsMyTypes.Contains(myType))

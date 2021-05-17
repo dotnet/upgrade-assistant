@@ -18,7 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
 
             services.AddReadinessChecks();
-            services.AddVisualBasic();
             services.AddTargetFrameworkSelectors();
 
             services.AddOptions<DefaultTfmOptions>()
@@ -41,11 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<ITargetFrameworkSelectorFilter, WebProjectTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, WindowsSdkTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, ExecutableTargetFrameworkSelectorFilter>();
-        }
-
-        private static void AddVisualBasic(this IServiceCollection services)
-        {
-            services.AddTransient<ITargetFrameworkSelectorFilter, MyNamespaceTargetFrameworkSelectorFilter>();
+            services.AddTransient<ITargetFrameworkSelectorFilter, MyTypeTargetFrameworkSelectorFilter>();
         }
     }
 }
