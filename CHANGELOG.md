@@ -3,6 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Fixed
+- VB projects that have a MyType property that requires Windows will now default to net5.0-windows [#529](https://github.com/dotnet/upgrade-assistant/pull/529)
+
 ## Version 0.2.226201 - 2021-05-12 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.226201))
 
 ### Added
