@@ -125,5 +125,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public Project GetRoslynProject()
             => Context.Workspace.CurrentSolution.Projects.First(p => string.Equals(p.FilePath, FileInfo.FullName, StringComparison.OrdinalIgnoreCase));
+
+        public override string ToString() => FileInfo.Name;
     }
 }

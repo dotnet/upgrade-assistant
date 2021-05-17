@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic
 
             if (_windowsMyTypes.Contains(myType))
             {
-                _logger.LogInformation("Project {Name} contains MyType node that requires at least net5.0-windows.", tfm.Project.FileInfo.Name);
+                _logger.LogInformation("Project {Name} contains MyType node that requires at least net5.0-windows.", tfm.Project);
 
                 tfm.TryUpdate(TargetFrameworkMoniker.Net50_Windows);
             }
