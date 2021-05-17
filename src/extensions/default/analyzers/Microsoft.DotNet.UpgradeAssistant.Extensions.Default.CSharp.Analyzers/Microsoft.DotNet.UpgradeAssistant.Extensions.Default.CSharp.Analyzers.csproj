@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" />
     <ProjectReference Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
   <ItemGroup>

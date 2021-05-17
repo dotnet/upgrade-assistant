@@ -4,22 +4,33 @@
 using System;
 using System.Threading;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
+using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
+using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     internal static class DiagnosticAnalyzerExtensions
     {
-        public static NameSyntax GetFullName(this NameSyntax nameSyntax)
+        public static string GetFullName(this CSSyntax.NameSyntax nameSyntax)
         {
-            while (nameSyntax.Parent is QualifiedNameSyntax qualifiedParent)
+            while (nameSyntax.Parent is CSSyntax.QualifiedNameSyntax qualifiedParent)
             {
                 nameSyntax = qualifiedParent;
             }
 
-            return nameSyntax;
+            return nameSyntax.ToString();
+        }
+
+        public static string GetFullName(this VBSyntax.NameSyntax nameSyntax)
+        {
+            while (nameSyntax.Parent is VBSyntax.QualifiedNameSyntax qualifiedParent)
+            {
+                nameSyntax = qualifiedParent;
+            }
+
+            return nameSyntax.ToString();
         }
 
         public static bool NameEquals(this IAssemblySymbol? symbol, string name, bool startsWith = true)

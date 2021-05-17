@@ -73,9 +73,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             // and other uses, use Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper.
             var replacementType = GetReplacementType(identifier);
 
+            // Make sure the name syntax node includes the whole name in case it is qualified
+            var fullyQualifiedNameNode = GetQualifiedName(identifier);
+
             var properties = ImmutableDictionary.Create<string, string?>().Add(NewIdentifierKey, replacementType);
 
-            var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), properties, name, replacementType);
+            var diagnostic = Diagnostic.Create(Rule, fullyQualifiedNameNode.GetLocation(), properties, name, replacementType);
             context.ReportDiagnostic(diagnostic);
         }
 
@@ -90,6 +93,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 MemberAccessExpressionSyntax => AspNetCoreHtmlHelperName, // Member access requires HtmlHelper
                 _ => AspNetCoreIHtmlHelperName // Default to IHtmlHelper
             };
+        }
+
+        private static SyntaxNode GetQualifiedName(SyntaxNode name)
+        {
+            // If the node is part of a qualified name, we want to get the full qualified name
+            while (name.Parent is NameSyntax || name.Parent is NameSyntax)
+            {
+                name = name.Parent;
+            }
+
+            // If the node is part of a member access expression (a static member access, for example), then the
+            // qualified name will be a member access expression rather than a name syntax.
+            if ((name.Parent is MemberAccessExpressionSyntax csMAE && csMAE.Name.ToString().Equals(name.ToString(), StringComparison.Ordinal))
+                || (name.Parent is MemberAccessExpressionSyntax vbMAE && vbMAE.Name.ToString().Equals(name.ToString(), StringComparison.OrdinalIgnoreCase)))
+            {
+                name = name.Parent;
+            }
+
+            return name;
         }
     }
 }

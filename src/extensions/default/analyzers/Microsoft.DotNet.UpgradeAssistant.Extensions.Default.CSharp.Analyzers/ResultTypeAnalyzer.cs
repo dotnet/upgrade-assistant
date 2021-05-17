@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             new IdentifierMapping("System.Web.Mvc.HttpUnauthorizedResult", "Microsoft.AspNetCore.Mvc.UnauthorizedResult"),
             new IdentifierMapping("System.Web.Mvc.RedirectResult", "Microsoft.AspNetCore.Mvc.RedirectResult"),
             new IdentifierMapping("System.Web.Mvc.PartialViewResult", "Microsoft.AspNetCore.Mvc.PartialViewResult"),
-            new IdentifierMapping("System.Web.Mvc.ViewResult", "Microsoft.AspNetCore.Mvc.ViewResult")
+            new IdentifierMapping("System.Web.Mvc.ViewResult", "Microsoft.AspNetCore.Mvc.ViewResult"),
         };
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ResultTypeTitle), Resources.ResourceManager, typeof(Resources));
