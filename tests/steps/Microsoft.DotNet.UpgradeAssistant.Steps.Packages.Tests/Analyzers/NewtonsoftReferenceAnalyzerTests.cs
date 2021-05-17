@@ -138,13 +138,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
         {
             var project = mock.Mock<IProject>();
             var nugetReferences = mock.Mock<INuGetReferences>();
-            nugetReferences.Setup(n => n.IsTransitivelyAvailable(It.IsAny<string>()))
-                .Returns(false);
+            nugetReferences.Setup(n => n.IsTransitivelyAvailableAsync(It.IsAny<string>(), default))
+                .Returns(new ValueTask<bool>(false));
 
             project.Setup(p => p.TargetFrameworks).Returns(new[] { TargetFrameworkMoniker.Net50 });
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.AspNetCore));
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
-            project.Setup(p => p.GetNuGetReferencesAsync(default)).Returns(new ValueTask<INuGetReferences>(nugetReferences.Object));
+            project.Setup(p => p.NuGetReferences).Returns(nugetReferences.Object);
 
             return project;
         }
