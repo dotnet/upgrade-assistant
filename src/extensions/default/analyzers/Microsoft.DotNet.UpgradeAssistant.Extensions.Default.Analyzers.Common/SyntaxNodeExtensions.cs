@@ -130,6 +130,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         /// <summary>
         /// Gets a method declared in a given syntax node.
         /// </summary>
+        /// <typeparam name="T">The type of method declaration syntax node to search for.</typeparam>
         /// <param name="node">The syntax node to find the method declaration in.</param>
         /// <param name="methodName">The name of the method to return.</param>
         /// <param name="requiredParameterTypes">An optional list of parameter types that the method must accept.</param>
@@ -149,10 +150,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         /// <summary>
         /// Applies whitespace trivia and new line trivia from another syntax node to this one.
         /// </summary>
+        /// <typeparam name="T">The type of syntax node to be updated.</typeparam>
         /// <param name="statement">The syntax node to update.</param>
         /// <param name="otherStatement">The syntax node to copy trivia from.</param>
         /// <returns>The original syntax node updated with the other syntax's whitespace and new line trivia.</returns>
-        public static SyntaxNode WithWhitespaceTriviaFrom(this SyntaxNode statement, SyntaxNode otherStatement)
+        public static T WithWhitespaceTriviaFrom<T>(this T statement, SyntaxNode otherStatement)
+            where T : SyntaxNode
         {
             return statement
                 .WithLeadingTrivia(otherStatement?.GetLeadingTrivia().Where(IsWhitespaceTrivia) ?? SyntaxTriviaList.Empty)

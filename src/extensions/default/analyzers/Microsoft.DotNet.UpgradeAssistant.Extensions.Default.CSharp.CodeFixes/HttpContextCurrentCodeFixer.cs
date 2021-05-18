@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 .AddUsingIfMissing("Microsoft.Extensions.DependencyInjection"); // For AddHttpContextAccessor
 
             // Add AddHttpContextAccessor call if needed
-            var configureServicesMethod = documentRoot.GetMethodDeclaration("ConfigureServices", "IServiceCollection");
+            var configureServicesMethod = documentRoot.GetMethodDeclaration<MethodDeclarationSyntax>("ConfigureServices", "IServiceCollection");
             var serviceCollectionParameter = configureServicesMethod?.ParameterList.Parameters
                 .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IServiceCollection", StringComparison.Ordinal));
 
@@ -173,7 +173,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             }
 
             // Add Initialize call in Configure method
-            var configureMethod = documentRoot.GetMethodDeclaration("Configure", "IApplicationBuilder");
+            var configureMethod = documentRoot.GetMethodDeclaration<MethodDeclarationSyntax>("Configure", "IApplicationBuilder");
             var appBuilderParameter = configureMethod?.ParameterList.Parameters
                 .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IApplicationBuilder", StringComparison.Ordinal));
 

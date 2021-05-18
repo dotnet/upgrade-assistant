@@ -13,6 +13,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
     {
         public static void RegisterMemberAccess(this AnalysisContext context, Action<InvocationAnalysisContext> action)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             var operationKinds = new[]
             {
                 OperationKind.Invocation,
@@ -70,33 +75,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 action(newCtx);
             }, SymbolKind.Property, SymbolKind.Method, SymbolKind.Parameter, SymbolKind.Field);
         }
+    }
 
-        public readonly struct InvocationAnalysisContext
+    public record InvocationAnalysisContext
+    {
+        private readonly Action<Diagnostic> _reportDiagnostic;
+
+        public InvocationAnalysisContext(ISymbol symbol, Location location, Compilation compilation, AnalyzerOptions options, Action<Diagnostic> reportDiagnostic, CancellationToken cancellationToken)
         {
-            private readonly Action<Diagnostic> _reportDiagnostic;
+            Symbol = symbol;
+            Location = location;
+            Options = options;
+            Compilation = compilation;
+            CancellationToken = cancellationToken;
 
-            public InvocationAnalysisContext(ISymbol symbol, Location location, Compilation compilation, AnalyzerOptions options, Action<Diagnostic> reportDiagnostic, CancellationToken cancellationToken)
-            {
-                Symbol = symbol;
-                Location = location;
-                Options = options;
-                Compilation = compilation;
-                CancellationToken = cancellationToken;
-
-                _reportDiagnostic = reportDiagnostic;
-            }
-
-            public Location Location { get; }
-
-            public AnalyzerOptions Options { get; }
-
-            public ISymbol Symbol { get; }
-
-            public Compilation Compilation { get; }
-
-            public CancellationToken CancellationToken { get; }
-
-            public void ReportDiagnostic(Diagnostic diagnostic) => _reportDiagnostic(diagnostic);
+            _reportDiagnostic = reportDiagnostic;
         }
+
+        public Location Location { get; }
+
+        public AnalyzerOptions Options { get; }
+
+        public ISymbol Symbol { get; }
+
+        public Compilation Compilation { get; }
+
+        public CancellationToken CancellationToken { get; }
+
+        public void ReportDiagnostic(Diagnostic diagnostic) => _reportDiagnostic(diagnostic);
     }
 }

@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
             var mvcBaseType = generator.QualifiedName(
-                    QualifiedNameBuilder.BuildQualifiedSyntax(generator, GoodNamespace),
+                    QualifiedNameBuilder.BuildQualifiedNameSyntax(generator, GoodNamespace),
                     generator.IdentifierName(GoodClassName))
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 

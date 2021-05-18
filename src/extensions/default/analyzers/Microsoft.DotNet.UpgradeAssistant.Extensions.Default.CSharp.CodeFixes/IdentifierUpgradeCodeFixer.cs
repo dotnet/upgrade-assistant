@@ -10,9 +10,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
-using CS = Microsoft.CodeAnalysis.CSharp;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
-using VB = Microsoft.CodeAnalysis.VisualBasic;
 using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
@@ -23,11 +21,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
+            // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
             return WellKnownFixAllProviders.BatchFixer;
         }
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
+            // Get the syntax root of the document to be fixed
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
             if (root is null)
@@ -50,6 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return;
             }
 
+            // Get the diagnostic to be fixed (the new identifier will be a property of the diagnostic)
             var diagnostic = context.Diagnostics.FirstOrDefault();
 
             if (diagnostic is null)
@@ -57,6 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 return;
             }
 
+            // Get the new identifier name and register the code fix action
             if (diagnostic.Properties.TryGetValue(IdentifierUpgradeAnalyzer.NewIdentifierKey, out var property) && property is not null)
             {
                 // Register a code action that will invoke the fix.
@@ -69,23 +71,41 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             }
         }
 
+        /// <summary>
+        /// Replaces a syntax node with a new fully qualified name or member accession expression from a given string.
+        /// </summary>
+        /// <param name="document">The document to update.</param>
+        /// <param name="node">The syntax node to be replaced.</param>
+        /// <param name="newIdentifier">A string representation of the new identifier (name of member access expression) to be used in the document.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <returns>An updated document with the given node replaced with the new identifier.</returns>
         private static async Task<Document> UpdateIdentifierTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
             var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            var generator = SyntaxGenerator.GetGenerator(document);
 
             if (documentRoot is null)
             {
                 return document;
             }
 
+            // Split the new idenfitier into namespace and name components
+            var namespaceDelimiterIndex = newIdentifier.LastIndexOf('.');
+            var (qualifier, name) = namespaceDelimiterIndex >= 0
+                ? (newIdentifier.Substring(0, namespaceDelimiterIndex), newIdentifier.Substring(namespaceDelimiterIndex + 1))
+                : ((string?)null, newIdentifier);
+
             // Create new identifier
-            var updatedNode = GetUpdatedNode(node, newIdentifier);
+            var updatedNode = GetUpdatedNode(node, generator, qualifier, name)?
+                .WithTriviaFrom(node)
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
             if (updatedNode is null)
             {
                 return document;
             }
 
+            // Replace the node
             var updatedRoot = documentRoot.ReplaceNode(node, updatedNode);
             var updatedDocument = document.WithSyntaxRoot(updatedRoot);
 
@@ -96,51 +116,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             return updatedDocument;
         }
 
-        private static SyntaxNode? GetUpdatedNode(SyntaxNode node, string newIdentifier) =>
-            node is null
-                ? null
-                : node switch
-                {
-                    // Many usages (constructing a type, casting to a type, etc.) will use a qualified name syntax
-                    // to refer to the type.
-                    CSSyntax.NameSyntax csNameSyntax => CreateQualifiedName(newIdentifier, csNameSyntax),
-                    VBSyntax.NameSyntax vbNameSyntax => CreateQualifiedName(newIdentifier, vbNameSyntax),
+        private static SyntaxNode? GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string? qualifier, string name)
+        {
+            if (node is null)
+            {
+                throw new System.ArgumentNullException(nameof(node));
+            }
 
-                    // Accessing a static member of a type will use a member access expression to refer to the type.
-                    CSSyntax.MemberAccessExpressionSyntax csMAE => CreateMemberAccessExpression(newIdentifier, csMAE),
-                    VBSyntax.MemberAccessExpressionSyntax vbMAE => CreateMemberAccessExpression(newIdentifier, vbMAE),
+            if (qualifier is null)
+            {
+                return generator.IdentifierName(name);
+            }
 
-                    // Using a type as a base type uses a base type syntax.
-          //          CSSyntax.BaseTypeSyntax csBaseType => CreateBaseType(newIdentifier, csBaseType),
+            return node switch
+            {
+                // Many usages (constructing a type, casting to a type, etc.) will use a qualified name syntax
+                // to refer to the type.
+                var nameSyntax when
+                    nameSyntax is CSSyntax.NameSyntax
+                    || nameSyntax is VBSyntax.NameSyntax => generator.QualifiedName(QualifiedNameBuilder.BuildQualifiedNameSyntax(generator, qualifier), generator.IdentifierName(name)),
 
-                    // Because the node is retrieved by location, it may sometimes be necessary to check children.
-                    _ => GetUpdatedNode(node.ChildNodes().FirstOrDefault(), newIdentifier)
-                };
+                // Accessing a static member of a type will use a member access expression to refer to the type.
+                var maeSyntax when
+                    maeSyntax is CSSyntax.MemberAccessExpressionSyntax
+                    || maeSyntax is VBSyntax.MemberAccessExpressionSyntax => generator.MemberAccessExpression(QualifiedNameBuilder.BuildMemberAccessExpression(generator, qualifier), generator.IdentifierName(name)),
 
-        private static CSSyntax.QualifiedNameSyntax CreateQualifiedName(string name, CSSyntax.TypeSyntax node) =>
-            (CSSyntax.QualifiedNameSyntax)CS.SyntaxFactory.ParseName(name)
-                .WithTriviaFrom(node)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
-
-        private static VBSyntax.QualifiedNameSyntax CreateQualifiedName(string name, VBSyntax.TypeSyntax node) =>
-            (VBSyntax.QualifiedNameSyntax)VB.SyntaxFactory.ParseName(name)
-                .WithTriviaFrom(node)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
-
-        private static CSSyntax.MemberAccessExpressionSyntax CreateMemberAccessExpression(string name, CSSyntax.MemberAccessExpressionSyntax node) =>
-            (CSSyntax.MemberAccessExpressionSyntax)CS.SyntaxFactory.ParseExpression(name)
-                .WithTriviaFrom(node)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
-
-        private static VBSyntax.MemberAccessExpressionSyntax CreateMemberAccessExpression(string name, VBSyntax.MemberAccessExpressionSyntax node) =>
-            (VBSyntax.MemberAccessExpressionSyntax)VB.SyntaxFactory.ParseExpression(name)
-                .WithTriviaFrom(node)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
-
-        private static CSSyntax.BaseTypeSyntax CreateBaseType(string name, CSSyntax.BaseTypeSyntax node) =>
-            node.WithType(CreateQualifiedName(name, node.Type))
-                .WithTriviaFrom(node)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
-
+                // Because the node is retrieved by location, it may sometimes be necessary to check children.
+                _ => GetUpdatedNode(node.ChildNodes().FirstOrDefault(), generator, qualifier, name)
+            };
+        }
     }
 }
