@@ -52,8 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return;
             }
 
-            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
-            if (references.IsTransitivelyAvailable(NewtonsoftPackageName))
+            if (await project.NuGetReferences.IsTransitivelyAvailableAsync(NewtonsoftPackageName, token).ConfigureAwait(false))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return;

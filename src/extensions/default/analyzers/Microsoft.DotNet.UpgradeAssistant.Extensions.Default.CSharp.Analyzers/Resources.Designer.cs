@@ -88,6 +88,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers 
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;ApiController&apos; should be replaced with &apos;Microsoft.AspNetCore.Mvc.Controller&apos;..
+        /// </summary>
+        internal static string ApiControllerDescription {
+            get {
+                return ResourceManager.GetString("ApiControllerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;ApiController&apos; should be replaced with &apos;Microsoft.AspNetCore.Mvc.Controller&apos;.
+        /// </summary>
+        internal static string ApiControllerMessageFormat {
+            get {
+                return ResourceManager.GetString("ApiControllerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;ApiController&apos; does not exist.
+        /// </summary>
+        internal static string ApiControllerTitle {
+            get {
+                return ResourceManager.GetString("ApiControllerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; should be replaced with &apos;Deserialize()&apos;..
         /// </summary>
         internal static string BinaryFormatterUnsafeDeserializeDescription {

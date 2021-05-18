@@ -151,28 +151,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private void WriteStepStatus(UpgradeStep step, bool isNextStep)
         {
-            switch (step.Status)
+            (ConsoleColor? color, var output) = step.Status switch
             {
-                case UpgradeStepStatus.Complete:
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    _io.Output.Write("[Complete] ");
-                    break;
-                case UpgradeStepStatus.Failed:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    _io.Output.Write("[Failed] ");
-                    break;
-                case UpgradeStepStatus.Skipped:
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    _io.Output.Write("[Skipped] ");
-                    break;
-                case UpgradeStepStatus.Incomplete:
-                    if (isNextStep)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        _io.Output.Write("[Next step] ");
-                    }
+                UpgradeStepStatus.Complete => (ConsoleColor.Green, "[Complete] "),
+                UpgradeStepStatus.Failed => (ConsoleColor.Red, "[Failed] "),
+                UpgradeStepStatus.Skipped => (ConsoleColor.DarkYellow, "[Skipped] "),
+                UpgradeStepStatus.Incomplete when isNextStep => (ConsoleColor.Yellow, "[Next step] "),
 
-                    break;
+                _ => default
+            };
+
+            if (color.HasValue && output is { Length: > 0 })
+            {
+                Console.ForegroundColor = color.Value;
+                _io.Output.Write(output);
             }
 
             Console.ResetColor();

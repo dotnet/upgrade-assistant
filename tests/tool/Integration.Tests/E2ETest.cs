@@ -88,9 +88,12 @@ namespace Integration.Tests
 
         private async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
         {
-            var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p[(expectedDir.Length + 1)..]).ToArray();
+            var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p[(expectedDir.Length + 1)..])
+                .OrderBy(fileName => fileName)
+                .ToArray();
             var actualFiles = Directory.GetFiles(actualDir, "*", SearchOption.AllDirectories).Select(p => p[(actualDir.Length + 1)..])
                 .Where(t => !_ignoredFiles.Contains(Path.GetFileName(t)))
+                .OrderBy(fileName => fileName)
                 .ToArray();
 
             var maxLength = expectedFiles.Length > actualFiles.Length ? expectedFiles.Length : actualFiles.Length;
