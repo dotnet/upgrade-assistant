@@ -2,54 +2,17 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
-using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
-using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
 {
-    internal static class DiagnosticAnalyzerExtensions
+    public static class AnalyzerExtensions
     {
-        public static string GetFullName(this CSSyntax.NameSyntax nameSyntax)
-        {
-            while (nameSyntax.Parent is CSSyntax.QualifiedNameSyntax qualifiedParent)
-            {
-                nameSyntax = qualifiedParent;
-            }
-
-            return nameSyntax.ToString();
-        }
-
-        public static string GetFullName(this VBSyntax.NameSyntax nameSyntax)
-        {
-            while (nameSyntax.Parent is VBSyntax.QualifiedNameSyntax qualifiedParent)
-            {
-                nameSyntax = qualifiedParent;
-            }
-
-            return nameSyntax.ToString();
-        }
-
-        public static bool NameEquals(this IAssemblySymbol? symbol, string name, bool startsWith = true)
-        {
-            if (symbol is null)
-            {
-                return false;
-            }
-
-            if (startsWith)
-            {
-                return symbol.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase);
-            }
-            else
-            {
-                return string.Equals(symbol.Name, name, StringComparison.OrdinalIgnoreCase);
-            }
-        }
-
         public static void RegisterMemberAccess(this AnalysisContext context, Action<InvocationAnalysisContext> action)
         {
             var operationKinds = new[]

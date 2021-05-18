@@ -21,10 +21,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
     /// </summary>
     public abstract class IdentifierUpgradeAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Key name for the diagnostic property containing the full name of the type
+        /// the code fix provider should use to replace the syntax node identified
+        /// in the diagnostic.
+        /// </summary>
         public const string NewIdentifierKey = "NewIdentifier";
 
+        /// <summary>
+        /// Gets an enumerable of <see cref="IdentifierMapping"/> object defining
+        /// the identifier names that should be replaced.
+        /// </summary>
         public abstract IEnumerable<IdentifierMapping> IdentifierMappings { get; }
 
+        /// <summary>
+        /// Initializes the analyzer by registering analysis callback methods.
+        /// </summary>
+        /// <param name="context">The context to use for initialization.</param>
         public override void Initialize(AnalysisContext context)
         {
             if (context is null)
@@ -35,32 +48,40 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
+            // Register actions for handling both C# and VB identifiers
             context.RegisterSyntaxNodeAction(AnalyzeCSharpIdentifier, CS.SyntaxKind.IdentifierName);
             context.RegisterSyntaxNodeAction(AnalyzeVBIdentifier, VB.SyntaxKind.IdentifierName);
         }
 
+        /// <summary>
+        /// Child types should implement this method to create the diagnostic for their specific scenario.
+        /// </summary>
+        /// <param name="location">The location the diagnostic occurs at.</param>
+        /// <param name="properties">Properties (including the name of the new identifier that code fix providers should substitute in) that should be included in the diagnostic.</param>
+        /// <param name="messageArgs">Arguments (the simple name of the identifier to be replaced and the full name of the identifier to replace it) to be used in diagnotic messages.</param>
+        /// <returns>A diagnostic to be shown to the user.</returns>
         protected abstract Diagnostic CreateDiagnostic(Location location, ImmutableDictionary<string, string?> properties, params object[] messageArgs);
 
         private void AnalyzeCSharpIdentifier(SyntaxNodeAnalysisContext context)
         {
             var identifier = (CSSyntax.IdentifierNameSyntax)context.Node;
-            AnalyzeIdentifier(context, identifier.Identifier.ValueText, identifier.GetFullName());
+            AnalyzeIdentifier(context, identifier.Identifier.ValueText);
         }
 
         private void AnalyzeVBIdentifier(SyntaxNodeAnalysisContext context)
         {
             var identifier = (VBSyntax.IdentifierNameSyntax)context.Node;
-            AnalyzeIdentifier(context, identifier.Identifier.ValueText, identifier.GetFullName());
+            AnalyzeIdentifier(context, identifier.Identifier.ValueText);
         }
 
-        private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, string simpleName, string fullName)
+        /// <summary>
+        /// Analyzes an identifier syntax node to determine if it likely represents any of the types present
+        /// in <see cref="IdentifierMappings"/>.
+        /// </summary>
+        /// <param name="context">The syntax node analysis context including the identifier node to analyze.</param>
+        /// <param name="simpleName">The simple name of the identifier being analyzed.</param>
+        private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, string simpleName)
         {
-            // If the node isn't an identifier, bail out
-            if (simpleName is null)
-            {
-                return;
-            }
-
             // If the identifier isn't one of the mapped identifiers, bail out
             var mapping = IdentifierMappings.FirstOrDefault(m => m.SimpleName.Equals(simpleName, StringComparison.Ordinal));
             if (mapping is null)
@@ -69,44 +90,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             }
 
             // If the identifier resolves to an actual symbol that isn't the old identifier, bail out
-            // TODO : Add a helper to compare the symbol names more correctly
-            if (context.SemanticModel.GetSymbolInfo(context.Node).Symbol is INamedTypeSymbol symbol && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldFullName, StringComparison.Ordinal))
+            if (context.SemanticModel.GetSymbolInfo(context.Node).Symbol is INamedTypeSymbol symbol
+                && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldFullName, StringComparison.Ordinal))
             {
                 return;
             }
 
-            // If the identified is part of a fully qualified name and the qualified name exactly matches the new full name,
+            // If the identifier is part of a fully qualified name and the qualified name exactly matches the new full name,
             // then bail out because the code is likely fine and the symbol is just unavailable because of missing references.
-            if (fullName.ToString().Equals(mapping.NewFullName, StringComparison.Ordinal))
+            var fullyQualifiedNameNode = context.Node.GetQualifiedName();
+            if (fullyQualifiedNameNode.ToString().Equals(mapping.NewFullName, StringComparison.Ordinal))
             {
                 return;
             }
 
-            // Make sure the name syntax node includes the whole name in case it is qualified
-            var fullyQualifiedNameNode = GetQualifiedName(context.Node);
-
+            // Store the new identifier name that this identifier should be replaced with for use
+            // by the code fix provider.
             var properties = ImmutableDictionary.Create<string, string?>().Add(NewIdentifierKey, mapping.NewFullName);
+
+            // Create and report the diagnostic. Note that the fully qualified name's location is used so
+            // that the code fix provider can directly replace the node without needing to consider its parents.
             var diagnostic = CreateDiagnostic(fullyQualifiedNameNode.GetLocation(), properties, simpleName, mapping.NewFullName);
             context.ReportDiagnostic(diagnostic);
-        }
-
-        private static SyntaxNode GetQualifiedName(SyntaxNode name)
-        {
-            // If the node is part of a qualified name, we want to get the full qualified name
-            while (name.Parent is CSSyntax.NameSyntax || name.Parent is VBSyntax.NameSyntax)
-            {
-                name = name.Parent;
-            }
-
-            // If the node is part of a member access expression (a static member access, for example), then the
-            // qualified name will be a member access expression rather than a name syntax.
-            if ((name.Parent is CSSyntax.MemberAccessExpressionSyntax csMAE && csMAE.Name.ToString().Equals(name.ToString(), StringComparison.Ordinal))
-                || (name.Parent is VBSyntax.MemberAccessExpressionSyntax vbMAE && vbMAE.Name.ToString().Equals(name.ToString(), StringComparison.OrdinalIgnoreCase)))
-            {
-                name = name.Parent;
-            }
-
-            return name;
         }
     }
 }

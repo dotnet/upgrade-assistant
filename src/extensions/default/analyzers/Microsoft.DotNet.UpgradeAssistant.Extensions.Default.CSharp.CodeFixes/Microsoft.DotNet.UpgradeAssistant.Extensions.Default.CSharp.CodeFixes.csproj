@@ -15,4 +15,7 @@
     <EmbeddedResource Include="Templates\*.*" />
     <EmbeddedResource Update="CodeFixResources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="CodeFixResources.Designer.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj" />
+  </ItemGroup>
 </Project>
