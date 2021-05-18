@@ -2,11 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static class SymbolExtensions
     {

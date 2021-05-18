@@ -9,7 +9,7 @@ using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
 using VB = Microsoft.CodeAnalysis.VisualBasic;
 using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static class SyntaxNodeExtensions
     {

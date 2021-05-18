@@ -2,14 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static class AnalyzerExtensions
     {
