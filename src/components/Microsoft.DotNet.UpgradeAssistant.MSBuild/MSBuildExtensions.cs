@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (comma > 0)
             {
-                name = name.Substring(0, comma - 1);
+                name = name.Substring(0, comma);
             }
 
             return new(name)
