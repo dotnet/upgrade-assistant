@@ -19,7 +19,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return new NuGetReference(packageName, packageVersion);
         }
 
-        public static string? GetMetadata(this ProjectItemElement item, string name)
+        public static string? GetHintPath(this ProjectItemElement item)
+            => item.GetMetadata("HintPath");
+
+        private static string? GetMetadata(this ProjectItemElement item, string name)
         {
             foreach (var metadata in item.Metadata)
             {
@@ -39,12 +42,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (comma > 0)
             {
-                name = name.Substring(0, comma);
+                name = name.Substring(0, comma - 1);
             }
 
             return new(name)
             {
-                HintPath = item.GetMetadata("HintPath"),
+                HintPath = item.GetHintPath(),
             };
         }
 
