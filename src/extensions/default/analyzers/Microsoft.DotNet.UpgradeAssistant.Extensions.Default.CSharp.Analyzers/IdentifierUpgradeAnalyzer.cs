@@ -49,8 +49,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
             // Register actions for handling both C# and VB identifiers
-            context.RegisterSyntaxNodeAction(AnalyzeCSharpIdentifier, CS.SyntaxKind.IdentifierName);
-            context.RegisterSyntaxNodeAction(AnalyzeVBIdentifier, VB.SyntaxKind.IdentifierName);
+            context.RegisterSyntaxNodeAction(AnalyzeIdentifier, CS.SyntaxKind.IdentifierName);
+            context.RegisterSyntaxNodeAction(AnalyzeIdentifier, VB.SyntaxKind.IdentifierName);
         }
 
         /// <summary>
@@ -62,27 +62,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
         /// <returns>A diagnostic to be shown to the user.</returns>
         protected abstract Diagnostic CreateDiagnostic(Location location, ImmutableDictionary<string, string?> properties, params object[] messageArgs);
 
-        private void AnalyzeCSharpIdentifier(SyntaxNodeAnalysisContext context)
-        {
-            var identifier = (CSSyntax.IdentifierNameSyntax)context.Node;
-            AnalyzeIdentifier(context, identifier.Identifier.ValueText);
-        }
-
-        private void AnalyzeVBIdentifier(SyntaxNodeAnalysisContext context)
-        {
-            var identifier = (VBSyntax.IdentifierNameSyntax)context.Node;
-            AnalyzeIdentifier(context, identifier.Identifier.ValueText);
-        }
-
         /// <summary>
         /// Analyzes an identifier syntax node to determine if it likely represents any of the types present
         /// in <see cref="IdentifierMappings"/>.
         /// </summary>
         /// <param name="context">The syntax node analysis context including the identifier node to analyze.</param>
-        /// <param name="simpleName">The simple name of the identifier being analyzed.</param>
-        private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, string simpleName)
+        private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context)
         {
             // If the identifier isn't one of the mapped identifiers, bail out
+            var simpleName = context.Node.GetSimpleName();
             var mapping = IdentifierMappings.FirstOrDefault(m => m.SimpleName.Equals(simpleName, StringComparison.Ordinal));
             if (mapping is null)
             {

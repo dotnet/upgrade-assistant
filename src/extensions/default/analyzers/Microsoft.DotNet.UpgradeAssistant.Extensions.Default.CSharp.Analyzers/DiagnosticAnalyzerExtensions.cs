@@ -7,17 +7,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
-    public static class AnalyzerExtensions
+    internal static class DiagnosticAnalyzerExtensions
     {
         public static void RegisterMemberAccess(this AnalysisContext context, Action<InvocationAnalysisContext> action)
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
             var operationKinds = new[]
             {
                 OperationKind.Invocation,
@@ -75,33 +70,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 action(newCtx);
             }, SymbolKind.Property, SymbolKind.Method, SymbolKind.Parameter, SymbolKind.Field);
         }
-    }
 
-    public record InvocationAnalysisContext
-    {
-        private readonly Action<Diagnostic> _reportDiagnostic;
-
-        public InvocationAnalysisContext(ISymbol symbol, Location location, Compilation compilation, AnalyzerOptions options, Action<Diagnostic> reportDiagnostic, CancellationToken cancellationToken)
+        public readonly struct InvocationAnalysisContext
         {
-            Symbol = symbol;
-            Location = location;
-            Options = options;
-            Compilation = compilation;
-            CancellationToken = cancellationToken;
+            private readonly Action<Diagnostic> _reportDiagnostic;
 
-            _reportDiagnostic = reportDiagnostic;
+            public InvocationAnalysisContext(ISymbol symbol, Location location, Compilation compilation, AnalyzerOptions options, Action<Diagnostic> reportDiagnostic, CancellationToken cancellationToken)
+            {
+                Symbol = symbol;
+                Location = location;
+                Options = options;
+                Compilation = compilation;
+                CancellationToken = cancellationToken;
+
+                _reportDiagnostic = reportDiagnostic;
+            }
+
+            public Location Location { get; }
+
+            public AnalyzerOptions Options { get; }
+
+            public ISymbol Symbol { get; }
+
+            public Compilation Compilation { get; }
+
+            public CancellationToken CancellationToken { get; }
+
+            public void ReportDiagnostic(Diagnostic diagnostic) => _reportDiagnostic(diagnostic);
         }
-
-        public Location Location { get; }
-
-        public AnalyzerOptions Options { get; }
-
-        public ISymbol Symbol { get; }
-
-        public Compilation Compilation { get; }
-
-        public CancellationToken CancellationToken { get; }
-
-        public void ReportDiagnostic(Diagnostic diagnostic) => _reportDiagnostic(diagnostic);
     }
 }

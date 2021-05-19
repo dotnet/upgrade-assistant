@@ -99,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             // Note that the simplifier does not recognize using statements within namespaces, so this
             // checks whether the necessary using statement is present or not and constructs the new identifer
             // as either a simple name or qualified name based on that.
-            var updatedNode = (qualifier is not null && documentRoot.HasUsingStatement(qualifier))
+            var updatedNode = (qualifier is not null && node.HasAccessToNamespace(qualifier))
                 ? generator.IdentifierName(name)
                 : GetUpdatedNode(node, generator, qualifier, name)
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);

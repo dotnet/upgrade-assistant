@@ -94,6 +94,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         }
 
         /// <summary>
+        /// Gets the simple name of an identifier syntax. Works for both C# and VB.
+        /// </summary>
+        /// <param name="node">The IdentifierNameSyntax node to get the simple name for.</param>
+        /// <returns>The identifier's simple name.</returns>
+        public static string GetSimpleName(this SyntaxNode node) =>
+            node switch
+            {
+                CSSyntax.IdentifierNameSyntax csIdentifier => csIdentifier.Identifier.ValueText,
+                VBSyntax.IdentifierNameSyntax vbIdentifier => vbIdentifier.Identifier.ValueText,
+                _ => throw new ArgumentException("Syntax node must be an IdentifierNameSyntax to get its simple name", nameof(node))
+            };
+
+        /// <summary>
         /// Finds the fully qualified name syntax or member access expression syntax (if any)
         /// that a node is part of and returns that larger, fully qualified syntax node.
         /// </summary>
@@ -172,10 +185,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
         /// <summary>
         /// Determines if a syntax node includes a using or import statement for a given namespace.
+        /// Will not return true if the node's children include the specified using/import but the node itself does not.
         /// </summary>
         /// <param name="node">The node to analyze.</param>
         /// <param name="namespaceName">The namespace name to check for.</param>
-        /// <returns>True if the node or any of its descendents have a an import or using statement for the given namespace. False otherwise.</returns>
+        /// <returns>True if the node has a direct import or using statement for the given namespace. False otherwise.</returns>
         public static bool HasUsingStatement(this SyntaxNode node, string namespaceName)
         {
             if (node is null)
@@ -183,10 +197,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(node));
             }
 
-            var nodes = node.DescendantNodesAndSelf(_ => true, false);
+            // Descend only into VB import statements
+            var nodes = node.DescendantNodesAndSelf(n => VisualBasicExtensions.IsKind(n, VB.SyntaxKind.ImportsStatement), false);
+            var children = node.ChildNodes();
 
-            return nodes.OfType<CSSyntax.UsingDirectiveSyntax>().Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal))
-                || nodes.OfType<VBSyntax.SimpleImportsClauseSyntax>().Any(i => i.Name.ToString().Equals(namespaceName, StringComparison.Ordinal));
+            var usings = children.OfType<CSSyntax.UsingDirectiveSyntax>().Select(u => u.Name.ToString())
+                .Concat(children.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString()))
+                .Concat(children.OfType<VBSyntax.ImportsStatementSyntax>().SelectMany(i => i.ImportsClauses.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString())));
+
+            return usings.Any(n => n.Equals(namespaceName, StringComparison.Ordinal));
+        }
+
+        /// <summary>
+        /// Determines if a syntax node is in a scope that includes a using or import statement for a given namespace.
+        /// </summary>
+        /// <param name="node">The node to analyze for access to the namespace in its scope.</param>
+        /// <param name="namespaceName">The namespace name to check for.</param>
+        /// <returns>True if the node is in a syntax tree with the given namespace in scope. False otherwise.</returns>
+        public static bool HasAccessToNamespace(this SyntaxNode node, string namespaceName)
+        {
+            if (node is null)
+            {
+                throw new ArgumentNullException(nameof(node));
+            }
+
+            return node.AncestorsAndSelf().Any(n => n.HasUsingStatement(namespaceName));
         }
 
         /// <summary>

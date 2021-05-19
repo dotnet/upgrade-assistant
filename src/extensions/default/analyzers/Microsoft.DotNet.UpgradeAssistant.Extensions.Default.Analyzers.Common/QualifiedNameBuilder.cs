@@ -30,6 +30,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(qualifiedName));
             }
 
+            // This is not a hot code path currently. If it becomes more heavily used, it may be worthwile to
+            // cache the component arrays to reduce array allocation.
             return BuildRecursiveNameSyntax(generator, qualifiedName.Split('.'), generator.QualifiedName);
         }
 
