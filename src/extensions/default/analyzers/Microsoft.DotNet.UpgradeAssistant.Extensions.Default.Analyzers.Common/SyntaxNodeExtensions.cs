@@ -120,8 +120,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
             // If the node is part of a member access expression (a static member access, for example), then the
             // qualified name will be a member access expression rather than a name syntax.
-            if ((node.Parent is CSSyntax.MemberAccessExpressionSyntax csMAE && csMAE.Name.ToString().Equals(node.ToString(), StringComparison.Ordinal))
-                || (node.Parent is VBSyntax.MemberAccessExpressionSyntax vbMAE && vbMAE.Name.ToString().Equals(node.ToString(), StringComparison.OrdinalIgnoreCase)))
+            if ((node.Parent is CSSyntax.MemberAccessExpressionSyntax csMAE && csMAE.Name.IsEquivalentTo(node))
+                || (node.Parent is VBSyntax.MemberAccessExpressionSyntax vbMAE && vbMAE.Name.IsEquivalentTo(node)))
             {
                 node = node.Parent;
             }
