@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using CS = Microsoft.CodeAnalysis.CSharp;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -166,6 +168,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 || CSharpExtensions.IsKind(trivia, CS.SyntaxKind.WhitespaceTrivia)
                 || VisualBasicExtensions.IsKind(trivia, VB.SyntaxKind.EndOfLineTrivia)
                 || VisualBasicExtensions.IsKind(trivia, VB.SyntaxKind.WhitespaceTrivia);
+        }
+
+        /// <summary>
+        /// Determines if a syntax node includes a using or import statement for a given namespace.
+        /// </summary>
+        /// <param name="node">The node to analyze.</param>
+        /// <param name="namespaceName">The namespace name to check for.</param>
+        /// <returns>True if the node or any of its descendents have a an import or using statement for the given namespace. False otherwise.</returns>
+        public static bool HasUsingStatement(this SyntaxNode node, string namespaceName)
+        {
+            if (node is null)
+            {
+                throw new ArgumentNullException(nameof(node));
+            }
+
+            var nodes = node.DescendantNodesAndSelf(_ => true, false);
+
+            return nodes.OfType<CSSyntax.UsingDirectiveSyntax>().Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal))
+                || nodes.OfType<VBSyntax.SimpleImportsClauseSyntax>().Any(i => i.Name.ToString().Equals(namespaceName, StringComparison.Ordinal));
         }
 
         /// <summary>

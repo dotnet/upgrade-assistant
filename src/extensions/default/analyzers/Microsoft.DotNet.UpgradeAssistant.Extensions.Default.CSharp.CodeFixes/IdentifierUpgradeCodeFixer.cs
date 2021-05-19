@@ -96,9 +96,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
                 : ((string?)null, newIdentifier);
 
             // Create new identifier
-            var updatedNode = GetUpdatedNode(node, generator, qualifier, name)?
-                .WithTriviaFrom(node)
+            // Note that the simplifier does not recognize using statements within namespaces, so this
+            // checks whether the necessary using statement is present or not and constructs the new identifer
+            // as either a simple name or qualified name based on that.
+            var updatedNode = (qualifier is not null && documentRoot.HasUsingStatement(qualifier))
+                ? generator.IdentifierName(name)
+                : GetUpdatedNode(node, generator, qualifier, name)
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
+
+            // Preserve white space and comments
+            updatedNode = updatedNode.WithTriviaFrom(node);
 
             if (updatedNode is null)
             {
@@ -111,18 +118,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
             // Add using declaration if needed
             updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
-            updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);
 
             return updatedDocument;
         }
 
-        private static SyntaxNode? GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string? qualifier, string name)
+        private static SyntaxNode GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string? qualifier, string name)
         {
-            if (node is null)
-            {
-                throw new System.ArgumentNullException(nameof(node));
-            }
-
             if (qualifier is null)
             {
                 return generator.IdentifierName(name);
