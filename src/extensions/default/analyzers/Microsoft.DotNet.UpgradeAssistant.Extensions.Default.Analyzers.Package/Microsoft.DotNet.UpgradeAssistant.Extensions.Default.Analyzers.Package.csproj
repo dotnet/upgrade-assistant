@@ -22,16 +22,18 @@
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.csproj" />
-    <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
   </ItemGroup>
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.dll" PackagePath="analyzers/dotnet/vb" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.dll" PackagePath="analyzers/dotnet/vb" />
     </ItemGroup>
   </Target>
 </Project>

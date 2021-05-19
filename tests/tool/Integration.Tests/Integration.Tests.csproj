@@ -36,7 +36,7 @@
       <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
     </PropertyGroup>
     <ItemGroup>
-      <SourceUpdateFiles Include="$(OutputPath)Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.*" />
+      <SourceUpdateFiles Include="$(OutputPath)Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.*" />
       <SourceUpdateFiles Include="$(OutputPath)Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.*" />
       <ConfigUpdateFiles Include="$(OutputPath)Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.*" />
     </ItemGroup>
