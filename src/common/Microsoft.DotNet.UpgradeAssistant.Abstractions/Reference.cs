@@ -5,6 +5,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public record Reference(string Name)
     {
+        public string? HintPath { get; init; }
+
         public override string ToString() => Name;
     }
 }
