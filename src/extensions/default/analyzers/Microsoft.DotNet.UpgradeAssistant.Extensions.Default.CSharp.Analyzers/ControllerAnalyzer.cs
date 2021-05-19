@@ -10,14 +10,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
-    public sealed class ApiControllerAnalyzer : IdentifierUpgradeAnalyzer
+    public sealed class ControllerAnalyzer : IdentifierUpgradeAnalyzer
     {
         public const string DiagnosticId = "UA0013";
         private const string Category = "Upgrade";
 
         public override IEnumerable<IdentifierMapping> IdentifierMappings { get; } = new[]
         {
-            new IdentifierMapping("System.Web.Http.ApiController", "Microsoft.AspNetCore.Mvc.Controller")
+            new IdentifierMapping("System.Web.Http.ApiController", "Microsoft.AspNetCore.Mvc.ControllerBase"),
+            new IdentifierMapping("System.Web.Mvc.Controller", "Microsoft.AspNetCore.Mvc.Controller")
         };
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiControllerTitle), Resources.ResourceManager, typeof(Resources));

@@ -10,10 +10,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic, Name = "UA0013 CodeFix Provider")]
-    public class ApiControllerCodeFixer : IdentifierUpgradeCodeFixer
+    public class ControllerCodeFixer : IdentifierUpgradeCodeFixer
     {
         public override string CodeFixTitle => CodeFixResources.ApiControllerTitle;
 
-        public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(ApiControllerAnalyzer.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(ControllerAnalyzer.DiagnosticId);
     }
 }

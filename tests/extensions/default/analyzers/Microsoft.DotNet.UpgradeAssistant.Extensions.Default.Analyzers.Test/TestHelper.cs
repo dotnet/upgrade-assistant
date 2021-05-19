@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
-            new ApiControllerAnalyzer(),
+            new ControllerAnalyzer(),
             new BinaryFormatterUnsafeDeserializeAnalyzer(),
             new FilterAnalyzer(),
             new HelperResultAnalyzer(),
@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new AllowHtmlAttributeCodeFixer(),
-            new ApiControllerCodeFixer(),
+            new ControllerCodeFixer(),
             new BinaryFormatterUnsafeDeserializeCodeFixer(),
             new FilterCodeFixer(),
             new HelperResultCodeFixer(),
