@@ -144,6 +144,9 @@
   <data name="HttpContextIsDebuggingEnabled" xml:space="preserve">
     <value>Replace IsDebuggingEnabled with System.Diagnostics.Debugger.IsAttached</value>
   </data>
+  <data name="HttpContextRefactorTitle" xml:space="preserve">
+    <value>Pass HttpContext through method instead of via HttpContext.Current</value>
+  </data>
   <data name="ResultTypeTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core result type</value>
   </data>

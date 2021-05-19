@@ -142,6 +142,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pass HttpContext through method instead of via HttpContext.Current.
+        /// </summary>
+        internal static string HttpContextRefactorTitle {
+            get {
+                return ResourceManager.GetString("HttpContextRefactorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with ASP.NET Core result type.
         /// </summary>
         internal static string ResultTypeTitle {
