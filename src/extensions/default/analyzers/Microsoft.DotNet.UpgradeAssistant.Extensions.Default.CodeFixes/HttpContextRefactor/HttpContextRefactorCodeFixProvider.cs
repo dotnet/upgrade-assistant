@@ -70,19 +70,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: CodeFixResources.HttpContextRefactorTitle,
-                    createChangedSolution: c => InjectHttpContext(context.Document, methodOperation, property, c),
+                    createChangedSolution: c => InjectHttpContext(context.Document, semantic, methodOperation, property, c),
                     equivalenceKey: nameof(CodeFixResources.HttpContextRefactorTitle)),
                 diagnostic);
         }
 
-        private async Task<Solution> InjectHttpContext(Document document, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken cancellationToken)
+        private async Task<Solution> InjectHttpContext(Document document, SemanticModel model, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken cancellationToken)
         {
             var slnEditor = new SolutionEditor(document.Project.Solution);
 
             var editor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
 
             // Add parameter if not available
-            var parameter = await GetOrAddMethodParameterAsync(editor, document, methodOperation, propertyOperation, cancellationToken).ConfigureAwait(false);
+            var parameter = GetOrAddMethodParameter(model, editor, document, methodOperation, propertyOperation, cancellationToken);
 
             if (parameter is null)
             {
@@ -103,16 +103,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         private IOperation? GetEnclosingMethodOperation(IOperation? operation)
             => operation.GetParentOperation(IsEnclosedMethodOperation);
 
-        private async Task<SyntaxNode?> GetOrAddMethodParameterAsync(DocumentEditor editor, Document document, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken token)
+        private SyntaxNode? GetOrAddMethodParameter(SemanticModel semanticModel, DocumentEditor editor, Document document, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken token)
         {
-            // Get the symbol representing the type to be renamed.
-            var semanticModel = await document.GetSemanticModelAsync(token).ConfigureAwait(false);
-
-            if (semanticModel is null)
-            {
-                return default;
-            }
-
             var expression = GetExistingExpression(semanticModel, propertyOperation.Property, editor, propertyOperation.Syntax, token);
 
             if (expression is not null)
