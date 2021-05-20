@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Solution;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
@@ -17,6 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         {
             services.AddTransient<IAnalyzeResultProvider, AnalyzePackageStatus>();
             services.AddTransient<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
+            services.AddTransient<IEntrypointResolver, EntrypointResolver>();
         }
     }
 }

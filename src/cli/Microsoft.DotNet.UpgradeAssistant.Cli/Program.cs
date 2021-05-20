@@ -44,7 +44,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Name = GetProcessName(),
             };
 
-
             var upgradeCmd = new Command("upgrade");
             ConfigureUpgradeCommand(upgradeCmd);
             root.AddCommand(upgradeCmd);
@@ -224,7 +223,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
             command.AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--extension" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
             command.AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--entry-point", "-e" }, "Provides the entry-point project to start the upgrade process. This may include globbing patterns such as '*' for match."));
+            command.IsHidden = true;
         }
-
     }
 }
