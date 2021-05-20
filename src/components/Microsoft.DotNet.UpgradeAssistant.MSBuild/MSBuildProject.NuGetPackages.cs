@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
@@ -16,17 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal partial class MSBuildProject : INuGetReferences
     {
-        public async ValueTask<INuGetReferences> GetNuGetReferencesAsync(CancellationToken token)
-        {
-            if (IsRestored)
-            {
-                return this;
-            }
-
-            await _restorer.RestorePackagesAsync(Context, this, token).ConfigureAwait(false);
-
-            return this;
-        }
+        public INuGetReferences NuGetReferences => this;
 
         public NugetPackageFormat PackageReferenceFormat
         {
@@ -68,38 +60,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public IEnumerable<NuGetReference> GetTransitivePackageReferences(TargetFrameworkMoniker tfm)
-        {
-            if (PackageReferenceFormat != NugetPackageFormat.PackageReference)
-            {
-                return Enumerable.Empty<NuGetReference>();
-            }
+        public IAsyncEnumerable<NuGetReference> GetTransitivePackageReferencesAsync(TargetFrameworkMoniker tfm, CancellationToken token)
+            => GetAllDependenciesAsync(tfm, token).Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
 
-            var parsedTfm = NuGetFramework.Parse(tfm.Name);
-            var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+        public ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token)
+            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token);
 
-            if (lockFile is null)
-            {
-                throw new ProjectRestoreRequiredException($"Project is not restored: {FileInfo}");
-            }
-
-            var lockFileTarget = lockFile
-                .Targets
-                .FirstOrDefault(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal));
-
-            if (lockFileTarget is null)
-            {
-                throw new ProjectRestoreRequiredException($"Could not find {parsedTfm.DotNetFrameworkName} in {LockFilePath} for {FileInfo}");
-            }
-
-            return lockFileTarget.Libraries.Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
-        }
-
-        public bool IsTransitivelyAvailable(string packageName)
-            => TargetFrameworks.Any(tfm => ContainsDependency(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase)));
-
-        public bool IsTransitiveDependency(NuGetReference nugetReference)
-            => TargetFrameworks.Any(tfm => ContainsDependency(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true)));
+        public ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token)
+            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token);
 
         private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
@@ -136,28 +104,64 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return true;
         }
 
-        private bool ContainsDependency(TargetFrameworkMoniker tfm, Func<PackageDependency, bool> filter)
-            => GetAllDependencies(tfm).Any(l => l.Dependencies.Any(d => filter(d)));
+        private ValueTask<bool> ContainsDependencyAsync(TargetFrameworkMoniker tfm, Func<PackageDependency, bool> filter, CancellationToken token)
+            => GetAllDependenciesAsync(tfm, token).AnyAsync(l => l.Dependencies.Any(d => filter(d)), token);
 
-        private IEnumerable<LockFileTargetLibrary> GetAllDependencies(TargetFrameworkMoniker tfm)
+        private async IAsyncEnumerable<LockFileTargetLibrary> GetAllDependenciesAsync(TargetFrameworkMoniker tfm, [EnumeratorCancellation] CancellationToken token)
         {
             if (!IsRestored)
             {
                 throw new InvalidOperationException("Project should have already been restored. Please file an issue at https://github.com/dotnet/upgrade-assistant");
             }
 
-            // If the LockFilePath is defined but does not exist, there are no libraries
-            if (!File.Exists(LockFilePath))
+            var parsedTfm = NuGetFramework.Parse(tfm.Name);
+            var target = GetLockFileTarget(parsedTfm);
+
+            if (target is null)
             {
-                return Enumerable.Empty<LockFileTargetLibrary>();
+                // Break if there are no packages in the project. Otherwise, we end up performing restores too often.
+                if (!PackageReferences.Any())
+                {
+                    _logger.LogDebug("Skipping restore as no package references exist in project file {Path}", FileInfo.FullName);
+                    yield break;
+                }
+
+                _logger.LogDebug("Attempting a restore to retrieve missing lock file data {Path}", FileInfo.FullName);
+
+                await _restorer.RestorePackagesAsync(Context, this, token).ConfigureAwait(false);
+
+                // If the LockFilePath is defined but does not exist, there are no libraries
+                if (!File.Exists(LockFilePath))
+                {
+                    yield break;
+                }
+
+                target = GetLockFileTarget(parsedTfm);
             }
 
-            var parsedTfm = NuGetFramework.Parse(tfm.Name);
-            var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+            if (target is null)
+            {
+                _logger.LogError("Target is still unavailable after restore. Please verify that the project has been restored.");
+                throw new UpgradeException("Cannot find targets. Please ensure that the project is fully restored.");
+            }
 
-            return lockFile.Targets
-                .First(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal))
-                .Libraries;
+            foreach (var library in target.Libraries)
+            {
+                yield return library;
+            }
+
+            LockFileTarget? GetLockFileTarget(NuGetFramework parsedTfm)
+            {
+                var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+
+                if (lockFile?.Targets is null)
+                {
+                    return null;
+                }
+
+                return lockFile.Targets
+                    .FirstOrDefault(t => t.TargetFramework.DotNetFrameworkName.Equals(parsedTfm.DotNetFrameworkName, StringComparison.Ordinal));
+            }
         }
 
         private bool IsRestored => LockFilePath is not null;

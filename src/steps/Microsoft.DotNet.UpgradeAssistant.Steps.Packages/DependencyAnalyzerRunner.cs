@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
@@ -36,9 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             await _packageRestorer.RestorePackagesAsync(context, projectRoot, token).ConfigureAwait(false);
-            var nugetReferences = await projectRoot.GetNuGetReferencesAsync(token).ConfigureAwait(false);
-
-            var analysisState = new DependencyAnalysisState(projectRoot, nugetReferences);
+            var analysisState = new DependencyAnalysisState(projectRoot, projectRoot.NuGetReferences);
 
             // Iterate through all package references in the project file
             foreach (var analyzer in _packageAnalyzers)

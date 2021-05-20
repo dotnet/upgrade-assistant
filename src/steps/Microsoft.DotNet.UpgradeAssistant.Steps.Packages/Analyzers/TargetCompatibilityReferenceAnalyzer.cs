@@ -40,8 +40,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var references = await project.GetNuGetReferencesAsync(token).ConfigureAwait(false);
-
             foreach (var packageReference in state.Packages)
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition

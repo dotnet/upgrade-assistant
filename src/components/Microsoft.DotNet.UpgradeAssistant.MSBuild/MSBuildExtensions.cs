@@ -19,8 +19,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return new NuGetReference(packageName, packageVersion);
         }
 
-        public static Reference AsReference(this ProjectItemElement item) =>
-            new(item.Include.Split(',').First());
+        public static string? GetHintPath(this ProjectItemElement item)
+            => item.GetMetadata("HintPath");
+
+        private static string? GetMetadata(this ProjectItemElement item, string name)
+        {
+            foreach (var metadata in item.Metadata)
+            {
+                if (string.Equals(metadata.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return metadata.Value;
+                }
+            }
+
+            return null;
+        }
+
+        public static Reference AsReference(this ProjectItemElement item)
+        {
+            var name = item.Include;
+            var comma = name.IndexOf(',', StringComparison.Ordinal);
+
+            if (comma > 0)
+            {
+                name = name.Substring(0, comma);
+            }
+
+            return new(name)
+            {
+                HintPath = item.GetHintPath(),
+            };
+        }
 
         public static void RemovePackage(this ProjectRootElement projectRoot, NuGetReference package)
         {

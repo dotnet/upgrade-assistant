@@ -13,8 +13,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.MSBuild;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
@@ -23,10 +22,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     {
         // Path relative from .\bin\debug\net5.0
         // TODO : Make this configurable so the test can pass from other working dirs
-        internal const string TestProjectPath = @"assets\TestProject.csproj";
+        internal const string TestProjectPath = @"assets\TestProject.{lang}proj";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
+            new ControllerAnalyzer(),
             new BinaryFormatterUnsafeDeserializeAnalyzer(),
             new FilterAnalyzer(),
             new HelperResultAnalyzer(),
@@ -40,6 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new AllowHtmlAttributeCodeFixer(),
+            new ControllerCodeFixer(),
             new BinaryFormatterUnsafeDeserializeCodeFixer(),
             new FilterCodeFixer(),
             new HelperResultCodeFixer(),
@@ -51,7 +52,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             new UsingSystemWebCodeFixer(),
             new UrlHelperCodeFixer());
 
-        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
+        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
+        {
+            return GetDiagnosticsAsync(Language.CSharp, documentPath, diagnosticIds);
+        }
+
+        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(Language lang, string documentPath, params string[] diagnosticIds)
         {
             if (documentPath is null)
             {
@@ -59,13 +65,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             using var workspace = MSBuildWorkspace.Create();
-            var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
+            var projectLanguage = lang.GetFileExtension();
+            var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
+            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
             return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
 
         private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, params string[] diagnosticIds)
         {
             var analyzersToUse = AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
+
             var compilation = await project.GetCompilationAsync().ConfigureAwait(false);
 
             if (compilation is null)
@@ -81,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .Where(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal));
         }
 
-        public static async Task<Document?> GetSourceAsync(string documentPath)
+        public static async Task<Document?> GetSourceAsync(Language lang, string documentPath)
         {
             if (documentPath is null)
             {
@@ -89,11 +98,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             using var workspace = MSBuildWorkspace.Create();
-            var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
+            var projectLanguage = lang.GetFileExtension();
+            var path = TestProjectPath.Replace("{lang}", $"Fixed.{projectLanguage}", StringComparison.OrdinalIgnoreCase);
+            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
+
             return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
         }
 
-        public static async Task<Document> FixSourceAsync(string documentPath, string diagnosticId)
+        public static async Task<Document> FixSourceAsync(Language lang, string documentPath, string diagnosticId)
         {
             if (documentPath is null)
             {
@@ -101,7 +113,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             using var workspace = MSBuildWorkspace.Create();
-            var project = await workspace.OpenProjectAsync(TestProjectPath).ConfigureAwait(false);
+            var projectLanguage = lang.GetFileExtension();
+            var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
+            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
+
             var projectId = project.Id;
 
             var diagnosticFixed = false;

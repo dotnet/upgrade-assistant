@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
 using Moq;
 using Xunit;
 

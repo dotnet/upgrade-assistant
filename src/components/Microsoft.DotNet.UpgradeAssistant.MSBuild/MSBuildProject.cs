@@ -121,9 +121,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return false;
         }
 
-        public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(FileInfo);
+        public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(FileInfo.FullName);
 
         public Project GetRoslynProject()
             => Context.Workspace.CurrentSolution.Projects.First(p => string.Equals(p.FilePath, FileInfo.FullName, StringComparison.OrdinalIgnoreCase));
+
+        public override string ToString() => FileInfo.Name;
     }
 }
