@@ -147,6 +147,9 @@
   <data name="ResultTypeTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core result type</value>
   </data>
+  <data name="TypeUpgradeTitle" xml:space="preserve">
+    <value>Replace type with .NET Core type</value>
+  </data>
   <data name="UrlHelperTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core URL helper type</value>
   </data>

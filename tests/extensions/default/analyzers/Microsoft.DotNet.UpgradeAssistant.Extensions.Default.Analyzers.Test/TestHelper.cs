@@ -40,18 +40,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             new HtmlHelperCodeFixer(),
             new HttpContextCurrentCodeFixer(),
             new HttpContextIsDebuggingEnabledCodeFixer(),
+            new TypeUpgradeCodeFixer(),
             new UsingSystemWebCodeFixer(),
             new UrlHelperCodeFixer());
 
         private static ImmutableArray<AdditionalText> AdditionalTexts => ImmutableArray.Create<AdditionalText>(
             new WebTypeReplacements());
 
-        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
+        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, IEnumerable<string> diagnosticIds)
         {
             return GetDiagnosticsAsync(Language.CSharp, documentPath, diagnosticIds);
         }
 
-        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(Language lang, string documentPath, params string[] diagnosticIds)
+        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(Language lang, string documentPath, IEnumerable<string> diagnosticIds)
         {
             if (documentPath is null)
             {
@@ -65,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
 
-        private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, params string[] diagnosticIds)
+        private static async Task<IEnumerable<Diagnostic>> GetDiagnosticsFromProjectAsync(Project project, string documentPath, IEnumerable<string> diagnosticIds)
         {
             var analyzersToUse = AllAnalyzers.Where(a => a.SupportedDiagnostics.Any(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal)));
 
@@ -99,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
         }
 
-        public static async Task<Document> FixSourceAsync(Language lang, string documentPath, string diagnosticId)
+        public static async Task<Document> FixSourceAsync(Language lang, string documentPath, IEnumerable<string> diagnosticIds)
         {
             if (documentPath is null)
             {
@@ -122,7 +123,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 fixAttempts++;
                 diagnosticFixed = false;
                 project = solution.GetProject(projectId)!;
-                var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticId).ConfigureAwait(false);
+                var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
 
                 foreach (var diagnostic in diagnostics)
                 {

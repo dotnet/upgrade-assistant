@@ -217,29 +217,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 }
 
                 var fileExtension = language.GetFileExtension();
-                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, $"{scenarioName}.{fileExtension}", expectedDiagnostics.Select(e => e.Id).Distinct().ToArray()).ConfigureAwait(false);
+                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, $"{scenarioName}.{fileExtension}", expectedDiagnostics.Select(e => e.Id).Distinct()).ConfigureAwait(false);
                 AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
             }
         }
 
         [InlineData("UA0001")]
-        [InlineData("UA0002")]
-        [InlineData("UA0003")]
-        [InlineData("UA0004")]
+        [InlineData("HtmlStringUpgrade")]
+        [InlineData("ResultUpgrade")]
+        [InlineData("FilterUpgrade")]
         [InlineData("UA0005")]
         [InlineData("UA0006")]
         [InlineData("UA0007")]
         [InlineData("UA0008")]
-        [InlineData("UA0009")]
+        [InlineData("HelperResultUpgrade")]
         [InlineData("UA0010")]
         [InlineData("UA0012")]
-        [InlineData("UA0013")]
+        [InlineData("ControllerUpgrade")]
         [Theory]
-        public async Task UpgradeCodeFixer(string diagnosticId)
+        public async Task UpgradeCodeFixer(string scenarioName)
         {
             foreach (var language in new[] { Language.CSharp, Language.VisualBasic })
             {
-                var expectedDiagnostics = ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language);
+                var expectedDiagnostics = ExpectedDiagnostics[scenarioName].Where(diagnostics => diagnostics.Language == language);
                 if (!expectedDiagnostics.Any())
                 {
                     // nothing to see here, move along
@@ -247,8 +247,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 }
 
                 var extension = language.GetFileExtension();
-                var fixedSource = await TestHelper.FixSourceAsync(language, $"{diagnosticId}.{extension}", diagnosticId).ConfigureAwait(false);
-                var expectedSource = await TestHelper.GetSourceAsync(language, $"{diagnosticId}.Fixed.{extension}").ConfigureAwait(false);
+                var fixedSource = await TestHelper.FixSourceAsync(language, $"{scenarioName}.{extension}", expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
+                var expectedSource = await TestHelper.GetSourceAsync(language, $"{scenarioName}.Fixed.{extension}").ConfigureAwait(false);
 
                 Assert.NotNull(expectedSource);
 
