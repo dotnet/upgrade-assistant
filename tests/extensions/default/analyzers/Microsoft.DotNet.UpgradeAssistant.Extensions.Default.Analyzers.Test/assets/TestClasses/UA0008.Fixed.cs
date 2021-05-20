@@ -7,7 +7,7 @@ namespace TestProject.TestClasses
     {
         public IUrlHelper Method1(this IUrlHelper h)
         {
-            var x = h;
+            IUrlHelper x = h;
 
             h.ExtenstionMethod(new TestProject.MyNamespace.UrlHelper(), new UrlHelper());
 

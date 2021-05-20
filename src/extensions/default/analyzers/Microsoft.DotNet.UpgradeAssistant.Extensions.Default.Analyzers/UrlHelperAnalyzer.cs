@@ -73,9 +73,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // and other uses, use Microsoft.AspNetCore.Mvc.IUrlHelper.
             var replacementType = GetReplacementType(identifier);
 
+            // Make sure the name syntax node includes the whole name in case it is qualified
+            var fullyQualifiedNameNode = identifier.GetQualifiedName();
+
             var properties = ImmutableDictionary.Create<string, string?>().Add(NewIdentifierKey, replacementType);
 
-            var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), properties, name, replacementType);
+            var diagnostic = Diagnostic.Create(Rule, fullyQualifiedNameNode.GetLocation(), properties, name, replacementType);
             context.ReportDiagnostic(diagnostic);
         }
 
@@ -86,9 +89,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return parent switch
             {
                 QualifiedNameSyntax => GetReplacementType(parent),
-                ObjectCreationExpressionSyntax => AspNetCoreUrlHelperName, // Object creation requires HtmlHelper
-                MemberAccessExpressionSyntax => AspNetCoreUrlHelperName, // Member access requires HtmlHelper
-                _ => AspNetCoreIUrlHelperName // Default to IHtmlHelper
+                ObjectCreationExpressionSyntax => AspNetCoreUrlHelperName, // Object creation requires UrlHelper
+                MemberAccessExpressionSyntax => AspNetCoreUrlHelperName, // Member access requires UrlHelper
+                _ => AspNetCoreIUrlHelperName // Default to IUrlHelper
             };
         }
     }

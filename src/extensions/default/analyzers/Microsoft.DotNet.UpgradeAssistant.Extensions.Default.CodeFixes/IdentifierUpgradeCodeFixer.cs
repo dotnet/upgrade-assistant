@@ -1,15 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
@@ -22,11 +19,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
+            // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
             return WellKnownFixAllProviders.BatchFixer;
         }
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
+            // Get the syntax root of the document to be fixed
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
             if (root is null)
@@ -34,13 +33,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            var node = root.FindNode(context.Span);
+            // The node is found by location, so it's possible `FindNode` will find a parent with the same span.
+            // To get the correct node, find the first name or MAE in the given span.
+            var node = root.FindNode(context.Span)
+                .DescendantNodesAndSelf(n => true)
+                .FirstOrDefault(n => n.Span.Equals(context.Span)
+                    && (n.IsNameSyntax() || n.IsMemberAccessExpressionSyntax()));
 
             if (node is null)
             {
                 return;
             }
 
+            // Get the diagnostic to be fixed (the new identifier will be a property of the diagnostic)
             var diagnostic = context.Diagnostics.FirstOrDefault();
 
             if (diagnostic is null)
@@ -48,6 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
+            // Get the new identifier name and register the code fix action
             if (diagnostic.Properties.TryGetValue(IdentifierUpgradeAnalyzer.NewIdentifierKey, out var property) && property is not null)
             {
                 // Register a code action that will invoke the fix.
@@ -60,78 +66,71 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             }
         }
 
+        /// <summary>
+        /// Replaces a syntax node with a new fully qualified name or member accession expression from a given string.
+        /// </summary>
+        /// <param name="document">The document to update.</param>
+        /// <param name="node">The syntax node to be replaced.</param>
+        /// <param name="newIdentifier">A string representation of the new identifier (name of member access expression) to be used in the document.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <returns>An updated document with the given node replaced with the new identifier.</returns>
         private static async Task<Document> UpdateIdentifierTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
+            var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            var generator = SyntaxGenerator.GetGenerator(document);
 
-            var name = node switch
-            {
-                // The most common case is that the node is an IdentifierName
-                NameSyntax n => n,
-
-                // In some cases (when the node is a SimpleBaseType, for example) we need to get the name from a child node
-                SyntaxNode x => x.DescendantNodesAndSelf().FirstOrDefault(n => n is NameSyntax)
-            };
-
-            // If we can't find a name, bail out
-            if (name is null)
+            if (documentRoot is null)
             {
                 return document;
             }
 
-            // Make sure the name syntax node includes the whole name in case it is qualified
-            if (name.Parent is NameSyntax)
-            {
-                while (name.Parent is NameSyntax)
-                {
-                    name = name.Parent;
-
-                    if (name is null)
-                    {
-                        return document;
-                    }
-                }
-            }
+            // Split the new idenfitier into namespace and name components
+            var namespaceDelimiterIndex = newIdentifier.LastIndexOf('.');
+            var (qualifier, name) = namespaceDelimiterIndex >= 0
+                ? (newIdentifier.Substring(0, namespaceDelimiterIndex), newIdentifier.Substring(namespaceDelimiterIndex + 1))
+                : ((string?)null, newIdentifier);
 
             // Create new identifier
-            SyntaxNode updatedName = SyntaxFactory.ParseName(newIdentifier)
-                .WithTriviaFrom(name)
-                .WithAdditionalAnnotations(Simplifier.Annotation);
+            // Note that the simplifier does not recognize using statements within namespaces, so this
+            // checks whether the necessary using statement is present or not and constructs the new identifer
+            // as either a simple name or qualified name based on that.
+            var updatedNode = (qualifier is not null && node.HasAccessToNamespace(qualifier))
+                ? generator.IdentifierName(name)
+                : GetUpdatedNode(node, generator, newIdentifier)
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
-            // In some cases (accessing a static member), the name may be part of a member access expression chain
-            // instead of a qualified name. If that's the case, update the name and updatedName accordingly.
-            if (name.Parent is MemberAccessExpressionSyntax m && m.Name.ToString().Equals(name.ToString(), StringComparison.Ordinal))
-            {
-                name = name.Parent;
+            // Preserve white space and comments
+            updatedNode = updatedNode.WithTriviaFrom(node);
 
-                if (name is null)
-                {
-                    return document;
-                }
-
-                updatedName = SyntaxFactory.ParseExpression(newIdentifier)
-                    .WithTriviaFrom(name)
-                    .WithAdditionalAnnotations(Simplifier.Annotation);
-            }
-
-            // Work on the document root instead of updating nodes with the editor directly so that
-            // additional changes can be made later (adding using statement) if necessary.
-            if (editor.OriginalRoot is not CompilationUnitSyntax documentRoot)
+            if (updatedNode is null)
             {
                 return document;
             }
 
-            documentRoot = documentRoot.ReplaceNode(name, updatedName)!;
+            // Replace the node
+            var updatedRoot = documentRoot.ReplaceNode(node, updatedNode);
+            var updatedDocument = document.WithSyntaxRoot(updatedRoot);
 
             // Add using declaration if needed
-            var namespaceName = GetNamespace(newIdentifier);
-            documentRoot = documentRoot.AddUsingIfMissing(namespaceName);
+            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
 
-            editor.ReplaceNode(editor.OriginalRoot, documentRoot);
-
-            return editor.GetChangedDocument();
+            return updatedDocument;
         }
 
-        private static string GetNamespace(string newIdentifier) => newIdentifier.Substring(0, newIdentifier.LastIndexOf('.'));
+        private static SyntaxNode GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string name)
+        {
+            return node switch
+            {
+                // Many usages (constructing a type, casting to a type, etc.) will use a qualified name syntax
+                // to refer to the type.
+                var nameSyntax when nameSyntax.IsNameSyntax() => QualifiedNameBuilder.BuildQualifiedNameSyntax(generator, name),
+
+                // Accessing a static member of a type will use a member access expression to refer to the type.
+                var maeSyntax when maeSyntax.IsMemberAccessExpressionSyntax() => QualifiedNameBuilder.BuildMemberAccessExpression(generator, name),
+
+                // Because the node is retrieved by location, it may sometimes be necessary to check children.
+                _ => GetUpdatedNode(node.ChildNodes().FirstOrDefault(), generator, name)
+            };
+        }
     }
 }

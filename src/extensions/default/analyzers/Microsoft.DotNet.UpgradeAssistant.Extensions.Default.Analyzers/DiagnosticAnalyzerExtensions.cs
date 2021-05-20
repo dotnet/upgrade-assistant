@@ -4,7 +4,6 @@
 using System;
 using System.Threading;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -12,33 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     internal static class DiagnosticAnalyzerExtensions
     {
-        public static NameSyntax GetFullName(this NameSyntax nameSyntax)
-        {
-            while (nameSyntax.Parent is QualifiedNameSyntax qualifiedParent)
-            {
-                nameSyntax = qualifiedParent;
-            }
-
-            return nameSyntax;
-        }
-
-        public static bool NameEquals(this IAssemblySymbol? symbol, string name, bool startsWith = true)
-        {
-            if (symbol is null)
-            {
-                return false;
-            }
-
-            if (startsWith)
-            {
-                return symbol.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase);
-            }
-            else
-            {
-                return string.Equals(symbol.Name, name, StringComparison.OrdinalIgnoreCase);
-            }
-        }
-
         public static void RegisterMemberAccess(this AnalysisContext context, Action<InvocationAnalysisContext> action)
         {
             var operationKinds = new[]
