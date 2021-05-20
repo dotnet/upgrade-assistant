@@ -3,8 +3,6 @@
 
 using Microsoft.CodeAnalysis.Testing;
 
-#pragma warning disable CA1002
-
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public interface ICodeFixTest : IAnalyzerTest
