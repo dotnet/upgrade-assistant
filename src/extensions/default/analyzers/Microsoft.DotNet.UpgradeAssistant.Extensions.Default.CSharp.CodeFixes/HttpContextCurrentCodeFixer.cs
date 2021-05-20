@@ -183,8 +183,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
 
                 if (configureMethodBody is not null)
                 {
-                    var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());")
-                        .WithWhitespaceTriviaFrom(configureMethodBody.Statements.First());
+                    var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());");
+
+                    // Update the initialize statement to match spacing with the existing first statement in the method body
+                    if (configureMethodBody.Statements.Any())
+                    {
+                        initializeStatement = initializeStatement.WithWhitespaceTriviaFrom(configureMethodBody.Statements.First());
+                    }
 
                     // Check whether the statement already exists
                     if (!configureMethodBody.Statements.Any(s => initializeStatement.IsEquivalentTo(s)))

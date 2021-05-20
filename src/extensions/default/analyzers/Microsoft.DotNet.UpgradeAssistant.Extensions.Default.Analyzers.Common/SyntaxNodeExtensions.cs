@@ -3,8 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using CS = Microsoft.CodeAnalysis.CSharp;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -151,16 +149,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         /// <param name="requiredParameterTypes">An optional list of parameter types that the method must accept.</param>
         /// <returns>The first method declaration in the syntax node with the given name and parameter types, or null if no such method declaration exists.</returns>
         public static T? GetMethodDeclaration<T>(this SyntaxNode node, string methodName, params string[] requiredParameterTypes)
-            where T : SyntaxNode =>
-            node?.DescendantNodes()
-                .OfType<T>()
-                .FirstOrDefault(m =>
+            where T : SyntaxNode
+        {
+            var methodDeclNodes = node?.DescendantNodes().OfType<T>();
+
+            return methodDeclNodes.FirstOrDefault(m =>
                     (m is CSSyntax.MethodDeclarationSyntax csM &&
                     csM.Identifier.ToString().Equals(methodName, StringComparison.Ordinal) &&
                     requiredParameterTypes.All(req => csM.ParameterList.Parameters.Any(p => string.Equals(p.Type?.ToString(), req, StringComparison.Ordinal))))
                 || (m is VBSyntax.MethodStatementSyntax vbM &&
                     vbM.Identifier.ToString().Equals(methodName, StringComparison.Ordinal) &&
                     requiredParameterTypes.All(req => vbM.ParameterList.Parameters.Any(p => string.Equals(p.AsClause?.Type?.ToString(), req, StringComparison.Ordinal)))));
+        }
 
         /// <summary>
         /// Applies whitespace trivia and new line trivia from another syntax node to this one.
@@ -237,11 +237,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(documentRoot));
             }
 
+            // TODO - remove this helper and use ImportAdder instead.
             var anyUsings = documentRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal));
             var usingDirective = CS.SyntaxFactory.UsingDirective(CS.SyntaxFactory.ParseName(namespaceName).WithLeadingTrivia(CS.SyntaxFactory.Whitespace(" ")));
             var result = anyUsings ? documentRoot : documentRoot.AddUsings(usingDirective);
 
             return result;
         }
+
+        /// <summary>
+        /// Determines whether a node if a NameSyntax (either C# or VB).
+        /// </summary>
+        /// <param name="node">The node to inspect.</param>
+        /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.NameSyntax, false otherwise.</returns>
+        public static bool IsNameSyntax(this SyntaxNode node) => node is CSSyntax.NameSyntax || node is VBSyntax.NameSyntax;
+
+        /// <summary>
+        /// Determines whether a node if a MemberAccessExpressionSyntax (either C# or VB).
+        /// </summary>
+        /// <param name="node">The node to inspect.</param>
+        /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax, false otherwise.</returns>
+        public static bool IsMemberAccessExpressionSyntax(this SyntaxNode node) => node is CSSyntax.MemberAccessExpressionSyntax || node is VBSyntax.MemberAccessExpressionSyntax;
     }
 }

@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
             var replacementType = GetReplacementType(identifier);
 
             // Make sure the name syntax node includes the whole name in case it is qualified
-            var fullyQualifiedNameNode = GetQualifiedName(identifier);
+            var fullyQualifiedNameNode = identifier.GetQualifiedName();
 
             var properties = ImmutableDictionary.Create<string, string?>().Add(NewIdentifierKey, replacementType);
 
@@ -93,25 +93,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers
                 MemberAccessExpressionSyntax => AspNetCoreUrlHelperName, // Member access requires UrlHelper
                 _ => AspNetCoreIUrlHelperName // Default to IUrlHelper
             };
-        }
-
-        private static SyntaxNode GetQualifiedName(SyntaxNode name)
-        {
-            // If the node is part of a qualified name, we want to get the full qualified name
-            while (name.Parent is NameSyntax || name.Parent is NameSyntax)
-            {
-                name = name.Parent;
-            }
-
-            // If the node is part of a member access expression (a static member access, for example), then the
-            // qualified name will be a member access expression rather than a name syntax.
-            if ((name.Parent is MemberAccessExpressionSyntax csMAE && csMAE.Name.ToString().Equals(name.ToString(), StringComparison.Ordinal))
-                || (name.Parent is MemberAccessExpressionSyntax vbMAE && vbMAE.Name.ToString().Equals(name.ToString(), StringComparison.OrdinalIgnoreCase)))
-            {
-                name = name.Parent;
-            }
-
-            return name;
         }
     }
 }

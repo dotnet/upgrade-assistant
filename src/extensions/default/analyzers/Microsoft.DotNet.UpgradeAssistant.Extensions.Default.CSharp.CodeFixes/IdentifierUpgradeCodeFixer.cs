@@ -40,10 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             var node = root.FindNode(context.Span)
                 .DescendantNodesAndSelf(n => true)
                 .FirstOrDefault(n => n.Span.Equals(context.Span)
-                    && (n is CSSyntax.NameSyntax
-                    || n is VBSyntax.NameSyntax
-                    || n is CSSyntax.MemberAccessExpressionSyntax
-                    || n is VBSyntax.MemberAccessExpressionSyntax));
+                    && (n.IsNameSyntax() || n.IsMemberAccessExpressionSyntax()));
 
             if (node is null)
             {
@@ -101,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             // as either a simple name or qualified name based on that.
             var updatedNode = (qualifier is not null && node.HasAccessToNamespace(qualifier))
                 ? generator.IdentifierName(name)
-                : GetUpdatedNode(node, generator, qualifier, name)
+                : GetUpdatedNode(node, generator, newIdentifier)
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
             // Preserve white space and comments
@@ -122,28 +119,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes
             return updatedDocument;
         }
 
-        private static SyntaxNode GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string? qualifier, string name)
+        private static SyntaxNode GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string name)
         {
-            if (qualifier is null)
-            {
-                return generator.IdentifierName(name);
-            }
-
             return node switch
             {
                 // Many usages (constructing a type, casting to a type, etc.) will use a qualified name syntax
                 // to refer to the type.
-                var nameSyntax when
-                    nameSyntax is CSSyntax.NameSyntax
-                    || nameSyntax is VBSyntax.NameSyntax => generator.QualifiedName(QualifiedNameBuilder.BuildQualifiedNameSyntax(generator, qualifier), generator.IdentifierName(name)),
+                var nameSyntax when nameSyntax.IsNameSyntax() => QualifiedNameBuilder.BuildQualifiedNameSyntax(generator, name),
 
                 // Accessing a static member of a type will use a member access expression to refer to the type.
-                var maeSyntax when
-                    maeSyntax is CSSyntax.MemberAccessExpressionSyntax
-                    || maeSyntax is VBSyntax.MemberAccessExpressionSyntax => generator.MemberAccessExpression(QualifiedNameBuilder.BuildMemberAccessExpression(generator, qualifier), generator.IdentifierName(name)),
+                var maeSyntax when maeSyntax.IsMemberAccessExpressionSyntax() => QualifiedNameBuilder.BuildMemberAccessExpression(generator, name),
 
                 // Because the node is retrieved by location, it may sometimes be necessary to check children.
-                _ => GetUpdatedNode(node.ChildNodes().FirstOrDefault(), generator, qualifier, name)
+                _ => GetUpdatedNode(node.ChildNodes().FirstOrDefault(), generator, name)
             };
         }
     }
