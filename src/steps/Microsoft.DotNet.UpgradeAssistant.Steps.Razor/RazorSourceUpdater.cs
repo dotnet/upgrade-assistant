@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _analyzers;
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
+        private readonly ImmutableArray<AdditionalText> _additionalTexts;
         private readonly ITextMatcher _textMatcher;
         private readonly ITextReplacer _textReplacer;
         private readonly ILogger<RazorSourceUpdater> _logger;
@@ -56,10 +57,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="textMatcher">The text matching service to use for correlating old sections of text in Razor documents with updated texts.</param>
         /// <param name="textReplacer">The text replacing service to use for updating replaced texts in the Razor documents.</param>
         /// <param name="logger">An ILogger to log diagnostics.</param>
-        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ITextMatcher textMatcher, ITextReplacer textReplacer, ILogger<RazorSourceUpdater> logger)
+        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, ITextMatcher textMatcher, ITextReplacer textReplacer, ILogger<RazorSourceUpdater> logger)
         {
+            if (additionalTexts is null)
+            {
+                throw new ArgumentNullException(nameof(additionalTexts));
+            }
+
             _analyzers = analyzers?.OrderBy(a => a.SupportedDiagnostics.First().Id) ?? throw new ArgumentNullException(nameof(analyzers));
             _codeFixProviders = codeFixProviders?.OrderBy(c => c.FixableDiagnosticIds.First()) ?? throw new ArgumentNullException(nameof(codeFixProviders));
+            _additionalTexts = ImmutableArray.CreateRange(additionalTexts);
             _textMatcher = textMatcher ?? throw new ArgumentNullException(nameof(textMatcher));
             _textReplacer = textReplacer ?? throw new ArgumentNullException(nameof(textReplacer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -214,7 +221,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             var updatedCompilation = compilation
-                .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(default), ProcessAnalyzerException, true, true));
+                .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
 
             var allDiagnostics = await updatedCompilation.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false);
 
