@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace TestProject.TestClasses
 {
-    public class UA0009
+    public class HelperResultUpgrade
     {
         public HelperResult Method1(HelperResult r)
         {

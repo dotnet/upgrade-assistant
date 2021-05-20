@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TestProject.TestClasses
 {
-    public class UA0003
+    public class ResultUpgrade
     {
         public System.Web.Mvc.ViewResult Index()
         {
