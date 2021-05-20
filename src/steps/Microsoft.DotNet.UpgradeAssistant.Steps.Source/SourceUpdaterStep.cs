@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
         private readonly IEnumerable<CodeFixProvider> _allCodeFixProviders;
+        private readonly ImmutableArray<AdditionalText> _additionalTexts;
 
         internal IProject? Project { get; private set; }
 
@@ -50,9 +51,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
+            if (additionalTexts is null)
+            {
+                throw new ArgumentNullException(nameof(additionalTexts));
+            }
+
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
@@ -60,6 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             _allAnalyzers = analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id);
             _allCodeFixProviders = codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First());
+            _additionalTexts = ImmutableArray.CreateRange(additionalTexts);
 
             // Add sub-steps for each analyzer that will be run
             SubSteps = new List<UpgradeStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
@@ -148,7 +155,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 else
                 {
                     var compilationWithAnalyzer = compilation
-                        .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(GetAdditionalFiles()), ProcessAnalyzerException, true, true));
+                        .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
 
                     // Find all diagnostics that upgrade code fixers can address
                     Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
@@ -183,9 +190,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
         }
-
-        // TODO
-        private static ImmutableArray<AdditionalText> GetAdditionalFiles() => default;
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
         {

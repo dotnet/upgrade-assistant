@@ -26,31 +26,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
-            new ControllerAnalyzer(),
             new BinaryFormatterUnsafeDeserializeAnalyzer(),
-            new FilterAnalyzer(),
-            new HelperResultAnalyzer(),
-            new HtmlStringAnalyzer(),
             new HtmlHelperAnalyzer(),
             new HttpContextCurrentAnalyzer(),
             new HttpContextIsDebuggingEnabledAnalyzer(),
-            new ResultTypeAnalyzer(),
+            new TypeUpgradeAnalyzer(),
             new UsingSystemWebAnalyzer(),
             new UrlHelperAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new AllowHtmlAttributeCodeFixer(),
-            new ControllerCodeFixer(),
             new BinaryFormatterUnsafeDeserializeCodeFixer(),
-            new FilterCodeFixer(),
-            new HelperResultCodeFixer(),
-            new HtmlStringCodeFixer(),
             new HtmlHelperCodeFixer(),
             new HttpContextCurrentCodeFixer(),
             new HttpContextIsDebuggingEnabledCodeFixer(),
-            new ResultTypeCodeFixer(),
             new UsingSystemWebCodeFixer(),
             new UrlHelperCodeFixer());
+
+        private static ImmutableArray<AdditionalText> AdditionalTexts => ImmutableArray.Create<AdditionalText>(
+            new WebTypeReplacements());
 
         public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, params string[] diagnosticIds)
         {
@@ -83,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             var compilationWithAnalyzers = compilation
-                            .WithAnalyzers(ImmutableArray.Create(analyzersToUse.ToArray()));
+                            .WithAnalyzers(ImmutableArray.Create(analyzersToUse.ToArray()), new AnalyzerOptions(AdditionalTexts));
 
             return (await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false))
                 .Where(d => d.Location.IsInSource && documentPath.Equals(Path.GetFileName(d.Location.GetLineSpan().Path), StringComparison.Ordinal))
