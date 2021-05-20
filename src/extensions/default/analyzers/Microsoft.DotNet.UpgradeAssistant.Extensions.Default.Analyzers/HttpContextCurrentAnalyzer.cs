@@ -8,11 +8,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public sealed class HttpContextCurrentAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0005";
@@ -40,7 +41,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressions, SyntaxKind.SimpleMemberAccessExpression);
+            context.RegisterCompilationStartAction(context =>
+            {
+                var isVb = context.Compilation.Language == LanguageNames.VisualBasic;
+
+                // For now, we'll just do operation level analysis for VB
+                if (isVb)
+                {
+                    context.RegisterOperationAction(ctx =>
+                    {
+                        if (ctx.Operation is not IPropertyReferenceOperation propertyReference)
+                        {
+                            return;
+                        }
+
+                        if (NameMatcher.HttpContextCurrent.Matches(propertyReference.Property))
+                        {
+                            var diagnostic = Diagnostic.Create(Rule, ctx.Operation.Syntax.GetLocation());
+
+                            ctx.ReportDiagnostic(diagnostic);
+                        }
+                    }, OperationKind.PropertyReference);
+                }
+                else
+                {
+                    context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressions, SyntaxKind.SimpleMemberAccessExpression);
+                }
+            });
         }
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)

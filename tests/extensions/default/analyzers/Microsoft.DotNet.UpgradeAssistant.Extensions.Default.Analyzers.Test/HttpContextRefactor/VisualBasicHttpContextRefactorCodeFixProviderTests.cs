@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         private const string HttpContextCurrentName = "Property HttpContext.Current As HttpContext";
         private const string DiagnosticId = HttpContextCurrentAnalyzer.DiagnosticId;
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task EmptyCode()
         {
             var test = string.Empty;
@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             await CreateTest().WithSource(test).RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task SimpleUse()
         {
             var test = @"
@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task ReuseArgument()
         {
             var test = @"
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task ReuseProperty()
         {
             var test = @"
@@ -138,7 +138,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task ReuseArgumentNotProperty()
         {
             var test = @"
@@ -186,7 +186,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task ReuseParameterName()
         {
             var test = @"
@@ -224,7 +224,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task InArgument()
         {
             var test = @"
@@ -260,7 +260,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task ReplaceCallerInSameDocument()
         {
             var test = @"
@@ -301,7 +301,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task InProperty()
         {
             var test = @"
@@ -327,7 +327,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task MultipleFiles()
         {
             var test1 = @"
@@ -381,7 +381,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        [Fact(Skip = "Analyzer doesn't support VB currently")]
+        [Fact]
         public async Task MultipleFilesNoSystemWebImport()
         {
             var test1 = @"

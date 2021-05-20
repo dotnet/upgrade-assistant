@@ -1,16 +1,16 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
-    public class Mapping
+    public class NameMatcher
     {
-        public static Mapping HttpContext { get; } = new Mapping("System.Web.HttpContext", "Current");
+        public static NameMatcher HttpContextCurrent { get; } = new NameMatcher("System.Web.HttpContext", "Current");
 
         private readonly string[] _typeName;
         private readonly string? _propertyName;
 
-        public Mapping(string typeName, string? propertyName = null)
+        public NameMatcher(string typeName, string? propertyName = null)
         {
             if (typeName is null)
             {
@@ -38,8 +38,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             return Matches(property.Type);
         }
 
-        public bool Matches(ITypeSymbol typeSymbol)
+        public bool Matches(ITypeSymbol? typeSymbol)
         {
+            if (typeSymbol is null)
+            {
+                return false;
+            }
+
             var symbol = (INamespaceOrTypeSymbol)typeSymbol;
 
             for (int i = _typeName.Length - 1; i >= 0; i--)
