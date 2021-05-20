@@ -246,14 +246,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         }
 
         /// <summary>
-        /// Determines whether a node if a NameSyntax (either C# or VB).
+        /// Determines whether a node is a NameSyntax (either C# or VB).
         /// </summary>
         /// <param name="node">The node to inspect.</param>
         /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.NameSyntax, false otherwise.</returns>
         public static bool IsNameSyntax(this SyntaxNode node) => node is CSSyntax.NameSyntax || node is VBSyntax.NameSyntax;
 
         /// <summary>
-        /// Determines whether a node if a MemberAccessExpressionSyntax (either C# or VB).
+        /// Determines whether a node is a MemberAccessExpressionSyntax (either C# or VB).
         /// </summary>
         /// <param name="node">The node to inspect.</param>
         /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax, false otherwise.</returns>
