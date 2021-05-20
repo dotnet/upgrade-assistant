@@ -1,10 +1,11 @@
 ﻿using System.Web.Http;
+using System.Web.Mvc;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TestProject.TestClasses
 {
-    public partial class ValuesController : Controller
+    public partial class ValuesController : ControllerBase
     {
         // GET api/values
         public IEnumerable<string> GetValues()
@@ -22,7 +23,7 @@ namespace TestProject.TestClasses
         }
     }
 
-    public class MoviesController : Controller
+    public class MoviesController : ControllerBase
     {
         // GET api/values
         public IEnumerable<string> GetValues()
@@ -35,11 +36,35 @@ namespace TestProject.TestClasses
     {
 
     }
+
+    public partial class Controller2
+    {
+        Controller Controller;
+    }
+
+    public partial class Controller2 : Controller
+    {
+        public Controller DoSomething(ControllerBase a)
+        {
+            var x = new List<Controller>();
+            return new Controller2();
+        }
+    }
+
+    public class NotAController : Foo.Controller
+    {
+
+    }
 }
 
 namespace Foo
 {
     public class ApiController
+    {
+
+    }
+
+    public class Controller
     {
 
     }

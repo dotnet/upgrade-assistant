@@ -73,9 +73,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // and other uses, use Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper.
             var replacementType = GetReplacementType(identifier);
 
+            // Make sure the name syntax node includes the whole name in case it is qualified
+            var fullyQualifiedNameNode = identifier.GetQualifiedName();
+
             var properties = ImmutableDictionary.Create<string, string?>().Add(NewIdentifierKey, replacementType);
 
-            var diagnostic = Diagnostic.Create(Rule, identifier.GetLocation(), properties, name, replacementType);
+            var diagnostic = Diagnostic.Create(Rule, fullyQualifiedNameNode.GetLocation(), properties, name, replacementType);
             context.ReportDiagnostic(diagnostic);
         }
 

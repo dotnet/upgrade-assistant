@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 .AddUsingIfMissing("Microsoft.Extensions.DependencyInjection"); // For AddHttpContextAccessor
 
             // Add AddHttpContextAccessor call if needed
-            var configureServicesMethod = documentRoot.GetMethodDeclaration("ConfigureServices", "IServiceCollection");
+            var configureServicesMethod = documentRoot.GetMethodDeclaration<MethodDeclarationSyntax>("ConfigureServices", "IServiceCollection");
             var serviceCollectionParameter = configureServicesMethod?.ParameterList.Parameters
                 .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IServiceCollection", StringComparison.Ordinal));
 
@@ -173,7 +173,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             }
 
             // Add Initialize call in Configure method
-            var configureMethod = documentRoot.GetMethodDeclaration("Configure", "IApplicationBuilder");
+            var configureMethod = documentRoot.GetMethodDeclaration<MethodDeclarationSyntax>("Configure", "IApplicationBuilder");
             var appBuilderParameter = configureMethod?.ParameterList.Parameters
                 .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IApplicationBuilder", StringComparison.Ordinal));
 
@@ -183,8 +183,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                 if (configureMethodBody is not null)
                 {
-                    var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());")
-                        .WithWhitespaceTriviaFrom(configureMethodBody.Statements.First());
+                    var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());");
+
+                    // Update the initialize statement to match spacing with the existing first statement in the method body
+                    if (configureMethodBody.Statements.Any())
+                    {
+                        initializeStatement = initializeStatement.WithWhitespaceTriviaFrom(configureMethodBody.Statements.First());
+                    }
 
                     // Check whether the statement already exists
                     if (!configureMethodBody.Statements.Any(s => initializeStatement.IsEquivalentTo(s)))
