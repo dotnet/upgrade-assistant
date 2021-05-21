@@ -20,15 +20,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task EmptyCode()
         {
-            var test = string.Empty;
+            var testFile = string.Empty;
 
-            await CreateTest().WithSource(test).RunAsync();
+            await CreateTest().WithSource(testFile).RunAsync();
         }
 
         [Fact]
         public async Task SimpleUse()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Sub
         End Class
     End Namespace";
-            var fixtest = @"
+            var fixedFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -51,16 +51,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fixtest)
+                .WithFixed(fixedFile)
                 .RunAsync();
         }
 
         [Fact]
         public async Task ReuseArgument()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Sub
         End Class
     End Namespace";
-            var fixtest = @"
+            var fixedFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -84,16 +84,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fixtest)
+                .WithFixed(fixedFile)
                 .RunAsync();
         }
 
         [Fact]
         public async Task ReuseProperty()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -111,7 +111,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Sub
         End Class
     End Namespace";
-            var fixtest = @"
+            var fixedFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -132,16 +132,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fixtest)
+                .WithFixed(fixedFile)
                 .RunAsync();
         }
 
         [Fact]
         public async Task ReuseArgumentNotProperty()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -159,7 +159,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Sub
         End Class
     End Namespace";
-            var fixtest = @"
+            var fixedFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -180,16 +180,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fixtest)
+                .WithFixed(fixedFile)
                 .RunAsync();
         }
 
         [Fact]
         public async Task ReuseParameterName()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -202,7 +202,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Sub
         End Class
     End Namespace";
-            var fixtest = @"
+            var fixedFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -218,16 +218,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fixtest)
+                .WithFixed(fixedFile)
                 .RunAsync();
         }
 
         [Fact]
         public async Task InArgument()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -239,7 +239,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Function
         End Class
     End Namespace";
-            var fixtest = @"
+            var fixedFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -254,16 +254,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fixtest)
+                .WithFixed(fixedFile)
                 .RunAsync();
         }
 
         [Fact]
         public async Task ReplaceCallerInSameDocument()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -276,7 +276,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Sub
         End Class
     End Namespace";
-            var fixtest = @"
+            var fixedFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -294,9 +294,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var expected2 = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected1)
-                .WithFixed(fixtest)
+                .WithFixed(fixedFile)
                 .WithExpectedDiagnosticsAfter(expected2)
                 .RunAsync();
         }
@@ -304,7 +304,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task InProperty()
         {
-            var test = @"
+            var testFile = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -320,9 +320,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var expected1 = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
             await CreateTest()
-                .WithSource(test)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected1)
-                .WithFixed(test)
+                .WithFixed(testFile)
                 .WithExpectedDiagnosticsAfter(expected1)
                 .RunAsync();
         }
@@ -330,7 +330,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task MultipleFiles()
         {
-            var test1 = @"
+            var testFile1 = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -340,7 +340,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Function
         End Class
     End Namespace";
-            var test2 = @"
+            var testFile = @"
     Imports System.Web
     Namespace ConsoleApplication1
         Class Program2
@@ -350,7 +350,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         End Class
     End Namespace";
 
-            var fix1 = @"
+            var fixedFile1 = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -360,7 +360,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         End Function
         End Class
     End Namespace";
-            var fix2 = @"
+            var fixedFile2 = @"
     Imports System.Web
     Namespace ConsoleApplication1
         Class Program2
@@ -372,11 +372,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
             await CreateTest()
-                .WithSource(test1)
-                .WithSource(test2)
+                .WithSource(testFile1)
+                .WithSource(testFile)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fix1)
-                .WithFixed(fix2)
+                .WithFixed(fixedFile1)
+                .WithFixed(fixedFile2)
                 .WithExpectedDiagnosticsAfter(expected)
                 .RunAsync();
         }
@@ -384,7 +384,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task MultipleFilesNoSystemWebImport()
         {
-            var test1 = @"
+            var testFile1 = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -394,7 +394,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             End Function
         End Class
     End Namespace";
-            var test2 = @"
+            var testFile2 = @"
     Namespace ConsoleApplication1
         Class Program2
             Public Function Test2() As Object
@@ -403,7 +403,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         End Class
     End Namespace";
 
-            var fix1 = @"
+            var fixedFile1 = @"
     Imports System.Web
 
     Namespace ConsoleApplication1
@@ -413,7 +413,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         End Function
         End Class
     End Namespace";
-            var fix2 = @"
+            var fixedFile2 = @"
     Namespace ConsoleApplication1
         Class Program2
             Public Function Test2() As Object
@@ -423,11 +423,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     End Namespace";
             var expected = VerifyVB.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
             await CreateTest()
-                .WithSource(test1)
-                .WithSource(test2)
+                .WithSource(testFile1)
+                .WithSource(testFile2)
                 .WithExpectedDiagnostics(expected)
-                .WithFixed(fix1)
-                .WithFixed(fix2)
+                .WithFixed(fixedFile1)
+                .WithFixed(fixedFile2)
                 .WithExpectedDiagnosticsAfter(expected)
 
                 // We use a generator that ends up not creating the same syntax

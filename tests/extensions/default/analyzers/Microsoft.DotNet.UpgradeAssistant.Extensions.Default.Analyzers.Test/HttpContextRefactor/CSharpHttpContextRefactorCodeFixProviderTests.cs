@@ -21,15 +21,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task EmptyCode()
         {
-            var test = string.Empty;
+            var testFile = string.Empty;
 
-            await VerifyCS.Create().WithSource(test).RunAsync();
+            await VerifyCS.Create().WithSource(testFile).RunAsync();
         }
 
         [Fact]
         public async Task SimpleUse()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -57,13 +57,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
-            await CreateTest().WithSource(test).WithFixed(fixtest).WithExpectedDiagnostics(expected).RunAsync();
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
         [Fact]
         public async Task ExpressionBody()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             public object Test() => {|#0:HttpContext.Current|};
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -85,13 +85,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
-            await CreateTest().WithSource(test).WithFixed(fixtest).WithExpectedDiagnostics(expected).RunAsync();
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
         [Fact]
         public async Task ReuseArgument()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -119,13 +119,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
-            await CreateTest().WithSource(test).WithFixed(fixtest).WithExpectedDiagnostics(expected).RunAsync();
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
         [Fact]
         public async Task ReuseProperty()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -157,13 +157,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
-            await CreateTest().WithSource(test).WithFixed(fixtest).WithExpectedDiagnostics(expected).RunAsync();
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
         [Fact]
         public async Task ReuseArgumentNotProperty()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -178,7 +178,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -195,13 +195,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
-            await CreateTest().WithSource(test).WithFixed(fixtest).WithExpectedDiagnostics(expected).RunAsync();
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
         [Fact]
         public async Task InArgument()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApp1
@@ -214,7 +214,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             public static void Test2() => Test({|#0:HttpContext.Current|});
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApp1
@@ -229,13 +229,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
-            await CreateTest().WithSource(test).WithFixed(fixtest).WithExpectedDiagnostics(expected).RunAsync();
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
         [Fact]
         public async Task ReuseParameterName()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApp1
@@ -249,7 +249,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             public static void Test2(HttpContext currentContext) => Test();
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApp1
@@ -265,13 +265,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
-            await CreateTest().WithSource(test).WithFixed(fixtest).WithExpectedDiagnostics(expected).RunAsync();
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
         [Fact]
         public async Task ReplaceCallerInSameDocument()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -289,7 +289,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
         }
     }";
-            var fixtest = @"
+            var fixedFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -311,7 +311,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             var expected1 = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
             var expected2 = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
-            await CreateTest().WithSource(test).WithFixed(fixtest)
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile)
                 .WithExpectedDiagnostics(expected1)
                 .WithExpectedDiagnosticsAfter(expected2)
                 .RunAsync();
@@ -320,7 +320,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task InProperty()
         {
-            var test = @"
+            var testFile = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -333,7 +333,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected1 = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
-            await CreateTest().WithSource(test).WithFixed(test)
+            await CreateTest().WithSource(testFile).WithFixed(testFile)
                 .WithExpectedDiagnostics(expected1)
                 .WithExpectedDiagnosticsAfter(expected1)
                 .RunAsync();
@@ -342,7 +342,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task MultipleFiles()
         {
-            var test1 = @"
+            var testFile1 = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -352,7 +352,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             public static object Instance() => {|#0:HttpContext.Current|};
         }
     }";
-            var test2 = @"
+            var testFile2 = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -363,7 +363,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         }
     }";
 
-            var fix1 = @"
+            var fixedFile1 = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -373,7 +373,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             public static object Instance(HttpContext currentContext) => currentContext;
         }
     }";
-            var fix2 = @"
+            var fixedFile2 = @"
     using System.Web;
 
     namespace ConsoleApplication1
@@ -386,17 +386,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
-            var test = new VerifyCS.Test
-            {
-                ReferenceAssemblies = ReferenceAssemblies.NetFramework.Net45.Default.AddAssemblies(ImmutableArray.Create("System.Web")),
-                CodeFixTestBehaviors = CodeFixTestBehaviors.FixOne,
-            };
-
             await CreateTest()
-                .WithSource(test1)
-                .WithSource(test2)
-                .WithFixed(fix1)
-                .WithFixed(fix2)
+                .WithSource(testFile1)
+                .WithSource(testFile2)
+                .WithFixed(fixedFile1)
+                .WithFixed(fixedFile2)
                 .WithExpectedDiagnostics(expected)
                 .WithExpectedDiagnosticsAfter(expected)
                 .RunAsync();
