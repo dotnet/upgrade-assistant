@@ -5,10 +5,13 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Operations;
+
+using CS = Microsoft.CodeAnalysis.CSharp;
+using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
+
+using VB = Microsoft.CodeAnalysis.VisualBasic;
+using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
@@ -43,36 +46,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             context.RegisterCompilationStartAction(context =>
             {
-                var isVb = context.Compilation.Language == LanguageNames.VisualBasic;
-
-                // For now, we'll just do operation level analysis for VB
-                if (isVb)
+                if (context.Compilation.Language == LanguageNames.CSharp)
                 {
-                    context.RegisterOperationAction(ctx =>
-                    {
-                        if (ctx.Operation is not IPropertyReferenceOperation propertyReference)
-                        {
-                            return;
-                        }
-
-                        if (NameMatcher.HttpContextCurrent.Matches(propertyReference.Property))
-                        {
-                            var diagnostic = Diagnostic.Create(Rule, ctx.Operation.Syntax.GetLocation());
-
-                            ctx.ReportDiagnostic(diagnostic);
-                        }
-                    }, OperationKind.PropertyReference);
+                    context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressionsCsharp, CS.SyntaxKind.SimpleMemberAccessExpression);
                 }
-                else
+                else if (context.Compilation.Language == LanguageNames.VisualBasic)
                 {
-                    context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressions, SyntaxKind.SimpleMemberAccessExpression);
+                    context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressionsVb, VB.SyntaxKind.SimpleMemberAccessExpression);
                 }
             });
         }
 
-        private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
+        private void AnalyzeMemberAccessExpressionsCsharp(SyntaxNodeAnalysisContext context)
         {
-            var memberAccessExpression = (MemberAccessExpressionSyntax)context.Node;
+            var memberAccessExpression = (CSSyntax.MemberAccessExpressionSyntax)context.Node;
 
             // If the accessed member isn't named "Current" bail out
             if (!TargetMember.Equals(memberAccessExpression.Name.ToString(), StringComparison.Ordinal))
@@ -82,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             // If the call is to a method called Current then bail out since they're
             // not using the HttpContext.Current property
-            if (memberAccessExpression.Parent is InvocationExpressionSyntax)
+            if (memberAccessExpression.Parent is CSSyntax.InvocationExpressionSyntax)
             {
                 return;
             }
@@ -90,17 +77,67 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // Get the identifier accessed
             var accessedIdentifier = memberAccessExpression.Expression switch
             {
-                IdentifierNameSyntax i => i,
-                MemberAccessExpressionSyntax m => m.DescendantNodes().OfType<IdentifierNameSyntax>().LastOrDefault(),
+                CSSyntax.IdentifierNameSyntax i => i,
+                CSSyntax.MemberAccessExpressionSyntax m => m.DescendantNodes().OfType<CSSyntax.IdentifierNameSyntax>().LastOrDefault(),
                 _ => null
             };
 
-            // Return if the accessed identifier wasn't from a simple member access expression or identifier, or if it doesn't match HttpContext
-            if (accessedIdentifier is null || !TargetTypeSimpleName.Equals(accessedIdentifier.Identifier.ValueText, StringComparison.Ordinal))
+            AnalyzeMemberAccessExpressions(context, memberAccessExpression, accessedIdentifier, accessedIdentifier?.Identifier.ValueText);
+        }
+
+        private void AnalyzeMemberAccessExpressionsVb(SyntaxNodeAnalysisContext context)
+        {
+            var memberAccessExpression = (VBSyntax.MemberAccessExpressionSyntax)context.Node;
+
+            // If the accessed member isn't named "Current" bail out
+            if (!TargetMember.Equals(memberAccessExpression.Name.ToString(), StringComparison.Ordinal))
             {
                 return;
             }
 
+            // If the call is to a method called Current then bail out since they're
+            // not using the HttpContext.Current property
+            if (memberAccessExpression.Parent is VBSyntax.InvocationExpressionSyntax)
+            {
+                return;
+            }
+
+            // Get the identifier accessed
+            var accessedIdentifier = memberAccessExpression.Expression switch
+            {
+                VBSyntax.IdentifierNameSyntax i => i,
+                VBSyntax.MemberAccessExpressionSyntax m => m.DescendantNodes().OfType<VBSyntax.IdentifierNameSyntax>().LastOrDefault(),
+                _ => null
+            };
+
+            AnalyzeMemberAccessExpressions(context, memberAccessExpression, accessedIdentifier, accessedIdentifier?.Identifier.ValueText);
+        }
+
+        private static void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context, SyntaxNode memberAccessExpression, SyntaxNode? accessedIdentifier, string? identifierValue)
+        {
+            // Return if the accessed identifier wasn't from a simple member access expression or identifier, or if it doesn't match HttpContext
+            if (accessedIdentifier is null || !TargetTypeSimpleName.Equals(identifierValue, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            if (!TryMatchSymbol(context, accessedIdentifier))
+            {
+                return;
+            }
+
+            var diagnostic = Diagnostic.Create(Rule, memberAccessExpression.GetLocation());
+            context.ReportDiagnostic(diagnostic);
+        }
+
+        /// <summary>
+        /// Attempts to match against a symbol if there. If a symbol is resolved, it must match exactly. Otherwise, we just match on name.
+        /// </summary>
+        /// <param name="context">The analysis context.</param>
+        /// <param name="accessedIdentifier">The accessedIdentifier that was found</param>
+        /// <returns>Whether a symbol was found and was matched.</returns>
+        private static bool TryMatchSymbol(SyntaxNodeAnalysisContext context, SyntaxNode accessedIdentifier)
+        {
             // If the accessed identifier resolves to a type symbol other than System.Web.HttpContext, then bail out
             // since it means the user is calling some other similarly named API.
             var accessedSymbol = context.SemanticModel.GetSymbolInfo(accessedIdentifier).Symbol;
@@ -108,18 +145,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 if (!symbol.ToDisplayString(NullableFlowState.NotNull).Equals(TargetTypeSymbolName, StringComparison.Ordinal))
                 {
-                    return;
+                    return false;
                 }
             }
             else if (accessedSymbol != null)
             {
                 // If the accessed identifier resolves to a symbol other than a type symbol, bail out
                 // since it's not a reference to System.Web.HttpContext
-                return;
+                return false;
             }
 
-            var diagnostic = Diagnostic.Create(Rule, memberAccessExpression.GetLocation());
-            context.ReportDiagnostic(diagnostic);
+            return true;
         }
     }
 }

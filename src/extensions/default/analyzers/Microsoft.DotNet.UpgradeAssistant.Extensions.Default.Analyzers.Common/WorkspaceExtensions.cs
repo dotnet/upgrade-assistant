@@ -8,6 +8,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static class WorkspaceExtensions
     {
+        /// <summary>
+        /// Tries to find a document given the <see cref="SyntaxTree"/> provided.
+        /// </summary>
+        /// <param name="sln">The solution to search in.</param>
+        /// <param name="tree">The tree to match.</param>
+        /// <param name="document">The resulting document.</param>
+        /// <returns>Whether the search was successful or not.</returns>
         public static bool TryGetDocument(this Solution sln, SyntaxTree? tree, [MaybeNullWhen(false)] out Document document)
         {
             if (tree is null || sln is null)
