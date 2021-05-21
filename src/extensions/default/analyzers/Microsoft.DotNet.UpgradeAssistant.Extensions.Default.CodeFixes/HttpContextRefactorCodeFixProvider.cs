@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +17,9 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 {
-    public abstract class HttpContextRefactorCodeFixProvider<TInvocationNode, TArgument> : CodeFixProvider
-        where TInvocationNode : SyntaxNode
-        where TArgument : SyntaxNode
+    [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic, Name = nameof(HttpContextRefactorCodeFixProvider))]
+    [Shared]
+    public class HttpContextRefactorCodeFixProvider : CodeFixProvider
     {
         private const string DefaultArgumentName = "currentContext";
 
@@ -29,10 +33,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
             return WellKnownFixAllProviders.BatchFixer;
         }
-
-        private protected abstract TInvocationNode AddArgumentToInvocation(TInvocationNode invocationNode, TArgument argument);
-
-        private protected abstract bool IsEnclosedMethodOperation(IOperation operation);
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            var methodOperation = GetEnclosingMethodOperation(property);
+            var methodOperation = property.GetEnclosingMethodOperation();
 
             if (methodOperation is null)
             {
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 diagnostic);
         }
 
-        private async Task<Solution> InjectHttpContext(Document document, SemanticModel model, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken cancellationToken)
+        private static async Task<Solution> InjectHttpContext(Document document, SemanticModel model, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken cancellationToken)
         {
             var slnEditor = new SolutionEditor(document.Project.Solution);
 
@@ -100,10 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             return slnEditor.GetChangedSolution();
         }
 
-        private IOperation? GetEnclosingMethodOperation(IOperation? operation)
-            => operation.GetParentOperation(IsEnclosedMethodOperation);
-
-        private SyntaxNode? GetOrAddMethodParameter(SemanticModel semanticModel, DocumentEditor editor, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken token)
+        private static SyntaxNode? GetOrAddMethodParameter(SemanticModel semanticModel, DocumentEditor editor, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken token)
         {
             // Search to see if an existing expression can be used (ie an existing parameter or property that matches the type)
             var expression = GetExistingExpression(semanticModel, propertyOperation.Property, editor, propertyOperation.Syntax, token);
@@ -122,7 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             return editor.Generator.IdentifierName(DefaultArgumentName);
         }
 
-        private async Task UpdateCallersAsync(SemanticModel semanticModel, ISymbol methodSymbol, IPropertySymbol property, SolutionEditor slnEditor, CancellationToken token)
+        private static async Task UpdateCallersAsync(SemanticModel semanticModel, ISymbol methodSymbol, IPropertySymbol property, SolutionEditor slnEditor, CancellationToken token)
         {
             // Check callers
             var callers = await SymbolFinder.FindCallersAsync(methodSymbol, slnEditor.OriginalSolution, token).ConfigureAwait(false);
@@ -156,13 +153,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                     continue;
                 }
 
-                var invocationNode = GetInvocationExpression(callerNode);
+                var invocationNode = callerNode.GetInvocationExpression();
 
                 if (invocationNode is not null)
                 {
                     var expression = GetExistingExpression(semanticModel, property, editor, invocationNode, token) ?? CreateDefaultParameter();
                     var argument = editor.Generator.Argument(expression);
-                    var newInvocation = AddArgumentToInvocation(invocationNode, (TArgument)argument);
+                    var newInvocation = invocationNode.AddArgumentToInvocation(argument);
 
                     editor.ReplaceNode(invocationNode, newInvocation);
 
@@ -175,10 +172,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             }
         }
 
-        private string? GetPropertyName(SemanticModel semanticModel, ITypeSymbol type, SyntaxNode node, CancellationToken token)
+        private static string? GetPropertyName(SemanticModel semanticModel, ITypeSymbol type, SyntaxNode node, CancellationToken token)
         {
             var operation = semanticModel.GetOperation(node, token);
-            var methodOperation = GetEnclosingMethodOperation(operation);
+            var methodOperation = operation.GetEnclosingMethodOperation();
 
             if (methodOperation is null)
             {
@@ -240,10 +237,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             }
         }
 
-        private string? GetEnclosingMethodParameterName(SemanticModel semanticModel, ITypeSymbol type, SyntaxNode node, CancellationToken token)
+        private static string? GetEnclosingMethodParameterName(SemanticModel semanticModel, ITypeSymbol type, SyntaxNode node, CancellationToken token)
         {
             var operation = semanticModel.GetOperation(node, token);
-            var methodOperation = GetEnclosingMethodOperation(operation);
+            var methodOperation = operation.GetEnclosingMethodOperation();
 
             if (methodOperation is null)
             {
@@ -255,7 +252,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             return parameter?.Name;
         }
 
-        private SyntaxNode? GetExistingExpression(SemanticModel model, IPropertySymbol property, SyntaxEditor editor, SyntaxNode invocation, CancellationToken token)
+        private static SyntaxNode? GetExistingExpression(SemanticModel model, IPropertySymbol property, SyntaxEditor editor, SyntaxNode invocation, CancellationToken token)
         {
             return GetParameterFromMethod() ?? GetParameterFromProperty();
 
@@ -283,8 +280,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return null;
             }
         }
-
-        private static TInvocationNode? GetInvocationExpression(SyntaxNode callerNode)
-            => callerNode.FirstAncestorOrSelf<TInvocationNode>();
     }
 }

@@ -7,7 +7,7 @@ using Xunit;
 
 using VerifyVB = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.VisualBasicCodeFixVerifier<
      Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.HttpContextCurrentAnalyzer,
-     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.VisualBasicHttpContextRefactorCodeFixProvider>;
+     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.HttpContextRefactorCodeFixProvider>;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {

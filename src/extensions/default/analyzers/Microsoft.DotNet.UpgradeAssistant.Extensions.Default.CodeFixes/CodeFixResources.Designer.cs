@@ -160,6 +160,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown language.
+        /// </summary>
+        internal static string UnknownLanguage {
+            get {
+                return ResourceManager.GetString("UnknownLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace with ASP.NET Core URL helper type.
         /// </summary>
         internal static string UrlHelperTitle {

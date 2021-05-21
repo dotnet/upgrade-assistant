@@ -8,7 +8,7 @@ using Xunit;
 
 using VerifyCS = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.CSharpCodeFixVerifier<
      Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.HttpContextCurrentAnalyzer,
-     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.CSharpHttpContextRefactorCodeFixProvider>;
+     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.HttpContextRefactorCodeFixProvider>;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
