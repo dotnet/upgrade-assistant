@@ -82,7 +82,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var editor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
 
             // Add parameter if not available
-            var parameter = GetOrAddMethodParameter(model, editor, document, methodOperation, propertyOperation, cancellationToken);
+            var parameter = GetOrAddMethodParameter(model, editor, methodOperation, propertyOperation, cancellationToken);
 
             if (parameter is null)
             {
@@ -103,8 +103,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         private IOperation? GetEnclosingMethodOperation(IOperation? operation)
             => operation.GetParentOperation(IsEnclosedMethodOperation);
 
-        private SyntaxNode? GetOrAddMethodParameter(SemanticModel semanticModel, DocumentEditor editor, Document document, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken token)
+        private SyntaxNode? GetOrAddMethodParameter(SemanticModel semanticModel, DocumentEditor editor, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken token)
         {
+            // Search to see if an existing expression can be used (ie an existing parameter or property that matches the type)
             var expression = GetExistingExpression(semanticModel, propertyOperation.Property, editor, propertyOperation.Syntax, token);
 
             if (expression is not null)

@@ -5,12 +5,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public class NameMatcher
     {
-        public static NameMatcher HttpContextCurrent { get; } = new NameMatcher("System.Web.HttpContext", "Current");
+        public static NameMatcher HttpContextCurrent { get; } = NameMatcher.MatchPropertyAccess("System.Web.HttpContext", "Current");
 
         private readonly string[] _typeName;
-        private readonly string? _propertyName;
+        private readonly string? _memberName;
 
-        public NameMatcher(string typeName, string? propertyName = null)
+        private NameMatcher(string typeName, string? memberName = null)
         {
             if (typeName is null)
             {
@@ -18,8 +18,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             }
 
             _typeName = typeName.Split('.');
-            _propertyName = propertyName;
+            _memberName = memberName;
         }
+
+        public static NameMatcher MatchPropertyAccess(string typeName, string memberName) => new(typeName, memberName);
 
         public string TypeName => _typeName[_typeName.Length - 1];
 
@@ -30,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 return false;
             }
 
-            if (!property.Name.Equals(_propertyName, StringComparison.Ordinal))
+            if (!property.Name.Equals(_memberName, StringComparison.Ordinal))
             {
                 return false;
             }
@@ -40,14 +42,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
         public bool Matches(ITypeSymbol? typeSymbol)
         {
-            if (typeSymbol is null)
-            {
-                return false;
-            }
+            // Cast here because its parent will be a namespace or type, and we want to only take in a type and not namespace
+            var symbol = (INamespaceOrTypeSymbol?)typeSymbol;
 
-            var symbol = (INamespaceOrTypeSymbol)typeSymbol;
-
-            for (int i = _typeName.Length - 1; i >= 0; i--)
+            for (var i = _typeName.Length - 1; i >= 0; i--)
             {
                 if (symbol is null)
                 {
