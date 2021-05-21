@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -29,6 +30,39 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 LanguageNames.VisualBasic => StringComparer.OrdinalIgnoreCase,
                 _ => throw new NotImplementedException(Resources.UnknownLanguage),
             };
+
+        public static IEnumerable<ISymbol> GetAllMembers(this INamedTypeSymbol? symbol, bool includeInstance)
+        {
+            var allowPrivate = true;
+
+            while (symbol is not null)
+            {
+                foreach (var member in symbol.GetMembers())
+                {
+                    if (member.IsImplicitlyDeclared)
+                    {
+                        continue;
+                    }
+
+                    if (!includeInstance && !member.IsStatic)
+                    {
+                        continue;
+                    }
+
+                    if (!allowPrivate && member.DeclaredAccessibility == Accessibility.Private)
+                    {
+                        continue;
+                    }
+
+                    yield return member;
+                }
+
+                // After the first level, we cannot see private
+                allowPrivate = false;
+
+                symbol = symbol.BaseType;
+            }
+        }
 
         public static bool NameEquals(this IAssemblySymbol? symbol, string name, bool startsWith = true)
         {

@@ -67,66 +67,104 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
+            var injector = new HttpContextMethodInjector(context.Document, semantic, methodOperation, property);
+
             //// Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: CodeFixResources.HttpContextRefactorTitle,
-                    createChangedSolution: c => InjectHttpContext(context.Document, semantic, methodOperation, property, c),
+                    createChangedSolution: c => injector.InjectHttpContext(c),
                     equivalenceKey: nameof(CodeFixResources.HttpContextRefactorTitle)),
                 diagnostic);
         }
 
-        private static async Task<Solution> InjectHttpContext(Document document, SemanticModel model, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken cancellationToken)
+        private record HttpContextMethodInjector
         {
-            var slnEditor = new SolutionEditor(document.Project.Solution);
+            private Document Document { get; init; }
 
-            var editor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
+            private SemanticModel Model { get; init; }
 
-            // Add parameter if not available
-            var parameter = GetOrAddMethodParameter(model, editor, methodOperation, propertyOperation, cancellationToken);
+            private IOperation EnclosingMethodOperation { get; init; }
 
-            if (parameter is null)
+            private IPropertyReferenceOperation PropertyOperation { get; init; }
+
+            public HttpContextMethodInjector(
+                Document document,
+                SemanticModel model,
+                IOperation methodOPeration,
+                IPropertyReferenceOperation propertyOperation)
             {
-                return document.Project.Solution;
+                Document = document;
+                Model = model;
+                EnclosingMethodOperation = methodOPeration;
+                PropertyOperation = propertyOperation;
             }
 
-            // Update node usage
-            editor.ReplaceNode(propertyOperation.Syntax, parameter);
+            private IMethodSymbol? methodSymbol;
 
-            if (methodOperation.SemanticModel?.GetDeclaredSymbol(methodOperation.Syntax, cancellationToken) is ISymbol methodSymbol)
+            private IMethodSymbol? GetEnclosingMethodSymbol(CancellationToken token)
             {
-                await UpdateCallersAsync(methodOperation.SemanticModel, methodSymbol, propertyOperation.Property, slnEditor, cancellationToken).ConfigureAwait(false);
+                if (methodSymbol is null)
+                {
+                    methodSymbol = Model.GetDeclaredSymbol(EnclosingMethodOperation.Syntax, token) as IMethodSymbol;
+                }
+
+                return methodSymbol;
             }
 
-            return slnEditor.GetChangedSolution();
-        }
-
-        private static SyntaxNode? GetOrAddMethodParameter(SemanticModel semanticModel, DocumentEditor editor, IOperation methodOperation, IPropertyReferenceOperation propertyOperation, CancellationToken token)
-        {
-            // Search to see if an existing expression can be used (ie an existing parameter or property that matches the type)
-            var expression = GetExistingExpression(semanticModel, propertyOperation.Property, editor, propertyOperation.Syntax, token);
-
-            if (expression is not null)
+            public async Task<Solution> InjectHttpContext(CancellationToken token)
             {
-                return expression;
+                var slnEditor = new SolutionEditor(Document.Project.Solution);
+                var editor = await slnEditor.GetDocumentEditorAsync(Document.Id, token).ConfigureAwait(false);
+
+                // Add parameter if not available
+                var parameter = GetOrAddMethodParameter(editor, token);
+                if (parameter is null)
+                {
+                    return Document.Project.Solution;
+                }
+
+                // Update node usage
+                editor.ReplaceNode(PropertyOperation.Syntax, parameter);
+                await UpdateCallersAsync(GetEnclosingMethodSymbol(token), slnEditor, token).ConfigureAwait(false);
+
+                return slnEditor.GetChangedSolution();
             }
 
-            var propertyTypeSyntaxNode = editor.Generator.NameExpression(propertyOperation.Property.Type);
-            var name = GetArgumentName();
-
-            var p = editor.Generator.ParameterDeclaration(name, propertyTypeSyntaxNode);
-
-            editor.AddParameter(methodOperation.Syntax, p);
-
-            return editor.Generator.IdentifierName(name);
-
-            string GetArgumentName()
+            private SyntaxNode? GetOrAddMethodParameter(DocumentEditor editor, CancellationToken token)
             {
-                var symbol = semanticModel.GetDeclaredSymbol(methodOperation.Syntax, cancellationToken: token);
+                // Search to see if an existing expression can be used (ie an existing parameter or property that matches the type)
+                var expression = GetExistingExpression(editor.Generator, PropertyOperation.Syntax, token);
+
+                if (expression is not null)
+                {
+                    return expression;
+                }
+
+                var propertyTypeSyntaxNode = editor.Generator.NameExpression(PropertyOperation.Property.Type);
+                var name = GetArgumentName(token);
+
+                var p = editor.Generator.ParameterDeclaration(name, propertyTypeSyntaxNode);
+
+                editor.AddParameter(EnclosingMethodOperation.Syntax, p);
+
+                return editor.Generator.IdentifierName(name);
+            }
+
+            private string? _argumentName;
+
+            private string GetArgumentName(CancellationToken token)
+            {
+                if (_argumentName is not null)
+                {
+                    return _argumentName;
+                }
+
+                var symbol = GetEnclosingMethodSymbol(token);
 
                 if (symbol is not IMethodSymbol method)
                 {
-                    return DefaultArgumentName;
+                    return _argumentName = DefaultArgumentName;
                 }
 
                 var set = new HashSet<string>(symbol.GetStringComparer());
@@ -143,171 +181,131 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                     if (!set.Contains(name))
                     {
-                        return name;
+                        return _argumentName = name;
                     }
                 }
             }
-        }
 
-        private static async Task UpdateCallersAsync(SemanticModel semanticModel, ISymbol methodSymbol, IPropertySymbol property, SolutionEditor slnEditor, CancellationToken token)
-        {
-            // Check callers
-            var callers = await SymbolFinder.FindCallersAsync(methodSymbol, slnEditor.OriginalSolution, token).ConfigureAwait(false);
-
-            foreach (var caller in callers)
+            private async Task UpdateCallersAsync(ISymbol? methodSymbol, SolutionEditor slnEditor, CancellationToken token)
             {
-                var location = caller.Locations.FirstOrDefault();
-
-                if (location is null)
+                if (methodSymbol is null)
                 {
-                    continue;
+                    return;
                 }
 
-                if (!slnEditor.OriginalSolution.TryGetDocument(location.SourceTree, out var document))
+                // Check callers
+                var callers = await SymbolFinder.FindCallersAsync(methodSymbol, slnEditor.OriginalSolution, token).ConfigureAwait(false);
+
+                foreach (var caller in callers)
                 {
-                    continue;
-                }
+                    var location = caller.Locations.FirstOrDefault();
 
-                var editor = await slnEditor.GetDocumentEditorAsync(document.Id, token).ConfigureAwait(false);
-                var root = await document.GetSyntaxRootAsync(token).ConfigureAwait(false);
-
-                if (root is null)
-                {
-                    continue;
-                }
-
-                var callerNode = root.FindNode(location.SourceSpan, getInnermostNodeForTie: true);
-
-                if (callerNode is null)
-                {
-                    continue;
-                }
-
-                var invocationNode = callerNode.GetInvocationExpression();
-
-                if (invocationNode is not null)
-                {
-                    var expression = GetExistingExpression(semanticModel, property, editor, invocationNode, token) ?? CreateDefaultParameter();
-                    var argument = editor.Generator.Argument(expression);
-                    var newInvocation = invocationNode.AddArgumentToInvocation(argument);
-
-                    editor.ReplaceNode(invocationNode, newInvocation);
-
-                    SyntaxNode CreateDefaultParameter()
-                    {
-                        var httpContextType = editor.Generator.NameExpression(property.Type);
-                        return editor.Generator.MemberAccessExpression(httpContextType, "Current");
-                    }
-                }
-            }
-        }
-
-        private static string? GetPropertyName(SemanticModel semanticModel, ITypeSymbol type, SyntaxNode node, CancellationToken token)
-        {
-            var operation = semanticModel.GetOperation(node, token);
-            var methodOperation = operation.GetEnclosingMethodOperation();
-
-            if (methodOperation is null)
-            {
-                return null;
-            }
-
-            var symbol = semanticModel.GetDeclaredSymbol(methodOperation.Syntax, cancellationToken: token);
-
-            if (symbol?.ContainingType is not INamedTypeSymbol typeSymbol)
-            {
-                return null;
-            }
-
-            foreach (var member in GetAllMembers(typeSymbol, !symbol.IsStatic))
-            {
-                if (member is IPropertySymbol property && SymbolEqualityComparer.Default.Equals(property.Type, type))
-                {
-                    return property.Name;
-                }
-                else if (member is IFieldSymbol field && SymbolEqualityComparer.Default.Equals(field.Type, type))
-                {
-                    return field.Name;
-                }
-            }
-
-            return null;
-        }
-
-        private static IEnumerable<ISymbol> GetAllMembers(INamedTypeSymbol? symbol, bool includeInstance)
-        {
-            var allowPrivate = true;
-
-            while (symbol is not null)
-            {
-                foreach (var member in symbol.GetMembers())
-                {
-                    if (member.IsImplicitlyDeclared)
+                    if (location is null)
                     {
                         continue;
                     }
 
-                    if (!includeInstance && !member.IsStatic)
+                    if (!slnEditor.OriginalSolution.TryGetDocument(location.SourceTree, out var document))
                     {
                         continue;
                     }
 
-                    if (!allowPrivate && member.DeclaredAccessibility == Accessibility.Private)
+                    var root = await document.GetSyntaxRootAsync(token).ConfigureAwait(false);
+
+                    if (root is null)
                     {
                         continue;
                     }
 
-                    yield return member;
+                    var callerNode = root.FindNode(location.SourceSpan, getInnermostNodeForTie: true);
+
+                    if (callerNode is null)
+                    {
+                        continue;
+                    }
+
+                    var invocationNode = callerNode.GetInvocationExpression();
+
+                    if (invocationNode is not null)
+                    {
+                        var editor = await slnEditor.GetDocumentEditorAsync(document.Id, token).ConfigureAwait(false);
+                        var expression = GetExistingExpression(editor.Generator, invocationNode, token) ?? CreateDefaultParameter();
+                        var argument = editor.Generator.Argument(expression);
+                        var newInvocation = invocationNode.AddArgumentToInvocation(argument);
+
+                        editor.ReplaceNode(invocationNode, newInvocation);
+
+                        SyntaxNode CreateDefaultParameter()
+                        {
+                            var httpContextType = editor.Generator.NameExpression(PropertyOperation.Property.Type);
+                            return editor.Generator.MemberAccessExpression(httpContextType, "Current");
+                        }
+                    }
                 }
-
-                // After the first level, we cannot see private
-                allowPrivate = false;
-
-                symbol = symbol.BaseType;
-            }
-        }
-
-        private static string? GetEnclosingMethodParameterName(SemanticModel semanticModel, ITypeSymbol type, SyntaxNode node, CancellationToken token)
-        {
-            var operation = semanticModel.GetOperation(node, token);
-            var methodOperation = operation.GetEnclosingMethodOperation();
-
-            if (methodOperation is null)
-            {
-                return null;
             }
 
-            var parameter = methodOperation.Syntax.GetExistingParameterSymbol(semanticModel, type, token);
-
-            return parameter?.Name;
-        }
-
-        private static SyntaxNode? GetExistingExpression(SemanticModel model, IPropertySymbol property, SyntaxEditor editor, SyntaxNode invocation, CancellationToken token)
-        {
-            return GetParameterFromMethod() ?? GetParameterFromProperty();
-
-            SyntaxNode? GetParameterFromMethod()
+            private string? GetEnclosingMethodParameterName(SyntaxNode node, CancellationToken token)
             {
-                var name = GetEnclosingMethodParameterName(model, property.Type, invocation, token);
+                var operation = Model.GetOperation(node, token);
+                var methodOperation = operation.GetEnclosingMethodOperation();
 
-                if (name is not null)
+                if (methodOperation is null)
                 {
-                    return editor.Generator.IdentifierName(name);
+                    return null;
                 }
 
-                return null;
+                var parameter = methodOperation.Syntax.GetExistingParameterSymbol(Model, PropertyOperation.Property.Type, token);
+
+                return parameter?.Name;
             }
 
-            SyntaxNode? GetParameterFromProperty()
+            private SyntaxNode? GetExistingExpression(SyntaxGenerator generator, SyntaxNode invocation, CancellationToken token)
             {
-                var name = GetPropertyName(model, property.Type, invocation, token);
+                return GetParameterFromMethod() ?? GetParameterFromProperty();
 
-                if (name is not null)
+                SyntaxNode? GetParameterFromMethod()
                 {
-                    return editor.Generator.IdentifierName(name);
+                    var name = GetEnclosingMethodParameterName(invocation, token);
+
+                    if (name is not null)
+                    {
+                        return generator.IdentifierName(name);
+                    }
+
+                    return null;
                 }
 
-                return null;
+                SyntaxNode? GetParameterFromProperty()
+                {
+                    var operation = Model.GetOperation(invocation, token);
+                    var methodOperation = operation.GetEnclosingMethodOperation();
+
+                    if (methodOperation is null)
+                    {
+                        return null;
+                    }
+
+                    var symbol = Model.GetDeclaredSymbol(methodOperation.Syntax, cancellationToken: token);
+
+                    if (symbol?.ContainingType is not INamedTypeSymbol typeSymbol)
+                    {
+                        return null;
+                    }
+
+                    foreach (var member in typeSymbol.GetAllMembers(!symbol.IsStatic))
+                    {
+                        if (member is IPropertySymbol property && SymbolEqualityComparer.Default.Equals(property.Type, PropertyOperation.Property.Type))
+                        {
+                            return generator.IdentifierName(property.Name);
+                        }
+                        else if (member is IFieldSymbol field && SymbolEqualityComparer.Default.Equals(field.Type, PropertyOperation.Property.Type))
+                        {
+                            return generator.IdentifierName(field.Name);
+                        }
+                    }
+
+                    return null;
+                }
             }
         }
     }
