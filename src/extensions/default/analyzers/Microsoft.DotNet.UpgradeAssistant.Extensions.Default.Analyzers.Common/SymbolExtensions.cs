@@ -5,11 +5,31 @@ using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static class SymbolExtensions
     {
+        public static bool NameEquals(this ISymbol? symbol, string name)
+            => string.Equals(symbol?.Name, name, symbol.GetStringComparison());
+
+        public static StringComparison GetStringComparison(this ISymbol? symbol)
+            => symbol?.Language switch
+            {
+                LanguageNames.CSharp => StringComparison.Ordinal,
+                LanguageNames.VisualBasic => StringComparison.OrdinalIgnoreCase,
+                _ => throw new NotImplementedException(Resources.UnknownLanguage),
+            };
+
+        public static StringComparer GetStringComparer(this ISymbol? symbol)
+            => symbol?.Language switch
+            {
+                LanguageNames.CSharp => StringComparer.Ordinal,
+                LanguageNames.VisualBasic => StringComparer.OrdinalIgnoreCase,
+                _ => throw new NotImplementedException(Resources.UnknownLanguage),
+            };
+
         public static bool NameEquals(this IAssemblySymbol? symbol, string name, bool startsWith = true)
         {
             if (symbol is null)

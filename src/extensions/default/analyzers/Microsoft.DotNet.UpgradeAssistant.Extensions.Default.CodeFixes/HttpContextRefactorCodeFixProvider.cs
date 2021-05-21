@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
@@ -111,12 +112,41 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             }
 
             var propertyTypeSyntaxNode = editor.Generator.NameExpression(propertyOperation.Property.Type);
+            var name = GetArgumentName();
 
-            var p = editor.Generator.ParameterDeclaration(DefaultArgumentName, propertyTypeSyntaxNode);
+            var p = editor.Generator.ParameterDeclaration(name, propertyTypeSyntaxNode);
 
             editor.AddParameter(methodOperation.Syntax, p);
 
-            return editor.Generator.IdentifierName(DefaultArgumentName);
+            return editor.Generator.IdentifierName(name);
+
+            string GetArgumentName()
+            {
+                var symbol = semanticModel.GetDeclaredSymbol(methodOperation.Syntax, cancellationToken: token);
+
+                if (symbol is not IMethodSymbol method)
+                {
+                    return DefaultArgumentName;
+                }
+
+                var set = new HashSet<string>(symbol.GetStringComparer());
+
+                foreach (var p in method.Parameters)
+                {
+                    set.Add(p.Name);
+                }
+
+                var i = 0;
+                while (true)
+                {
+                    var name = ++i == 1 ? DefaultArgumentName : $"{DefaultArgumentName}{i}";
+
+                    if (!set.Contains(name))
+                    {
+                        return name;
+                    }
+                }
+            }
         }
 
         private static async Task UpdateCallersAsync(SemanticModel semanticModel, ISymbol methodSymbol, IPropertySymbol property, SolutionEditor slnEditor, CancellationToken token)

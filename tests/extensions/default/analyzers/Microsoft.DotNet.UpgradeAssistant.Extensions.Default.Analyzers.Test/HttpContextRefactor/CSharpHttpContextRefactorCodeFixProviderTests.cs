@@ -123,6 +123,74 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         }
 
         [Fact]
+        public async Task SuffixNameIfAlreadyExists()
+        {
+            var testFile = @"
+    using System.Web;
+
+    namespace ConsoleApplication1
+    {
+        class Program
+        {
+            public void Test(object currentContext)
+            {
+                _ = {|#0:HttpContext.Current|};
+            }
+        }
+    }";
+            var fixedFile = @"
+    using System.Web;
+
+    namespace ConsoleApplication1
+    {
+        class Program
+        {
+            public void Test(object currentContext, HttpContext currentContext2)
+            {
+                _ = currentContext2;
+            }
+        }
+    }";
+
+            var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
+        }
+
+        [Fact]
+        public async Task SuffixNameTwiceIfAlreadyExists()
+        {
+            var testFile = @"
+    using System.Web;
+
+    namespace ConsoleApplication1
+    {
+        class Program
+        {
+            public void Test(object currentContext, object currentContext2)
+            {
+                _ = {|#0:HttpContext.Current|};
+            }
+        }
+    }";
+            var fixedFile = @"
+    using System.Web;
+
+    namespace ConsoleApplication1
+    {
+        class Program
+        {
+            public void Test(object currentContext, object currentContext2, HttpContext currentContext3)
+            {
+                _ = currentContext3;
+            }
+        }
+    }";
+
+            var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
+            await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
+        }
+
+        [Fact]
         public async Task ReuseProperty()
         {
             var testFile = @"
