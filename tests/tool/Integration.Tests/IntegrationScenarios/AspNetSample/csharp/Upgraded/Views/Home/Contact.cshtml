@@ -1,5 +1,21 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Razor
+@{
     ViewBag.Title = "Contact";
+}
+@{
+	HelperResult ShowMessage(bool isHeader, string message)
+	{
+		if (isHeader)
+		{
+			<h1>@message</h1>
+		}
+		else
+		{
+			<p>@message</p>
+	}
+
+		return new HelperResult(w => Task.CompletedTask);
+	}
 }
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
@@ -10,7 +26,8 @@
     <abbr title="Phone">P:</abbr>
     425.555.0100
 </address>
-
+@ShowMessage(true, "This is a header")
+@ShowMessage(false, "This is not a header")
 <address>
     <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
     <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
