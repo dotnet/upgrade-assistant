@@ -13,31 +13,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
     {
         private readonly SyntaxNode _memberAccessExpression;
 
-        private GeneralMemberAccessExpression(SyntaxNode aMemberAccessExpression)
+        private GeneralMemberAccessExpression(SyntaxNode syntaxNode)
         {
-            _memberAccessExpression = aMemberAccessExpression ?? throw new ArgumentNullException(nameof(aMemberAccessExpression));
-        }
-
-        public static bool TryGetGeneralMemberAccessExpress(SyntaxNode node, [MaybeNullWhen(false)] out GeneralMemberAccessExpression expression)
-        {
-            if (!node.IsMemberAccessExpressionSyntax())
-            {
-                expression = null;
-                return false;
-            }
-
-            expression = new GeneralMemberAccessExpression(node);
-            return true;
-        }
-
-        private visualBasic.Syntax.MemberAccessExpressionSyntax GetVisualBasicNode()
-        {
-            return (visualBasic.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
-        }
-
-        private cSharp.Syntax.MemberAccessExpressionSyntax GetCSharpNode()
-        {
-            return (cSharp.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
+            // the only valid way to construct one is to try parse
+            // this enables validation to assert we're providing a wrapper around a valid SyntaxNode
+            _memberAccessExpression = syntaxNode ?? throw new ArgumentNullException(nameof(syntaxNode));
         }
 
         public string GetName()
@@ -77,6 +57,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
                 LanguageNames.VisualBasic => GetVisualBasicNode().Expression.GetQualifiedName(),
                 _ => throw new NotSupportedException(nameof(_memberAccessExpression.Language))
             };
+        }
+
+        public static bool TryParse(SyntaxNode node, [MaybeNullWhen(false)] out GeneralMemberAccessExpression expression)
+        {
+            if (!node.IsMemberAccessExpressionSyntax())
+            {
+                expression = null;
+                return false;
+            }
+
+            expression = new GeneralMemberAccessExpression(node);
+            return true;
+        }
+
+        private visualBasic.Syntax.MemberAccessExpressionSyntax GetVisualBasicNode()
+        {
+            return (visualBasic.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
+        }
+
+        private cSharp.Syntax.MemberAccessExpressionSyntax GetCSharpNode()
+        {
+            return (cSharp.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
         }
     }
 }

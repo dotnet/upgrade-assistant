@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             }
 
             return node.IsKind(CS.SyntaxKind.QualifiedName)
-            || node.IsKind(VB.SyntaxKind.QualifiedName);
+                || node.IsKind(VB.SyntaxKind.QualifiedName);
         }
 
         /// <summary>
@@ -69,7 +69,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             }
 
             return node.IsKind(CS.SyntaxKind.IdentifierName)
-            || node.IsKind(VB.SyntaxKind.IdentifierName);
+                || node.IsKind(VB.SyntaxKind.IdentifierName);
+        }
+
+        public static bool IsInvocationExpression(this SyntaxNode node)
+        {
+            if (node is null)
+            {
+                return false;
+            }
+
+            return node.IsKind(CS.SyntaxKind.InvocationExpression)
+                || node.IsKind(VB.SyntaxKind.InvocationExpression);
         }
 
         /// <summary>
@@ -87,8 +98,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             }
 
             return node.IsKind(CS.SyntaxKind.BaseList)
-            || node.IsKind(CS.SyntaxKind.SimpleBaseType)
-            || node.IsKind(VB.SyntaxKind.InheritsStatement);
+                || node.IsKind(CS.SyntaxKind.SimpleBaseType)
+                || node.IsKind(VB.SyntaxKind.InheritsStatement);
         }
 
         /// <summary>

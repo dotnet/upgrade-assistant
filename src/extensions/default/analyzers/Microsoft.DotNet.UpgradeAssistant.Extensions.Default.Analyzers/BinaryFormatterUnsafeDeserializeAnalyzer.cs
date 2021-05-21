@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
         {
-            var isMemberAccessExpresion = GeneralMemberAccessExpression.TryGetGeneralMemberAccessExpress(context.Node, out var expression);
+            var isMemberAccessExpresion = GeneralMemberAccessExpression.TryParse(context.Node, out var expression);
             if (!isMemberAccessExpresion || expression is null)
             {
                 return;

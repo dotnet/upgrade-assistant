@@ -77,12 +77,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         private static async Task<Document> UpdateIdentifierTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
             var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-            var generator = SyntaxGenerator.GetGenerator(document);
-
             if (documentRoot is null)
             {
                 return document;
             }
+
+            var generator = SyntaxGenerator.GetGenerator(document);
 
             // Split the new idenfitier into namespace and name components
             var namespaceDelimiterIndex = newIdentifier.LastIndexOf('.');

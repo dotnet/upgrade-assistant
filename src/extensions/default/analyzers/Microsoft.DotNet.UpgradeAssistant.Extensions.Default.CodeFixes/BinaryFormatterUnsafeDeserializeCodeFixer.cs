@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -11,11 +12,12 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0012 CodeFix Provider")]
+    [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic, Name = "UA0012 CodeFix Provider")]
     public sealed class BinaryFormatterUnsafeDeserializeCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(BinaryFormatterUnsafeDeserializeAnalyzer.DiagnosticId);
@@ -37,19 +39,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var node = root.FindNode(context.Span, false, true);
 
-            if (node is null)
+            if (node is null || node.Parent is null)
             {
                 return;
             }
 
-            var invocationExpression = node.Parent as InvocationExpressionSyntax;
-            if (invocationExpression is null)
+            if (!GeneralInvocationExpression.TryParse(node.Parent, out var invocationExpression))
             {
                 return;
             }
 
-            var lastArg = invocationExpression.ArgumentList.Arguments.Last();
-            if (invocationExpression.ArgumentList.Arguments.Count != 2 || !lastArg.Expression.IsKind(CodeAnalysis.CSharp.SyntaxKind.NullLiteralExpression))
+            var arguments = invocationExpression.GetArguments();
+            var lastArgument = arguments.Last();
+            if (arguments.Count() != 2 || !NullLiteralExpression(lastArgument))
             {
                 // UnsafeDeserialize accepts 2 parameters. This code fix only applies when the 2nd param is null
                 return;
@@ -62,6 +64,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                     cancellationToken => ReplaceUnsafeDeserializationAsync(context.Document, node, cancellationToken),
                     nameof(CodeFixResources.BinaryFormatterUnsafeDeserializeTitle)),
                 context.Diagnostics);
+        }
+
+        private static bool NullLiteralExpression(string lastArgument)
+        {
+            return "NullLiteralExpression".Equals(lastArgument, StringComparison.OrdinalIgnoreCase)
+                || "NothingLiteralExpression".Equals(lastArgument, StringComparison.OrdinalIgnoreCase);
         }
 
         private static async Task<Document> ReplaceUnsafeDeserializationAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
