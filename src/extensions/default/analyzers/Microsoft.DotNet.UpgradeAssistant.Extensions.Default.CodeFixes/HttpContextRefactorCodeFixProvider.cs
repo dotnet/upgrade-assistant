@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 
@@ -72,16 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             context.RegisterCodeFix(
             CodeAction.Create(
                 title: CodeFixResources.HttpContextRefactorTitle,
-                createChangedSolution: async c =>
-                {
-                    var slnEditor = new SolutionEditor(context.Document.Project.Solution);
-                    var docEditor = await slnEditor.GetDocumentEditorAsync(context.Document.Id, c).ConfigureAwait(false);
-                    var injector = new StaticCallToMethodInjector(slnEditor, docEditor, methodOperation, methodSymbol, property, DefaultArgumentName);
-
-                    await injector.MethodInjectPropertyAsync(c).ConfigureAwait(false);
-
-                    return slnEditor.GetChangedSolution();
-                },
+                createChangedSolution: c => context.Document.MovePropertyAccessToMethodInjectionAsync(property, methodOperation, methodSymbol, DefaultArgumentName, c),
                 equivalenceKey: nameof(CodeFixResources.HttpContextRefactorTitle)),
             diagnostic);
         }
