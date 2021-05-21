@@ -21,15 +21,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         public StaticCallToMethodInjector(
             SolutionEditor helper,
             DocumentEditor editor,
-            IOperation methodOperation,
-            IMethodSymbol methodSymbol,
+            IOperation containingMethodOperation,
+            IMethodSymbol containingMethodSymbol,
             IPropertyReferenceOperation propertyOperation,
             string defaultArgName)
         {
             DocEditor = editor;
             SlnEditor = helper;
-            MethodSymbol = methodSymbol;
-            EnclosingMethodOperation = methodOperation;
+            ContainingMethodSymbol = containingMethodSymbol;
+            ContainingMethodOperation = containingMethodOperation;
             PropertyOperation = propertyOperation;
             _defaultArgumentName = defaultArgName;
         }
@@ -38,11 +38,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
         public DocumentEditor DocEditor { get; init; }
 
-        private IOperation EnclosingMethodOperation { get; }
+        private IOperation ContainingMethodOperation { get; }
 
         private IPropertyReferenceOperation PropertyOperation { get; }
 
-        private IMethodSymbol MethodSymbol { get; }
+        private IMethodSymbol ContainingMethodSymbol { get; }
 
         public async Task MethodInjectPropertyAsync(CancellationToken token)
         {
@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var propertyTypeSyntaxNode = DocEditor.Generator.NameExpression(PropertyOperation.Property.Type);
             var name = GetArgumentName();
 
-            DocEditor.AddParameter(EnclosingMethodOperation.Syntax,
+            DocEditor.AddParameter(ContainingMethodOperation.Syntax,
                 DocEditor.Generator.ParameterDeclaration(name, propertyTypeSyntaxNode));
 
             return DocEditor.Generator.IdentifierName(name);
@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 while (true)
                 {
                     var name = ++i == 1 ? _defaultArgumentName : $"{_defaultArgumentName}{i}";
-                    var exists = MethodSymbol.Parameters.Any(p => p.NameEquals(name));
+                    var exists = ContainingMethodSymbol.Parameters.Any(p => p.NameEquals(name));
 
                     if (!exists)
                     {
@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
         private async Task UpdateCallersAsync(CancellationToken token)
         {
-            var callers = await SymbolFinder.FindCallersAsync(MethodSymbol, SlnEditor.OriginalSolution, token).ConfigureAwait(false);
+            var callers = await SymbolFinder.FindCallersAsync(ContainingMethodSymbol, SlnEditor.OriginalSolution, token).ConfigureAwait(false);
 
             foreach (var caller in callers)
             {

@@ -63,9 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            var methodSymbol = methodOperation.SemanticModel!.GetDeclaredSymbol(methodOperation.Syntax, context.CancellationToken) as IMethodSymbol;
-
-            if (methodSymbol is null)
+            if (semantic.GetDeclaredSymbol(methodOperation.Syntax, context.CancellationToken) is not IMethodSymbol methodSymbol)
             {
                 return;
             }
