@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Added an analyzer and code fix provider to upgrade System.Web.Mvc.Controller to Microsoft.AspNetCore.Mvc.Controller [#534](https://github.com/dotnet/upgrade-assistant/pull/534)
+- Analyzers that recommend replacing one type with another are now combined into a single analyzer (`TypeUpgradeAnalyzer`) with behavior that can be customized via AdditionalTexts containing old -> new type mappings [#540](https://github.com/dotnet/upgrade-assistant/pull/540)
 
 ### Fixed
 - VB projects that have a MyType property that requires Windows will now default to net5.0-windows [#529](https://github.com/dotnet/upgrade-assistant/pull/529)

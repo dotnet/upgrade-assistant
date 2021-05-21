@@ -5,8 +5,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     public record TypeMapping(string OldName, string NewName)
     {
-        public string SimpleName => OldName.LastIndexOf('.') < 0
+        public string? SimpleName => (OldName?.LastIndexOf('.') ?? -1) < 0
             ? OldName
-            : OldName.Substring(OldName.LastIndexOf('.') + 1);
+            : OldName!.Substring(OldName.LastIndexOf('.') + 1);
     }
 }

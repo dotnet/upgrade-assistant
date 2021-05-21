@@ -118,7 +118,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, string simpleName)
         {
             // If the identifier isn't one of the mapped identifiers, bail out
-            var mapping = _mappings.FirstOrDefault(m => m.SimpleName.Equals(simpleName, StringComparison.Ordinal));
+            var mapping = _mappings.FirstOrDefault(m => m.SimpleName?.Equals(simpleName, StringComparison.Ordinal) ?? false);
             if (mapping is null)
             {
                 return;
