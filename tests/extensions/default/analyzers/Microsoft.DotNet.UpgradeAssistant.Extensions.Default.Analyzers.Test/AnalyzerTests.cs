@@ -143,6 +143,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0012", new TextSpan(3169, 28)),
                     new ExpectedDiagnostic("UA0012", new TextSpan(4096, 39)),
                     new ExpectedDiagnostic("UA0012", new TextSpan(4950, 39)),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(2287, 28), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(3212, 28), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(4287, 39), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(5150, 39), Language.VisualBasic),
                 }
             },
             {
