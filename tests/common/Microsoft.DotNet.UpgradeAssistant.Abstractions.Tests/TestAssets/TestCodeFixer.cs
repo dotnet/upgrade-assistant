@@ -4,7 +4,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets
 {

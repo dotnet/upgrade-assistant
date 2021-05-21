@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using System.Web.Mvc;
 using System.Collections.Generic;
 
 namespace TestProject.TestClasses
@@ -34,11 +35,35 @@ namespace TestProject.TestClasses
     {
 
     }
+
+    public partial class Controller2
+    {
+        Bar.Controller Controller;
+    }
+
+    public partial class Controller2 : System.Web.Mvc.Controller
+    {
+        public Controller DoSomething(ApiController a)
+        {
+            var x = new List<System.Web.Mvc.Controller>();
+            return new Controller2();
+        }
+    }
+
+    public class NotAController : Foo.Controller
+    {
+
+    }
 }
 
 namespace Foo
 {
     public class ApiController
+    {
+
+    }
+
+    public class Controller
     {
 
     }

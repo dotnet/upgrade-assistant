@@ -7,10 +7,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.Test
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     [Collection(AnalyzerTestCollection.Name)]
     public class AnalyzerTests
@@ -33,8 +32,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 {
                     new ExpectedDiagnostic("UA0002", new TextSpan(121, 11)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(171, 10)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(307, 10)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(375, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(296, 21)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(360, 28)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(434, 13)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(486, 13))
                 }
@@ -43,12 +42,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0003",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0003", new TextSpan(248, 10)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(339, 14)),
+                    new ExpectedDiagnostic("UA0003", new TextSpan(233, 25)),
+                    new ExpectedDiagnostic("UA0003", new TextSpan(335, 18)),
                     new ExpectedDiagnostic("UA0003", new TextSpan(375, 14)),
                     new ExpectedDiagnostic("UA0003", new TextSpan(416, 12)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(485, 12)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(521, 10)),
+                    new ExpectedDiagnostic("UA0003", new TextSpan(470, 27)),
+                    new ExpectedDiagnostic("UA0003", new TextSpan(506, 25)),
                     new ExpectedDiagnostic("UA0003", new TextSpan(556, 14)),
                     new ExpectedDiagnostic("UA0003", new TextSpan(605, 18))
                 }
@@ -57,13 +56,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0004",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0004", new TextSpan(97, 13)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(171, 21)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(336, 22)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(402, 22)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(434, 22)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(624, 21)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(716, 22)),
+                    new ExpectedDiagnostic("UA0004", new TextSpan(82, 28)),
+                    new ExpectedDiagnostic("UA0004", new TextSpan(156, 36)),
+                    new ExpectedDiagnostic("UA0004", new TextSpan(321, 37)),
+                    new ExpectedDiagnostic("UA0004", new TextSpan(398, 26)),
+                    new ExpectedDiagnostic("UA0004", new TextSpan(430, 26)),
+                    new ExpectedDiagnostic("UA0004", new TextSpan(609, 36)),
+                    new ExpectedDiagnostic("UA0004", new TextSpan(701, 37)),
                     new ExpectedDiagnostic("UA0004", new TextSpan(866, 13)),
                     new ExpectedDiagnostic("UA0004", new TextSpan(941, 21))
                 }
@@ -92,15 +91,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0007",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0007", new TextSpan(131, 10)),
-                    new ExpectedDiagnostic("UA0007", new TextSpan(314, 10)),
-                    new ExpectedDiagnostic("UA0007", new TextSpan(377, 10)),
-                    new ExpectedDiagnostic("UA0007", new TextSpan(417, 10)),
-                    new ExpectedDiagnostic("UA0007", new TextSpan(597, 10)),
+                    new ExpectedDiagnostic("UA0007", new TextSpan(116, 25)),
+                    new ExpectedDiagnostic("UA0007", new TextSpan(310, 14)),
+                    new ExpectedDiagnostic("UA0007", new TextSpan(362, 25)),
+                    new ExpectedDiagnostic("UA0007", new TextSpan(402, 25)),
+                    new ExpectedDiagnostic("UA0007", new TextSpan(593, 14)),
                     new ExpectedDiagnostic("UA0007", new TextSpan(617, 10)),
-                    new ExpectedDiagnostic("UA0007", new TextSpan(675, 10)),
+                    new ExpectedDiagnostic("UA0007", new TextSpan(660, 25)),
                     new ExpectedDiagnostic("UA0007", new TextSpan(735, 10)),
-                    new ExpectedDiagnostic("UA0007", new TextSpan(826, 10)),
+                    new ExpectedDiagnostic("UA0007", new TextSpan(811, 25)),
                     new ExpectedDiagnostic("UA0007", new TextSpan(871, 10)),
                 }
             },
@@ -108,12 +107,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0008",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0008", new TextSpan(79, 9)),
+                    new ExpectedDiagnostic("UA0008", new TextSpan(64, 24)),
                     new ExpectedDiagnostic("UA0008", new TextSpan(112, 9)),
-                    new ExpectedDiagnostic("UA0008", new TextSpan(150, 9)),
-                    new ExpectedDiagnostic("UA0008", new TextSpan(191, 9)),
+                    new ExpectedDiagnostic("UA0008", new TextSpan(135, 24)),
+                    new ExpectedDiagnostic("UA0008", new TextSpan(187, 13)),
                     new ExpectedDiagnostic("UA0008", new TextSpan(287, 9)),
-                    new ExpectedDiagnostic("UA0008", new TextSpan(331, 9)),
+                    new ExpectedDiagnostic("UA0008", new TextSpan(316, 24)),
                 }
             },
             {
@@ -121,10 +120,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 new[]
                 {
                     new ExpectedDiagnostic("UA0009", new TextSpan(102, 12)),
-                    new ExpectedDiagnostic("UA0009", new TextSpan(143, 12)),
-                    new ExpectedDiagnostic("UA0009", new TextSpan(216, 12)),
+                    new ExpectedDiagnostic("UA0009", new TextSpan(123, 32)),
+                    new ExpectedDiagnostic("UA0009", new TextSpan(196, 32)),
                     new ExpectedDiagnostic("UA0009", new TextSpan(243, 12)),
-                    new ExpectedDiagnostic("UA0009", new TextSpan(311, 12)),
+                    new ExpectedDiagnostic("UA0009", new TextSpan(307, 16)),
                 }
             },
             {
@@ -150,10 +149,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers.
                 "UA0013",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0013", new TextSpan(143, 13)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(571, 29)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(153, 13), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(439, 29), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(166, 13)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(594, 29)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(933, 14)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(1009, 25)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(1058, 10)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(1081, 13)),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(1139, 25)),
+
+                    new ExpectedDiagnostic("UA0013", new TextSpan(177, 13), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(463, 29), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(982, 10), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0013", new TextSpan(1265, 25), Language.VisualBasic),
                 }
             },
         };

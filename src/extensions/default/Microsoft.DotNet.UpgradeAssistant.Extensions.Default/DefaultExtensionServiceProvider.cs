@@ -4,9 +4,9 @@
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.Analyzers;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             // Add source analyzers and code fix providers (note that order doesn't matter as they're run alphabetically)
             // Analyzers
             services.AddTransient<DiagnosticAnalyzer, AllowHtmlAttributeAnalyzer>();
-            services.AddTransient<DiagnosticAnalyzer, ApiControllerAnalyzer>();
+            services.AddTransient<DiagnosticAnalyzer, ControllerAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, BinaryFormatterUnsafeDeserializeAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, FilterAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, HelperResultAnalyzer>();
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
             // Code fix providers
             services.AddTransient<CodeFixProvider, AllowHtmlAttributeCodeFixer>();
-            services.AddTransient<CodeFixProvider, ApiControllerCodeFixer>();
+            services.AddTransient<CodeFixProvider, ControllerCodeFixer>();
             services.AddTransient<CodeFixProvider, BinaryFormatterUnsafeDeserializeCodeFixer>();
             services.AddTransient<CodeFixProvider, FilterCodeFixer>();
             services.AddTransient<CodeFixProvider, HelperResultCodeFixer>();
