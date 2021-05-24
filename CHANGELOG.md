@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Current
 
+### Added
+- BinaryFormatterUnsafeDeserializer now works with Visual Basic [#544](https://github.com/dotnet/upgrade-assistant/pull/544)
+
 ### Fixed
 - Added analyzer and code fixer to upgrade System.Web.Mvc.Controller to Microsoft.AspNetCore.Mvc.Controller. Updated ApiControll upgrade code fix to upgrade to ControllerBase, instead. [#534](https://github.com/dotnet/upgrade-assistant/pull/534)
 - VB projects that have a MyType property that requires Windows will now default to net5.0-windows [#529](https://github.com/dotnet/upgrade-assistant/pull/529)
