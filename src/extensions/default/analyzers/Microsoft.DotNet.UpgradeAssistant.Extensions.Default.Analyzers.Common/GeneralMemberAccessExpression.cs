@@ -4,8 +4,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using cSharp = Microsoft.CodeAnalysis.CSharp;
-using visualBasic = Microsoft.CodeAnalysis.VisualBasic;
+using CS = Microsoft.CodeAnalysis.CSharp;
+using VB = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
 {
@@ -34,8 +34,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
         {
             return _memberAccessExpression.Language switch
             {
-                LanguageNames.CSharp => _memberAccessExpression.Parent is cSharp.Syntax.InvocationExpressionSyntax,
-                LanguageNames.VisualBasic => _memberAccessExpression.Parent is visualBasic.Syntax.InvocationExpressionSyntax,
+                LanguageNames.CSharp => _memberAccessExpression.Parent is CS.Syntax.InvocationExpressionSyntax,
+                LanguageNames.VisualBasic => _memberAccessExpression.Parent is VB.Syntax.InvocationExpressionSyntax,
                 _ => throw new NotSupportedException(nameof(_memberAccessExpression.Language))
             };
         }
@@ -71,14 +71,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
             return true;
         }
 
-        private visualBasic.Syntax.MemberAccessExpressionSyntax GetVisualBasicNode()
+        private VB.Syntax.MemberAccessExpressionSyntax GetVisualBasicNode()
         {
-            return (visualBasic.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
+            return (VB.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
         }
 
-        private cSharp.Syntax.MemberAccessExpressionSyntax GetCSharpNode()
+        private CS.Syntax.MemberAccessExpressionSyntax GetCSharpNode()
         {
-            return (cSharp.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
+            return (CS.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
         }
     }
 }

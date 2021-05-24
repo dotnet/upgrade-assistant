@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using cSharp = Microsoft.CodeAnalysis.CSharp;
-using visualBasic = Microsoft.CodeAnalysis.VisualBasic;
+using CS = Microsoft.CodeAnalysis.CSharp;
+using VB = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
 {
@@ -22,12 +22,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
             _invocationExpression = syntaxNode ?? throw new ArgumentNullException(nameof(syntaxNode));
         }
 
-        public IEnumerable<string> GetArguments()
+        public IEnumerable<SyntaxNode> GetArguments()
         {
             return _invocationExpression.Language switch
             {
-                LanguageNames.CSharp => GetCSharpNode().ArgumentList.Arguments.Select(x => x.Expression.Kind().ToString()),
-                LanguageNames.VisualBasic => GetVisualBasicNode().ArgumentList.Arguments.Select(x => x.GetExpression().Kind().ToString()),
+                LanguageNames.CSharp => GetCSharpNode().ArgumentList.Arguments.Select(x => x.Expression),
+                LanguageNames.VisualBasic => GetVisualBasicNode().ArgumentList.Arguments.Select(x => x.GetExpression()),
                 _ => throw new NotSupportedException(nameof(_invocationExpression.Language))
             };
         }
@@ -44,14 +44,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
             return true;
         }
 
-        private visualBasic.Syntax.InvocationExpressionSyntax GetVisualBasicNode()
+        private VB.Syntax.InvocationExpressionSyntax GetVisualBasicNode()
         {
-            return (visualBasic.Syntax.InvocationExpressionSyntax)_invocationExpression;
+            return (VB.Syntax.InvocationExpressionSyntax)_invocationExpression;
         }
 
-        private cSharp.Syntax.InvocationExpressionSyntax GetCSharpNode()
+        private CS.Syntax.InvocationExpressionSyntax GetCSharpNode()
         {
-            return (cSharp.Syntax.InvocationExpressionSyntax)_invocationExpression;
+            return (CS.Syntax.InvocationExpressionSyntax)_invocationExpression;
         }
     }
 }
