@@ -151,7 +151,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Replace type with .NET Core type.
+        ///   Looks up a localized string similar to Replace type.
         /// </summary>
         internal static string TypeUpgradeTitle {
             get {

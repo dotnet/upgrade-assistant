@@ -44,12 +44,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// </summary>
         private const string TypeMapFileSuffix = ".typemap";
 
-        /// <summary>
-        /// An enumerable of <see cref="TypeMapping"/> objects defining
-        /// the type names that should be replaced.
-        /// </summary>
-        private IEnumerable<TypeMapping> _mappings = Enumerable.Empty<TypeMapping>();
-
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.TypeUpgradeTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.TypeUpgradeMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.TypeUpgradeDescription), Resources.ResourceManager, typeof(Resources));
@@ -75,14 +69,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.RegisterCompilationStartAction(context =>
             {
                 // Load analyzer configuration defining the types that should be mapped.
-                _mappings = LoadMappings(context.Options.AdditionalFiles);
+                var mappings = LoadMappings(context.Options.AdditionalFiles);
 
                 // If type maps are present, register syntax node actions to analyze for those types
-                if (_mappings.Any())
+                if (mappings.Any())
                 {
                     // Register actions for handling both C# and VB identifiers
-                    context.RegisterSyntaxNodeAction(AnalyzeCSharpIdentifier, CS.SyntaxKind.IdentifierName);
-                    context.RegisterSyntaxNodeAction(AnalyzeVBIdentifier, VB.SyntaxKind.IdentifierName);
+                    context.RegisterSyntaxNodeAction(context => AnalyzeCSharpIdentifier(context, mappings), CS.SyntaxKind.IdentifierName);
+                    context.RegisterSyntaxNodeAction(context => AnalyzeVBIdentifier(context, mappings), VB.SyntaxKind.IdentifierName);
                 }
             });
         }
@@ -97,16 +91,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static Diagnostic CreateDiagnostic(Location location, ImmutableDictionary<string, string?> properties, params object[] messageArgs)
             => Diagnostic.Create(Rule, location, properties, messageArgs);
 
-        private void AnalyzeCSharpIdentifier(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeCSharpIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TypeMapping> mappings)
         {
             var identifier = (CSSyntax.IdentifierNameSyntax)context.Node;
-            AnalyzeIdentifier(context, identifier.Identifier.ValueText);
+            AnalyzeIdentifier(context, mappings, identifier.Identifier.ValueText);
         }
 
-        private void AnalyzeVBIdentifier(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeVBIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TypeMapping> mappings)
         {
             var identifier = (VBSyntax.IdentifierNameSyntax)context.Node;
-            AnalyzeIdentifier(context, identifier.Identifier.ValueText);
+            AnalyzeIdentifier(context, mappings, identifier.Identifier.ValueText);
         }
 
         /// <summary>
@@ -114,11 +108,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// in <see cref="IdentifierMappings"/>.
         /// </summary>
         /// <param name="context">The syntax node analysis context including the identifier node to analyze.</param>
+        /// <param name="mappings">Type mappings to use when upgrading types.</param>
         /// <param name="simpleName">The simple name of the identifier being analyzed.</param>
-        private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, string simpleName)
+        private static void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TypeMapping> mappings, string simpleName)
         {
             // If the identifier isn't one of the mapped identifiers, bail out
-            var mapping = _mappings.FirstOrDefault(m => m.SimpleName?.Equals(simpleName, StringComparison.Ordinal) ?? false);
+            var mapping = mappings.FirstOrDefault(m => m.SimpleName?.Equals(simpleName, StringComparison.Ordinal) ?? false);
             if (mapping is null)
             {
                 return;
