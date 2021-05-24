@@ -2,21 +2,19 @@
 @{
     ViewBag.Title = "Contact";
 }
-@{
-	HelperResult ShowMessage(bool isHeader, string message)
+@{ HelperResult ShowMessage(bool isHeader, string message)
 	{
-		if (isHeader)
-		{
-			<h1>@message</h1>
-		}
-		else
-		{
-			<p>@message</p>
-	}
-
+	    if (isHeader)
+	    {
+	        <h1>@message</h1>
+	    }
+	    else
+	    {
+	        <p>@message</p>
+	    }
 		return new HelperResult(w => Task.CompletedTask);
-	}
-}
+} }
+
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
 

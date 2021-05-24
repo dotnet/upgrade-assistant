@@ -23,6 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services
             .AddUpgradeStep<RazorUpdaterStep>()
             .AddTransient<IUpdater<RazorCodeDocument>, RazorSourceUpdater>()
+            .AddTransient<IUpdater<RazorCodeDocument>, RazorHelperUpdater>()
             .AddTransient<ITextMatcher, DefaultTextMatcher>()
             .AddTransient<ITextReplacer, RazorTextReplacer>()
             .AddTransient<IDiffer, Differ>()
