@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         public static bool IsCSharp(this IOperation operation) => operation?.Language == LanguageNames.CSharp;
 
         public static IOperation? GetEnclosingMethodOperation(this IOperation? operation)
-            => operation.GetParentOperation(static o => o.IsEnclosedMethodOperation());
+            => operation.GetParentOperationWhere(static o => o.IsEnclosedMethodOperation());
 
         public static bool IsEnclosedMethodOperation(this IOperation operation)
         {

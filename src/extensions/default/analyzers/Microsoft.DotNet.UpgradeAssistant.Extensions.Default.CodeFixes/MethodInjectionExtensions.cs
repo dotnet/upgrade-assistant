@@ -131,42 +131,48 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                 foreach (var caller in callers)
                 {
-                    var location = caller.Locations.FirstOrDefault();
-
-                    if (location is null)
+                    foreach (var location in caller.Locations)
                     {
-                        continue;
-                    }
+                        if (location is null)
+                        {
+                            continue;
+                        }
 
-                    if (!SlnEditor.OriginalSolution.TryGetDocument(location.SourceTree, out var doc))
-                    {
-                        continue;
-                    }
+                        if (!location.IsInSource)
+                        {
+                            continue;
+                        }
 
-                    var injector = this with
-                    {
-                        DocEditor = await SlnEditor.GetDocumentEditorAsync(doc.Id, token).ConfigureAwait(false)
-                    };
+                        if (!SlnEditor.OriginalSolution.TryGetDocument(location.SourceTree, out var doc))
+                        {
+                            continue;
+                        }
 
-                    var root = await injector.DocEditor.OriginalDocument.GetSyntaxRootAsync(token).ConfigureAwait(false);
+                        var injector = this with
+                        {
+                            DocEditor = await SlnEditor.GetDocumentEditorAsync(doc.Id, token).ConfigureAwait(false)
+                        };
 
-                    if (root is null)
-                    {
-                        continue;
-                    }
+                        var root = await injector.DocEditor.OriginalDocument.GetSyntaxRootAsync(token).ConfigureAwait(false);
 
-                    var callerNode = root.FindNode(location.SourceSpan, getInnermostNodeForTie: true);
+                        if (root is null)
+                        {
+                            continue;
+                        }
 
-                    if (callerNode is null)
-                    {
-                        continue;
-                    }
+                        var callerNode = root.FindNode(location.SourceSpan, getInnermostNodeForTie: true);
 
-                    var invocationNode = callerNode.GetInvocationExpression();
+                        if (callerNode is null)
+                        {
+                            continue;
+                        }
 
-                    if (invocationNode is not null)
-                    {
-                        injector.UpdateInvocation(invocationNode, token);
+                        var invocationNode = callerNode.GetInvocationExpression();
+
+                        if (invocationNode is not null)
+                        {
+                            injector.UpdateInvocation(invocationNode, token);
+                        }
                     }
                 }
             }
@@ -191,9 +197,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             private SyntaxNode? GetExistingVariableOrMember(SyntaxNode node, CancellationToken token)
             {
-                return GetParameterFromMethod() ?? GetParameterFromProperty();
+                return FindAvailableMethodParameter() ?? FindAvailableMember();
 
-                SyntaxNode? GetParameterFromMethod()
+                SyntaxNode? FindAvailableMethodParameter()
                 {
                     var dataFlow = DocEditor.SemanticModel.AnalyzeDataFlow(node);
 
@@ -208,7 +214,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                     return null;
                 }
 
-                SyntaxNode? GetParameterFromProperty()
+                SyntaxNode? FindAvailableMember()
                 {
                     var operation = DocEditor.SemanticModel.GetOperation(node, token);
                     var methodOperation = operation.GetEnclosingMethodOperation();
@@ -225,8 +231,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                         return null;
                     }
 
-                    foreach (var member in typeSymbol.GetAllMembers(!symbol.IsStatic))
+                    foreach (var member in typeSymbol.GetAllMembers())
                     {
+                        if (symbol.IsStatic)
+                        {
+                            continue;
+                        }
+
                         if (member is IPropertySymbol property && SymbolEqualityComparer.Default.Equals(property.Type, PropertyOperation.Property.Type))
                         {
                             return DocEditor.Generator.IdentifierName(property.Name);

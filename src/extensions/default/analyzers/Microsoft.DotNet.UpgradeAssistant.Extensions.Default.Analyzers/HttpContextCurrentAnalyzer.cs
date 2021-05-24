@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             var memberAccessExpression = (CSSyntax.MemberAccessExpressionSyntax)context.Node;
 
             // If the accessed member isn't named "Current" bail out
-            if (!TargetMember.Equals(memberAccessExpression.Name.ToString(), StringComparison.Ordinal))
+            if (!TargetMember.Equals(memberAccessExpression.Name.Identifier.ValueText, StringComparison.Ordinal))
             {
                 return;
             }
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             var memberAccessExpression = (VBSyntax.MemberAccessExpressionSyntax)context.Node;
 
             // If the accessed member isn't named "Current" bail out
-            if (!TargetMember.Equals(memberAccessExpression.Name.ToString(), StringComparison.Ordinal))
+            if (!TargetMember.Equals(memberAccessExpression.Name.Identifier.ValueText, StringComparison.Ordinal))
             {
                 return;
             }

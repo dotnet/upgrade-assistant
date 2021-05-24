@@ -31,7 +31,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 _ => throw new NotImplementedException(Resources.UnknownLanguage),
             };
 
-        public static IEnumerable<ISymbol> GetAllMembers(this INamedTypeSymbol? symbol, bool includeInstance)
+        /// <summary>
+        /// Finds all members including those on the base classes.
+        /// </summary>
+        /// <param name="symbol">Symbol to search</param>
+        /// <returns>A collection of base members.</returns>
+        public static IEnumerable<ISymbol> GetAllMembers(this INamedTypeSymbol? symbol)
         {
             var allowPrivate = true;
 
@@ -40,11 +45,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 foreach (var member in symbol.GetMembers())
                 {
                     if (member.IsImplicitlyDeclared)
-                    {
-                        continue;
-                    }
-
-                    if (!includeInstance && !member.IsStatic)
                     {
                         continue;
                     }
@@ -71,6 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 return false;
             }
 
+            // This compares the assembly name which is case-insensitive for all languages.
             if (startsWith)
             {
                 return symbol.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase);
@@ -82,14 +83,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         }
 
         /// <summary>
-        /// Gets an existing parameter of the type from node if it is a method.
+        /// Gets the first existing parameter of the type from node if it is a method.
         /// </summary>
         /// <param name="node">A node that is potentially a method.</param>
         /// <param name="semanticModel">The current semantic model.</param>
         /// <param name="type">The type that should be matched.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns>A parameter symbol if a match is found.</returns>
-        public static IParameterSymbol? GetExistingParameterSymbol(this SyntaxNode node, SemanticModel semanticModel, ITypeSymbol? type, CancellationToken token)
+        public static IParameterSymbol? GetExistingParameterSymbolByType(this SyntaxNode node, SemanticModel semanticModel, ITypeSymbol? type, CancellationToken token)
         {
             if (type is null)
             {
@@ -120,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         /// <param name="operation">A starting operation.</param>
         /// <param name="func">A predicate to check matches against.</param>
         /// <returns>A matching operation if found.</returns>
-        public static IOperation? GetParentOperation(this IOperation? operation, Func<IOperation, bool> func)
+        public static IOperation? GetParentOperationWhere(this IOperation? operation, Func<IOperation, bool> func)
         {
             if (func is null)
             {

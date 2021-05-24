@@ -39,7 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            var diagnostic = context.Diagnostics.First();
             var semantic = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
 
             if (semantic is null)
@@ -47,8 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            // Find the type declaration identified by the diagnostic.
-            var node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
+            var node = root.FindNode(context.Span, getInnermostNodeForTie: true);
 
             if (semantic.GetOperation(node, context.CancellationToken) is not IPropertyReferenceOperation property)
             {
@@ -69,11 +67,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             //// Register a code action that will invoke the fix.
             context.RegisterCodeFix(
-            CodeAction.Create(
-                title: CodeFixResources.HttpContextRefactorTitle,
-                createChangedSolution: c => context.Document.MovePropertyAccessToMethodInjectionAsync(property, methodOperation, methodSymbol, DefaultArgumentName, c),
-                equivalenceKey: nameof(CodeFixResources.HttpContextRefactorTitle)),
-            diagnostic);
+                CodeAction.Create(
+                    title: CodeFixResources.HttpContextRefactorTitle,
+                    createChangedSolution: c => context.Document.MovePropertyAccessToMethodInjectionAsync(property, methodOperation, methodSymbol, DefaultArgumentName, c),
+                    equivalenceKey: nameof(CodeFixResources.HttpContextRefactorTitle)),
+                context.Diagnostics);
         }
     }
 }
