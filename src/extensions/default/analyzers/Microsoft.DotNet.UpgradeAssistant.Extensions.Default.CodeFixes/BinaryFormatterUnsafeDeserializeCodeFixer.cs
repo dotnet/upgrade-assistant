@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -19,6 +18,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     public sealed class BinaryFormatterUnsafeDeserializeCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(BinaryFormatterUnsafeDeserializeAnalyzer.DiagnosticId);
+
+        /// <summary>
+        /// references to "UnsafeDeserialize" should be replaced with "UnsafeDeserialize" when the 2nd param to "UnsafeDeserialize" is null.
+        /// </summary>
+        public const string ReplacementMethod = "Deserialize";
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -96,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             // the codefixer should only be triggered when we are replacing "UnsafeDeserialize"
             // so we can assume that the node has at least one descendant when invoking .First()
-            var newMemberAccessExpression = generator.MemberAccessExpression(node.DescendantNodes().First(), "Deserialize");
+            var newMemberAccessExpression = generator.MemberAccessExpression(node.DescendantNodes().First(), ReplacementMethod);
 
             // create a new invocation
             var invocation = generator.InvocationExpression(newMemberAccessExpression, args.First());
