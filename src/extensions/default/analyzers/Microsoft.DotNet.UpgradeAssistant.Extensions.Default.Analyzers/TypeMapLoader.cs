@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                             continue;
                         }
 
-                        var components = trimmedLine.Split('\t');
+                        var components = trimmedLine.Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                         if (components.Length == 2)
                         {
                             yield return new TypeMapping(components[0], components[1]);
