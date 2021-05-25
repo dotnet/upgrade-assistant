@@ -6,11 +6,9 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-
-using CS = Microsoft.CodeAnalysis.CSharp;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using VB = Microsoft.CodeAnalysis.VisualBasic;
 using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
@@ -44,17 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterCompilationStartAction(context =>
-            {
-                if (context.Compilation.Language == LanguageNames.CSharp)
-                {
-                    context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressionsCsharp, CS.SyntaxKind.SimpleMemberAccessExpression);
-                }
-                else if (context.Compilation.Language == LanguageNames.VisualBasic)
-                {
-                    context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressionsVb, VB.SyntaxKind.SimpleMemberAccessExpression);
-                }
-            });
+            context.RegisterSimpleMemberAccessExpression(AnalyzeMemberAccessExpressionsCsharp, AnalyzeMemberAccessExpressionsVb);
         }
 
         private void AnalyzeMemberAccessExpressionsCsharp(SyntaxNodeAnalysisContext context)

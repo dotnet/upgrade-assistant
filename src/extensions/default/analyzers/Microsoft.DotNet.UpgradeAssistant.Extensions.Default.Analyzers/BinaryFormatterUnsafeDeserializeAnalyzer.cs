@@ -38,8 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressions, CodeAnalysis.CSharp.SyntaxKind.SimpleMemberAccessExpression);
-            context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressions, CodeAnalysis.VisualBasic.SyntaxKind.SimpleMemberAccessExpression);
+            context.RegisterSimpleMemberAccessExpression(AnalyzeMemberAccessExpressions);
         }
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
