@@ -15,8 +15,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
     {
         private readonly SyntaxNode _invocationExpression;
 
-        private GeneralInvocationExpression(SyntaxNode syntaxNode)
+        public GeneralInvocationExpression(SyntaxNode syntaxNode)
         {
+            if (!syntaxNode.IsInvocationExpression())
+            {
+                throw new ArgumentException("Invalid type of syntaxNode", nameof(syntaxNode));
+            }
+
             // the only valid way to construct one is to try parse
             // this enables validation to assert we're providing a wrapper around a valid SyntaxNode
             _invocationExpression = syntaxNode ?? throw new ArgumentNullException(nameof(syntaxNode));
@@ -30,18 +35,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
                 LanguageNames.VisualBasic => GetVisualBasicNode().ArgumentList.Arguments.Select(x => x.GetExpression()),
                 _ => throw new NotSupportedException(nameof(_invocationExpression.Language))
             };
-        }
-
-        public static bool TryParse(SyntaxNode node, [MaybeNullWhen(false)] out GeneralInvocationExpression expression)
-        {
-            if (!node.IsInvocationExpression())
-            {
-                expression = null;
-                return false;
-            }
-
-            expression = new GeneralInvocationExpression(node);
-            return true;
         }
 
         private VB.Syntax.InvocationExpressionSyntax GetVisualBasicNode()

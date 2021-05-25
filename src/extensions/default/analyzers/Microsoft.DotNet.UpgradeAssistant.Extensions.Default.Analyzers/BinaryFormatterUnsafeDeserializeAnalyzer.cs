@@ -45,10 +45,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
         {
-            if (!GeneralMemberAccessExpression.TryParse(context.Node, out var expression) || expression is null)
+            if (!context.Node.IsMemberAccessExpression())
             {
                 return;
             }
+
+            var expression = new GeneralMemberAccessExpression(context.Node);
 
             // Continue, only if the syntax being evaluated is a method invocation
             if (!expression.IsChildOfInvocationExpression())
@@ -88,12 +90,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// <returns>True when (e.g. new BinaryFormatter().UnsafeDeserialize and <paramref name="theSymbol"/> is the symbol representing BinaryFormatter).</returns>
         private static bool IsSymbolAConstructorInstanceOfBinaryFormatter(ISymbol theSymbol)
         {
-            var methodSymbol = theSymbol as IMethodSymbol;
-            if (methodSymbol is null)
+            if (theSymbol is not IMethodSymbol)
             {
                 return false;
             }
 
+            var methodSymbol = (IMethodSymbol)theSymbol;
             return methodSymbol.MethodKind == MethodKind.Constructor && BinaryFormatterUnsafeDeserialize.Matches(methodSymbol.ContainingType);
         }
 
@@ -104,11 +106,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// <returns>True when (e.g. formatter1.UnsafeDeserialize and <paramref name="theSymbol"/> is the symbol representing the variable formatter1 of type BinaryFormatter).</returns>
         private static bool IsSymbolAVariableOfTheTypeBinaryFormatter(ISymbol theSymbol)
         {
-            var localSymbol = theSymbol as ILocalSymbol;
-            if (localSymbol is null)
+            if (theSymbol is not ILocalSymbol)
             {
                 return false;
             }
+
+            var localSymbol = (ILocalSymbol)theSymbol;
 
             // using StartsWith because the ToString may produce a nullable type variable ending with '?'
             return BinaryFormatterUnsafeDeserialize.Matches(localSymbol.Type);

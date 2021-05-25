@@ -13,8 +13,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
     {
         private readonly SyntaxNode _memberAccessExpression;
 
-        private GeneralMemberAccessExpression(SyntaxNode syntaxNode)
+        public GeneralMemberAccessExpression(SyntaxNode syntaxNode)
         {
+            if (!syntaxNode.IsMemberAccessExpression())
+            {
+                throw new ArgumentException("Invalid type of syntaxNode", nameof(syntaxNode));
+            }
+
             // the only valid way to construct one is to try parse
             // this enables validation to assert we're providing a wrapper around a valid SyntaxNode
             _memberAccessExpression = syntaxNode ?? throw new ArgumentNullException(nameof(syntaxNode));
@@ -48,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
         /// <summary>
         /// Finds the name of the object being accessed.
         /// </summary>
-        /// <returns>For new BinaryFormatter().UnsafeDeserialize(x,y) this should return the "new BinaryFormatter()" portion</returns>
+        /// <returns>For new BinaryFormatter().UnsafeDeserialize(x,y) this should return the "new BinaryFormatter()" portion.</returns>
         public SyntaxNode GetAccessedIdentifier()
         {
             return _memberAccessExpression.Language switch
@@ -57,18 +62,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
                 LanguageNames.VisualBasic => GetVisualBasicNode().Expression.GetQualifiedName(),
                 _ => throw new NotSupportedException(nameof(_memberAccessExpression.Language))
             };
-        }
-
-        public static bool TryParse(SyntaxNode node, [MaybeNullWhen(false)] out GeneralMemberAccessExpression expression)
-        {
-            if (!node.IsMemberAccessExpressionSyntax())
-            {
-                expression = null;
-                return false;
-            }
-
-            expression = new GeneralMemberAccessExpression(node);
-            return true;
         }
 
         private VB.Syntax.MemberAccessExpressionSyntax GetVisualBasicNode()

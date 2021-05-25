@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         /// </summary>
         /// <param name="node">The node to inspect.</param>
         /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax, false otherwise.</returns>
-        public static bool IsMemberAccessExpressionSyntax(this SyntaxNode node) => node is CSSyntax.MemberAccessExpressionSyntax || node is VBSyntax.MemberAccessExpressionSyntax;
+        public static bool IsMemberAccessExpression(this SyntaxNode node) => node is CSSyntax.MemberAccessExpressionSyntax || node is VBSyntax.MemberAccessExpressionSyntax;
 
         /// <summary>
         /// Determines whether a node is a NameSyntax (either C# or VB).
@@ -99,6 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             return node.IsKind(CS.SyntaxKind.QualifiedName)
                 || node.IsKind(VB.SyntaxKind.QualifiedName);
         }
+
         public static bool IsVisualBasic(this SyntaxNode node) => node?.Language == LanguageNames.VisualBasic;
     }
 }

@@ -46,11 +46,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            if (!GeneralInvocationExpression.TryParse(node.Parent, out var invocationExpression))
+            if (!node.Parent.IsInvocationExpression())
             {
                 return;
             }
 
+            var invocationExpression = new GeneralInvocationExpression(node.Parent);
             var arguments = invocationExpression.GetArguments();
             var lastArgument = arguments.Last();
             if (arguments.Count() != 2 || !lastArgument.IsNullLiteralExpression())
@@ -90,10 +91,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var generator = SyntaxGenerator.GetGenerator(document);
 
             // the code fixer is only registered to handle code that derives from an invocationExpression
-            if (!GeneralInvocationExpression.TryParse(node.Parent!, out var expression))
+            if (!node.Parent!.IsInvocationExpression())
             {
                 return document;
             }
+
+            var expression = new GeneralInvocationExpression(node.Parent!);
 
             // list of existing arguments
             var args = expression.GetArguments();

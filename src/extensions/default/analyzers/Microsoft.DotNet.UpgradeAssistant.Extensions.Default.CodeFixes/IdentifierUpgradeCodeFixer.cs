@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var node = root.FindNode(context.Span)
                 .DescendantNodesAndSelf(n => true)
                 .FirstOrDefault(n => n.Span.Equals(context.Span)
-                    && (n.IsNameSyntax() || n.IsMemberAccessExpressionSyntax()));
+                    && (n.IsNameSyntax() || n.IsMemberAccessExpression()));
 
             if (node is null)
             {
@@ -126,7 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 var nameSyntax when nameSyntax.IsNameSyntax() => QualifiedNameBuilder.BuildQualifiedNameSyntax(generator, name),
 
                 // Accessing a static member of a type will use a member access expression to refer to the type.
-                var maeSyntax when maeSyntax.IsMemberAccessExpressionSyntax() => QualifiedNameBuilder.BuildMemberAccessExpression(generator, name),
+                var maeSyntax when maeSyntax.IsMemberAccessExpression() => QualifiedNameBuilder.BuildMemberAccessExpression(generator, name),
 
                 // Because the node is retrieved by location, it may sometimes be necessary to check children.
                 _ => GetUpdatedNode(node.ChildNodes().FirstOrDefault(), generator, name)
