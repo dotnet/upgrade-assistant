@@ -4,8 +4,11 @@
 using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common;
+
 using CS = Microsoft.CodeAnalysis.CSharp;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using VB = Microsoft.CodeAnalysis.VisualBasic;
 using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
@@ -13,6 +16,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static partial class SyntaxNodeExtensions
     {
+        public static bool IsVisualBasic(this SyntaxNode node) => node?.Language == LanguageNames.VisualBasic;
+
+        public static bool IsCSharp(this SyntaxNode node) => node?.Language == LanguageNames.CSharp;
+
+        public static SyntaxNode AddArgumentToInvocation(this SyntaxNode invocationNode, SyntaxNode argument)
+        {
+            if (invocationNode.IsVisualBasic())
+            {
+                var node = (VBSyntax.InvocationExpressionSyntax)invocationNode;
+                return node.WithArgumentList(node.ArgumentList.AddArguments((VBSyntax.ArgumentSyntax)argument));
+            }
+            else if (invocationNode.IsCSharp())
+            {
+                var node = (CSSyntax.InvocationExpressionSyntax)invocationNode;
+                return node.WithArgumentList(node.ArgumentList.AddArguments((CSSyntax.ArgumentSyntax)argument));
+            }
+
+            throw new NotImplementedException(Resources.UnknownLanguage);
+        }
+
         /// <summary>
         /// Handles language aware selection of QualifiedNameSyntax or IdentifierNameSyntaxNode from current context.
         /// </summary>
@@ -192,6 +215,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             var result = anyUsings ? documentRoot : documentRoot.AddUsings(usingDirective);
 
             return result;
+        }
+
+        /// <summary>
+        /// Determines whether a node is a NameSyntax (either C# or VB).
+        /// </summary>
+        /// <param name="node">The node to inspect.</param>
+        /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.NameSyntax, false otherwise.</returns>
+        public static bool IsNameSyntax(this SyntaxNode node) => node is CSSyntax.NameSyntax || node is VBSyntax.NameSyntax;
+
+        /// <summary>
+        /// Determines whether a node is a MemberAccessExpressionSyntax (either C# or VB).
+        /// </summary>
+        /// <param name="node">The node to inspect.</param>
+        /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax, false otherwise.</returns>
+        public static bool IsMemberAccessExpressionSyntax(this SyntaxNode node) => node is CSSyntax.MemberAccessExpressionSyntax || node is VBSyntax.MemberAccessExpressionSyntax;
+
+        public static SyntaxNode? GetInvocationExpression(this SyntaxNode callerNode)
+        {
+            if (callerNode.IsVisualBasic())
+            {
+                return callerNode.FirstAncestorOrSelf<VBSyntax.InvocationExpressionSyntax>();
+            }
+            else if (callerNode.IsCSharp())
+            {
+                return callerNode.FirstAncestorOrSelf<CSSyntax.InvocationExpressionSyntax>();
+            }
+
+            throw new NotImplementedException(Resources.UnknownLanguage);
         }
     }
 }
