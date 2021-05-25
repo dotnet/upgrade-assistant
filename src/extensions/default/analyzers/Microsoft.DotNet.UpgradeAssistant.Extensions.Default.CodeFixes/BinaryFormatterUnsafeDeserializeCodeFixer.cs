@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            var node = root.FindNode(context.Span, false, true);
+            var node = root.FindNode(context.Span, findInsideTrivia: false, getInnermostNodeForTie: true);
 
             if (node is null || node.Parent is null)
             {
