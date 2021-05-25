@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
 {
     public static class AnalysisContextExtensions
     {
-        public static void RegisterSimpleMemberAccessExpression(this AnalysisContext analysisContext, Action<SyntaxNodeAnalysisContext> analyze, Action<SyntaxNodeAnalysisContext> vbAnalyze = null)
+        public static void RegisterSimpleMemberAccessExpression(this AnalysisContext analysisContext, Action<SyntaxNodeAnalysisContext> analyze, Action<SyntaxNodeAnalysisContext>? vbAnalyze = null)
         {
             if (analysisContext is null)
             {
