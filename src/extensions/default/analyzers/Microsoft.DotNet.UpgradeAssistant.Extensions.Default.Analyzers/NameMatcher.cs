@@ -5,8 +5,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public class NameMatcher
     {
-        public static NameMatcher HttpContextCurrent { get; } = NameMatcher.MatchPropertyAccess("System.Web.HttpContext", "Current");
-
         private readonly string[] _typeName;
         private readonly string? _memberName;
 

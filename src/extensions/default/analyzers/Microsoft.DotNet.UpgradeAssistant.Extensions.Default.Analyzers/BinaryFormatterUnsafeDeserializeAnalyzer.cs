@@ -15,16 +15,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         public const string DiagnosticId = "UA0012";
         private const string Category = "Upgrade";
 
-        private const string QualifiedTargetSymbolName = TargetTypeSymbolNamespace + "." + TargetTypeSymbolName;
-        private const string TargetTypeSymbolNamespace = "System.Runtime.Serialization.Formatters.Binary";
-        private const string TargetTypeSymbolName = "BinaryFormatter";
-        private const string TargetMember = "UnsafeDeserialize";
+        internal const string QualifiedTargetSymbolName = TargetTypeSymbolNamespace + "." + TargetTypeSymbolName;
+        internal const string TargetTypeSymbolNamespace = "System.Runtime.Serialization.Formatters.Binary";
+        internal const string TargetTypeSymbolName = "BinaryFormatter";
+        internal const string TargetMember = "UnsafeDeserialize";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeDescription), Resources.ResourceManager, typeof(Resources));
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        public static NameMatcher BinaryFormatterUnsafeDeserialize { get; } = NameMatcher.MatchPropertyAccess(QualifiedTargetSymbolName, TargetMember);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -80,12 +82,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         }
 
         /// <summary>
-        /// Checks to see if the symbol is a reference to BinaryFormatter.
+        /// Checks to see if the symbol is a constructor reference to BinaryFormatter.
         /// </summary>
         /// <param name="theSymbol">any symbol.</param>
         /// <returns>True when (e.g. new BinaryFormatter().UnsafeDeserialize and <paramref name="theSymbol"/> is the symbol representing BinaryFormatter).</returns>
         private static bool IsSymbolAConstructorInstanceOfBinaryFormatter(ISymbol theSymbol)
-             => QualifiedTargetSymbolName.Equals(theSymbol.ContainingType.ToString(), StringComparison.Ordinal);
+        {
+            var methodSymbol = theSymbol as IMethodSymbol;
+            if (methodSymbol is null)
+            {
+                return false;
+            }
+
+            return methodSymbol.MethodKind == MethodKind.Constructor && BinaryFormatterUnsafeDeserialize.Matches(methodSymbol.ContainingType);
+        }
 
         /// <summary>
         /// Checks to see if the symbol is a reference to BinaryFormatter.
@@ -100,10 +110,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return false;
             }
 
-            var typeName = localSymbol.Type?.ToString() ?? string.Empty;
-
             // using StartsWith because the ToString may produce a nullable type variable ending with '?'
-            return typeName.StartsWith(QualifiedTargetSymbolName, StringComparison.Ordinal);
+            return BinaryFormatterUnsafeDeserialize.Matches(localSymbol.Type);
         }
     }
 }
