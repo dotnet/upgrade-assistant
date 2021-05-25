@@ -87,14 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// <param name="theSymbol">any symbol.</param>
         /// <returns>True when (e.g. new BinaryFormatter().UnsafeDeserialize and <paramref name="theSymbol"/> is the symbol representing BinaryFormatter).</returns>
         private static bool IsSymbolAConstructorInstanceOfBinaryFormatter(ISymbol theSymbol)
-        {
-            if (theSymbol is null)
-            {
-                return false;
-            }
-
-            return theSymbol.ContainingType.ToString().Equals(QualifiedTargetSymbolName, StringComparison.Ordinal);
-        }
+             => QualifiedTargetSymbolName.Equals(theSymbol.ContainingType.ToString(), StringComparison.Ordinal);
 
         /// <summary>
         /// Checks to see if the symbol is a reference to BinaryFormatter.
