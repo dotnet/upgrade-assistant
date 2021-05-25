@@ -43,8 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
         {
-            var isMemberAccessExpresion = GeneralMemberAccessExpression.TryParse(context.Node, out var expression);
-            if (!isMemberAccessExpresion || expression is null)
+            if (!GeneralMemberAccessExpression.TryParse(context.Node, out var expression) || expression is null)
             {
                 return;
             }
