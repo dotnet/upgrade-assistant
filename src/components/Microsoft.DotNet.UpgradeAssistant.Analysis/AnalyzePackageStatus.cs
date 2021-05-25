@@ -43,17 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             var context = analysis.UpgradeContext;
             var projects = context.Projects.ToList();
 
-            if (!context.InputIsSolution)
-            {
-                var selectedProject = projects.First(i => i.FileInfo.Name.Equals(Path.GetFileName(context.InputPath), StringComparison.OrdinalIgnoreCase));
-                context.EntryPoints = new[] { selectedProject };
-            }
-            else
-            {
-                context.EntryPoints = _entrypointResolver.GetEntrypoints(context.Projects, _options.EntryPoint.Any() ? _options.EntryPoint : new[] { "*" });
-            }
-
-            foreach (var project in context.EntryPoints)
+            foreach (var project in projects)
             {
                 try
                 {
@@ -70,13 +60,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
+                Logger.LogInformation("Package Analysis for {ProjectPath}", project.FileInfo.Name);
+
                 if (_analysisState is null || !_analysisState.AreChangesRecommended)
                 {
                     Logger.LogInformation("No package updates needed");
                 }
                 else
                 {
-                    Logger.LogInformation("Package Analysis for the {ProjectPath}", project.FileInfo);
                     LogDetails("References to be removed: {References}", _analysisState.References.Deletions);
                     LogDetails("References to be added: {References}", _analysisState.References.Additions);
                     LogDetails("Packages to be removed: {Packages}", _analysisState.Packages.Deletions);
