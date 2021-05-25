@@ -7,7 +7,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Text;
 using CS = Microsoft.CodeAnalysis.CSharp;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
 using VB = Microsoft.CodeAnalysis.VisualBasic;
@@ -39,11 +38,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// </summary>
         private const string Category = "Upgrade";
 
-        /// <summary>
-        /// The suffix that type map files are expected to use.
-        /// </summary>
-        private const string TypeMapFileSuffix = ".typemap";
-
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.TypeUpgradeTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.TypeUpgradeMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.TypeUpgradeDescription), Resources.ResourceManager, typeof(Resources));
@@ -69,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.RegisterCompilationStartAction(context =>
             {
                 // Load analyzer configuration defining the types that should be mapped.
-                var mappings = LoadMappings(context.Options.AdditionalFiles);
+                var mappings = TypeMapLoader.LoadMappings(context.Options.AdditionalFiles);
 
                 // If type maps are present, register syntax node actions to analyze for those types
                 if (mappings.Any())
@@ -142,28 +136,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // that the code fix provider can directly replace the node without needing to consider its parents.
             var diagnostic = CreateDiagnostic(fullyQualifiedNameNode.GetLocation(), properties, simpleName, mapping.NewName);
             context.ReportDiagnostic(diagnostic);
-        }
-
-        /// <summary>
-        /// Load type mappings from additional files.
-        /// </summary>
-        /// <returns>Type mappings as defined in *.typemap files in the project's additional files.</returns>
-        private static IEnumerable<TypeMapping> LoadMappings(ImmutableArray<AdditionalText> additionalTexts)
-        {
-            foreach (var file in additionalTexts)
-            {
-                if (file.Path.EndsWith(TypeMapFileSuffix, StringComparison.OrdinalIgnoreCase))
-                {
-                    foreach (var line in file.GetText()?.Lines ?? Enumerable.Empty<TextLine>())
-                    {
-                        var components = line.ToString().Trim().Split('\t');
-                        if (components.Length == 2)
-                        {
-                            yield return new TypeMapping(components[0], components[1]);
-                        }
-                    }
-                }
-            }
         }
     }
 }
