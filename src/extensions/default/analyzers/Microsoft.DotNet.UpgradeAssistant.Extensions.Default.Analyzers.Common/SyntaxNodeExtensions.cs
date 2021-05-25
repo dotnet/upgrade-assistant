@@ -16,10 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static partial class SyntaxNodeExtensions
     {
-        public static bool IsVisualBasic(this SyntaxNode node) => node?.Language == LanguageNames.VisualBasic;
-
-        public static bool IsCSharp(this SyntaxNode node) => node?.Language == LanguageNames.CSharp;
-
         public static SyntaxNode AddArgumentToInvocation(this SyntaxNode invocationNode, SyntaxNode argument)
         {
             if (invocationNode.IsVisualBasic())
@@ -216,20 +212,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
             return result;
         }
-
-        /// <summary>
-        /// Determines whether a node is a NameSyntax (either C# or VB).
-        /// </summary>
-        /// <param name="node">The node to inspect.</param>
-        /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.NameSyntax, false otherwise.</returns>
-        public static bool IsNameSyntax(this SyntaxNode node) => node is CSSyntax.NameSyntax || node is VBSyntax.NameSyntax;
-
-        /// <summary>
-        /// Determines whether a node is a MemberAccessExpressionSyntax (either C# or VB).
-        /// </summary>
-        /// <param name="node">The node to inspect.</param>
-        /// <returns>True if the node derives from Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax, false otherwise.</returns>
-        public static bool IsMemberAccessExpressionSyntax(this SyntaxNode node) => node is CSSyntax.MemberAccessExpressionSyntax || node is VBSyntax.MemberAccessExpressionSyntax;
 
         public static SyntaxNode? GetInvocationExpression(this SyntaxNode callerNode)
         {
