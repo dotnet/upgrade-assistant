@@ -23,6 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         // Path relative from .\bin\debug\net5.0
         // TODO : Make this configurable so the test can pass from other working dirs
         internal const string TestProjectPath = @"assets\TestProject.{lang}proj";
+        private const string TypeMapPath = "WebTypeReplacements.typemap";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new AllowHtmlAttributeAnalyzer(),
@@ -44,8 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             new UsingSystemWebCodeFixer(),
             new UrlHelperCodeFixer());
 
-        private static ImmutableArray<AdditionalText> AdditionalTexts => ImmutableArray.Create<AdditionalText>(
-            new WebTypeReplacements());
+        private static ImmutableArray<AdditionalText> AdditionalTexts => ImmutableArray.Create<AdditionalText>(new AdditionalFileText(Path.Combine(AppContext.BaseDirectory, TypeMapPath)));
 
         public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, IEnumerable<string> diagnosticIds)
         {

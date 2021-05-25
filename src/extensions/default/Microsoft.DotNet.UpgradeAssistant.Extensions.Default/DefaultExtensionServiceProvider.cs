@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -17,6 +19,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
     public class DefaultExtensionServiceProvider : IExtensionServiceProvider
     {
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
+        private static readonly string[] TypeMapFiles = new[]
+        {
+            "WebTypeReplacements.typemap"
+        };
 
         public void AddServices(IExtensionServiceCollection services)
         {
@@ -79,7 +85,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<CodeFixProvider, UsingSystemWebCodeFixer>();
 
             // Add additional documents used by the analzyers
-            services.AddTransient<AdditionalText, WebTypeReplacements>();
+            foreach (var path in TypeMapFiles)
+            {
+                services.AddTransient<AdditionalText>(sp => new AdditionalFileText(Path.Combine(AppContext.BaseDirectory, path)));
+            }
         }
 
         // This extension only adds default package reference analyzers, but other extensions
