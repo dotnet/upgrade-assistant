@@ -1,35 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Solution;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Analysis
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class AnalyzePackageStatus : IAnalyzeResultProvider
     {
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
-        private readonly IEntrypointResolver _entrypointResolver;
-        private readonly UpgradeOptions _options;
-
         private IDependencyAnalysisState? _analysisState;
 
-        protected ILogger Logger { get; }
+        private ILogger Logger { get; }
 
-        public AnalyzePackageStatus(UpgradeOptions options,
-            IDependencyAnalyzerRunner packageAnalyzer,
-            ILogger<AnalyzePackageStatus> logger,
-            IEntrypointResolver entrypointResolver)
+        public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
+            ILogger<AnalyzePackageStatus> logger)
         {
             Logger = logger;
-            _options = options;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
-            _entrypointResolver = entrypointResolver ?? throw new ArgumentNullException(nameof(entrypointResolver));
             _analysisState = null;
         }
 

@@ -4,7 +4,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Analysis
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IAnalyzeResultProvider
     {

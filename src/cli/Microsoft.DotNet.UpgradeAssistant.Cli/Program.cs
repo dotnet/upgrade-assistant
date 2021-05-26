@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,7 +68,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
     {
         services.AddScoped<IAppCommand, ConsoleAnalyze>();
-        services.AddAnalysis();
     }), token);
 
         public static Task<int> RunUpgradeAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
