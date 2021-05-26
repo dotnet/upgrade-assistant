@@ -29,6 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        [ObsoleteAttribute("This property is WIP, expect changes in this area.", false)]
         public async Task RunAsync(CancellationToken token)
         {
             _logger.LogWarning("The Analyze command feature is still under development, expect things to be not fully functional at the moment");
