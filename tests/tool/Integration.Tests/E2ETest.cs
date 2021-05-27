@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
 using Xunit.Abstractions;
@@ -20,8 +20,6 @@ namespace Integration.Tests
         private const string IntegrationTestAssetsPath = "IntegrationScenarios";
         private const string OriginalProjectSubDir = "Original";
         private const string UpgradedProjectSubDir = "Upgraded";
-
-        private static readonly string[] DirsToIgnore = new[] { "bin", "obj" };
 
         private readonly HashSet<string> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -50,7 +48,7 @@ namespace Integration.Tests
 
             // Copy the scenario files to the temporary directory
             var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioPath);
-            await CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
+            await FileHelpers.CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
             var upgradeRunner = new UpgradeRunner();
 
             // Run upgrade
@@ -58,7 +56,7 @@ namespace Integration.Tests
 
             Assert.Equal(ErrorCodes.Success, result);
 
-            CleanupBuildArtifacts(workingDir);
+            FileHelpers.CleanupBuildArtifacts(workingDir);
 
             AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages, workingDir);
             await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
@@ -124,42 +122,6 @@ namespace Integration.Tests
                 catch (EqualException ex)
                 {
                     Assert.True(false, $"The contents of \"{file}\" do not match.{Environment.NewLine}{ex.Message}");
-                }
-            }
-        }
-
-        private async Task CopyDirectoryAsync(string sourceDir, string destinationDir)
-        {
-            Directory.CreateDirectory(destinationDir);
-            var directoryInfo = new DirectoryInfo(sourceDir);
-            foreach (var file in directoryInfo.GetFiles("*", SearchOption.TopDirectoryOnly))
-            {
-                var dest = Path.Combine(destinationDir, file.Name);
-                await CopyFileAsync(file.FullName, dest).ConfigureAwait(false);
-            }
-
-            foreach (var dir in directoryInfo.GetDirectories())
-            {
-                await CopyDirectoryAsync(dir.FullName, Path.Combine(destinationDir, dir.Name)).ConfigureAwait(false);
-            }
-        }
-
-        private static async Task CopyFileAsync(string sourceFile, string destinationFile)
-        {
-            var fileOptions = FileOptions.Asynchronous | FileOptions.SequentialScan;
-            var bufferSize = 65536;
-            using var sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize, fileOptions);
-            using var destinationStream = new FileStream(destinationFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, fileOptions);
-            await sourceStream.CopyToAsync(destinationStream, bufferSize, CancellationToken.None).ConfigureAwait(false);
-        }
-
-        private static void CleanupBuildArtifacts(string workingDir)
-        {
-            foreach (var dir in DirsToIgnore.SelectMany(d => Directory.GetDirectories(workingDir, d, SearchOption.AllDirectories)))
-            {
-                if (Directory.Exists(dir))
-                {
-                    Directory.Delete(dir, true);
                 }
             }
         }

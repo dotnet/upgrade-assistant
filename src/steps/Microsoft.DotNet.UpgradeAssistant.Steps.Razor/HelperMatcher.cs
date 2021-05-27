@@ -162,7 +162,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // Add a return statement for the local method
             newText.Insert(newText.Length - 1, $"\treturn new HelperResult(w => Task.CompletedTask);{Environment.NewLine}{whitespace}");
 
-            newText.AppendLine(" }");
+            newText.Append(" }");
 
             return new HelperReplacement(newText.ToString(), helperOffset, index - helperOffset);
         }

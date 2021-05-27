@@ -27,6 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             .AddTransient<ITextMatcher, DefaultTextMatcher>()
             .AddTransient<ITextReplacer, RazorTextReplacer>()
             .AddTransient<IDiffer, Differ>()
-            .AddTransient<IChunker, CharacterChunker>();
+            .AddTransient<IChunker, CharacterChunker>()
+            .AddTransient<IHelperMatcher, HelperMatcher>();
     }
 }
