@@ -3,7 +3,7 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Current
+## Version 0.2.227701 - 2021-05-27 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.227701))
 
 ### Added
 - Added analyzer and code fixer to upgrade System.Web.Mvc.Controller to Microsoft.AspNetCore.Mvc.Controller. Updated ApiControll upgrade code fix to upgrade to ControllerBase, instead. [#534](https://github.com/dotnet/upgrade-assistant/pull/534)
