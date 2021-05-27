@@ -29,12 +29,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             var dll = $"{assemblyName.Name}.dll";
-            var file = _extension.FileProvider.GetFileInfo(dll);
+            var dllFile = _extension.FileProvider.GetFileInfo(dll);
 
-            if (file.Exists)
+            var pdb = $"{assemblyName.Name}.pdb";
+            var pdbFile = _extension.FileProvider.GetFileInfo(pdb);
+
+            if (dllFile.Exists)
             {
-                using var stream = file.CreateReadStream();
-                return LoadFromStream(stream);
+                using var dllStream = dllFile.CreateReadStream();
+
+                if (pdbFile.Exists)
+                {
+                    using var pdbStream = pdbFile.CreateReadStream();
+                    return LoadFromStream(pdbStream);
+                }
+                else
+                {
+                    return LoadFromStream(dllStream);
+                }
             }
 
             return null;
