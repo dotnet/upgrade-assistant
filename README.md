@@ -70,13 +70,13 @@ To try the latest (and likely less stable) versions of the tool, CI builds are a
 
 ### Running the tool
 
-The usual usage of the tool is: `upgrade-assistant <Path to csproj or sln to upgrade>`
+The usual usage of the tool is: `upgrade-assistant upgrade <Path to csproj or sln to upgrade>`
 
 Full usage information:
 
 ```
 Usage:
-  upgrade-assistant [options] <project>
+  upgrade-assistant upgrade [options] <project>
 
 Arguments:
   <project>
