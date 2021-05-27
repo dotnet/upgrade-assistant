@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         [Fact]
         public void CtorNegativeTests()
         {
-            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", Array.Empty<LocationLookup[]>());
+            using var mock = GetMock("RazorSourceUpdaterStepViews/Test.csproj", Array.Empty<LocationLookup[]>());
             var analyzers = mock.Container.Resolve<IEnumerable<DiagnosticAnalyzer>>();
             var textMatcher = mock.Container.Resolve<ITextMatcher>();
             var codeFixProviders = mock.Container.Resolve<IEnumerable<CodeFixProvider>>();
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         [Fact]
         public void PropertyTests()
         {
-            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", Array.Empty<LocationLookup[]>());
+            using var mock = GetMock("RazorSourceUpdaterStepViews/Test.csproj", Array.Empty<LocationLookup[]>());
             var updater = mock.Create<RazorSourceUpdater>();
 
             Assert.Equal("Microsoft.DotNet.UpgradeAssistant.Steps.Razor.RazorSourceUpdater", updater.Id);
@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         public async Task IsApplicableTests(LocationLookup[][] diagnosticLocations, string[] expectedApplicableFilePaths)
         {
             // Arrange
-            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", diagnosticLocations);
+            using var mock = GetMock("RazorSourceUpdaterStepViews/Test.csproj", diagnosticLocations);
             var razorDocs = await GetRazorCodeDocumentsAsync(mock).ConfigureAwait(true);
             var context = mock.Mock<IUpgradeContext>();
             var updater = mock.Create<RazorSourceUpdater>();
@@ -105,9 +105,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new[]
                     {
-                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]") },
+                        new[] { new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]") },
                     },
-                    new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
+                    new[] { GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml") },
                 },
 
                 // Diagnostic mapped to shared Razor file
@@ -115,9 +115,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new[]
                     {
-                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;") },
+                        new[] { new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;") },
                     },
-                    new[] { GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml") },
+                    new[] { GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml") },
                 },
 
                 // Diagnostic in unmapped portions of generated files
@@ -127,13 +127,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     {
                         new[]
                         {
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "assembly: global::Microsoft.AspNetCore"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\\r\\n        <p>\")"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "assembly: global::Microsoft.AspNetCore"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\\r\\n        <p>\")"),
                         },
                     },
                     new[]
                     {
-                        GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs"),
+                        GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs"),
                     },
                 },
 
@@ -144,21 +144,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     {
                         new[]
                         {
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]"),
                         },
                         new[]
                         {
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[1]"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "DateTime.Now.ToString()"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[1]"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "DateTime.Now.ToString()"),
                         }
                     },
                     new[]
                     {
-                        GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"),
-                        GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"),
-                        GetFullPath("RazorUpdaterStepViews\\TestViews\\Simple.cshtml"),
+                        GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml"),
+                        GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"),
+                        GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml"),
                     },
                 }
             };
@@ -178,7 +178,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         public async Task ApplyTests(LocationLookup[][] diagnosticLocations, string[] expectedUpdatedFiles, TextReplacement[] expectedReplacements)
         {
             // Arrange
-            using var mock = GetMock("RazorUpdaterStepViews/Test.csproj", diagnosticLocations);
+            using var mock = GetMock("RazorSourceUpdaterStepViews/Test.csproj", diagnosticLocations);
             var razorDocs = await GetRazorCodeDocumentsAsync(mock).ConfigureAwait(true);
             var context = mock.Mock<IUpgradeContext>();
             var updater = mock.Create<RazorSourceUpdater>();
@@ -234,10 +234,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new[]
                     {
-                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]") },
+                        new[] { new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]") },
                     },
-                    new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
-                    new[] { new TextReplacement("      Write(Model[0]);\r\n", "      Write(Model[0] /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6) }
+                    new[] { GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml") },
+                    new[] { new TextReplacement("      Write(Model[0]);\r\n", "      Write(Model[0] /* Test! */);\r\n", GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 6) }
                 },
 
                 // Diagnostic mapped to shared Razor file
@@ -245,10 +245,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new[]
                     {
-                        new[] { new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;") },
+                        new[] { new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;") },
                     },
-                    new[] { GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml") },
-                    new[] { new TextReplacement("using Microsoft.AspNetCore.Mvc;\r\n", "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n", GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1) }
+                    new[] { GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml") },
+                    new[] { new TextReplacement("using Microsoft.AspNetCore.Mvc;\r\n", "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n", GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml"), 1) }
                 },
 
                 // Diagnostic in unmapped portions of generated files
@@ -258,16 +258,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     {
                         new[]
                         {
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "assembly: global::Microsoft.AspNetCore"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\\r\\n        <p>\")"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "assembly: global::Microsoft.AspNetCore"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "WriteLiteral(\"    <div>\\r\\n        <p>\")"),
                         },
                     },
-                    new[] { GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml") },
+                    new[] { GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml") },
                     new[]
                     {
                         // The first one *does* generate a replacement because it represents text being prepended to the beginning of the source file
                         // Don't check the actual text, though, since it will include file path-specific values that will change
-                        new TextReplacement(string.Empty, string.Empty, GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 0),
+                        new TextReplacement(string.Empty, string.Empty, GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 0),
                     }
                 },
 
@@ -278,28 +278,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     {
                         new[]
                         {
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[0]"),
                         },
                         new[]
                         {
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[1]"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
-                            new LocationLookup("RazorUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "DateTime.Now.ToString()"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml.cs", "Model[1]"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "using Microsoft.AspNetCore.Mvc;"),
+                            new LocationLookup("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml.cs", "DateTime.Now.ToString()"),
                         }
                     },
                     new[]
                     {
-                        GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"),
-                        GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"),
-                        GetFullPath("RazorUpdaterStepViews\\TestViews\\Simple.cshtml"),
+                        GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml"),
+                        GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"),
+                        GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml"),
                     },
                     new[]
                     {
-                        new TextReplacement("using Microsoft.AspNetCore.Mvc;\r\n", "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n", GetFullPath("RazorUpdaterStepViews\\_ViewImports.cshtml"), 1),
-                        new TextReplacement(" Write(DateTime.Now.ToString());\r\n", " Write(DateTime.Now.ToString() /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\Simple.cshtml"), 1),
-                        new TextReplacement("      Write(Model[0]);\r\n", "      Write(Model[0] /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 6),
-                        new TextReplacement("      Write(Model[1]);\r\n", "      Write(Model[1] /* Test! */);\r\n", GetFullPath("RazorUpdaterStepViews\\TestViews\\View.cshtml"), 18),
+                        new TextReplacement("using Microsoft.AspNetCore.Mvc;\r\n", "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n", GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml"), 1),
+                        new TextReplacement(" Write(DateTime.Now.ToString());\r\n", " Write(DateTime.Now.ToString() /* Test! */);\r\n", GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml"), 1),
+                        new TextReplacement("      Write(Model[0]);\r\n", "      Write(Model[0] /* Test! */);\r\n", GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 6),
+                        new TextReplacement("      Write(Model[1]);\r\n", "      Write(Model[1] /* Test! */);\r\n", GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 18),
                     }
                 }
             };
