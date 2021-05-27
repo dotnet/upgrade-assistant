@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,50 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllowHtmlAttributeTitle" xml:space="preserve">
-    <value>Remove [AllowHtml] attribute</value>
-  </data>
-  <data name="ApiControllerTitle" xml:space="preserve">
-    <value>Replace with Microsoft.AspNetCore.Mvc.Controller</value>
-  </data>
-  <data name="BinaryFormatterUnsafeDeserializeTitle" xml:space="preserve">
-    <value>Replace with BinaryFormatter.Deserialize</value>
-  </data>
-  <data name="FilterTitle" xml:space="preserve">
-    <value>Replace with ASP.NET Core filter type</value>
-  </data>
-  <data name="HelperResultTitle" xml:space="preserve">
-    <value>Replace with Microsoft.AspNetCore.Mvc.Razor.HelperResult</value>
-  </data>
-  <data name="HtmlHelperTitle" xml:space="preserve">
-    <value>Replace with ASP.NET Core HTML helper type</value>
-  </data>
-  <data name="HtmlStringTitle" xml:space="preserve">
-    <value>Replace with Microsoft.AspNetCore.Html.HtmlString</value>
-  </data>
-  <data name="HttpContextCurrentTitle" xml:space="preserve">
-    <value>Replace HttpContext.Current usage with an HttpContextAccessor-based solution</value>
-  </data>
-  <data name="HttpContextIsDebuggingEnabled" xml:space="preserve">
-    <value>Replace IsDebuggingEnabled with System.Diagnostics.Debugger.IsAttached</value>
-  </data>
-  <data name="HttpContextRefactorTitle" xml:space="preserve">
-    <value>Pass HttpContext through method instead of via HttpContext.Current</value>
-  </data>
-  <data name="ResultTypeTitle" xml:space="preserve">
-    <value>Replace with ASP.NET Core result type</value>
-  </data>
   <data name="UnknownLanguage" xml:space="preserve">
-    <value>Unknown language</value>
-  </data>
-  <data name="TypeUpgradeTitle" xml:space="preserve">
-    <value>Replace type</value>
-  </data>
-  <data name="UrlHelperTitle" xml:space="preserve">
-    <value>Replace with ASP.NET Core URL helper type</value>
-  </data>
-  <data name="UsingSystemWebTitle" xml:space="preserve">
-    <value>Remove using directive</value>
-    <comment>The title of the code fix.</comment>
+    <value>UnknownLanguage</value>
   </data>
 </root>
