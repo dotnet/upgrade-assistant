@@ -4,12 +4,17 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    public record ExtensionServiceCollection(IServiceCollection Services, IConfiguration Configuration) : IExtensionServiceCollection
+    internal record ExtensionServiceCollection(IServiceCollection Services, ExtensionInstance Extension) : IExtensionServiceCollection
     {
+        public IConfiguration Configuration => Extension.Configuration;
+
+        public IFileProvider Files => Extension.FileProvider;
+
         public IExtensionOptionsBuilder<TOption> AddExtensionOption<TOption>(string sectionName)
             where TOption : class, new()
         {

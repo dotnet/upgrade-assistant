@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
@@ -18,6 +19,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// Gets the service collection.
         /// </summary>
         IServiceCollection Services { get; }
+
+        /// <summary>
+        /// Gets the file provider for the root of the extension.
+        /// </summary>
+        IFileProvider Files { get; }
 
         /// <summary>
         /// Add options that are supplied within an extension manifest.

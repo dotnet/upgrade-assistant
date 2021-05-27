@@ -17,6 +17,7 @@
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageTags>Upgrade Assistant</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <ItemGroup>

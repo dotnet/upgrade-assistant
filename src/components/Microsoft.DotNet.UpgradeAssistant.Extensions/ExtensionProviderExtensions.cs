@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
@@ -96,6 +97,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return;
             }
 
+            var context = new ExtensionAssemblyLoadContext(extension);
+
             foreach (var path in extensionServiceProviderPaths)
             {
                 try
@@ -116,21 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         continue;
                     }
 
-                    // AssemblyLoadContext is not available in .NET Standard 2.0
-                    // var assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
-                    var assemblyBytes = new byte[assemblyStream.Length];
-                    assemblyStream.Read(assemblyBytes, 0, assemblyBytes.Length);
-                    var assembly = Assembly.Load(assemblyBytes);
-
-                    var serviceProviders = assembly.GetTypes()
-                        .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
-                        .Select(t => Activator.CreateInstance(t))
-                        .Cast<IExtensionServiceProvider>();
-
-                    foreach (var sp in serviceProviders)
-                    {
-                        sp.AddServices(new ExtensionServiceCollection(services, extension.Configuration));
-                    }
+                    context.LoadFromStream(assemblyStream);
                 }
                 catch (FileLoadException)
                 {
@@ -138,6 +127,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 catch (BadImageFormatException)
                 {
                 }
+            }
+
+            var serviceProviders = context.Assemblies.SelectMany(assembly => assembly
+                .GetTypes()
+                .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
+                .Select(t => Activator.CreateInstance(t))
+                .Cast<IExtensionServiceProvider>());
+
+            foreach (var sp in serviceProviders)
+            {
+                sp.AddServices(new ExtensionServiceCollection(services, extension));
             }
         }
     }

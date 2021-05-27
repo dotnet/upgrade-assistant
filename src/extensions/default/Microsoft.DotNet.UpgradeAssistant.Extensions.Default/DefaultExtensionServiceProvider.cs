@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.Services.AddBackupStep();
             services.AddConfigUpdaterStep();
             services.AddPackageUpdaterStep();
-            services.Services.AddProjectFormatSteps()
+            services.AddProjectFormatSteps()
                 .Bind(configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
             services.Services.AddSolutionSteps();
             services.Services.AddSourceUpdaterStep();
