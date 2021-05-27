@@ -17,8 +17,15 @@ using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
 {
-    public class RazorHelperUpdaterTests
+    public sealed class RazorHelperUpdaterTests : IDisposable
     {
+        List<string> _temporaryDirectories;
+
+        public RazorHelperUpdaterTests()
+        {
+            _temporaryDirectories = new List<string>();
+        }
+
         [Fact]
         public void CtorNegativeTests()
         {
@@ -50,18 +57,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 .ConfigureAwait(true);
         }
 
-        [Fact]
-        public async Task ApplyNegativeTests()
-        {
-            using var mock = await GetMock(null).ConfigureAwait(true);
-            var updater = mock.Create<RazorHelperUpdater>();
-
-            await Assert.ThrowsAsync<ArgumentNullException>("context", () => updater.ApplyAsync(null!, Enumerable.Empty<RazorCodeDocument>().ToImmutableArray(), CancellationToken.None))
-                .ConfigureAwait(true);
-        }
-
         [Theory]
-        [MemberData(nameof(IsApplicableData))]
+        [MemberData(nameof(HelperTestViews))]
         public async Task IsApplicableTests(string projectPath, FileUpdaterResult expectedResult)
         {
             // Arrange
@@ -79,7 +76,45 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             Assert.Collection(fileUpdaterResult.FilePaths, expectedResult.FilePaths.Select<string, Action<string>>(e => a => Assert.EndsWith(e, a, StringComparison.Ordinal)).ToArray());
         }
 
-        public static IEnumerable<object[]> IsApplicableData =>
+        [Fact]
+        public async Task ApplyNegativeTests()
+        {
+            using var mock = await GetMock(null).ConfigureAwait(true);
+            var updater = mock.Create<RazorHelperUpdater>();
+
+            await Assert.ThrowsAsync<ArgumentNullException>("context", () => updater.ApplyAsync(null!, Enumerable.Empty<RazorCodeDocument>().ToImmutableArray(), CancellationToken.None))
+                .ConfigureAwait(true);
+        }
+
+        [Theory]
+        [MemberData(nameof(HelperTestViews))]
+        public async Task ApplyTests(string projectPath, FileUpdaterResult expectedResult)
+        {
+            // Arrange
+            using var mock = await GetMock(projectPath).ConfigureAwait(true);
+            var context = mock.Mock<IUpgradeContext>().Object;
+            var updater = mock.Create<RazorHelperUpdater>();
+            var inputs = await GetRazorCodeDocumentsAsync(mock).ConfigureAwait(true);
+
+            // Act
+            var result = await updater.ApplyAsync(context, inputs, CancellationToken.None).ConfigureAwait(true);
+
+            // Assert
+            var fileUpdaterResult = Assert.IsType<FileUpdaterResult>(result);
+            Assert.True(fileUpdaterResult.Result);
+            Assert.Collection(fileUpdaterResult.FilePaths, expectedResult.FilePaths.Select<string, Action<string>>(e => a => Assert.EndsWith(e, a, StringComparison.Ordinal)).ToArray());
+
+            // Confirm that files are updated as expected
+            var projectFiles = context.CurrentProject!.FileInfo.Directory!.GetFiles("*.*", new EnumerationOptions { RecurseSubdirectories = true });
+            var expectedFiles = new DirectoryInfo($"{Path.GetDirectoryName(projectPath)}.Fixed").GetFiles("*.*", new EnumerationOptions { RecurseSubdirectories = true });
+            Assert.Collection(projectFiles, expectedFiles.Select<FileInfo, Action<FileInfo>>(e => a =>
+            {
+                Assert.Equal(File.ReadAllText(e.FullName), File.ReadAllText(a.FullName));
+            }).ToArray());
+
+        }
+
+        public static IEnumerable<object[]> HelperTestViews =>
             new List<object[]>
             {
                 new object[]
@@ -104,12 +139,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 }
             };
 
-        private static async Task<AutoMock> GetMock(string? projectPath)
+        private async Task<AutoMock> GetMock(string? projectPath)
         {
             if (projectPath is not null)
             {
                 // Create a temporary working directory and copy views to it so that they can be updated
                 var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                _temporaryDirectories.Add(workingDir);
                 var dir = Directory.CreateDirectory(workingDir);
                 Assert.True(dir.Exists);
                 await FileHelpers.CopyDirectoryAsync(Path.GetDirectoryName(projectPath)!, workingDir).ConfigureAwait(false);
@@ -142,6 +178,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             var updaterStep = new RazorUpdaterStep(Enumerable.Empty<IUpdater<RazorCodeDocument>>(), mock.Mock<ILogger<RazorUpdaterStep>>().Object);
             await updaterStep.InitializeAsync(mock.Mock<IUpgradeContext>().Object, CancellationToken.None).ConfigureAwait(true);
             return updaterStep.RazorDocuments;
+        }
+
+        public void Dispose()
+        {
+            foreach (var dir in _temporaryDirectories)
+            {
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true);
+                }
+            }
         }
     }
 }
