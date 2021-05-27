@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
 {
     public sealed class RazorHelperUpdaterTests : IDisposable
     {
-        List<string> _temporaryDirectories;
+        private readonly List<string> _temporaryDirectories;
 
         public RazorHelperUpdaterTests()
         {
@@ -111,7 +111,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             {
                 Assert.Equal(File.ReadAllText(e.FullName), File.ReadAllText(a.FullName));
             }).ToArray());
-
         }
 
         public static IEnumerable<object[]> HelperTestViews =>
