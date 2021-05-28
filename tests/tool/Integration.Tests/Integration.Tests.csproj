@@ -30,19 +30,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <Target Name="MoveAnalyzersToSourceUpdatersDir" AfterTargets="Build">
-    <PropertyGroup>
-      <SourceUpdateFilePath>$(OutputPath)SourceUpdaters\</SourceUpdateFilePath>
-      <ConfigUpdateFilePath>$(OutputPath)ConfigUpdaters\</ConfigUpdateFilePath>
-    </PropertyGroup>
-    <ItemGroup>
-      <SourceUpdateFiles Include="$(OutputPath)Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.*" />
-      <SourceUpdateFiles Include="$(OutputPath)Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CSharp.CodeFixes.*" />
-      <ConfigUpdateFiles Include="$(OutputPath)Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.*" />
-    </ItemGroup>
-    <Message Importance="normal" Text="Moving source updaters to $(SourceUpdateFilePath)" />
-    <Copy SourceFiles="@(SourceUpdateFiles)" DestinationFolder="$(SourceUpdateFilePath)" ContinueOnError="true" />
-    <Message Importance="normal" Text="Moving config updaters to $(ConfigUpdateFilePath)" />
-    <Copy SourceFiles="@(ConfigUpdateFiles)" DestinationFolder="$(ConfigUpdateFilePath)" ContinueOnError="true" />
-  </Target>
 </Project>

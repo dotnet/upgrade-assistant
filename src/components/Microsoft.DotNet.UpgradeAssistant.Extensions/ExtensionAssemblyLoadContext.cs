@@ -31,12 +31,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             var dll = $"{assemblyName.Name}.dll";
             var dllFile = _extension.FileProvider.GetFileInfo(dll);
 
-            var pdb = $"{assemblyName.Name}.pdb";
-            var pdbFile = _extension.FileProvider.GetFileInfo(pdb);
-
             if (dllFile.Exists)
             {
                 using var dllStream = dllFile.CreateReadStream();
+
+                var pdb = $"{assemblyName.Name}.pdb";
+                var pdbFile = _extension.FileProvider.GetFileInfo(pdb);
 
                 if (pdbFile.Exists)
                 {
