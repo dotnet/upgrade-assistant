@@ -1,5 +1,6 @@
 <Project>
 
+  <!-- Publish the extension and collect its output -->
   <Target Name="ComputePublishOutput" DependsOnTargets="Build;Publish" Returns="@(ExtensionFiles)">
     <ItemGroup>
       <ExtensionFiles Include="@(ResolvedFileToPublish)">
@@ -27,6 +28,7 @@
   <!-- Publish each extension into its own directory -->
   <Target Name="PublishUpgradeAssistantExtensions" DependsOnTargets="ResolveAssemblyReferences" BeforeTargets="AssignTargetPaths" Outputs="%(Extension.Identity)">
 
+    <!-- Add the relative directory the extension will be added to -->
     <ItemGroup>
       <Extension Update="@(Extension)">
         <ExtensionDir>extensions/%(Extension.Name)</ExtensionDir>
@@ -35,22 +37,27 @@
 
     <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
 
+    <!-- Publish the extension and collect its extension -->
     <MSBuild Projects="%(Extension.Identity)" Targets="ComputePublishOutput" Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);PackageAsSingleFile=false;_IsExtension=true" Condition=" '%(Extension.Name)' != '' ">
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
     <ItemGroup>
-      <_ExistingReferences Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
-      <_ExistingReferences Include="%(RuntimeCopyLocalItems.DestinationSubPath)" />      
+      <!-- Create a list of all assemblies included by host -->
+      <_ExcludeFromExtension Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+      <_ExcludeFromExtension Include="%(RuntimeCopyLocalItems.DestinationSubPath)" />
 
+      <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
       <_ExtensionArtifactsByRelativePath Include="%(_ExtensionArtifacts.RelativePath)">
         <OriginalIdentity>%(Identity)</OriginalIdentity>
         <TargetPath>%(TargetPath)</TargetPath>
         <Link>%(Link)</Link>
       </_ExtensionArtifactsByRelativePath>
 
-      <_FilteredExtensionArtifactsByRelativePath Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_ExistingReferences)" />
-      
+      <!-- Remove the host supplied assemblies -->
+      <_FilteredExtensionArtifactsByRelativePath Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_ExcludeFromExtension)" />
+
+      <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
       <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsByRelativePath.OriginalIdentity)">
         <RelativePath>%(Identity)</RelativePath>
         <TargetPath>%(TargetPath)</TargetPath>

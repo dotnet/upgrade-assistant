@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Unexpected error during upgrade.");
+                _logger.LogError(e, "Unexpected error during upgrade: " + e.ToString());
                 _errorCode.ErrorCode = ErrorCodes.UnexpectedError;
             }
             finally
