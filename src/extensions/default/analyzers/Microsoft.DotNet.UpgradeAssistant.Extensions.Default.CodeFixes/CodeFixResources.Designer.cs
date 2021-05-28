@@ -160,6 +160,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace type.
+        /// </summary>
+        internal static string TypeUpgradeTitle {
+            get {
+                return ResourceManager.GetString("TypeUpgradeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown language.
         /// </summary>
         internal static string UnknownLanguage {

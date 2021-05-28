@@ -207,6 +207,15 @@
   <data name="ResultTypeTitle" xml:space="preserve">
     <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace</value>
   </data>
+  <data name="TypeUpgradeDescription" xml:space="preserve">
+    <value>This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent.</value>
+  </data>
+  <data name="TypeUpgradeMessageFormat" xml:space="preserve">
+    <value>Type '{0}' should be replaced with '{1}'</value>
+  </data>
+  <data name="TypeUpgradeTitle" xml:space="preserve">
+    <value>Type should be upgraded</value>
+  </data>
   <data name="UrlHelperDescription" xml:space="preserve">
     <value>UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper.</value>
   </data>
