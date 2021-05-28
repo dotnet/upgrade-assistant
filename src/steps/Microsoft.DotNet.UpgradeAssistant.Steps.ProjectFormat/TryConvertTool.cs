@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string DotNetCli = "dotnet";
-        private const string TryConvertArgumentsFormat = "try-convert.dll --no-backup -m \"{0}\" --force-web-conversion --keep-current-tfms -p \"{1}\"";
+        private const string TryConvertArgumentsFormat = "{0} --no-backup -m \"{1}\" --force-web-conversion --keep-current-tfms -p \"{2}\"";
 
         private static readonly string[] ErrorMessages = new[]
         {
@@ -97,6 +97,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, GetMSBuildPath(), project.Required().FileInfo);
+        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Path, GetMSBuildPath(), project.Required().FileInfo);
     }
 }
