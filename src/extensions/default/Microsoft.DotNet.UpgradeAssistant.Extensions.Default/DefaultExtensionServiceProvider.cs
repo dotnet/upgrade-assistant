@@ -24,13 +24,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new System.ArgumentNullException(nameof(services));
             }
 
-            AddUpgradeSteps(services, services.Configuration);
+            AddUpgradeSteps(services);
             AddConfigUpdaters(services.Services);
             AddAnalyzersAndCodeFixProviders(services.Services);
             AddPackageReferenceAnalyzers(services.Services);
         }
 
-        private static void AddUpgradeSteps(IExtensionServiceCollection services, IConfiguration configuration)
+        private static void AddUpgradeSteps(IExtensionServiceCollection services)
         {
             services.Services.AddBackupStep();
             services.AddConfigUpdaterStep();
