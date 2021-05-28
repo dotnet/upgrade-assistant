@@ -31,13 +31,16 @@
     <ItemGroup>
       <Extension Update="@(Extension)">
         <ExtensionDir>extensions/%(Extension.Name)</ExtensionDir>
+
+        <!-- We want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
+        <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\extensions\%(Extension.Name)\</IntermediateOutputPath>
       </Extension>
     </ItemGroup>
 
     <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
 
     <!-- Publish the extension and collect its extension -->
-    <MSBuild Projects="%(Extension.Identity)" Targets="ComputePublishOutput" Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true" Condition=" '%(Extension.Name)' != '' ">
+    <MSBuild Projects="%(Extension.Identity)" Targets="ComputePublishOutput" Properties="Configuration=$(Configuration);IntermediateOutputPath=%(Extension.IntermediateOutputPath);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true" Condition=" '%(Extension.Name)' != '' ">
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
