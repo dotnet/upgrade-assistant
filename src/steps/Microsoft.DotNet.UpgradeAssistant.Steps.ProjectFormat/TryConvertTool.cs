@@ -17,7 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertTool : ITryConvertTool
     {
-        private const string TryConvertArgumentsFormat = "--no-backup -m \"{0}\" --force-web-conversion --keep-current-tfms -p \"{1}\"";
+        private const string DotNetCli = "dotnet";
+        private const string TryConvertArgumentsFormat = "try-convert.dll --no-backup -m \"{0}\" --force-web-conversion --keep-current-tfms -p \"{1}\"";
+
         private static readonly string[] ErrorMessages = new[]
         {
             "This project has custom imports that are not accepted by try-convert",
@@ -71,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             return _runner.RunProcessAsync(new ProcessInfo
             {
-                Command = Path,
+                Command = DotNetCli,
                 Arguments = GetArguments(project.Required()),
                 EnvironmentVariables = context.GlobalProperties,
                 IsErrorFilter = data => ErrorMessages.Any(data.Contains),
