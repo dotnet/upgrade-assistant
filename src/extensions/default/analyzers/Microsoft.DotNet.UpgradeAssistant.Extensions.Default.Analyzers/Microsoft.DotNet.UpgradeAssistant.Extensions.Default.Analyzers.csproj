@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="TypeMaps.props" CopyToOutputDirectory="Always" />
-    <None Include="WebTypeReplacements.typemap" CopyToOutputDirectory="Always" />
+    <None Include="WebTypeReplacements.typemap" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" />
