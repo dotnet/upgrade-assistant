@@ -29,6 +29,15 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" />
     <PackageReference Include="System.Linq.Async" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
+
+  <Target Name="PrivateAssetsIfExtension" Condition=" '$(IsExtension)' == 'true' " BeforeTargets="CollectPackageReferences">
+    <ItemGroup>
+      <PackageReference Update="@(PackageReference)">
+        <ExcludeAssets>runtime</ExcludeAssets>
+      </PackageReference>
+    </ItemGroup>
+  </Target>
 
 </Project>

@@ -1,0 +1,67 @@
+<Project>
+
+  <Target Name="ComputePublishOutput" DependsOnTargets="Build;Publish" Returns="@(ExtensionFiles)">
+    <ItemGroup>
+      <ExtensionFiles Include="@(ResolvedFileToPublish)">
+        <Link>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</Link>
+        <TargetPath>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</TargetPath>
+      </ExtensionFiles>
+    </ItemGroup>
+  </Target>
+
+  <!-- If a project is an extension, its reference to the abstractions should not be copied -->
+  <Target Name="MarkExtensionPrivateAssemblies" Condition=" '$(_IsExtension)' == 'true' " BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <ProjectReference Update="@(ProjectReference)" Condition=" '%(ProjectReference.FileName)' == 'Microsoft.DotNet.UpgradeAssistant.Abstractions' ">
+        <Private>false</Private>
+      </ProjectReference>
+    </ItemGroup>
+  </Target>
+
+  <!-- Since we will be publishing extensions, we want to ensure they are restored -->
+  <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild">
+    <MSBuild Projects="%(Extension.Identity)" Targets="Restore" Properties="Configuration=$(Configuration)" Condition=" '%(Extension.Name)' != '' ">
+    </MSBuild>
+  </Target>
+
+  <!-- Publish each extension into its own directory -->
+  <Target Name="PublishUpgradeAssistantExtensions" DependsOnTargets="ResolveAssemblyReferences" BeforeTargets="AssignTargetPaths" Outputs="%(Extension.Identity)">
+
+    <ItemGroup>
+      <Extension Update="@(Extension)">
+        <ExtensionDir>extensions/%(Extension.Name)</ExtensionDir>
+      </Extension>
+    </ItemGroup>
+
+    <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
+
+    <MSBuild Projects="%(Extension.Identity)" Targets="ComputePublishOutput" Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);PackageAsSingleFile=false;_IsExtension=true" Condition=" '%(Extension.Name)' != '' ">
+      <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
+    </MSBuild>
+
+    <ItemGroup>
+      <_ExistingReferences Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+
+      <_ExtensionArtifactsByRelativePath Include="%(_ExtensionArtifacts.RelativePath)">
+        <OriginalIdentity>%(Identity)</OriginalIdentity>
+        <TargetPath>%(TargetPath)</TargetPath>
+        <Link>%(Link)</Link>
+      </_ExtensionArtifactsByRelativePath>
+
+      <_FilteredExtensionArtifactsByRelativePath Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_ExistingReferences)" />
+      
+      <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsByRelativePath.OriginalIdentity)">
+        <RelativePath>%(Identity)</RelativePath>
+        <TargetPath>%(TargetPath)</TargetPath>
+        <Link>%(Link)</Link>
+      </_FilteredExtensionArtifacts>
+
+      <None Include="@(_FilteredExtensionArtifacts)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <Message Text="Published extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
+  </Target>
+
+</Project>

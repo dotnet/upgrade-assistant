@@ -1,0 +1,26 @@
+﻿{
+  "ExtensionName": "Default",
+
+  "ConfigUpdater": {
+    "ConfigFilePaths": [
+      "app.config",
+      "web.config",
+      "Views\\web.config"
+    ]
+  },
+
+  "PackageUpdater": {
+    "PackageMapPath": "PackageMaps"
+  },
+
+  "TemplateInserter": {
+    "TemplateConfigFiles": [
+      "Templates\\CSharpWebAppTemplates\\WebAppTemplates.json",
+      "Templates\\VisualBasicWebAppTemplates\\WebAppTemplates.json"
+    ]
+  },
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.dll"
+  ]
+}

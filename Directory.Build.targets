@@ -28,4 +28,6 @@
     <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
   </ItemGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)/Extensions.targets" />
+
 </Project>

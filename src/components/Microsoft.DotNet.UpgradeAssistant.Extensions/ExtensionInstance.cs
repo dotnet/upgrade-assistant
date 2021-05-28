@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
@@ -14,14 +15,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         private const string ExtensionNamePropertyName = "ExtensionName";
         private const string DefaultExtensionName = "Unknown";
 
+        private readonly Lazy<AssemblyLoadContext> _alc;
+
         public ExtensionInstance(IFileProvider fileProvider, string? name = null, IConfiguration? configuration = null)
         {
             FileProvider = fileProvider;
             Configuration = configuration ?? CreateConfiguration(fileProvider);
             Name = name ?? GetName(Configuration, FileProvider);
+            _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(this));
         }
 
         public string Name { get; }
+
+        public bool HasAssemblyLoadContext => _alc.IsValueCreated;
+
+        /// <summary>
+        /// Gets the <see cref="AssemblyLoadContext"/> for the extension. Guard calls with <see cref="HasAssemblyLoadContext"/> first,
+        /// otherwise it may trigger creation of the load context if it is not needed.
+        /// </summary>
+        public AssemblyLoadContext LoadContext => _alc.Value;
 
         public IFileProvider FileProvider { get; }
 

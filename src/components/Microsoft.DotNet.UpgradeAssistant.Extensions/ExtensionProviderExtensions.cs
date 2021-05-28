@@ -61,9 +61,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Will be disposed by dependency injection.")]
         private static IEnumerable<ExtensionInstance> GetExtensions(IConfiguration originalConfiguration, IEnumerable<string> additionalExtensionPaths)
         {
-            // Always include the default extension which contains built-in source updaters, config updaters, etc.
-            yield return new ExtensionInstance(new PhysicalFileProvider(AppContext.BaseDirectory), "Default extension", originalConfiguration);
-
             foreach (var e in GetExtensionPaths())
             {
                 if (string.IsNullOrEmpty(e))
@@ -79,10 +76,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             IEnumerable<string> GetExtensionPaths()
             {
+                const string ExtensionDirectory = "extensions";
+
+                var fromConfig = originalConfiguration.GetSection("DefaultExtensions")
+                    .Get<string[]>()
+                    .Select(n => Path.GetFullPath(Path.Combine(ExtensionDirectory, n)));
+
                 var extensionPathString = originalConfiguration[UpgradeAssistantExtensionPathsSettingName];
                 var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
 
-                return pathsFromString.Concat(additionalExtensionPaths);
+                return fromConfig.Concat(pathsFromString).Concat(additionalExtensionPaths);
             }
         }
 
@@ -96,8 +99,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 return;
             }
-
-            var context = new ExtensionAssemblyLoadContext(extension);
 
             foreach (var path in extensionServiceProviderPaths)
             {
@@ -119,7 +120,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         continue;
                     }
 
-                    context.LoadFromStream(assemblyStream);
+                    extension.LoadContext.LoadFromStream(assemblyStream);
                 }
                 catch (FileLoadException)
                 {
@@ -129,7 +130,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 }
             }
 
-            var serviceProviders = context.Assemblies.SelectMany(assembly => assembly
+            if (!extension.HasAssemblyLoadContext)
+            {
+                return;
+            }
+
+            var serviceProviders = extension.LoadContext.Assemblies.SelectMany(assembly => assembly
                 .GetTypes()
                 .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
                 .Select(t => Activator.CreateInstance(t))
@@ -137,7 +143,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             foreach (var sp in serviceProviders)
             {
-                sp.AddServices(new ExtensionServiceCollection(services, extension));
+                using (extension.LoadContext.EnterContextualReflection())
+                {
+                    sp.AddServices(new ExtensionServiceCollection(services, extension));
+                }
             }
         }
     }
