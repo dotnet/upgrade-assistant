@@ -25,7 +25,7 @@
   </Target>
 
   <!-- Publish each extension into its own directory -->
-  <Target Name="PublishUpgradeAssistantExtensions" DependsOnTargets="ResolveAssemblyReferences;ResolveTargetingPackAssets" BeforeTargets="AssignTargetPaths" Outputs="%(Extension.Identity)">
+  <Target Name="PublishUpgradeAssistantExtensions" DependsOnTargets="ResolveAssemblyReferences" BeforeTargets="AssignTargetPaths" Outputs="%(Extension.Identity)">
 
     <ItemGroup>
       <Extension Update="@(Extension)">

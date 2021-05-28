@@ -10,7 +10,7 @@
   },
 
   "TryConvertProjectConverter": {
-    "TryConvertPath": "./tools/try-convert.exe"
+    "TryConvertPath": "./try-convert/try-convert.dll"
   },
 
 

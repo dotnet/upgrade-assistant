@@ -10,7 +10,7 @@
       <NoDefaultExcludes>true</NoDefaultExcludes>
       <ToolsDirectory>$(MSBuildThisFileDirectory).tools\</ToolsDirectory>
       <TryConvertVersion>0.7.226301</TryConvertVersion>
-      <TryConvertDirectory>$(ToolsDirectory)try-convert\$(TryConvertVersion)\</TryConvertDirectory>
+      <TryConvertDirectory>$(ToolsDirectory)try-convert\$(TryConvertVersion)\.store\try-convert\$(TryConvertVersion)\try-convert\$(TryConvertVersion)\tools\net5.0\any</TryConvertDirectory>
     </PropertyGroup>
 
     <Exec Command="dotnet tool install try-convert --version $(TryConvertVersion) --tool-path $(TryConvertDirectory)" Condition="!Exists($(TryConvertDirectory))" />
@@ -18,7 +18,7 @@
     <ItemGroup>
       <__TryConvertContents Include="$(TryConvertDirectory)\**\*" />
       <None Include="@(__TryConvertContents)">
-        <Link>extensions/Default/tools/%(RecursiveDir)%(Filename)%(Extension)</Link>
+        <Link>extensions/Default/try-convert/%(RecursiveDir)%(Filename)%(Extension)</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

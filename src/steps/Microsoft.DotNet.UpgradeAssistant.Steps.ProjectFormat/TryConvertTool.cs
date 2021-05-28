@@ -17,7 +17,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertTool : ITryConvertTool
     {
-        private const string StorePath = ".store/try-convert";
         private const string TryConvertArgumentsFormat = "--no-backup -m \"{0}\" --force-web-conversion --keep-current-tfms -p \"{1}\"";
         private static readonly string[] ErrorMessages = new[]
         {
@@ -91,20 +90,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 return commitIndex >= 0
                     ? productVersion.Substring(0, commitIndex)
                     : productVersion;
-            }
-
-            // Local .NET CLI tools (like try-convert) typically have their implementations in a version-specific
-            // folder inside the hidden .store path next to the host. In case the version being stored in the
-            // tool's product version attribute ever changes, this could be used as a backup means of getting
-            // try-convert's version.
-            var storeDir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path), StorePath);
-            if (Directory.Exists(storeDir))
-            {
-                var versionDirs = Directory.GetDirectories(storeDir);
-                if (versionDirs.Length == 1)
-                {
-                    return System.IO.Path.GetFileName(versionDirs[0]);
-                }
             }
 
             return null;
