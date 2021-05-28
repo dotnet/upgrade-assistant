@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
