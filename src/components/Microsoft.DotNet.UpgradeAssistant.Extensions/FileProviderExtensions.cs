@@ -33,12 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 IFileInfo fileInfo = null,
                 FileProviderGlobbingDirectory parent = null)
             {
-                if (fileProvider == null)
-                {
-                    throw new ArgumentNullException(nameof(fileProvider));
-                }
-
-                _fileProvider = fileProvider;
+                _fileProvider = fileProvider ?? throw new ArgumentNullException(nameof(fileProvider));
                 _fileInfo = fileInfo;
                 _parent = parent;
 
@@ -119,13 +114,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         throw new ArgumentNullException(nameof(fileInfo));
                     }
 
-                    if (parent == null)
-                    {
-                        throw new ArgumentNullException(nameof(parent));
-                    }
-
                     Name = fileInfo.Name;
-                    ParentDirectory = parent;
+                    ParentDirectory = parent ?? throw new ArgumentNullException(nameof(parent));
                     FullName = ParentDirectory.FullName + DirectorySeparatorChar + Name;
                 }
 
