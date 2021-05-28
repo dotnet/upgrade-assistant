@@ -3,7 +3,6 @@
     <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsUnitTestProject>true</IsUnitTestProject>
-    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="IntegrationScenarios\**" />

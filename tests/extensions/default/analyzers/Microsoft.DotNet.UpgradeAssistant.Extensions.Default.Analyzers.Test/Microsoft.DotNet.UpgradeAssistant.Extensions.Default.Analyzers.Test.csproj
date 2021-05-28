@@ -4,7 +4,6 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <IsTestProject>true</IsTestProject>
-    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
     <!-- Ignore the .ConfigureAwait(false) warning -->
     <NoWarn>$(NoWarn);CA2007</NoWarn>
   </PropertyGroup>
