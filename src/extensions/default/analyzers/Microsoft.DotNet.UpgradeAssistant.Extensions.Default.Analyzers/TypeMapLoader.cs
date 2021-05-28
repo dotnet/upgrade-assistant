@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// <summary>
         /// Load type mappings from additional files.
         /// </summary>
+        /// <param name="additionalTexts">The additional texts to parse for type mappings.</param>
         /// <returns>Type mappings as defined in *.typemap files in the project's additional files.</returns>
         public static IEnumerable<TypeMapping> LoadMappings(ImmutableArray<AdditionalText> additionalTexts)
         {

@@ -30,6 +30,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentException($"'{nameof(filePath)}' cannot be null or whitespace.", nameof(filePath));
             }
 
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentException($"File path {filePath} not found", nameof(filePath));
+            }
+
             Path = filePath;
         }
 
