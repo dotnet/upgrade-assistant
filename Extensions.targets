@@ -1,7 +1,7 @@
 <Project>
 
   <!-- Publish the extension and collect its output -->
-  <Target Name="ComputePublishOutput" DependsOnTargets="Build;Publish" Returns="@(ExtensionFiles)">
+  <Target Name="ComputePublishOutput" DependsOnTargets="Build;ComputeFilesToPublish" Returns="@(ExtensionFiles)">
     <ItemGroup>
       <ExtensionFiles Include="@(ResolvedFileToPublish)">
         <Link>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</Link>
@@ -38,7 +38,7 @@
     <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
 
     <!-- Publish the extension and collect its extension -->
-    <MSBuild Projects="%(Extension.Identity)" Targets="ComputePublishOutput" Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);PackageAsSingleFile=false;_IsExtension=true" Condition=" '%(Extension.Name)' != '' ">
+    <MSBuild Projects="%(Extension.Identity)" Targets="ComputePublishOutput" Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true" Condition=" '%(Extension.Name)' != '' ">
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
