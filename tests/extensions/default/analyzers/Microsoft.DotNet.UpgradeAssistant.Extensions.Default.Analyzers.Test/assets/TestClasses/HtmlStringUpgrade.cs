@@ -3,7 +3,7 @@ using System.Web;
 
 namespace TestProject.TestClasses
 {
-    public class UA0002
+    public class HtmlStringUpgrade
     {
         public IHtmlString String1 { get; set; }
         public HtmlString String2 { get; set; }

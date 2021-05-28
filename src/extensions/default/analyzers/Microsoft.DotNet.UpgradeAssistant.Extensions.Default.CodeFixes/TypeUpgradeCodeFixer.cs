@@ -8,12 +8,11 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 {
-    [ApplicableComponents(ProjectComponents.AspNetCore)]
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0004 CodeFix Provider")]
-    public class FilterCodeFixer : IdentifierUpgradeCodeFixer
+    [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic, Name = "UA0002 CodeFix Provider")]
+    public class TypeUpgradeCodeFixer : IdentifierUpgradeCodeFixer
     {
-        public override string CodeFixTitle => CodeFixResources.FilterTitle;
+        public override string CodeFixTitle => CodeFixResources.TypeUpgradeTitle;
 
-        public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(FilterAnalyzer.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(TypeUpgradeAnalyzer.DiagnosticId);
     }
 }

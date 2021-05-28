@@ -14,13 +14,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
     public class TemplateProvider
     {
         private readonly ICollection<TemplateConfiguration> _options;
-        private readonly ILogger<TemplateProvider> _logger;
 
         public bool IsEmpty => _options.Count == 0;
 
         public IEnumerable<string> TemplateConfigFileNames => _options.SelectMany(o => o.TemplateItems).Select(t => t.Path);
 
-        public TemplateProvider(IOptions<ICollection<TemplateConfiguration>> options, ILogger<TemplateProvider> logger)
+        public TemplateProvider(IOptions<ICollection<TemplateConfiguration>> options)
         {
             if (options is null)
             {
@@ -28,7 +27,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             }
 
             _options = options.Value;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         internal async Task<Dictionary<string, RuntimeItemSpec>> GetTemplatesAsync(IProject project, CancellationToken token)

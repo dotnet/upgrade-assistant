@@ -2,7 +2,7 @@
 
 namespace TestProject.TestClasses
 {
-    public class UA0004A : System.Web.Mvc.IResultFilter
+    public class FilterUpgrade : System.Web.Mvc.IResultFilter
     {
         public void OnResultExecuted(System.Web.Mvc.ResultExecutedContext filterContext)
         {

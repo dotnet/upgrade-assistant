@@ -331,6 +331,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
+        /// </summary>
+        internal static string TypeUpgradeDescription {
+            get {
+                return ResourceManager.GetString("TypeUpgradeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
+        /// </summary>
+        internal static string TypeUpgradeMessageFormat {
+            get {
+                return ResourceManager.GetString("TypeUpgradeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type should be upgraded.
+        /// </summary>
+        internal static string TypeUpgradeTitle {
+            get {
+                return ResourceManager.GetString("TypeUpgradeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper..
         /// </summary>
         internal static string UrlHelperDescription {

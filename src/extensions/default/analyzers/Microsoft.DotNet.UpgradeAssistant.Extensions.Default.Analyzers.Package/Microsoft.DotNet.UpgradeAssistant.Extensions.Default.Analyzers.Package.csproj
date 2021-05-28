@@ -27,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    <None Update="build\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.props" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
   </ItemGroup>
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
@@ -36,6 +37,8 @@
       <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.dll" PackagePath="analyzers/dotnet/vb" />
       <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.dll" PackagePath="analyzers/dotnet/vb" />
       <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.dll" PackagePath="analyzers/dotnet/vb" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\TypeMaps.props" PackagePath="build" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\WebTypeReplacements.typemap" PackagePath="build" />
     </ItemGroup>
   </Target>
 </Project>
