@@ -7,7 +7,7 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     /// <summary>
     /// An AdditionalText implementation that reads a document from disk.

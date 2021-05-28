@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.IO;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
@@ -19,16 +17,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
     public class DefaultExtensionServiceProvider : IExtensionServiceProvider
     {
         private const string TryConvertProjectConverterStepOptionsSection = "TryConvertProjectConverter";
-        private static readonly string[] TypeMapFiles = new[]
-        {
-            "WebTypeReplacements.typemap"
-        };
 
         public void AddServices(IExtensionServiceCollection services)
         {
             if (services is null)
             {
-                throw new System.ArgumentNullException(nameof(services));
+                throw new ArgumentNullException(nameof(services));
             }
 
             AddUpgradeSteps(services, services.Configuration);
@@ -45,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.Services.AddProjectFormatSteps()
                 .Bind(configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
             services.Services.AddSolutionSteps();
-            services.Services.AddSourceUpdaterStep();
+            services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
             services.Services.AddRazorUpdaterStep();
         }
@@ -83,12 +77,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<CodeFixProvider, TypeUpgradeCodeFixer>();
             services.AddTransient<CodeFixProvider, UrlHelperCodeFixer>();
             services.AddTransient<CodeFixProvider, UsingSystemWebCodeFixer>();
-
-            // Add additional documents used by the analzyers
-            foreach (var path in TypeMapFiles)
-            {
-                services.AddTransient<AdditionalText>(sp => new AdditionalFileText(Path.Combine(AppContext.BaseDirectory, path)));
-            }
         }
 
         // This extension only adds default package reference analyzers, but other extensions
