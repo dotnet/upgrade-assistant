@@ -18,7 +18,7 @@
     <ItemGroup>
       <__TryConvertContents Include="$(TryConvertDirectory)\**\*" />
       <None Include="@(__TryConvertContents)">
-        <Link>tools/%(RecursiveDir)%(Filename)%(Extension)</Link>
+        <Link>extensions/Default/tools/%(RecursiveDir)%(Filename)%(Extension)</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

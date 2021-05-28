@@ -5,13 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Loader;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -143,10 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             foreach (var sp in serviceProviders)
             {
-                using (extension.LoadContext.EnterContextualReflection())
-                {
-                    sp.AddServices(new ExtensionServiceCollection(services, extension));
-                }
+                sp.AddServices(new ExtensionServiceCollection(services, extension));
             }
         }
     }

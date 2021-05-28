@@ -21,11 +21,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         protected override Assembly? Load(AssemblyName assemblyName)
         {
             // If available in the default, we want to ensure that is used.
-            var inDefault = Default.Assemblies.Any(a => string.Equals(a.GetName().Name, assemblyName.Name, StringComparison.Ordinal));
+            var inDefault = Default.Assemblies.FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName.Name, StringComparison.Ordinal));
 
-            if (inDefault)
+            if (inDefault is Assembly existing)
             {
-                return null;
+                return existing;
             }
 
             var dll = $"{assemblyName.Name}.dll";
@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 if (pdbFile.Exists)
                 {
                     using var pdbStream = pdbFile.CreateReadStream();
-                    return LoadFromStream(pdbStream);
+                    return LoadFromStream(dllStream, pdbStream);
                 }
                 else
                 {

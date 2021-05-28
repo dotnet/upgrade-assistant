@@ -9,6 +9,11 @@
     ]
   },
 
+  "TryConvertProjectConverter": {
+    "TryConvertPath": "./tools/try-convert.exe"
+  },
+
+
   "PackageUpdater": {
     "PackageMapPath": "PackageMaps"
   },
