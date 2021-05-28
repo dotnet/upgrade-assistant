@@ -59,7 +59,7 @@
 
       <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
       <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsByRelativePath.OriginalIdentity)">
-        <RelativePath>%(Identity)</RelativePath>
+        <RelativePath>%(TargetPath)</RelativePath>
         <TargetPath>%(TargetPath)</TargetPath>
         <Link>%(Link)</Link>
       </_FilteredExtensionArtifacts>
