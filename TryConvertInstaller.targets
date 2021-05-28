@@ -4,7 +4,6 @@
   </PropertyGroup>
 
   <Target Name="RestoreAndCopyTryConvert" BeforeTargets="AssignTargetPaths" Condition="$(InstallTryConvert)">
-
     <PropertyGroup>
       <!-- By default, NuGet will not include files starting with '.' or ending with '.nupkg'. Since we are including try-convert via dotnet tools, some of the files fit into this. -->
       <NoDefaultExcludes>true</NoDefaultExcludes>
@@ -23,7 +22,6 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
-
   </Target>
 
 </Project>
