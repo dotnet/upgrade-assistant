@@ -10,10 +10,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal class ExtensionAssemblyLoadContext : AssemblyLoadContext
     {
+        private const string ALC_PREFIX = "UA_";
+
         private readonly ExtensionInstance _extension;
 
         public ExtensionAssemblyLoadContext(ExtensionInstance extension)
-            : base(extension.Name)
+            : base(ALC_PREFIX + extension.Name)
         {
             _extension = extension;
         }
