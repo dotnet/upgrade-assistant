@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3FC16DAB-215C-422B-9130-61D566695463}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Cli", "src\cli\Microsoft.DotNet.UpgradeAssistant.Cli\Microsoft.DotNet.UpgradeAssistant.Cli.csproj", "{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DBE3FD1D-811C-416B-AE2E-08D468ABA4D6} = {DBE3FD1D-811C-416B-AE2E-08D468ABA4D6}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Abstractions", "src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj", "{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42}"
 EndProject
