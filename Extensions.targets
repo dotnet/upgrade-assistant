@@ -19,9 +19,19 @@
     </ItemGroup>
   </Target>
 
-  <!-- Since we will be publishing extensions, we want to ensure they are restored -->
+  <!--
+    Since we will be publishing extensions, we want to ensure they are restored. Must run before the following targets:
+
+    Restore: For clean builds
+    PrepareForBuild: For incremental builds in VS
+    PackDependsOn: For pack commands
+  -->
   <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild;$(PackDependsOn)">
-    <MSBuild Projects="%(Extension.Identity)" Targets="Restore" Properties="Configuration=$(Configuration)" Condition=" '%(Extension.Name)' != '' " />
+    <MSBuild Projects="%(Extension.Identity)"
+             Targets="Restore"
+             Properties="Configuration=$(Configuration)"
+             RemoveProperties="TargetFramework"
+             Condition=" '%(Extension.Name)' != '' " />
   </Target>
 
   <!-- Publish each extension into its own directory -->
@@ -40,7 +50,11 @@
     <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
 
     <!-- Publish the extension and collect its extension -->
-    <MSBuild Projects="%(Extension.Identity)" Targets="ComputePublishOutput" Properties="Configuration=$(Configuration);IntermediateOutputPath=%(Extension.IntermediateOutputPath);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true" Condition=" '%(Extension.Name)' != '' ">
+    <MSBuild Projects="%(Extension.Identity)"
+             Targets="ComputePublishOutput"
+             RemoveProperties="TargetFramework"
+             Properties="Configuration=$(Configuration);IntermediateOutputPath=%(Extension.IntermediateOutputPath);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true"
+             Condition=" '%(Extension.Name)' != '' ">
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
