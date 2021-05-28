@@ -12,7 +12,7 @@
   "TryConvertProjectConverter": {
     "TryConvertPath": "./try-convert/try-convert.dll"
   },
-  
+
   "SourceUpdater": {
     "AdditionalAnalyzerTexts": [
       "WebTypeReplacements.typemap"
