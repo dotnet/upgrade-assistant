@@ -20,7 +20,7 @@
   </Target>
 
   <!-- Since we will be publishing extensions, we want to ensure they are restored -->
-  <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild">
+  <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild;Pack">
     <MSBuild Projects="%(Extension.Identity)" Targets="Restore" Properties="Configuration=$(Configuration)" Condition=" '%(Extension.Name)' != '' ">
     </MSBuild>
   </Target>
