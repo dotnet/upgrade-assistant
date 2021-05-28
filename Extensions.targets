@@ -49,7 +49,12 @@
 
     <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
 
-    <!-- Publish the extension and collect its extension -->
+    <!--
+      Publish the extension and collect its extension.
+
+      - We also pass in some custom configuration so it'll know its an extension.
+      - We want to remove any TargetFramework that is set so that isn't flowed through to the next project.
+      -->
     <MSBuild Projects="%(Extension.Identity)"
              Targets="ComputePublishOutput"
              RemoveProperties="TargetFramework"
