@@ -4,7 +4,6 @@
     <IsPackable>false</IsPackable>
     <IsUnitTestProject>true</IsUnitTestProject>
     <InstallTryConvert>true</InstallTryConvert>
-    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="IntegrationScenarios\**" />

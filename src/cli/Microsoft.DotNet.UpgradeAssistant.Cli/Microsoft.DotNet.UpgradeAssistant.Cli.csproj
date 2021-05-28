@@ -11,7 +11,6 @@
     <PackageReleaseNotes>A changelog is available at https://github.com/dotnet/upgrade-assistant/blob/main/CHANGELOG.md.</PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
     <InstallTryConvert>true</InstallTryConvert>
-    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.json">
