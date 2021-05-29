@@ -1,0 +1,96 @@
+<Project>
+
+  <!-- Publish the extension and collect its output -->
+  <Target Name="ComputePublishOutput" DependsOnTargets="Build;ComputeFilesToPublish" Returns="@(ExtensionFiles)">
+    <ItemGroup>
+      <ExtensionFiles Include="@(ResolvedFileToPublish)">
+        <Link>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</Link>
+        <TargetPath>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</TargetPath>
+      </ExtensionFiles>
+    </ItemGroup>
+  </Target>
+
+  <!-- If a project is an extension, its reference to the abstractions should not be copied -->
+  <Target Name="MarkExtensionPrivateAssemblies" Condition=" '$(_IsExtension)' == 'true' " BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <ProjectReference Update="@(ProjectReference)" Condition=" '%(ProjectReference.FileName)' == 'Microsoft.DotNet.UpgradeAssistant.Abstractions' ">
+        <Private>false</Private>
+      </ProjectReference>
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Since we will be publishing extensions, we want to ensure they are restored. Must run before the following targets:
+
+    Restore: For clean builds
+    PrepareForBuild: For incremental builds in VS
+    PackDependsOn: For pack commands
+  -->
+  <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild;$(PackDependsOn)">
+    <MSBuild Projects="%(Extension.Identity)"
+             Targets="Restore"
+             Properties="Configuration=$(Configuration)"
+             RemoveProperties="TargetFramework"
+             Condition=" '%(Extension.Name)' != '' " />
+  </Target>
+
+  <!-- Publish each extension into its own directory -->
+  <Target Name="PublishUpgradeAssistantExtensions" DependsOnTargets="ResolveAssemblyReferences" BeforeTargets="AssignTargetPaths" Outputs="%(Extension.Identity)">
+
+    <!-- Add the relative directory the extension will be added to -->
+    <ItemGroup>
+      <Extension Update="@(Extension)">
+        <ExtensionDir>extensions/%(Extension.Name)</ExtensionDir>
+
+        <!-- We want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
+        <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\extensions\%(Extension.Name)\</IntermediateOutputPath>
+      </Extension>
+    </ItemGroup>
+
+    <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
+
+    <!--
+      Publish the extension and collect its extension.
+
+      - We also pass in some custom configuration so it'll know its an extension.
+      - We want to remove any TargetFramework that is set so that isn't flowed through to the next project.
+      -->
+    <MSBuild Projects="%(Extension.Identity)"
+             Targets="ComputePublishOutput"
+             RemoveProperties="TargetFramework"
+             Properties="Configuration=$(Configuration);IntermediateOutputPath=%(Extension.IntermediateOutputPath);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true"
+             Condition=" '%(Extension.Name)' != '' ">
+      <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
+    </MSBuild>
+
+    <ItemGroup>
+      <!-- Create a list of all assemblies included by host -->
+      <_ExcludeFromExtension Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+      <_ExcludeFromExtension Include="%(RuntimeCopyLocalItems.DestinationSubPath)" />
+
+      <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
+      <_ExtensionArtifactsByRelativePath Include="%(_ExtensionArtifacts.RelativePath)">
+        <OriginalIdentity>%(Identity)</OriginalIdentity>
+        <TargetPath>%(TargetPath)</TargetPath>
+        <Link>%(Link)</Link>
+      </_ExtensionArtifactsByRelativePath>
+
+      <!-- Remove the host supplied assemblies -->
+      <_FilteredExtensionArtifactsByRelativePath Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_ExcludeFromExtension)" />
+
+      <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
+      <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsByRelativePath.OriginalIdentity)">
+        <RelativePath>%(TargetPath)</RelativePath>
+        <TargetPath>%(TargetPath)</TargetPath>
+        <Link>%(Link)</Link>
+      </_FilteredExtensionArtifacts>
+
+      <None Include="@(_FilteredExtensionArtifacts)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <Message Text="Published extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
+  </Target>
+
+</Project>

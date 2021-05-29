@@ -5,12 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Runtime.Loader;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -60,9 +59,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Will be disposed by dependency injection.")]
         private static IEnumerable<ExtensionInstance> GetExtensions(IConfiguration originalConfiguration, IEnumerable<string> additionalExtensionPaths)
         {
-            // Always include the default extension which contains built-in source updaters, config updaters, etc.
-            yield return new ExtensionInstance(new PhysicalFileProvider(AppContext.BaseDirectory), "Default extension", originalConfiguration);
-
             foreach (var e in GetExtensionPaths())
             {
                 if (string.IsNullOrEmpty(e))
@@ -78,10 +74,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             IEnumerable<string> GetExtensionPaths()
             {
+                const string ExtensionDirectory = "extensions";
+
+                var fromConfig = originalConfiguration.GetSection("DefaultExtensions")
+                    .Get<string[]>()
+                    .Select(n => Path.GetFullPath(Path.Combine(ExtensionDirectory, n)));
+
                 var extensionPathString = originalConfiguration[UpgradeAssistantExtensionPathsSettingName];
                 var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
 
-                return pathsFromString.Concat(additionalExtensionPaths);
+                return fromConfig.Concat(pathsFromString).Concat(additionalExtensionPaths);
             }
         }
 
@@ -116,21 +118,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         continue;
                     }
 
-                    // AssemblyLoadContext is not available in .NET Standard 2.0
-                    // var assembly = System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromStream(assemblyStream);
-                    var assemblyBytes = new byte[assemblyStream.Length];
-                    assemblyStream.Read(assemblyBytes, 0, assemblyBytes.Length);
-                    var assembly = Assembly.Load(assemblyBytes);
-
-                    var serviceProviders = assembly.GetTypes()
-                        .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
-                        .Select(t => Activator.CreateInstance(t))
-                        .Cast<IExtensionServiceProvider>();
-
-                    foreach (var sp in serviceProviders)
-                    {
-                        sp.AddServices(new ExtensionServiceCollection(services, extension.Configuration));
-                    }
+                    extension.LoadContext.LoadFromStream(assemblyStream);
                 }
                 catch (FileLoadException)
                 {
@@ -138,6 +126,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 catch (BadImageFormatException)
                 {
                 }
+            }
+
+            if (!extension.HasAssemblyLoadContext)
+            {
+                return;
+            }
+
+            var serviceProviders = extension.LoadContext.Assemblies.SelectMany(assembly => assembly
+                .GetTypes()
+                .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
+                .Select(t => Activator.CreateInstance(t))
+                .Cast<IExtensionServiceProvider>());
+
+            foreach (var sp in serviceProviders)
+            {
+                sp.AddServices(new ExtensionServiceCollection(services, extension));
             }
         }
     }

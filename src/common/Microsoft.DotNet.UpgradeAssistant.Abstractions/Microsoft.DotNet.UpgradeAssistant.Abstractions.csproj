@@ -17,6 +17,7 @@
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageTags>Upgrade Assistant</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
+    <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" />
     <PackageReference Include="System.Linq.Async" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
 </Project>

@@ -10,9 +10,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.IO.FileSystem.Primitives" />
-    <PackageReference Include="System.Linq.Async" />
-    <PackageReference Include="System.Text.Encoding.Extensions" />
-  </ItemGroup>
 </Project>

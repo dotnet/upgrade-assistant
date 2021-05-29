@@ -17,8 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertTool : ITryConvertTool
     {
-        private const string StorePath = ".store/try-convert";
-        private const string TryConvertArgumentsFormat = "--no-backup -m \"{0}\" --force-web-conversion --keep-current-tfms -p \"{1}\"";
+        private const string DotNetCli = "dotnet";
+        private const string TryConvertArgumentsFormat = "{0} --no-backup -m \"{1}\" --force-web-conversion --keep-current-tfms -p \"{2}\"";
+
         private static readonly string[] ErrorMessages = new[]
         {
             "This project has custom imports that are not accepted by try-convert",
@@ -72,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             return _runner.RunProcessAsync(new ProcessInfo
             {
-                Command = Path,
+                Command = DotNetCli,
                 Arguments = GetArguments(project.Required()),
                 EnvironmentVariables = context.GlobalProperties,
                 IsErrorFilter = data => ErrorMessages.Any(data.Contains),
@@ -93,23 +94,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                     : productVersion;
             }
 
-            // Local .NET CLI tools (like try-convert) typically have their implementations in a version-specific
-            // folder inside the hidden .store path next to the host. In case the version being stored in the
-            // tool's product version attribute ever changes, this could be used as a backup means of getting
-            // try-convert's version.
-            var storeDir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path), StorePath);
-            if (Directory.Exists(storeDir))
-            {
-                var versionDirs = Directory.GetDirectories(storeDir);
-                if (versionDirs.Length == 1)
-                {
-                    return System.IO.Path.GetFileName(versionDirs[0]);
-                }
-            }
-
             return null;
         }
 
-        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, GetMSBuildPath(), project.Required().FileInfo);
+        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Path, GetMSBuildPath(), project.Required().FileInfo);
     }
 }

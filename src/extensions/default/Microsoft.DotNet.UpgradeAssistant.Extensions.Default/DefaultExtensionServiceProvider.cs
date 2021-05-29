@@ -25,19 +25,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(services));
             }
 
-            AddUpgradeSteps(services, services.Configuration);
+            AddUpgradeSteps(services);
             AddConfigUpdaters(services.Services);
             AddAnalyzersAndCodeFixProviders(services.Services);
             AddPackageReferenceAnalyzers(services.Services);
         }
 
-        private static void AddUpgradeSteps(IExtensionServiceCollection services, IConfiguration configuration)
+        private static void AddUpgradeSteps(IExtensionServiceCollection services)
         {
             services.Services.AddBackupStep();
             services.AddConfigUpdaterStep();
             services.AddPackageUpdaterStep();
-            services.Services.AddProjectFormatSteps()
-                .Bind(configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
+            services.AddProjectFormatSteps()
+                .Bind(services.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
             services.Services.AddSolutionSteps();
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
