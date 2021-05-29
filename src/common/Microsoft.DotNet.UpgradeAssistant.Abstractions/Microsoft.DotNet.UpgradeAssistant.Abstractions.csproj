@@ -32,12 +32,4 @@
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
-  <Target Name="PrivateAssetsIfExtension" Condition=" '$(IsExtension)' == 'true' " BeforeTargets="CollectPackageReferences">
-    <ItemGroup>
-      <PackageReference Update="@(PackageReference)">
-        <ExcludeAssets>runtime</ExcludeAssets>
-      </PackageReference>
-    </ItemGroup>
-  </Target>
-
 </Project>

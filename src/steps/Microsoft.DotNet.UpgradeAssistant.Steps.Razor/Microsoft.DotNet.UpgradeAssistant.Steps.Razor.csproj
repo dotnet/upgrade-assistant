@@ -13,6 +13,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Language" />
     <PackageReference Include="Microsoft.CodeAnalysis.Razor" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
   </ItemGroup>
 </Project>
