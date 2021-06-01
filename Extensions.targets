@@ -10,12 +10,15 @@
     </ItemGroup>
   </Target>
 
-  <!-- If a project is an extension, its reference to the abstractions should not be copied -->
-  <Target Name="MarkExtensionPrivateAssemblies" Condition=" '$(_IsExtension)' == 'true' " BeforeTargets="PrepareForBuild">
+  <Target Name="_AddMetadataToExtensions" BeforeTargets="RestoreExtensions;PublishUpgradeAssistantExtensions">
+    <!-- Add the relative directory the extension will be added to -->
     <ItemGroup>
-      <ProjectReference Update="@(ProjectReference)" Condition=" '%(ProjectReference.FileName)' == 'Microsoft.DotNet.UpgradeAssistant.Abstractions' ">
-        <Private>false</Private>
-      </ProjectReference>
+      <Extension Update="@(Extension)">
+        <ExtensionDir>extensions/%(Extension.Name)</ExtensionDir>
+
+        <!-- We want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
+        <IntermediateOutputPath>$(BaseIntermediateOutputPath)\extensions\%(Extension.Name)\</IntermediateOutputPath>
+      </Extension>
     </ItemGroup>
   </Target>
 
@@ -29,23 +32,13 @@
   <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild;$(PackDependsOn)">
     <MSBuild Projects="%(Extension.Identity)"
              Targets="Restore"
-             Properties="Configuration=$(Configuration)"
+             Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true"
              RemoveProperties="TargetFramework"
              Condition=" '%(Extension.Name)' != '' " />
   </Target>
 
   <!-- Publish each extension into its own directory -->
   <Target Name="PublishUpgradeAssistantExtensions" DependsOnTargets="ResolveAssemblyReferences" BeforeTargets="AssignTargetPaths" Outputs="%(Extension.Identity)">
-
-    <!-- Add the relative directory the extension will be added to -->
-    <ItemGroup>
-      <Extension Update="@(Extension)">
-        <ExtensionDir>extensions/%(Extension.Name)</ExtensionDir>
-
-        <!-- We want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
-        <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\extensions\%(Extension.Name)\</IntermediateOutputPath>
-      </Extension>
-    </ItemGroup>
 
     <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
 
@@ -58,7 +51,7 @@
     <MSBuild Projects="%(Extension.Identity)"
              Targets="ComputePublishOutput"
              RemoveProperties="TargetFramework"
-             Properties="Configuration=$(Configuration);IntermediateOutputPath=%(Extension.IntermediateOutputPath);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true"
+             Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true"
              Condition=" '%(Extension.Name)' != '' ">
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
