@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             .AddTransient<IUpdater<RazorCodeDocument>, RazorSourceUpdater>()
             .AddTransient<IUpdater<RazorCodeDocument>, RazorHelperUpdater>()
             .AddTransient<ITextMatcher, DefaultTextMatcher>()
-            .AddTransient<ITextReplacer, RazorTextReplacer>()
+            .AddTransient<IMappedTextReplacer, RazorMappedTextReplacer>()
             .AddTransient<IDiffer, Differ>()
             .AddTransient<IChunker, CharacterChunker>()
             .AddTransient<IHelperMatcher, HelperMatcher>();

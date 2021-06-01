@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
     public interface IHelperMatcher
     {
-        Task<IEnumerable<HelperReplacement>> GetHelperReplacementsAsync(RazorCodeDocument document);
+        Task<IEnumerable<TextReplacement>> GetHelperReplacementsAsync(RazorCodeDocument document);
 
         Task<bool> HasHelperAsync(RazorCodeDocument document);
     }

@@ -16,6 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="originalTexts">MappedSubTexts representing the original text sections to be updated. These should appear in the order they appear in the source document.</param>
         /// <param name="newTexts">New texts that should replace the original texts. These should also appear in the order they appear in the document but not all original texts need to have a corresponding new text.</param>
         /// <returns>An enumerable of text replacements mapping original texts with corresponding new text.</returns>
-        IEnumerable<TextReplacement> MatchOrderedSubTexts(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts);
+        IEnumerable<MappedTextReplacement> MatchOrderedSubTexts(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts);
     }
 }

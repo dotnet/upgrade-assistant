@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="originalTexts">MappedSubTexts representing the original text sections to be updated. These should appear in the order they appear in the source document.</param>
         /// <param name="newTexts">New texts that should replace the original texts. These should also appear in the order they appear in the document but not all original texts need to have a corresponding new text.</param>
         /// <returns>An enumerable of text replacements mapping original texts with corresponding new text. Sub-texts that are unchanged are not included in the returned enumerable.</returns>
-        public IEnumerable<TextReplacement> MatchOrderedSubTexts(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts)
+        public IEnumerable<MappedTextReplacement> MatchOrderedSubTexts(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts)
         {
             if (originalTexts is null)
             {
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 throw new ArgumentException("originalTexts length must be greated than or equal to newTexts length. Sub-texts can be removed but not added.");
             }
 
-            var replacements = new List<TextReplacement>();
+            var replacements = new List<MappedTextReplacement>();
 
             // We want to correlate the mapped code blocks in the original document with corresponding ones in the updated document.
             // Unfortunately, this is non-trivial because some code blocks may have been removed and, in other cases, multiple code blocks
@@ -59,13 +59,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // If both groups have the same number of elements, then they pair in order
             if (originalTexts.Count() == newTexts.Count())
             {
-                AddReplacementCandidates(replacements, originalTexts.Zip(newTexts, (original, updated) => new TextReplacement(original, updated)));
+                AddReplacementCandidates(replacements, originalTexts.Zip(newTexts, (original, updated) => new MappedTextReplacement(original, updated)));
             }
 
             // If there are no new texts, then the original elements all pair with empty source text
             else if (!newTexts.Any())
             {
-                AddReplacementCandidates(replacements, originalTexts.Select(t => new TextReplacement(t, string.Empty)));
+                AddReplacementCandidates(replacements, originalTexts.Select(t => new MappedTextReplacement(t, string.Empty)));
             }
 
             // This is the tricky one. If there are less updated code blocks than original code blocks, it will be necesary to guess which original code blocks
@@ -82,7 +82,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <summary>
         /// Adds text replacements to a list only if the replacement is not a no-op.
         /// </summary>
-        private static void AddReplacementCandidates(List<TextReplacement> replacements, IEnumerable<TextReplacement> candidates)
+        private static void AddReplacementCandidates(List<MappedTextReplacement> replacements, IEnumerable<MappedTextReplacement> candidates)
         {
             replacements.AddRange(candidates.Where(c => !c.NewText.Equals(c.OriginalText, StringComparison.Ordinal)));
         }
@@ -90,11 +90,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <summary>
         /// Recursively enumerate all the possible ways the source and updated texts can match.
         /// </summary>
-        private static IEnumerable<IEnumerable<TextReplacement>> GetAllPossiblePairings(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts)
+        private static IEnumerable<IEnumerable<MappedTextReplacement>> GetAllPossiblePairings(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts)
         {
             if (originalTexts.Count() == newTexts.Count())
             {
-                yield return originalTexts.Zip(newTexts, (original, updated) => new TextReplacement(original, updated));
+                yield return originalTexts.Zip(newTexts, (original, updated) => new MappedTextReplacement(original, updated));
             }
             else
             {
@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <summary>
         /// Finds the total size of diff (sum or all inserts and deletes) between old and new texts in an enumerable of text replacements.
         /// </summary>
-        private int GetTotalDiffSize(IEnumerable<TextReplacement> replacements) =>
+        private int GetTotalDiffSize(IEnumerable<MappedTextReplacement> replacements) =>
             replacements.Sum(r =>
             {
                 var diff = _differ.CreateDiffs(r.OriginalText.ToString(), r.NewText.ToString(), true, false, _chunker);

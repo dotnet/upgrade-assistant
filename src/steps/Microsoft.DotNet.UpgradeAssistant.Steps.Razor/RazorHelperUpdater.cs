@@ -107,6 +107,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             foreach (var document in inputs)
             {
                 var path = document.Source.FilePath;
+
+                if (path is null || !File.Exists(path))
+                {
+                    _logger.LogWarning("Could not find expected Razor document at {Path}", path);
+                    continue;
+                }
+
                 var helperReplacements = await _helperMatcher.GetHelperReplacementsAsync(document).ConfigureAwait(false);
 
                 if (helperReplacements.Any())

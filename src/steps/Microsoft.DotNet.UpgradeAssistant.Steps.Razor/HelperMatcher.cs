@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     public class HelperMatcher : IHelperMatcher
     {
         // Regex used to identify @helper functions
-        private static readonly Regex HelperDeclRegex = new Regex(@"@helper\s+.*?\(.*?\)", RegexOptions.Compiled);
+        private static readonly Regex HelperDeclRegex = new Regex(@"@helper\s+.*?\(", RegexOptions.Compiled);
 
         private readonly ILogger<HelperMatcher> _logger;
 
@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// </summary>
         /// <param name="document">The Razor document to find @helper functions in.</param>
         /// <returns>HelperReplacements proposing replacements of each @helper with a local method.</returns>
-        public async Task<IEnumerable<HelperReplacement>> GetHelperReplacementsAsync(RazorCodeDocument document)
+        public async Task<IEnumerable<TextReplacement>> GetHelperReplacementsAsync(RazorCodeDocument document)
         {
             if (document is null)
             {
@@ -94,14 +94,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             if (text is null)
             {
                 _logger.LogWarning("Failed to read Razor document {FilePath}", path);
-                return Enumerable.Empty<HelperReplacement>();
+                return Enumerable.Empty<TextReplacement>();
             }
 
             var helpers = HelperDeclRegex.Matches(text);
 
             // This would be a lot more succinct with Linq,
             // but MatchCollection doesn't implement IEnumerable<Match>.
-            var replacements = new HelperReplacement[helpers.Count];
+            var replacements = new TextReplacement[helpers.Count];
             for (var i = 0; i < helpers.Count; i++)
             {
                 replacements[i] = GetHelperReplacement(text, helpers[i].Index);
@@ -110,7 +110,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             return replacements;
         }
 
-        private static HelperReplacement GetHelperReplacement(string text, int helperOffset)
+        private static TextReplacement GetHelperReplacement(string text, int helperOffset)
         {
             var newText = new StringBuilder("@{ HelperResult ");
             var functionBodyBegun = false;
@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             newText.Append(" }");
 
-            return new HelperReplacement(newText.ToString(), helperOffset, index - helperOffset);
+            return new TextReplacement(newText.ToString(), helperOffset, index - helperOffset);
         }
     }
 }

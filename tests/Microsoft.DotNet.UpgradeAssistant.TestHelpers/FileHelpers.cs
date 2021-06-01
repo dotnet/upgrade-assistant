@@ -12,9 +12,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         private static readonly string[] DirsToIgnore = new[] { "bin", "obj" };
 
-        public static async Task CopyDirectoryAsync(string sourceDir, string destinationDir)
+        public static async Task<TemporaryDirectory> CopyDirectoryAsync(string sourceDir, string destinationDir)
         {
-            Directory.CreateDirectory(destinationDir);
+            var destDir = await CopyDirectoryImplAsync(sourceDir, destinationDir).ConfigureAwait(false);
+            return new TemporaryDirectory(destDir.FullName);
+        }
+
+        private static async Task<DirectoryInfo> CopyDirectoryImplAsync(string sourceDir, string destinationDir)
+        {
+            var destDir = Directory.CreateDirectory(destinationDir);
             var directoryInfo = new DirectoryInfo(sourceDir);
             foreach (var file in directoryInfo.GetFiles("*", SearchOption.TopDirectoryOnly))
             {
@@ -24,11 +30,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             foreach (var dir in directoryInfo.GetDirectories())
             {
-                await CopyDirectoryAsync(dir.FullName, Path.Combine(destinationDir, dir.Name)).ConfigureAwait(false);
+                await CopyDirectoryImplAsync(dir.FullName, Path.Combine(destinationDir, dir.Name)).ConfigureAwait(false);
             }
+
+            return destDir;
         }
 
-        public static async Task CopyFileAsync(string sourceFile, string destinationFile)
+        private static async Task CopyFileAsync(string sourceFile, string destinationFile)
         {
             var fileOptions = FileOptions.Asynchronous | FileOptions.SequentialScan;
             var bufferSize = 65536;

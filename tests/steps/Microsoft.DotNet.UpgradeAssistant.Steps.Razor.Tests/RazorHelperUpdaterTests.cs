@@ -19,11 +19,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
 {
     public sealed class RazorHelperUpdaterTests : IDisposable
     {
-        private readonly List<string> _temporaryDirectories;
+        private readonly List<TemporaryDirectory> _temporaryDirectories;
 
         public RazorHelperUpdaterTests()
         {
-            _temporaryDirectories = new List<string>();
+            _temporaryDirectories = new List<TemporaryDirectory>();
         }
 
         [Fact]
@@ -144,10 +144,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             {
                 // Create a temporary working directory and copy views to it so that they can be updated
                 var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-                _temporaryDirectories.Add(workingDir);
                 var dir = Directory.CreateDirectory(workingDir);
                 Assert.True(dir.Exists);
-                await FileHelpers.CopyDirectoryAsync(Path.GetDirectoryName(projectPath)!, workingDir).ConfigureAwait(false);
+                _temporaryDirectories.Add(await FileHelpers.CopyDirectoryAsync(Path.GetDirectoryName(projectPath)!, workingDir).ConfigureAwait(false));
                 projectPath = Path.Combine(workingDir, Path.GetFileName(projectPath));
             }
 
@@ -183,10 +182,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         {
             foreach (var dir in _temporaryDirectories)
             {
-                if (Directory.Exists(dir))
-                {
-                    Directory.Delete(dir, true);
-                }
+                dir?.Dispose();
             }
         }
     }

@@ -14,18 +14,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     /// <summary>
     /// Updater service for applying text replacements to Razor documents.
     /// </summary>
-    public class RazorTextReplacer : ITextReplacer
+    public class RazorMappedTextReplacer : IMappedTextReplacer
     {
         private static readonly Regex UsingBlockRegex = new(@"^(\s*using\s+(?<namespace>.+?);+\s*)+$", RegexOptions.Compiled);
         private static readonly Regex UsingNamespaceRegex = new(@"using\s+(?<namespace>.+?);", RegexOptions.Compiled);
 
-        private readonly ILogger<RazorTextReplacer> _logger;
+        private readonly ILogger<RazorMappedTextReplacer> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RazorTextReplacer"/> class.
+        /// Initializes a new instance of the <see cref="RazorMappedTextReplacer"/> class.
         /// </summary>
         /// <param name="logger">Logger for logging diagnostics.</param>
-        public RazorTextReplacer(ILogger<RazorTextReplacer> logger)
+        public RazorMappedTextReplacer(ILogger<RazorMappedTextReplacer> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// Updates source code in Razor documents based on provider TextReplacements, accounting for Razor source code transition syntax.
         /// </summary>
         /// <param name="replacements">The text replacements to apply.</param>
-        public void ApplyTextReplacements(IEnumerable<TextReplacement> replacements)
+        public void ApplyTextReplacements(IEnumerable<MappedTextReplacement> replacements)
         {
             if (replacements is null)
             {

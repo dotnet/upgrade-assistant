@@ -15,7 +15,7 @@ using Xunit.Sdk;
 
 namespace Integration.Tests
 {
-    public class E2ETest
+    public sealed class E2ETest : IDisposable
     {
         private const string IntegrationTestAssetsPath = "IntegrationScenarios";
         private const string OriginalProjectSubDir = "Original";
@@ -27,10 +27,12 @@ namespace Integration.Tests
         };
 
         private readonly ITestOutputHelper _output;
+        private readonly List<TemporaryDirectory> _temporaryDirectories;
 
         public E2ETest(ITestOutputHelper output)
         {
             _output = output;
+            _temporaryDirectories = new List<TemporaryDirectory>();
         }
 
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
@@ -48,7 +50,7 @@ namespace Integration.Tests
 
             // Copy the scenario files to the temporary directory
             var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioPath);
-            await FileHelpers.CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
+            _temporaryDirectories.Add(await FileHelpers.CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false));
             var upgradeRunner = new UpgradeRunner();
 
             // Run upgrade
@@ -60,11 +62,6 @@ namespace Integration.Tests
 
             AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages, workingDir);
             await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
-
-            if (Directory.Exists(workingDir))
-            {
-                Directory.Delete(workingDir, true);
-            }
         }
 
         private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
@@ -123,6 +120,14 @@ namespace Integration.Tests
                 {
                     Assert.True(false, $"The contents of \"{file}\" do not match.{Environment.NewLine}{ex.Message}");
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach (var dir in _temporaryDirectories)
+            {
+                dir?.Dispose();
             }
         }
     }
