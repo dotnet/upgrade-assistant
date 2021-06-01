@@ -4,10 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     public class HelperMatcher : IHelperMatcher
     {
         // Regex used to identify @helper functions
-        private static readonly Regex HelperDeclRegex = new Regex(@"@helper\s+.*?\(", RegexOptions.Compiled);
+        private const string HelperDeclSyntax = @"@helper ";
 
         private readonly ILogger<HelperMatcher> _logger;
 
@@ -34,51 +31,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         }
 
         /// <summary>
-        /// Determines whether a RazorCodeDocument contains a @helper function.
-        /// </summary>
-        /// <param name="document">The Razor document to inspect.</param>
-        /// <returns>True if the document contains a @helper, false otherwise.</returns>
-        public async Task<bool> HasHelperAsync(RazorCodeDocument document)
-        {
-            if (document is null)
-            {
-                throw new ArgumentNullException(nameof(document));
-            }
-
-            // Checking for '@helper' in the document is non-trivial becausae
-            // ASP.NET Core's Razor engine doesn't understand the @helper syntax.
-            //
-            // Because of that, @helper functions show up in intermediate nodes and
-            // syntax trees as C# expressions and the function body following is just
-            // treated as HTML rather than a code block.
-            //
-            // Because of these challenges (along with the lack of a public API for
-            // walking Razor syntax trees), it's simplest to just search the text of
-            // the document
-            using var reader = new StreamReader(document.Source.FilePath);
-            var line = await reader.ReadLineAsync().ConfigureAwait(false);
-            while (line is not null)
-            {
-                // Helper declarations need to be on a single line, so it's safe
-                // to evaluate the regex on individual lines.
-                if (HelperDeclRegex.IsMatch(line))
-                {
-                    _logger.LogInformation("Razor document {FilePath} contains a @helper function", document.Source.FilePath);
-                    return true;
-                }
-
-                line = await reader.ReadLineAsync().ConfigureAwait(false);
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Creates HelperReplacements for each @helper function in a Razor document.
         /// </summary>
         /// <param name="document">The Razor document to find @helper functions in.</param>
         /// <returns>HelperReplacements proposing replacements of each @helper with a local method.</returns>
-        public async Task<IEnumerable<TextReplacement>> GetHelperReplacementsAsync(RazorCodeDocument document)
+        public IEnumerable<TextReplacement> GetHelperReplacements(RazorCodeDocument document)
         {
             if (document is null)
             {
@@ -89,39 +46,54 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // the Razor document contents are primarily treated as a string.
             var path = document.Source.FilePath;
             using var reader = new StreamReader(path);
-            var text = await reader.ReadToEndAsync().ConfigureAwait(false);
 
-            if (text is null)
+            // Iterate through the document one character at a time looking for @helper functions.
+            var matchCount = 0;
+            var nextCharResult = reader.Read();
+            var index = 1;
+            while (nextCharResult >= 0)
             {
-                _logger.LogWarning("Failed to read Razor document {FilePath}", path);
-                return Enumerable.Empty<TextReplacement>();
+                var nextChar = (char)nextCharResult;
+                if (nextChar == HelperDeclSyntax[matchCount])
+                {
+                    matchCount++;
+                    if (matchCount == HelperDeclSyntax.Length)
+                    {
+                        matchCount = 0;
+                        var replacement = GetHelperReplacement(reader, ref index);
+                        if (replacement is null)
+                        {
+                            _logger.LogWarning("Invalid @helper function found in {Path}; not replacing", path);
+                        }
+                        else
+                        {
+                            yield return replacement;
+                        }
+                    }
+                }
+                else
+                {
+                    matchCount = 0;
+                }
+
+                nextCharResult = reader.Read();
+                index++;
             }
-
-            var helpers = HelperDeclRegex.Matches(text);
-
-            // This would be a lot more succinct with Linq,
-            // but MatchCollection doesn't implement IEnumerable<Match>.
-            var replacements = new TextReplacement[helpers.Count];
-            for (var i = 0; i < helpers.Count; i++)
-            {
-                replacements[i] = GetHelperReplacement(text, helpers[i].Index);
-            }
-
-            return replacements;
         }
 
-        private static TextReplacement GetHelperReplacement(string text, int helperOffset)
+        private static TextReplacement? GetHelperReplacement(StreamReader reader, ref int index)
         {
             var newText = new StringBuilder("@{ HelperResult ");
             var functionBodyBegun = false;
             var braceCount = 0;
-            var index = helperOffset + "@helper ".Length;
-            var lineStart = index;
+            var helperStart = index - HelperDeclSyntax.Length;
 
             // Copy the helper function until the end of its body block
-            while ((!functionBodyBegun || braceCount > 0) && index < text.Length)
+            var nextCharResult = reader.Read();
+            index++;
+            while (nextCharResult != -1)
             {
-                var nextChar = text[index];
+                var nextChar = (char)nextCharResult;
 
                 // Match braces while moving through the function body so that
                 // the loop can end when all braces are matched
@@ -131,6 +103,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     '}' => -1,
                     _ => 0
                 };
+
+#pragma warning disable CA1508 // Avoid dead conditional code
+                if (functionBodyBegun && braceCount == 0)
+#pragma warning restore CA1508 // Avoid dead conditional code
+                {
+                    // If we've reached the final brace, add a return statement for the local method,
+                    // and return the text replacement.
+                    newText.Append($"\treturn new HelperResult(w => Task.CompletedTask);\r\n}} }}");
+
+                    return new TextReplacement(newText.ToString(), helperStart, index - helperStart);
+                }
 
                 if (!functionBodyBegun && braceCount > 0)
                 {
@@ -143,28 +126,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 // introduced by the replacement
                 if (nextChar == '\n')
                 {
-                    lineStart = index + 1;
                     newText.Append('\t');
                 }
 
+                nextCharResult = reader.Read();
                 index++;
             }
 
-            // Figure out how far the helper's text is indented by looking at the start of the last line
-            int whitespaceCount;
-            for (whitespaceCount = 0; lineStart + whitespaceCount < text.Length && char.IsWhiteSpace(text[lineStart + whitespaceCount]); whitespaceCount++)
-            {
-                // Intentionally empty; this is just walking to the end of the whitespace
-            }
-
-            var whitespace = text.Substring(lineStart, whitespaceCount);
-
-            // Add a return statement for the local method
-            newText.Insert(newText.Length - 1, $"\treturn new HelperResult(w => Task.CompletedTask);{Environment.NewLine}{whitespace}");
-
-            newText.Append(" }");
-
-            return new TextReplacement(newText.ToString(), helperOffset, index - helperOffset);
+            return null;
         }
     }
 }

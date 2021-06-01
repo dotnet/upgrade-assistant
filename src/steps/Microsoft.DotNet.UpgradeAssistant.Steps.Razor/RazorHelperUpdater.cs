@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="inputs">The Razor code documents being upgraded.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns>A FileUpdaterResult with a 'true' value if any documents contain a @helper and false otherwise. If true, the result will also include the paths of the documents containing a @helper.</returns>
-        public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
+        public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             foreach (var input in inputs)
             {
                 // Check whether any of the documents contain a @helper function
-                if (await _helperMatcher.HasHelperAsync(input).ConfigureAwait(false))
+                if (_helperMatcher.GetHelperReplacements(input).Any())
                 {
                     // If a @helper is present, log it to the console and store the path to return later
                     var path = input.Source.FilePath;
@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Log how many Razor documents had @helpers and return a corresponding FileUpdaterResult
             _logger.LogInformation("Found @helper functions in {Count} documents", inputsWithHelpers.Count);
-            return new FileUpdaterResult(inputsWithHelpers.Any(), inputsWithHelpers);
+            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(inputsWithHelpers.Any(), inputsWithHelpers));
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="inputs">The Razor code documents to upgrade.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns>A FileUpdaterResult indicating whether the opertaion succeeded and which documents (if any) were updated.</returns>
-        public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
+        public Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<RazorCodeDocument> inputs, CancellationToken token)
         {
             if (context is null)
             {
@@ -114,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     continue;
                 }
 
-                var helperReplacements = await _helperMatcher.GetHelperReplacementsAsync(document).ConfigureAwait(false);
+                var helperReplacements = _helperMatcher.GetHelperReplacements(document);
 
                 if (helperReplacements.Any())
                 {
@@ -146,7 +146,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
             }
 
-            return new FileUpdaterResult(true, updatedDocuments);
+            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(true, updatedDocuments));
         }
 
         private static bool HasMvcRazorUsing(RazorCodeDocument document)
