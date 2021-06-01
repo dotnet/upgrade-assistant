@@ -20,4 +20,10 @@
     <ProjectReference Include="..\..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ExtensionManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

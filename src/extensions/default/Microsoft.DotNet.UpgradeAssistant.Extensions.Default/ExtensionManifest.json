@@ -1,0 +1,36 @@
+﻿{
+  "ExtensionName": "Default",
+
+  "ConfigUpdater": {
+    "ConfigFilePaths": [
+      "app.config",
+      "web.config",
+      "Views\\web.config"
+    ]
+  },
+
+  "TryConvertProjectConverter": {
+    "TryConvertPath": "./try-convert/try-convert.dll"
+  },
+
+  "SourceUpdater": {
+    "AdditionalAnalyzerTexts": [
+      "WebTypeReplacements.typemap"
+    ]
+  },
+
+  "PackageUpdater": {
+    "PackageMapPath": "PackageMaps"
+  },
+
+  "TemplateInserter": {
+    "TemplateConfigFiles": [
+      "Templates\\CSharpWebAppTemplates\\WebAppTemplates.json",
+      "Templates\\VisualBasicWebAppTemplates\\WebAppTemplates.json"
+    ]
+  },
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.dll"
+  ]
+}

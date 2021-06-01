@@ -4,7 +4,6 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IsPackable>true</IsPackable>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers</PackageId>
@@ -24,9 +23,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj" />
+    <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    <None Update="build\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.props" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
   </ItemGroup>
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
@@ -36,6 +37,8 @@
       <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.dll" PackagePath="analyzers/dotnet/vb" />
       <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.dll" PackagePath="analyzers/dotnet/vb" />
       <TfmSpecificPackageFile Include="$(OutputPath)\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.dll" PackagePath="analyzers/dotnet/vb" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\TypeMaps.props" PackagePath="build" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\WebTypeReplacements.typemap" PackagePath="build" />
     </ItemGroup>
   </Target>
 </Project>

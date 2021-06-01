@@ -2,7 +2,7 @@
 
 namespace TestProject.TestClasses
 {
-    public class UA0009
+    public class HelperResultUpgrade
     {
         public HelperResult Method1(System.Web.WebPages.HelperResult r)
         {

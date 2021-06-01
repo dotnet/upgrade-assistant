@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TestProject.TestClasses
 {
-    public class UA0004A : IResultFilter
+    public class FilterUpgrade : IResultFilter
     {
         public void OnResultExecuted(ResultExecutedContext filterContext)
         {

@@ -33,11 +33,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             var textReplacer = mock.Mock<IMappedTextReplacer>();
             var logger = mock.Mock<ILogger<RazorSourceUpdater>>();
 
-            Assert.Throws<ArgumentNullException>("analyzers", () => new RazorSourceUpdater(null!, codeFixProviders, textMatcher, textReplacer.Object, logger.Object));
-            Assert.Throws<ArgumentNullException>("codeFixProviders", () => new RazorSourceUpdater(analyzers, null!, textMatcher, textReplacer.Object, logger.Object));
-            Assert.Throws<ArgumentNullException>("textMatcher", () => new RazorSourceUpdater(analyzers, codeFixProviders, null!, textReplacer.Object, logger.Object));
-            Assert.Throws<ArgumentNullException>("textReplacer", () => new RazorSourceUpdater(analyzers, codeFixProviders, textMatcher, null!, logger.Object));
-            Assert.Throws<ArgumentNullException>("logger", () => new RazorSourceUpdater(analyzers, codeFixProviders, textMatcher, textReplacer.Object, null!));
+            Assert.Throws<ArgumentNullException>("analyzers", () => new RazorSourceUpdater(null!, codeFixProviders, ImmutableArray<AdditionalText>.Empty, textMatcher, textReplacer.Object, logger.Object));
+            Assert.Throws<ArgumentNullException>("codeFixProviders", () => new RazorSourceUpdater(analyzers, null!, ImmutableArray<AdditionalText>.Empty, textMatcher, textReplacer.Object, logger.Object));
+            Assert.Throws<ArgumentNullException>("textMatcher", () => new RazorSourceUpdater(analyzers, codeFixProviders, ImmutableArray<AdditionalText>.Empty, null!, textReplacer.Object, logger.Object));
+            Assert.Throws<ArgumentNullException>("textReplacer", () => new RazorSourceUpdater(analyzers, codeFixProviders, ImmutableArray<AdditionalText>.Empty, textMatcher, null!, logger.Object));
+            Assert.Throws<ArgumentNullException>("logger", () => new RazorSourceUpdater(analyzers, codeFixProviders, ImmutableArray<AdditionalText>.Empty, textMatcher, textReplacer.Object, null!));
+            Assert.Throws<ArgumentNullException>("additionalTexts", () => new RazorSourceUpdater(analyzers, codeFixProviders, null!, textMatcher, textReplacer.Object, logger.Object));
         }
 
         [Fact]

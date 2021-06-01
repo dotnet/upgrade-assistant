@@ -13,8 +13,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json" />
-  </ItemGroup>
 </Project>
