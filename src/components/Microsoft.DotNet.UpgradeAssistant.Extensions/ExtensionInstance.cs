@@ -17,11 +17,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         private readonly Lazy<AssemblyLoadContext> _alc;
 
-        public ExtensionInstance(IFileProvider fileProvider, string? name = null, IConfiguration? configuration = null)
+        public ExtensionInstance(IFileProvider fileProvider, string location)
         {
             FileProvider = fileProvider;
-            Configuration = configuration ?? CreateConfiguration(fileProvider);
-            Name = name ?? GetName(Configuration, FileProvider);
+            Location = location;
+            Configuration = CreateConfiguration(fileProvider);
+            Name = GetName(Configuration, location);
             _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(this));
         }
 
@@ -34,6 +35,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// otherwise it may trigger creation of the load context if it is not needed.
         /// </summary>
         public AssemblyLoadContext LoadContext => _alc.Value;
+
+        public string Location { get; }
 
         public IFileProvider FileProvider { get; }
 
@@ -57,20 +60,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 if (Directory.Exists(e))
                 {
-                    return new ExtensionInstance(new PhysicalFileProvider(e));
+                    return new ExtensionInstance(new PhysicalFileProvider(e), e);
                 }
                 else if (File.Exists(e))
                 {
                     if (ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
                     {
                         var dir = Path.GetDirectoryName(e) ?? string.Empty;
-                        return new ExtensionInstance(new PhysicalFileProvider(dir));
+                        return new ExtensionInstance(new PhysicalFileProvider(dir), dir);
                     }
                     else if (Path.GetExtension(e).Equals(".zip", StringComparison.OrdinalIgnoreCase))
                     {
                         var provider = new ZipFileProvider(e);
 
-                        return new ExtensionInstance(new ZipFileProvider(e));
+                        return new ExtensionInstance(new ZipFileProvider(e), e);
                     }
                 }
                 else
@@ -86,16 +89,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return null;
         }
 
-        private static string GetName(IConfiguration configuration, IFileProvider fileProvider)
+        private static string GetName(IConfiguration configuration, string location)
         {
             if (configuration[ExtensionNamePropertyName] is string name)
             {
                 return name;
             }
 
-            if (fileProvider is PhysicalFileProvider physical)
+            if (Path.GetFileNameWithoutExtension(location) is string locationName)
             {
-                return physical.Root;
+                return locationName;
             }
 
             return DefaultExtensionName;

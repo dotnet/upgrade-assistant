@@ -115,9 +115,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
 
+                    services.AddExtensions(context.Configuration, options.Extension);
                     services.AddMsBuild();
                     services.AddSingleton(options);
-                    services.AddExtensions(context.Configuration, options.Extension);
 
                     // Add command handlers
                     if (options.NonInteractive)
