@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 var fromConfig = originalConfiguration.GetSection("DefaultExtensions")
                     .Get<string[]>()
-                    .Select(n => Path.GetFullPath(Path.Combine(ExtensionDirectory, n)));
+                    .Select(n => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ExtensionDirectory, n)));
 
                 var extensionPathString = originalConfiguration[UpgradeAssistantExtensionPathsSettingName];
                 var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
