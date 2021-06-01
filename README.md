@@ -62,9 +62,21 @@ Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can
 dotnet tool update -g upgrade-assistant
 ```
 
-If installation fails, trying running the install command with the `--ignore-failed-sources` parameter: `dotnet tool install -g upgrade-assistant --ignore-failed-sources`. Upgrade-assistant is installed as a NuGet package, so invalid or authenticated sources in [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) can cause installation problems.
+If installation fails, trying running the install command with the `--ignore-failed-sources` parameter:
 
-To try the latest (and likely less stable) versions of the tool, CI builds are available on the dotnet-tools NuGet feed and can be installed with `dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json` or updated using the same --add-source parameter.
+```
+dotnet tool install -g upgrade-assistant --ignore-failed-sources
+```
+
+Upgrade-assistant is installed as a NuGet package, so invalid or authenticated sources in [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) can cause installation problems.
+
+To try the latest (and likely less stable) versions of the tool, CI builds are available on the dotnet-tools NuGet feed and can be installed with 
+
+```
+dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+```
+
+or updated using the same `--add-source` parameter.
 
 ## Usage
 
