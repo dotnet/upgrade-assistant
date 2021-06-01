@@ -49,6 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         private static void AddConfigUpdaters(IServiceCollection services)
         {
             services.AddScoped<IUpdater<ConfigFile>, AppSettingsConfigUpdater>();
+            services.AddScoped<IUpdater<ConfigFile>, ConnectionStringsConfigUpdater>();
             services.AddScoped<IUpdater<ConfigFile>, UnsupportedSectionConfigUpdater>();
             services.AddScoped<IUpdater<ConfigFile>, WebNamespaceConfigUpdater>();
         }
