@@ -76,7 +76,11 @@ To try the latest (and likely less stable) versions of the tool, CI builds are a
 dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
 ```
 
-or updated using the same `--add-source` parameter.
+or to update:
+
+```
+dotnet tool update -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+```
 
 ## Usage
 
