@@ -9,9 +9,10 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal sealed class ExtensionInstance : IDisposable
+    public sealed class ExtensionInstance : IDisposable
     {
-        private const string ManifestFileName = "ExtensionManifest.json";
+        public const string ManifestFileName = "ExtensionManifest.json";
+
         private const string ExtensionNamePropertyName = "ExtensionName";
         private const string DefaultExtensionName = "Unknown";
 
