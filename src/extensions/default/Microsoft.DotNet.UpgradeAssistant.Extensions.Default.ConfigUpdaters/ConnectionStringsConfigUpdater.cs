@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
@@ -16,16 +14,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
-    public class ConnectionStringsConfigUpdater : IUpdater<ConfigFile>
+    public class ConnectionStringsConfigUpdater : BaseAppSettingsConfigUpdater, IUpdater<ConfigFile>
     {
         private const string ConnectionStringsPath = "/configuration/connectionStrings";
         private const string AddConnectionStringElementName = "add";
-        private const string KeyAttributeName = "name";
-        private const string ValueAttributeName = "connectionString";
-        private const string AppSettingsJsonFileName = "appsettings.json";
+        private const string NameAttributeName = "name";
+        private const string ConnectionStringAttributeName = "connectionString";
         private const string ConnectionStringsObjectName = "ConnectionStrings";
 
-        private static readonly Regex AppSettingsFileRegex = new("^appsettings(\\..+)?\\.json$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger<ConnectionStringsConfigUpdater> _logger;
         private readonly Dictionary<string, string> _connectionStrings;
 
@@ -43,68 +39,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _connectionStrings = new Dictionary<string, string>();
         }
 
-        public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
+        public override void WriteChangesToAppSettings(Utf8JsonWriter jsonWriter)
         {
-            if (context is null)
+            if (jsonWriter is null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(jsonWriter));
             }
 
-            var project = context.CurrentProject.Required();
-
-            // Determine where appsettings.json should live
-            var appSettingsPath = Path.Combine(project.FileInfo.DirectoryName ?? string.Empty, AppSettingsJsonFileName);
-
-            // Parse existing appsettings.json properties, if any
-            var existingJson = "{}";
-            if (File.Exists(appSettingsPath))
+            // Write new object for the connection strings
+            jsonWriter.WriteStartObject(ConnectionStringsObjectName);
+            foreach (var setting in _connectionStrings)
             {
-                // Read all text instead of keeping the stream open so that we can
-                // re-open the config file later in this method as writeable
-                existingJson = File.ReadAllText(appSettingsPath);
+                jsonWriter.WriteString(setting.Key, setting.Value);
             }
 
-            using var json = JsonDocument.Parse(existingJson, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
-            var existingProperties = json.RootElement.EnumerateObject();
-
-            // Write an updated appsettings.json file including the previous properties and new ones for the new connection string properties
-            using var fs = new FileStream(appSettingsPath, FileMode.Create, FileAccess.Write);
-            using var jsonWriter = new Utf8JsonWriter(fs, new JsonWriterOptions { Indented = true });
-            {
-                jsonWriter.WriteStartObject();
-                foreach (var property in existingProperties)
-                {
-                    property.WriteTo(jsonWriter);
-                }
-
-                // Write new object for the connection strings
-                jsonWriter.WriteStartObject(ConnectionStringsObjectName);
-                foreach (var setting in _connectionStrings)
-                {
-                    jsonWriter.WriteString(setting.Key, setting.Value);
-                }
-
-                // Close the ConnectionStrings object
-                jsonWriter.WriteEndObject();
-
-                jsonWriter.WriteEndObject();
-            }
-
-            // Confirm that the appsettings.json file is included in the project. In rare cases (auto-include disabled),
-            // it may be necessary to add it explicitly
-            var file = project.GetFile();
-
-            if (!file.ContainsItem(appSettingsPath, ProjectItemType.Content, token))
-            {
-                // Remove the directory that was added at the beginning of this method.
-                var itemPath = Path.IsPathRooted(appSettingsPath)
-                    ? Path.GetFileName(appSettingsPath)
-                    : appSettingsPath;
-                file.AddItem(ProjectItemType.Content.Name, itemPath);
-                await file.SaveAsync(token).ConfigureAwait(false);
-            }
-
-            return new DefaultUpdaterResult(true);
+            // Close the ConnectionStrings object
+            jsonWriter.WriteEndObject();
         }
 
         public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
@@ -125,8 +75,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                     {
                         if (connectionString is not null)
                         {
-                            var key = connectionString.Attribute(KeyAttributeName);
-                            var value = connectionString.Attribute(ValueAttributeName);
+                            var key = connectionString.Attribute(NameAttributeName);
+                            var value = connectionString.Attribute(ConnectionStringAttributeName);
                             if (key is not null && value is not null)
                             {
                                 _logger.LogDebug("Found connection string {ConnectionStringName} in {ConfigFilePath}", key.Value, configFile.Path);
@@ -137,11 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 }
             }
 
-            var project = context.CurrentProject.Required();
-
-            var jsonConfigFiles = project.FindFiles(ProjectItemType.Content, AppSettingsFileRegex)
-                .Select(f => new AppSettingsFile(f))
-                .ToList();
+            var jsonConfigFiles = FindExistingAppSettingsFiles(context);
 
             // Check for existing appSettings.json files for connection strings
             foreach (var setting in connectionStrings)
