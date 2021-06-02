@@ -12,7 +12,7 @@ using System.Xml.XPath;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class ConnectionStringsConfigUpdater : BaseAppSettingsConfigUpdater, IUpdater<ConfigFile>
     {
