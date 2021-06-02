@@ -8,7 +8,7 @@
        so that it will be present in the extension's binary output. -->
   <ItemGroup>
     <Content Include="ExtensionManifest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
