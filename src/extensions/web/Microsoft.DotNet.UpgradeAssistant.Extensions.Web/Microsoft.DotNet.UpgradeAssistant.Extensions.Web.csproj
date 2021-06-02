@@ -10,7 +10,7 @@
     <None Update="ExtensionManifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\WebTypeReplacements.typemap" Link="WebTypeReplacements.typemap">
+    <None Include="..\..\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package\build\WebTypeReplacements.typemap" Link="WebTypeReplacements.typemap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="PackageMaps\*.json">
