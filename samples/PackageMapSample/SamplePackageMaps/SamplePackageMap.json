@@ -8,6 +8,10 @@
     // This boolean indicates whether the package map replacements work
     // while targeting .NET Framework or if the project must be upgraded
     // to .NET 5/.NET Standard before the package maps should be applied.
+    //
+    // If false, the package map will only be applied after the project
+    // targets .NET Core/.NET 5/.NET Standard. If true, the package map
+    // will be appplied regardless of the project's TFM.
     "NetCorePackagesWorkOnNetFx": true,
 
     // The NetFrameworkPackages array lists package references that should be removed.
@@ -51,5 +55,26 @@
     // remove references to MyCompany.Package2 and not add anything
     // in their place.
     "NetCorePackages": []
+  },
+
+  // In addition to mapping NuGet package references, package maps
+  // can also map .NET Framework references to NuGet package replacements.
+  {
+    "PackageSetName": "System.Configuration",
+    "NetCorePackagesWorkOnNetFx": true,
+
+    // The NetFrameworkAssemblies property lists assembly references
+    // to be replaced.
+    "NetFrameworkAssemblies": [
+      {
+        "Name": "System.Configuration"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "System.Configuration.ConfigurationManager",
+        "Version": "5.0.0"
+      }
+    ]
   }
 ]

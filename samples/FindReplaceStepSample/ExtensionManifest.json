@@ -24,6 +24,6 @@
   // or any other type that would be useful to Upgrade Assistant or
   // its extensions.
   "ExtensionServiceProviders": [
-    "FindReplaceStep.dll"
+    "FindReplaceStepSample.dll"
   ]
 }

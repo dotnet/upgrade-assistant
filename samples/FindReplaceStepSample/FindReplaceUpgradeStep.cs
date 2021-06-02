@@ -8,8 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FindReplaceStep
 {
@@ -18,8 +18,6 @@ namespace FindReplaceStep
     /// </summary>
     public class FindReplaceUpgradeStep : UpgradeStep
     {
-        private const string FindReplaceOptionsSectionName = "FindReplaceOptions";
-
         // A mapping for file paths to the strings in that file to be replaced.
         private Dictionary<string, IEnumerable<string>>? _neededReplacements;
 
@@ -35,19 +33,19 @@ namespace FindReplaceStep
         /// is a useful service for providing access to extensions' configuration (as read from extension manifests).
         /// </summary>
         /// <param name="logger">Used for logging diagnostic messages. Must be passed to the upgrade step's base class ctor.</param>
-        /// <param name="aggregateExtension">A useful service that provides access to extensions' configuration settings.</param>
-        public FindReplaceUpgradeStep(AggregateExtension aggregateExtension, ILogger<FindReplaceUpgradeStep> logger)
+        /// <param name="findReplaceOptionsCollection">Find/replace options as read from extension manifests. Because an ICollection is requested,
+        /// this property will include FindReplaceOptions from all extensions.</param>
+        public FindReplaceUpgradeStep(IOptions<ICollection<FindReplaceOptions>> findReplaceOptionsCollection, ILogger<FindReplaceUpgradeStep> logger)
             : base(logger)
         {
-            if (aggregateExtension is null)
+            if (findReplaceOptionsCollection is null)
             {
-                throw new ArgumentNullException(nameof(aggregateExtension));
+                throw new ArgumentNullException(nameof(findReplaceOptionsCollection));
             }
 
             // Reading configuration from AggregateExtension allows us to read configuration both from this extension's
             // manifest as well as from other extensions' manifests which may wish to further refine the behavior of this one.
-            StringsToReplace = aggregateExtension.GetOptions<FindReplaceOptions>(FindReplaceOptionsSectionName)?.Replacements
-                ?? throw new InvalidOperationException("No replacement strings configured");
+            StringsToReplace = findReplaceOptionsCollection.Value.SelectMany(f => f.Replacements).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
         // ***** ***** *****

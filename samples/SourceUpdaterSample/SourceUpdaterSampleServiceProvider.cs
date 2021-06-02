@@ -24,20 +24,23 @@ namespace SourceUpdaterSample
         /// Registers services (the analyzer and code fix provider) comprising the
         /// SourceUpdaterSample extension into Upgrade Assistant's dependency injection container.
         /// </summary>
-        /// <param name="serviceConfiguration">A configuration object containing both the
-        /// service collection to register services in and the extension's configuration file.</param>
-        /// <returns>The service collection updated with services Upgrade Assistant should use.</returns>
-        public IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration)
+        /// <param name="services">A configuration object containing the service collection
+        /// to register services in, the extension's configuration file, and a file provider
+        /// for retrieving extension files.</param>
+        public void AddServices(IExtensionServiceCollection services)
         {
-            if (serviceConfiguration is null)
+            if (services is null)
             {
-                throw new ArgumentNullException(nameof(serviceConfiguration));
+                throw new ArgumentNullException(nameof(services));
             }
 
-            serviceConfiguration.ServiceCollection.AddTransient<DiagnosticAnalyzer, MakeConstAnalyzer>();
-            serviceConfiguration.ServiceCollection.AddTransient<CodeFixProvider, MakeConstCodeFixProvider>();
-
-            return serviceConfiguration.ServiceCollection;
+            // Register the analyzer and code fix provider for this extension.
+            // Even though this extension doesn't register any new upgrade steps,
+            // these services will be picked up by existing upgrade steps that use
+            // analzyers and code fix providers (like the SourceUpdaterStep and
+            // RazorUpdaterStep).
+            services.Services.AddTransient<DiagnosticAnalyzer, MakeConstAnalyzer>();
+            services.Services.AddTransient<CodeFixProvider, MakeConstCodeFixProvider>();
         }
     }
 }
