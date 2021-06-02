@@ -1,5 +1,10 @@
 <Project>
 
+  <PropertyGroup>
+    <IsCI>false</IsCI>
+    <IsCI Condition=" '$(ARCADE_BUILD_TOOL_COMMAND)' != '' ">true</IsCI>
+  </PropertyGroup>
+
   <!-- Publish the extension and collect its output -->
   <Target Name="ComputePublishOutput" DependsOnTargets="Build;ComputeFilesToPublish" Returns="@(ExtensionFiles)">
     <ItemGroup>
@@ -14,10 +19,14 @@
     <!-- Add the relative directory the extension will be added to -->
     <ItemGroup>
       <Extension Update="@(Extension)">
-        <ExtensionDir>extensions/%(Extension.Name)</ExtensionDir>
+        <Properties>Configuration=$(Configuration);ExtensionDir=extensions/%(Name);_IsExtension=true</Properties>
+      </Extension>
+    </ItemGroup>
 
+    <ItemGroup Condition="$(IsCI)">
+      <Extension Update="@(Extension)">
         <!-- We want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
-        <IntermediateOutputPath>$(BaseIntermediateOutputPath)\extensions\%(Extension.Name)\</IntermediateOutputPath>
+        <Properties>%(Properties);$(BaseIntermediateOutputPath)\extensions\%(Name)\</Properties>
       </Extension>
     </ItemGroup>
   </Target>
@@ -32,9 +41,9 @@
   <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild;$(PackDependsOn)">
     <MSBuild Projects="%(Extension.Identity)"
              Targets="Restore"
-             Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true"
+             Properties="%(Properties)"
              RemoveProperties="TargetFramework"
-             Condition=" '%(Extension.Name)' != '' " />
+             Condition=" '%(Name)' != '' " />
   </Target>
 
   <!-- Publish each extension into its own directory -->
@@ -51,8 +60,8 @@
     <MSBuild Projects="%(Extension.Identity)"
              Targets="ComputePublishOutput"
              RemoveProperties="TargetFramework"
-             Properties="Configuration=$(Configuration);ExtensionDir=%(Extension.ExtensionDir);_IsExtension=true"
-             Condition=" '%(Extension.Name)' != '' ">
+             Properties="%(Properties)"
+             Condition=" '%(Name)' != '' ">
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
