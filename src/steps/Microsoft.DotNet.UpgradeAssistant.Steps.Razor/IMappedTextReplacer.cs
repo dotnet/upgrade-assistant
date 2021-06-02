@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 {
-    public interface ITextReplacer
+    public interface IMappedTextReplacer
     {
-        void ApplyTextReplacements(IEnumerable<TextReplacement> replacements);
+        void ApplyTextReplacements(IEnumerable<MappedTextReplacement> replacements);
     }
 }

@@ -10,11 +10,11 @@ using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
 {
-    public sealed class RazorTextReplacerTests : IDisposable
+    public sealed class RazorMappedTextReplacerTests : IDisposable
     {
         private static readonly string WorkingDir = Path.Combine(Path.GetTempPath(), "RazorTextReplacerTestFiles");
 
-        public RazorTextReplacerTests()
+        public RazorMappedTextReplacerTests()
         {
             if (Directory.Exists(WorkingDir))
             {
@@ -35,28 +35,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         [Fact]
         public void CtorNegativeTests()
         {
-            Assert.Throws<ArgumentNullException>("logger", () => new RazorTextReplacer(null!));
+            Assert.Throws<ArgumentNullException>("logger", () => new RazorMappedTextReplacer(null!));
         }
 
         [Fact]
         public void ApplyTextReplacementsNegativeTests()
         {
             using var mock = AutoMock.GetLoose();
-            var replacer = mock.Create<RazorTextReplacer>();
+            var replacer = mock.Create<RazorMappedTextReplacer>();
 
             Assert.Throws<ArgumentNullException>("replacements", () => replacer.ApplyTextReplacements(null!));
         }
 
         [Theory]
         [MemberData(nameof(ApplyReplacementsData))]
-        public void ApplyTextReplacementsPositiveTests(string testCaseId, IEnumerable<TextReplacement> replacements)
+        public void ApplyTextReplacementsPositiveTests(string testCaseId, IEnumerable<MappedTextReplacement> replacements)
         {
             // Arrange
             replacements = StageInputFiles(replacements);
             var inputFiles = replacements.Select(r => r.FilePath).Distinct().OrderBy(p => p);
             var expectedPostReplacementFiles = Directory.GetFiles(Path.Combine("TestViewsAfterReplacement", testCaseId), "*.cshtml").OrderBy(p => p);
             using var mock = AutoMock.GetLoose();
-            var replacer = mock.Create<RazorTextReplacer>();
+            var replacer = mock.Create<RazorMappedTextReplacer>();
 
             // Act
             replacer.ApplyTextReplacements(replacements);
@@ -76,18 +76,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "NoReplacements",
-                    Enumerable.Empty<TextReplacement>()
+                    Enumerable.Empty<MappedTextReplacement>()
                 },
 
                 // Vanilla replacements
                 new object[]
                 {
                     "VanillaReplacements",
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("ToString()", "ToAnotherString()", GetPath("Simple.cshtml"), 1),
-                        new TextReplacement("Model[1]", "Model[2]", GetPath("View.cshtml"), 18),
-                        new TextReplacement("if(Model != null && Model.Length > 1)", "if(Model is not null)", GetPath("View.cshtml"), 15)
+                        new MappedTextReplacement("ToString()", "ToAnotherString()", GetPath("Simple.cshtml"), 1),
+                        new MappedTextReplacement("Model[1]", "Model[2]", GetPath("View.cshtml"), 18),
+                        new MappedTextReplacement("if(Model != null && Model.Length > 1)", "if(Model is not null)", GetPath("View.cshtml"), 15)
                     }
                 },
 
@@ -95,9 +95,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "MultilineReplacement",
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement(
+                        new MappedTextReplacement(
                             "{\r\n    <div>\r\n        <p>@Model[1]</p>\r\n    </div>\r\n}\r\n",
                             "<h1>\r\n    Hi!\r\n</h1>",
                             GetPath("View.cshtml"),
@@ -109,10 +109,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "InapplicableReplacement",
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("DateTime", "DateTimeOffset", GetPath("Simple.cshtml"), 2),
-                        new TextReplacement("<div>\r\n ", "<div>\r\n", GetPath("View.cshtml"), 9),
+                        new MappedTextReplacement("DateTime", "DateTimeOffset", GetPath("Simple.cshtml"), 2),
+                        new MappedTextReplacement("<div>\r\n ", "<div>\r\n", GetPath("View.cshtml"), 9),
                     }
                 },
 
@@ -120,10 +120,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "NewTextAtStart",
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("Something inapplicable", "using Foo;\r\nSomething inapplicable", GetPath("Simple.cshtml"), 0),
-                        new TextReplacement(string.Empty, "Test", GetPath("View.cshtml"), 0),
+                        new MappedTextReplacement("Something inapplicable", "using Foo;\r\nSomething inapplicable", GetPath("Simple.cshtml"), 0),
+                        new MappedTextReplacement(string.Empty, "Test", GetPath("View.cshtml"), 0),
                     }
                 },
 
@@ -131,12 +131,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "RemoveCodeBlock",
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("DateTime.Now.ToString();", string.Empty, GetPath("Simple.cshtml"), 1),
-                        new TextReplacement("using Foo;", string.Empty, GetPath("View2.cshtml"), 1),
-                        new TextReplacement("Model[0]", string.Empty, GetPath("View2.cshtml"), 7),
-                        new TextReplacement("\r\n        var x = 0;\r\n", string.Empty, GetPath("View2.cshtml"), 23),
+                        new MappedTextReplacement("DateTime.Now.ToString();", string.Empty, GetPath("Simple.cshtml"), 1),
+                        new MappedTextReplacement("using Foo;", string.Empty, GetPath("View2.cshtml"), 1),
+                        new MappedTextReplacement("Model[0]", string.Empty, GetPath("View2.cshtml"), 7),
+                        new MappedTextReplacement("\r\n        var x = 0;\r\n", string.Empty, GetPath("View2.cshtml"), 23),
                     }
                 },
 
@@ -144,18 +144,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "RemovePartialCodeBlock",
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement(".ToString();", ";", GetPath("Simple.cshtml"), 1),
-                        new TextReplacement(" Foo", string.Empty, GetPath("View2.cshtml"), 1),
-                        new TextReplacement("Model[0];", "Model;", GetPath("View2.cshtml"), 7),
+                        new MappedTextReplacement(".ToString();", ";", GetPath("Simple.cshtml"), 1),
+                        new MappedTextReplacement(" Foo", string.Empty, GetPath("View2.cshtml"), 1),
+                        new MappedTextReplacement("Model[0];", "Model;", GetPath("View2.cshtml"), 7),
                     }
                 }
             };
 
         private static string GetPath(string fileName) => Path.Combine(AppContext.BaseDirectory, "TestViews", fileName);
 
-        private static IEnumerable<TextReplacement> StageInputFiles(IEnumerable<TextReplacement> replacements)
+        private static IEnumerable<MappedTextReplacement> StageInputFiles(IEnumerable<MappedTextReplacement> replacements)
         {
             var inputFiles = replacements.Select(r => r.FilePath).Distinct();
 
@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 File.Copy(inputFile, Path.Combine(WorkingDir, Path.GetFileName(inputFile)), true);
             }
 
-            return replacements.Select(r => new TextReplacement(r.OriginalText, r.NewText, Path.Combine(WorkingDir, Path.GetFileName(r.FilePath)), r.StartingLine));
+            return replacements.Select(r => new MappedTextReplacement(r.OriginalText, r.NewText, Path.Combine(WorkingDir, Path.GetFileName(r.FilePath)), r.StartingLine));
         }
     }
 }

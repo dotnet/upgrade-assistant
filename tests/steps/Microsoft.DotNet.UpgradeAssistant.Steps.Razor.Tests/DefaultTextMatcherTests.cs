@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
 
         [Theory]
         [MemberData(nameof(MatchOrderedSubTextsData))]
-        public void MatchOrderedSubTextsPositiveTests(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts, IEnumerable<TextReplacement> expectedReplacements)
+        public void MatchOrderedSubTextsPositiveTests(IEnumerable<MappedSubText> originalTexts, IEnumerable<string> newTexts, IEnumerable<MappedTextReplacement> expectedReplacements)
         {
             // Arrange
             var matcher = new DefaultTextMatcher(new Differ(), new CharacterChunker());
@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             var replacements = matcher.MatchOrderedSubTexts(originalTexts, newTexts);
 
             // Assert
-            Assert.Collection(replacements, expectedReplacements.Select<TextReplacement, Action<TextReplacement>>(expected => actual => Assert.Equal(expected, actual)).ToArray());
+            Assert.Collection(replacements, expectedReplacements.Select<MappedTextReplacement, Action<MappedTextReplacement>>(expected => actual => Assert.Equal(expected, actual)).ToArray());
         }
 
         public static IEnumerable<object[]> MatchOrderedSubTextsData
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     Array.Empty<MappedSubText>(),
                     Array.Empty<string>(),
-                    Array.Empty<TextReplacement>()
+                    Array.Empty<MappedTextReplacement>()
                 };
 
                 // Equal number of original and updated texts
@@ -66,11 +66,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new MappedSubText[] { GetSubText("A", "A.txt", 10), GetSubText("B", "B.txt", 2), GetSubText("B", "B.txt", 2) },
                     new string[] { "C", string.Empty, "D" },
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("A", "C", "A.txt", 10),
-                        new TextReplacement("B", string.Empty, "B.txt", 2),
-                        new TextReplacement("B", "D", "B.txt", 2),
+                        new MappedTextReplacement("A", "C", "A.txt", 10),
+                        new MappedTextReplacement("B", string.Empty, "B.txt", 2),
+                        new MappedTextReplacement("B", "D", "B.txt", 2),
                     }
                 };
 
@@ -79,11 +79,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new MappedSubText[] { GetSubText("A", "A.txt", 10), GetSubText("B", "B.txt", 2), GetSubText("C", "B.txt", 2) },
                     Array.Empty<string>(),
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("A", string.Empty, "A.txt", 10),
-                        new TextReplacement("B", string.Empty, "B.txt", 2),
-                        new TextReplacement("C", string.Empty, "B.txt", 2),
+                        new MappedTextReplacement("A", string.Empty, "A.txt", 10),
+                        new MappedTextReplacement("B", string.Empty, "B.txt", 2),
+                        new MappedTextReplacement("C", string.Empty, "B.txt", 2),
                     }
                 };
 
@@ -92,10 +92,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new MappedSubText[] { GetSubText("A", "A.txt", 10), GetSubText("B", "B.txt", 2), GetSubText("C", "C.txt", 0) },
                     new string[] { "D", "B", "C " },
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("A", "D", "A.txt", 10),
-                        new TextReplacement("C", "C ", "C.txt", 0),
+                        new MappedTextReplacement("A", "D", "A.txt", 10),
+                        new MappedTextReplacement("C", "C ", "C.txt", 0),
                     }
                 };
 
@@ -104,11 +104,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new MappedSubText[] { GetSubText("Cat", "A.txt", 10), GetSubText("Dog", "B.txt", 2), GetSubText("Fish", "C.txt", 1000000000) },
                     new string[] { "C", "F" },
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("Cat", "C", "A.txt", 10),
-                        new TextReplacement("Dog", string.Empty, "B.txt", 2),
-                        new TextReplacement("Fish", "F", "C.txt", 1000000000),
+                        new MappedTextReplacement("Cat", "C", "A.txt", 10),
+                        new MappedTextReplacement("Dog", string.Empty, "B.txt", 2),
+                        new MappedTextReplacement("Fish", "F", "C.txt", 1000000000),
                     }
                 };
 
@@ -117,11 +117,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new MappedSubText[] { GetSubText("Cat", "A.txt", 10), GetSubText("Dog", "B.txt", 2), GetSubText("Fish", "C.txt", 1000000000) },
                     new string[] { "C", "o" },
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("Cat", "C", "A.txt", 10),
-                        new TextReplacement("Dog", "o", "B.txt", 2),
-                        new TextReplacement("Fish", string.Empty, "C.txt", 1000000000),
+                        new MappedTextReplacement("Cat", "C", "A.txt", 10),
+                        new MappedTextReplacement("Dog", "o", "B.txt", 2),
+                        new MappedTextReplacement("Fish", string.Empty, "C.txt", 1000000000),
                     }
                 };
 
@@ -130,11 +130,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new MappedSubText[] { GetSubText("Cat", "A.txt", 10), GetSubText("Dog", "B.txt", 2), GetSubText("Fish", "C.txt", 1000000000) },
                     new string[] { "CDg", "-" },
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("Cat", string.Empty, "A.txt", 10),
-                        new TextReplacement("Dog", "CDg", "B.txt", 2),
-                        new TextReplacement("Fish", "-", "C.txt", 1000000000),
+                        new MappedTextReplacement("Cat", string.Empty, "A.txt", 10),
+                        new MappedTextReplacement("Dog", "CDg", "B.txt", 2),
+                        new MappedTextReplacement("Fish", "-", "C.txt", 1000000000),
                     }
                 };
 
@@ -143,10 +143,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 {
                     new MappedSubText[] { GetSubText("Cat", "A.txt", 10), GetSubText("Dog", "B.txt", 2), GetSubText("Fish", "C.txt", 1000000000) },
                     new string[] { "Fish", "Dog" },
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("Cat", "Fish", "A.txt", 10),
-                        new TextReplacement("Fish", string.Empty, "C.txt", 1000000000),
+                        new MappedTextReplacement("Cat", "Fish", "A.txt", 10),
+                        new MappedTextReplacement("Fish", string.Empty, "C.txt", 1000000000),
                     }
                 };
 
@@ -162,12 +162,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         GetSubText("  ", "E.txt", 2),
                     },
                     new string[] { "Cog", "  " },
-                    new TextReplacement[]
+                    new MappedTextReplacement[]
                     {
-                        new TextReplacement("Cat", string.Empty, "a.txt", 10),
-                        new TextReplacement("Dog", "Cog", "b.txt", 2),
-                        new TextReplacement("Fish", string.Empty, "c.txt", 1000000000),
-                        new TextReplacement("Bird Bird", string.Empty, "d.txt", 11),
+                        new MappedTextReplacement("Cat", string.Empty, "a.txt", 10),
+                        new MappedTextReplacement("Dog", "Cog", "b.txt", 2),
+                        new MappedTextReplacement("Fish", string.Empty, "c.txt", 1000000000),
+                        new MappedTextReplacement("Bird Bird", string.Empty, "d.txt", 11),
                     }
                 };
             }

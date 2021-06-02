@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
         private readonly ITextMatcher _textMatcher;
-        private readonly ITextReplacer _textReplacer;
+        private readonly IMappedTextReplacer _textReplacer;
         private readonly ILogger<RazorSourceUpdater> _logger;
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         /// <param name="textMatcher">The text matching service to use for correlating old sections of text in Razor documents with updated texts.</param>
         /// <param name="textReplacer">The text replacing service to use for updating replaced texts in the Razor documents.</param>
         /// <param name="logger">An ILogger to log diagnostics.</param>
-        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, ITextMatcher textMatcher, ITextReplacer textReplacer, ILogger<RazorSourceUpdater> logger)
+        public RazorSourceUpdater(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, ITextMatcher textMatcher, IMappedTextReplacer textReplacer, ILogger<RazorSourceUpdater> logger)
         {
             if (additionalTexts is null)
             {
@@ -171,9 +171,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             return new FileUpdaterResult(true, textReplacements.Select(r => r.FilePath).Distinct());
         }
 
-        private async Task<IEnumerable<TextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)
+        private async Task<IEnumerable<MappedTextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)
         {
-            var replacements = new List<TextReplacement>();
+            var replacements = new List<MappedTextReplacement>();
             foreach (var updatedDocument in updatedDocuments)
             {
                 var originalDocument = originalProject.GetDocument(updatedDocument.Id);
