@@ -1,5 +1,10 @@
 <Project>
 
+  <PropertyGroup>
+    <IsCI>false</IsCI>
+    <IsCI Condition=" '$(BuildingInsideVisualStudio)' == '' ">true</IsCI>
+  </PropertyGroup>
+
   <!-- Publish the extension and collect its output -->
   <Target Name="ComputePublishOutput" DependsOnTargets="Build;ComputeFilesToPublish" Returns="@(ExtensionFiles)">
     <ItemGroup>
@@ -18,10 +23,10 @@
       </Extension>
     </ItemGroup>
 
-    <!-- Outside of VS, we want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
-    <ItemGroup Condition="!$(BuildingInsideVisualStudio)">
+    <!-- When compiling outside of VS, we want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
+    <ItemGroup Condition="$(IsCI)">
       <Extension Update="@(Extension)">
-        <Properties>%(Properties);$(BaseIntermediateOutputPath)\extensions\%(Name)\</Properties>
+        <Properties>%(Properties);$(BaseIntermediateOutputPath)extensions\%(Name)\</Properties>
       </Extension>
     </ItemGroup>
   </Target>
