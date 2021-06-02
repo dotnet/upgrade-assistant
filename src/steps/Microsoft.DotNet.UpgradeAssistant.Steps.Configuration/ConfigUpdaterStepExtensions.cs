@@ -27,6 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         private static void AddDefaultConfigUpdaters(this IServiceCollection services)
         {
+            services.AddScoped<IUpdater<ConfigFile>, ConnectionStringsConfigUpdater>();
             services.AddScoped<IUpdater<ConfigFile>, AppSettingsConfigUpdater>();
             services.AddScoped<IUpdater<ConfigFile>, UnsupportedSectionConfigUpdater>();
         }
