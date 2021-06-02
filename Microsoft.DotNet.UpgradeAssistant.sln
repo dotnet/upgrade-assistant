@@ -120,9 +120,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common", "src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj", "{91391896-C591-43FD-B6F6-7D9150DB3CB2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindReplaceStep", "samples\FindReplaceStepSample\FindReplaceStep\FindReplaceStep.csproj", "{5B8E8267-E90E-4E78-A219-A62AEDCE81CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FindReplaceStepSample", "samples\FindReplaceStepSample\FindReplaceStepSample\FindReplaceStepSample.csproj", "{5B8E8267-E90E-4E78-A219-A62AEDCE81CE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{EE464F98-73F3-4858-8B5C-5254EECFA3B3}"
+	ProjectSection(SolutionItems) = preProject
+		samples\README.md = samples\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceUpdaterSample", "samples\SourceUpdaterSample\SourceUpdaterSample\SourceUpdaterSample.csproj", "{AF6A2C7F-686F-4DAF-81C7-9A36CBD797C0}"
 EndProject
