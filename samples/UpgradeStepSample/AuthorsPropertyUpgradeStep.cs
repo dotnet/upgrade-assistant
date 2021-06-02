@@ -6,18 +6,17 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace UpgradeStepSample
 {
     /// <summary>
-    /// Upgrade steps all derived from the Microsoft.DotNet.UpgradeAssistant.UpgradeStep base class.
+    /// Upgrade steps all derive from the Microsoft.DotNet.UpgradeAssistant.UpgradeStep base class.
     /// </summary>
     public class AuthorsPropertyUpgradeStep : UpgradeStep
     {
         private const string AuthorsPropertyName = "Authors";
-        private const string AuthorsPropertySectionName = "AuthorsProperty";
 
         private readonly AuthorsPropertyOptions? _options;
         private readonly ILogger<AuthorsPropertyUpgradeStep> _logger;
@@ -25,22 +24,16 @@ namespace UpgradeStepSample
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorsPropertyUpgradeStep"/> class.
         /// An upgrade step's constructor should have an ILogger parameter along with parameters for any other
-        /// services that need resolved from the dependency injection container. In extensions, AggregateExtension
-        /// is a useful service for providing access to extensions' configuration (as read from extension manifests).
+        /// services that need resolved from the dependency injection container. In extensions, IOptions objects
+        /// can be requested to access extensions' configuration (as read from extension manifests).
         /// </summary>
+        /// <param name="authorPropertyOptions">The extension's option read from extension configuration.</param>
         /// <param name="logger">Used for logging diagnostic messages. Must be passed to the upgrade step's base class ctor.</param>
-        /// <param name="aggregateExtension">A useful service that provides access to extensions' configuration settings.</param>
-        public AuthorsPropertyUpgradeStep(AggregateExtension aggregateExtension, ILogger<AuthorsPropertyUpgradeStep> logger)
+        public AuthorsPropertyUpgradeStep(IOptions<AuthorsPropertyOptions> authorPropertyOptions, ILogger<AuthorsPropertyUpgradeStep> logger)
             : base(logger)
         {
+            _options = authorPropertyOptions?.Value;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            if (aggregateExtension is null)
-            {
-                throw new ArgumentNullException(nameof(aggregateExtension));
-            }
-
-            // The AggregateExtension type can be used to get files and configuration settings from extensions.
-            _options = aggregateExtension.GetOptions<AuthorsPropertyOptions>(AuthorsPropertySectionName);
         }
 
         // ***** ***** *****
@@ -69,12 +62,13 @@ namespace UpgradeStepSample
         /// so the applicability of the step may change over the course of the upgrade process.
         /// </summary>
         /// <param name="context">The upgrade context to evaluate for applicability.</param>
+        /// <param name="token">A cancellation token.</param>
         /// <returns>True if the upgrade step should be displayed to the user; false otherwise.</returns>
-        protected override bool IsApplicableImpl(IUpgradeContext context)
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
             // Because this upgrade step works at the project level, it is only applicable if there is a current project available.
             // If, for example, the user hasn't selected which project to upgrade yet, then this step will not apply.
-            return context?.CurrentProject is not null;
+            return Task.FromResult(context?.CurrentProject is not null);
         }
 
         /// <summary>
@@ -107,7 +101,7 @@ namespace UpgradeStepSample
             }
 
             var existingAuthorsProperty = projectFile.GetPropertyValue(AuthorsPropertyName);
-            if (existingAuthorsProperty is null || !existingAuthorsProperty.Contains(_options.Authors, StringComparison.OrdinalIgnoreCase))
+            if (existingAuthorsProperty is null || !existingAuthorsProperty.Contains(_options.Authors))
             {
                 _logger.LogDebug("Existing authors property ({Authors}) does not contain expected authors ({ExpectedAuthors})", existingAuthorsProperty, _options.Authors);
 
@@ -149,7 +143,7 @@ namespace UpgradeStepSample
 
             var updatedPropertyValue = existingAuthorsProperty is null
                 ? _options.Authors
-                : string.Join(';', _options.Authors, existingAuthorsProperty);
+                : string.Join(";", _options.Authors, existingAuthorsProperty);
 
             // IProjectFile.SetPropertyValue will add or update a property
             projectFile.SetPropertyValue(AuthorsPropertyName, updatedPropertyValue);
