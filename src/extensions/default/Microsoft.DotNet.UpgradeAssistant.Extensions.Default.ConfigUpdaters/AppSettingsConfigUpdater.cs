@@ -4,26 +4,23 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.XPath;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
 {
-    public class AppSettingsConfigUpdater : IUpdater<ConfigFile>
+    public class AppSettingsConfigUpdater : BaseAppSettingsConfigUpdater, IUpdater<ConfigFile>
     {
         private const string AppSettingsPath = "/configuration/appSettings";
         private const string AddSettingElementName = "add";
         private const string KeyAttributeName = "key";
         private const string ValueAttributeName = "value";
-        private const string AppSettingsJsonFileName = "appsettings.json";
 
-        private static readonly Regex AppSettingsFileRegex = new("^appsettings(\\..+)?\\.json$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger<AppSettingsConfigUpdater> _logger;
         private readonly Dictionary<string, string> _appSettings;
 
@@ -41,78 +38,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             _appSettings = new Dictionary<string, string>();
         }
 
-        public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
+        public override void WriteChangesToAppSettings(Utf8JsonWriter jsonWriter)
         {
-            if (context is null)
+            if (jsonWriter is null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(jsonWriter));
             }
 
-            var project = context.CurrentProject.Required();
-
-            // Determine where appsettings.json should live
-            var appSettingsPath = Path.Combine(project.FileInfo.DirectoryName ?? string.Empty, AppSettingsJsonFileName);
-
-            // Parse existing appsettings.json properties, if any
-            var existingJson = "{}";
-            if (File.Exists(appSettingsPath))
+            foreach (var setting in _appSettings)
             {
-                // Read all text instead of keeping the stream open so that we can
-                // re-open the config file later in this method as writeable
-                existingJson = File.ReadAllText(appSettingsPath);
-            }
-
-            using var json = JsonDocument.Parse(existingJson, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
-            var existingProperties = json.RootElement.EnumerateObject();
-
-            // Write an updated appsettings.json file including the previous properties and new ones for the new app settings properties
-            using var fs = new FileStream(appSettingsPath, FileMode.Create, FileAccess.Write);
-            using var jsonWriter = new Utf8JsonWriter(fs, new JsonWriterOptions { Indented = true });
-            {
-                jsonWriter.WriteStartObject();
-                foreach (var property in existingProperties)
+                if (bool.TryParse(setting.Value, out var boolValue))
                 {
-                    property.WriteTo(jsonWriter);
+                    jsonWriter.WriteBoolean(setting.Key, boolValue);
                 }
-
-                foreach (var setting in _appSettings)
+                else if (long.TryParse(setting.Value, out var longValue))
                 {
-                    if (bool.TryParse(setting.Value, out var boolValue))
-                    {
-                        jsonWriter.WriteBoolean(setting.Key, boolValue);
-                    }
-                    else if (long.TryParse(setting.Value, out var longValue))
-                    {
-                        jsonWriter.WriteNumber(setting.Key, longValue);
-                    }
-                    else if (double.TryParse(setting.Value, out var doubleValue))
-                    {
-                        jsonWriter.WriteNumber(setting.Key, doubleValue);
-                    }
-                    else
-                    {
-                        jsonWriter.WriteString(setting.Key, setting.Value);
-                    }
+                    jsonWriter.WriteNumber(setting.Key, longValue);
                 }
-
-                jsonWriter.WriteEndObject();
+                else if (double.TryParse(setting.Value, out var doubleValue))
+                {
+                    jsonWriter.WriteNumber(setting.Key, doubleValue);
+                }
+                else
+                {
+                    jsonWriter.WriteString(setting.Key, setting.Value);
+                }
             }
-
-            // Confirm that the appsettings.json file is included in the project. In rare cases (auto-include disabled),
-            // it may be necessary to add it explicitly
-            var file = project.GetFile();
-
-            if (!file.ContainsItem(appSettingsPath, ProjectItemType.Content, token))
-            {
-                // Remove the directory that was added at the beginning of this method.
-                var itemPath = Path.IsPathRooted(appSettingsPath)
-                    ? Path.GetFileName(appSettingsPath)
-                    : appSettingsPath;
-                file.AddItem(ProjectItemType.Content.Name, itemPath);
-                await file.SaveAsync(token).ConfigureAwait(false);
-            }
-
-            return new DefaultUpdaterResult(true);
         }
 
         public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
@@ -145,11 +96,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
                 }
             }
 
-            var project = context.CurrentProject.Required();
-
-            var jsonConfigFiles = project.FindFiles(ProjectItemType.Content, AppSettingsFileRegex)
-                .Select(f => new AppSettingsFile(f))
-                .ToList();
+            var jsonConfigFiles = FindExistingAppSettingsFiles(context);
 
             // Check for existing appSettings.json files for app settings
             foreach (var setting in appSettings)
