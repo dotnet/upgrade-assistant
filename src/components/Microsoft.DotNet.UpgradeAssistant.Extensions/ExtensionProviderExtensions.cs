@@ -7,8 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -36,6 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 throw new ArgumentNullException(nameof(configuration));
             }
 
+            services.AddTransient<IUpgradeStartup, ExtensionLoggingStartup>();
             services.AddSerializer();
 
             foreach (var extension in GetExtensions(configuration, additionalExtensionPaths))
