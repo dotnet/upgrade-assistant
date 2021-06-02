@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(configUpdaterOptions));
             }
 
-            _configFilePaths = configUpdaterOptions.Value.SelectMany(s => s.ConfigFilePaths).ToArray(); 
+            _configFilePaths = configUpdaterOptions.Value.SelectMany(s => s.ConfigFilePaths).ToArray();
             SubSteps = _allSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 
