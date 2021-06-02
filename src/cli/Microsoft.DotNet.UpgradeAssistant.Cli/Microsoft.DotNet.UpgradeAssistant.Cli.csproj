@@ -89,7 +89,10 @@
   </ItemGroup>
   <ItemGroup>
     <Extension Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj">
-      <Name>Default</Name>
+      <Name>default</Name>
+    </Extension>
+    <Extension Include="..\..\extensions\web\Microsoft.DotNet.UpgradeAssistant.Extensions.Web\Microsoft.DotNet.UpgradeAssistant.Extensions.Web.csproj">
+      <Name>web</Name>
     </Extension>
   </ItemGroup>
 </Project>

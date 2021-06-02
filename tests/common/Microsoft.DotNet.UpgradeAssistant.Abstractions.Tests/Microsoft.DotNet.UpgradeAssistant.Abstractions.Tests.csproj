@@ -19,7 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.csproj" />
-    <ProjectReference Include="..\..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.csproj" />
     <ProjectReference Include="..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

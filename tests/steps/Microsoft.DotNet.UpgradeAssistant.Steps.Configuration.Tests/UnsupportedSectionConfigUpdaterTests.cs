@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters.Tests
 {
     public class UnsupportedSectionConfigUpdaterTests
     {

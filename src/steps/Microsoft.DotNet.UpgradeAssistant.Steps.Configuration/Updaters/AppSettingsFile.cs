@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class AppSettingsFile
     {

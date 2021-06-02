@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +25,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             }
 
             AddUpgradeSteps(services);
-            AddConfigUpdaters(services.Services);
             AddAnalyzersAndCodeFixProviders(services.Services);
             AddPackageReferenceAnalyzers(services.Services);
         }
@@ -42,15 +40,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
             services.Services.AddRazorUpdaterStep();
-        }
-
-        // This extension only adds default config updaters, but other extensions
-        // can register additional updaters, as needed.
-        private static void AddConfigUpdaters(IServiceCollection services)
-        {
-            services.AddScoped<IUpdater<ConfigFile>, AppSettingsConfigUpdater>();
-            services.AddScoped<IUpdater<ConfigFile>, UnsupportedSectionConfigUpdater>();
-            services.AddScoped<IUpdater<ConfigFile>, WebNamespaceConfigUpdater>();
         }
 
         // This extension only adds default analyzers and code fix providers, but other extensions
@@ -90,7 +79,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<IDependencyAnalyzer, TargetCompatibilityReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, UpgradeAssistantReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, WindowsCompatReferenceAnalyzer>();
-            services.AddTransient<IDependencyAnalyzer, NewtonsoftReferenceAnalyzer>();
         }
     }
 }

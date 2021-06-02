@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class AppSettingsConfigUpdater : IUpdater<ConfigFile>
     {

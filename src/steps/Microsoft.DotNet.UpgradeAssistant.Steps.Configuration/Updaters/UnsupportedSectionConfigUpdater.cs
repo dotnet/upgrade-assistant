@@ -10,7 +10,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class UnsupportedSectionConfigUpdater : IUpdater<ConfigFile>
     {

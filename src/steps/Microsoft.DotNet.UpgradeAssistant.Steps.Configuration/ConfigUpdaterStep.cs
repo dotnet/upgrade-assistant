@@ -41,7 +41,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             WellKnownStepIds.NextProjectStepId
         };
 
-        public ConfigUpdaterStep(IEnumerable<IUpdater<ConfigFile>> configUpdaters, IOptions<ConfigUpdaterOptions> configUpdaterOptions, ILogger<ConfigUpdaterStep> logger)
+        public ConfigUpdaterStep(
+            IEnumerable<IUpdater<ConfigFile>> configUpdaters,
+            IOptions<ICollection<ConfigUpdaterOptions>> configUpdaterOptions,
+            ILogger<ConfigUpdaterStep> logger)
             : base(logger)
         {
             if (configUpdaters is null)
@@ -54,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(configUpdaterOptions));
             }
 
-            _configFilePaths = configUpdaterOptions.Value?.ConfigFilePaths ?? Array.Empty<string>();
+            _configFilePaths = configUpdaterOptions.Value?.SelectMany(s => s.ConfigFilePaths ?? Enumerable.Empty<string>()).ToArray() ?? Array.Empty<string>();
             SubSteps = _allSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
         }
 
