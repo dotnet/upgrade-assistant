@@ -77,8 +77,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
             var options = provider.GetRequiredService<IOptions<OptionsWithArray>>();
 
             // Assert
-            var o = options.Value;
             Assert.Equal(new[] { 3, 4 }, options.Value.Array);
+        }
+
+        [Fact]
+        public void CanGetAllArrays()
+        {
+            // Arrange
+            var manifests = new[]
+            {
+                new OptionsWithArray { Array = new[] { 1, 2 } },
+                new OptionsWithArray { Array = new[] { 3, 4 } },
+            };
+
+            using var provider = CreateServiceProvider(manifests);
+
+            // Act
+            var options = provider.GetRequiredService<IOptions<ICollection<OptionsWithArray>>>();
+
+            // Assert
+            Assert.Collection(
+                options.Value,
+                c => Assert.Equal(manifests[0].Array, c.Array),
+                c => Assert.Equal(manifests[1].Array, c.Array));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "These objects will be disposed in the service provider")]
