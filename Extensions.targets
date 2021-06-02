@@ -65,7 +65,7 @@
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
-    <!-- Create a list of all assemblies included by host -->
+    <!-- Create a list of all assemblies included by host and framework -->
     <ItemGroup>
       <_ExcludeFromExtension Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.dll" />
       <_ExcludeFromExtension Include="System.ComponentModel.Annotations.dll" />

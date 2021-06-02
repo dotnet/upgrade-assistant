@@ -39,7 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.Services.AddSolutionSteps();
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
-            services.Services.AddRazorUpdaterStep();
         }
 
         // This extension only adds default analyzers and code fix providers, but other extensions
