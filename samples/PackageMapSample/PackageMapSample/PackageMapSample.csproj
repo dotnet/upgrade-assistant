@@ -4,10 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <!-- Be sure the extension's manifest file is copied on build,
-       so that it will be present in the extension's binary output. -->
   <ItemGroup>
-    <!-- Make sure the extension manifest is copied -->
+    <!-- Be sure the extension's manifest file is copied on build,
+       so that it will be present in the extension's binary output. -->
     <Content Include="ExtensionManifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

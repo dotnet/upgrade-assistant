@@ -4,7 +4,6 @@
 using System;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace UpgradeStepSample
 {
@@ -19,21 +18,38 @@ namespace UpgradeStepSample
     /// </summary>
     public class SampleExtensionServiceProvider : IExtensionServiceProvider
     {
+        private const string AuthorsPropertySectionName = "AuthorsProperty";
+
         /// <summary>
         /// Registers services needed for the AuthorsProperty sample extension in
         /// Upgrade Assistant's dependency injection container.
         /// </summary>
-        /// <param name="serviceConfiguration">A configuration object containing both the
-        /// service collection to register services in and the extension's configuration file.</param>
-        /// <returns>The service collection updated with services Upgrade Assistant should use.</returns>
-        public IServiceCollection AddServices(ExtensionServiceConfiguration serviceConfiguration)
+        /// <param name="services">A configuration object containing the service collection
+        /// to register services in, the extension's configuration file, and a file provider
+        /// for retrieving extension files.</param>
+        public void AddServices(IExtensionServiceCollection services)
         {
-            if (serviceConfiguration is null)
+            if (services is null)
             {
-                throw new ArgumentNullException(nameof(serviceConfiguration));
+                throw new ArgumentNullException(nameof(services));
             }
 
-            return serviceConfiguration.ServiceCollection.AddScoped<UpgradeStep, AuthorsPropertyUpgradeStep>();
+            // Add the upgrade step to Upgrade Assistant's DI container so that it
+            // will be used by the tool.
+            services.Services.AddUpgradeStep<AuthorsPropertyUpgradeStep>();
+
+            // This registers a type read from extension configuration. Using
+            // AddExtensionOption (instead of registering an option using the
+            // IExtensionServiceCollection's Configuration property) allows the
+            // extension system to load the specified option from *all* extension,
+            // not just the one registering it.
+            //
+            // Extensions can get the configured option from DI by requesting
+            // IOptions<AuthorsPropertyOptions> (to get only the value of the option
+            // specified by the most recently registered extension that includes the
+            // option) or IOptions<ICollection<AuthorsPropertyOptions>> to get a collection
+            // of all options of this type registered by any extensions.
+            services.AddExtensionOption<AuthorsPropertyOptions>(AuthorsPropertySectionName);
         }
     }
 }
