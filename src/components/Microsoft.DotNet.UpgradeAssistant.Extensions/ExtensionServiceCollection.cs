@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal record ExtensionServiceCollection(IServiceCollection Services, ExtensionInstance Extension) : IExtensionServiceCollection
+    public record ExtensionServiceCollection(IServiceCollection Services, ExtensionInstance Extension) : IExtensionServiceCollection
     {
         public IConfiguration Configuration => Extension.Configuration;
 
