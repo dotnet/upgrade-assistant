@@ -65,11 +65,20 @@
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
+    <!-- Create a list of all assemblies included by host -->
     <ItemGroup>
-      <!-- Create a list of all assemblies included by host -->
+      <_ExcludeFromExtension Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.dll" />
+      <_ExcludeFromExtension Include="System.ComponentModel.Annotations.dll" />
+      <_ExcludeFromExtension Include="System.Memory.dll" />
+      <_ExcludeFromExtension Include="System.Numerics.Vectors.dll" />
+      <_ExcludeFromExtension Include="System.Reflection.Emit.dll" />
+      <_ExcludeFromExtension Include="System.Text.Encodings.Web.dll" />
+      <_ExcludeFromExtension Include="System.Threading.Tasks.Extensions.dll" />
       <_ExcludeFromExtension Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
       <_ExcludeFromExtension Include="%(RuntimeCopyLocalItems.DestinationSubPath)" />
+    </ItemGroup>
 
+    <ItemGroup>
       <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
       <_ExtensionArtifactsByRelativePath Include="%(_ExtensionArtifacts.RelativePath)">
         <OriginalIdentity>%(Identity)</OriginalIdentity>
