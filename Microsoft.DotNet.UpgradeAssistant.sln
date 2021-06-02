@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30509.190
@@ -102,9 +102,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.csproj", "{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj", "{117FFF7E-019E-400E-9F51-A4F7F9F3195D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor", "src\extensions\web\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj", "{117FFF7E-019E-400E-9F51-A4F7F9F3195D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests.csproj", "{D41E4E00-B3F2-4F31-B890-C27F9E997B71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests", "tests\extensions\web\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests.csproj", "{D41E4E00-B3F2-4F31-B890-C27F9E997B71}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests", "tests\common\Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests\Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.csproj", "{C0E07F03-E689-4FEB-BDFC-039633ECD11C}"
 EndProject
