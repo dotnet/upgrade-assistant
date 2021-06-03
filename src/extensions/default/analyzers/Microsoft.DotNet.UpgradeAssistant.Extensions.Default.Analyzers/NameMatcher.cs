@@ -38,6 +38,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             return Matches(property.Type);
         }
 
+        public bool MatchesConstructorOfType(ISymbol theSymbol)
+        {
+            if (theSymbol is null || theSymbol is not IMethodSymbol)
+            {
+                return false;
+            }
+
+            var methodSymbol = (IMethodSymbol)theSymbol;
+            return methodSymbol.MethodKind == MethodKind.Constructor && Matches(methodSymbol.ContainingType);
+        }
+
         public bool Matches(ITypeSymbol? typeSymbol)
         {
             // Cast here because its parent will be a namespace or type, and we want to only take in a type and not namespace

@@ -90,13 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// <returns>True when (e.g. new BinaryFormatter().UnsafeDeserialize and <paramref name="theSymbol"/> is the symbol representing BinaryFormatter).</returns>
         private static bool IsSymbolAConstructorInstanceOfBinaryFormatter(ISymbol theSymbol)
         {
-            if (theSymbol is not IMethodSymbol)
-            {
-                return false;
-            }
-
-            var methodSymbol = (IMethodSymbol)theSymbol;
-            return methodSymbol.MethodKind == MethodKind.Constructor && BinaryFormatterUnsafeDeserialize.Matches(methodSymbol.ContainingType);
+            return BinaryFormatterUnsafeDeserialize.MatchesConstructorOfType(theSymbol);
         }
 
         /// <summary>
