@@ -10,7 +10,9 @@ using VB = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
 {
-    public readonly struct GeneralInvocationExpression : IEquatable<GeneralInvocationExpression>
+    public readonly struct GeneralInvocationExpression :
+        IGeneralizeRoslynSyntax<CS.Syntax.InvocationExpressionSyntax, VB.Syntax.InvocationExpressionSyntax>,
+        IEquatable<GeneralInvocationExpression>
     {
         private readonly SyntaxNode _invocationExpression;
 
@@ -36,12 +38,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
             };
         }
 
-        private VB.Syntax.InvocationExpressionSyntax GetVisualBasicNode()
+        public Location GetLocation()
+        {
+            return _invocationExpression.GetLocation();
+        }
+
+        public VB.Syntax.InvocationExpressionSyntax GetVisualBasicNode()
         {
             return (VB.Syntax.InvocationExpressionSyntax)_invocationExpression;
         }
 
-        private CS.Syntax.InvocationExpressionSyntax GetCSharpNode()
+        public CS.Syntax.InvocationExpressionSyntax GetCSharpNode()
         {
             return (CS.Syntax.InvocationExpressionSyntax)_invocationExpression;
         }

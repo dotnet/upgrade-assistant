@@ -2,14 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using CS = Microsoft.CodeAnalysis.CSharp;
 using VB = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
 {
-    public class GeneralMemberAccessExpression
+    public readonly struct GeneralMemberAccessExpression :
+        IGeneralizeRoslynSyntax<CS.Syntax.MemberAccessExpressionSyntax, VB.Syntax.MemberAccessExpressionSyntax>,
+        IEquatable<GeneralMemberAccessExpression>
     {
         private readonly SyntaxNode _memberAccessExpression;
 
@@ -45,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
             };
         }
 
-        public Location? GetLocation()
+        public Location GetLocation()
         {
             return _memberAccessExpression.GetLocation();
         }
@@ -64,14 +65,44 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
             };
         }
 
-        private VB.Syntax.MemberAccessExpressionSyntax GetVisualBasicNode()
+        public VB.Syntax.MemberAccessExpressionSyntax GetVisualBasicNode()
         {
             return (VB.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
         }
 
-        private CS.Syntax.MemberAccessExpressionSyntax GetCSharpNode()
+        public CS.Syntax.MemberAccessExpressionSyntax GetCSharpNode()
         {
             return (CS.Syntax.MemberAccessExpressionSyntax)_memberAccessExpression;
+        }
+
+        public bool Equals(GeneralMemberAccessExpression other)
+        {
+            return _memberAccessExpression.Equals(other._memberAccessExpression);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null || obj is not GeneralMemberAccessExpression)
+            {
+                return false;
+            }
+
+            return _memberAccessExpression.Equals(((GeneralMemberAccessExpression)obj)._memberAccessExpression);
+        }
+
+        public override int GetHashCode()
+        {
+            return _memberAccessExpression.GetHashCode();
+        }
+
+        public static bool operator ==(GeneralMemberAccessExpression left, GeneralMemberAccessExpression right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(GeneralMemberAccessExpression left, GeneralMemberAccessExpression right)
+        {
+            return !(left == right);
         }
     }
 }
