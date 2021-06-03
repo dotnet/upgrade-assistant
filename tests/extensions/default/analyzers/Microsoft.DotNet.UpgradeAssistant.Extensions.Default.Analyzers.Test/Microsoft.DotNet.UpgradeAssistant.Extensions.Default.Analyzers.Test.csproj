@@ -14,6 +14,9 @@
     <Content Include="assets\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package\build\WebTypeReplacements.typemap" Link="WebTypeReplacements.typemap">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis">
