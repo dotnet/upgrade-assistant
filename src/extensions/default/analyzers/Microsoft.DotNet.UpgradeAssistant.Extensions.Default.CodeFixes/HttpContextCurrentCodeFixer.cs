@@ -172,34 +172,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 }
             }
 
-            // Add Initialize call in Configure method
-            var configureMethod = documentRoot.GetMethodDeclaration<MethodDeclarationSyntax>("Configure", "IApplicationBuilder");
-            var appBuilderParameter = configureMethod?.ParameterList.Parameters
-                .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IApplicationBuilder", StringComparison.Ordinal));
-
-            if (configureMethod != null && appBuilderParameter != null)
-            {
-                var configureMethodBody = configureMethod.Body;
-
-                if (configureMethodBody is not null)
-                {
-                    var initializeStatement = ParseStatement($"{httpContextHelperClass.Name}.Initialize({appBuilderParameter.Identifier}.ApplicationServices.GetRequiredService<IHttpContextAccessor>());");
-
-                    // Update the initialize statement to match spacing with the existing first statement in the method body
-                    if (configureMethodBody.Statements.Any())
-                    {
-                        initializeStatement = initializeStatement.WithWhitespaceTriviaFrom(configureMethodBody.Statements.First());
-                    }
-
-                    // Check whether the statement already exists
-                    if (!configureMethodBody.Statements.Any(s => initializeStatement.IsEquivalentTo(s)))
-                    {
-                        var updatedMethodBody = configureMethodBody.WithStatements(configureMethodBody.Statements.Insert(0, initializeStatement));
-                        documentRoot = documentRoot.ReplaceNode(configureMethodBody, updatedMethodBody);
-                    }
-                }
-            }
-
             editor.ReplaceNode(editor.OriginalRoot, documentRoot);
         }
     }

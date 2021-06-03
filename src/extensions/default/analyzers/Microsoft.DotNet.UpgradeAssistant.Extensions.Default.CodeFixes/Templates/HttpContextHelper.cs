@@ -1,29 +1,22 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace AlloyTemplates
+﻿namespace Microsoft.AspNetCore.Http
 {
     /// <summary>
-    /// Temporary helper class for retrieving the current HttpContext. This temporary
-    /// workaround should be removed in the future and HttpContext should be retrieved
+    /// Temporary helper class for retrieving the current <see cref="HttpContext"/> . This temporary
+    /// workaround should be removed in the future and <see cref="HttpContext"/> HttpContext should be retrieved
     /// from the current controller, middleware, or page instead. If working in another
-    /// component, the current HttpContext can be retrieved from an IHttpContextAccessor
+    /// component, the current <see cref="HttpContext"/> can be retrieved from an <see cref="IHttpContextAccessor"/>
     /// retrieved via dependency injection.
     /// </summary>
-    public static class HttpContextHelper
+    internal static class HttpContextHelper
     {
-        private static IHttpContextAccessor HttpContextAccessor;
+        private static readonly HttpContextAccessor HttpContextAccessor = new HttpContextAccessor();
 
         /// <summary>
-        /// Prepare HttpContextHelper by supplying it with an instance of IHttpContextAccessor.
+        /// Gets the current <see cref="HttpContext"/>. Returns <c>null</c> if there is no current <see cref="HttpContext"/>.
         /// </summary>
-        public static void Initialize(IHttpContextAccessor httpContextAccessor)
-        {
-            HttpContextAccessor = httpContextAccessor;
-        }
-
-        /// <summary>
-        /// Gets the current HttpContext. Returns null if there is no current HttpContext.
-        /// </summary>
-        public static HttpContext Current => HttpContextAccessor?.HttpContext;
+#if NET5_0_OR_GREATER
+        [Obsolete("Prefer accessing HttpContext via injection", error: false, DiagnosticId = "HttpContextCurrent", UrlFormat = "https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-context")]
+#endif
+        public static HttpContext Current => HttpContextAccessor.HttpContext;
     }
 }
