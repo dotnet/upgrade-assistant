@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             }
 
             // Get the new identifier name and register the code fix action
-            if (diagnostic.Properties.TryGetValue(IdentifierUpgradeAnalyzer.NewIdentifierKey, out var property) && property is not null)
+            if (diagnostic.Properties.TryGetValue(TypeUpgradeAnalyzer.NewIdentifierKey, out var property) && property is not null)
             {
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(

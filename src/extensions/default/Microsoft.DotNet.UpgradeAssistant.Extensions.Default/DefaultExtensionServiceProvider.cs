@@ -1,12 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,35 +21,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         {
             if (services is null)
             {
-                throw new System.ArgumentNullException(nameof(services));
+                throw new ArgumentNullException(nameof(services));
             }
 
-            AddUpgradeSteps(services, services.Configuration);
-            AddConfigUpdaters(services.Services);
+            AddUpgradeSteps(services);
             AddAnalyzersAndCodeFixProviders(services.Services);
             AddPackageReferenceAnalyzers(services.Services);
         }
 
-        private static void AddUpgradeSteps(IExtensionServiceCollection services, IConfiguration configuration)
+        private static void AddUpgradeSteps(IExtensionServiceCollection services)
         {
             services.Services.AddBackupStep();
             services.AddConfigUpdaterStep();
             services.AddPackageUpdaterStep();
-            services.Services.AddProjectFormatSteps()
-                .Bind(configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
+            services.AddProjectFormatSteps()
+                .Bind(services.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
             services.Services.AddSolutionSteps();
-            services.Services.AddSourceUpdaterStep();
+            services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
-            services.Services.AddRazorUpdaterStep();
-        }
-
-        // This extension only adds default config updaters, but other extensions
-        // can register additional updaters, as needed.
-        private static void AddConfigUpdaters(IServiceCollection services)
-        {
-            services.AddScoped<IUpdater<ConfigFile>, AppSettingsConfigUpdater>();
-            services.AddScoped<IUpdater<ConfigFile>, UnsupportedSectionConfigUpdater>();
-            services.AddScoped<IUpdater<ConfigFile>, WebNamespaceConfigUpdater>();
         }
 
         // This extension only adds default analyzers and code fix providers, but other extensions
@@ -59,29 +48,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             // Add source analyzers and code fix providers (note that order doesn't matter as they're run alphabetically)
             // Analyzers
             services.AddTransient<DiagnosticAnalyzer, AllowHtmlAttributeAnalyzer>();
-            services.AddTransient<DiagnosticAnalyzer, ControllerAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, BinaryFormatterUnsafeDeserializeAnalyzer>();
-            services.AddTransient<DiagnosticAnalyzer, FilterAnalyzer>();
-            services.AddTransient<DiagnosticAnalyzer, HelperResultAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, HtmlHelperAnalyzer>();
-            services.AddTransient<DiagnosticAnalyzer, HtmlStringAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, HttpContextCurrentAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, HttpContextIsDebuggingEnabledAnalyzer>();
-            services.AddTransient<DiagnosticAnalyzer, ResultTypeAnalyzer>();
+            services.AddTransient<DiagnosticAnalyzer, TypeUpgradeAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, UrlHelperAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, UsingSystemWebAnalyzer>();
 
             // Code fix providers
             services.AddTransient<CodeFixProvider, AllowHtmlAttributeCodeFixer>();
-            services.AddTransient<CodeFixProvider, ControllerCodeFixer>();
             services.AddTransient<CodeFixProvider, BinaryFormatterUnsafeDeserializeCodeFixer>();
-            services.AddTransient<CodeFixProvider, FilterCodeFixer>();
-            services.AddTransient<CodeFixProvider, HelperResultCodeFixer>();
             services.AddTransient<CodeFixProvider, HtmlHelperCodeFixer>();
-            services.AddTransient<CodeFixProvider, HtmlStringCodeFixer>();
             services.AddTransient<CodeFixProvider, HttpContextCurrentCodeFixer>();
             services.AddTransient<CodeFixProvider, HttpContextIsDebuggingEnabledCodeFixer>();
-            services.AddTransient<CodeFixProvider, ResultTypeCodeFixer>();
+            services.AddTransient<CodeFixProvider, TypeUpgradeCodeFixer>();
             services.AddTransient<CodeFixProvider, UrlHelperCodeFixer>();
             services.AddTransient<CodeFixProvider, UsingSystemWebCodeFixer>();
         }
@@ -97,7 +78,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<IDependencyAnalyzer, TargetCompatibilityReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, UpgradeAssistantReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, WindowsCompatReferenceAnalyzer>();
-            services.AddTransient<IDependencyAnalyzer, NewtonsoftReferenceAnalyzer>();
         }
     }
 }

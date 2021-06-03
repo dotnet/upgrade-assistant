@@ -153,6 +153,9 @@
   <data name="UnknownLanguage" xml:space="preserve">
     <value>Unknown language</value>
   </data>
+  <data name="TypeUpgradeTitle" xml:space="preserve">
+    <value>Replace type</value>
+  </data>
   <data name="UrlHelperTitle" xml:space="preserve">
     <value>Replace with ASP.NET Core URL helper type</value>
   </data>

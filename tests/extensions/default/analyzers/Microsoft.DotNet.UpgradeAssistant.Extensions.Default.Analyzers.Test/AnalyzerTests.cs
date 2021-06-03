@@ -16,6 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     {
         private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new()
         {
+            // Using System.Web scenarios
             {
                 "UA0001",
                 new[]
@@ -26,47 +27,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0001", new TextSpan(184, 11))
                 }
             },
-            {
-                "UA0002",
-                new[]
-                {
-                    new ExpectedDiagnostic("UA0002", new TextSpan(121, 11)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(171, 10)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(296, 21)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(360, 28)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(434, 13)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(486, 13))
-                }
-            },
-            {
-                "UA0003",
-                new[]
-                {
-                    new ExpectedDiagnostic("UA0003", new TextSpan(233, 25)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(335, 18)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(375, 14)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(416, 12)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(470, 27)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(506, 25)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(556, 14)),
-                    new ExpectedDiagnostic("UA0003", new TextSpan(605, 18))
-                }
-            },
-            {
-                "UA0004",
-                new[]
-                {
-                    new ExpectedDiagnostic("UA0004", new TextSpan(82, 28)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(156, 36)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(321, 37)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(398, 26)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(430, 26)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(609, 36)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(701, 37)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(866, 13)),
-                    new ExpectedDiagnostic("UA0004", new TextSpan(941, 21))
-                }
-            },
+
+            // HttpContext.Current scenarios
             {
                 "UA0005",
                 new[]
@@ -77,6 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0005", new TextSpan(494, 19))
                 }
             },
+
+            // HttpContext.IsDebuggingEnabled scenarios
             {
                 "UA0006",
                 new[]
@@ -87,6 +51,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0006", new TextSpan(497, 42))
                 }
             },
+
+            // HtmlHelper scenarios
             {
                 "UA0007",
                 new[]
@@ -103,6 +69,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0007", new TextSpan(871, 10)),
                 }
             },
+
+            // IUrlHelper scenarios
             {
                 "UA0008",
                 new[]
@@ -115,17 +83,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0008", new TextSpan(316, 24)),
                 }
             },
-            {
-                "UA0009",
-                new[]
-                {
-                    new ExpectedDiagnostic("UA0009", new TextSpan(102, 12)),
-                    new ExpectedDiagnostic("UA0009", new TextSpan(123, 32)),
-                    new ExpectedDiagnostic("UA0009", new TextSpan(196, 32)),
-                    new ExpectedDiagnostic("UA0009", new TextSpan(243, 12)),
-                    new ExpectedDiagnostic("UA0009", new TextSpan(307, 16)),
-                }
-            },
+
+            // AllowHtmlAttribute scenarios
             {
                 "UA0010",
                 new[]
@@ -135,6 +94,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0010", new TextSpan(344, 13)),
                 }
             },
+
+            // UnsafeDeserialize.UnsafeDeserialize scenarios
             {
                 "UA0012",
                 new[]
@@ -149,22 +110,76 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0012", new TextSpan(5150, 39), Language.VisualBasic),
                 }
             },
+
+            // TypeUpgradeAnalyzer scenarios
             {
-                "UA0013",
+                "HelperResultUpgrade",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0013", new TextSpan(166, 13)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(594, 29)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(933, 14)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(1009, 25)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(1058, 10)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(1081, 13)),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(1139, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(115, 12)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(136, 32)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(209, 32)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(256, 12)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(320, 16)),
+                }
+            },
+            {
+                "HtmlStringUpgrade",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0002", new TextSpan(132, 11)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(182, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(307, 21)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(371, 28)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(445, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(497, 13))
+                }
+            },
+            {
+                "ResultUpgrade",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0002", new TextSpan(240, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(342, 18)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(382, 14)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(423, 12)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(477, 27)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(513, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(563, 14)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(612, 18))
+                }
+            },
+            {
+                "FilterUpgrade",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0002", new TextSpan(88, 28)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(162, 36)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(327, 37)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(404, 26)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(436, 26)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(615, 36)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(707, 37)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(872, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(947, 21))
+                }
+            },
+            {
+                "ControllerUpgrade",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0002", new TextSpan(166, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(594, 29)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(933, 14)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1009, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1058, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1081, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1139, 25)),
 
-                    new ExpectedDiagnostic("UA0013", new TextSpan(177, 13), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(463, 29), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(982, 10), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0013", new TextSpan(1265, 25), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(177, 13), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(463, 29), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(982, 10), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1265, 25), Language.VisualBasic),
                 }
             },
         };
@@ -182,23 +197,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         }
 
         [InlineData("UA0001")]
-        [InlineData("UA0002")]
-        [InlineData("UA0003")]
-        [InlineData("UA0004")]
+        [InlineData("HtmlStringUpgrade")]
+        [InlineData("ResultUpgrade")]
+        [InlineData("FilterUpgrade")]
         [InlineData("UA0005")]
         [InlineData("UA0006")]
         [InlineData("UA0007")]
         [InlineData("UA0008")]
-        [InlineData("UA0009")]
+        [InlineData("HelperResultUpgrade")]
         [InlineData("UA0010")]
         [InlineData("UA0012")]
-        [InlineData("UA0013")]
+        [InlineData("ControllerUpgrade")]
         [Theory]
-        public async Task UpgradeAnalyzers(string diagnosticId)
+        public async Task UpgradeAnalyzers(string scenarioName)
         {
             foreach (var language in new[] { Language.CSharp, Language.VisualBasic })
             {
-                var expectedDiagnostics = ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language);
+                var expectedDiagnostics = ExpectedDiagnostics[scenarioName].Where(diagnostics => diagnostics.Language == language);
                 if (!expectedDiagnostics.Any())
                 {
                     // nothing to see here, move along
@@ -206,29 +221,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 }
 
                 var fileExtension = language.GetFileExtension();
-                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, $"{diagnosticId}.{fileExtension}", diagnosticId).ConfigureAwait(false);
+                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, $"{scenarioName}.{fileExtension}", expectedDiagnostics.Select(e => e.Id).Distinct()).ConfigureAwait(false);
                 AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
             }
         }
 
         [InlineData("UA0001")]
-        [InlineData("UA0002")]
-        [InlineData("UA0003")]
-        [InlineData("UA0004")]
+        [InlineData("HtmlStringUpgrade")]
+        [InlineData("ResultUpgrade")]
+        [InlineData("FilterUpgrade")]
         [InlineData("UA0005")]
         [InlineData("UA0006")]
         [InlineData("UA0007")]
         [InlineData("UA0008")]
-        [InlineData("UA0009")]
+        [InlineData("HelperResultUpgrade")]
         [InlineData("UA0010")]
         [InlineData("UA0012")]
-        [InlineData("UA0013")]
+        [InlineData("ControllerUpgrade")]
         [Theory]
-        public async Task UpgradeCodeFixer(string diagnosticId)
+        public async Task UpgradeCodeFixer(string scenarioName)
         {
             foreach (var language in new[] { Language.CSharp, Language.VisualBasic })
             {
-                var expectedDiagnostics = ExpectedDiagnostics[diagnosticId].Where(diagnostics => diagnostics.Language == language);
+                var expectedDiagnostics = ExpectedDiagnostics[scenarioName].Where(diagnostics => diagnostics.Language == language);
                 if (!expectedDiagnostics.Any())
                 {
                     // nothing to see here, move along
@@ -236,8 +251,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 }
 
                 var extension = language.GetFileExtension();
-                var fixedSource = await TestHelper.FixSourceAsync(language, $"{diagnosticId}.{extension}", diagnosticId).ConfigureAwait(false);
-                var expectedSource = await TestHelper.GetSourceAsync(language, $"{diagnosticId}.Fixed.{extension}").ConfigureAwait(false);
+                var fixedSource = await TestHelper.FixSourceAsync(language, $"{scenarioName}.{extension}", expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
+                var expectedSource = await TestHelper.GetSourceAsync(language, $"{scenarioName}.Fixed.{extension}").ConfigureAwait(false);
 
                 Assert.NotNull(expectedSource);
 

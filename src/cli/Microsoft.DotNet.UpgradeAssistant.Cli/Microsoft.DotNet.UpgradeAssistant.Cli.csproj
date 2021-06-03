@@ -10,8 +10,6 @@
     <PackageId>upgrade-assistant</PackageId>
     <PackageReleaseNotes>A changelog is available at https://github.com/dotnet/upgrade-assistant/blob/main/CHANGELOG.md.</PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
-    <InstallTryConvert>true</InstallTryConvert>
-    <ExcludeMSBuildRuntime>true</ExcludeMSBuildRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.json">
@@ -19,14 +17,30 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Serilog" />
-    <PackageReference Include="Serilog.Extensions.Hosting" />
-    <PackageReference Include="Serilog.Sinks.Console" />
-    <PackageReference Include="Serilog.Sinks.File" />
-    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="Autofac">
+      <Version>6.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection">
+      <Version>7.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting">
+      <Version>5.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog">
+      <Version>2.10.0</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog.Extensions.Hosting">
+      <Version>3.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.Console">
+      <Version>3.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.File">
+      <Version>4.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.CommandLine">
+      <Version>2.0.0-beta1.21216.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <!-- Explicitly reference packages that we do *not* want included in output
@@ -39,23 +53,46 @@
          Directory.Build.Targets because tests can use these NuGet packages (and
          the test harness needs to). However, no project (this one or tests) should
          use MSBuild runtime assets. -->
-    <PackageReference Include="NuGet.Common" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.Configuration" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.DependencyResolver.Core" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.Frameworks" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.LibraryModel" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.Packaging" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.ProjectModel" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.Protocol" ExcludeAssets="runtime" />
-    <PackageReference Include="NuGet.Versioning" ExcludeAssets="runtime" />
+    <PackageReference Include="NuGet.Common" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.Configuration" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.DependencyResolver.Core" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.Frameworks" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.LibraryModel" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.Packaging" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.ProjectModel" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.Protocol" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
+    <PackageReference Include="NuGet.Versioning" ExcludeAssets="runtime">
+      <Version>5.8.0</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
-    <ProjectReference Include="..\..\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant\Microsoft.DotNet.UpgradeAssistant.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj" />
-    <!-- This isn't used directly, but needs to be referenced so that the binary is available at runtime to be registered as an extension -->
-    <ProjectReference Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Extension Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj">
+      <Name>default</Name>
+    </Extension>
+    <Extension Include="..\..\extensions\web\Microsoft.DotNet.UpgradeAssistant.Extensions.Web\Microsoft.DotNet.UpgradeAssistant.Extensions.Web.csproj">
+      <Name>web</Name>
+    </Extension>
   </ItemGroup>
 </Project>

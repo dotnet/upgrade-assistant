@@ -13,6 +13,7 @@ To test out a sample, build the sample's solution (if the sample includes a proj
 
 | Sample | Features demonstrated |
 | ------ | --------------------- |
+| [FindReplaceStepSample](./FindReplaceStepSample) | Demonstrates how to create an extension with a custom upgrade step that finds and replaces text snippets configured in extension options. |
 | [PackageMapSample](./PackageMapSample) | Demonstrates how to create an extension with configuration specifying NuGet package dependency replacements. This sample is made entirely of config files, so there's no project to build. |
 | [SourceUpdaterSample](./SourceUpdaterSample) | Demonstrates how to add custom source update behaviors using Roslyn analyzers and code fix providers. |
 | [UpgradeStepSample](./UpgradeStepSample) | Demonstrates how to create custom upgrade steps by making a sample upgrade step that ensures upgrade project files include a NuGet `<Authors>` property. |

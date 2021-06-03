@@ -3,25 +3,41 @@
 
 using System;
 using System.IO;
+using System.Runtime.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal sealed class ExtensionInstance : IDisposable
+    public sealed class ExtensionInstance : IDisposable
     {
-        private const string ManifestFileName = "ExtensionManifest.json";
+        public const string ManifestFileName = "ExtensionManifest.json";
+
         private const string ExtensionNamePropertyName = "ExtensionName";
         private const string DefaultExtensionName = "Unknown";
 
-        public ExtensionInstance(IFileProvider fileProvider, string? name = null, IConfiguration? configuration = null)
+        private readonly Lazy<AssemblyLoadContext> _alc;
+
+        public ExtensionInstance(IFileProvider fileProvider, string location)
         {
             FileProvider = fileProvider;
-            Configuration = configuration ?? CreateConfiguration(fileProvider);
-            Name = name ?? GetName(Configuration, FileProvider);
+            Location = location;
+            Configuration = CreateConfiguration(fileProvider);
+            Name = GetName(Configuration, location);
+            _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(this));
         }
 
         public string Name { get; }
+
+        public bool HasAssemblyLoadContext => _alc.IsValueCreated;
+
+        /// <summary>
+        /// Gets the <see cref="AssemblyLoadContext"/> for the extension. Guard calls with <see cref="HasAssemblyLoadContext"/> first,
+        /// otherwise it may trigger creation of the load context if it is not needed.
+        /// </summary>
+        public AssemblyLoadContext LoadContext => _alc.Value;
+
+        public string Location { get; }
 
         public IFileProvider FileProvider { get; }
 
@@ -45,20 +61,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 if (Directory.Exists(e))
                 {
-                    return new ExtensionInstance(new PhysicalFileProvider(e));
+                    return new ExtensionInstance(new PhysicalFileProvider(e), e);
                 }
                 else if (File.Exists(e))
                 {
                     if (ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
                     {
                         var dir = Path.GetDirectoryName(e) ?? string.Empty;
-                        return new ExtensionInstance(new PhysicalFileProvider(dir));
+                        return new ExtensionInstance(new PhysicalFileProvider(dir), dir);
                     }
                     else if (Path.GetExtension(e).Equals(".zip", StringComparison.OrdinalIgnoreCase))
                     {
                         var provider = new ZipFileProvider(e);
 
-                        return new ExtensionInstance(new ZipFileProvider(e));
+                        return new ExtensionInstance(new ZipFileProvider(e), e);
                     }
                 }
                 else
@@ -74,16 +90,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return null;
         }
 
-        private static string GetName(IConfiguration configuration, IFileProvider fileProvider)
+        private static string GetName(IConfiguration configuration, string location)
         {
             if (configuration[ExtensionNamePropertyName] is string name)
             {
                 return name;
             }
 
-            if (fileProvider is PhysicalFileProvider physical)
+            if (Path.GetFileNameWithoutExtension(location) is string locationName)
             {
-                return physical.Root;
+                return locationName;
             }
 
             return DefaultExtensionName;

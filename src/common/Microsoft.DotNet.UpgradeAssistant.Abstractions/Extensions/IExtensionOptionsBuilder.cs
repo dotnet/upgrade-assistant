@@ -14,8 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// Maps file paths given in <typeparamref name="TOption"/> to options of <typeparamref name="TTo"/>.
         ///
         /// Can be accessed via the following patterns:
-        /// - <see cref="IOptions{OptionCollection{TTo}}"/>
-        /// - <see cref="IOptions{OptionCollection{FileOption{TTo}}}"/>.
+        /// - <see cref="IOptions{ICollection{TTo}}"/>.
         /// </summary>
         /// <typeparam name="TTo">Type mapped file should be deserialized to.</typeparam>
         /// <param name="factory">Method to retrieve file paths.</param>
@@ -25,8 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// Maps file paths given in <typeparamref name="TOption"/> to options of <typeparamref name="TTo"/>.
         ///
         /// Can be accessed via the following patterns:
-        /// - <see cref="IOptions{OptionCollection{TTo}}"/>
-        /// - <see cref="IOptions{OptionCollection{FileOption{TTo}}}"/>.
+        /// - <see cref="IOptions{ICollection{TTo}}"/>.
         /// </summary>
         /// <typeparam name="TTo">Type mapped file should be deserialized to.</typeparam>
         /// <param name="factory">Method to retrieve file path.</param>

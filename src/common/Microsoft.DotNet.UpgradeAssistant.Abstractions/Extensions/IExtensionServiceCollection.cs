@@ -1,8 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
@@ -20,12 +22,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         IServiceCollection Services { get; }
 
         /// <summary>
+        /// Gets the file provider for the root of the extension.
+        /// </summary>
+        IFileProvider Files { get; }
+
+        /// <summary>
         /// Add options that are supplied within an extension manifest.
         ///
         /// These options can be accessed via the following patterns:
         /// - <see cref="IOptions{TOption}"/>
-        /// - <see cref="IOptions{OptionCollection{TOption}}"/>
-        /// - <see cref="IOptions{OptionCollection{FileOption{TOption}}}"/>.
+        /// - <see cref="IOptions{ICollection{TOption}}"/>.
         /// </summary>
         /// <typeparam name="TOption">Option to bind configuration to.</typeparam>
         /// <param name="sectionName">Name in manifest to bind.</param>

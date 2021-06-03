@@ -39,7 +39,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         [Fact]
         public void NegativeCtorTests()
         {
-            var goodParent = new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new Mock<IOptions<ConfigUpdaterOptions>>().Object, new NullLogger<ConfigUpdaterStep>());
+            var options = new Mock<IOptions<ICollection<ConfigUpdaterOptions>>>();
+            options.Setup(o => o.Value).Returns(Array.Empty<ConfigUpdaterOptions>());
+
+            var goodParent = new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), options.Object, new NullLogger<ConfigUpdaterStep>());
             var badParent = new TestUpgradeStep("Test step");
 
             Assert.Throws<ArgumentNullException>("parentStep", () => new ConfigUpdaterSubStep(null!, new Mock<IUpdater<ConfigFile>>().Object, new NullLogger<ConfigUpdaterStep>()));
@@ -207,10 +210,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         {
             using var mock = AutoMock.GetLoose(cfg =>
             {
-                cfg.RegisterInstance(new ConfigUpdaterOptions
+                var options = new Mock<IOptions<ICollection<ConfigUpdaterOptions>>>();
+                var collection = new[]
                 {
-                    ConfigFilePaths = configPaths
-                });
+                    new ConfigUpdaterOptions
+                    {
+                        ConfigFilePaths = configPaths,
+                    },
+                };
+
+                options.Setup(o => o.Value).Returns(collection);
+
+                cfg.RegisterInstance(options.Object);
 
                 foreach (var updater in updaters)
                 {

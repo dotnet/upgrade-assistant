@@ -3,16 +3,22 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Current
+## Version 0.2.227701 - 2021-05-27 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.227701))
 
 ### Added
+- Added an analyzer and code fix provider to upgrade System.Web.Mvc.Controller to Microsoft.AspNetCore.Mvc.Controller [#534](https://github.com/dotnet/upgrade-assistant/pull/534)
 - Added additional code fixer for `HttpContext.Current` that will replace calls with method injection [#536](https://github.com/dotnet/upgrade-assistant/pull/536)
+- Added a Razor upgrade sub-step to replace @helper functions in Razor views with local methods [#559](https://github.com/dotnet/upgrade-assistant/pull/559)
+- Analyzers that recommend replacing one type with another are now combined into a single analyzer (`TypeUpgradeAnalyzer`) with behavior that can be customized via AdditionalTexts containing old -> new type mappings [#540](https://github.com/dotnet/upgrade-assistant/pull/540)
 - BinaryFormatterUnsafeDeserializer now works with Visual Basic [#544](https://github.com/dotnet/upgrade-assistant/pull/544)
 
 ### Fixed
-- Added analyzer and code fixer to upgrade System.Web.Mvc.Controller to Microsoft.AspNetCore.Mvc.Controller. Updated ApiControll upgrade code fix to upgrade to ControllerBase, instead. [#534](https://github.com/dotnet/upgrade-assistant/pull/534)
 - VB projects that have a MyType property that requires Windows will now default to net5.0-windows [#529](https://github.com/dotnet/upgrade-assistant/pull/529)
 - Restores are now more likely to be performed if needed so errors about finding targets won't be surfaced. A clearer message will be surfaced as well if this occurs. [#525](https://github.com/dotnet/upgrade-assistant/pull/525)
+- Updated the ApiController upgrade code fix provider to upgrade to Microsoft.AspNetCore.Mvc.ControllerBase instead of Microsoft.AspNetCore.Mvc.Controller [#534](https://github.com/dotnet/upgrade-assistant/pull/534)
+
+### Breaking change
+- Upgrade path now uses the command `upgrade`. In order to use the tool to upgrade projects, the command looks like `upgrade-assistant upgrade <Path to csproj or sln to upgrade>` [#541](https://github.com/dotnet/upgrade-assistant/pull/541)
 
 ## Version 0.2.226201 - 2021-05-12 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.226201))
 

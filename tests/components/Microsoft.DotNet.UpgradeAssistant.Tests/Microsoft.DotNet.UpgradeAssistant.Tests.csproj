@@ -8,6 +8,7 @@
     <PackageReference Include="coverlet.collector">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+      <Version>3.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

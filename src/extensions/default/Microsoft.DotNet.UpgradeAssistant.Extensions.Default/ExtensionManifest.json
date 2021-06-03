@@ -1,0 +1,21 @@
+﻿{
+  "ExtensionName": "Default",
+
+  "ConfigUpdater": {
+    "ConfigFilePaths": [
+      "app.config"
+    ]
+  },
+
+  "TryConvertProjectConverter": {
+    "TryConvertPath": "./try-convert/try-convert.dll"
+  },
+
+  "PackageUpdater": {
+    "PackageMapPath": "PackageMaps"
+  },
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.dll"
+  ]
+}
