@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using CS = Microsoft.CodeAnalysis.CSharp;
@@ -11,7 +10,7 @@ using VB = Microsoft.CodeAnalysis.VisualBasic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
 {
-    public class GeneralInvocationExpression
+    public readonly struct GeneralInvocationExpression : IEquatable<GeneralInvocationExpression>
     {
         private readonly SyntaxNode _invocationExpression;
 
@@ -45,6 +44,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common
         private CS.Syntax.InvocationExpressionSyntax GetCSharpNode()
         {
             return (CS.Syntax.InvocationExpressionSyntax)_invocationExpression;
+        }
+
+        public bool Equals(GeneralInvocationExpression other)
+        {
+            return _invocationExpression.Equals(other._invocationExpression);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null || obj is not GeneralInvocationExpression)
+            {
+                return false;
+            }
+
+            return _invocationExpression.Equals(((GeneralInvocationExpression)obj)._invocationExpression);
+        }
+
+        public override int GetHashCode()
+        {
+            return _invocationExpression.GetHashCode();
+        }
+
+        public static bool operator ==(GeneralInvocationExpression left, GeneralInvocationExpression right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(GeneralInvocationExpression left, GeneralInvocationExpression right)
+        {
+            return !(left == right);
         }
     }
 }
