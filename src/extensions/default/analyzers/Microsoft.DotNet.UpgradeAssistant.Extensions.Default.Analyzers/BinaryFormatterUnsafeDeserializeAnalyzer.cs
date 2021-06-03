@@ -3,29 +3,30 @@
 
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public sealed class BinaryFormatterUnsafeDeserializeAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA0012";
         private const string Category = "Upgrade";
 
-        private const string TargetTypeSymbolNamespace = "System.Runtime.Serialization.Formatters.Binary";
-        private const string TargetTypeSymbolName = "BinaryFormatter";
-        private const string TargetMember = "UnsafeDeserialize";
+        internal const string QualifiedTargetSymbolName = TargetTypeSymbolNamespace + "." + TargetTypeSymbolName;
+        internal const string TargetTypeSymbolNamespace = "System.Runtime.Serialization.Formatters.Binary";
+        internal const string TargetTypeSymbolName = "BinaryFormatter";
+        internal const string TargetMember = "UnsafeDeserialize";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.BinaryFormatterUnsafeDeserializeDescription), Resources.ResourceManager, typeof(Resources));
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        public static NameMatcher BinaryFormatterUnsafeDeserialize { get; } = NameMatcher.MatchPropertyAccess(QualifiedTargetSymbolName, TargetMember);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -39,71 +40,75 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressions, SyntaxKind.SimpleMemberAccessExpression);
+            context.RegisterSimpleMemberAccessExpression(AnalyzeMemberAccessExpressions);
         }
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
         {
-            var memberAccessExpression = (MemberAccessExpressionSyntax)context.Node;
-
-            // If the accessed member isn't named "UnsafeDeserialize" bail out
-            if (!TargetMember.Equals(memberAccessExpression.Name.ToString(), StringComparison.Ordinal))
+            if (!context.Node.IsMemberAccessExpression())
             {
                 return;
             }
 
-            // Continue, only if the call is to a method called UnsafeDeserialize
-            if (!(memberAccessExpression.Parent is InvocationExpressionSyntax))
+            var expression = new GeneralMemberAccessExpression(context.Node);
+
+            // Continue, only if the syntax being evaluated is a method invocation
+            if (!expression.IsChildOfInvocationExpression())
             {
                 return;
             }
 
-            // Get the identifier accessed
-            var accessedIdentifier = memberAccessExpression.Expression switch
+            if (!TargetMember.Equals(expression.GetName(), StringComparison.Ordinal))
             {
-                IdentifierNameSyntax i => i,
-                ObjectCreationExpressionSyntax o => o.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault(),
-                MemberAccessExpressionSyntax m => m.DescendantNodes().OfType<IdentifierNameSyntax>().LastOrDefault(),
-                _ => null
-            };
-
-            // Return if the accessed identifier wasn't from a simple member access expression, object creation expression, or identifier
-            if (accessedIdentifier is null)
-            {
+                // The thing being invoked isn't a method named "UnsafeDeserialize"
+                // bail out
                 return;
             }
 
-            // If the accessed identifier resolves to a type symbol other than BinaryFormatter, then bail out
-            // since it means the user is calling some other similarly named API.
+            // at this point, we have confirmed that the code is invoking a method named "UnsafeDeserialize"
+            // next we want to see if this method belongs to System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            var accessedIdentifier = expression.GetAccessedIdentifier();
+
             var accessedSymbol = context.SemanticModel.GetSymbolInfo(accessedIdentifier).Symbol;
-            if (accessedSymbol is ILocalSymbol localSymbol)
+            if (accessedSymbol != null
+                && !IsSymbolAVariableOfTheTypeBinaryFormatter(accessedSymbol)
+                && !IsSymbolAConstructorInstanceOfBinaryFormatter(accessedSymbol))
             {
-                // refactored from $"{localSymbol.Type.ContainingNamespace}.{localSymbol.Type.Name}" for performance reasons
-                // avoiding the memory pressure from creating an interpolated string due to the volume of times a syntax analyzer is executed
-                if (!TargetTypeSymbolNamespace.Equals(localSymbol.Type.ContainingNamespace.ToString(), StringComparison.Ordinal)
-                    || !TargetTypeSymbolName.Equals(localSymbol.Type.Name, StringComparison.Ordinal))
-                {
-                    return;
-                }
-            }
-            else if (accessedSymbol is INamedTypeSymbol symbol)
-            {
-                var symbolText = symbol.ToDisplayString(NullableFlowState.NotNull);
-                if (!symbolText.StartsWith(TargetTypeSymbolNamespace, StringComparison.Ordinal)
-                    || !symbolText.EndsWith(TargetTypeSymbolName, StringComparison.Ordinal))
-                {
-                    return;
-                }
-            }
-            else if (accessedSymbol != null)
-            {
-                // If the accessed identifier resolves to a symbol other than a ILocalSymbol symbol, bail out
-                // since it's not a reference to BinaryFormatter
+                // we found the type that owns this method
+                // and we proved it is not "System.Runtime.Serialization.Formatters.Binary.BinaryFormatter"
                 return;
             }
 
-            var diagnostic = Diagnostic.Create(Rule, memberAccessExpression.GetLocation());
+            var diagnostic = Diagnostic.Create(Rule, expression.GetLocation());
             context.ReportDiagnostic(diagnostic);
+        }
+
+        /// <summary>
+        /// Checks to see if the symbol is a constructor reference to BinaryFormatter.
+        /// </summary>
+        /// <param name="theSymbol">any symbol.</param>
+        /// <returns>True when (e.g. new BinaryFormatter().UnsafeDeserialize and <paramref name="theSymbol"/> is the symbol representing BinaryFormatter).</returns>
+        private static bool IsSymbolAConstructorInstanceOfBinaryFormatter(ISymbol theSymbol)
+        {
+            return BinaryFormatterUnsafeDeserialize.MatchesConstructorOfType(theSymbol);
+        }
+
+        /// <summary>
+        /// Checks to see if the symbol is a reference to BinaryFormatter.
+        /// </summary>
+        /// <param name="theSymbol">any symbol.</param>
+        /// <returns>True when (e.g. formatter1.UnsafeDeserialize and <paramref name="theSymbol"/> is the symbol representing the variable formatter1 of type BinaryFormatter).</returns>
+        private static bool IsSymbolAVariableOfTheTypeBinaryFormatter(ISymbol theSymbol)
+        {
+            if (theSymbol is not ILocalSymbol)
+            {
+                return false;
+            }
+
+            var localSymbol = (ILocalSymbol)theSymbol;
+
+            // using StartsWith because the ToString may produce a nullable type variable ending with '?'
+            return BinaryFormatterUnsafeDeserialize.Matches(localSymbol.Type);
         }
     }
 }

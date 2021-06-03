@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,11 +14,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
 {
     public class UA0012
     {
-        public const string ADDRESSES_FILE = "DataFile.dat";
+        public const string ADDRESSES_FILE = "DataFile1.dat";
         public const string CONTACTS_FILE = "DataFile2.dat";
-        public const string PROFILES_FILE = "button1_click.dat";
-        public const string PHONE_NUMBERS_FILE = "button2_click.dat";
-        public const string SUPER_FILE = "button3_click.dat";
+        public const string PROFILES_FILE = "DataFile3.dat";
+        public const string PHONE_NUMBERS_FILE = "DataFile4.dat";
+        public const string SUPER_FILE = "DataFile5.dat";
 
         public UA0012()
         {
@@ -155,7 +156,7 @@ namespace SuperHeroicSerializer
     {
         public object UnsafeDeserialize(Stream serializationStream, System.Runtime.Remoting.Messaging.HeaderHandler handler)
         {
-            return throw new NotImplementedException("under construction");
+            throw new NotImplementedException("under construction");
         }
     }
 }

@@ -5,8 +5,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public class NameMatcher
     {
-        public static NameMatcher HttpContextCurrent { get; } = NameMatcher.MatchPropertyAccess("System.Web.HttpContext", "Current");
-
         private readonly string[] _typeName;
         private readonly string? _memberName;
 
@@ -38,6 +36,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             }
 
             return Matches(property.Type);
+        }
+
+        public bool MatchesConstructorOfType(ISymbol theSymbol)
+        {
+            if (theSymbol is null || theSymbol is not IMethodSymbol)
+            {
+                return false;
+            }
+
+            var methodSymbol = (IMethodSymbol)theSymbol;
+            return methodSymbol.MethodKind == MethodKind.Constructor && Matches(methodSymbol.ContainingType);
         }
 
         public bool Matches(ITypeSymbol? typeSymbol)

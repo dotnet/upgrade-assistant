@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added additional code fixer for `HttpContext.Current` that will replace calls with method injection [#536](https://github.com/dotnet/upgrade-assistant/pull/536)
 - Added a Razor upgrade sub-step to replace @helper functions in Razor views with local methods [#559](https://github.com/dotnet/upgrade-assistant/pull/559)
 - Analyzers that recommend replacing one type with another are now combined into a single analyzer (`TypeUpgradeAnalyzer`) with behavior that can be customized via AdditionalTexts containing old -> new type mappings [#540](https://github.com/dotnet/upgrade-assistant/pull/540)
+- BinaryFormatterUnsafeDeserializer now works with Visual Basic [#544](https://github.com/dotnet/upgrade-assistant/pull/544)
 
 ### Fixed
 - VB projects that have a MyType property that requires Windows will now default to net5.0-windows [#529](https://github.com/dotnet/upgrade-assistant/pull/529)

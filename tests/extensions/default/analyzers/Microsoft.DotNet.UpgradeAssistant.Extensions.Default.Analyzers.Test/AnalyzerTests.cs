@@ -100,10 +100,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 "UA0012",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0012", new TextSpan(2249, 28)),
-                    new ExpectedDiagnostic("UA0012", new TextSpan(3162, 28)),
-                    new ExpectedDiagnostic("UA0012", new TextSpan(4089, 39)),
-                    new ExpectedDiagnostic("UA0012", new TextSpan(4943, 39)),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(2256, 28)),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(3169, 28)),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(4096, 39)),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(4950, 39)),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(2287, 28), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(3212, 28), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(4287, 39), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0012", new TextSpan(5150, 39), Language.VisualBasic),
                 }
             },
 
