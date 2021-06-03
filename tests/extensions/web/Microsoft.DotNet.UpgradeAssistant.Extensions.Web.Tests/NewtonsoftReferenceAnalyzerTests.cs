@@ -7,11 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Moq;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 {
     /// <summary>
     /// Unit tests for the NewtonsoftReferenceAnalyzer.

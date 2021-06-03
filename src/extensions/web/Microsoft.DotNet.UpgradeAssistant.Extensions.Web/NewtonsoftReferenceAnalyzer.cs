@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 {
     /// <summary>
     /// Increases backward compatibility by using the Newtonsoft Serializer for ASP.NET Core.

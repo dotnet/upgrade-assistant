@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 {
     [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ApplicableLanguage(Language.CSharp)]
@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
             "System.Web"
         };
 
-        private readonly ILogger<AppSettingsConfigUpdater> _logger;
+        private readonly ILogger<WebNamespaceConfigUpdater> _logger;
         private IEnumerable<string> _namespacesToUpgrade;
         private string? _viewImportsPath;
 
@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters
         // namespaces should be cleaned up by the same processes.
         public BuildBreakRisk Risk => BuildBreakRisk.Low;
 
-        public WebNamespaceConfigUpdater(ILogger<AppSettingsConfigUpdater> logger)
+        public WebNamespaceConfigUpdater(ILogger<WebNamespaceConfigUpdater> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _namespacesToUpgrade = Enumerable.Empty<string>();

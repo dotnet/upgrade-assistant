@@ -11,7 +11,7 @@ using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Moq;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 {
     public class WebSdkCleanupAnalyzerTests
     {

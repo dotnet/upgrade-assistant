@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 {
     public class WebSdkCleanupAnalyzer : IDependencyAnalyzer
     {
