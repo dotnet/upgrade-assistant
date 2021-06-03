@@ -57,8 +57,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
                 throw new ArgumentNullException(nameof(configUpdaterOptions));
             }
 
-            _configFilePaths = configUpdaterOptions.Value.SelectMany(s => s.ConfigFilePaths).ToArray();
-            SubSteps = _allSteps = configUpdaters.Select(u => new ConfigUpdaterSubStep(this, u, logger)).ToList();
+            _configFilePaths = configUpdaterOptions.Value
+                .SelectMany(s => s.ConfigFilePaths)
+                .ToArray();
+            SubSteps = _allSteps = configUpdaters
+                .Select(u => new ConfigUpdaterSubStep(this, u, logger))
+                .Distinct()
+                .ToList();
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
