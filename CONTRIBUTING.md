@@ -54,6 +54,7 @@ Here are some resources to help you get started on how to contribute code or new
 * Look at the [Contributor documentation](/README.md) to get started on building the source code on your own.
 * ["Help wanted" issues](https://github.com/dotnet/upgrade-assistant/labels/help%20wanted) - these issues are up for grabs. Comment on an issue if you want to create a fix.
 * ["Good first issue" issues](https://github.com/dotnet/upgrade-assistant/labels/good%20first%20issue) - we think these are a good for newcomers.
+* [Best Practices for Roslyn Analyzers and Code Fixers](./docs/roslyn_best_practices.md) - our goal is to build analyzers that are performant and available for both C# and Visual Basic by default. 
 
 ### Identifying the scale
 
