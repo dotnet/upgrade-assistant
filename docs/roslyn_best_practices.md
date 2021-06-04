@@ -183,3 +183,14 @@ If you need to [AddMetadataReference](https://docs.microsoft.com/en-us/dotnet/ap
 Examples include:
 * [Microsoft .NET Framework Reference Assemblies .NET 4.8](https://www.nuget.org/packages/Microsoft.NETFramework.ReferenceAssemblies.net48/)
 * [Microsoft .NET Framework Reference Assemblies .NET 4.7.2](https://www.nuget.org/packages/Microsoft.NETFramework.ReferenceAssemblies.net472/)
+
+## Tips and more resources
+
+### 1. Use the Syntax Visualizer
+https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/syntax-visualizer
+
+The Syntax Visualizer is a tool window that helps you inspect and explore syntax trees. It's an essential tool to understand the models for code you want to analyze. It's also a debugging aid when you develop your own applications using the .NET Compiler Platform (“Roslyn”) SDK.
+
+### 2. Take a look at examples
+* [Roslyn-analyzers](https://github.com/dotnet/roslyn-analyzers)
+* [Roslynator](https://github.com/JosefPihrt/Roslynator)
