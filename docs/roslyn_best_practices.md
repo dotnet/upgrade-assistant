@@ -70,11 +70,26 @@ If the only methods available are async, you should find another way to implemen
 **Do not**
 * Use `.Result` or `Wait()` in a Roslyn Analyzer. Forcing asynchronous code the behave synchronously can result in timing issues that are hard to debug and thread starvation.
 
-### 8. Use the Microsoft Roslyn testing framework
+### 8. Use the *Microsoft.CodeAnalysis.Testing* framework
+Separation of analyzer and code fix tests increases complexity and code duplication, and tends to decrease the overall confidence in the test suite. If you're testing entire files at a time, you will either be quickly overwhelmed by the number of files per test scenario or be tempted to put multiple test scenarios into a single file which shifts from unit to integration testing. The *Microsoft.CodeAnalysis.Testing* framework addresses these concerns.
 
-### 9. Avoid state management unless absolutely needed
+**Do**
+* Read the testing overview: [Microsoft.CodeAnalysis.Testing](https://github.com/dotnet/roslyn-sdk/blob/main/src/Microsoft.CodeAnalysis.Testing/README.md)
+
+### 9. Avoid member variables and state management
+Expect your analyzer to be invoked repeatedly and asynchronously. Design your analyzer so that execution can start processing a 2nd call before processing finishes for the 1st call. 
+
+**Do**
+* Pass information between methods via method arguments.
+
+**Do not**
+* Do not use member variables to store instance data.
 
 ### 10. Use abstractions and focus on the intent of your Analyzer rather than Roslyn
+Roslyn is a rich framework of information that describes every detail of code in every file of every project. The concepts can become overwhelming. Use abstractions to develop class names and methods that sharpen the focus on what the analyzer does by hiding how it achieves the goal.
+
+**Do**
+* Use extension methods, and wrapper objects to describe "what" the code does instead of "how" the code behaves.
 
 ## Roslyn Code Fixer Best Practices
 
