@@ -14,7 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public static class ExtensionProviderExtensions
     {
-        private const string ExtensionServiceProvidersSectionName = "ExtensionServiceProviders";
         private const string UpgradeAssistantExtensionPathsSettingName = "UpgradeAssistantExtensionPaths";
 
         /// <summary>
@@ -41,7 +40,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             foreach (var extension in GetExtensions(configuration, additionalExtensionPaths))
             {
-                services.AddExtension(extension);
+                services.AddSingleton(extension);
+
+                foreach (var sp in extension.GetServiceProviders())
+                {
+                    sp.AddServices(new ExtensionServiceCollection(services, extension));
+                }
             }
         }
 
@@ -84,64 +88,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
 
                 return fromConfig.Concat(pathsFromString).Concat(additionalExtensionPaths);
-            }
-        }
-
-        private static void AddExtension(this IServiceCollection services, ExtensionInstance extension)
-        {
-            services.AddSingleton(extension);
-
-            var extensionServiceProviderPaths = extension.GetOptions<string[]>(ExtensionServiceProvidersSectionName);
-
-            if (extensionServiceProviderPaths is null)
-            {
-                return;
-            }
-
-            foreach (var path in extensionServiceProviderPaths)
-            {
-                try
-                {
-                    var fileInfo = extension.FileProvider.GetFileInfo(path);
-
-                    if (!fileInfo.Exists)
-                    {
-                        Console.WriteLine($"ERROR: Could not find extension service provider assembly {path} in extension {extension.Name}");
-                        continue;
-                    }
-
-                    using var assemblyStream = fileInfo.CreateReadStream();
-
-                    if (assemblyStream is null)
-                    {
-                        Console.WriteLine($"ERROR: Could not find extension service provider assembly {path} in extension {extension.Name}");
-                        continue;
-                    }
-
-                    extension.LoadContext.LoadFromStream(assemblyStream);
-                }
-                catch (FileLoadException)
-                {
-                }
-                catch (BadImageFormatException)
-                {
-                }
-            }
-
-            if (!extension.HasAssemblyLoadContext)
-            {
-                return;
-            }
-
-            var serviceProviders = extension.LoadContext.Assemblies.SelectMany(assembly => assembly
-                .GetTypes()
-                .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
-                .Select(t => Activator.CreateInstance(t))
-                .Cast<IExtensionServiceProvider>());
-
-            foreach (var sp in serviceProviders)
-            {
-                sp.AddServices(new ExtensionServiceCollection(services, extension));
             }
         }
     }
