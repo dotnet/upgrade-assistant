@@ -5,8 +5,17 @@
     <IsCI Condition=" '$(BuildingInsideVisualStudio)' == '' ">true</IsCI>
   </PropertyGroup>
 
+  <!-- If building an extension with a _ExtensionIntermediateOutputPath, we want to redirect bin and obj folders to reduce file lock conflicts -->
+  <PropertyGroup Condition=" '$(_ExtensionIntermediateOutputPath)' != '' ">
+    <_AssemblyIntermediatePath>$(_ExtensionIntermediateOutputPath)$(ExtensionDir)$(AssemblyName)\</_AssemblyIntermediatePath>
+    <OutDir>$(_AssemblyIntermediatePath)bin\</OutDir>
+    <IntermediateOutputPath>$(_AssemblyIntermediatePath)$(ExtensionDir)obj\</IntermediateOutputPath>
+  </PropertyGroup>
+
   <!-- Publish the extension and collect its output -->
-  <Target Name="ComputePublishOutput" DependsOnTargets="Build;ComputeFilesToPublish" Returns="@(ExtensionFiles)">
+  <Target Name="ComputePublishOutput"
+          DependsOnTargets="Build;ComputeFilesToPublish"
+          Returns="@(ExtensionFiles)">
     <ItemGroup>
       <ExtensionFiles Include="@(ResolvedFileToPublish)">
         <Link>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</Link>
@@ -15,18 +24,19 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="_AddMetadataToExtensions" BeforeTargets="RestoreExtensions;PublishUpgradeAssistantExtensions">
+  <Target Name="_AddMetadataToExtensions"
+          BeforeTargets="RestoreExtensions;PublishUpgradeAssistantExtensions">
     <!-- Add the relative directory the extension will be added to -->
     <ItemGroup>
       <Extension Update="@(Extension)">
-        <Properties>Configuration=$(Configuration);ExtensionDir=extensions/%(Name);_IsExtension=true</Properties>
+        <Properties>Configuration=$(Configuration);ExtensionDir=extensions\%(Name)\</Properties>
       </Extension>
     </ItemGroup>
 
     <!-- When compiling outside of VS, we want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
     <ItemGroup Condition="$(IsCI)">
       <Extension Update="@(Extension)">
-        <Properties>%(Properties);$(BaseIntermediateOutputPath)extensions\%(Name)\</Properties>
+        <Properties>%(Properties);_ExtensionIntermediateOutputPath=$(IntermediateOutputPath)</Properties>
       </Extension>
     </ItemGroup>
   </Target>
@@ -38,7 +48,8 @@
     PrepareForBuild: For incremental builds in VS
     PackDependsOn: For pack commands
   -->
-  <Target Name="RestoreExtensions" BeforeTargets="Restore;PrepareForBuild;$(PackDependsOn)">
+  <Target Name="RestoreExtensions"
+          BeforeTargets="Restore;PrepareForBuild;$(PackDependsOn)">
     <MSBuild Projects="%(Extension.Identity)"
              Targets="Restore"
              Properties="%(Properties)"
@@ -47,7 +58,10 @@
   </Target>
 
   <!-- Publish each extension into its own directory -->
-  <Target Name="PublishUpgradeAssistantExtensions" DependsOnTargets="ResolveAssemblyReferences" BeforeTargets="AssignTargetPaths" Outputs="%(Extension.Identity)">
+  <Target Name="PublishUpgradeAssistantExtensions"
+          DependsOnTargets="ResolveAssemblyReferences"
+          BeforeTargets="AssignTargetPaths"
+          Outputs="%(Extension.Identity)">
 
     <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
 
@@ -58,6 +72,7 @@
       - We want to remove any TargetFramework that is set so that isn't flowed through to the next project.
       -->
     <MSBuild Projects="%(Extension.Identity)"
+             BuildInParallel="true"
              Targets="ComputePublishOutput"
              RemoveProperties="TargetFramework"
              Properties="%(Properties)"
@@ -87,10 +102,10 @@
       </_ExtensionArtifactsByRelativePath>
 
       <!-- Remove the host supplied assemblies -->
-      <_FilteredExtensionArtifactsByRelativePath Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_ExcludeFromExtension)" />
+      <_FilteredExtensionArtifactsMinusExclusions Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_ExcludeFromExtension)" />
 
       <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
-      <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsByRelativePath.OriginalIdentity)">
+      <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsMinusExclusions.OriginalIdentity)">
         <RelativePath>%(TargetPath)</RelativePath>
         <TargetPath>%(TargetPath)</TargetPath>
         <Link>%(Link)</Link>
