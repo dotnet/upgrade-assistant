@@ -16,7 +16,31 @@ The following guidelines are a list of best practices that we we use to guide th
 3. Samples included follow best practices as established by [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers)
 4. Use abstractions, and clean code principles, to write code that everyone can read regardless of their Roslyn experience to promote community contributions and reduce code maintenance
 
-## Roslyn Analyzer Best Practices
+## Best Practices for Roslyn Analyzers and Code Fixes
+
+### 1. Use the *Microsoft.CodeAnalysis.Testing* framework
+
+Separation of analyzer and code fix tests increases complexity and code duplication, and tends to decrease the overall confidence in the test suite. If you're testing entire files at a time, you will either be quickly overwhelmed by the number of files per test scenario or be tempted to put multiple test scenarios into a single file which shifts from unit to integration testing. The *Microsoft.CodeAnalysis.Testing* framework addresses these concerns.
+
+**Do**
+* Read the testing overview: [Microsoft.CodeAnalysis.Testing](https://github.com/dotnet/roslyn-sdk/blob/main/src/Microsoft.CodeAnalysis.Testing/README.md)
+
+### 2. Avoid member variables and state management
+Expect your analyzer to be invoked repeatedly and asynchronously. Design your analyzer so that execution can start processing a 2nd call before processing finishes for the 1st call. 
+
+**Do**
+* Pass information between methods via method arguments.
+
+**Do not**
+* Do not use member variables to store instance data.
+
+### 3. Use abstractions and focus on the intent of your Analyzer rather than Roslyn
+Roslyn is a rich framework of information that describes every detail of code in every file of every project. The concepts can become overwhelming. Use abstractions to develop class names and methods that sharpen the focus on what the analyzer does by hiding how it achieves the goal.
+
+**Do**
+* Use extension methods, and wrapper objects to describe "what" the code does instead of "how" the code behaves.
+
+## Best Practices for Roslyn Analyzers
 
 ### 1. "Bail out" Quickly
 Roslyn sees class files as rich trees of information. There will likely be millions of syntax nodes to evaluate across a large solution. You should limit the performance impact of running the analyzer by reducing the number of operations performed.
@@ -70,28 +94,7 @@ If the only methods available are async, you should find another way to implemen
 **Do not**
 * Use `.Result` or `Wait()` in a Roslyn Analyzer. Forcing asynchronous code the behave synchronously can result in timing issues that are hard to debug and thread starvation.
 
-### 8. Use the *Microsoft.CodeAnalysis.Testing* framework
-Separation of analyzer and code fix tests increases complexity and code duplication, and tends to decrease the overall confidence in the test suite. If you're testing entire files at a time, you will either be quickly overwhelmed by the number of files per test scenario or be tempted to put multiple test scenarios into a single file which shifts from unit to integration testing. The *Microsoft.CodeAnalysis.Testing* framework addresses these concerns.
-
-**Do**
-* Read the testing overview: [Microsoft.CodeAnalysis.Testing](https://github.com/dotnet/roslyn-sdk/blob/main/src/Microsoft.CodeAnalysis.Testing/README.md)
-
-### 9. Avoid member variables and state management
-Expect your analyzer to be invoked repeatedly and asynchronously. Design your analyzer so that execution can start processing a 2nd call before processing finishes for the 1st call. 
-
-**Do**
-* Pass information between methods via method arguments.
-
-**Do not**
-* Do not use member variables to store instance data.
-
-### 10. Use abstractions and focus on the intent of your Analyzer rather than Roslyn
-Roslyn is a rich framework of information that describes every detail of code in every file of every project. The concepts can become overwhelming. Use abstractions to develop class names and methods that sharpen the focus on what the analyzer does by hiding how it achieves the goal.
-
-**Do**
-* Use extension methods, and wrapper objects to describe "what" the code does instead of "how" the code behaves.
-
-## Roslyn Code Fixer Best Practices
+## Best Practices for Roslyn Code Fixers
 
 ### 1. Code fixers handle well-known scenarios
 You may need to do a few final checks before registering your code fixer by calling `RegisterCodeFix` but you should lean into doing as many checks as possible in the analyzer.
@@ -109,59 +112,38 @@ When replacing a SyntaxNode consider whether or not the node you're replacing ha
 **Do**
 * Use the `WithLeadingTrivia` and `WithTrailingTrivia` extension methods to preserve trivia when creating new nodes.
 
-### 4. Use the *Microsoft.CodeAnalysis.Testing* framework
-Separation of analyzer and code fix tests increases complexity and code duplication, and tends to decrease the overall confidence in the test suite. If you're testing entire files at a time, you will either be quickly overwhelmed by the number of files per test scenario or be tempted to put multiple test scenarios into a single file which shifts from unit to integration testing. The *Microsoft.CodeAnalysis.Testing* framework addresses these concerns.
+### 4. Apply Async programming best practices
+Code fixers are asynchronous. Follow best practice guidance for asynchronous programming to prevent race conditions and performance issues.
 
-### 5. Do not force async code to run synchronously
-<span style="background:yellow;color:black">TODO: call out to ensure cancellation tokens are used so things can be gracefully shut down</span>
+Learn more about Async best practices by reading [Async/Await - Best Practices in Asynchronous Programming](https://docs.microsoft.com/en-us/archive/msdn-magazine/2013/march/async-await-best-practices-in-asynchronous-programming) by Stephen Cleary
 
-Avoid calling `.Result` and prefer to use await as needed when working in the code fixer construct. 
+**Do**
+* Leverage the CancellationToken to interrupt processing when cancellation has been requested.
 
-### 6. When using CodeAction.Create prefer Document over Solution
-<span style="background:yellow;color:black">TODO: rephrase to highlight prefer smaller scope</span>
+**Do not**
+* Do not force async code to run synchronously. Avoid calling `.Result` and prefer to use await as needed when working in the code fixer construct.
 
-When writing your CodeFixer you need to create a CodeAction to resolve the diagnostic. If your code fixer only modifies a single document then your CodeAction should return a `Task<Document>` and not a `Task<Solution>`.
+### 5. When using CodeAction.Create prefer Document over Solution
+Minimize the impact of running a code fixer by using the smallest possible scope. 
 
-### 7. Use SolutionEditor and DocEditor when you need to batch changes
+When writing your CodeFixer you need to create a CodeAction to resolve the diagnostic. If your code fixer only modifies a single document then your CodeAction should return a document.
+
+**Should**
+* Prefer `Task<Document>` when possible and use `Task<Solution>` as needed when returning a result from a Code Fixer.
+
+### 6. Use SolutionEditor and DocEditor when you need to batch changes
 When you need to make numerous changes you will want to batch those changes with the SolutionEditor, or DocEditor. It can be helpful to think about these objects as you would think about using StringBuilder when concatenating a large number of strings. These objects enable you to create a cumulative list of changes that can reduce GC pressure created by modifying immutable SyntaxTrees.
 
 If you’re not batching changes, then most code changes can be accomplished by working directly with the document’s syntax root and the SyntaxGenerator.
 
 
-### 6. Enable support for Fix All
+### 7. Enable support for Fix All
 Don’t force users to fix instances of a diagnostic one-by-one. A FixAll occurrences code fix means: I have a code fix 'C', that fixes a specific instance of diagnostic 'D' in my source and I want to apply this fix to all instances of 'D' across a broader scope, such as a document or a project or the entire solution.
 
 Your code fixer should override `GetFixAllProvider` to return a non-null instance of [FixAll Provider](https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md).
 
-### 7. Treat the code fixer as a single unit of work
-Code fixers are applied as a one-step change and their order is not guaranteed. If the code you’re adding requires a namespace import then your code fixer should perform that change if necessary. Do not assume that another code fixer will be responsible for adding the correct namespace
-
-### 8. Use the *Microsoft.CodeAnalysis.Testing* framework
-<span style="background:yellow;color:black">TODO: elevate as shared</span>
-
-Separation of analyzer and code fix tests increases complexity and code duplication, and tends to decrease the overall confidence in the test suite. If you're testing entire files at a time, you will either be quickly overwhelmed by the number of files per test scenario or be tempted to put multiple test scenarios into a single file which shifts from unit to integration testing. The *Microsoft.CodeAnalysis.Testing* framework addresses these concerns.
-
-**Do**
-* Read the testing overview: [Microsoft.CodeAnalysis.Testing](https://github.com/dotnet/roslyn-sdk/blob/main/src/Microsoft.CodeAnalysis.Testing/README.md)
-
-### 9. Avoid member variables and state management
-<span style="background:yellow;color:black">TODO: elevate as shared</span>
-
-Expect your analyzer to be invoked repeatedly and asynchronously. Design your analyzer so that execution can start processing a 2nd call before processing finishes for the 1st call. 
-
-**Do**
-* Pass information between methods via method arguments.
-
-**Do not**
-* Do not use member variables to store instance data.
-
-### 10. Use abstractions and focus on the intent of your Analyzer rather than Roslyn
-<span style="background:yellow;color:black">TODO: elevate as shared</span>
-
-Roslyn is a rich framework of information that describes every detail of code in every file of every project. The concepts can become overwhelming. Use abstractions to develop class names and methods that sharpen the focus on what the analyzer does by hiding how it achieves the goal.
-
-**Do**
-* Use extension methods, and wrapper objects to describe "what" the code does instead of "how" the code behaves.
+### 8. Treat the Code Fixer as a single unit of work
+Code fixers are applied as a one-step change and their order is not guaranteed. If the code you’re adding requires a namespace import then your code fixer should perform that change if necessary. Do not assume that another code fixer will be responsible for adding the correct namespace.
 
 ## Considerations specific to upgrade-assistant
 
@@ -194,3 +176,6 @@ The Syntax Visualizer is a tool window that helps you inspect and explore syntax
 ### 2. Take a look at examples
 * [Roslyn-analyzers](https://github.com/dotnet/roslyn-analyzers)
 * [Roslynator](https://github.com/JosefPihrt/Roslynator)
+
+### 3. Video Training Courses
+* [Youtube: Learn Roslyn Now](https://www.youtube.com/watch?v=wXXHd8gYqVg) by Josh Varty
