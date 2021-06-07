@@ -1,26 +1,26 @@
 # Roslyn Best Practices
 
-We use [Roslyn Analyzers](https://docs.microsoft.com/en-us/visualstudio/code-quality/roslyn-analyzers-overview) highlight areas of code that will need to be refactored. By default our goal is to pair these Analyzers with Code Fixers to automate as much of the upgrade workflow as possible.
+We use [Roslyn Analyzers](https://docs.microsoft.com/en-us/visualstudio/code-quality/roslyn-analyzers-overview) to highlight areas of code that will need to be refactored. By default, we aim to pair these Analyzers with Code Fixers to automate as much of the upgrade workflow as possible.
 
 We support the following types of fixes:
-* Mapping from one type to another one common example is [System.Web.Http.ApiController](https://docs.microsoft.com/en-us/previous-versions/aspnet/hh834453(v=vs.118)) should become [Microsoft.AspNetCore.Mvc.ControllerBase](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase))
+* Mapping from one type to another one common example is [System.Web.Http.ApiController](https://docs.microsoft.com/en-us/previous-versions/aspnet/hh834453(v=vs.118)) should become [Microsoft.AspNetCore.Mvc.ControllerBase](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase)
 * Extracting HttpContext via method dependency injection
 * Replacing methods that are not available on .NET latest such as [BinaryFormatter.UnsafeDeserialize](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.formatters.binary.binaryformatter.unsafedeserialize)
 
-The following guidelines are a list of best practices that we we use to guide the development of Analyzers and Code Fixers to support our goals.
+The following guidelines are a list of best practices that we use to guide the development of Analyzers and Code Fixers to support our goals.
 
 ### Our Goals
 
-1. Write language agnostic analyzers with as much code reuse as possible
-2. Analyzers should be as performant as possible
-3. Samples included follow best practices as established by [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers)
-4. Use abstractions, and clean code principles, to write code that everyone can read regardless of their Roslyn experience to promote community contributions and reduce code maintenance
+1. Write language agnostic analyzers with as much code reuse as possible.
+2. Analyzers should be as performant as possible.
+3. Samples included follow best practices as setup by [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers).
+4. Use abstractions, and clean code principles, to write code that everyone can read regardless of their Roslyn experience to promote community contributions and reduce code maintenance.
 
 ## Best Practices for Roslyn Analyzers and Code Fixes
 
 ### 1. Use the *Microsoft.CodeAnalysis.Testing* framework
 
-Separation of analyzer and code fix tests increases complexity and code duplication, and tends to decrease the overall confidence in the test suite. If you're testing entire files at a time, you will either be quickly overwhelmed by the number of files per test scenario or be tempted to put multiple test scenarios into a single file which shifts from unit to integration testing. The *Microsoft.CodeAnalysis.Testing* framework addresses these concerns.
+Separation of analyzer and code fix tests increases complexity and code duplication and tends to decrease the overall confidence in the test suite. If you're testing entire files at a time, you will either be quickly overwhelmed by the number of files per test scenario or be tempted to put multiple test scenarios into a single file which shifts from unit to integration testing. The *Microsoft.CodeAnalysis.Testing* framework addresses these concerns.
 
 **Do**
 * Read the testing overview: [Microsoft.CodeAnalysis.Testing](https://github.com/dotnet/roslyn-sdk/blob/main/src/Microsoft.CodeAnalysis.Testing/README.md)
@@ -46,11 +46,11 @@ Roslyn is a rich framework of information that describes every detail of code in
 Roslyn sees class files as rich trees of information. There will likely be millions of syntax nodes to evaluate across a large solution. You should limit the performance impact of running the analyzer by reducing the number of operations performed.
 
 **Do**
-* Use the [Syntax Visualizer](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/syntax-visualizer) to determine the relevant syntax. Where possible use specific syntax options. As an example, if you are building an analyzer that will examine class inheritance then you should use `SyntaxKind.BaseList`, which will occur much less frequently than the `SyntaxKind.IdentifierName`.
-* Use information already available from `SyntaxNodeAnalysisContext` to quickly filter relevant information. As an example, if you build an analyzer that looks for a method then you would be evaluating `MemberAccessExpressionSyntax` nodes. In this scenario, you should also check the parent of the node to determine if this Syntax is a method or a property.
+* Use the [Syntax Visualizer](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/syntax-visualizer) to build syntax. Where possible use specific syntax options. As an example, if you are building an analyzer that will examine class inheritance then you should use `SyntaxKind.BaseList`, which will occur much less often than the `SyntaxKind.IdentifierName`.
+* Use information already available from `SyntaxNodeAnalysisContext` to quickly filter relevant information. As an example, if you build an analyzer that looks for a method then you would be evaluating `MemberAccessExpressionSyntax` nodes. In this scenario, you should also check the parent of the node to figure out if this Syntax is a method or a property.
 
 **Do Not**
-* Do not put string compare operations above other conditional checks that can be performed. String comparisson is slower than checking for a type, or examining an enumeration value.
+* Do not put string compare operations above other conditional checks that can be performed. String comparison is slower than checking for a type or examining an enumeration value.
 
 
 ### 2. Beware of String manipulations
@@ -60,7 +60,7 @@ Build your analyzer with the expectation that it will be invoked a million times
 * Use string constants when evaluating string conditionals.
 
 **Do Not**
-* Do not use string interpolation, contenation, or format strings which construct new objects each time the analyzer is run.
+* Do not use string interpolation, concatenation, or format strings which construct new objects each time the analyzer is run.
 
 ### 3. Enable your Analyzer to run concurrently
 Enable concurrent execution of your analyzers and prevent them from running in auto generated code.
@@ -80,7 +80,7 @@ Enable concurrent execution of your analyzers and prevent them from running in a
 If you track multiple syntax nodes in your Analyzer then you can make it easier to write your Code Fixer by using the method overload of `Diagnostic.Create` that supports [additionalLocations](https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.diagnostic.create#Microsoft_CodeAnalysis_Diagnostic_Create_Microsoft_CodeAnalysis_DiagnosticDescriptor_Microsoft_CodeAnalysis_Location_System_Collections_Generic_IEnumerable_Microsoft_CodeAnalysis_Location__System_Collections_Immutable_ImmutableDictionary_System_String_System_String__System_Object___)
 
 ### 5. Beware of Trivia
-When searching for patterns of code it is common to perform string comparisons. These approaches can work successfully but you should beware that trivia, the spacing we use to make code more readable, can vary from team to team. Not everyone puts a space after an assignment operator and if there are two spaces, or a tab, after the assignment operator that code is still valid.
+When searching for patterns of code it is common to perform string comparisons. These approaches can work successfully but you should beware that trivia, the blank space we use to make code more readable, can vary from team to team. Not everyone puts a space after an assignment operator and if there are two spaces, or a tab, after the assignment operator that code is still valid.
 
 **Should Not**
 * Try to avoid `ToFullString` and solutions that require awareness of trivia.
@@ -92,7 +92,7 @@ When searching for patterns of code it is common to perform string comparisons. 
 If the only methods available are async, you should find another way to implement your analyzer to prevent runtime issues.
 
 **Do not**
-* Use `.Result` or `Wait()` in a Roslyn Analyzer. Forcing asynchronous code the behave synchronously can result in timing issues that are hard to debug and thread starvation.
+* Use `.Result` or `Wait()` in a Roslyn Analyzer. Forcing asynchronous code to behave synchronously can result in timing issues that are hard to debug and thread starvation.
 
 ## Best Practices for Roslyn Code Fixers
 
@@ -107,7 +107,7 @@ In many scenarios, your code fixer can apply to Csharp and VB. The SyntaxGenerat
 The trees generated by this API will try to respect user preferences when possible. For example, generating MemberAccessExpression(SyntaxNode, String) will be done in a way such that `this.` or `Me.` will be simplified according to user preference if any `ReduceAsync(Document, OptionSet, CancellationToken)` overload is called.
 
 ### 3. Beware of Trivia
-When replacing a SyntaxNode consider whether or not the node you're replacing had trivia. Trivia, the spacing we use to make code more readable, can vary from team to team. Not everyone puts a space after an assignment operator and if there are two spaces, or a tab, after the assignment operator then the code fixer should respect the file's original formatting.
+When replacing a SyntaxNode consider whether the node you're replacing had trivia. Trivia, the blank space we use to make code more readable, can vary from team to team. Not everyone puts a space after an assignment operator and if there are two spaces, or a tab, after the assignment operator then the code fixer should respect the file's original formatting.
 
 **Do**
 * Use the `WithLeadingTrivia` and `WithTrailingTrivia` extension methods to preserve trivia when creating new nodes.
@@ -126,24 +126,24 @@ Learn more about Async best practices by reading [Async/Await - Best Practices i
 ### 5. When using CodeAction.Create prefer Document over Solution
 Minimize the impact of running a code fixer by using the smallest possible scope. 
 
-When writing your CodeFixer you need to create a CodeAction to resolve the diagnostic. If your code fixer only modifies a single document then your CodeAction should return a document.
+When writing your CodeFixer you need to create a CodeAction to resolve the diagnostic. If your code fixer only changes a single document, then your CodeAction should return a document.
 
 **Should**
 * Prefer `Task<Document>` when possible and use `Task<Solution>` as needed when returning a result from a Code Fixer.
 
 ### 6. Use SolutionEditor and DocEditor when you need to batch changes
-When you need to make numerous changes you will want to batch those changes with the SolutionEditor, or DocEditor. It can be helpful to think about these objects as you would think about using StringBuilder when concatenating a large number of strings. These objects enable you to create a cumulative list of changes that can reduce GC pressure created by modifying immutable SyntaxTrees.
+When you need to make many changes, you will want to batch those changes with the SolutionEditor, or DocEditor. It can be helpful to think about these objects as you would think about using StringBuilder when concatenating many strings. These objects enable you to create a cumulative list of changes that can reduce GC pressure created by changing immutable SyntaxTrees.
 
-If you’re not batching changes, then most code changes can be accomplished by working directly with the document’s syntax root and the SyntaxGenerator.
+If you’re not batching changes, then most code changes can be carried out by working directly with the document’s syntax root and the SyntaxGenerator.
 
 
 ### 7. Enable support for Fix All
-Don’t force users to fix instances of a diagnostic one-by-one. A FixAll occurrences code fix means: I have a code fix 'C', that fixes a specific instance of diagnostic 'D' in my source and I want to apply this fix to all instances of 'D' across a broader scope, such as a document or a project or the entire solution.
+Don’t force users to fix instances of a diagnostic one-by-one. A FixAll occurrences code fix means: I have a code fix 'C', that fixes a specific instance of diagnostic 'D' in my source, and I want to apply this fix to all instances of 'D' across a broader scope, such as a document or a project or the entire solution.
 
 Your code fixer should override `GetFixAllProvider` to return a non-null instance of [FixAll Provider](https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md).
 
 ### 8. Treat the Code Fixer as a single unit of work
-Code fixers are applied as a one-step change and their order is not guaranteed. If the code you’re adding requires a namespace import then your code fixer should perform that change if necessary. Do not assume that another code fixer will be responsible for adding the correct namespace.
+Code fixers are applied as a one-step change and their order is not guaranteed. If the code you’re adding requires a namespace import, then your code fixer should perform that change if necessary. Do not assume that another code fixer will handle adding the correct namespace.
 
 ## Considerations specific to upgrade-assistant
 
@@ -158,7 +158,7 @@ As an example, `upgrade-assistant` will upgrade NuGet packages across major vers
 `upgrade-assistant` will add, upgrade, and remove package references during the upgrade process. If your analyzer is looking for a specific symbol then you may need to [AddMetadataReference](https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.project.addmetadatareference) to ensure the symbol is available.
 
 ### 3. Add reference assemblies instead of the assembly implementation
-Reference assemblies are a special type of assembly that contain only the minimum amount of metadata required to represent the library's public API surface.
+Reference assemblies are a special type of assembly that have only the smallest amount of metadata needed to represent the library's public API surface.
 
 If you need to [AddMetadataReference](https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.project.addmetadatareference) then use a reference assembly when possible.
 
@@ -173,7 +173,7 @@ https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/syntax-visualizer
 
 The Syntax Visualizer is a tool window that helps you inspect and explore syntax trees. It's an essential tool to understand the models for code you want to analyze. It's also a debugging aid when you develop your own applications using the .NET Compiler Platform (“Roslyn”) SDK.
 
-### 2. Take a look at examples
+### 2. Look at examples
 * [Roslyn-analyzers](https://github.com/dotnet/roslyn-analyzers)
 * [Roslynator](https://github.com/JosefPihrt/Roslynator)
 
