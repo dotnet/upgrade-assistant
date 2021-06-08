@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-                Logger.LogInformation("Package Analysis for {ProjectPath} for the target TFM of {TargetTFM}", new object[] { project.FileInfo.Name, targetTfm});
+                Logger.LogInformation("Package Analysis for {ProjectPath} for the target TFM of {TargetTFM}", new object[] { project.FileInfo.Name, targetTfm });
 
                 if (_analysisState is null || !_analysisState.AreChangesRecommended)
                 {
