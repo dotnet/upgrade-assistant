@@ -109,7 +109,7 @@ If the only methods available are async, you should find another way to implemen
 ### 1. Code fixers handle well-known scenarios
 You may need to do a few final checks before registering your code fixer by calling `RegisterCodeFix` but you should lean into doing as many checks as possible in the analyzer.
 
-You can also accelerate your code fixer productivity by using the additionalLocations overload when reporting a diagnostic so that you can find multiple interesting locations in a document when working from a single diagnostic.
+You can also accelerate your code fixer productivity by using the `additionalLocations` overload when reporting a diagnostic so that you can find multiple interesting locations in a document when working from a single diagnostic.
 
 ### 2. Use the `SyntaxGenerator` to create language agnostic code fixers
 In many scenarios, your code fixer can apply to Csharp and VB. The SyntaxGenerator  is a language agnostic factory for creating syntax nodes.
