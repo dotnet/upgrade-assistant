@@ -25,11 +25,11 @@ The existing default in Upgrade-Assistant is "upgrade" mode but once the analyze
    If a referenced NuGet package in the project isn't compatible with the target .NET version, Upgrade-Assistant already has capabilities built-in to determine the first major version that is compatible to the target .NET version by using existing Nuget APIs. Upgrade-Assistant also already has logic built-in to determine transitive dependencies that needs to be removed while upgrading to .NET Core.
 
 ## Loose-Assembly Analysis:
-There are scenarios where projects depend on loose-assemblies (GAC, checked-in binaries), ability to determine a path to modernizing the loose-assembly dependencies is helpful. This step will determine if the content of the assembly now exists in a nuget package that then can be added to packagereference for the project. An internal MSFT tool called Chem provides the capability to "look-up" a compatible nuget package based on the assembly meta-data(name, version, API surface areas used etc.). As a preliminary attempt to integrate Chem capabilities to upgrade-assistant:
+There are scenarios where projects depend on loose-assemblies (GAC, checked-in binaries), ability to determine a path to modernizing the loose-assembly dependencies is helpful. This step will determine if the content of the assembly now exists in a nuget package that then can be added to packagereference for the project. MSFT tooling can provide the capability to "look-up" a compatible nuget package based on the assembly meta-data(name, version, API surface areas used etc.). As a preliminary attempt to integrate capabilities to upgrade-assistant:
 
 - Add code for computing binary hash for identifying assembly <-> NuGet package mapping
 - Provide option for users to download a compressed indexed cache of binary hash -> nuget package mapping data on demand if the solution being analyzed has loose-assemblies present.
-- The lazy-downloadable cache will be kept up-to-date with regular imports of all publicly available nuget package data from Chem internal DB.
+- The lazy-downloadable cache will be kept up-to-date with regular imports of all publicly available nuget package data from loose assembly DB.
 
 ## Inter-Project dependencies:
 Upgrade-Assistant has built-in capability to determine inter-project dependencies in a solution and calculate the order in which it is recommended to start upgrade process.
@@ -75,9 +75,9 @@ Detailed instructions on how to set up the decentralized solution will be provid
 
 ## Phase III:
 Add loose assembly analysis capability to upgrade-assistant.
-- Chem integration.
+- Loose assembly analysis integration.
 
-**Cost** : L (This is L coz this requires quite a bit of experimental prototyping to know the best way to integrate Chem. This effort can happen in parallel to Phase I and Phase II)
+**Cost** : L (This is L coz this requires quite a bit of experimental prototyping to know the best way to integrate loose assembly analysis. This effort can happen in parallel to Phase I and Phase II)
 
 ## Phase IV:
 - Analyze command supports multiple solutions / directory of solutions.
@@ -96,7 +96,7 @@ One of the possible imlementation methods is using a container like docker.
 
 ## Phase VI / Future:
 - Support for analyzing and / or upgrading a solution from the data visualization component.
-- Internal tool, Chem, into a modern service with a public end-point that upgrade-assistant / any tool can post a request with computed hash and receive a response from the service.
+- Integrate loose assembly analysis into a modern service with a public end-point that upgrade-assistant / any tool can post a request with computed hash and receive a response from the service.
 - Assembly-level dependency analysis between services for dependency graph.
 - Explore other push and/or pull models to get the data to the decentralized data store.
 
