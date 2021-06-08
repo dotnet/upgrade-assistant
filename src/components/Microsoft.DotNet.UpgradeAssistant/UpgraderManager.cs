@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -13,26 +14,34 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public class UpgraderManager
     {
         private readonly IUpgradeStepOrderer _orderer;
+        private readonly ITelemetry _telemetry;
         private readonly ILogger _logger;
 
         public UpgraderManager(
             IUpgradeStepOrderer orderer,
+            ITelemetry telemetry,
             ILogger<UpgraderManager> logger)
         {
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
+            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IEnumerable<UpgradeStep> AllSteps => _orderer.UpgradeSteps;
 
-        public Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
+        public async Task<IEnumerable<UpgradeStep>> InitializeAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return Task.FromResult(AllSteps);
+            _telemetry.TrackEvent("initialize", measurements: new Dictionary<string, double> { { "Project Count", context.Projects.Count() } });
+            await _telemetry.TrackProjectPropertiesAsync(context, token).ConfigureAwait(false);
+
+            context.CurrentStep = null;
+
+            return AllSteps;
         }
 
         /// <summary>
@@ -43,7 +52,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// Returns null if no upgrade steps need to be applied.</returns>
         public async Task<UpgradeStep?> GetNextStepAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             token.ThrowIfCancellationRequested();
+
+            context.CurrentStep = null;
 
             var steps = GetStepsForContextAsync(context, AllSteps);
 
@@ -59,23 +75,23 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 return null;
             }
 
-            var nextStep = await GetNextStepInternalAsync(steps, context, token).ConfigureAwait(false);
+            context.CurrentStep = await GetNextStepInternalAsync(steps, context, token).ConfigureAwait(false);
 
-            if (nextStep is null)
+            if (context.CurrentStep is null)
             {
-                nextStep = await GetNextStepAsync(context, token).ConfigureAwait(false);
+                context.CurrentStep = await GetNextStepAsync(context, token).ConfigureAwait(false);
             }
 
-            if (nextStep is null)
+            if (context.CurrentStep is null)
             {
                 _logger.LogDebug("No applicable incomplete upgrade steps found");
             }
             else
             {
-                _logger.LogDebug("Identified upgrade step {UpgradeStep} as the next step", nextStep.Id);
+                _logger.LogDebug("Identified upgrade step {UpgradeStep} as the next step", context.CurrentStep.Id);
             }
 
-            return nextStep;
+            return context.CurrentStep;
         }
 
         private async Task<UpgradeStep?> GetNextStepInternalAsync(IAsyncEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token)
@@ -95,6 +111,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             //    continue iterating with the next step if it is.
             await foreach (var step in steps.ConfigureAwait(false))
             {
+                context.CurrentStep = step;
+
                 token.ThrowIfCancellationRequested();
 
                 if (step.Status == UpgradeStepStatus.Unknown)
@@ -102,7 +120,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     // It is not necessary to iterate through sub-steps because parents steps are
                     // expected to initialize their children during their own initialization
                     _logger.LogInformation("Initializing upgrade step {StepTitle}", step.Title);
-                    await step.InitializeAsync(context, token).ConfigureAwait(false);
+
+                    using (_telemetry.TimeStep("initialize", step))
+                    {
+                        await step.InitializeAsync(context, token).ConfigureAwait(false);
+                    }
 
                     // This is actually not dead code. The above sentence InitializeAsync(...) call will potentially change the status.
 #pragma warning disable CA1508 // Avoid dead conditional code

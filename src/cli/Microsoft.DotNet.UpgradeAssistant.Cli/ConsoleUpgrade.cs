@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
@@ -13,27 +14,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     public class ConsoleUpgrade : IAppCommand
     {
         private readonly IUserInput _input;
+        private readonly IUpgradeContextAccessor _context;
         private readonly InputOutputStreams _io;
         private readonly IUpgradeContextFactory _contextFactory;
         private readonly CommandProvider _commandProvider;
         private readonly UpgraderManager _upgrader;
+        private readonly ITelemetry _telemetry;
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleUpgrade> _logger;
 
         public ConsoleUpgrade(
             IUserInput input,
+            IUpgradeContextAccessor context,
             InputOutputStreams io,
             IUpgradeContextFactory contextFactory,
             CommandProvider commandProvider,
             UpgraderManager upgrader,
+            ITelemetry telemetry,
             IUpgradeStateManager stateManager,
             ILogger<ConsoleUpgrade> logger)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
+            _context = context;
             _io = io ?? throw new ArgumentNullException(nameof(io));
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _commandProvider = commandProvider ?? throw new ArgumentNullException(nameof(commandProvider));
             _upgrader = upgrader ?? throw new ArgumentNullException(nameof(upgrader));
+            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -41,6 +48,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         public async Task RunAsync(CancellationToken token)
         {
             using var context = await _contextFactory.CreateContext(token);
+
+            _context.Current = context;
 
             await _stateManager.LoadStateAsync(context, token);
 
@@ -54,33 +63,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 while (step is not null)
                 {
-                    token.ThrowIfCancellationRequested();
-
                     await ShowUpgradeStepsAsync(steps, context, token, step);
-                    _io.Output.WriteLine();
 
-                    var commands = _commandProvider.GetCommands(step, context);
-                    var command = await _input.ChooseAsync("Choose a command:", commands, token);
-
-                    // TODO : It might be nice to allow commands to show more details by having a 'status' property
-                    //        that can be shown here. Also, commands currently only return bools but, in the future,
-                    //        if they return more complex objects, custom handlers could be used to respond to the different
-                    //        commands' return values.
-                    if (!await command.ExecuteAsync(context, token))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
-                        Console.ResetColor();
-                    }
-                    else if (await _input.WaitToProceedAsync(token))
-                    {
-                        ConsoleUtils.Clear();
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Upgrade process was canceled. Quitting....");
-                        return;
-                    }
+                    await RunStepAsync(context, step, token);
 
                     step = await _upgrader.GetNextStepAsync(context, token);
                 }
@@ -91,6 +76,44 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 // Do not pass the same token as it may have been canceled and we still need to persist this.
                 await _stateManager.SaveStateAsync(context, default);
+            }
+        }
+
+        private async Task RunStepAsync(IUpgradeContext context, UpgradeStep step, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            _io.Output.WriteLine();
+
+            var commands = _commandProvider.GetCommands(step, context);
+            var command = await _input.ChooseAsync("Choose a command:", commands, token);
+
+            // TODO : It might be nice to allow commands to show more details by having a 'status' property
+            //        that can be shown here. Also, commands currently only return bools but, in the future,
+            //        if they return more complex objects, custom handlers could be used to respond to the different
+            //        commands' return values.
+            if (!await ExecuteAndTimeCommand(context, step, command, token))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
+                Console.ResetColor();
+            }
+            else if (await _input.WaitToProceedAsync(token))
+            {
+                ConsoleUtils.Clear();
+            }
+            else
+            {
+                _logger.LogWarning("Upgrade process was canceled. Quitting....");
+                return;
+            }
+        }
+
+        private async ValueTask<bool> ExecuteAndTimeCommand(IUpgradeContext context, UpgradeStep step, UpgradeCommand command, CancellationToken token)
+        {
+            using (_telemetry.TimeStep(command.Id, step))
+            {
+                return await command.ExecuteAsync(context, token);
             }
         }
 

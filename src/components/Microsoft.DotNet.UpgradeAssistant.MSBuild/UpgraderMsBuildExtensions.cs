@@ -21,6 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
             services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
             services.AddTransient<IUpgradeStartup, MSBuildRegistrationStartup>();
+            services.AddTransient<ISolutionInfo, SolutionInfo>();
             services.AddSingleton<IUpgradeContextFactory, MSBuildUpgradeContextFactory>();
             services.AddSingleton<IComponentIdentifier, ComponentIdentifier>();
 

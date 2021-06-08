@@ -3,6 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Added
+- Usage telemetry has been added to help guide product development. See [https://aka.ms/upgrade-assistant-telemetry](https://aka.ms/upgrade-assistant-telemetry) for details.
+
 ## Version 0.2.231403 - 2021-06-14 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.231403))
 
 ### Fixed

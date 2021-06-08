@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Commands
             _stopTheProgram = stopTheProgram ?? throw new ArgumentNullException(nameof(stopTheProgram));
         }
 
+        public override string Id => "Exit";
+
         // todo - support localization
         public override string CommandText => "Exit";
 
