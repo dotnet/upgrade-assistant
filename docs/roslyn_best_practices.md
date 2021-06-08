@@ -1,5 +1,15 @@
 # Roslyn Best Practices
 
+Concepts referred to in this document which are not assumed to be familiar for all readers are explained in the following table.
+
+| Name    | Description |
+|---------|-------------|
+| Analyzer    | **Analyzers** are pieces of code that inspect your C# or Visual Basic code for style, quality, maintainability, and other issues. An **analyzer** contains code that recognizes violations of rules that you define. |
+| Code Fixer | A **code fixer** contains the code that fixes the violation by modifying source code. **Code fixes** in Visual Studio appear as "light bulb" suggestions. |
+| Language agnostic | We use this phrase to describe when the **analyzer** or **code fixer** is able to operate on both C# and Visual Basic.|
+
+<br />
+
 We use [Roslyn Analyzers](https://docs.microsoft.com/en-us/visualstudio/code-quality/roslyn-analyzers-overview) to highlight areas of code that will need to be refactored. By default, we aim to pair these Analyzers with Code Fixers to automate as much of the upgrade workflow as possible.
 
 Example of changes that we can perform include:
@@ -15,17 +25,6 @@ The following guidelines are a list of best practices that we use to guide the d
 2. Analyzers should be as performant as possible.
 3. Samples included follow best practices as setup by [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers).
 4. Use abstractions, and clean code principles, to write code that everyone can read regardless of their Roslyn experience to promote community contributions and reduce code maintenance.
-
-## Terminology
-
-Concepts referred to in this document which are not assumed to be familiar for all readers are explained in the following table.
-
-| Name    | Description |
-|---------|-------------|
-| Analyzer    | **Analyzers** are pieces of code that inspect your C# or Visual Basic code for style, quality, maintainability, and other issues. An **analyzer** contains code that recognizes violations of rules that you define. |
-| Code Fixer | A **code fixer** contains the code that fixes the violation by modifying source code. **Code fixes** in Visual Studio appear as "light bulb" suggestions. |
-| Language agnostic | We use this phrase to describe when the **analyzer** or **code fixer** is able to operate on both C# and Visual Basic.|
-
 
 ## Best Practices for Roslyn Analyzers and Code Fixes
 
