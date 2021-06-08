@@ -16,6 +16,17 @@ The following guidelines are a list of best practices that we use to guide the d
 3. Samples included follow best practices as setup by [Roslyn Analyzers](https://github.com/dotnet/roslyn-analyzers).
 4. Use abstractions, and clean code principles, to write code that everyone can read regardless of their Roslyn experience to promote community contributions and reduce code maintenance.
 
+## Terminology
+
+Concepts referred to in this document which are not assumed to be familiar for all readers are explained in the following table.
+
+| Name    | Description |
+|---------|-------------|
+| Analyzer    | **Analyzers** are pieces of code that inspect your C# or Visual Basic code for style, quality, maintainability, and other issues. An **analyzer** contains code that recognizes violations of rules that you define. |
+| Code Fixer | A **code fixer** contains the code that fixes the violation by modifying source code. **Code fixes** in Visual Studio appear as "light bulb" suggestions. |
+| Language agnostic | We use this phrase to describe when the **analyzer** or **code fixer** is able to operate on both C# and Visual Basic.|
+
+
 ## Best Practices for Roslyn Analyzers and Code Fixes
 
 ### 1. Use the *Microsoft.CodeAnalysis.Testing* framework
