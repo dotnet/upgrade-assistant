@@ -1,13 +1,17 @@
-# Extensibility
+# Extensibility <!-- omit in toc -->
 
-The Upgrade Assistant has an extension system that make it easy for users to customize many of the upgrade steps (or add new upgrade steps) without having to rebuild the tool. The `Microsoft.DotNet.UpgradeAssistant.Abstractions` library provides services that may be requested and/or registered in custom extensions. Some common extension points include:
+The Upgrade Assistant has an extension system that make it easy for users to customize many of the upgrade steps (or add new upgrade steps) without having to rebuild the tool. There are both code and non-code ways of extending the tool.
 
-1. Source updates (via Roslyn analyzers and code fix providers)
-2. NuGet package and other dependency updates (by explicitly mapping certain packages to their replacements)
-3. Custom template files (files that should be added to upgraded projects)
-4. Config file updates (components that update the project based on the contents of app.config and web.config)
-5. Custom upgrade steps (allowing complete freedom to add whatever behaviors are necessary to the upgrade process)
-6. Implementation of abstractions used in other steps
+- [Create](#create)
+- [Extension Service Providers](#extension-service-providers)
+  - [Registering Services Configuration](#registering-services-configuration)
+  - [Accessing extension files](#accessing-extension-files)
+  - [Mapping custom configuration to files](#mapping-custom-configuration-to-files)
+- [Steps](#steps)
+- [Analyzers/code fixers](#analyzerscode-fixers)
+- [Updaters](#updaters)
+- [Dependency analyzers](#dependency-analyzers)
+- [Templates](#templates)
 
 ## Create
 To create an Upgrade Assistant extension, you will need to start with a manifest file called `ExtensionManifest.json`. The manifest file contains pointers to the paths (relative to the manifest file) where the different extension items can be found. The extension manifest is required, but all of its elements are optional and it is only necessary to include the ones that are useful for the extension the manifest is describing. An outline of possible extension manifest elements is:
