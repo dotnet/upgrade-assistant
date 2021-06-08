@@ -2,7 +2,7 @@
 
 We use [Roslyn Analyzers](https://docs.microsoft.com/en-us/visualstudio/code-quality/roslyn-analyzers-overview) to highlight areas of code that will need to be refactored. By default, we aim to pair these Analyzers with Code Fixers to automate as much of the upgrade workflow as possible.
 
-We support the following types of fixes:
+Example of changes that we can perform include:
 * Mapping from one type to another one common example is [System.Web.Http.ApiController](https://docs.microsoft.com/en-us/previous-versions/aspnet/hh834453(v=vs.118)) should become [Microsoft.AspNetCore.Mvc.ControllerBase](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase)
 * Extracting HttpContext via method dependency injection
 * Replacing methods that are not available on .NET latest such as [BinaryFormatter.UnsafeDeserialize](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.formatters.binary.binaryformatter.unsafedeserialize)
