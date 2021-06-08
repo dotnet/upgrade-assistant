@@ -3,12 +3,19 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Fixed
+- Updated `HttpContext.Current` code fix to use an internal `HttpContextHelper` that will work in multi-project solutions [#599](https://github.com/dotnet/upgrade-assistant/pull/599).
+
 ## Version 0.2.227701 - 2021-05-27 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.227701))
 
 ### Added
 - Added an analyzer and code fix provider to upgrade System.Web.Mvc.Controller to Microsoft.AspNetCore.Mvc.Controller [#534](https://github.com/dotnet/upgrade-assistant/pull/534)
 - Added additional code fixer for `HttpContext.Current` that will replace calls with method injection [#536](https://github.com/dotnet/upgrade-assistant/pull/536)
+- Added a Razor upgrade sub-step to replace @helper functions in Razor views with local methods [#559](https://github.com/dotnet/upgrade-assistant/pull/559)
 - Analyzers that recommend replacing one type with another are now combined into a single analyzer (`TypeUpgradeAnalyzer`) with behavior that can be customized via AdditionalTexts containing old -> new type mappings [#540](https://github.com/dotnet/upgrade-assistant/pull/540)
+- BinaryFormatterUnsafeDeserializer now works with Visual Basic [#544](https://github.com/dotnet/upgrade-assistant/pull/544)
 
 ### Fixed
 - VB projects that have a MyType property that requires Windows will now default to net5.0-windows [#529](https://github.com/dotnet/upgrade-assistant/pull/529)

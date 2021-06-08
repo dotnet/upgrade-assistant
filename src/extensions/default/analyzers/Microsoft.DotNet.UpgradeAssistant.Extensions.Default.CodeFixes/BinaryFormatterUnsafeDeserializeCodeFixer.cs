@@ -8,17 +8,21 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0012 CodeFix Provider")]
+    [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic, Name = "UA0012 CodeFix Provider")]
     public sealed class BinaryFormatterUnsafeDeserializeCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(BinaryFormatterUnsafeDeserializeAnalyzer.DiagnosticId);
+
+        /// <summary>
+        /// references to "UnsafeDeserialize" should be replaced with "UnsafeDeserialize" when the 2nd param to "UnsafeDeserialize" is null.
+        /// </summary>
+        public const string ReplacementMethod = "Deserialize";
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -35,21 +39,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
-            var node = root.FindNode(context.Span, false, true);
+            var node = root.FindNode(context.Span, findInsideTrivia: false, getInnermostNodeForTie: true);
 
-            if (node is null)
+            if (node is null || node.Parent is null)
             {
                 return;
             }
 
-            var invocationExpression = node.Parent as InvocationExpressionSyntax;
-            if (invocationExpression is null)
+            if (!node.Parent.IsInvocationExpression())
             {
                 return;
             }
 
-            var lastArg = invocationExpression.ArgumentList.Arguments.Last();
-            if (invocationExpression.ArgumentList.Arguments.Count != 2 || !lastArg.Expression.IsKind(CodeAnalysis.CSharp.SyntaxKind.NullLiteralExpression))
+            var invocationExpression = new GeneralInvocationExpression(node.Parent);
+            var arguments = invocationExpression.GetArguments();
+            var lastArgument = arguments.Last();
+            if (arguments.Count() != 2 || !lastArgument.IsNullLiteralExpression())
             {
                 // UnsafeDeserialize accepts 2 parameters. This code fix only applies when the 2nd param is null
                 return;
@@ -64,54 +69,49 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 context.Diagnostics);
         }
 
+        /// <summary>
+        /// Fixes SimpleMemberAccessExpressions e.g.
+        /// - new BinaryFormatter().UnsafeDeserialize(someVar, null)
+        /// - formatterVar.UnsafeDeserialize(anotherVar, null)
+        /// By replacing "UnsafeDeserialize" because it does not exist on .NET Core.
+        /// </summary>
+        /// <param name="document">a code document.</param>
+        /// <param name="node">expecting a simpleMemberAccessExpression of CS or VB syntax.</param>
+        /// <param name="cancellationToken">the cancellationToken.</param>
+        /// <returns>A document with the corrected method call.</returns>
         private static async Task<Document> ReplaceUnsafeDeserializationAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
-            if (node.Parent is null)
+            var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            if (documentRoot is null)
             {
                 return document;
             }
 
-            var memberExpression = node as MemberAccessExpressionSyntax;
-            if (memberExpression is null)
+            // use the document to build a language aware code generator
+            var generator = SyntaxGenerator.GetGenerator(document);
+
+            // the code fixer is only registered to handle code that derives from an invocationExpression
+            if (!node.Parent!.IsInvocationExpression())
             {
                 return document;
             }
 
-            var project = document.Project;
-            var slnEditor = new SolutionEditor(project.Solution);
+            var expression = new GeneralInvocationExpression(node.Parent!);
 
-            var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
-            var docRoot = docEditor.OriginalRoot;
+            // list of existing arguments
+            var args = expression.GetArguments();
 
-            ReplaceMethodCall(memberExpression, docEditor);
-            DropNullParameter(memberExpression, docEditor);
+            // the codefixer should only be triggered when we are replacing "UnsafeDeserialize"
+            // so we can assume that the node has at least one descendant when invoking .First()
+            var newMemberAccessExpression = generator.MemberAccessExpression(node.DescendantNodes().First(), ReplacementMethod);
 
-            docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
-            return docEditor.GetChangedDocument();
-        }
+            // create a new invocation
+            var invocation = generator.InvocationExpression(newMemberAccessExpression, args.First());
 
-        private static void ReplaceMethodCall(MemberAccessExpressionSyntax? memberExpression, DocumentEditor docEditor)
-        {
-            if (memberExpression is null)
-            {
-                return;
-            }
+            // replace the invocationExpression with the new one we just created
+            var newDocRoot = documentRoot.ReplaceNode(node.Parent!, invocation);
 
-            var parsedExpression = ParseExpression("Deserialize");
-            var identifierExpression = memberExpression.DescendantNodes().OfType<IdentifierNameSyntax>().Last();
-            docEditor.ReplaceNode(identifierExpression, parsedExpression);
-        }
-
-        private static void DropNullParameter(MemberAccessExpressionSyntax? memberExpression, DocumentEditor docEditor)
-        {
-            if (memberExpression is null || memberExpression.Parent is null)
-            {
-                return;
-            }
-
-            var argumentListSyntaxOriginal = memberExpression.Parent.DescendantNodes().OfType<ArgumentListSyntax>().Last();
-            var modified = argumentListSyntaxOriginal.WithArguments(argumentListSyntaxOriginal.Arguments.RemoveAt(1));
-            docEditor.ReplaceNode(argumentListSyntaxOriginal, modified);
+            return document.WithSyntaxRoot(newDocRoot);
         }
     }
 }

@@ -1,0 +1,31 @@
+﻿{
+  "ExtensionName": "Web",
+
+  "ConfigUpdater": {
+    "ConfigFilePaths": [
+      "web.config",
+      "Views\\web.config"
+    ]
+  },
+
+  "SourceUpdater": {
+    "AdditionalAnalyzerTexts": [
+      "WebTypeReplacements.typemap"
+    ]
+  },
+
+  "PackageUpdater": {
+    "PackageMapPath": "PackageMaps"
+  },
+
+  "TemplateInserter": {
+    "TemplateConfigFiles": [
+      "Templates\\CSharpWebAppTemplates\\WebAppTemplates.json",
+      "Templates\\VisualBasicWebAppTemplates\\WebAppTemplates.json"
+    ]
+  },
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.Web.dll"
+  ]
+}

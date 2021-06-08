@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
@@ -31,10 +30,22 @@ namespace Microsoft.DotNet.UpgradeAssistant
             //        with json serialized files.
             services.Services.AddTransient<IEnumerable<AdditionalText>>(sp =>
             {
-                var options = sp.GetRequiredService<IOptions<ICollection<SourceUpdaterOptions>>>().Value;
-                var textPaths = options.SelectMany(o => o.AdditionalAnalyzerTexts);
-                return textPaths.Select(p => new AdditionalFileText(p));
+                var options = sp.GetRequiredService<IOptions<ICollection<SourceUpdaterOptions>>>();
+
+                return ExpandAdditionalTexts(options.Value);
             });
+        }
+
+        private static IEnumerable<AdditionalText> ExpandAdditionalTexts(IEnumerable<SourceUpdaterOptions> options)
+        {
+            foreach (var option in options)
+            {
+                foreach (var text in option.AdditionalAnalyzerTexts)
+                {
+                    var fileInfo = option.Files.GetFileInfo(text);
+                    yield return new FileInfoAdditionalText(fileInfo);
+                }
+            }
         }
     }
 }

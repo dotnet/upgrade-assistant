@@ -4,6 +4,8 @@
 using System;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration;
+using Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -20,6 +22,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.Services.AddUpgradeStep<ConfigUpdaterStep>();
             services.AddExtensionOption<ConfigUpdaterOptions>(ConfigUpdaterOptionsSectionName);
+            services.Services.AddDefaultConfigUpdaters();
+        }
+
+        private static void AddDefaultConfigUpdaters(this IServiceCollection services)
+        {
+            services.AddScoped<IUpdater<ConfigFile>, AppSettingsConfigUpdater>();
+            services.AddScoped<IUpdater<ConfigFile>, ConnectionStringsConfigUpdater>();
+            services.AddScoped<IUpdater<ConfigFile>, UnsupportedSectionConfigUpdater>();
         }
     }
 }

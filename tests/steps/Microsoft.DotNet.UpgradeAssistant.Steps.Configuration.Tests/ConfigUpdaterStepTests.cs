@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -28,9 +29,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
                 RegisterConfigUpdaters(cfg, 0, 2);
             });
 
-            mock.Mock<IOptions<ConfigUpdaterOptions>>().Setup(o => o.Value).Returns(new ConfigUpdaterOptions
+            mock.Mock<IOptions<ICollection<ConfigUpdaterOptions>>>().Setup(o => o.Value).Returns(new[]
             {
-                ConfigFilePaths = new[] { "a", "b" }
+                new ConfigUpdaterOptions
+                {
+                    ConfigFilePaths = new[] { "a", "b" }
+                }
             });
 
             // Act
@@ -58,9 +62,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         [Fact]
         public void NegativeCtorTests()
         {
-            Assert.Throws<ArgumentNullException>("configUpdaters", () => new ConfigUpdaterStep(null!, new Mock<IOptions<ConfigUpdaterOptions>>().Object, new NullLogger<ConfigUpdaterStep>()));
+            Assert.Throws<ArgumentNullException>("configUpdaters", () => new ConfigUpdaterStep(null!, new Mock<IOptions<ICollection<ConfigUpdaterOptions>>>().Object, new NullLogger<ConfigUpdaterStep>()));
             Assert.Throws<ArgumentNullException>("configUpdaterOptions", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), null!, new NullLogger<ConfigUpdaterStep>()));
-            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new Mock<IOptions<ConfigUpdaterOptions>>().Object, null!));
+            Assert.Throws<ArgumentNullException>("logger", () => new ConfigUpdaterStep(Enumerable.Empty<IUpdater<ConfigFile>>(), new Mock<IOptions<ICollection<ConfigUpdaterOptions>>>().Object, null!));
         }
 
         [Theory]
@@ -179,9 +183,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
                 RegisterConfigUpdaters(cfg, completeConfigUpdaterCount, incompleteConfigUpdaterCount);
             });
 
-            mock.Mock<IOptions<ConfigUpdaterOptions>>().Setup(o => o.Value).Returns(new ConfigUpdaterOptions
+            mock.Mock<IOptions<ICollection<ConfigUpdaterOptions>>>().Setup(o => o.Value).Returns(new[]
             {
-                ConfigFilePaths = configPaths
+                new ConfigUpdaterOptions
+                {
+                    ConfigFilePaths = configPaths
+                }
             });
 
             var project = mock.Mock<IProject>();

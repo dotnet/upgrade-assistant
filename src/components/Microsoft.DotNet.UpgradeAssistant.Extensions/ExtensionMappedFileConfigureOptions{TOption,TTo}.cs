@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     foreach (var match in other.Files.GetFiles(path))
                     {
                         var fileInfo = other.Files.GetFileInfo(match.Path);
-                        var directory = Path.GetDirectoryName(match.Path);
+                        var directory = Path.GetDirectoryName(match.Path)!;
                         var newFileProvider = new SubFileProvider(other.Files, directory);
 
                         foreach (var obj in ReadAll(fileInfo))

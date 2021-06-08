@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.ConfigUpdaters;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,32 +24,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(services));
             }
 
-            AddUpgradeSteps(services, services.Configuration);
-            AddConfigUpdaters(services.Services);
+            AddUpgradeSteps(services);
             AddAnalyzersAndCodeFixProviders(services.Services);
             AddPackageReferenceAnalyzers(services.Services);
         }
 
-        private static void AddUpgradeSteps(IExtensionServiceCollection services, IConfiguration configuration)
+        private static void AddUpgradeSteps(IExtensionServiceCollection services)
         {
             services.Services.AddBackupStep();
             services.AddConfigUpdaterStep();
             services.AddPackageUpdaterStep();
-            services.Services.AddProjectFormatSteps()
-                .Bind(configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
+            services.AddProjectFormatSteps()
+                .Bind(services.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
             services.Services.AddSolutionSteps();
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
-            services.Services.AddRazorUpdaterStep();
-        }
-
-        // This extension only adds default config updaters, but other extensions
-        // can register additional updaters, as needed.
-        private static void AddConfigUpdaters(IServiceCollection services)
-        {
-            services.AddScoped<IUpdater<ConfigFile>, AppSettingsConfigUpdater>();
-            services.AddScoped<IUpdater<ConfigFile>, UnsupportedSectionConfigUpdater>();
-            services.AddScoped<IUpdater<ConfigFile>, WebNamespaceConfigUpdater>();
         }
 
         // This extension only adds default analyzers and code fix providers, but other extensions
@@ -90,7 +78,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<IDependencyAnalyzer, TargetCompatibilityReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, UpgradeAssistantReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, WindowsCompatReferenceAnalyzer>();
-            services.AddTransient<IDependencyAnalyzer, NewtonsoftReferenceAnalyzer>();
         }
     }
 }
