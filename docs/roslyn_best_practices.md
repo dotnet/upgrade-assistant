@@ -41,7 +41,7 @@ Expect your analyzer to be invoked repeatedly and asynchronously. Design your an
 **Do**
 * Pass information between methods via method arguments.
 
-**Do not**
+**Do Not**
 * Do not use member variables to store instance data.
 
 ### 3. Use abstractions and focus on the intent of your Analyzer rather than Roslyn
@@ -95,13 +95,13 @@ When searching for patterns of code it is common to perform string comparisons. 
 **Should Not**
 * Try to avoid `ToFullString` and solutions that require awareness of trivia.
 
-### 6. Report the diagnostic only on parts of code that would be changed by a code fixer.
+### 6. Report the diagnostic only on the part of code that needs to change.
  This is a better communication to the end-user when running in Visual Studio and it makes it easier to write the Code Fixer.
 
 ### 7. Do not use async methods in the synchronous context of an Analyzer. 
 If the only methods available are async, you should find another way to implement your analyzer to prevent runtime issues.
 
-**Do not**
+**Do Not**
 * Use `.Result` or `Wait()` in a Roslyn Analyzer. Forcing asynchronous code to behave synchronously can result in timing issues that are hard to debug and thread starvation.
 
 ## Best Practices for Roslyn Code Fixers
@@ -130,7 +130,7 @@ Learn more about Async best practices by reading [Async/Await - Best Practices i
 **Do**
 * Leverage the CancellationToken to interrupt processing when cancellation has been requested.
 
-**Do not**
+**Do Not**
 * Do not force async code to run synchronously. Avoid calling `.Result` and prefer to use await as needed when working in the code fixer construct.
 
 ### 5. When using CodeAction.Create prefer Document over Solution
