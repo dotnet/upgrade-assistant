@@ -133,10 +133,8 @@ Learn more about Async best practices by reading [Async/Await - Best Practices i
 **Do Not**
 * Do not force async code to run synchronously. Avoid calling `.Result` and prefer to use await as needed when working in the code fixer construct.
 
-### 5. When using CodeAction.Create prefer Document over Solution
-Minimize the impact of running a code fixer by using the smallest possible scope. 
-
-When writing your CodeFixer you need to create a CodeAction to resolve the diagnostic. If your code fixer only changes a single document, then your CodeAction should return a document.
+### 5. Minimize the impact by using the smallest possible scope
+When writing your code fixer you need to create a `CodeAction` to resolve the diagnostic. If your code fixer only changes a single document, then your `CodeAction` should return a document.
 
 **Should**
 * Prefer `Task<Document>` when possible and use `Task<Solution>` as needed when returning a result from a Code Fixer.
