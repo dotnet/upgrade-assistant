@@ -134,7 +134,13 @@ An example TemplateConfig.json file looks like this:
       "Keywords": []
     }
   ],
-  "UpdateWebAppsOnly": true
+  "TemplateOutputType": [
+    "Exe"
+  ],
+  "TemplateLanguage": "CSharp",
+  "TemplateAppliesTo": [
+    "AspNetCore"
+  ]
 }
 ```
 
