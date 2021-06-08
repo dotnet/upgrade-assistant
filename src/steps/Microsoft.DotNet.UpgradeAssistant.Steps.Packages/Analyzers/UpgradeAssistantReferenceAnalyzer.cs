@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -46,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // If the project doesn't include a reference to the analyzer package, mark it for addition
             if (!state.Packages.Any(r => AnalyzerPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, project.TargetFrameworks, true, token).ConfigureAwait(false);
+                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, targetframeworks, true, token).ConfigureAwait(false);
 
                 if (analyzerPackage is not null)
                 {

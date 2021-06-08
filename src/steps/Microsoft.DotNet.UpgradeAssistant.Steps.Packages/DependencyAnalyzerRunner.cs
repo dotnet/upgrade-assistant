@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _logger = logger;
         }
 
-        public async Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, CancellationToken token)
+        public async Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, CancellationToken token)
         {
             if (projectRoot is null)
             {
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 _logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
                 try
                 {
-                    await analyzer.AnalyzeAsync(projectRoot, analysisState, token).ConfigureAwait(false);
+                    await analyzer.AnalyzeAsync(projectRoot, targetframeworks, analysisState, token).ConfigureAwait(false);
                 }
 #pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)

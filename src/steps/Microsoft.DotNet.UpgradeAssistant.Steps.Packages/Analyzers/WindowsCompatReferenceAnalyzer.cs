@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public string Name => "Windows Compatibility Pack Analyzer";
 
-        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -42,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!project.TargetFrameworks.Any(tfm => tfm.IsWindows))
+            if (!targetframeworks.Any(tfm => tfm.IsWindows))
             {
                 return;
             }
@@ -53,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return;
             }
 
-            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, project.TargetFrameworks, false, token).ConfigureAwait(false);
+            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, targetframeworks, false, token).ConfigureAwait(false);
 
             if (latestVersion is null)
             {

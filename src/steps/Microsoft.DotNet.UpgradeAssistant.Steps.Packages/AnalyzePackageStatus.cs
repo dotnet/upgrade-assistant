@@ -11,14 +11,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     public class AnalyzePackageStatus : IAnalyzeResultProvider
     {
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
+        private readonly ITargetFrameworkSelector _tfmSelector;
         private IDependencyAnalysisState? _analysisState;
 
         private ILogger Logger { get; }
 
         public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
+            ITargetFrameworkSelector tfmSelector,
             ILogger<AnalyzePackageStatus> logger)
         {
             Logger = logger;
+            _tfmSelector = tfmSelector;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
         }
@@ -35,9 +38,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             foreach (var project in projects)
             {
+                var targetTfm = await _tfmSelector.SelectTargetFrameworkAsync(project, token).ConfigureAwait(false);
+                var targetframeworks = new List<TargetFrameworkMoniker>
+                {
+                        targetTfm
+                };
+
                 try
                 {
-                    _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, token).ConfigureAwait(false);
+                    _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, targetframeworks.AsReadOnly(), token).ConfigureAwait(false);
                     if (!_analysisState.IsValid)
                     {
                         Logger.LogError($"Package analysis failed");
@@ -50,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-                Logger.LogInformation("Package Analysis for {ProjectPath}", project.FileInfo.Name);
+                Logger.LogInformation("Package Analysis for {ProjectPath} for the target TFM of {TargetTFM}", new object[] { project.FileInfo.Name, targetTfm});
 
                 if (_analysisState is null || !_analysisState.AreChangesRecommended)
                 {
