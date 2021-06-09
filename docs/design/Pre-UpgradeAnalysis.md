@@ -31,6 +31,8 @@ There are scenarios where projects depend on loose-assemblies (GAC, checked-in b
 - Provide option for users to download a compressed indexed cache of binary hash -> nuget package mapping data on demand if the solution being analyzed has loose-assemblies present.
 - The lazy-downloadable cache will be kept up-to-date with regular imports of all publicly available nuget package data from loose assembly DB.
 
+Detailed design [here](../Chem_Integration.md)
+
 ## Inter-Project dependencies:
 Upgrade-Assistant has built-in capability to determine inter-project dependencies in a solution and calculate the order in which it is recommended to start upgrade process.
 

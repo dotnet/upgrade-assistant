@@ -2,21 +2,26 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
+    [DebuggerDisplay("{Name}, {Location}")]
     public sealed class ExtensionInstance : IDisposable
     {
+        private const string ExtensionServiceProvidersSectionName = "ExtensionServiceProviders";
         public const string ManifestFileName = "ExtensionManifest.json";
 
         private const string ExtensionNamePropertyName = "ExtensionName";
         private const string DefaultExtensionName = "Unknown";
 
-        private readonly Lazy<AssemblyLoadContext> _alc;
+        private readonly Lazy<AssemblyLoadContext>? _alc;
 
         public ExtensionInstance(IFileProvider fileProvider, string location)
         {
@@ -24,18 +29,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             Location = location;
             Configuration = CreateConfiguration(fileProvider);
             Name = GetName(Configuration, location);
-            _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(this));
+
+            var serviceProviders = GetOptions<string[]>(ExtensionServiceProvidersSectionName);
+
+            if (serviceProviders is not null)
+            {
+                _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(this, serviceProviders));
+            }
         }
 
         public string Name { get; }
 
-        public bool HasAssemblyLoadContext => _alc.IsValueCreated;
+        public IEnumerable<IExtensionServiceProvider> GetServiceProviders()
+        {
+            if (_alc is null)
+            {
+                return Enumerable.Empty<IExtensionServiceProvider>();
+            }
 
-        /// <summary>
-        /// Gets the <see cref="AssemblyLoadContext"/> for the extension. Guard calls with <see cref="HasAssemblyLoadContext"/> first,
-        /// otherwise it may trigger creation of the load context if it is not needed.
-        /// </summary>
-        public AssemblyLoadContext LoadContext => _alc.Value;
+            return _alc.Value.Assemblies.SelectMany(assembly => assembly
+                .GetTypes()
+                .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
+                .Select(t => Activator.CreateInstance(t))
+                .Cast<IExtensionServiceProvider>());
+        }
 
         public string Location { get; }
 
@@ -74,7 +91,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     {
                         var provider = new ZipFileProvider(e);
 
-                        return new ExtensionInstance(new ZipFileProvider(e), e);
+                        try
+                        {
+                            return new ExtensionInstance(provider, e);
+                        }
+
+                        // If the manifest file couldn't be found, let's try looking at one layer deep with the name
+                        // of the file as the first folder. This is what happens when you create a zip file from a folder
+                        // with Windows or 7-zip
+                        catch (UpgradeException ex) when (ex.InnerException is FileNotFoundException)
+                        {
+                            var subpath = Path.GetFileNameWithoutExtension(e);
+                            var subprovider = new SubFileProvider(provider, subpath);
+                            return new ExtensionInstance(subprovider, e);
+                        }
                     }
                 }
                 else
@@ -106,8 +136,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         }
 
         private static IConfiguration CreateConfiguration(IFileProvider fileProvider)
-            => new ConfigurationBuilder()
-                .AddJsonFile(fileProvider, ManifestFileName, optional: false, reloadOnChange: false)
-                .Build();
+        {
+            try
+            {
+                return new ConfigurationBuilder()
+                    .AddJsonFile(fileProvider, ManifestFileName, optional: false, reloadOnChange: false)
+                    .Build();
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new UpgradeException("Could not find manifest file", e);
+            }
+        }
     }
 }

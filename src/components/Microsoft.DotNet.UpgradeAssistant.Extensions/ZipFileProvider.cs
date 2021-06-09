@@ -36,6 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public IDirectoryContents GetDirectoryContents(string subpath)
         {
+            subpath = NormalizeZipPath(subpath);
             var list = new List<IFileInfo>();
 
             foreach (var entry in _archive.Entries)
@@ -56,9 +57,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new ListDirectoryContents(list);
         }
 
+        private static string NormalizeZipPath(string path) => path.Replace('\\', '/');
+
         public IFileInfo GetFileInfo(string subpath)
         {
-            var entry = _archive.GetEntry(subpath);
+            var entry = _archive.GetEntry(NormalizeZipPath(subpath));
 
             if (entry is null)
             {

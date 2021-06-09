@@ -2,9 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -14,10 +16,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         private readonly ExtensionInstance _extension;
 
-        public ExtensionAssemblyLoadContext(ExtensionInstance extension)
+        public ExtensionAssemblyLoadContext(ExtensionInstance extension, string[] assemblies)
             : base(ALC_Prefix + extension.Name)
         {
             _extension = extension;
+            Load(extension, assemblies);
+        }
+
+        private void Load(ExtensionInstance extension, string[] assemblies)
+        {
+            foreach (var path in assemblies)
+            {
+                try
+                {
+                    var fileInfo = extension.FileProvider.GetFileInfo(path);
+
+                    if (!fileInfo.Exists)
+                    {
+                        Console.WriteLine($"ERROR: Could not find extension service provider assembly {path} in extension {extension.Name}");
+                        continue;
+                    }
+
+                    using var assemblyStream = GetSeekableStream(fileInfo);
+
+                    LoadFromStream(assemblyStream);
+                }
+                catch (FileLoadException)
+                {
+                }
+                catch (BadImageFormatException)
+                {
+                }
+            }
         }
 
         protected override Assembly? Load(AssemblyName assemblyName)
@@ -35,14 +65,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             if (dllFile.Exists)
             {
-                using var dllStream = dllFile.CreateReadStream();
+                using var dllStream = GetSeekableStream(dllFile);
 
                 var pdb = $"{assemblyName.Name}.pdb";
                 var pdbFile = _extension.FileProvider.GetFileInfo(pdb);
 
                 if (pdbFile.Exists)
                 {
-                    using var pdbStream = pdbFile.CreateReadStream();
+                    using var pdbStream = GetSeekableStream(pdbFile);
                     return LoadFromStream(dllStream, pdbStream);
                 }
                 else
@@ -52,6 +82,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             return null;
+        }
+
+        private static Stream GetSeekableStream(IFileInfo file)
+        {
+            var assemblyStream = file.CreateReadStream();
+
+            if (assemblyStream.CanSeek)
+            {
+                return assemblyStream;
+            }
+
+            var ms = new MemoryStream();
+            assemblyStream.CopyTo(ms);
+            ms.Position = 0;
+            assemblyStream.Dispose();
+            return ms;
         }
     }
 }
