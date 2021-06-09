@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
         public string Name => "Windows Compatibility Pack Analyzer";
 
-        public async Task AnalyzeAsync(IProject project, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, IDependencyAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!targetframeworks.Any(tfm => tfm.IsWindows))
+            if (!state.TargetFrameworks.Any(tfm => tfm.IsWindows))
             {
                 return;
             }
@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return;
             }
 
-            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, targetframeworks, false, token).ConfigureAwait(false);
+            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, state.TargetFrameworks, false, token).ConfigureAwait(false);
 
             if (latestVersion is null)
             {

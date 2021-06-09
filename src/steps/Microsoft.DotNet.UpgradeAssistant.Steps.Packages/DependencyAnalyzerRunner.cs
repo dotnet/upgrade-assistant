@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             await _packageRestorer.RestorePackagesAsync(context, projectRoot, token).ConfigureAwait(false);
-            var analysisState = new DependencyAnalysisState(projectRoot, projectRoot.NuGetReferences);
+            var analysisState = new DependencyAnalysisState(projectRoot, projectRoot.NuGetReferences, targetframeworks);
 
             // Iterate through all package references in the project file
             foreach (var analyzer in _packageAnalyzers)
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 _logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
                 try
                 {
-                    await analyzer.AnalyzeAsync(projectRoot, targetframeworks, analysisState, token).ConfigureAwait(false);
+                    await analyzer.AnalyzeAsync(projectRoot, analysisState, token).ConfigureAwait(false);
                 }
 #pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)

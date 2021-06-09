@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             var analyzer = mock.Create<WebSdkCleanupAnalyzer>();
 
             // Act
-            await analyzer.AnalyzeAsync(project, project.TargetFrameworks, state.Object, CancellationToken.None).ConfigureAwait(true);
+            await analyzer.AnalyzeAsync(project, state.Object, CancellationToken.None).ConfigureAwait(true);
 
             // Assert
             foreach (var expected in expectedReferencesToRemove)
@@ -82,8 +82,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             var analyzer = mock.Create<WebSdkCleanupAnalyzer>();
 
             // Act / Assert
-            await Assert.ThrowsAsync<ArgumentNullException>("state", () => analyzer.AnalyzeAsync(project, project.TargetFrameworks, null!, CancellationToken.None)).ConfigureAwait(true);
-            await Assert.ThrowsAsync<InvalidOperationException>(() => analyzer.AnalyzeAsync(null!, null!, state.Object, CancellationToken.None)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<ArgumentNullException>("state", () => analyzer.AnalyzeAsync(project, null!, CancellationToken.None)).ConfigureAwait(true);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => analyzer.AnalyzeAsync(null!, state.Object, CancellationToken.None)).ConfigureAwait(true);
         }
 
         private static IProject GetMockProjectAndPackageState(AutoMock mock, string? sdk = null, IEnumerable<Reference>? frameworkReferences = null)

@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task AnalyzeAsync(IProject project, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, IDependencyAnalysisState state, CancellationToken token)
+        public Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (state is null)
             {

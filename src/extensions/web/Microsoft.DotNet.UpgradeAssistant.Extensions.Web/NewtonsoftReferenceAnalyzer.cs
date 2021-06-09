@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
         }
 
-        public async Task AnalyzeAsync(IProject project, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, IDependencyAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             // This reference only needs added to ASP.NET Core exes
             if (!(components.HasFlag(ProjectComponents.AspNetCore)
                 && project.OutputType == ProjectOutputType.Exe
-                && !targetframeworks.Any(tfm => _tfmComparer.Compare(tfm, TargetFrameworkMoniker.NetCoreApp30) < 0)))
+                && !state.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, TargetFrameworkMoniker.NetCoreApp30) < 0)))
             {
                 return;
             }
@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
             if (!state.Packages.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, targetframeworks, false, token).ConfigureAwait(false);
+                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, state.TargetFrameworks, false, token).ConfigureAwait(false);
 
                 if (newtonsoftPackage is not null)
                 {

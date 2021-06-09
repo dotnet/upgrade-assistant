@@ -16,9 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
         /// the breaking change risk of this action.
         /// </summary>
         /// <param name="project">The project whose dependencies should be analyzed.</param>
-        /// <param name="targetframeworks">The targetframworkmonikers applicable for the project.</param>
         /// <param name="state">The current analysis state which will be updated.</param>
         /// <param name="token">The token used to gracefully cancel this request.</param>
-        Task AnalyzeAsync(IProject project, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, IDependencyAnalysisState state, CancellationToken token);
+        Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token);
     }
 }

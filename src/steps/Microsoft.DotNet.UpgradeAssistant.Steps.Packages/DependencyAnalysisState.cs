@@ -2,13 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public sealed class DependencyAnalysisState : IDependencyAnalysisState
     {
-        public DependencyAnalysisState(IProject project, INuGetReferences nugetReferences)
+        public DependencyAnalysisState(IProject project, INuGetReferences nugetReferences, IReadOnlyCollection<TargetFrameworkMoniker> targetFrameworks)
         {
             if (project is null)
             {
@@ -24,6 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             Packages = new DependencyCollection<NuGetReference>(initial: nugetReferences.PackageReferences, setRisk: SetRisk);
             References = new DependencyCollection<Reference>(project.References, SetRisk);
             IsValid = true;
+            TargetFrameworks = targetFrameworks;
             void SetRisk(BuildBreakRisk risk)
             {
                 Risk = (BuildBreakRisk)Math.Max((int)Risk, (int)risk);
@@ -47,5 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         public bool AreChangesRecommended => FrameworkReferences.HasChanges || Packages.HasChanges || References.HasChanges;
 
         public bool IsValid { get; set; }
+
+        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks { get; set; }
     }
 }

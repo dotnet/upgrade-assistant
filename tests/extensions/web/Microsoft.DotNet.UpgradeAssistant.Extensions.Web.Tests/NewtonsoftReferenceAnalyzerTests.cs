@@ -37,11 +37,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 
             var packageState = new Mock<IDependencyAnalysisState>();
             packageState.Setup(p => p.Packages).Returns(packages.Object);
+            packageState.Setup(p => p.TargetFrameworks).Returns(project.Object.TargetFrameworks);
 
             var packageLoader = CreatePackageLoader(mock);
 
             // Act
-            await analyzer.AnalyzeAsync(project.Object, project.Object.TargetFrameworks, packageState.Object, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
             packages.Verify(p => p.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None));
@@ -71,7 +72,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
                 .Returns(-1);
 
             // Act
-            await analyzer.AnalyzeAsync(project.Object, project.Object.TargetFrameworks, packageState.Object, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
             packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
@@ -98,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Library);
 
             // Act
-            await analyzer.AnalyzeAsync(project.Object, project.Object.TargetFrameworks, packageState.Object, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
             packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
@@ -125,7 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.Wpf));
 
             // Act
-            await analyzer.AnalyzeAsync(project.Object, project.Object.TargetFrameworks, packageState.Object, default).ConfigureAwait(false);
+            await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
             packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);

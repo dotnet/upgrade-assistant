@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task AnalyzeAsync(IProject project, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, IDependencyAnalysisState state, CancellationToken token)
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
             if (project is null)
             {
@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             }
 
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
-            var packageMaps = targetframeworks.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
+            var packageMaps = state.TargetFrameworks.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
 
             foreach (var packageReference in state.Packages)
             {
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 {
                     _logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
                     state.Packages.Remove(packageReference, BuildBreakRisk.Medium);
-                    await AddNetCoreReferences(map, targetframeworks, state, project, token).ConfigureAwait(false);
+                    await AddNetCoreReferences(map, state.TargetFrameworks, state, project, token).ConfigureAwait(false);
                 }
             }
 
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 {
                     _logger.LogInformation("Marking assembly reference {ReferenceName} for removal based on package mapping configuration {PackageMapSet}", reference.Name, map.PackageSetName);
                     state.References.Remove(reference, BuildBreakRisk.Medium);
-                    await AddNetCoreReferences(map, targetframeworks, state, project, token).ConfigureAwait(false);
+                    await AddNetCoreReferences(map, state.TargetFrameworks, state, project, token).ConfigureAwait(false);
                 }
             }
         }
