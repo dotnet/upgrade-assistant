@@ -2,7 +2,7 @@
 
 The Upgrade Assistant has an extension system that make it easy for users to customize many of the upgrade steps (or add new upgrade steps) without having to rebuild the tool. There are both code and non-code ways of extending the tool.
 
-- [Create](#create)
+- [Create Extension](#create-extension)
 - [Extension Service Providers](#extension-service-providers)
   - [Registering Services Configuration](#registering-services-configuration)
   - [Accessing extension files](#accessing-extension-files)
@@ -13,7 +13,7 @@ The Upgrade Assistant has an extension system that make it easy for users to cus
 - [Dependency analyzers](#dependency-analyzers)
 - [Templates](#templates)
 
-## Create
+## Create Extension
 To create an Upgrade Assistant extension, you will need to start with a manifest file called `ExtensionManifest.json`. The manifest file contains pointers to the paths (relative to the manifest file) where the different extension items can be found. The extension manifest is required, but all of its elements are optional and it is only necessary to include the ones that are useful for the extension the manifest is describing. An outline of possible extension manifest elements is:
 
 ```json
