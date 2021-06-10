@@ -71,6 +71,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             comparer.Setup(comparer => comparer.Compare(It.IsAny<TargetFrameworkMoniker>(), It.IsAny<TargetFrameworkMoniker>()))
                 .Returns(-1);
 
+            packageState.Setup(p => p.TargetFrameworks).Returns(project.Object.TargetFrameworks);
+
             // Act
             await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
