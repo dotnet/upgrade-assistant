@@ -50,6 +50,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public bool IsValid { get; set; }
 
-        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks { get; set; }
+        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks { get; }
     }
 }
