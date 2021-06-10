@@ -14,10 +14,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public CanLoadProjectFile(ILogger<CanLoadProjectFile> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string Id => nameof(CanLoadProjectFile);
+
+        public bool IsBypassable => false;
 
         public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
         {

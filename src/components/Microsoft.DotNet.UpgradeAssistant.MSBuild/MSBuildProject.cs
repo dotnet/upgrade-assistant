@@ -90,10 +90,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token)
             => _componentIdentifier.GetComponentsAsync(this, token);
 
+        public IEnumerable<string> FindFiles(ProjectItemMatcher matcher)
+        {
+            // TODO: code review - do we want to just flip the parameter order and make the itemType an optional parameter?
+            return FindFilesByProjectType(null, matcher);
+        }
+
         public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
         {
+            return FindFilesByProjectType(itemType, matcher);
+        }
+
+        private IEnumerable<string> FindFilesByProjectType(ProjectItemType? itemType, ProjectItemMatcher matcher)
+        {
             var items = Project.Items
-                .Where<MBuild.ProjectItem>(i => i.ItemType.Equals(itemType.Name, StringComparison.Ordinal) && matcher.Match(i.EvaluatedInclude));
+                .Where<MBuild.ProjectItem>(i => matcher.Match(i.EvaluatedInclude));
+
+            if (itemType is not null)
+            {
+                items = items.Where(i => i.ItemType.Equals(itemType.Name, StringComparison.Ordinal));
+            }
 
             foreach (var item in items)
             {

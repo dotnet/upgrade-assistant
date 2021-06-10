@@ -14,10 +14,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public CentralPackageManagementCheck(ILogger<CentralPackageManagementCheck> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string Id => nameof(CentralPackageManagementCheck);
+
+        public bool IsBypassable => false;
 
         public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
         {

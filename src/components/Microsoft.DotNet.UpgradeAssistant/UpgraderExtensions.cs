@@ -30,6 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeReadyCheck, CanLoadProjectFile>();
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
             services.AddTransient<IUpgradeReadyCheck, TargetFrameworkCheck>();
+            services.AddTransient<IUpgradeReadyCheck, VisualBasicRazorTemplateCheck>();
         }
 
         private static void AddTargetFrameworkSelectors(this IServiceCollection services)

@@ -23,5 +23,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <param name="token">A cancellation token.</param>
         /// <returns><c>true</c> if the project is ready, <c>false</c> if it is not.</returns>
         Task<bool> IsReadyAsync(IProject project, CancellationToken token);
+
+        /// <summary>
+        /// Gets a value indicating whether this check can be bypassed using the ReadinessAcknowledgement option.
+        /// False should represent ReadyChecks that validate requirements customer's cannot bypass.
+        /// True should represent ReadyChecks that can be bypassed.
+        /// </summary>
+        // TODO: code review - compare difference of changing the interface to upgrading to netstandard2.1 for default interface implementations
+        bool IsBypassable { get; }
     }
 }

@@ -15,10 +15,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public TargetFrameworkCheck(ILogger<TargetFrameworkCheck> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string Id => nameof(TargetFrameworkCheck);
+
+        public bool IsBypassable => false;
 
         public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
         {
