@@ -39,14 +39,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             foreach (var project in projects)
             {
                 var targetTfm = await _tfmSelector.SelectTargetFrameworkAsync(project, token).ConfigureAwait(false);
-                var targetframeworks = new List<TargetFrameworkMoniker>
+                var targetframeworks = new TargetFrameworkMoniker[]
                 {
                         targetTfm
                 };
 
                 try
                 {
-                    _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, targetframeworks.AsReadOnly(), token).ConfigureAwait(false);
+                    _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, targetframeworks, token).ConfigureAwait(false);
                     if (!_analysisState.IsValid)
                     {
                         Logger.LogError($"Package analysis failed");
