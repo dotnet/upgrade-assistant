@@ -50,10 +50,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var currentTFM = project.TargetFrameworks;
-
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
-            var packageMaps = currentTFM.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
+            var packageMaps = state.TargetFrameworks.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
 
             foreach (var packageReference in state.Packages)
             {
@@ -108,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 var packageToAdd = newPackage;
                 if (packageToAdd.HasWildcardVersion)
                 {
-                    var reference = await _packageLoader.GetLatestVersionAsync(packageToAdd.Name, project.TargetFrameworks, false, token).ConfigureAwait(false);
+                    var reference = await _packageLoader.GetLatestVersionAsync(packageToAdd.Name, state.TargetFrameworks, false, token).ConfigureAwait(false);
 
                     if (reference is not null)
                     {
