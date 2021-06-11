@@ -61,13 +61,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         public IAsyncEnumerable<NuGetReference> GetTransitivePackageReferencesAsync(TargetFrameworkMoniker tfm, CancellationToken token)
-            => GetAllDependenciesAsync(tfm, token).Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
+            => GetAllPackageDependenciesAsync(tfm, token).Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
 
         public ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token)
-            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token);
+            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token);
 
         public ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token)
-            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token);
+            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token);
 
         private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
@@ -104,10 +104,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return true;
         }
 
-        private ValueTask<bool> ContainsDependencyAsync(TargetFrameworkMoniker tfm, Func<PackageDependency, bool> filter, CancellationToken token)
-            => GetAllDependenciesAsync(tfm, token).AnyAsync(l => l.Dependencies.Any(d => filter(d)), token);
+        private ValueTask<bool> ContainsPackageDependencyAsync(TargetFrameworkMoniker tfm, Func<PackageDependency, bool> filter, CancellationToken token)
+            => GetAllPackageDependenciesAsync(tfm, token).AnyAsync(l => l.Dependencies.Any(d => filter(d)), token);
 
-        private async IAsyncEnumerable<LockFileTargetLibrary> GetAllDependenciesAsync(TargetFrameworkMoniker tfm, [EnumeratorCancellation] CancellationToken token)
+        private async IAsyncEnumerable<LockFileTargetLibrary> GetAllPackageDependenciesAsync(TargetFrameworkMoniker tfm, [EnumeratorCancellation] CancellationToken token)
         {
             if (!IsRestored)
             {
