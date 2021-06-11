@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public bool IsSdk =>
             ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparison.OrdinalIgnoreCase);
 
-        public IEnumerable<string> Imports => ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
+        public ICollection<string> Imports => ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project)).ToList();
 
         public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this, _comparer).SetTargetFramework(tfm);
 
@@ -194,5 +194,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             Path.IsPathFullyQualified(path)
             ? path
             : Path.Combine(projectDir, path);
+
+        public void AddImports(string item)
+        {
+            if (!string.IsNullOrEmpty(item))
+            {
+                Imports.Add(item);
+            }
+        }
+
+        public void RemoveImports(string item)
+        {
+            if (Imports.Contains(item))
+            {
+                Imports.Remove(item);
+            }
+        }
     }
 }

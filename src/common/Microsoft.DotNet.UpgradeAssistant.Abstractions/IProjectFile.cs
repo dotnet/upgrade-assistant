@@ -25,6 +25,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void RemoveReferences(IEnumerable<Reference> references);
 
+        void AddImports(string item);
+
+        void RemoveImports(string item);
+
         ValueTask SaveAsync(CancellationToken token);
 
         void Simplify();
@@ -41,6 +45,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void SetTFM(TargetFrameworkMoniker targetTFM);
 
-        IEnumerable<string> Imports { get; }
+        ICollection<string> Imports { get; }
     }
 }
