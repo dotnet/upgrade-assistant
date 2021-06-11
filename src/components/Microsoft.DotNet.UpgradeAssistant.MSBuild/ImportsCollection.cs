@@ -1,0 +1,85 @@
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Build.Construction;
+
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+{
+    public class ImportsCollection : ICollection<string>
+    {
+        private readonly ProjectRootElement _projectRoot;
+
+        public ImportsCollection(ProjectRootElement projectRoot)
+        {
+            _projectRoot = projectRoot;
+        }
+
+        public bool Contains(string item)
+        {
+            if (_projectRoot.Imports.Any(p => item.Equals(p.Project, StringComparison.Ordinal)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void Add(string item)
+        {
+            if (!Contains(item))
+            {
+                _projectRoot.AddImport(item);
+            }
+        }
+
+        public void Clear()
+        {
+            _projectRoot.Imports.Clear();
+        }
+
+        public int Count
+        {
+            get
+            {
+                return _projectRoot.Imports.Count;
+            }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
+        public bool Remove(string item)
+        {
+            var element = _projectRoot.Imports.FirstOrDefault(p => item.Equals(p.Project, StringComparison.Ordinal));
+
+            if (element != null)
+            {
+                element.RemoveElement();
+                return true;
+            }
+
+            return false;
+        }
+
+        public void CopyTo(string[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            return (IEnumerator<string>)_projectRoot.Imports.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _projectRoot.Imports.GetEnumerator();
+        }
+    }
+}

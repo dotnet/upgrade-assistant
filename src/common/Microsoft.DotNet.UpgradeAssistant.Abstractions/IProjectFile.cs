@@ -25,10 +25,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void RemoveReferences(IEnumerable<Reference> references);
 
-        void AddImports(string item);
-
-        void RemoveImports(string item);
-
         ValueTask SaveAsync(CancellationToken token);
 
         void Simplify();
