@@ -114,8 +114,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
 
             // If the identifier resolves to an actual symbol that isn't the old identifier, bail out
-            if (context.SemanticModel.GetSymbolInfo(context.Node).Symbol is INamedTypeSymbol symbol
+            // Also refrain from adding a diagnostic if the symbol is ambiguous but a candidate symbol matches the
+            // new type. This is useful in cases where the type is referenced as a simple name and the new namespace
+            // has been added but the old namespace hasn't been removed yet.
+            var symbolInfo = context.SemanticModel.GetSymbolInfo(context.Node);
+
+            // Bail out if the node corresponds to a symbol that isn't the old type.
+            if (symbolInfo.Symbol is INamedTypeSymbol symbol
                 && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldName, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            // Bail out if the symbol might correspond to a symbol that is the new type.
+            if (symbolInfo.CandidateSymbols.OfType<INamedTypeSymbol>().Any(s => s.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.NewName, StringComparison.Ordinal)))
             {
                 return;
             }
