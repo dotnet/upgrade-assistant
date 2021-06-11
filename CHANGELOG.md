@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Current
 
+### Added
+- New project readiness checks evaluate if the project contains unsupported technologies to increase awareness before users invest significant time trying to upgrade. [#617](https://github.com/dotnet/upgrade-assistant/pull/617)
+
 ### Fixed
 - Updated `HttpContext.Current` code fix to use an internal `HttpContextHelper` that will work in multi-project solutions [#599](https://github.com/dotnet/upgrade-assistant/pull/599).
 
