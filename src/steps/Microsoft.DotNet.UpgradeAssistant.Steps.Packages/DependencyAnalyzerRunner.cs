@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _logger = logger;
         }
 
-        public async Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, CancellationToken token)
+        public async Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, CancellationToken token)
         {
             if (projectRoot is null)
             {
@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             await _packageRestorer.RestorePackagesAsync(context, projectRoot, token).ConfigureAwait(false);
-            var analysisState = new DependencyAnalysisState(projectRoot, projectRoot.NuGetReferences);
+            var analysisState = new DependencyAnalysisState(projectRoot, projectRoot.NuGetReferences, targetframeworks);
 
             // Iterate through all package references in the project file
             foreach (var analyzer in _packageAnalyzers)

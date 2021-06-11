@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // If the project doesn't include a reference to the analyzer package, mark it for addition
             if (!state.Packages.Any(r => AnalyzerPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, project.TargetFrameworks, true, token).ConfigureAwait(false);
+                var analyzerPackage = await _packageLoader.GetLatestVersionAsync(AnalyzerPackageName, state.TargetFrameworks, true, token).ConfigureAwait(false);
 
                 if (analyzerPackage is not null)
                 {
