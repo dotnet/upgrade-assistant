@@ -101,7 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // Check imports and references
             var references = project.References.Select(r => r.Name);
 
-            if (file.Imports.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase) ||
+            if ((file.Imports != null && file.Imports.Contains(MSBuildConstants.WebApplicationTargets, StringComparer.OrdinalIgnoreCase)) ||
                 references.Any(r => MSBuildConstants.WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.AspNet;
