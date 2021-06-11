@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
     /// <summary>
-    /// Customers running upgrade-assistant on ASP.NET projects with Web Forms
+    /// Users running upgrade-assistant on ASP.NET projects with Web Forms
     /// should be informed that this is an unsupported technology before they
     /// invest significant time running the tool.
     /// </summary>

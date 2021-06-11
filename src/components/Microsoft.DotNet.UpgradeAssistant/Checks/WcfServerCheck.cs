@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
     /// <summary>
-    /// Customers running upgrade-assistant on projects that build WCF Services
+    /// Users running upgrade-assistant on projects that build WCF Services
     /// should be informed that this is an unsupported technology before they
     /// invest significant time running the tool.
     /// </summary>
