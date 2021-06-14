@@ -61,13 +61,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         public IAsyncEnumerable<NuGetReference> GetTransitivePackageReferencesAsync(TargetFrameworkMoniker tfm, CancellationToken token)
-            => GetAllDependenciesAsync(tfm, token).Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString()));
+            => PackageReferenceFormat switch
+            {
+                NugetPackageFormat.PackageConfig => PackageReferences.ToAsyncEnumerable(),
+                NugetPackageFormat.PackageReference => GetAllPackageReferenceDependenciesAsync(tfm, token).Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString())),
+                _ => AsyncEnumerable.Empty<NuGetReference>()
+            };
 
-        public ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token)
-            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token);
+        public async ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token)
+            => PackageReferences.Any(p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase))
+            || (PackageReferenceFormat == NugetPackageFormat.PackageReference && await TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token).ConfigureAwait(false));
 
-        public ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token)
-            => TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token);
+        public async ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token)
+            => PackageReferenceFormat == NugetPackageFormat.PackageReference && await TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token).ConfigureAwait(false);
 
         private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
@@ -104,14 +110,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return true;
         }
 
-        private ValueTask<bool> ContainsDependencyAsync(TargetFrameworkMoniker tfm, Func<PackageDependency, bool> filter, CancellationToken token)
-            => GetAllDependenciesAsync(tfm, token).AnyAsync(l => l.Dependencies.Any(d => filter(d)), token);
+        private ValueTask<bool> ContainsPackageDependencyAsync(TargetFrameworkMoniker tfm, Func<PackageDependency, bool> filter, CancellationToken token)
+            => GetAllPackageReferenceDependenciesAsync(tfm, token).AnyAsync(l => l.Dependencies.Any(d => filter(d)), token);
 
-        private async IAsyncEnumerable<LockFileTargetLibrary> GetAllDependenciesAsync(TargetFrameworkMoniker tfm, [EnumeratorCancellation] CancellationToken token)
+        private async IAsyncEnumerable<LockFileTargetLibrary> GetAllPackageReferenceDependenciesAsync(TargetFrameworkMoniker tfm, [EnumeratorCancellation] CancellationToken token)
         {
             if (!IsRestored)
             {
                 throw new InvalidOperationException("Project should have already been restored. Please file an issue at https://github.com/dotnet/upgrade-assistant");
+            }
+
+            if (PackageReferenceFormat != NugetPackageFormat.PackageReference)
+            {
+                throw new InvalidOperationException("PackageReference restore for transitive dependencies should only happen for PackageReference package reference format");
             }
 
             var parsedTfm = NuGetFramework.Parse(tfm.Name);
