@@ -44,8 +44,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
         {
             if (project is null)
             {
-                // this is not a valid scenario
-                // satisfies CA1062
                 return false;
             }
 
