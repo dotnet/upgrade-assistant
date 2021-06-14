@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             }
 
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-            if (!components.HasFlag(ProjectComponents.AspNet))
+            if (!components.HasFlag(ProjectComponents.AspNet) && !components.HasFlag(ProjectComponents.AspNetCore))
             {
                 // this readiness check only applies to ASP.NET projects
                 return false;
