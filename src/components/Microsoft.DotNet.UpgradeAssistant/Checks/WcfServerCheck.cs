@@ -36,17 +36,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
         // TODO: code review - do we expect people to copy and paste this? Maybe we need to make a friendly URL.
         public override string SupportLink => "https://docs.microsoft.com/en-us/dotnet/architecture/porting-existing-aspnet-apps/migrate-web-forms";
 
-        protected override async Task<bool> DoesProjectContainTechnologyAsync(IProject project, CancellationToken token)
+        protected override Task<bool> DoesProjectContainTechnologyAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
                 // this is not a valid scenario
                 // satisfies CA1062
-                return false;
+                return Task.FromResult(false);
             }
 
             // are there any svc.cs files in this project?
-            return project.FindFiles($".svc{GetExtensionForLanguage(project)}").Any();
+            return Task.FromResult(project.FindFiles($".svc{GetExtensionForLanguage(project)}").Any());
         }
 
         private static string GetExtensionForLanguage(IProject project)
