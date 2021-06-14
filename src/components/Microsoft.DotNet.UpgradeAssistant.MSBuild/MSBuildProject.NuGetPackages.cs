@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        private string? GetPackagesConfigPath() => FindFiles(ProjectItemType.Content, "packages.config").FirstOrDefault();
+        private string? GetPackagesConfigPath() => FindFiles("packages.config", ProjectItemType.Content).FirstOrDefault();
 
         public IEnumerable<NuGetReference> PackageReferences
         {

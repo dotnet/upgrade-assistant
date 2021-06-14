@@ -31,9 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         ProjectOutputType OutputType { get; }
 
-        IEnumerable<string> FindFiles(ProjectItemMatcher matcher);
-
-        IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher);
+        IEnumerable<string> FindFiles(ProjectItemMatcher matcher, ProjectItemType? itemType = null);
 
         IProjectFile GetFile();
     }
