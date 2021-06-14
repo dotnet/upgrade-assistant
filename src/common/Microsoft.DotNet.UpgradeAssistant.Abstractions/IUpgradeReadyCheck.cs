@@ -29,7 +29,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// False should represent ReadyChecks that validate requirements customer's cannot bypass.
         /// True should represent ReadyChecks that can be bypassed.
         /// </summary>
-        // TODO: code review - compare difference of changing the interface to upgrading to netstandard2.1 for default interface implementations
         bool IsBypassable { get; }
     }
 }
