@@ -25,6 +25,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public abstract string TechnologyDetected { get; }
 
+        /// <summary>
+        /// When relevant, the ReadinessCheck should proactively share guidance for migrating technologies that are not supported on .NET latest.
+        /// </summary>
         public abstract string SupportLink { get; }
 
         protected abstract Task<bool> DoesProjectContainTechnologyAsync(IProject project, CancellationToken token);
