@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public bool IsSdk =>
             ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparison.OrdinalIgnoreCase);
 
-        public IEnumerable<string> Imports => ProjectRoot.Imports.Select(p => Path.GetFileName(p.Project));
+        public ICollection<string> Imports => new ImportsCollection(ProjectRoot);
 
         public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this, _comparer).SetTargetFramework(tfm);
 
