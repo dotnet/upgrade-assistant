@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void CopyTo(string[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            ((ICollection<string>)this).CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<string> GetEnumerator()
