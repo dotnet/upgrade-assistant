@@ -60,6 +60,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public IConfiguration Configuration { get; }
 
+        public Version? Version => GetOptions<Version>("Version");
+
         public T? GetOptions<T>(string sectionName) => Configuration.GetSection(sectionName).Get<T>();
 
         public void Dispose()
