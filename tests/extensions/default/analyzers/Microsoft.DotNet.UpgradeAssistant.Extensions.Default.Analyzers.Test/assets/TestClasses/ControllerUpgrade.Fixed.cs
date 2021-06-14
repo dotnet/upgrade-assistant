@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TestProject.TestClasses
 {
-    public partial class ValuesController : ControllerBase
+    public partial class ValuesController : Microsoft.AspNetCore.Mvc.ControllerBase
     {
         // GET api/values
         public IEnumerable<string> GetValues()
@@ -23,7 +23,7 @@ namespace TestProject.TestClasses
         }
     }
 
-    public class MoviesController : ControllerBase
+    public class MoviesController : Microsoft.AspNetCore.Mvc.ControllerBase
     {
         // GET api/values
         public IEnumerable<string> GetValues()
@@ -39,14 +39,14 @@ namespace TestProject.TestClasses
 
     public partial class Controller2
     {
-        Controller Controller;
+        Microsoft.AspNetCore.Mvc.Controller Controller;
     }
 
-    public partial class Controller2 : Controller
+    public partial class Controller2 : Microsoft.AspNetCore.Mvc.Controller
     {
-        public Controller DoSomething(ControllerBase a)
+        public Controller DoSomething(Microsoft.AspNetCore.Mvc.ControllerBase a)
         {
-            var x = new List<Controller>();
+            var x = new List<Microsoft.AspNetCore.Mvc.Controller>();
             return new Controller2();
         }
     }
