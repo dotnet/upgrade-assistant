@@ -331,7 +331,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             return new NuGetPackageMetadata
             {
-                OwnerId = nuspec.GetOwners()
+                Owners = nuspec.GetOwners()
             };
         }
     }

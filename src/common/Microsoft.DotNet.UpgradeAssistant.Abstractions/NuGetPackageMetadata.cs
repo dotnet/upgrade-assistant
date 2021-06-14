@@ -5,6 +5,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public record NuGetPackageMetadata
     {
-        public string? OwnerId { get; init; }
+        /// <summary>
+        /// Gets the package owners stored in the Nuspec file.
+        /// </summary>
+        public string? Owners { get; init; }
     }
 }
