@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Build.Construction;
 
@@ -74,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IEnumerator<string> GetEnumerator()
         {
-            return (IEnumerator<string>)_projectRoot.Imports.GetEnumerator();
+            return _projectRoot.Imports.Select(p => p.Project).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
