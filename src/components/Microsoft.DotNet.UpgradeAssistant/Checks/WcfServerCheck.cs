@@ -33,8 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public override string TechnologyDetected => "WCF Server-side Services";
 
-        // TODO: code review - do we expect people to copy and paste this? Maybe we need to make a friendly URL.
-        public override string SupportLink => "https://docs.microsoft.com/en-us/dotnet/architecture/porting-existing-aspnet-apps/migrate-web-forms";
+        public override string SupportLink => "https://docs.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/migrate-wcf-to-grpc";
 
         protected override Task<bool> DoesProjectContainTechnologyAsync(IProject project, CancellationToken token)
         {

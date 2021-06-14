@@ -32,7 +32,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public override string TechnologyDetected => "VB Razor Engine";
 
-        // TODO: code review - do we expect people to copy and paste this? Maybe we need to make a friendly URL.
         public override string SupportLink => "https://devblogs.microsoft.com/vbteam/combining-angular-visual-basic-and-net-core-for-developing-modern-web-apps/";
 
         protected override async Task<bool> DoesProjectContainTechnologyAsync(IProject project, CancellationToken token)
