@@ -155,8 +155,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return results
                 .Where(r =>
                 {
-                    var unsupported = tfmSet;
+                    // If the package has no dependency sets, then include it (as it may be build tools, analyzers, etc.).
+                    if (!r.DependencySets.Any())
+                    {
+                        return true;
+                    }
 
+                    // If the package has dependency sets, only include it if there are dependency sets for each
+                    // of the TFMs that need to be supported.
+                    var unsupported = tfmSet;
                     foreach (var dep in r.DependencySets)
                     {
                         foreach (var t in unsupported)
