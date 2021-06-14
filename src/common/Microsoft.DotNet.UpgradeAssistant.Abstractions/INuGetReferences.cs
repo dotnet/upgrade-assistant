@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         IEnumerable<NuGetReference> PackageReferences { get; }
 
         /// <summary>
-        /// Gets the packages that are transitively referenced via other packages or projects for the given <paramref name="tfm"/>.
+        /// Gets all the packages that are referenced for the given <paramref name="tfm"/> either directly or transitively.
         /// </summary>
         /// <param name="tfm">The target framework to get the dependencies for.</param>
         /// <param name="token">A cancellation token.</param>
@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         IAsyncEnumerable<NuGetReference> GetTransitivePackageReferencesAsync(TargetFrameworkMoniker tfm, CancellationToken token);
 
         /// <summary>
-        /// Checks if the package name is transitively referenced via other packages or projects.
+        /// Checks if the package name is referenced either directly or transitively via other packages or projects.
         /// </summary>
         /// <param name="packageName">The name of a package.</param>
         /// <param name="token">A cancellation token.</param>
@@ -36,7 +36,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
         ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token);
 
         /// <summary>
-        /// Checks if the package is transitively referenced via other packages or projects.
+        /// Checks if a particular version of a package is transitively referenced via other packages or projects.
+        /// This does not check whether the package is directly referenced or not and will always return false
+        /// for projects not using PackageReference package references.
         /// </summary>
         /// <param name="nugetReference">The package identity.</param>
         /// <param name="token">A cancellation token.</param>
