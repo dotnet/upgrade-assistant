@@ -9,8 +9,6 @@ using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.MSBuildPath;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
@@ -46,13 +44,6 @@ namespace Integration.Tests
             };
 
             var status = await Program.RunUpgradeAsync(options, host => host
-                .ConfigureServices(services =>
-                {
-                    services.AddOptions<PackageUpdaterOptions>().Configure(o =>
-                    {
-                        o.PackageMapPath = "PackageMaps";
-                    });
-                })
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
                     builder.RegisterInstance(MSBuildPathInstance.Locator);
