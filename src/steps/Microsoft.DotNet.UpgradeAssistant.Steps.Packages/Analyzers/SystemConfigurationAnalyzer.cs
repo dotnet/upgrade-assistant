@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     /// <summary>
     /// Adds the System.Configuration.ConfigurationManager package when needed.
