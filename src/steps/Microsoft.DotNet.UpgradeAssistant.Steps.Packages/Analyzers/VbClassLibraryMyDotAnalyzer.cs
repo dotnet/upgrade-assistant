@@ -11,20 +11,21 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     /// <summary>
-    /// Adds the System.Configuration.ConfigurationManager package when needed.
-    /// Scenarios include:
-    ///  1. VB Class Libraries that have a reference to the 'My.' namespace.
+    /// This analyzer will modify the vbproj of class libraries to resolve compilation errors:
+    /// 1. Adding System.Configuration.ConfigurationManager resolves the error from Settings.Designer.vb
+    /// 2. Adding <VBRuntime>Embed</VBRuntime> resolves the error from the vb compiler
+    ///     Per https://github.com/dotnet/runtime/issues/30478#issuecomment-521270193.
     /// </summary>
-    public class SystemConfigurationAnalyzer : IDependencyAnalyzer
+    public class VbClassLibraryMyDotAnalyzer : IDependencyAnalyzer
     {
         private const string SystemConfigurationPackageName = "System.Configuration.ConfigurationManager";
 
         private readonly IPackageLoader _packageLoader;
-        private readonly ILogger<SystemConfigurationAnalyzer> _logger;
+        private readonly ILogger<VbClassLibraryMyDotAnalyzer> _logger;
 
-        public string Name => nameof(SystemConfigurationAnalyzer) + " reference analyzer";
+        public string Name => nameof(VbClassLibraryMyDotAnalyzer) + " reference analyzer";
 
-        public SystemConfigurationAnalyzer(IPackageLoader packageLoader, ILogger<SystemConfigurationAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
+        public VbClassLibraryMyDotAnalyzer(IPackageLoader packageLoader, ILogger<VbClassLibraryMyDotAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -42,10 +43,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (!IsVbClassLibrary(project) || !project.TargetFrameworks.Any(tfm => tfm.IsNetStandard))
+            if (!project.TargetFrameworks.Any(tfm => tfm.IsNetCore))
             {
-                // Currently, only applies to VB class library projects
+                _logger.LogDebug("None of the tfms match packages from {PackageName}", SystemConfigurationPackageName);
                 return;
+            }
+
+            if (!IsVbClassLibrary(project))
+            {
+                _logger.LogDebug("{Project} is not a VB class library", project.FileInfo);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(project.GetFile().GetPropertyValue("VBRuntime")))
+            {
+                // resolves error BC30002: Type 'Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue' is not defined.
+                project.GetFile().SetPropertyValue("VBRuntime", "Embed");
             }
 
             if (await project.NuGetReferences.IsTransitivelyAvailableAsync(SystemConfigurationPackageName, token).ConfigureAwait(false))
@@ -60,6 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
                 if (systemConfigurationPackage is not null)
                 {
+                    // resolves error BC30002: Type 'Global.System.Configuration.ApplicationSettingsBase' is not defined.
                     _logger.LogInformation("Reference to configuration package ({SystemConfigurationPackageName}, version {SystemConfigurationPackageVersion}) needs added", SystemConfigurationPackageName, systemConfigurationPackage.Version);
                     state.Packages.Add(systemConfigurationPackage);
                 }
