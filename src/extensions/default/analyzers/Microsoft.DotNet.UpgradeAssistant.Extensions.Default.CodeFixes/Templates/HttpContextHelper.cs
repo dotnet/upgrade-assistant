@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Http
+﻿using System;
+
+namespace Microsoft.AspNetCore.Http
 {
     /// <summary>
     /// Temporary helper class for retrieving the current <see cref="HttpContext"/> . This temporary
