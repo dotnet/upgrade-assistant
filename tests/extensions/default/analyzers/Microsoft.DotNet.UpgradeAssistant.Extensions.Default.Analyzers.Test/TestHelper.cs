@@ -124,7 +124,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 fixAttempts++;
                 diagnosticFixed = false;
                 project = solution.GetProject(projectId)!;
-                var diagnostics = await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
+                var diagnostics = (await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false))
+                    .OrderBy(d => d.Location.SourceSpan.Start);
 
                 foreach (var diagnostic in diagnostics)
                 {

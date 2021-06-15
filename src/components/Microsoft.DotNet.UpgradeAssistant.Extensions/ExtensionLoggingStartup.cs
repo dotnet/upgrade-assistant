@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,7 +27,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             foreach (var extension in _extensions)
             {
-                _logger.LogDebug("Loaded extension: {Name} [{Location}]", extension.Name, extension.Location);
+                if (extension.Version is Version version)
+                {
+                    _logger.LogDebug("Loaded extension: {Name} v{Version} [{Location}]", extension.Name, version, extension.Location);
+                }
+                else
+                {
+                    _logger.LogDebug("Loaded extension: {Name} [{Location}]", extension.Name, extension.Location);
+                }
             }
 
             return Task.FromResult(true);

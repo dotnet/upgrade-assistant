@@ -41,6 +41,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void SetTFM(TargetFrameworkMoniker targetTFM);
 
-        IEnumerable<string> Imports { get; }
+        ICollection<string> Imports { get; }
     }
 }

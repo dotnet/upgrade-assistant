@@ -67,5 +67,8 @@ namespace Integration.Tests
 
             return latest ?? Enumerable.Empty<NuGetReference>();
         }
+
+        public Task<NuGetPackageMetadata?> GetPackageMetadata(NuGetReference reference, CancellationToken token)
+            => _other.GetPackageMetadata(reference, token);
     }
 }

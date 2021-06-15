@@ -14,5 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, bool latestMinorAndBuildOnly, CancellationToken token);
 
         Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, bool includePreRelease, CancellationToken token);
+
+        Task<NuGetPackageMetadata?> GetPackageMetadata(NuGetReference reference, CancellationToken token);
     }
 }
