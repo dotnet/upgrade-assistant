@@ -33,6 +33,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic
                 throw new ArgumentNullException(nameof(tfm));
             }
 
+            if (tfm.Project.OutputType == ProjectOutputType.Library)
+            {
+                // class libraries should target netstandard whenever possible because we can
+                // share netstandard between .NET Framework and .NET5 projects.
+                return;
+            }
+
             var myType = tfm.Project.GetFile().GetPropertyValue("MyType");
 
             if (_windowsMyTypes.Contains(myType))

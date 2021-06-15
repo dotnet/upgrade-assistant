@@ -78,6 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<IDependencyAnalyzer, TargetCompatibilityReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, UpgradeAssistantReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, WindowsCompatReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, SystemConfigurationAnalyzer>();
         }
     }
 }
