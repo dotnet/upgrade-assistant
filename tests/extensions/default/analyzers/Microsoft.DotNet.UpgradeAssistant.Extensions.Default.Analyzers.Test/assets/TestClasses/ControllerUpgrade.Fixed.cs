@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TestProject.TestClasses
 {
+    [ApiController]
     public partial class ValuesController : Microsoft.AspNetCore.Mvc.ControllerBase
     {
         // GET api/values

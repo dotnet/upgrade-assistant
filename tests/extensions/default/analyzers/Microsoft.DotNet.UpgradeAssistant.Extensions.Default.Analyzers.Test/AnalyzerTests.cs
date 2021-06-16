@@ -168,13 +168,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 "ControllerUpgrade",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0002", new TextSpan(166, 13)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(594, 29)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(933, 14)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1009, 25)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1058, 10)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1081, 13)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1139, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(187, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(615, 29)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(954, 14)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1030, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1079, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1102, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1160, 25)),
 
                     new ExpectedDiagnostic("UA0002", new TextSpan(177, 13), Language.VisualBasic),
                     new ExpectedDiagnostic("UA0002", new TextSpan(463, 29), Language.VisualBasic),

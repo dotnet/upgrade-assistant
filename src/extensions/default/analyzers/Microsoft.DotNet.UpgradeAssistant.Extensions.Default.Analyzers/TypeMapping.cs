@@ -7,14 +7,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     {
         public string OldName { get; init; }
 
-        public string NewName { get; init; }
+        public string? NewName { get; init; }
 
         public string SimpleName { get; init; }
 
-        public TypeMapping(string oldName, string newName)
+        public TypeMapping(string oldName, string? newName)
         {
             OldName = oldName ?? throw new System.ArgumentNullException(nameof(oldName));
-            NewName = newName ?? throw new System.ArgumentNullException(nameof(newName));
+            NewName = newName;
             SimpleName = OldName.LastIndexOf('.') < 0
             ? OldName
             : OldName!.Substring(OldName.LastIndexOf('.') + 1);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace TestProject.TestClasses
 {
+    [ApiController]
     public partial class ValuesController : ApiController
     {
         // GET api/values

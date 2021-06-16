@@ -42,6 +42,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                         {
                             yield return new TypeMapping(components[0], components[1]);
                         }
+                        else if (components.Length == 1)
+                        {
+                            yield return new TypeMapping(components[0], null);
+                        }
                     }
                 }
             }
