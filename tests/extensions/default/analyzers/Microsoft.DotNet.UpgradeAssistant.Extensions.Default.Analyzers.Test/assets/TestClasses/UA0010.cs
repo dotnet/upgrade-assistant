@@ -15,5 +15,8 @@ namespace TestProject.TestClasses
 
         [Foo.AllowHtml, Required]
         public double Property3 { set { } }
+
+        [System.Web.Mvc.AllowHtml, Required]
+        public double Property3 { set { } }
     }
 }

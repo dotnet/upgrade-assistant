@@ -117,23 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllowHtmlAttributeDescription" xml:space="preserve">
-    <value>[AllowHtmlAttribute] should be removed.</value>
+  <data name="AttributeUpgradeDescription" xml:space="preserve">
+    <value>This attribute type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent.</value>
   </data>
-  <data name="AllowHtmlAttributeMessageFormat" xml:space="preserve">
-    <value>Attribute '{0}' should be removed</value>
+  <data name="AttributeUpgradeMessageFormat" xml:space="preserve">
+    <value>Attribute type '{0}' should be replaced with '{1}'</value>
   </data>
-  <data name="AllowHtmlAttributeTitle" xml:space="preserve">
-    <value>[AllowHtmlAttribute] should be removed</value>
-  </data>
-  <data name="ApiControllerDescription" xml:space="preserve">
-    <value>'ApiController' should be replaced with 'Microsoft.AspNetCore.Mvc.Controller'.</value>
-  </data>
-  <data name="ApiControllerMessageFormat" xml:space="preserve">
-    <value>'ApiController' should be replaced with 'Microsoft.AspNetCore.Mvc.Controller'</value>
-  </data>
-  <data name="ApiControllerTitle" xml:space="preserve">
-    <value>'ApiController' does not exist</value>
+  <data name="AttributeUpgradeTitle" xml:space="preserve">
+    <value>Attributes should be upgraded</value>
   </data>
   <data name="BinaryFormatterUnsafeDeserializeDescription" xml:space="preserve">
     <value>'UnsafeDeserialize()' should be replaced with 'Deserialize()'.</value>
@@ -214,7 +205,7 @@
     <value>Type '{0}' should be replaced with '{1}'</value>
   </data>
   <data name="TypeUpgradeTitle" xml:space="preserve">
-    <value>Type should be upgraded</value>
+    <value>Types should be upgraded</value>
   </data>
   <data name="UrlHelperDescription" xml:space="preserve">
     <value>UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper.</value>

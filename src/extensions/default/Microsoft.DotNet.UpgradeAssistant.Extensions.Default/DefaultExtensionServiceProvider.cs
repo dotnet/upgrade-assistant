@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         {
             // Add source analyzers and code fix providers (note that order doesn't matter as they're run alphabetically)
             // Analyzers
-            services.AddTransient<DiagnosticAnalyzer, AllowHtmlAttributeAnalyzer>();
+            services.AddTransient<DiagnosticAnalyzer, AttributeUpgradeAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, BinaryFormatterUnsafeDeserializeAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, HtmlHelperAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, HttpContextCurrentAnalyzer>();
@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<DiagnosticAnalyzer, UsingSystemWebAnalyzer>();
 
             // Code fix providers
-            services.AddTransient<CodeFixProvider, AllowHtmlAttributeCodeFixer>();
+            services.AddTransient<CodeFixProvider, AttributeUpgradeCodeFixer>();
             services.AddTransient<CodeFixProvider, BinaryFormatterUnsafeDeserializeCodeFixer>();
             services.AddTransient<CodeFixProvider, HtmlHelperCodeFixer>();
             services.AddTransient<CodeFixProvider, HttpContextCurrentCodeFixer>();

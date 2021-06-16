@@ -61,56 +61,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [AllowHtmlAttribute] should be removed..
+        ///   Looks up a localized string similar to This attribute type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
         /// </summary>
-        internal static string AllowHtmlAttributeDescription {
+        internal static string AttributeUpgradeDescription {
             get {
-                return ResourceManager.GetString("AllowHtmlAttributeDescription", resourceCulture);
+                return ResourceManager.GetString("AttributeUpgradeDescription", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attribute &apos;{0}&apos; should be removed.
+        ///   Looks up a localized string similar to Attribute type &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
-        internal static string AllowHtmlAttributeMessageFormat {
+        internal static string AttributeUpgradeMessageFormat {
             get {
-                return ResourceManager.GetString("AllowHtmlAttributeMessageFormat", resourceCulture);
+                return ResourceManager.GetString("AttributeUpgradeMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to [AllowHtmlAttribute] should be removed.
+        ///   Looks up a localized string similar to Attributes should be upgraded.
         /// </summary>
-        internal static string AllowHtmlAttributeTitle {
+        internal static string AttributeUpgradeTitle {
             get {
-                return ResourceManager.GetString("AllowHtmlAttributeTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;ApiController&apos; should be replaced with &apos;Microsoft.AspNetCore.Mvc.Controller&apos;..
-        /// </summary>
-        internal static string ApiControllerDescription {
-            get {
-                return ResourceManager.GetString("ApiControllerDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;ApiController&apos; should be replaced with &apos;Microsoft.AspNetCore.Mvc.Controller&apos;.
-        /// </summary>
-        internal static string ApiControllerMessageFormat {
-            get {
-                return ResourceManager.GetString("ApiControllerMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;ApiController&apos; does not exist.
-        /// </summary>
-        internal static string ApiControllerTitle {
-            get {
-                return ResourceManager.GetString("ApiControllerTitle", resourceCulture);
+                return ResourceManager.GetString("AttributeUpgradeTitle", resourceCulture);
             }
         }
         
@@ -349,7 +322,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type should be upgraded.
+        ///   Looks up a localized string similar to Types should be upgraded.
         /// </summary>
         internal static string TypeUpgradeTitle {
             get {

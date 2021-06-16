@@ -11,6 +11,9 @@ namespace TestProject.TestClasses
         [MyNamespace.AllowHtml]
         public int Property2 { get; }
 
+        [Foo.AllowHtml, Required]
+        public double Property3 { set { } }
+
         [Required]
         public double Property3 { set { } }
     }

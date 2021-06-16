@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 {
                     new ExpectedDiagnostic("UA0010", new TextSpan(150, 9)),
                     new ExpectedDiagnostic("UA0010", new TextSpan(240, 18)),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(344, 13)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(426, 24)),
                 }
             },
 
