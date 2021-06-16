@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,8 +43,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 _logger.LogDebug("Configuration loaded from context base directory: {BaseDirectory}", AppContext.BaseDirectory);
 
-                await RunStartupAsync(token);
-                await RunCommandAsync(token);
+                using var scope = _services.GetAutofacRoot().BeginLifetimeScope(builder =>
+                {
+                    foreach (var extension in _services.GetRequiredService<IEnumerable<ExtensionInstance>>())
+                    {
+                        var services = new ServiceCollection();
+                        extension.AddServices(services);
+                        builder.Populate(services);
+                    }
+                });
+
+                await RunStartupAsync(scope.Resolve<IEnumerable<IUpgradeStartup>>(), token);
+
+                await scope.Resolve<IAppCommand>().RunAsync(token);
 
                 _errorCode.ErrorCode = ErrorCodes.Success;
             }
@@ -65,11 +79,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        private async Task RunStartupAsync(CancellationToken token)
+        private static async Task RunStartupAsync(IEnumerable<IUpgradeStartup> startups, CancellationToken token)
         {
-            using var scope = _services.CreateScope();
-            var startups = scope.ServiceProvider.GetRequiredService<IEnumerable<IUpgradeStartup>>();
-
             foreach (var startup in startups)
             {
                 if (!await startup.StartupAsync(token))
@@ -77,13 +88,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     throw new UpgradeException($"Failure running start up action {startup.GetType().FullName}");
                 }
             }
-        }
-
-        private async Task RunCommandAsync(CancellationToken token)
-        {
-            using var scope = _services.CreateScope();
-            var command = scope.ServiceProvider.GetRequiredService<IAppCommand>();
-            await command.RunAsync(token);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
