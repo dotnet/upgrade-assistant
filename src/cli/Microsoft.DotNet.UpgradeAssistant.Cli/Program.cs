@@ -114,7 +114,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
 
-                    services.AddExtensions(context.Configuration, options.Extension);
+                    services.AddExtensions()
+                        .AddDefaultExtensions(context.Configuration)
+                        .AddFromEnvironmentVariables(context.Configuration)
+                        .Configure(opts =>
+                        {
+                            opts.CurrentVersion = Constants.Version;
+
+                            foreach (var path in options.Extension)
+                            {
+                                opts.ExtensionPaths.Add(path);
+                            }
+                        });
+
                     services.AddMsBuild();
                     services.AddSingleton(options);
 
@@ -173,7 +185,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ShowHeader()
         {
-            var title = $"- Microsoft .NET Upgrade Assistant v{Constants.Version} -";
+            var title = $"- Microsoft .NET Upgrade Assistant v{Constants.FullVersion} -";
             Console.WriteLine(new string('-', title.Length));
             Console.WriteLine(title);
             Console.WriteLine(new string('-', title.Length));

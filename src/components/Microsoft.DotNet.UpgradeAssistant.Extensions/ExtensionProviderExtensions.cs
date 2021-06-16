@@ -22,30 +22,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// extensions found in specified paths.
         /// </summary>
         /// <param name="services">The service collection to register services into.</param>
+        /// <param name="currentVersion">The current app version.</param>
         /// <param name="configuration">The app configuration containing a setting for extension paths and the default extension service providers. These extensions will be registered before those found with the string[] argument.</param>
         /// <param name="additionalExtensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files. These extensions will be registered after those found from configuration.</param>
-        public static void AddExtensions(this IServiceCollection services, IConfiguration configuration, IEnumerable<string> additionalExtensionPaths)
+        /// <returns>A builder for options</returns>
+        public static OptionsBuilder<ExtensionOptions> AddExtensions(this IServiceCollection services)
         {
             if (services is null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
-
-            if (configuration is null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-
-            services.AddOptions<ExtensionOptions>()
-                .AddDefaultExtensions(configuration)
-                .AddFromEnvironmentVariables(configuration)
-                .Configure(options =>
-                {
-                    foreach (var path in additionalExtensionPaths)
-                    {
-                        options.ExtensionPaths.Add(path);
-                    }
-                });
 
             services.AddOptions<JsonSerializerOptions>()
                 .Configure(o =>
@@ -58,6 +44,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             services.AddScoped<ExtensionManager>();
             services.AddTransient<IEnumerable<ExtensionInstance>>(ctx => ctx.GetRequiredService<ExtensionManager>());
             services.AddExtensionLoaders();
+
+            return services.AddOptions<ExtensionOptions>();
         }
 
         private static void AddExtensionLoaders(this IServiceCollection services)
@@ -67,8 +55,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             services.AddTransient<IExtensionLoader, ZipExtensionLoader>();
         }
 
-        private static OptionsBuilder<ExtensionOptions> AddDefaultExtensions(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)
-            => builder.Configure(options =>
+        public static OptionsBuilder<ExtensionOptions> AddDefaultExtensions(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            return builder.Configure(options =>
             {
                 const string ExtensionDirectory = "extensions";
                 const string DefaultExtensionsSection = "DefaultExtensions";
@@ -82,9 +76,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     options.ExtensionPaths.Add(path);
                 }
             });
+        }
 
-        private static OptionsBuilder<ExtensionOptions> AddFromEnvironmentVariables(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)
-            => builder.Configure(options =>
+        public static OptionsBuilder<ExtensionOptions> AddFromEnvironmentVariables(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            return builder.Configure(options =>
             {
                 var extensionPathString = configuration[UpgradeAssistantExtensionPathsSettingName];
                 var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
@@ -94,5 +95,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     options.ExtensionPaths.Add(path);
                 }
             });
+        }
     }
 }
