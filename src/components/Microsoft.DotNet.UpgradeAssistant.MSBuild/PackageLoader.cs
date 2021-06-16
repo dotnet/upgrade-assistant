@@ -317,5 +317,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             return repository;
         }
+
+        public async Task<NuGetPackageMetadata?> GetPackageMetadata(NuGetReference reference, CancellationToken token)
+        {
+            var archive = await GetPackageArchiveAsync(reference, token).ConfigureAwait(false);
+
+            if (archive is null)
+            {
+                return null;
+            }
+
+            var nuspec = await archive.GetNuspecReaderAsync(token).ConfigureAwait(false);
+
+            return new NuGetPackageMetadata
+            {
+                Owners = nuspec.GetOwners()
+            };
+        }
     }
 }

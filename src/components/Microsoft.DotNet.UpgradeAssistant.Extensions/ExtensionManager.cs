@@ -47,7 +47,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     {
                         if (loader.LoadExtension(path) is ExtensionInstance instance)
                         {
-                            logger.LogDebug("Loaded extension from {Path}", path);
+                            if (instance.Version is Version version)
+                            {
+                                logger.LogDebug("Loaded extension: {Name} v{Version} [{Location}]", instance.Name, version, instance.Location);
+                            }
+                            else
+                            {
+                                logger.LogDebug("Loaded extension: {Name} [{Location}]", instance.Name, instance.Location);
+                            }
+
                             return instance;
                         }
                     }
