@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     /// 1. Adding System.Configuration.ConfigurationManager resolves the error from Settings.Designer.vb
     /// 2. Adding <VBRuntime>Embed</VBRuntime> resolves the error from the vb compiler
     ///     Per https://github.com/dotnet/runtime/issues/30478#issuecomment-521270193.
+    /// Note: this also resolves the same compile errors for VB unit test projects.
     /// </summary>
     public class VbClassLibraryMyDotAnalyzer : IDependencyAnalyzer
     {
@@ -55,10 +56,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(project.GetFile().GetPropertyValue("VBRuntime")))
+            var projectFile = project.GetFile();
+            if (string.IsNullOrWhiteSpace(projectFile.GetPropertyValue("VBRuntime")))
             {
-                // resolves error BC30002: Type 'Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue' is not defined.
-                project.GetFile().SetPropertyValue("VBRuntime", "Embed");
+                // resolves errors
+                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
+                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue' is not defined.
+                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
+                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.Devices.Computer' is not defined.
+                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.ApplicationBase' is not defined.
+                projectFile.SetPropertyValue("VBRuntime", "Embed");
             }
 
             if (await project.NuGetReferences.IsTransitivelyAvailableAsync(SystemConfigurationPackageName, token).ConfigureAwait(false))
@@ -73,7 +80,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
                 if (systemConfigurationPackage is not null)
                 {
-                    // resolves error BC30002: Type 'Global.System.Configuration.ApplicationSettingsBase' is not defined.
+                    // Note: Not expecting to see this package added explicitly. This resolves the error but the package is also included in the WindowCompatabilityPack which would make this reference transitively available.
+                    // 1>C:\{ProjectDir}\My Project\Settings.Designer.vb(21,18): error BC30002: Type 'Global.System.Configuration.ApplicationSettingsBase' is not defined.
+                    // 1>C:\{ProjectDir}\My Project\Settings.Designer.vb(57,10): error BC30002: Type 'Global.System.Configuration.UserScopedSettingAttribute' is not defined.
+                    // 1>C:\{ProjectDir}\My Project\Settings.Designer.vb(59,10): error BC30002: Type 'Global.System.Configuration.DefaultSettingValueAttribute' is not defined.
                     _logger.LogInformation("Reference to configuration package ({SystemConfigurationPackageName}, version {SystemConfigurationPackageVersion}) needs added", SystemConfigurationPackageName, systemConfigurationPackage.Version);
                     state.Packages.Add(systemConfigurationPackage);
                 }
