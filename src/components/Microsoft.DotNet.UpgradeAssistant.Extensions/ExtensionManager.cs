@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     {
                         if (extension.MinUpgradeAssistantVersion is Version minVersion && minVersion < options.Value.CurrentVersion)
                         {
-                            logger.LogWarning("Could not load extension from {Path}", path);
+                            logger.LogWarning("Could not load extension from {Path}. Requires at least v{Version} of Upgrade Assistant.", path, minVersion);
                         }
                         else
                         {
@@ -56,11 +56,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         {
                             if (instance.Version is Version version)
                             {
-                                logger.LogDebug("Loaded extension: {Name} v{Version} [{Location}]", instance.Name, version, instance.Location);
+                                logger.LogDebug("Found extension '{Name}' v{Version} [{Location}]", instance.Name, version, instance.Location);
                             }
                             else
                             {
-                                logger.LogDebug("Loaded extension: {Name} [{Location}]", instance.Name, instance.Location);
+                                logger.LogDebug("Found extension '{Name}' [{Location}]", instance.Name, instance.Location);
                             }
 
                             return instance;
