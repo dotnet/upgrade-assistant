@@ -37,15 +37,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             services.AddOptions<ExtensionOptions>()
+                .AddDefaultExtensions(configuration)
+                .AddFromEnvironmentVariables(configuration)
                 .Configure(options =>
                 {
                     foreach (var path in additionalExtensionPaths)
                     {
                         options.ExtensionPaths.Add(path);
                     }
-                })
-                .AddDefaultExtensions(configuration)
-                .AddFromEnvironmentVariables(configuration);
+                });
 
             services.AddOptions<JsonSerializerOptions>()
                 .Configure(o =>
