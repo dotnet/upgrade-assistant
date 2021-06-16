@@ -91,6 +91,9 @@
     <Extension Include="..\..\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj">
       <Name>default</Name>
     </Extension>
+    <Extension Include="..\..\extensions\vb\Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic\Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic.csproj">
+      <Name>vb</Name>
+    </Extension>
     <Extension Include="..\..\extensions\web\Microsoft.DotNet.UpgradeAssistant.Extensions.Web\Microsoft.DotNet.UpgradeAssistant.Extensions.Web.csproj">
       <Name>web</Name>
     </Extension>

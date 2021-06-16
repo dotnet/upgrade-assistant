@@ -12,10 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     /// <summary>
     /// This analyzer will modify the vbproj of class libraries to resolve compilation errors:
-    /// 1. Adding System.Configuration.ConfigurationManager resolves the error from Settings.Designer.vb
-    /// 2. Adding <VBRuntime>Embed</VBRuntime> resolves the error from the vb compiler
-    ///     Per https://github.com/dotnet/runtime/issues/30478#issuecomment-521270193.
-    /// Note: this also resolves the same compile errors for VB unit test projects.
+    /// 1. Adding System.Configuration.ConfigurationManager resolves the error from Settings.Designer.vb.
     /// </summary>
     public class VbClassLibraryMyDotAnalyzer : IDependencyAnalyzer
     {
@@ -54,18 +51,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             {
                 _logger.LogDebug("{Project} is not a VB class library", project.FileInfo);
                 return;
-            }
-
-            var projectFile = project.GetFile();
-            if (string.IsNullOrWhiteSpace(projectFile.GetPropertyValue("VBRuntime")))
-            {
-                // resolves errors
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.Devices.Computer' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.ApplicationBase' is not defined.
-                projectFile.SetPropertyValue("VBRuntime", "Embed");
             }
 
             if (await project.NuGetReferences.IsTransitivelyAvailableAsync(SystemConfigurationPackageName, token).ConfigureAwait(false))
