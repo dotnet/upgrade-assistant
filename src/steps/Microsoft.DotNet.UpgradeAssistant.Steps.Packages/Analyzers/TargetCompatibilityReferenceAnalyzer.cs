@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, state.TargetFrameworks, true, token).ConfigureAwait(false);
+                    var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, state.TargetFrameworks, new() { Prerelease = true }, token).ConfigureAwait(false);
                     var updatedReference = newerVersions.FirstOrDefault();
 
                     if (updatedReference == null)
