@@ -26,7 +26,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 {
                     if (LoadExtension(path) is ExtensionInstance extension)
                     {
-                        list.Add(extension);
+                        if (extension.MinUpgradeAssistantVersion is Version minVersion && minVersion < options.Value.CurrentVersion)
+                        {
+                            logger.LogWarning("Could not load extension from {Path}", path);
+                        }
+                        else
+                        {
+                            list.Add(extension);
+                        }
                     }
                     else
                     {

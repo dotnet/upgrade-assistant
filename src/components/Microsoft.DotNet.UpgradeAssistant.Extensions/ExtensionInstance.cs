@@ -67,6 +67,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public Version? Version => GetOptions<Version>("Version");
 
+        public Version? MinUpgradeAssistantVersion => GetOptions<Version>("MinRequiredVersion");
+
         public T? GetOptions<T>(string sectionName) => Configuration.GetSection(sectionName).Get<T>();
 
         public void Dispose()
