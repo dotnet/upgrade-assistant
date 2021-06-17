@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public ICollection<string> Imports => new ImportsCollection(ProjectRoot);
 
-        public ICollection<string> Sdk => ProjectRoot.Sdk.Split(';').ToList();
+        public ICollection<string> Sdk => new SdkCollection(ProjectRoot);
 
         public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this, _comparer).SetTargetFramework(tfm);
 
