@@ -20,7 +20,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
         /// </summary>
         public string Id => nameof(VisualBasicRazorTemplateCheck);
 
-        public string UpgradeGuidance => "https://devblogs.microsoft.com/vbteam/combining-angular-visual-basic-and-net-core-for-developing-modern-web-apps/";
+        // todo: code review - make new aka.ms link waiting on feedback from the team
+        public string UpgradeGuidance => $"Support for the VB Razor engine is limited to .NET Full Framework. To learn more please read: https://aka.ms/vb-angular-and-web-api";
 
         public async Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
         {

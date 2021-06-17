@@ -16,11 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
     public class WcfServerCheck : IUpgradeReadyCheck
     {
         /// <summary>
-        /// Gets the value 'WebFormsCheck'.
+        /// Gets the value 'WcfServerCheck'.
         /// </summary>
         public string Id => nameof(WcfServerCheck);
 
-        public string UpgradeGuidance => "https://docs.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/migrate-wcf-to-grpc";
+        // todo: code review - make new aka.ms link waiting on feedback from the team
+        public string UpgradeGuidance => $"Support for WCF Server-side Services is limited to .NET Full Framework. To learn more please read: https://aka.ms/migrate-wcf-to-grpc";
 
         public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
         {

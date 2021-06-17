@@ -14,12 +14,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
 {
     public class MultiTargetingCheckTests
     {
-        [InlineData(0, false)]
-        [InlineData(1, true)]
-        [InlineData(2, false)]
-        [InlineData(3, false)]
+        [InlineData(0, UpgradeReadiness.NotReady)]
+        [InlineData(1, UpgradeReadiness.Ready)]
+        [InlineData(2, UpgradeReadiness.NotReady)]
+        [InlineData(3, UpgradeReadiness.NotReady)]
         [Theory]
-        public async Task IsReadyTest(int tfmCount, bool isValid)
+        public async Task IsReadyTest(int tfmCount, UpgradeReadiness readiness)
         {
             // Arrange
             var fixture = new Fixture();
@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
             var result = await readyCheck.IsReadyAsync(project.Object, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(isValid, result);
+            Assert.Equal(readiness, result);
         }
     }
 }

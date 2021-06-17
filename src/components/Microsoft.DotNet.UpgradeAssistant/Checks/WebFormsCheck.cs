@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
         // NOTE: Intentionally does not detect user controls. https://docs.microsoft.com/en-us/previous-versions/aspnet/fb3w5b53(v=vs.100)
         // NOTE: Intentionally does not detect custom controls. A custom control is a class that you write that derives from Control or WebControl.
         // NOTE: Intentionally does not detect master pages. The assumption is that a project will also contain ASPX Web Forms if it contains master pages, user controls, or custom controls.
-        public string UpgradeGuidance => "https://docs.microsoft.com/en-us/dotnet/architecture/porting-existing-aspnet-apps/migrate-web-forms";
+        public string UpgradeGuidance => $"Support for Web Forms is limited to .NET Full Framework. To learn more please read: https://aka.ms/migrate-web-forms";
 
         public async Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
         {

@@ -44,6 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
+            _upgradeOptions = upgradeOptions ?? throw new ArgumentNullException(nameof(upgradeOptions));
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
@@ -202,36 +203,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
         private async Task<bool> RunChecksAsync(IProject project, CancellationToken token)
         {
+            var upgradeGuidanceMessages = new List<string>();
             foreach (var check in _checks)
             {
                 Logger.LogTrace("Running readiness check {Id}", check.Id);
 
-                if (await check.IsReadyAsync(project, token).ConfigureAwait(false) == UpgradeReadiness.NotReady)
+                var readiness = await check.IsReadyAsync(project, token).ConfigureAwait(false);
+                if (readiness == UpgradeReadiness.NotReady)
                 {
                     return false;
                 }
+                else if (!_upgradeOptions.IgnoreUnsupportedAreas && readiness == UpgradeReadiness.Unsupported)
+                {
+                    // an unsupported area has been detected. Capture a message to explain how to proceed.
+                    upgradeGuidanceMessages.Add(check.UpgradeGuidance);
+                }
             }
 
-            if (!_upgradeOptions.IgnoreUnsupportedAreas)
+            if (upgradeGuidanceMessages.Any())
             {
-                var upgradeGuidanceMessages = new List<string>();
-                foreach (var check in _checks)
-                {
-                    Logger.LogTrace("Running readiness check {Id}", check.Id);
+                Logger.LogError($"Project {{Name}} uses feature(s) that are not supported:{Environment.NewLine}{{Messages}}",
+                    project.FileInfo,
+                    string.Join(Environment.NewLine,upgradeGuidanceMessages));
+                Logger.LogInformation("If you would like to upgrade-assistant to continue anways please use the \"--ignore-unsupported-features\' option.");
 
-                    if (await check.IsReadyAsync(project, token).ConfigureAwait(false) == UpgradeReadiness.Unsupported)
-                    {
-                        upgradeGuidanceMessages.Add(check.UpgradeGuidance);
-                    }
-                }
-
-                if (upgradeGuidanceMessages.Any())
-                {
-                    Logger.LogError($"Project {{Name}} uses feature(s) that are not supported:{Environment.NewLine}{{Messages}}",
-                        project.FileInfo,
-                        string.Join(Environment.NewLine,upgradeGuidanceMessages));
-                    Logger.LogInformation("If you would like to upgrade-assistant to continue anways please use the \"--ignore-unsupported-features\' option.");
-                }
+                // user has been informed about how to proceed.
+                // This project is not ready until the option '--ignore-unsupported-features' is provided.
+                return false;
             }
 
             return true;
