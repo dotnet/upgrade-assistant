@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             projectRoot.Setup(r => r.IsSdk).Returns(sdk is not null);
             if (sdk is not null)
             {
-                projectRoot.Setup(r => r.Sdk).Returns(sdk);
+                projectRoot.Setup(r => r.Sdk).Returns(new List<string>() { sdk });
             }
             else
             {

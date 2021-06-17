@@ -38,25 +38,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public string Sdk
-        {
-            get
-            {
-                var sdk = ProjectRoot.Sdk;
-
-                if (sdk is null)
-                {
-                    throw new ArgumentOutOfRangeException("Should check IsSdk property first");
-                }
-
-                return sdk;
-            }
-        }
-
         public bool IsSdk =>
-            ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparison.OrdinalIgnoreCase);
+            Sdk.Contains(MSBuildConstants.DefaultSDK);
 
         public ICollection<string> Imports => new ImportsCollection(ProjectRoot);
+
+        public ICollection<string> Sdk => ProjectRoot.Sdk.Split(';').ToList();
 
         public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this, _comparer).SetTargetFramework(tfm);
 
@@ -194,5 +181,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             Path.IsPathFullyQualified(path)
             ? path
             : Path.Combine(projectDir, path);
+
+        public void SetSDK(string sdk)
+        {
+            var currentSdk = ProjectRoot.Sdk;
+            ProjectRoot.Sdk = sdk + ";" + currentSdk;
+        }
     }
 }
