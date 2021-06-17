@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -21,36 +22,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// extensions found in specified paths.
         /// </summary>
         /// <param name="services">The service collection to register services into.</param>
+        /// <param name="currentVersion">The current app version.</param>
         /// <param name="configuration">The app configuration containing a setting for extension paths and the default extension service providers. These extensions will be registered before those found with the string[] argument.</param>
         /// <param name="additionalExtensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files. These extensions will be registered after those found from configuration.</param>
-        public static void AddExtensions(this IServiceCollection services, IConfiguration configuration, IEnumerable<string> additionalExtensionPaths)
+        /// <returns>A builder for options</returns>
+        public static OptionsBuilder<ExtensionOptions> AddExtensions(this IServiceCollection services)
         {
             if (services is null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            if (configuration is null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-
-            services.AddTransient<IUpgradeStartup, ExtensionLoggingStartup>();
-            services.AddSerializer();
-
-            foreach (var extension in GetExtensions(configuration, additionalExtensionPaths))
-            {
-                services.AddSingleton(extension);
-
-                foreach (var sp in extension.GetServiceProviders())
-                {
-                    sp.AddServices(new ExtensionServiceCollection(services, extension));
-                }
-            }
-        }
-
-        private static void AddSerializer(this IServiceCollection services)
-        {
             services.AddOptions<JsonSerializerOptions>()
                 .Configure(o =>
                 {
@@ -58,37 +40,61 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     o.ReadCommentHandling = JsonCommentHandling.Skip;
                     o.Converters.Add(new JsonStringEnumConverter());
                 });
+
+            services.AddScoped<ExtensionManager>();
+            services.AddTransient<IEnumerable<ExtensionInstance>>(ctx => ctx.GetRequiredService<ExtensionManager>());
+            services.AddExtensionLoaders();
+
+            return services.AddOptions<ExtensionOptions>();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Will be disposed by dependency injection.")]
-        private static IEnumerable<ExtensionInstance> GetExtensions(IConfiguration originalConfiguration, IEnumerable<string> additionalExtensionPaths)
+        private static void AddExtensionLoaders(this IServiceCollection services)
         {
-            foreach (var e in GetExtensionPaths())
-            {
-                if (string.IsNullOrEmpty(e))
-                {
-                    continue;
-                }
+            services.AddTransient<IExtensionLoader, DirectoryExtensionLoader>();
+            services.AddTransient<IExtensionLoader, ManifestDirectoryExtensionLoader>();
+            services.AddTransient<IExtensionLoader, ZipExtensionLoader>();
+        }
 
-                if (ExtensionInstance.Create(e) is ExtensionInstance instance)
-                {
-                    yield return instance;
-                }
+        public static OptionsBuilder<ExtensionOptions> AddDefaultExtensions(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
             }
 
-            IEnumerable<string> GetExtensionPaths()
+            return builder.Configure(options =>
             {
                 const string ExtensionDirectory = "extensions";
+                const string DefaultExtensionsSection = "DefaultExtensions";
 
-                var fromConfig = originalConfiguration.GetSection("DefaultExtensions")
+                var defaultExtensions = configuration.GetSection(DefaultExtensionsSection)
                     .Get<string[]>()
                     .Select(n => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ExtensionDirectory, n)));
 
-                var extensionPathString = originalConfiguration[UpgradeAssistantExtensionPathsSettingName];
+                foreach (var path in defaultExtensions)
+                {
+                    options.ExtensionPaths.Add(path);
+                }
+            });
+        }
+
+        public static OptionsBuilder<ExtensionOptions> AddFromEnvironmentVariables(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            return builder.Configure(options =>
+            {
+                var extensionPathString = configuration[UpgradeAssistantExtensionPathsSettingName];
                 var pathsFromString = extensionPathString?.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>();
 
-                return fromConfig.Concat(pathsFromString).Concat(additionalExtensionPaths);
-            }
+                foreach (var path in pathsFromString)
+                {
+                    options.ExtensionPaths.Add(path);
+                }
+            });
         }
     }
 }

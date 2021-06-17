@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
             if (!state.Packages.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, state.TargetFrameworks, false, token).ConfigureAwait(false);
+                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, state.TargetFrameworks, new(), token).ConfigureAwait(false);
 
                 if (newtonsoftPackage is not null)
                 {
