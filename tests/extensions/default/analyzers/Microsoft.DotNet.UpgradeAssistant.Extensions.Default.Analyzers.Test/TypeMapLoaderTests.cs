@@ -20,6 +20,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 new TestAdditionalText(@"C:\Foo\bar\x.typemap", @"a b
                   Test1     Test2
                   x     
+
+            
                   y
                   1                                     3       2
                   4      5
@@ -40,6 +42,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             {
                 new TypeMapping("a", "b"),
                 new TypeMapping("Test1", "Test2"),
+                new TypeMapping("x", null),
+                new TypeMapping("y", null),
                 new TypeMapping("4", "5"),
                 new TypeMapping("Foo", "Bar")
             };

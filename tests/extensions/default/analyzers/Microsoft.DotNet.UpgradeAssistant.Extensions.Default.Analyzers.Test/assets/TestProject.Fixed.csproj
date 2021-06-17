@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="*\UA*.cs" />
-    <Compile Include="*\UA*.Fixed.cs" />
+    <Compile Remove="*\*.cs" />
+    <Compile Include="*\*.Fixed.cs" />
   </ItemGroup>
   
   <ItemGroup>

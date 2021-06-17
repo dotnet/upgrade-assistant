@@ -88,6 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             // Bail out if the node corresponds to a symbol that isn't the old type.
             if (attrType.Type is INamedTypeSymbol typeSymbol
+                && typeSymbol is not IErrorTypeSymbol
                 && !typeSymbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldName, StringComparison.Ordinal))
             {
                 return;
