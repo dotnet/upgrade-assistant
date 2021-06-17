@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
 {
     /// <summary>
     /// This analyzer will modify the vbproj of class libraries to resolve compilation errors:

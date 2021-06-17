@@ -2,8 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
             }
 
             services.Services.AddUpgradeStep<VisualBasicProjectUpdaterStep>();
+            services.AddTransient<IDependencyAnalyzer, VbClassLibraryMyDotAnalyzer>();
         }
     }
 }
