@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Updated `HttpContext.Current` code fix to use an internal `HttpContextHelper` that will work in multi-project solutions [#599](https://github.com/dotnet/upgrade-assistant/pull/599).
+- Updated `HttpContext.Current` analyzer to more correctly identify uses of `HttpContext.Current` that need replaced [#628](https://github.com/dotnet/upgrade-assistant/pull/628).
+- Fixed a bug that was preventing the Upgrade Assistant analyzer package from being added to upgraded projects [#620](https://github.com/dotnet/upgrade-assistant/pull/620).
+- Fixed a bug in `PackageLoader` that was causing many extraneous warning messages when verbose logging was enabled [#619](https://github.com/dotnet/upgrade-assistant/pull/619).
+- Fixed a bug in `SourceUpdaterStep` that was leaving an extra .cs file in projects after upgrade which introduced build errors in the project (since the .cs files were already automatically included) [#616](https://github.com/dotnet/upgrade-assistant/pull/616).
 
 ## Version 0.2.227701 - 2021-05-27 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.227701))
 
