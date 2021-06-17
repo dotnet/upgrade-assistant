@@ -10,7 +10,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
 {
     public class VisualBasicExtensionServiceProvider : IExtensionServiceProvider
     {
-
         public void AddServices(IExtensionServiceCollection services)
         {
             if (services is null)
@@ -19,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
             }
 
             services.Services.AddUpgradeStep<VisualBasicProjectUpdaterStep>();
-            services.AddTransient<IDependencyAnalyzer, MyDotAnalyzer>();
+            services.Services.AddTransient<IDependencyAnalyzer, MyDotAnalyzer>();
         }
     }
 }

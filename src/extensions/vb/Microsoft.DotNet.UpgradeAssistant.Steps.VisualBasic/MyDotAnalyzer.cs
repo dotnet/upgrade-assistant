@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
 
         public string Name => nameof(MyDotAnalyzer) + " reference analyzer";
 
-        public MyDotAnalyzer(IPackageLoader packageLoader, ILogger<MyDotAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
+        public MyDotAnalyzer(IPackageLoader packageLoader, ILogger<MyDotAnalyzer> logger)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
 
             if (!state.Packages.Any(r => SystemConfigurationPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var systemConfigurationPackage = await _packageLoader.GetLatestVersionAsync(SystemConfigurationPackageName, state.TargetFrameworks, false, token).ConfigureAwait(false);
+                var systemConfigurationPackage = await _packageLoader.GetLatestVersionAsync(SystemConfigurationPackageName, state.TargetFrameworks, new(), token).ConfigureAwait(false);
 
                 if (systemConfigurationPackage is not null)
                 {
