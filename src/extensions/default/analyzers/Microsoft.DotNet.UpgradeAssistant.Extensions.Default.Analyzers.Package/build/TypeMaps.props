@@ -2,7 +2,7 @@
 <Project>
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)\WebTypeReplacements.typemap">
-      <Link>$(AppDesignerFolder)\WebTypeReplacements.typemap</Link>
+      <Visible>false</Visible>
     </AdditionalFiles>
   </ItemGroup>
 </Project>
