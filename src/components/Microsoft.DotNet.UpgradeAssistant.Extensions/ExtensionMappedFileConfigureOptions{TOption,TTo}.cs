@@ -8,7 +8,6 @@ using System.Text.Json;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
