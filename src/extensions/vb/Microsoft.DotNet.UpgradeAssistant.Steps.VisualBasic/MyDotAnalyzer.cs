@@ -11,19 +11,19 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
 {
     /// <summary>
-    /// This analyzer will modify the vbproj of class libraries to resolve compilation errors:
-    /// 1. Adding System.Configuration.ConfigurationManager resolves the error from Settings.Designer.vb.
+    /// This analyzer will modify the vbproj of class libraries to resolve compilation errors.
+    /// Adding System.Configuration.ConfigurationManager resolves compile errors from Settings.Designer.vb.
     /// </summary>
-    public class VbClassLibraryMyDotAnalyzer : IDependencyAnalyzer
+    public class MyDotAnalyzer : IDependencyAnalyzer
     {
         private const string SystemConfigurationPackageName = "System.Configuration.ConfigurationManager";
 
         private readonly IPackageLoader _packageLoader;
-        private readonly ILogger<VbClassLibraryMyDotAnalyzer> _logger;
+        private readonly ILogger<MyDotAnalyzer> _logger;
 
-        public string Name => nameof(VbClassLibraryMyDotAnalyzer) + " reference analyzer";
+        public string Name => nameof(MyDotAnalyzer) + " reference analyzer";
 
-        public VbClassLibraryMyDotAnalyzer(IPackageLoader packageLoader, ILogger<VbClassLibraryMyDotAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
+        public MyDotAnalyzer(IPackageLoader packageLoader, ILogger<MyDotAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

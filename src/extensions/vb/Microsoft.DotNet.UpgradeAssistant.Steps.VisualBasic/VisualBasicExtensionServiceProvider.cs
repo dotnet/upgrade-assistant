@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
             }
 
             services.Services.AddUpgradeStep<VisualBasicProjectUpdaterStep>();
-            services.AddTransient<IDependencyAnalyzer, VbClassLibraryMyDotAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, MyDotAnalyzer>();
         }
     }
 }
