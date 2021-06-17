@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private const string TargetTypeSimpleName = "HttpContext";
         private const string TargetMember = "Current";
+        private const string TargetPropertySymbolName = "Microsoft.AspNetCore.Mvc.ControllerBase.HttpContext";
 
         private static readonly string[] TargetTypeSymbolNames = new[] { "System.Web.HttpContext", "Microsoft.AspNetCore.Http.HttpContext" };
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.HttpContextCurrentTitle), Resources.ResourceManager, typeof(Resources));
@@ -142,9 +143,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     return false;
                 }
             }
+            else if (accessedSymbol is IPropertySymbol propSymbol)
+            {
+                // If the HttpContext reference occurs inside a controller, HttpContext.Current can look
+                // like a reference to the ControllerBase.HttpContext property. However, these should still
+                // be flagged because .Current won't exist in ASP.NET Core. Therefore, bail out for
+                // property symbols only if they are not ControllerBase.HttpContext.
+                if (!TargetPropertySymbolName.Equals(propSymbol.ToDisplayString(), StringComparison.Ordinal))
+                {
+                    return false;
+                }
+            }
             else if (accessedSymbol != null)
             {
-                // If the accessed identifier resolves to a symbol other than a type symbol, bail out
+                // If the accessed identifier resolves to a symbol other than a type or property symbol, bail out
                 // since it's not a reference to System.Web.HttpContext
                 return false;
             }
