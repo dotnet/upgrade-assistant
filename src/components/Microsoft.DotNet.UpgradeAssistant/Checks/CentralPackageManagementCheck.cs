@@ -19,9 +19,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public string Id => nameof(CentralPackageManagementCheck);
 
-        public bool IsBypassable => false;
+        public string UpgradeGuidance => "Please see https://github.com/dotnet/upgrade-assistant/issues/252 to request this feature.";
 
-        public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
+        public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -32,12 +32,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
             if (bool.TryParse(projectRoot.GetPropertyValue("EnableCentralPackageVersions"), out var result) && result)
             {
-                _logger.LogError("Project {Name} uses EnableCentralPackageVersions which is not currently supported. Please see https://github.com/dotnet/upgrade-assistant/issues/252 to request this feature.", project.FileInfo);
-                return Task.FromResult(false);
+                _logger.LogError("Project {Name} uses EnableCentralPackageVersions which is not currently supported. {UpgradeGuidance}", project.FileInfo, UpgradeGuidance);
+                return Task.FromResult(UpgradeReadiness.NotReady);
             }
             else
             {
-                return Task.FromResult(true);
+                return Task.FromResult(UpgradeReadiness.Ready);
             }
         }
     }

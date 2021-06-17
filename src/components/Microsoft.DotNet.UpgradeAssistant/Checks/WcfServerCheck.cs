@@ -1,11 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.IO;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
@@ -14,36 +13,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
     /// should be informed that this is an unsupported technology before they
     /// invest significant time running the tool.
     /// </summary>
-    public class WcfServerCheck : BypassableReadinessCheck
+    public class WcfServerCheck : IUpgradeReadyCheck
     {
-        public WcfServerCheck(ILogger<WcfServerCheck> logger, UpgradeOptions upgradeOptions)
-            : base(logger, upgradeOptions)
-        {
-        }
-
         /// <summary>
-        /// Gets the value WebFormsCheck.
+        /// Gets the value 'WebFormsCheck'.
         /// </summary>
-        public override string Id => nameof(WcfServerCheck);
+        public string Id => nameof(WcfServerCheck);
 
-        /// <summary>
-        /// Gets a value indicating whether this check can be bypassed using the ReadinessAcknowledgement option.
-        /// </summary>
-        public override bool IsBypassable => true;
+        public string UpgradeGuidance => "https://docs.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/migrate-wcf-to-grpc";
 
-        public override string TechnologyDetected => "WCF Server-side Services";
-
-        public override string SupportLink => "https://docs.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/migrate-wcf-to-grpc";
-
-        protected override Task<bool> DoesProjectContainTechnologyAsync(IProject project, CancellationToken token)
+        public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
-                return Task.FromResult(false);
+                throw new ArgumentNullException(nameof(project));
             }
 
             // are there any svc.cs files in this project?
-            return Task.FromResult(project.FindFiles($".svc{GetExtensionForLanguage(project)}").Any());
+            if (project.FindFiles($".svc{GetExtensionForLanguage(project)}").Any())
+            {
+                return Task.FromResult(UpgradeReadiness.Unsupported);
+            }
+
+            return Task.FromResult(UpgradeReadiness.Ready);
         }
 
         private static string GetExtensionForLanguage(IProject project)

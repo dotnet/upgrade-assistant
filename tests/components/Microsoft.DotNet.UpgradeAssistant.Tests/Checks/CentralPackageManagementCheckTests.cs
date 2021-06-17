@@ -9,14 +9,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks.Tests
 {
     public class CentralPackageManagementCheckTests
     {
-        [InlineData("true", false)]
-        [InlineData("True", false)]
-        [InlineData("false", true)]
-        [InlineData("False", true)]
-        [InlineData(null, true)]
-        [InlineData("", true)]
+        [InlineData("true", UpgradeReadiness.NotReady)]
+        [InlineData("True", UpgradeReadiness.NotReady)]
+        [InlineData("false", UpgradeReadiness.Ready)]
+        [InlineData("False", UpgradeReadiness.Ready)]
+        [InlineData(null, UpgradeReadiness.Ready)]
+        [InlineData("", UpgradeReadiness.Ready)]
         [Theory]
-        public async Task ChecksProperty(string isCentrallyManaged, bool isReady)
+        public async Task ChecksProperty(string isCentrallyManaged, UpgradeReadiness isReady)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();

@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetFrameworkSelector _tfmSelector;
+        private readonly UpgradeOptions _upgradeOptions;
         private IProject[]? _orderedProjects;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
@@ -35,6 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
             ITargetFrameworkSelector tfmSelector,
+            UpgradeOptions upgradeOptions,
             ILogger<CurrentProjectSelectionStep> logger)
             : base(logger)
         {
@@ -204,9 +206,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 Logger.LogTrace("Running readiness check {Id}", check.Id);
 
-                if (!await check.IsReadyAsync(project, token).ConfigureAwait(false))
+                if (await check.IsReadyAsync(project, token).ConfigureAwait(false) == UpgradeReadiness.NotReady)
                 {
                     return false;
+                }
+            }
+
+            if (!_upgradeOptions.IgnoreUnsupportedAreas)
+            {
+                var upgradeGuidanceMessages = new List<string>();
+                foreach (var check in _checks)
+                {
+                    Logger.LogTrace("Running readiness check {Id}", check.Id);
+
+                    if (await check.IsReadyAsync(project, token).ConfigureAwait(false) == UpgradeReadiness.Unsupported)
+                    {
+                        upgradeGuidanceMessages.Add(check.UpgradeGuidance);
+                    }
+                }
+
+                if (upgradeGuidanceMessages.Any())
+                {
+                    Logger.LogError($"Project {{Name}} uses feature(s) that are not supported:{Environment.NewLine}{{Messages}}",
+                        project.FileInfo,
+                        string.Join(Environment.NewLine,upgradeGuidanceMessages));
+                    Logger.LogInformation("If you would like to upgrade-assistant to continue anways please use the \"--ignore-unsupported-features\' option.");
                 }
             }
 

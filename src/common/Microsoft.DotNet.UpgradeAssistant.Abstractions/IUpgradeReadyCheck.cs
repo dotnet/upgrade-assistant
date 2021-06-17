@@ -17,18 +17,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
         string Id { get; }
 
         /// <summary>
+        /// Gets a message that tells users what they can do if their project is not ready to upgrade.
+        /// </summary>
+        string UpgradeGuidance { get; }
+
+        /// <summary>
         /// Verifies that given the supplied project, an upgrade is possible.
         /// </summary>
         /// <param name="project">The project to be upgraded.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns><c>true</c> if the project is ready, <c>false</c> if it is not.</returns>
-        Task<bool> IsReadyAsync(IProject project, CancellationToken token);
-
-        /// <summary>
-        /// Gets a value indicating whether this check can be bypassed using the ReadinessAcknowledgement option.
-        /// False should represent ReadyChecks that validate requirements customer's cannot bypass.
-        /// True should represent ReadyChecks that can be bypassed.
-        /// </summary>
-        bool IsBypassable { get; }
+        Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token);
     }
 }

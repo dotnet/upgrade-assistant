@@ -19,9 +19,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public string Id => nameof(CanLoadProjectFile);
 
-        public bool IsBypassable => false;
+        public string UpgradeGuidance => "Use Visual Studio to confirm that this project can be loaded.";
 
-        public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
+        public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
         {
             if (project is null)
             {
@@ -32,14 +32,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             {
                 // Just need to access some values in the file to see if it can be properly loaded.
                 _ = project.GetFile().GetPropertyValue("SomeValue");
-                return Task.FromResult(true);
+                return Task.FromResult(UpgradeReadiness.Ready);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
                 _logger.LogError("Project {Name} can not be loaded: {Message}", project.FileInfo, e.Message);
-                return Task.FromResult(false);
+                return Task.FromResult(UpgradeReadiness.NotReady);
             }
         }
     }

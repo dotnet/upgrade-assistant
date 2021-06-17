@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public string Id => nameof(TargetFrameworkCheck);
 
-        public bool IsBypassable => false;
+        public string UpgradeGuidance => "Please see https://github.com/dotnet/upgrade-assistant/issues/252 to request this feature.";
 
         public Task<bool> IsReadyAsync(IProject project, CancellationToken token)
         {
@@ -38,9 +38,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             }
             else
             {
-                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. Multi-targeted projects are not yet supported.", project.FileInfo);
+                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. {UpgradeGuidance}", project.FileInfo, UpgradeGuidance);
                 return Task.FromResult(false);
             }
+        }
+
+        Task<UpgradeReadiness> IUpgradeReadyCheck.IsReadyAsync(IProject project, CancellationToken token)
+        {
+            throw new NotImplementedException();
         }
     }
 }
