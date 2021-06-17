@@ -224,7 +224,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 Logger.LogError($"Project {{Name}} uses feature(s) that are not supported:{Environment.NewLine}{{Messages}}",
                     project.FileInfo,
-                    string.Join(Environment.NewLine,upgradeGuidanceMessages));
+                    string.Join(Environment.NewLine, upgradeGuidanceMessages));
                 Logger.LogInformation("If you would like to upgrade-assistant to continue anways please use the \"--ignore-unsupported-features\' option.");
 
                 // user has been informed about how to proceed.
