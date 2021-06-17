@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             // Check SDK directly (instead of using project.Components) since having the FrameworkReference counts as
             // having the AspNetCore component and this analyzer is specifically insterested in cases where both the SDK
             // and the framework reference are present.
-            if (!projectRoot.Sdk.Contains(WebSdk))
+            if (projectRoot.Sdk != null && !projectRoot.Sdk.Contains(WebSdk))
             {
                 return Task.CompletedTask;
             }
