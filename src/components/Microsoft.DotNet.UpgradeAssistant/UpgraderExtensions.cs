@@ -29,11 +29,17 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddTransient<IUpgradeReadyCheck, CanLoadProjectFile>();
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
-            services.AddTransient<IUpgradeReadyCheck, TargetFrameworkCheck>();
+            services.AddTransient<IUpgradeReadyCheck, MultiTargetFrameworkCheck>();
 
             services.AddTransient<IUpgradeReadyCheck, VisualBasicRazorTemplateCheck>();
             services.AddTransient<IUpgradeReadyCheck, WebFormsCheck>();
             services.AddTransient<IUpgradeReadyCheck, WcfServerCheck>();
+
+            services.AddOptions<UpgradeReadinessOptions>()
+                .Configure<UpgradeOptions>((upgradeReadinessOptions, upgradeOptions) =>
+                {
+                    upgradeReadinessOptions.IgnoreUnsupportedFeatures = upgradeOptions.IgnoreUnsupportedFeatures;
+                });
         }
 
         private static void AddTargetFrameworkSelectors(this IServiceCollection services)

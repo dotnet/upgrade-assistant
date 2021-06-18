@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
     public class CanLoadProjectFile : IUpgradeReadyCheck
     {
+        private const string MESSAGE_TEMPLATE = "Project {0} can not be loaded: {1}";
+        private const string GUIDANCE = "Use Visual Studio to confirm that this project can be loaded.";
+
         private readonly ILogger<CanLoadProjectFile> _logger;
 
         public CanLoadProjectFile(ILogger<CanLoadProjectFile> logger)
@@ -19,9 +23,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public string Id => nameof(CanLoadProjectFile);
 
-        public string UpgradeGuidance => "Use Visual Studio to confirm that this project can be loaded.";
+        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, MESSAGE_TEMPLATE, "{Project}", GUIDANCE);
 
-        public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
+        public Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
             if (project is null)
             {
@@ -38,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                _logger.LogError("Project {Name} can not be loaded: {Message}", project.FileInfo, e.Message);
+                _logger.LogError(MESSAGE_TEMPLATE, project.FileInfo, e.Message);
                 return Task.FromResult(UpgradeReadiness.NotReady);
             }
         }

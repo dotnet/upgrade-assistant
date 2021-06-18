@@ -2,9 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
@@ -15,23 +17,44 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
     /// </summary>
     public class WcfServerCheck : IUpgradeReadyCheck
     {
+        private const string UPGRADE_LINK = "https://aka.ms/migrate-wcf-to-grpc";
+        private const string CATEGORY = "WCF Server-side Services";
+        private const string WCF_MESSAGE = "Support for {0} is limited to .NET Full Framework. To learn more please read: {1}";
+        private readonly ILogger<WcfServerCheck> _logger;
+
+        public WcfServerCheck(ILogger<WcfServerCheck> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
         /// <summary>
         /// Gets the value 'WcfServerCheck'.
         /// </summary>
         public string Id => nameof(WcfServerCheck);
 
-        public string UpgradeGuidance => $"Support for WCF Server-side Services is limited to .NET Full Framework. To learn more please read: https://aka.ms/migrate-wcf-to-grpc";
+        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, WCF_MESSAGE, CATEGORY, UPGRADE_LINK);
 
-        public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
+        public Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
             if (project is null)
             {
                 throw new ArgumentNullException(nameof(project));
             }
 
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (options.IgnoreUnsupportedFeatures)
+            {
+                return Task.FromResult(UpgradeReadiness.Ready);
+            }
+
             // are there any svc.cs files in this project?
             if (project.FindFiles($".svc{GetExtensionForLanguage(project)}").Any())
             {
+                _logger.LogError(WCF_MESSAGE, CATEGORY, UPGRADE_LINK);
                 return Task.FromResult(UpgradeReadiness.Unsupported);
             }
 

@@ -19,14 +19,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets a message that tells users what they can do if their project is not ready to upgrade.
         /// </summary>
-        string UpgradeGuidance { get; }
+        string UpgradeMessage { get; }
 
         /// <summary>
         /// Verifies that given the supplied project, an upgrade is possible.
         /// </summary>
         /// <param name="project">The project to be upgraded.</param>
+        /// <param name="options">Options for readiness checks.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns><c>true</c> if the project is ready, <c>false</c> if it is not.</returns>
-        Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token);
+        Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token);
     }
 }

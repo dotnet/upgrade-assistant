@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
@@ -17,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         private readonly IUserInput _input;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
         private readonly ITargetFrameworkSelector _tfmSelector;
-        private readonly UpgradeOptions _upgradeOptions;
+        private readonly IOptions<UpgradeReadinessOptions> _upgradeOptions;
         private IProject[]? _orderedProjects;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
@@ -36,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             IUserInput input,
             ITargetFrameworkMonikerComparer tfmComparer,
             ITargetFrameworkSelector tfmSelector,
-            UpgradeOptions upgradeOptions,
+            IOptions<UpgradeReadinessOptions> upgradeOptions,
             ILogger<CurrentProjectSelectionStep> logger)
             : base(logger)
         {
@@ -45,6 +46,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
             _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _upgradeOptions = upgradeOptions ?? throw new ArgumentNullException(nameof(upgradeOptions));
+
+            if (_upgradeOptions.Value is null)
+            {
+                throw new ArgumentException("Missing UpgradeReadinessOptions");
+            }
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
@@ -208,24 +214,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 Logger.LogTrace("Running readiness check {Id}", check.Id);
 
-                var readiness = await check.IsReadyAsync(project, token).ConfigureAwait(false);
+                var readiness = await check.IsReadyAsync(project, _upgradeOptions.Value, token).ConfigureAwait(false);
                 if (readiness == UpgradeReadiness.NotReady)
                 {
                     return false;
                 }
-                else if (!_upgradeOptions.IgnoreUnsupportedFeatures && readiness == UpgradeReadiness.Unsupported)
+                else if (!_upgradeOptions.Value.IgnoreUnsupportedFeatures && readiness == UpgradeReadiness.Unsupported)
                 {
                     // an unsupported area has been detected. Capture a message to explain how to proceed.
-                    upgradeGuidanceMessages.Add(check.UpgradeGuidance);
+                    upgradeGuidanceMessages.Add(check.UpgradeMessage);
                 }
             }
 
             if (upgradeGuidanceMessages.Any())
             {
-                Logger.LogError($"Project {{Name}} uses feature(s) that are not supported:{Environment.NewLine}{{Messages}}",
+                // NOTE: the hidden assumption is that the UpgradeGuidance messages that were collected will be printed
+                // to console by the IUpgradeReadyCheck. We make these messages accessible by property so that they can be integrated into a UI in the future
+                // but assume that the IUpgradeReadyCheck displays them via logging because semantic logging provides color highlighting that we want to preserve.
+                Logger.LogError($"Project {{Name}} uses feature(s) that are not supported.{Environment.NewLine}If you would like to upgrade-assistant to continue anways please use the \"{{UnsupportedFeatures}}\" option.",
                     project.FileInfo,
-                    string.Join(Environment.NewLine, upgradeGuidanceMessages));
-                Logger.LogInformation("If you would like to upgrade-assistant to continue anways please use the \"--ignore-unsupported-features\' option.");
+                    "--ignore-unsupported-features");
 
                 // user has been informed about how to proceed.
                 // This project is not ready until the option '--ignore-unsupported-features' is provided.

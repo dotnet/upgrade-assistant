@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,20 +14,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
     /// Checks to see if the project has more than one target framework moniker.
     /// Multi-target projects are not currently supported.
     /// </summary>
-    public class TargetFrameworkCheck : IUpgradeReadyCheck
+    public class MultiTargetFrameworkCheck : IUpgradeReadyCheck
     {
-        private readonly ILogger<TargetFrameworkCheck> _logger;
+        private const string FEATURE_LINK = "https://github.com/dotnet/upgrade-assistant/issues/640";
 
-        public TargetFrameworkCheck(ILogger<TargetFrameworkCheck> logger)
+        private readonly ILogger<MultiTargetFrameworkCheck> _logger;
+
+        public MultiTargetFrameworkCheck(ILogger<MultiTargetFrameworkCheck> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public string Id => nameof(TargetFrameworkCheck);
+        public string Id => nameof(MultiTargetFrameworkCheck);
 
-        public string UpgradeGuidance => "Please see https://github.com/dotnet/upgrade-assistant/issues/252 to request this feature.";
+        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, "Please see {0} to request this feature.", FEATURE_LINK);
 
-        public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
+        public Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
             if (project is null)
             {
@@ -42,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             }
             else
             {
-                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. {UpgradeGuidance}", project.FileInfo, UpgradeGuidance);
+                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. Please see {FeatureLink} to request this feature.", project.FileInfo, FEATURE_LINK);
                 return Task.FromResult(UpgradeReadiness.NotReady);
             }
         }

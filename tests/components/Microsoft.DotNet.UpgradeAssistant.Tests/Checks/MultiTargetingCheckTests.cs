@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
             var tfms = fixture.CreateMany<TargetFrameworkMoniker>(tfmCount).ToArray();
 
             using var mock = AutoMock.GetLoose();
-            var readyCheck = mock.Create<TargetFrameworkCheck>();
+            var readyCheck = mock.Create<MultiTargetFrameworkCheck>();
 
             var project = new Mock<IProject>();
             project.Setup(p => p.TargetFrameworks).Returns(tfms);
