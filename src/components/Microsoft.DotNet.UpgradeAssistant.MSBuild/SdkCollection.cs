@@ -19,13 +19,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _projectRoot = projectRoot;
         }
 
-        public HashSet<string> GetSdks() => _projectRoot.Sdk.Split(';').ToHashSet(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> GetSdks() => _projectRoot.Sdk.Split(';').ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        public ICollection<string> GetSdkLists() => _projectRoot.Sdk.Split(';').ToList();
+        private ICollection<string> GetSdkLists() => _projectRoot.Sdk.Split(';').ToList();
 
         public bool Contains(string item)
         {
-            return GetSdks().Contains(item, StringComparer.OrdinalIgnoreCase);
+            return GetSdks().Contains(item);
         }
 
         public void Add(string item)
@@ -72,14 +72,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ((ICollection<string>)this).CopyTo(array, arrayIndex);
         }
 
-        public IEnumerator<string> GetEnumerator()
-        {
-            return _projectRoot.Sdk.Split(';').ToList().GetEnumerator();
-        }
+        public IEnumerator<string> GetEnumerator() => GetSdkLists().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _projectRoot.Sdk.Split(';').ToArray().GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

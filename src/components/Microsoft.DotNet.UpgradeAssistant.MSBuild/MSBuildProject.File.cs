@@ -181,11 +181,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             Path.IsPathFullyQualified(path)
             ? path
             : Path.Combine(projectDir, path);
-
-        public void SetSDK(string sdk)
-        {
-            var currentSdk = ProjectRoot.Sdk;
-            ProjectRoot.Sdk = sdk + ";" + currentSdk;
-        }
     }
 }
