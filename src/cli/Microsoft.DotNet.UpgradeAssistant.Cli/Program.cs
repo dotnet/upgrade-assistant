@@ -64,10 +64,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         }
 
         public static Task<int> RunAnalysisAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
-    => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
-    {
-        services.AddScoped<IAppCommand, ConsoleAnalyze>();
-    }), token);
+            => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
+            {
+                services.AddScoped<IAppCommand, ConsoleAnalyze>();
+            }), token);
 
         public static Task<int> RunUpgradeAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
             => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
