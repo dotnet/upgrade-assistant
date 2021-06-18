@@ -31,7 +31,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
             services.AddTransient<IUpgradeReadyCheck, TargetFrameworkCheck>();
 
-            // bypassable checks
             services.AddTransient<IUpgradeReadyCheck, VisualBasicRazorTemplateCheck>();
             services.AddTransient<IUpgradeReadyCheck, WebFormsCheck>();
             services.AddTransient<IUpgradeReadyCheck, WcfServerCheck>();
