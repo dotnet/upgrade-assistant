@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Usage telemetry has been added to help guide product development. See [https://aka.ms/upgrade-assistant-telemetry](https://aka.ms/upgrade-assistant-telemetry) for details [#644](https://github.com/dotnet/upgrade-assistant/pull/644).
+
+### Fixed
 - Updated `HttpContext.Current` analyzer to more correctly identify uses of `HttpContext.Current` that need replaced [#628](https://github.com/dotnet/upgrade-assistant/pull/628).
 
 ## Version 0.2.231403 - 2021-06-14 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.231403))
