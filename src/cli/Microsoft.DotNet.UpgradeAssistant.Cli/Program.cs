@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 services.AddScoped<IAppCommand, ConsoleUpgrade>();
             }), token);
 
-        private static IHostBuilder EnableLogging(UpgradeOptions options, IHostBuilder host)
+        private static IHostBuilder EnableLogging(UpgradeOptions options, ParseResult parseResult, IHostBuilder host)
         {
             var logSettings = new LogSettings(options.Verbose);
 
@@ -83,6 +83,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton(logSettings);
+
+                    services.AddSingleton(parseResult);
+                    services.AddTransient<IUpgradeStartup, UsedCommandTelemetry>();
                 })
                 .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
                     .Enrich.FromLogContext()
@@ -108,8 +111,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             var hostBuilder = Host.CreateDefaultBuilder()
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .UseContentRoot(AppContext.BaseDirectory)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
+                    // Register this first so the first startup step is to check for telemetry opt-in
+                    services.AddTransient<IUpgradeStartup, ConsoleFirstTimeUserNotifier>();
+                    services.AddTelemetry(options =>
+                    {
+                        context.Configuration.GetSection("Telemetry").Bind(options);
+                        options.ProductVersion = Constants.FullVersion;
+                    });
+
                     services.AddHostedService<ConsoleRunner>();
 
                     services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
@@ -212,7 +224,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ConfigureUpgradeCommand(Command command)
         {
-            command.Handler = CommandHandler.Create<UpgradeOptions, CancellationToken>((options, token) => RunUpgradeAsync(options, host => EnableLogging(options, host), token));
+            command.Handler = CommandHandler.Create<ParseResult, UpgradeOptions, CancellationToken>((result, options, token) => RunUpgradeAsync(options, host => EnableLogging(options, result, host), token));
             RegisterCommonOptions(command);
             command.AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
             command.AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option in non-interactive mode."));
@@ -221,7 +233,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ConfigureAnalyzeCommand(Command command)
         {
-            command.Handler = CommandHandler.Create<UpgradeOptions, CancellationToken>((options, token) => RunAnalysisAsync(options, host => EnableLogging(options, host), token));
+            command.Handler = CommandHandler.Create<ParseResult, UpgradeOptions, CancellationToken>((result, options, token) => RunAnalysisAsync(options, host => EnableLogging(options, result, host), token));
             RegisterCommonOptions(command);
             command.IsHidden = true;
         }

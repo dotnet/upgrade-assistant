@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         public abstract string CommandText { get; }
 
+        public abstract string Id { get; }
+
         public bool IsEnabled { get; init; } = true;
 
         public static UpgradeCommand Create(string text, bool isEnabled = true)
@@ -56,6 +58,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 CommandText = text;
             }
 
+            public override string Id { get; } = "CustomCommand";
+
             public override string CommandText { get; }
 
             public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
@@ -66,6 +70,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             where TEnum : Enum
         {
             public override string CommandText => Value.ToString();
+
+            public override string Id => $"Select{typeof(TEnum).Name}";
 
             public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
                 => Task.FromResult(true);

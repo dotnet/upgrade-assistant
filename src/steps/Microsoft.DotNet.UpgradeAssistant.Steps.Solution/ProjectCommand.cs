@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             Project = project;
         }
 
+        public override string Id => "Project";
+
         // Use ANSI escape codes to colorize parts of the output (https://en.wikipedia.org/wiki/ANSI_escape_code)
         public override string CommandText
         {

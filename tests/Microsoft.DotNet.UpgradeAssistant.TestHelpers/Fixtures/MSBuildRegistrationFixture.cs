@@ -1,8 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Autofac.Extras.Moq;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Fixtures
 {
@@ -11,7 +11,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Fixtures
         public MSBuildRegistrationFixture()
         {
             // Register MSBuild
-            var msBuildRegistrar = new MSBuildRegistrationStartup(new NullLogger<MSBuildRegistrationStartup>(), MSBuildPath.MSBuildPathInstance.Locator);
+            using var mock = AutoMock.GetLoose();
+            var msBuildRegistrar = mock.Create<MSBuildRegistrationStartup>();
+
             msBuildRegistrar.RegisterMSBuildInstance();
         }
     }

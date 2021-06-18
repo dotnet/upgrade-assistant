@@ -12,5 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         public const int UpgradeError = 2;
 
         public const int UnexpectedError = 3;
+
+        public const int Canceled = 4;
     }
 }
