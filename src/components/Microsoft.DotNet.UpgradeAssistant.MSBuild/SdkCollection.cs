@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public HashSet<string> GetSdks() => _projectRoot.Sdk.Split(';').ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        public List<string> GetSdkLists() => _projectRoot.Sdk.Split(';').ToList();
+        public ICollection<string> GetSdkLists() => _projectRoot.Sdk.Split(';').ToList();
 
         public bool Contains(string item)
         {
