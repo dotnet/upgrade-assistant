@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
                 _logger.LogError(WEB_FORMS_MESSAGE, CATEGORY, UPGRADE_LINK);
                 return UpgradeReadiness.Unsupported;
             }
-            
+
             return UpgradeReadiness.Ready;
         }
 
