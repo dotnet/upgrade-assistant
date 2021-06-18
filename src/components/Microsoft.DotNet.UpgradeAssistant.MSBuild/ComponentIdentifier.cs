@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private static ProjectComponents GetSDKProjectComponents(IProject project, IProjectFile file)
         {
             var components = ProjectComponents.None;
-            if (file.Sdk.Contains(MSBuildConstants.WebSdk, StringComparer.OrdinalIgnoreCase))
+            if (file.Sdk.Contains(MSBuildConstants.WebSdk))
             {
                 components |= ProjectComponents.AspNetCore;
             }
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 components |= ProjectComponents.WindowsDesktop;
             }
 
-            if (file.Sdk.Contains(MSBuildConstants.DesktopSdk, StringComparer.OrdinalIgnoreCase))
+            if (file.Sdk.Contains(MSBuildConstants.DesktopSdk))
             {
                 components |= ProjectComponents.WindowsDesktop;
             }
