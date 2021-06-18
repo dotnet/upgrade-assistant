@@ -19,24 +19,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _projectRoot = projectRoot;
         }
 
+        public HashSet<string> GetSdks() => _projectRoot.Sdk.Split(';').ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        public List<string> GetSdkLists() => _projectRoot.Sdk.Split(';').ToList();
+
         public bool Contains(string item)
         {
-            var sdkElements = _projectRoot.Sdk.Split(';').ToList();
-            if (sdkElements.Contains(item))
-            {
-                return true;
-            }
-
-            return false;
+            return GetSdks().Contains(item, StringComparer.OrdinalIgnoreCase);
         }
 
         public void Add(string item)
         {
-            var sdkElements = _projectRoot.Sdk.Split(';').ToList();
             if (!Contains(item))
             {
-                sdkElements.Add(item);
-                _projectRoot.Sdk = string.Join(';', sdkElements);
+                _projectRoot.Sdk = string.Concat(_projectRoot.Sdk, ";", item);
             }
         }
 
@@ -49,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             get
             {
-                return _projectRoot.Imports.Count;
+                return GetSdks().Count;
             }
         }
 
@@ -60,11 +56,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public bool Remove(string item)
         {
-            var sdkElements = _projectRoot.Sdk.Split(';').ToList();
             if (Contains(item))
             {
-                sdkElements.Remove(item);
-                _projectRoot.Sdk = string.Join(';', sdkElements);
+                var sdkList = GetSdkLists();
+                sdkList.Remove(item);
+                _projectRoot.Sdk = string.Join(";", sdkList);
                 return true;
             }
 

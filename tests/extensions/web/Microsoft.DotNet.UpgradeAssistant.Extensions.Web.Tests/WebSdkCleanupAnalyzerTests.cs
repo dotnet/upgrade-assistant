@@ -96,7 +96,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             }
             else
             {
-                projectRoot.Setup(r => r.Sdk).Throws<ArgumentOutOfRangeException>();
+                projectRoot.Setup(r => r.Sdk).Returns(Array.Empty<string>());
             }
 
             var project = mock.Mock<IProject>();
