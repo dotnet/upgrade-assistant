@@ -213,7 +213,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 {
                     return false;
                 }
-                else if (!_upgradeOptions.IgnoreUnsupportedAreas && readiness == UpgradeReadiness.Unsupported)
+                else if (!_upgradeOptions.IgnoreUnsupportedFeatures && readiness == UpgradeReadiness.Unsupported)
                 {
                     // an unsupported area has been detected. Capture a message to explain how to proceed.
                     upgradeGuidanceMessages.Add(check.UpgradeGuidance);
