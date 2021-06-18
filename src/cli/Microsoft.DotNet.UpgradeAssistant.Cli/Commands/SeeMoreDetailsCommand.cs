@@ -20,6 +20,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
 
         public override string CommandText => "See more step details";
 
+        public override string Id => "Details";
+
         public override async Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
         {
             await _showDetails(_step).ConfigureAwait(false);

@@ -10,6 +10,7 @@ using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Locator;
+using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
@@ -24,13 +25,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         // per process.
         private static VisualStudioInstance? _instance;
 
+        private readonly ITelemetry _telemetry;
         private readonly ILogger _logger;
         private readonly MSBuildPathLocator _locator;
 
-        public MSBuildRegistrationStartup(ILogger<MSBuildRegistrationStartup> logger, MSBuildPathLocator locator)
+        public MSBuildRegistrationStartup(ITelemetry telemetry, MSBuildPathLocator locator, ILogger<MSBuildRegistrationStartup> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _locator = locator ?? throw new ArgumentNullException(nameof(locator));
+            _telemetry = telemetry;
+            _logger = logger;
         }
 
         public Task<bool> StartupAsync(CancellationToken token)
@@ -78,6 +82,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     }
                 }
             }
+
+            _telemetry.TrackEvent("msbuild", new Dictionary<string, string> { { "MSBuild Version", _instance.Version.ToString() } });
 
             return _instance.MSBuildPath;
         }

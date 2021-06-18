@@ -42,6 +42,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger = logger;
         }
 
+        public string Id => Context.SolutionInfo.GetProjectId(FileInfo.FullName);
+
         public IEnumerable<IProject> ProjectReferences => GetRoslynProject().ProjectReferences.Select(p =>
         {
             var project = Context.Workspace.CurrentSolution.GetProject(p.ProjectId);
@@ -115,6 +117,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
         public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks => new TargetFrameworkMonikerCollection(this, _comparer);
+
+        public IEnumerable<string> ProjectTypes => GetPropertyValue("ProjectTypeGuids").Split(';');
 
         public override bool Equals(object? obj)
         {

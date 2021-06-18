@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.DotNet.UpgradeAssistant.Checks;
 using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Microsoft.DotNet.UpgradeAssistant.VisualBasic;
@@ -23,6 +24,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddOptions<DefaultTfmOptions>()
                 .Configure(options)
                 .ValidateDataAnnotations();
+            services.AddContextTelemetry();
+        }
+
+        public static void AddContextTelemetry(this IServiceCollection services)
+        {
+            services.AddSingleton<UpgradeContextTelemetry>();
+            services.AddTransient<ITelemetryInitializer>(ctx => ctx.GetRequiredService<UpgradeContextTelemetry>());
+            services.AddTransient<IUpgradeContextAccessor>(ctx => ctx.GetRequiredService<UpgradeContextTelemetry>());
         }
 
         private static void AddReadinessChecks(this IServiceCollection services)

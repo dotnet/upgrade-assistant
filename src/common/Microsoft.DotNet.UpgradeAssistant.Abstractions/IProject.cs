@@ -13,6 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         FileInfo FileInfo { get; }
 
+        string Id { get; }
+
         Language Language { get; }
 
         Project GetRoslynProject();
@@ -22,6 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         IEnumerable<Reference> FrameworkReferences { get; }
 
         INuGetReferences NuGetReferences { get; }
+
+        IEnumerable<string> ProjectTypes { get; }
 
         IEnumerable<Reference> References { get; }
 
