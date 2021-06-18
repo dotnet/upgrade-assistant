@@ -58,8 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             if (Contains(item))
             {
-                var sdkList = GetSdkLists();
-                sdkList.Remove(item);
+                var sdkList = GetSdks().Where(p => p != item);
                 _projectRoot.Sdk = string.Join(";", sdkList);
                 return true;
             }
