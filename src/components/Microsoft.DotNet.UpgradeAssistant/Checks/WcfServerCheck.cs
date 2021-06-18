@@ -20,7 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
         /// </summary>
         public string Id => nameof(WcfServerCheck);
 
-        // todo: code review - make new aka.ms link waiting on feedback from the team
         public string UpgradeGuidance => $"Support for WCF Server-side Services is limited to .NET Full Framework. To learn more please read: https://aka.ms/migrate-wcf-to-grpc";
 
         public Task<UpgradeReadiness> IsReadyAsync(IProject project, CancellationToken token)
