@@ -33,7 +33,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var project = mock.Mock<IProjectFile>();
-            project.Setup(p => p.IsSdk).Returns(true);
             project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(string.Empty);
             project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(tfm);
 
@@ -56,7 +55,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var project = mock.Mock<IProjectFile>();
-            project.Setup(p => p.IsSdk).Returns(true);
             project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(string.Empty);
             project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(value);
 
@@ -78,7 +76,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var project = mock.Mock<IProjectFile>();
-            project.Setup(p => p.IsSdk).Returns(false);
             project.Setup(p => p.GetPropertyValue(NonSdkSingleTargetFrameworkName)).Returns(version);
 
             var moniker = mock.Mock<ITargetFrameworkMonikerComparer>();
@@ -100,7 +97,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var project = mock.Mock<IProjectFile>();
-            project.Setup(p => p.IsSdk).Returns(false);
 
             // Act
             var collection = mock.Create<TargetFrameworkMonikerCollection>();
@@ -116,7 +112,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var project = mock.Mock<IProjectFile>();
-            project.Setup(p => p.IsSdk).Returns(true);
             project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(Net45);
             project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(string.Empty);
 
@@ -137,7 +132,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var project = mock.Mock<IProjectFile>();
-            project.Setup(p => p.IsSdk).Returns(true);
             project.Setup(p => p.GetPropertyValue(SdkSingleTargetFramework)).Returns(string.Empty);
             project.Setup(p => p.GetPropertyValue(SdkMultipleTargetFrameworkName)).Returns(Net45);
 

@@ -89,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
         private static IProject GetMockProjectAndPackageState(AutoMock mock, string? sdk = null, IEnumerable<Reference>? frameworkReferences = null)
         {
             var projectRoot = mock.Mock<IProjectFile>();
-            projectRoot.Setup(r => r.IsSdk).Returns(sdk is not null);
+
             if (sdk is not null)
             {
                 projectRoot.Setup(r => r.Sdk).Returns(new List<string>() { sdk });

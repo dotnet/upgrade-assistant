@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             // so old project components are checked regardless of SDK status
             var components = await GetGeneralProjectComponentsAsync(project, file, token).ConfigureAwait(false);
 
-            if (file.IsSdk)
+            if (file.Sdk.Any())
             {
                 components |= GetSDKProjectComponents(project, file);
             }

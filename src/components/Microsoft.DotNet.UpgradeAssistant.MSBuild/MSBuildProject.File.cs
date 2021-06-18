@@ -38,9 +38,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public bool IsSdk =>
+        /*public bool IsSdk =>
             Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparer.OrdinalIgnoreCase) || Sdk.Contains(MSBuildConstants.WebSdk, StringComparer.OrdinalIgnoreCase);
-
+        */
         public ICollection<string> Imports => new ImportsCollection(ProjectRoot);
 
         public ICollection<string> Sdk => new SdkCollection(ProjectRoot);

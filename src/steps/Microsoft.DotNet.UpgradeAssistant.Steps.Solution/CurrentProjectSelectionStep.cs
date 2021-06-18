@@ -158,7 +158,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
         // Consider a project completely upgraded if it is SDK-style and has a TFM equal to (or greater then) the expected one
         private async ValueTask<bool> IsCompletedAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
-            if (!project.GetFile().IsSdk)
+            if (!project.GetFile().Sdk.Any())
             {
                 return false;
             }

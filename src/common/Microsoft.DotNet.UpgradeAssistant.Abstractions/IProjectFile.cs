@@ -11,8 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         ICollection<string> Sdk { get; }
 
-        public bool IsSdk { get; }
-
+        // public bool IsSdk { get; }
         string FilePath { get; }
 
         void AddFrameworkReferences(IEnumerable<Reference> frameworkReferences);

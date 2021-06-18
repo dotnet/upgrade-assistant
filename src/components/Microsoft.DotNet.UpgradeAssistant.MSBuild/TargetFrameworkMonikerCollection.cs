@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
@@ -35,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(tfm));
             }
 
-            if (!_projectFile.IsSdk)
+            if (!_projectFile.Sdk.Any())
             {
                 throw new InvalidOperationException("Project file only supports setting TFM on new style csproj");
             }
@@ -85,7 +86,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
         private static string[] GetFrameworkMonikers(IProjectFile file)
-            => file.IsSdk ? GetSdkTargetFramework(file) : GetNonSdkTargetFramework(file);
+            => file.Sdk.Any() ? GetSdkTargetFramework(file) : GetNonSdkTargetFramework(file);
 
         private static string[] GetSdkTargetFramework(IProjectFile file)
         {

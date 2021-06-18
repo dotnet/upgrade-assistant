@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -102,7 +103,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             try
             {
                 // SDK-style projects should reference the Microsoft.NET.Sdk SDK
-                if (!projectFile.IsSdk)
+                if (!projectFile.Sdk.Any())
                 {
                     Logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
 

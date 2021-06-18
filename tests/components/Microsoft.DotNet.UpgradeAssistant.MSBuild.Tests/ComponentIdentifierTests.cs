@@ -27,7 +27,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(true);
             projectFile.Setup(f => f.Sdk).Returns(Array.Empty<string>());
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
             projectFile.Setup(f => f.GetPropertyValue(propertyName)).Returns(value);
@@ -56,7 +55,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(true);
             projectFile.Setup(f => f.Sdk).Returns(new List<string>() { sdk });
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
 
@@ -96,7 +94,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(true);
             projectFile.Setup(f => f.Sdk).Returns(Array.Empty<string>());
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
 
@@ -136,7 +133,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(false);
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
@@ -167,7 +163,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(false);
             projectFile.Setup(p => p.Imports).Returns(imports);
 
             var project = mock.Mock<IProject>();
@@ -195,7 +190,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(false);
 
             var nugetPackages = mock.Mock<INuGetReferences>();
             nugetPackages.Setup(p => p.IsTransitivelyAvailableAsync(name, default)).ReturnsAsync(true);
