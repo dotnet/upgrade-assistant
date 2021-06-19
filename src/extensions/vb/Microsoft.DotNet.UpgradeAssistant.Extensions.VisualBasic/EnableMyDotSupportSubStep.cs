@@ -42,6 +42,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
                 return Task.FromResult(false);
             }
 
+            if (context.CurrentProject.Language != Language.VisualBasic)
+            {
+                return Task.FromResult(false);
+            }
+
             // applicable to Unit test projects and class libraries
             return Task.FromResult(context.CurrentProject.OutputType == ProjectOutputType.Library);
         }
