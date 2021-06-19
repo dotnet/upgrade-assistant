@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
                 return;
             }
 
-            if (!IsVbClassLibrary(project))
+            if (!project.IsVbClassLibrary())
             {
                 _logger.LogDebug("{Project} is not a VB class library", project.FileInfo);
                 return;
@@ -81,11 +81,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
             {
                 _logger.LogDebug("Reference to configuration package ({SystemConfigurationPackageName}) already exists", SystemConfigurationPackageName);
             }
-        }
-
-        private static bool IsVbClassLibrary(IProject project)
-        {
-            return project.Language == Language.VisualBasic && project.OutputType == ProjectOutputType.Library;
         }
     }
 }
