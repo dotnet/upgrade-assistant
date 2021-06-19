@@ -75,17 +75,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
             }
 
             var file = context.CurrentProject!.GetFile();
-            if (DoesThisProjectEmbedVbRuntime(file))
-            {
-                // resolves errors
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.Devices.Computer' is not defined.
-                // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.ApplicationBase' is not defined.
-                file.SetPropertyValue("VBRuntime", "Embed");
-                await file.SaveAsync(token).ConfigureAwait(false);
-            }
+
+            // resolves errors
+            // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
+            // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue' is not defined.
+            // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
+            // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.Devices.Computer' is not defined.
+            // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.ApplicationBase' is not defined.
+            file.SetPropertyValue("VBRuntime", "Embed");
+            await file.SaveAsync(token).ConfigureAwait(false);
 
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
         }
