@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 {
     /// <summary>
     /// This analyzer will add &lt;VBRuntime&gt;Embed&lt;/VBRuntime&gt; to the vbproj to resolve compilation errors.

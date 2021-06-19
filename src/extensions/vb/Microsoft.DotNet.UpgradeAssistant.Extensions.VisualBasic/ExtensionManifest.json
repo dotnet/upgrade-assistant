@@ -16,6 +16,6 @@
   },
 
   "ExtensionServiceProviders": [
-    "Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic.dll"
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.dll"
   ]
 }

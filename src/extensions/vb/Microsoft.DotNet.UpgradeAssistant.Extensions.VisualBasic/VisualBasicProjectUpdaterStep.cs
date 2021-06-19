@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 {
     /// <summary>
     /// Upgrade step that applies changes specific to helping customers

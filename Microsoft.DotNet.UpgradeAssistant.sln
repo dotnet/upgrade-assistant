@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30509.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31410.414
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3FC16DAB-215C-422B-9130-61D566695463}"
 EndProject
@@ -140,7 +140,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vb", "vb", "{F2EF99BD-71B3-41E5-B316-347EA69C41A9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic", "src\extensions\vb\Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic\Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic.csproj", "{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic", "src\extensions\vb\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.csproj", "{608E7CE5-5674-49EB-8728-719A468FC62E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -596,18 +596,18 @@ Global
 		{F380A54A-F8FF-4342-B558-FF70F1AA693F}.Release|x64.Build.0 = Release|Any CPU
 		{F380A54A-F8FF-4342-B558-FF70F1AA693F}.Release|x86.ActiveCfg = Release|Any CPU
 		{F380A54A-F8FF-4342-B558-FF70F1AA693F}.Release|x86.Build.0 = Release|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Debug|x64.Build.0 = Debug|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Debug|x86.Build.0 = Debug|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Release|x64.ActiveCfg = Release|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Release|x64.Build.0 = Release|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Release|x86.ActiveCfg = Release|Any CPU
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119}.Release|x86.Build.0 = Release|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Debug|x64.Build.0 = Debug|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Debug|x86.Build.0 = Debug|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Release|x64.ActiveCfg = Release|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Release|x64.Build.0 = Release|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Release|x86.ActiveCfg = Release|Any CPU
+		{608E7CE5-5674-49EB-8728-719A468FC62E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -667,7 +667,7 @@ Global
 		{AC17CD64-6601-43B2-BF1E-EFD7FFEEC012} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
 		{F380A54A-F8FF-4342-B558-FF70F1AA693F} = {AC17CD64-6601-43B2-BF1E-EFD7FFEEC012}
 		{F2EF99BD-71B3-41E5-B316-347EA69C41A9} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
-		{F1866FDB-2330-4ED2-A1B7-1B96C8D70119} = {F2EF99BD-71B3-41E5-B316-347EA69C41A9}
+		{608E7CE5-5674-49EB-8728-719A468FC62E} = {F2EF99BD-71B3-41E5-B316-347EA69C41A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

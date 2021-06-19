@@ -4,9 +4,10 @@
 using System;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 {
     public class VisualBasicExtensionServiceProvider : IExtensionServiceProvider
     {
