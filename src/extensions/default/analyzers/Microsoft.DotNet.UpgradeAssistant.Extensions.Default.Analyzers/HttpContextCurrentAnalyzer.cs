@@ -21,9 +21,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private const string Category = "Upgrade";
 
         private const string TargetTypeSimpleName = "HttpContext";
-        private const string TargetTypeSymbolName = "System.Web.HttpContext";
         private const string TargetMember = "Current";
+        private const string TargetPropertySymbolName = "Microsoft.AspNetCore.Mvc.ControllerBase.HttpContext";
 
+        private static readonly string[] TargetTypeSymbolNames = new[] { "System.Web.HttpContext", "Microsoft.AspNetCore.Http.HttpContext" };
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.HttpContextCurrentTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.HttpContextCurrentMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.HttpContextCurrentDescription), Resources.ResourceManager, typeof(Resources));
@@ -119,26 +120,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         }
 
         /// <summary>
-        /// Attempts to match against a symbol if there. If a symbol is resolved, it must match exactly. Otherwise, we just match on name.
+        /// Attempts to match against an identifier's symbol against ASP.NET's HttpContext.
+        /// If a symbol is resolved, it must match System.Web.HttpContext or
+        /// Microsoft.AspNetCore.Http.HttpContext exactly.
         /// </summary>
         /// <param name="context">The analysis context.</param>
-        /// <param name="accessedIdentifier">The accessedIdentifier that was found</param>
-        /// <returns>Whether a symbol was found and was matched.</returns>
+        /// <param name="accessedIdentifier">The accessedIdentifier that was found.</param>
+        /// <returns>Returns true if the identifier's symbol matches ASP.NET's HttpContext or if no symbol was found.</returns>
         private static bool TryMatchSymbol(SyntaxNodeAnalysisContext context, SyntaxNode accessedIdentifier)
         {
-            // If the accessed identifier resolves to a type symbol other than System.Web.HttpContext, then bail out
-            // since it means the user is calling some other similarly named API.
+            // If the accessed identifier resolves to a type symbol other than System.Web.HttpContext or
+            // Microsoft.AspNetCore.Http.HttpContext, then bail out since it means the user is calling
+            // some other similarly named API. This allows diagnostics on Microsoft.AspNetCore.Http.HttpContext
+            // in addition to System.Web.HttpContext since ASP.NET Core's HttpContext doesn't have a Current
+            // property so any attempt to access such a property probably indicates a partially upgraded
+            // call site that needs remedied.
             var accessedSymbol = context.SemanticModel.GetSymbolInfo(accessedIdentifier).Symbol;
             if (accessedSymbol is INamedTypeSymbol symbol)
             {
-                if (!symbol.ToDisplayString(NullableFlowState.NotNull).Equals(TargetTypeSymbolName, StringComparison.Ordinal))
+                if (!TargetTypeSymbolNames.Any(name => symbol.ToDisplayString(NullableFlowState.NotNull).Equals(name, StringComparison.Ordinal)))
+                {
+                    return false;
+                }
+            }
+            else if (accessedSymbol is IPropertySymbol propSymbol)
+            {
+                // If the HttpContext reference occurs inside a controller, HttpContext.Current can look
+                // like a reference to the ControllerBase.HttpContext property. However, these should still
+                // be flagged because .Current won't exist in ASP.NET Core. Therefore, bail out for
+                // property symbols only if they are not ControllerBase.HttpContext.
+                if (!TargetPropertySymbolName.Equals(propSymbol.ToDisplayString(), StringComparison.Ordinal))
                 {
                     return false;
                 }
             }
             else if (accessedSymbol != null)
             {
-                // If the accessed identifier resolves to a symbol other than a type symbol, bail out
+                // If the accessed identifier resolves to a symbol other than a type or property symbol, bail out
                 // since it's not a reference to System.Web.HttpContext
                 return false;
             }

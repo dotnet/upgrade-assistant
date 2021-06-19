@@ -50,10 +50,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var currentTFM = project.TargetFrameworks;
-
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
-            var packageMaps = currentTFM.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
+            var packageMaps = state.TargetFrameworks.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
 
             foreach (var packageReference in state.Packages)
             {
@@ -61,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 {
                     _logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
                     state.Packages.Remove(packageReference, BuildBreakRisk.Medium);
-                    await AddNetCoreReferences(map, state, project, token).ConfigureAwait(false);
+                    await AddNetCoreReferences(map, state, token).ConfigureAwait(false);
                 }
             }
 
@@ -71,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 {
                     _logger.LogInformation("Marking assembly reference {ReferenceName} for removal based on package mapping configuration {PackageMapSet}", reference.Name, map.PackageSetName);
                     state.References.Remove(reference, BuildBreakRisk.Medium);
-                    await AddNetCoreReferences(map, state, project, token).ConfigureAwait(false);
+                    await AddNetCoreReferences(map, state, token).ConfigureAwait(false);
                 }
             }
         }
@@ -101,14 +99,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             return _comparer.Compare(version, reference.Version) <= 0;
         }
 
-        private async Task AddNetCoreReferences(NuGetPackageMap packageMap, IDependencyAnalysisState state, IProject project, CancellationToken token)
+        private async Task AddNetCoreReferences(NuGetPackageMap packageMap, IDependencyAnalysisState state, CancellationToken token)
         {
             foreach (var newPackage in packageMap.NetCorePackages)
             {
                 var packageToAdd = newPackage;
                 if (packageToAdd.HasWildcardVersion)
                 {
-                    var reference = await _packageLoader.GetLatestVersionAsync(packageToAdd.Name, project.TargetFrameworks, false, token).ConfigureAwait(false);
+                    var reference = await _packageLoader.GetLatestVersionAsync(packageToAdd.Name, state.TargetFrameworks, new(), token).ConfigureAwait(false);
 
                     if (reference is not null)
                     {

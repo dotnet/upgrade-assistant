@@ -135,7 +135,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private class UpgradeState
         {
-            public string Build { get; init; } = Constants.Version;
+            public string Build { get; init; } = Constants.FullVersion;
 
             public string? CurrentProject { get; init; }
 

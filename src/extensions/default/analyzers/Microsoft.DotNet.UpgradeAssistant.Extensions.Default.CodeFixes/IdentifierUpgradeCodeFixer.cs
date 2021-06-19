@@ -86,18 +86,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             // Split the new idenfitier into namespace and name components
             var namespaceDelimiterIndex = newIdentifier.LastIndexOf('.');
-            var (qualifier, name) = namespaceDelimiterIndex >= 0
-                ? (newIdentifier.Substring(0, namespaceDelimiterIndex), newIdentifier.Substring(namespaceDelimiterIndex + 1))
-                : ((string?)null, newIdentifier);
+            var qualifier = namespaceDelimiterIndex >= 0
+                ? newIdentifier.Substring(0, namespaceDelimiterIndex)
+                : null;
 
             // Create new identifier
-            // Note that the simplifier does not recognize using statements within namespaces, so this
-            // checks whether the necessary using statement is present or not and constructs the new identifer
-            // as either a simple name or qualified name based on that.
-            var updatedNode = (qualifier is not null && node.HasAccessToNamespace(qualifier))
-                ? generator.IdentifierName(name)
-                : GetUpdatedNode(node, generator, newIdentifier)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
+            var updatedNode = GetUpdatedNode(node, generator, newIdentifier)
+                .WithAdditionalAnnotations(Simplifier.Annotation);
+
+            // The simplifier does not recognize using statements within namespaces, so this
+            // checks whether the necessary using statement is present or not and adds the
+            // AddImportsAnnotation only if it's absent.
+            if (qualifier is not null && !node.HasAccessToNamespace(qualifier))
+            {
+                updatedNode = updatedNode.WithAdditionalAnnotations(Simplifier.AddImportsAnnotation);
+            }
 
             // Preserve white space and comments
             updatedNode = updatedNode.WithTriviaFrom(node);
@@ -113,6 +116,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             // Add using declaration if needed
             updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
+
+            // Simplify the call, if possible
+            updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);
 
             return updatedDocument;
         }

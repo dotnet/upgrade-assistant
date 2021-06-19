@@ -43,20 +43,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             foreach (var packageReference in state.Packages)
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
-                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, project.TargetFrameworks, token).ConfigureAwait(false))
+                if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, state.TargetFrameworks, token).ConfigureAwait(false))
                 {
-                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, project.TargetFrameworks);
+                    _logger.LogDebug("Package {NuGetPackage} will work on {TargetFramework}", packageReference, state.TargetFrameworks);
                     continue;
                 }
                 else
                 {
                     // If the package won't work on the target Framework, check newer versions of the package
-                    var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, project.TargetFrameworks, true, token).ConfigureAwait(false);
+                    var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, state.TargetFrameworks, new() { LatestMinorAndBuildOnly = true }, token).ConfigureAwait(false);
                     var updatedReference = newerVersions.FirstOrDefault();
 
                     if (updatedReference == null)
                     {
-                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, project.TargetFrameworks);
+                        _logger.LogWarning("No version of {PackageName} found that supports {TargetFramework}; leaving unchanged", packageReference.Name, state.TargetFrameworks);
                     }
                     else
                     {
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
                         if (updatedReference.IsPrerelease)
                         {
-                            _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", project.TargetFrameworks));
+                            _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", state.TargetFrameworks));
                         }
 
                         state.Packages.Remove(packageReference);

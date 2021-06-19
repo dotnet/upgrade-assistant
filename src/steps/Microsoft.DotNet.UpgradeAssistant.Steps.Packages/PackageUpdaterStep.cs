@@ -77,7 +77,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             try
             {
-                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                var currentProject = context.CurrentProject.Required();
+                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, currentProject, currentProject.TargetFrameworks, token).ConfigureAwait(false);
                 if (!_analysisState.IsValid)
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
@@ -155,7 +156,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         count++;
 
                         Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        _analysisState = await _packageAnalyzer.AnalyzeAsync(context, context.CurrentProject, token).ConfigureAwait(false);
+                        _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, project.TargetFrameworks, token).ConfigureAwait(false);
                         if (!_analysisState.IsValid)
                         {
                             return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");

@@ -2,12 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
@@ -40,18 +40,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public string Name { get; }
 
-        public IEnumerable<IExtensionServiceProvider> GetServiceProviders()
+        public void AddServices(IServiceCollection services)
         {
             if (_alc is null)
             {
-                return Enumerable.Empty<IExtensionServiceProvider>();
+                return;
             }
 
-            return _alc.Value.Assemblies.SelectMany(assembly => assembly
-                .GetTypes()
+            var serviceProviders = _alc.Value.Assemblies
+                .SelectMany(assembly => assembly.GetTypes()
                 .Where(t => t.IsPublic && !t.IsAbstract && typeof(IExtensionServiceProvider).IsAssignableFrom(t))
                 .Select(t => Activator.CreateInstance(t))
                 .Cast<IExtensionServiceProvider>());
+
+            foreach (var sp in serviceProviders)
+            {
+                sp.AddServices(new ExtensionServiceCollection(services, this));
+            }
         }
 
         public string Location { get; }
@@ -59,6 +64,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public IFileProvider FileProvider { get; }
 
         public IConfiguration Configuration { get; }
+
+        public Version? Version => GetOptions<Version>("Version");
+
+        public Version? MinUpgradeAssistantVersion => GetOptions<Version>("MinRequiredVersion");
 
         public T? GetOptions<T>(string sectionName) => Configuration.GetSection(sectionName).Get<T>();
 
@@ -68,56 +77,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 disposable.Dispose();
             }
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Calling method will handle disposal.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Creating extensions should not throw any extensions.")]
-        public static ExtensionInstance? Create(string e)
-        {
-            try
-            {
-                if (Directory.Exists(e))
-                {
-                    return new ExtensionInstance(new PhysicalFileProvider(e), e);
-                }
-                else if (File.Exists(e))
-                {
-                    if (ManifestFileName.Equals(Path.GetFileName(e), StringComparison.OrdinalIgnoreCase))
-                    {
-                        var dir = Path.GetDirectoryName(e) ?? string.Empty;
-                        return new ExtensionInstance(new PhysicalFileProvider(dir), dir);
-                    }
-                    else if (Path.GetExtension(e).Equals(".zip", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var provider = new ZipFileProvider(e);
-
-                        try
-                        {
-                            return new ExtensionInstance(provider, e);
-                        }
-
-                        // If the manifest file couldn't be found, let's try looking at one layer deep with the name
-                        // of the file as the first folder. This is what happens when you create a zip file from a folder
-                        // with Windows or 7-zip
-                        catch (UpgradeException ex) when (ex.InnerException is FileNotFoundException)
-                        {
-                            var subpath = Path.GetFileNameWithoutExtension(e);
-                            var subprovider = new SubFileProvider(provider, subpath);
-                            return new ExtensionInstance(subprovider, e);
-                        }
-                    }
-                }
-                else
-                {
-                    Console.Error.WriteLine($"ERROR: Extension {e} not found; ignoring extension {e}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"ERROR: Could not load extension from {e}: {ex.Message}");
-            }
-
-            return null;
         }
 
         private static string GetName(IConfiguration configuration, string location)

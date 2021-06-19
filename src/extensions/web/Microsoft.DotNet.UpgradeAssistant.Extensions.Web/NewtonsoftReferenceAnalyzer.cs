@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             // This reference only needs added to ASP.NET Core exes
             if (!(components.HasFlag(ProjectComponents.AspNetCore)
                 && project.OutputType == ProjectOutputType.Exe
-                && !project.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, TargetFrameworkMoniker.NetCoreApp30) < 0)))
+                && !state.TargetFrameworks.Any(tfm => _tfmComparer.Compare(tfm, TargetFrameworkMoniker.NetCoreApp30) < 0)))
             {
                 return;
             }
@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
             if (!state.Packages.Any(r => NewtonsoftPackageName.Equals(r.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, project.TargetFrameworks, false, token).ConfigureAwait(false);
+                var newtonsoftPackage = await _packageLoader.GetLatestVersionAsync(NewtonsoftPackageName, state.TargetFrameworks, new(), token).ConfigureAwait(false);
 
                 if (newtonsoftPackage is not null)
                 {

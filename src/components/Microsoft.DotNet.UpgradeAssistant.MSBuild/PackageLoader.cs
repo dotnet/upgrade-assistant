@@ -79,24 +79,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return targetFrameworks.All(tfm => packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(tfm.Name), f)));
         }
 
-        public Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, bool latestMinorAndBuildOnly, CancellationToken token)
+        public Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
         {
             if (reference is null)
             {
                 throw new ArgumentNullException(nameof(reference));
             }
 
-            return SearchByNameAsync(reference.Name, tfms, currentVersion: reference.GetNuGetVersion(), latestMinorAndBuildOnly: latestMinorAndBuildOnly, token: token);
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            return SearchByNameAsync(reference.Name, tfms, options, currentVersion: reference.GetNuGetVersion(), token: token);
         }
 
-        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, bool includePreRelease, CancellationToken token)
+        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
         {
-            var result = await SearchByNameAsync(packageName, tfms, includePreRelease, token: token).ConfigureAwait(false);
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            var result = await SearchByNameAsync(packageName, tfms, options, null, token: token).ConfigureAwait(false);
 
             return result.LastOrDefault();
         }
 
-        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, bool includePrerelease = false, NuGetVersion? currentVersion = null, bool latestMinorAndBuildOnly = false, CancellationToken token = default)
+        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, NuGetVersion? currentVersion = null, CancellationToken token = default)
         {
             var results = new List<IPackageSearchMetadata>();
 
@@ -105,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 try
                 {
                     var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(name, includePrerelease: includePrerelease, includeUnlisted: false, _cache, _nugetLogger, token)).ConfigureAwait(false);
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(name, includePrerelease: options.Prerelease, includeUnlisted: options.Unlisted, _cache, _nugetLogger, token)).ConfigureAwait(false);
 
                     results.AddRange(searchResults);
                 }
@@ -120,7 +130,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
             }
 
-            return FilterSearchResults(name, results, tfms, currentVersion, latestMinorAndBuildOnly);
+            return FilterSearchResults(name, results, tfms, currentVersion, options.LatestMinorAndBuildOnly);
         }
 
         public static IEnumerable<NuGetReference> FilterSearchResults(
@@ -155,8 +165,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return results
                 .Where(r =>
                 {
-                    var unsupported = tfmSet;
+                    // If the package has no dependency sets, then include it (as it may be build tools, analyzers, etc.).
+                    if (!r.DependencySets.Any())
+                    {
+                        return true;
+                    }
 
+                    // If the package has dependency sets, only include it if there are dependency sets for each
+                    // of the TFMs that need to be supported.
+                    var unsupported = tfmSet;
                     foreach (var dep in r.DependencySets)
                     {
                         foreach (var t in unsupported)
@@ -309,6 +326,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
 
             return repository;
+        }
+
+        public async Task<NuGetPackageMetadata?> GetPackageMetadata(NuGetReference reference, CancellationToken token)
+        {
+            var archive = await GetPackageArchiveAsync(reference, token).ConfigureAwait(false);
+
+            if (archive is null)
+            {
+                return null;
+            }
+
+            var nuspec = await archive.GetNuspecReaderAsync(token).ConfigureAwait(false);
+
+            return new NuGetPackageMetadata
+            {
+                Owners = nuspec.GetOwners()
+            };
         }
     }
 }

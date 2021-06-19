@@ -37,6 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 
             var packageState = new Mock<IDependencyAnalysisState>();
             packageState.Setup(p => p.Packages).Returns(packages.Object);
+            packageState.Setup(p => p.TargetFrameworks).Returns(project.Object.TargetFrameworks);
 
             var packageLoader = CreatePackageLoader(mock);
 
@@ -45,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 
             // Assert
             packages.Verify(p => p.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None));
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<PackageSearchOptions>(), It.IsAny<CancellationToken>()),
                 Times.Once());
         }
 
@@ -70,12 +71,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             comparer.Setup(comparer => comparer.Compare(It.IsAny<TargetFrameworkMoniker>(), It.IsAny<TargetFrameworkMoniker>()))
                 .Returns(-1);
 
+            packageState.Setup(p => p.TargetFrameworks).Returns(project.Object.TargetFrameworks);
+
             // Act
             await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
             packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<PackageSearchOptions>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
 
@@ -102,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 
             // Assert
             packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<PackageSearchOptions>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
 
@@ -129,7 +132,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 
             // Assert
             packageState.Verify(p => p.Packages.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), BuildBreakRisk.None), Times.Never);
-            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
+            packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<PackageSearchOptions>(), It.IsAny<CancellationToken>()),
                 Times.Never());
         }
 
@@ -151,7 +154,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
         private static Mock<IPackageLoader> CreatePackageLoader(AutoMock mock)
         {
             var packageLoader = mock.Mock<IPackageLoader>();
-            packageLoader.Setup(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            packageLoader.Setup(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<PackageSearchOptions>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult((NuGetReference?)new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion)));
             return packageLoader;
         }

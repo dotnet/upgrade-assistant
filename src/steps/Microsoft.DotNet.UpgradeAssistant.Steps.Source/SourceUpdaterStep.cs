@@ -177,10 +177,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentNullException(nameof(context));
             }
 
+            // Reload the workspace in case code fixes modified the project file
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
+
+            // Apply any necessary cleanup to the project file
             var file = context.CurrentProject.Required().GetFile();
-
             file.Simplify();
-
             await file.SaveAsync(token).ConfigureAwait(false);
 
             if (Diagnostics.Any())

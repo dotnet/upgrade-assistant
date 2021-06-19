@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Commands
             _step = step ?? throw new ArgumentNullException(nameof(step));
         }
 
+        public override string Id => "Next";
+
         // todo - support localization
         public override string CommandText => $"Skip next step ({_step.Title})";
 
