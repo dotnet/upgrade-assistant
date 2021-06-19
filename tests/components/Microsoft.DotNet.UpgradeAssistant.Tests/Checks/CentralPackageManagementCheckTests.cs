@@ -27,8 +27,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks.Tests
             var project = mock.Mock<IProject>();
             project.Setup(f => f.GetFile()).Returns(file.Object);
 
+            var options = mock.Mock<UpgradeReadinessOptions>();
+
             // Act
-            var result = await mock.Create<CentralPackageManagementCheck>().IsReadyAsync(project.Object, default).ConfigureAwait(false);
+            var result = await mock.Create<CentralPackageManagementCheck>().IsReadyAsync(project.Object, options.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(isReady, result);

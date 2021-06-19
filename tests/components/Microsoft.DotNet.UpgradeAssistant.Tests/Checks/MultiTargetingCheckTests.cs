@@ -31,8 +31,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
             var project = new Mock<IProject>();
             project.Setup(p => p.TargetFrameworks).Returns(tfms);
 
+            var options = mock.Mock<UpgradeReadinessOptions>();
+
             // Act
-            var result = await readyCheck.IsReadyAsync(project.Object, CancellationToken.None).ConfigureAwait(false);
+            var result = await readyCheck.IsReadyAsync(project.Object, options.Object, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(readiness, result);
