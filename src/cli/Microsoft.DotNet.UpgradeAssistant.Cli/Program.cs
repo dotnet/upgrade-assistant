@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddTelemetry(options =>
                     {
                         context.Configuration.GetSection("Telemetry").Bind(options);
-                        options.ProductVersion = Constants.FullVersion;
+                        options.ProductVersion = UpgradeVersion.Current.FullVersion;
                     });
 
                     services.AddHostedService<ConsoleRunner>();
@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         .AddFromEnvironmentVariables(context.Configuration)
                         .Configure(opts =>
                         {
-                            opts.CurrentVersion = Constants.Version;
+                            opts.CurrentVersion = UpgradeVersion.Current.Version;
 
                             foreach (var path in options.Extension)
                             {
@@ -197,7 +197,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ShowHeader()
         {
-            var title = $"- Microsoft .NET Upgrade Assistant v{Constants.FullVersion} -";
+            var title = $"- Microsoft .NET Upgrade Assistant v{UpgradeVersion.Current.FullVersion} -";
             Console.WriteLine(new string('-', title.Length));
             Console.WriteLine(title);
             Console.WriteLine(new string('-', title.Length));
