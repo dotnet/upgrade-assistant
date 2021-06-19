@@ -58,6 +58,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
                 throw new ArgumentNullException(nameof(context));
             }
 
+            var file = context.CurrentProject!.GetFile();
+            if (DoesThisProjectEmbedVbRuntime(file))
+            {
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"VB updater \"{Id}\" has already been applied to {context.CurrentProject!.FileInfo}", BuildBreakRisk.None));
+            }
+
             return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"VB updater \"{Id}\" needs to be applied to {context.CurrentProject!.FileInfo}", BuildBreakRisk.Unknown));
         }
 
@@ -69,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
             }
 
             var file = context.CurrentProject!.GetFile();
-            if (string.IsNullOrWhiteSpace(file.GetPropertyValue("VBRuntime")))
+            if (DoesThisProjectEmbedVbRuntime(file))
             {
                 // resolves errors
                 // 1>vbc : error BC30002: Type 'Global.Microsoft.VisualBasic.ApplicationServices.User' is not defined.
@@ -82,6 +88,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
             }
 
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
+        }
+
+        private static bool DoesThisProjectEmbedVbRuntime(IProjectFile file)
+        {
+            return string.IsNullOrWhiteSpace(file.GetPropertyValue("VBRuntime"));
         }
 
         /// <summary>
