@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
 {
     /// <summary>
     /// An implementation of <see cref="ITargetFrameworkSelectorFilter"/> that adapts the target framework selection based

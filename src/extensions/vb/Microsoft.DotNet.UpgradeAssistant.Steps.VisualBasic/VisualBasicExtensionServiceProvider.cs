@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.VisualBasic
 
             services.Services.AddUpgradeStep<VisualBasicProjectUpdaterStep>();
             services.Services.AddTransient<IDependencyAnalyzer, MyDotAnalyzer>();
+            services.Services.AddTransient<ITargetFrameworkSelectorFilter, MyTypeTargetFrameworkSelectorFilter>();
         }
     }
 }
