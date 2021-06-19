@@ -59,18 +59,13 @@ Roslyn sees class files as rich trees of information. There will likely be milli
 * Use the [Syntax Visualizer](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/syntax-visualizer) to build syntax. Where possible use specific syntax options. As an example, if you are building an analyzer that will examine class inheritance then you should use `SyntaxKind.BaseList`, which will occur much less often than the `SyntaxKind.IdentifierName`.
 * Use information already available from `SyntaxNodeAnalysisContext` to quickly filter relevant information. As an example, if you build an analyzer that looks for a method then you would be evaluating `MemberAccessExpressionSyntax` nodes. In this scenario, you should also check the parent of the node to figure out if this Syntax is a method or a property.
 
-**Do Not**
-* Do not put string compare operations above other conditional checks that can be performed. String comparison is slower than checking for a type or examining an enumeration value.
-
 
 ### 2. Beware of String manipulations
 Build your analyzer with the expectation that it will be invoked a million times. Look for, and replace, strings to prevent excessive garbage collection due to frequent executions of your analyzer.
 
 **Do**
 * Use string constants when evaluating string conditionals.
-
-**Do Not**
-* Do not use string interpolation, concatenation, or format strings which construct new objects each time the analyzer is run.
+* Cache values from string interpolation, concatenation, or `string.Format` so that new objects are not constructed each time the analyzer is run.
 
 ### 3. Enable your Analyzer to run concurrently
 Enable concurrent execution of your analyzers and prevent them from running in auto generated code.
