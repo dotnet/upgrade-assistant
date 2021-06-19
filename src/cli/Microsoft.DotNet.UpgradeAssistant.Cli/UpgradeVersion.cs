@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         public UpgradeVersion()
         {
             FullVersion = typeof(UpgradeVersion).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
-            Version = Version.Parse(GetVersionFromInformationalVersion(FullVersion));
+            Version = ConvertToVersion(FullVersion);
         }
 
         public string FullVersion { get; }
@@ -23,25 +23,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         /// <summary>
         /// Need to grab just the version part of strings such as: <c>0.2.231602+ef31c22633e629fac65d9f9d8bf700119c888380</c> and <c>0.2.0-dev</c>.
         /// </summary>
-        /// <param name="informational">An informational version string.</param>
-        /// <returns>A truncated version.</returns>
-        private static ReadOnlySpan<char> GetVersionFromInformationalVersion(ReadOnlySpan<char> informational)
+        /// <param name="version">An informational version string.</param>
+        /// <returns>A version.</returns>
+        private static Version ConvertToVersion(ReadOnlySpan<char> version)
         {
-            var plusIdx = informational.IndexOf("+", StringComparison.Ordinal);
+            var idx = version.IndexOfAny("+-");
+            var newVersionString = idx > 0 ? version[..idx] : version;
 
-            if (plusIdx > 0)
-            {
-                informational = informational[..plusIdx];
-            }
-
-            var minusIdx = informational.IndexOf("-", StringComparison.Ordinal);
-
-            if (minusIdx > 0)
-            {
-                informational = informational[..minusIdx];
-            }
-
-            return informational;
+            return Version.Parse(newVersionString);
         }
     }
 }
