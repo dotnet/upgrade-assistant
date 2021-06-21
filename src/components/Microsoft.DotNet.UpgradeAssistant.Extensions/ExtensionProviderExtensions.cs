@@ -48,6 +48,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return services.AddOptions<ExtensionOptions>();
         }
 
+        public static IEnumerable<KeyValuePair<string, string>> ParseOptions(this IEnumerable<string> options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            foreach (var option in options)
+            {
+                var split = option.Split('=');
+
+                if (split.Length == 2)
+                {
+                    yield return new KeyValuePair<string, string>(split[0], split[1]);
+                }
+            }
+        }
+
         private static void AddExtensionLoaders(this IServiceCollection services)
         {
             services.AddTransient<IExtensionLoader, DirectoryExtensionLoader>();

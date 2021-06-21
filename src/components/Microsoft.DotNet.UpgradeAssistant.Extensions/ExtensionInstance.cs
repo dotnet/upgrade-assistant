@@ -13,7 +13,7 @@ using Microsoft.Extensions.FileProviders;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     [DebuggerDisplay("{Name}, {Location}")]
-    public sealed class ExtensionInstance : IDisposable
+    public sealed class ExtensionInstance : IDisposable, IExtensionInstance
     {
         private const string ExtensionServiceProvidersSectionName = "ExtensionServiceProviders";
         public const string ManifestFileName = "ExtensionManifest.json";
@@ -24,10 +24,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         private readonly Lazy<AssemblyLoadContext>? _alc;
 
         public ExtensionInstance(IFileProvider fileProvider, string location)
+            : this(fileProvider, location, CreateConfiguration(fileProvider))
+        {
+        }
+
+        public ExtensionInstance(IFileProvider fileProvider, string location, IConfiguration configuration)
         {
             FileProvider = fileProvider;
             Location = location;
-            Configuration = CreateConfiguration(fileProvider);
+            Configuration = configuration;
             Name = GetName(Configuration, location);
 
             var serviceProviders = GetOptions<string[]>(ExtensionServiceProvidersSectionName);
@@ -37,6 +42,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(this, serviceProviders));
             }
         }
+
+        private T? GetOptions<T>(string sectionName) => ((IExtensionInstance)this).GetOptions<T>(sectionName);
 
         public string Name { get; }
 
@@ -68,8 +75,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public Version? Version => GetOptions<Version>("Version");
 
         public Version? MinUpgradeAssistantVersion => GetOptions<Version>("MinRequiredVersion");
-
-        public T? GetOptions<T>(string sectionName) => Configuration.GetSection(sectionName).Get<T>();
 
         public void Dispose()
         {
