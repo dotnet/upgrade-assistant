@@ -35,14 +35,40 @@ Separation of analyzer and code fix tests increases complexity and code duplicat
 **Do**
 * Read the testing overview: [Microsoft.CodeAnalysis.Testing](https://github.com/dotnet/roslyn-sdk/blob/main/src/Microsoft.CodeAnalysis.Testing/README.md)
 
-### 2. Avoid member variables and state management
-Expect your analyzer to execute concurrently. Design your analyzer so that execution can start processing a 2nd call before processing finishes for the 1st call. 
+### 2. Handle state management with thread safety
+The analyzer, or code fixer, will be instantiated as a singleton and executed concurrently. Design your `DiagnosticAnalyzer` and `CodeFixProvider` so that execution can start processing a 2nd call before processing finishes for the 1st call.
 
-**Do**
-* Pass information between methods via method arguments.
+The following is an example that illustrates the problem.
 
-**Do Not**
-* Do not use member variables to store instance data.
+```cs
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public sealed class MyAnalyzer : DiagnosticAnalyzer
+    {
+        public string MyData { get; set; } //this property is not handled with thread safety
+
+        ///... override of SupportedDiagnostics omitted for brevity
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.RegisterSyntaxNodeAction(analyze, SyntaxKind.SimpleMemberAccessExpression);
+        }
+
+        private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
+        {
+            MyData = context.Node.ToString();
+
+            if (MyData == "HttpContext")
+            {
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+    }
+```
+
+> Only one instance of `MyAnalyzer` will be created and  `AnalyzeMemberAccessExpressions` will be invoked repeatedly. This will result in a race condition that can lead to inconsistent behavior.
+
+**Do not**
+* Do not build your analyzer to depend on (object state) properties or fields (instance or static) from the singleton instance of your derived `DiagnosticAnalyzer` or `CodeFixProvider`. Use local variables, or method arguments to store information.
 
 ### 3. Use abstractions and focus on the intent of your Analyzer rather than Roslyn
 Roslyn is a rich framework of information that describes every detail of code in every file of every project. The concepts can become overwhelming. Use abstractions to develop class names and methods that sharpen the focus on what the analyzer does by hiding how it achieves the goal.
