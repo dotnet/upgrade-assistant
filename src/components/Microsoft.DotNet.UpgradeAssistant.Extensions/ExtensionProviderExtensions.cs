@@ -41,11 +41,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     o.Converters.Add(new JsonStringEnumConverter());
                 });
 
-            services.AddScoped<ExtensionManager>();
+            services.AddSingleton<ExtensionManager>();
             services.AddTransient<IEnumerable<ExtensionInstance>>(ctx => ctx.GetRequiredService<ExtensionManager>());
             services.AddExtensionLoaders();
 
             return services.AddOptions<ExtensionOptions>();
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> ParseOptions(this IEnumerable<string> options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            foreach (var option in options)
+            {
+                var split = option.Split('=');
+
+                if (split.Length == 2)
+                {
+                    yield return new KeyValuePair<string, string>(split[0], split[1]);
+                }
+            }
         }
 
         private static void AddExtensionLoaders(this IServiceCollection services)

@@ -64,10 +64,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         }
 
         public static Task<int> RunAnalysisAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
-    => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
-    {
-        services.AddScoped<IAppCommand, ConsoleAnalyze>();
-    }), token);
+            => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
+            {
+                services.AddScoped<IAppCommand, ConsoleAnalyze>();
+            }), token);
 
         public static Task<int> RunUpgradeAsync(UpgradeOptions options, Func<IHostBuilder, IHostBuilder> configure, CancellationToken token)
             => RunCommandAsync(options, host => configure(host).ConfigureServices(services =>
@@ -119,7 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddTelemetry(options =>
                     {
                         context.Configuration.GetSection("Telemetry").Bind(options);
-                        options.ProductVersion = Constants.FullVersion;
+                        options.ProductVersion = UpgradeVersion.Current.FullVersion;
                     });
 
                     services.AddHostedService<ConsoleRunner>();
@@ -131,7 +131,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         .AddFromEnvironmentVariables(context.Configuration)
                         .Configure(opts =>
                         {
-                            opts.CurrentVersion = Constants.Version;
+                            opts.RetainedProperties = options.Option.ParseOptions();
+                            opts.CurrentVersion = UpgradeVersion.Current.Version;
 
                             foreach (var path in options.Extension)
                             {
@@ -197,7 +198,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private static void ShowHeader()
         {
-            var title = $"- Microsoft .NET Upgrade Assistant v{Constants.FullVersion} -";
+            var title = $"- Microsoft .NET Upgrade Assistant v{UpgradeVersion.Current.FullVersion} -";
             Console.WriteLine(new string('-', title.Length));
             Console.WriteLine(title);
             Console.WriteLine(new string('-', title.Length));
@@ -243,6 +244,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             command.AddArgument(new Argument<FileInfo>("project") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
             command.AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
             command.AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--extension" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
+            command.AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--option" }, "Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times."));
             command.AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--entry-point", "-e" }, "Provides the entry-point project to start the upgrade process. This may include globbing patterns such as '*' for match."));
             command.AddOption(new Option<UpgradeTarget>(new[] { "--target-tfm-support" }, "Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean."));
         }
