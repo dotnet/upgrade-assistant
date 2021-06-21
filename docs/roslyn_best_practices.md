@@ -36,7 +36,7 @@ Separation of analyzer and code fix tests increases complexity and code duplicat
 * Read the testing overview: [Microsoft.CodeAnalysis.Testing](https://github.com/dotnet/roslyn-sdk/blob/main/src/Microsoft.CodeAnalysis.Testing/README.md)
 
 ### 2. Avoid member variables and state management
-Expect your analyzer to be invoked repeatedly and asynchronously. Design your analyzer so that execution can start processing a 2nd call before processing finishes for the 1st call. 
+Expect your analyzer to execute concurrently. Design your analyzer so that execution can start processing a 2nd call before processing finishes for the 1st call. 
 
 **Do**
 * Pass information between methods via method arguments.
