@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         // Name must be EntryPoint and not plural as the name of the argument that it binds to is `--entry-point`
         public IReadOnlyCollection<string> EntryPoint { get; set; } = Array.Empty<string>();
 
+        public IReadOnlyCollection<string> Option { get; set; } = Array.Empty<string>();
+
         public bool Verbose { get; set; }
 
         public bool NonInteractive { get; set; }
