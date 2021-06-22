@@ -11,6 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     public class SdkCollectionTests
     {
         private const string DefaultSDK = "Microsoft.NET.Sdk";
+        private const string WebSDK = "Microsoft.NET.Sdk.Web";
 
         [Fact]
         public void SdkCollectionEmptyTest()
@@ -40,9 +41,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             Assert.Contains(sdk, sdkCollection);
         }
 
-        [InlineData("Microsoft.NET.Sdk.Web")]
+        [InlineData(WebSDK)]
         [Theory]
-        public void SdkCollectionAddTest(string sdk)
+        public void SdkCollectionNotContainsTest(string sdk)
+        {
+            // Arrange
+            using var mock = AutoMock.GetLoose();
+
+            var projectRoot = ProjectRootElement.Create();
+            projectRoot.Sdk = DefaultSDK;
+            var sdkCollection = new SdkCollection(projectRoot);
+
+            // Assert
+            Assert.DoesNotContain(sdk, sdkCollection);
+        }
+
+        [InlineData(WebSDK, new string[] { DefaultSDK, WebSDK })]
+        [Theory]
+        public void SdkCollectionAddTest(string sdk, string[] expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -56,31 +72,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             sdkCollection.Add(sdk);
 
             // Assert
-            Assert.Collection(
+            Assert.Equal(
                 sdkCollection,
-                s => Assert.Equal(s, DefaultSDK),
-                s => Assert.Equal(s, sdk));
+                expected);
         }
 
-        [InlineData("Microsoft.NET.Sdk.Web")]
+        [InlineData(WebSDK, new string[] { DefaultSDK })]
+        [InlineData("System.NET.Sdk.Test", new string[] { DefaultSDK, WebSDK })]
         [Theory]
-        public void SdkCollectionRemoveTest(string sdk)
+        public void SdkCollectionRemoveTest(string sdkToRemove, string[] expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
 
             var projectRoot = ProjectRootElement.Create();
-            projectRoot.Sdk = string.Concat(DefaultSDK, ";", sdk);
+            projectRoot.Sdk = string.Concat(DefaultSDK, ";", WebSDK);
 
             var sdkCollection = new SdkCollection(projectRoot);
 
             // Act
-            sdkCollection.Remove(sdk);
+            sdkCollection.Remove(sdkToRemove);
 
             // Assert
-            Assert.Collection(
+            Assert.Equal(
                 sdkCollection,
-                s => Assert.Equal(s, DefaultSDK));
+                expected);
         }
     }
 }
