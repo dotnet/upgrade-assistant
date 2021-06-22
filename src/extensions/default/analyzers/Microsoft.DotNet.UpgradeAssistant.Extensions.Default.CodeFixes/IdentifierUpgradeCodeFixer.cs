@@ -84,12 +84,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var generator = SyntaxGenerator.GetGenerator(document);
 
-            // Split the new idenfitier into namespace and name components
-            var namespaceDelimiterIndex = newIdentifier.LastIndexOf('.');
-            var qualifier = namespaceDelimiterIndex >= 0
-                ? newIdentifier.Substring(0, namespaceDelimiterIndex)
-                : null;
-
             // Create new identifier
             var updatedNode = GetUpdatedNode(node, generator, newIdentifier)
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
@@ -107,11 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var updatedDocument = document.WithSyntaxRoot(updatedRoot);
 
             // Add using declaration if needed
-            if (qualifier is not null)
-            {
-                var targetNode = updatedRoot.GetAnnotatedNodes(Simplifier.AddImportsAnnotation).Where(n => n.SpanStart == node.SpanStart && n.Span.Length == updatedNode.Span.Length).FirstOrDefault();
-                updatedDocument = await updatedDocument.AddImportIfMissingAsync(qualifier, targetNode, cancellationToken).ConfigureAwait(false);
-            }
+            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
 
             // Simplify the call, if possible
             updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);

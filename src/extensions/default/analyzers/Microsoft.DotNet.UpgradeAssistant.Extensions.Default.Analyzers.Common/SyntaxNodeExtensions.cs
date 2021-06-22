@@ -200,6 +200,50 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             return usings.Any(n => n.Equals(namespaceName, node.Language == LanguageNames.CSharp ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
         }
 
+        public static CSSyntax.CompilationUnitSyntax AddImportIfMissing(this CSSyntax.CompilationUnitSyntax documentRoot, string namespaceName)
+        {
+            if (documentRoot is null)
+            {
+                throw new ArgumentNullException(nameof(documentRoot));
+            }
+
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                throw new ArgumentException($"'{nameof(namespaceName)}' cannot be null or empty.", nameof(namespaceName));
+            }
+
+            if (documentRoot.RootIncludesImport(namespaceName))
+            {
+                return documentRoot;
+            }
+
+            var usingDirective = CS.SyntaxFactory.UsingDirective(CS.SyntaxFactory.ParseName(namespaceName).WithLeadingTrivia(CS.SyntaxFactory.Whitespace(" ")))
+                .WithTrailingTrivia(CS.SyntaxFactory.CarriageReturnLineFeed);
+            return documentRoot.AddUsings(usingDirective);
+        }
+
+        public static VBSyntax.CompilationUnitSyntax AddImportIfMissing(this VBSyntax.CompilationUnitSyntax documentRoot, string namespaceName)
+        {
+            if (documentRoot is null)
+            {
+                throw new ArgumentNullException(nameof(documentRoot));
+            }
+
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                throw new ArgumentException($"'{nameof(namespaceName)}' cannot be null or empty.", nameof(namespaceName));
+            }
+
+            if (documentRoot.RootIncludesImport(namespaceName))
+            {
+                return documentRoot;
+            }
+
+            var importsStatement = VB.SyntaxFactory.ImportsStatement(VB.SyntaxFactory.SingletonSeparatedList<VBSyntax.ImportsClauseSyntax>(VB.SyntaxFactory.SimpleImportsClause(VB.SyntaxFactory.ParseName(namespaceName).WithLeadingTrivia(VB.SyntaxFactory.Whitespace(" ")))))
+                .WithTrailingTrivia(VB.SyntaxFactory.CarriageReturnLineFeed);
+            return documentRoot.AddImports(importsStatement);
+        }
+
         /// <summary>
         /// Determines if a document root element contains a using/import statement for a given namespace.
         /// </summary>
@@ -221,111 +265,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                     vbRoot.Imports.SelectMany(i => i.ImportsClauses.OfType<VBSyntax.SimpleImportsClauseSyntax>()).Any(i => i.Name.ToString().Equals(namespaceName, StringComparison.OrdinalIgnoreCase)),
                 _ => false
             };
-        }
-
-        /// <summary>
-        /// Adds a using or import directive for a given namespace to the document root only if the directive is not already present.
-        /// </summary>
-        /// <param name="document">The document to update.</param>
-        /// <param name="namespaceName">The namespace to add.</param>
-        /// <param name="node">The syntax node that needs access to the namespace.
-        /// If this is null, the using/import will be added if there isn't a global import already present for the namespace.
-        /// If this is not null, the import will only be added if the namespace is not available to the given syntax node
-        /// (so imports within a namespace can be used).</param>
-        /// <param name="ct">A cancellation token.</param>
-        /// <returns>An updated document with the necessary import added if it was not present previously.</returns>
-        public static async Task<Document> AddImportIfMissingAsync(this Document document, string namespaceName, SyntaxNode? node, CancellationToken ct)
-        {
-            // This should be possible using the ImportAdder, but the ImportAdder does not support scenarios with compiler errors well, especially in the case of Visual Basic.
-            // TODO: Investigate the feasibility of using ImportAdder in the future. For now, this method implements its own simple import addition logic.
-            /*
-                return node is null
-                    ? await ImportAdder.AddImportsAsync(document, CodeAnalysis.Simplification.Simplifier.AddImportsAnnotation, null, ct).ConfigureAwait(false)
-                    : await ImportAdder.AddImportsAsync(document, node.FullSpan, null, ct).ConfigureAwait(false);
-            */
-
-            if (document is null)
-            {
-                throw new ArgumentNullException(nameof(document));
-            }
-
-            if (string.IsNullOrEmpty(namespaceName))
-            {
-                throw new ArgumentException($"'{nameof(namespaceName)}' cannot be null or empty.", nameof(namespaceName));
-            }
-
-            var root = await document.GetSyntaxRootAsync(ct).ConfigureAwait(false);
-            if (root is null)
-            {
-                return document;
-            }
-
-            var updatedRoot = root.AddImportIfMissing(namespaceName, SyntaxGenerator.GetGenerator(document), node);
-
-            return document.WithSyntaxRoot(updatedRoot);
-        }
-
-        /// <summary>
-        /// Adds a using or import directive for a given namespace to the document root only if the directive is not already present.
-        /// </summary>
-        /// <param name="documentRoot">The document root to be updated. This should be a C# or VB CompilationUnitSyntax (document root syntax node).</param>
-        /// <param name="namespaceName">The namespace to add.</param>
-        /// <param name="generator">The syntax generator to use to create new import statements.</param>
-        /// <param name="node">The syntax node that needs access to the namespace.
-        /// If this is null, the using/import will be added if there isn't a global import already present for the namespace.
-        /// If this is not null, the import will only be added if the namespace is not available to the given syntax node
-        /// (so imports within a namespace can be used).</param>
-        /// <returns>An updated document root with the necessary import added if it was not present previously.</returns>
-        public static SyntaxNode AddImportIfMissing(this SyntaxNode documentRoot, string namespaceName, SyntaxGenerator generator, SyntaxNode? node)
-        {
-            if (documentRoot is null)
-            {
-                throw new ArgumentNullException(nameof(documentRoot));
-            }
-
-            if (string.IsNullOrEmpty(namespaceName))
-            {
-                throw new ArgumentException($"'{nameof(namespaceName)}' cannot be null or empty.", nameof(namespaceName));
-            }
-
-            if (generator is null)
-            {
-                throw new ArgumentNullException(nameof(generator));
-            }
-
-            // If a target node is provided, bail out if that node has access to the given namespace
-            if (node is not null)
-            {
-                if (node.HasAccessToNamespace(namespaceName))
-                {
-                    return documentRoot;
-                }
-            }
-
-            // If no target node is provided, bail out only if there is a global import present for the given namespace
-            else
-            {
-                if (documentRoot.RootIncludesImport(namespaceName))
-                {
-                    return documentRoot;
-                }
-            }
-
-            // Create the import statement
-            var importDeclaration = generator.NamespaceImportDeclaration(namespaceName);
-
-            // Add the import to the document root
-            if (documentRoot is CSSyntax.CompilationUnitSyntax csRoot)
-            {
-                documentRoot = csRoot.AddUsings((CSSyntax.UsingDirectiveSyntax)importDeclaration);
-            }
-            else if (documentRoot is VBSyntax.CompilationUnitSyntax vbRoot)
-            {
-                documentRoot = vbRoot.AddImports((VBSyntax.ImportsStatementSyntax)importDeclaration);
-            }
-
-            // Return the document with an updated root
-            return documentRoot;
         }
 
         public static SyntaxNode? GetInvocationExpression(this SyntaxNode callerNode)

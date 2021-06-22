@@ -107,12 +107,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         {
             var generator = SyntaxGenerator.GetGenerator(document);
 
-            // Split the new idenfitier into namespace and name components
-            var namespaceDelimiterIndex = attributeType.LastIndexOf('.');
-            var qualifier = namespaceDelimiterIndex >= 0
-                ? attributeType.Substring(0, namespaceDelimiterIndex)
-                : null;
-
             // Create an updated Attribute node
             var updatedNode = node switch
             {
@@ -120,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 VBSyntax.AttributeSyntax vbAttribute => vbAttribute.WithName((VBSyntax.NameSyntax)QualifiedNameBuilder.BuildQualifiedNameSyntax(generator, attributeType)),
                 _ => throw new InvalidOperationException($"Unexpected syntax node type: {node.GetType().FullName}")
             };
-            updatedNode = updatedNode.WithAdditionalAnnotations(Simplifier.Annotation);
+            updatedNode = updatedNode.WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
             // Get the document root
             var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -134,11 +128,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var updatedDocument = document.WithSyntaxRoot(updatedRoot);
 
             // Add using declaration if needed
-            if (qualifier is not null)
-            {
-                var targetNode = updatedRoot.GetAnnotatedNodes(Simplifier.AddImportsAnnotation).Where(n => n.SpanStart == node.SpanStart && n.Span.Length == updatedNode.Span.Length).FirstOrDefault();
-                updatedDocument = await updatedDocument.AddImportIfMissingAsync(qualifier, targetNode, cancellationToken).ConfigureAwait(false);
-            }
+            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
 
             // Simplify the call, if possible
             updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);

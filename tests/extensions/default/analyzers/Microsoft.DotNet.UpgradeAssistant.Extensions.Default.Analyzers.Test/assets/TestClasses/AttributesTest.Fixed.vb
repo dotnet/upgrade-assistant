@@ -6,8 +6,8 @@ Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Text
 Imports System.Threading.Tasks
-Imports Microsoft.AspNetCore.Mvc
 Imports Microsoft.AspNetCore.Authorization
+Imports Microsoft.AspNetCore.Mvc
 
 Namespace TestClasses
     Public Class Class1

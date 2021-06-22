@@ -19,7 +19,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0006 CodeFix Provider")]
     public class HttpContextIsDebuggingEnabledCodeFixer : CodeFixProvider
     {
-        private const string DiagnosticsNamespace = "System.Diagnostics";
         private const string DebuggerIsAttachedSyntax = "System.Diagnostics.Debugger.IsAttached";
 
         public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HttpContextIsDebuggingEnabledAnalyzer.DiagnosticId);
@@ -65,14 +64,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             // Replace the member access expression with Debugger.IsAttached
             var newExpression = SyntaxFactory.ParseExpression(DebuggerIsAttachedSyntax)
                 .WithTriviaFrom(node)
-                .WithAdditionalAnnotations(Simplifier.Annotation);
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
             documentRoot = documentRoot.ReplaceNode(node, newExpression)!;
-
-            // Add a using statement to System.Diagnostics, if necessary
-            documentRoot = (CompilationUnitSyntax)documentRoot.AddImportIfMissing(DiagnosticsNamespace, editor.Generator, null);
-
             editor.ReplaceNode(editor.OriginalRoot, documentRoot);
-            return editor.GetChangedDocument();
+            var updatedDocument = editor.GetChangedDocument();
+
+            // Add using declaration if needed
+            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
+
+            return updatedDocument;
         }
     }
 }
