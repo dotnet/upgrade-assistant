@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -42,6 +45,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 }
 
                 logger.LogInformation("Loaded {Count} extensions", list.Count);
+
+                if (options.Value.RetainedProperties.Any())
+                {
+                    list.Add(LoadOptionsExtension(options.Value.RetainedProperties));
+                }
 
                 return list;
             });
@@ -85,6 +93,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     extension.Dispose();
                 }
             }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The extension instance will dispose of this.")]
+        private static ExtensionInstance LoadOptionsExtension(IEnumerable<KeyValuePair<string, string>> values)
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(values)
+                .Build();
+
+            return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
         }
 
         public IEnumerator<ExtensionInstance> GetEnumerator() => _extensions.Value.GetEnumerator();

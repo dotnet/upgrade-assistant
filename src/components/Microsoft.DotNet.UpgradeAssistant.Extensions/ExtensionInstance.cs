@@ -24,10 +24,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         private readonly Lazy<AssemblyLoadContext>? _alc;
 
         public ExtensionInstance(IFileProvider fileProvider, string location)
+            : this(fileProvider, location, CreateConfiguration(fileProvider))
+        {
+        }
+
+        public ExtensionInstance(IFileProvider fileProvider, string location, IConfiguration configuration)
         {
             FileProvider = fileProvider;
             Location = location;
-            Configuration = CreateConfiguration(fileProvider);
+            Configuration = configuration;
             Name = GetName(Configuration, location);
 
             var serviceProviders = GetOptions<string[]>(ExtensionServiceProvidersSectionName);
