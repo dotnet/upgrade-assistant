@@ -3,6 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Added
+- Added an analyzer and code fix provider to remove unnecessary attributes and upgrade changed attributes (based on type mappings in registered typemap files) [#641](https://github.com/dotnet/upgrade-assistant/pull/641)
+
 ## Version 0.2.231403 - 2021-06-14 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.231403))
 
 ### Fixed
