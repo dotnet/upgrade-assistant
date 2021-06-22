@@ -9,7 +9,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Language)'=='C#'">
     <Compile Include="$(MSBuildThisFileDirectory)/shared/**/*.cs" />
   </ItemGroup>
 
