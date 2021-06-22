@@ -12,7 +12,7 @@
       <Version>3.3.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all">
-      <Version>3.9.0</Version>
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
   </ItemGroup>
 </Project>
