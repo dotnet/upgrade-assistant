@@ -9,6 +9,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Commands
 {
     public class SelectProjectCommand : UpgradeCommand
     {
+        public override string Id => "SelectProject";
+
         public override string CommandText => "Select different project";
 
         public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
