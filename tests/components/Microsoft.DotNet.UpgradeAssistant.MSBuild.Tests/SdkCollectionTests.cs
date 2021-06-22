@@ -12,16 +12,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     {
         private const string DefaultSDK = "Microsoft.NET.Sdk";
 
+        [Fact]
+        public void SdkCollectionEmptyTest()
+        {
+            // Arrange
+            using var mock = AutoMock.GetLoose();
+
+            var projectRoot = ProjectRootElement.Create();
+            var sdkCollection = new SdkCollection(projectRoot);
+
+            // Assert
+            Assert.Empty(sdkCollection);
+        }
+
         [InlineData(DefaultSDK)]
         [Theory]
         public void SdkCollectionContainsTest(string sdk)
         {
+            // Arrange
             using var mock = AutoMock.GetLoose();
 
             var projectRoot = ProjectRootElement.Create();
             projectRoot.Sdk = sdk;
             var sdkCollection = new SdkCollection(projectRoot);
 
+            // Assert
             Assert.Contains(sdk, sdkCollection);
         }
 

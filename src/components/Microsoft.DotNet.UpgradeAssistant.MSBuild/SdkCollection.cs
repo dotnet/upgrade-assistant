@@ -19,11 +19,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _projectRoot = projectRoot;
         }
 
-        private string[] GetSdks() => _projectRoot.Sdk.Split(";", StringSplitOptions.RemoveEmptyEntries);
+        private string[] SplitSdks() => _projectRoot.Sdk.Split(";", StringSplitOptions.RemoveEmptyEntries);
 
         public bool Contains(string item)
         {
-            return GetSdks().Contains(item, StringComparer.OrdinalIgnoreCase);
+            return SplitSdks().Contains(item, StringComparer.OrdinalIgnoreCase);
         }
 
         public void Add(string item)
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             get
             {
-                return GetSdks().Length;
+                return SplitSdks().Length;
             }
         }
 
@@ -54,9 +54,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public bool Remove(string item)
         {
-            var sdkList = GetSdks().Where(p => p != item);
-            _projectRoot.Sdk = string.Join(";", sdkList);
-            return true;
+            if (Contains(item))
+            {
+                var sdkList = SplitSdks().Where(p => p != item);
+                _projectRoot.Sdk = string.Join(";", sdkList);
+                return true;
+            }
+
+            return false;
         }
 
         public void CopyTo(string[] array, int arrayIndex)
@@ -66,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IEnumerator<string> GetEnumerator()
         {
-             return GetSdks().Cast<string>().GetEnumerator();
+             return SplitSdks().Cast<string>().GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
