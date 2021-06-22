@@ -77,10 +77,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
                 expected);
         }
 
-        [InlineData(WebSDK, new string[] { DefaultSDK })]
-        [InlineData("System.NET.Sdk.Test", new string[] { DefaultSDK, WebSDK })]
+        [InlineData(WebSDK, new string[] { DefaultSDK }, true)]
+        [InlineData("System.NET.Sdk.Test", new string[] { DefaultSDK, WebSDK }, false)]
         [Theory]
-        public void SdkCollectionRemoveTest(string sdkToRemove, string[] expected)
+        public void SdkCollectionRemoveTest(string sdkToRemove, string[] expected, bool expectedStatus)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -90,8 +90,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var sdkCollection = new SdkCollection(projectRoot);
 
-            // Act
-            sdkCollection.Remove(sdkToRemove);
+            // Act and Assert
+            Assert.Equal(expectedStatus, sdkCollection.Remove(sdkToRemove));
 
             // Assert
             Assert.Equal(
