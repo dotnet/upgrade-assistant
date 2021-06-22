@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _projectRoot = projectRoot;
         }
 
-        private string[] GetSdks() => _projectRoot.Sdk.Split(';');
+        private string[] GetSdks() => _projectRoot.Sdk.Split(";", StringSplitOptions.RemoveEmptyEntries);
 
         public bool Contains(string item)
         {
