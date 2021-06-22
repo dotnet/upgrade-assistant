@@ -25,6 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public bool Verbose { get; set; }
 
+        public bool IgnoreUnsupportedFeatures { get; set; }
+
         public bool NonInteractive { get; set; }
 
         public int NonInteractiveWait { get; set; } = 2;

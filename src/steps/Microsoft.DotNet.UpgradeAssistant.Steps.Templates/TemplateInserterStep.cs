@@ -178,7 +178,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         private bool IsTemplateNeeded(IProject project, RuntimeItemSpec template)
         {
-            var candidateMatches = project.FindFiles(template.Type, template.Path);
+            var candidateMatches = project.FindFiles(template.Path, template.Type);
 
             if (candidateMatches.Any(path => ItemMatches(path, template)))
             {
@@ -241,7 +241,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
         /// Determines if a project is likely to be a web app base on its included items.
         /// </summary>
         private static bool IsWebApp(IProject p)
-            => WebAppFiles.Any(file => p.FindFiles(file.Type, file.Path).Any());
+            => WebAppFiles.Any(file => p.FindFiles(file.Path, file.Type).Any());
 
         /// <summary>
         /// Determines if a given project element matches an item specification.

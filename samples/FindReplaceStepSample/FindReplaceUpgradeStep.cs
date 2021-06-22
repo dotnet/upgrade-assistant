@@ -100,7 +100,7 @@ namespace FindReplaceStep
             var currentProject = context.CurrentProject.Required();
 
             // Prepare state by identifying necessary replacements
-            var compiledItems = currentProject.FindFiles(ProjectItemType.Compile, ".cs");
+            var compiledItems = currentProject.FindFiles(".cs", ProjectItemType.Compile);
             var stringsToReplace = StringsToReplace.Keys;
             _neededReplacements = new Dictionary<string, IEnumerable<string>>();
             foreach (var itemPath in compiledItems)

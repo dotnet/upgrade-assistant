@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## Current
 
 ### Added
+- New project readiness checks evaluate if the project contains unsupported technologies to increase awareness before users invest significant time trying to upgrade. [#617](https://github.com/dotnet/upgrade-assistant/pull/617)
 - Usage telemetry has been added to help guide product development. See [https://aka.ms/upgrade-assistant-telemetry](https://aka.ms/upgrade-assistant-telemetry) for details [#644](https://github.com/dotnet/upgrade-assistant/pull/644).
 - Command line option to pass options through in the form of `--option KEY=Value` [#651](https://github.com/dotnet/upgrade-assistant/pull/651)
 

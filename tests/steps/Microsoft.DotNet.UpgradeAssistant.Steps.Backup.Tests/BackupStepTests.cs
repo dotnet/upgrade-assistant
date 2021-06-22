@@ -2,12 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extras.Moq;
-using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Moq;
 using Xunit;
 
@@ -86,15 +87,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
                 Assert.Equal(expectedStatus, step.Status);
                 Assert.Equal(expectedStatusDetails, step.StatusDetails);
 
-                var properties = mock.Container.Resolve<IUpgradeContextProperties>();
-                Assert.Single(properties.GetAllPropertyValues());
-                Assert.Equal(expectedBaseBackupPath, properties.GetPropertyValue("BaseBackupLocation"));
+                mock.Mock<IUpgradeContextProperties>().Verify(p => p.SetPropertyValue("BaseBackupLocation", expectedBaseBackupPath, true), Times.Once());
             }
             finally
             {
                 if (!backupComplete)
                 {
-                    Directory.Delete(expectedBackupPath, true);
+                    try
+                    {
+                        Directory.Delete(expectedBackupPath, true);
+                    }
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch
+#pragma warning restore CA1031 // Do not catch general exception types
+                    {
+                    }
                 }
             }
         }
@@ -112,11 +119,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             var mock = AutoMock.GetLoose(cfg =>
             {
                 cfg.RegisterInstance(options);
-                cfg.RegisterInstance<IUpgradeContextProperties>(new UpgradeContextProperties());
-                cfg.RegisterType<NonInteractiveUserInput>().As<IUserInput>();
+                cfg.RegisterType<MockedUserInput>().As<IUserInput>();
             });
 
             return mock;
+        }
+
+        private class MockedUserInput : IUserInput
+        {
+            public bool IsInteractive => throw new NotImplementedException();
+
+            public Task<string?> AskUserAsync(string prompt)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
+                where T : UpgradeCommand
+                => Task.FromResult(commands.First());
+
+            public Task<bool> WaitToProceedAsync(CancellationToken token)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         private static IUpgradeContext GetContext(AutoMock mock, string inputPath, string? projectPath)
