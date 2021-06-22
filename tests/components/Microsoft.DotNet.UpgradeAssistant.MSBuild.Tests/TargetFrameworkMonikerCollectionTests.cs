@@ -100,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var project = mock.Mock<IProjectFile>();
-            project.Setup(p => p.IsSdk).Returns(true);
+            project.Setup(p => p.IsSdk).Returns(false);
 
             // Act
             var collection = mock.Create<TargetFrameworkMonikerCollection>();
