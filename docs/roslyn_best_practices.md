@@ -42,7 +42,7 @@ The following is an example that illustrates the problem.
 
 ```cs
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class MyAnalyzer : DiagnosticAnalyzer
+    public class MyAnalyzer : DiagnosticAnalyzer
     {
         public string MyData { get; set; } //this property is not handled with thread safety
 
@@ -50,7 +50,7 @@ The following is an example that illustrates the problem.
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(analyze, SyntaxKind.SimpleMemberAccessExpression);
+            context.RegisterSyntaxNodeAction(AnalyzeMemberAccessExpressions, SyntaxKind.SimpleMemberAccessExpression);
         }
 
         private void AnalyzeMemberAccessExpressions(SyntaxNodeAnalysisContext context)
@@ -67,8 +67,59 @@ The following is an example that illustrates the problem.
 
 > Only one instance of `MyAnalyzer` will be created and  `AnalyzeMemberAccessExpressions` will be invoked repeatedly. This will result in a race condition that can lead to inconsistent behavior.
 
-**Do not**
-* Do not build your analyzer to depend on (object state) properties or fields (instance or static) from the singleton instance of your derived `DiagnosticAnalyzer` or `CodeFixProvider`. Use local variables, or method arguments to store information.
+**Do**
+*  Use local variables or method arguments to store information.
+
+```cs
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class MyAnalyzer : DiagnosticAnalyzer
+    {
+        internal static readonly DiagnosticDescriptor Rule = new("EX00001", "Example 1", "Message 1", "Example Category", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: "Example description.");
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.RegisterSyntaxNodeAction(Option1, SyntaxKind.SimpleMemberAccessExpression);
+            
+            // in this example: option2 will create a unique MyAnalysisClass object each time a roslyn analysis session is started
+            context.RegisterSyntaxNodeAction(new MyAnalysisClass("HttpContext").Option2, SyntaxKind.SimpleMemberAccessExpression);
+        }
+
+        private void Option1(SyntaxNodeAnalysisContext context)
+        {
+            // use local variables and pass data as method arguments
+            var myData = context.Node.ToString();
+
+            if (myData == "HttpContext")
+            {
+                var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation());
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+    }
+
+    public class MyAnalysisClass
+    {
+        private readonly string _myStatefulInfo;
+
+        public Analysis(string stateInfo)
+        {
+            _myStatefulInfo = stateInfo;
+        }
+
+        internal void Option2(SyntaxNodeAnalysisContext context)
+        {
+            if (context.Node.ToString() == _myStatefulInfo)
+            {
+                var diagnostic = Diagnostic.Create(MyAnalyzer.Rule, context.Node.GetLocation());
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+    }
+```
+
+> Note that option2 enables you to organize your code and even do code analysis from classes in .net standard libraries.
 
 ### 3. Use abstractions and focus on the intent of your Analyzer rather than Roslyn
 Roslyn is a rich framework of information that describes every detail of code in every file of every project. The concepts can become overwhelming. Use abstractions to develop class names and methods that sharpen the focus on what the analyzer does by hiding how it achieves the goal.
