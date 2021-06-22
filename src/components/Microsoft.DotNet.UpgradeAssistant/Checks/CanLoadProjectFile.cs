@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
     public class CanLoadProjectFile : IUpgradeReadyCheck
     {
-        private const string MESSAGE_TEMPLATE = "Project {0} can not be loaded: {1}";
+        private const string MESSAGE_TEMPLATE = "Project {0} cannot be loaded: {1}";
         private const string GUIDANCE = "Use Visual Studio to confirm that this project can be loaded.";
 
         private readonly ILogger<CanLoadProjectFile> _logger;
