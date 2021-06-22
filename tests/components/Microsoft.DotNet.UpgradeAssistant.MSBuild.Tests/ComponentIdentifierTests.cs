@@ -46,18 +46,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             Assert.Equal(expected, components);
         }
 
-        [InlineData("", ProjectComponents.None)]
-        [InlineData("Microsoft.NET.Sdk.Web", ProjectComponents.AspNetCore)]
-        [InlineData("Microsoft.NET.Sdk.Desktop", ProjectComponents.WindowsDesktop)]
+        [InlineData(new[] { "" }, ProjectComponents.None)]
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, ProjectComponents.AspNetCore)]
+        [InlineData(new[] { "Microsoft.NET.Sdk.Desktop" }, ProjectComponents.WindowsDesktop)]
         [Theory]
-        public async Task SdkTypesAsync(string sdk, ProjectComponents expected)
+        public async Task SdkTypesAsync(string[] sdk, ProjectComponents expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);
-            projectFile.Setup(f => f.Sdk).Returns(new List<string>() { sdk });
+            projectFile.Setup(f => f.Sdk).Returns(new HashSet<string>(sdk, StringComparer.OrdinalIgnoreCase));
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
 
             var project = mock.Mock<IProject>();

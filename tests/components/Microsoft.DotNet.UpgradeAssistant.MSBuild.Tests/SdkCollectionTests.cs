@@ -20,50 +20,52 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var projectRoot = ProjectRootElement.Create();
             projectRoot.Sdk = sdk;
+            var sdkCollection = new SdkCollection(projectRoot);
 
-            var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(true);
-            projectFile.Setup(f => f.Sdk).Returns(new SdkCollection(projectRoot));
-
-            Assert.True(projectFile.Object.Sdk.Contains(sdk));
+            Assert.Contains(sdk, sdkCollection);
         }
 
         [InlineData("Microsoft.NET.Sdk.Web")]
         [Theory]
         public void SdkCollectionAddTest(string sdk)
         {
+            // Arrange
             using var mock = AutoMock.GetLoose();
 
             var projectRoot = ProjectRootElement.Create();
             projectRoot.Sdk = DefaultSDK;
 
-            var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(true);
-            projectFile.Setup(f => f.Sdk).Returns(new SdkCollection(projectRoot));
+            var sdkCollection = new SdkCollection(projectRoot);
 
-            projectFile.Object.Sdk.Add(sdk);
+            // Act
+            sdkCollection.Add(sdk);
 
-            Assert.Equal(2, projectFile.Object.Sdk.Count);
-            Assert.Equal(projectFile.Object.Sdk, new string[] { DefaultSDK, sdk });
+            // Assert
+            Assert.Collection(
+                sdkCollection,
+                s => Assert.Equal(s, DefaultSDK),
+                s => Assert.Equal(s, sdk));
         }
 
         [InlineData("Microsoft.NET.Sdk.Web")]
         [Theory]
         public void SdkCollectionRemoveTest(string sdk)
         {
+            // Arrange
             using var mock = AutoMock.GetLoose();
 
             var projectRoot = ProjectRootElement.Create();
             projectRoot.Sdk = string.Concat(DefaultSDK, ";", sdk);
 
-            var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(true);
-            projectFile.Setup(f => f.Sdk).Returns(new SdkCollection(projectRoot));
+            var sdkCollection = new SdkCollection(projectRoot);
 
-            projectFile.Object.Sdk.Remove(sdk);
+            // Act
+            sdkCollection.Remove(sdk);
 
-            Assert.Equal(1, projectFile.Object.Sdk.Count);
-            Assert.Equal(projectFile.Object.Sdk, new string[] { DefaultSDK });
+            // Assert
+            Assert.Collection(
+                sdkCollection,
+                s => Assert.Equal(s, DefaultSDK));
         }
     }
 }
