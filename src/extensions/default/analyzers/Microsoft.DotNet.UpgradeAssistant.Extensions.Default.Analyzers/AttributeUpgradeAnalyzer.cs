@@ -77,7 +77,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
 
             // If the attribute name isn't one of the mapped names, bail out
-            var mapping = mappings.FirstOrDefault(m => MatchesPartiallyQualifiedName(m.OldName, attributeName) || MatchesPartiallyQualifiedName(m.OldName, $"{attributeName}{AttributeSuffix}"));
+            var mapping = mappings.FirstOrDefault(m =>
+            {
+                var matcher = NameMatcher.MatchType(m.OldName);
+                return matcher.MatchesPartiallyQualifiedType(attributeName) || matcher.MatchesPartiallyQualifiedType($"{attributeName}{AttributeSuffix}");
+            });
             if (mapping is null)
             {
                 return;
@@ -101,27 +105,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // Create and report the diagnostic
             var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), properties, mapping.OldName, mapping.NewName);
             context.ReportDiagnostic(diagnostic);
-        }
-
-        private static bool MatchesPartiallyQualifiedName(string fullyQualifiedName, string partiallyQualifiedName)
-        {
-            var partialName = partiallyQualifiedName.Split('.');
-            var fullName = fullyQualifiedName.Split('.');
-
-            if (partialName.Length > fullName.Length)
-            {
-                return false;
-            }
-
-            for (var i = 1; i <= partialName.Length; i++)
-            {
-                if (!partialName[partialName.Length - i].Equals(fullName[fullName.Length - i], StringComparison.Ordinal))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }
