@@ -14,14 +14,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
         Ready,
 
         /// <summary>
-        /// This project contains something that prevents upgrade.
-        /// </summary>
-        NotReady,
-
-        /// <summary>
         /// Upgrade-assistant can help with some of the tasks required to upgrade this project.
         /// But users should be informed that upgrade-assistant cannot completely upgrade this project.
         /// </summary>
-        Unsupported
+        Unsupported,
+
+        /// <summary>
+        /// This project contains something that prevents upgrade.
+        /// </summary>
+        NotReady
     }
 }
