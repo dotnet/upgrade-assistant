@@ -92,15 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             // Create new identifier
             var updatedNode = GetUpdatedNode(node, generator, newIdentifier)
-                .WithAdditionalAnnotations(Simplifier.Annotation);
-
-            // The simplifier does not recognize using statements within namespaces, so this
-            // checks whether the necessary using statement is present or not and adds the
-            // AddImportsAnnotation only if it's absent.
-            if (qualifier is not null && !node.HasAccessToNamespace(qualifier))
-            {
-                updatedNode = updatedNode.WithAdditionalAnnotations(Simplifier.AddImportsAnnotation);
-            }
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
             // Preserve white space and comments
             updatedNode = updatedNode.WithTriviaFrom(node);
@@ -115,7 +107,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var updatedDocument = document.WithSyntaxRoot(updatedRoot);
 
             // Add using declaration if needed
-            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
+            if (qualifier is not null)
+            {
+                var targetNode = updatedRoot.GetAnnotatedNodes(Simplifier.AddImportsAnnotation).Where(n => n.SpanStart == node.SpanStart && n.Span.Length == updatedNode.Span.Length).FirstOrDefault();
+                updatedDocument = await updatedDocument.AddImportIfMissingAsync(qualifier, targetNode, cancellationToken).ConfigureAwait(false);
+            }
 
             // Simplify the call, if possible
             updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);

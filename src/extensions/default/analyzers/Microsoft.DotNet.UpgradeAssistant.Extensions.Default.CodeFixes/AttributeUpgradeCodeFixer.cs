@@ -107,6 +107,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         {
             var generator = SyntaxGenerator.GetGenerator(document);
 
+            // Split the new idenfitier into namespace and name components
+            var namespaceDelimiterIndex = attributeType.LastIndexOf('.');
+            var qualifier = namespaceDelimiterIndex >= 0
+                ? attributeType.Substring(0, namespaceDelimiterIndex)
+                : null;
+
             // Create an updated Attribute node
             var updatedNode = node switch
             {
@@ -115,20 +121,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 _ => throw new InvalidOperationException($"Unexpected syntax node type: {node.GetType().FullName}")
             };
             updatedNode = updatedNode.WithAdditionalAnnotations(Simplifier.Annotation);
-
-            // Split the new idenfitier into namespace and name components
-            var namespaceDelimiterIndex = attributeType.LastIndexOf('.');
-            var qualifier = namespaceDelimiterIndex >= 0
-                ? attributeType.Substring(0, namespaceDelimiterIndex)
-                : null;
-
-            // The simplifier does not recognize using statements within namespaces, so this
-            // checks whether the necessary using statement is present or not and adds the
-            // AddImportsAnnotation only if it's absent.
-            if (qualifier is not null && !node.HasAccessToNamespace(qualifier))
-            {
-                updatedNode = updatedNode.WithAdditionalAnnotations(Simplifier.AddImportsAnnotation);
-            }
 
             // Get the document root
             var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -142,7 +134,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var updatedDocument = document.WithSyntaxRoot(updatedRoot);
 
             // Add using declaration if needed
-            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
+            if (qualifier is not null)
+            {
+                var targetNode = updatedRoot.GetAnnotatedNodes(Simplifier.AddImportsAnnotation).Where(n => n.SpanStart == node.SpanStart && n.Span.Length == updatedNode.Span.Length).FirstOrDefault();
+                updatedDocument = await updatedDocument.AddImportIfMissingAsync(qualifier, targetNode, cancellationToken).ConfigureAwait(false);
+            }
 
             // Simplify the call, if possible
             updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);

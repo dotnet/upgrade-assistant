@@ -6,15 +6,15 @@ Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Text
 Imports System.Threading.Tasks
-Imports Microsoft.AspNetCore.Authorization
 Imports Microsoft.AspNetCore.Mvc
+Imports Microsoft.AspNetCore.Authorization
 
-Namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Analyzers.Test.assets.TestClasses
+Namespace TestClasses
     Public Class Class1
     End Class
 
-    <System.AllowHtml>
-    <ResponseCache>
+    <System.AllowHtml()>
+    <ResponseCache()> ' Comment2
     Public Class Class2
     End Class
 
@@ -22,11 +22,11 @@ Namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Analyzers.Test.assets.Tes
     Public Class Class3
     End Class
 
-    <Microsoft.AspNetCore.Mvc.Filters.ActionFilter>
-    <Authorize>
+    <Microsoft.AspNetCore.Mvc.Filters.ActionFilter()>
+    <Authorize()>
     Public Class Class4
-        <Bind>
-        <Microsoft.AspNetCore.Authorization.Authorize>
+        <Bind()>
+        <Microsoft.AspNetCore.Authorization.AuthorizeAttribute>
         Public Sub Method1(
         <BindAttribute> ByVal s As String)
         End Sub

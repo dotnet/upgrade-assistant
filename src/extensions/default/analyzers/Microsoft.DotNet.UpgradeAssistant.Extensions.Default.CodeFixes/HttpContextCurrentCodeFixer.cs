@@ -100,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             // Add a using statement, if necessary
             // This must be done after the diagnostic node is replaced since the node won't be the same
             // after updating using statements.
-            docRoot = docRoot.AddUsingIfMissing(httpContextHelperClass.ContainingNamespace.ToString())!;
+            docRoot = (CompilationUnitSyntax)docRoot.AddImportIfMissing(httpContextHelperClass.ContainingNamespace.ToString(), docEditor.Generator, null);
 
             docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
 
@@ -143,10 +143,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             var documentRoot = (CompilationUnitSyntax)editor.OriginalRoot;
 
             // Add using declarations if needed
-            documentRoot = documentRoot
-                .AddUsingIfMissing(httpContextHelperClass.ContainingNamespace.ToString()) // For HttpContextHelper
-                .AddUsingIfMissing("Microsoft.AspNetCore.Http") // For IHttpContextAccessor
-                .AddUsingIfMissing("Microsoft.Extensions.DependencyInjection"); // For AddHttpContextAccessor
+            documentRoot = (CompilationUnitSyntax)documentRoot
+                .AddImportIfMissing(httpContextHelperClass.ContainingNamespace.ToString(), editor.Generator, null) // For HttpContextHelper
+                .AddImportIfMissing("Microsoft.AspNetCore.Http", editor.Generator, null) // For IHttpContextAccessor
+                .AddImportIfMissing("Microsoft.Extensions.DependencyInjection", editor.Generator, null); // For AddHttpContextAccessor
 
             // Add AddHttpContextAccessor call if needed
             var configureServicesMethod = documentRoot.GetMethodDeclaration<MethodDeclarationSyntax>("ConfigureServices", "IServiceCollection");

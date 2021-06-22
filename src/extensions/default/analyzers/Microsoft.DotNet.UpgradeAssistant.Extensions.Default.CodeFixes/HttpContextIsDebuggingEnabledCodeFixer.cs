@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             documentRoot = documentRoot.ReplaceNode(node, newExpression)!;
 
             // Add a using statement to System.Diagnostics, if necessary
-            documentRoot = documentRoot.AddUsingIfMissing(DiagnosticsNamespace);
+            documentRoot = (CompilationUnitSyntax)documentRoot.AddImportIfMissing(DiagnosticsNamespace, editor.Generator, null);
 
             editor.ReplaceNode(editor.OriginalRoot, documentRoot);
             return editor.GetChangedDocument();

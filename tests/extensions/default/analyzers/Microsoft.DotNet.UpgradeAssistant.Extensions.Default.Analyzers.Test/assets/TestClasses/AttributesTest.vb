@@ -7,17 +7,17 @@ Imports System.Linq
 Imports System.Text
 Imports System.Threading.Tasks
 
-Namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Analyzers.Test.assets.TestClasses
+Namespace TestClasses
     <AllowHtml()> ' Comment
     Public Class Class1
     End Class
 
     <System.AllowHtml()>
-    <OutputCacheAttribute()>
+    <OutputCacheAttribute()> ' Comment2
     Public Class Class2
     End Class
 
-    <Web.Mvc.ValidateInput(), System.Web.Mvc.AuthorizeAttribute()>
+    <Web.Mvc.ValidateInput(), System.Web.Mvc.AuthorizeAttribute>
     Public Class Class3
     End Class
 
@@ -26,9 +26,9 @@ Namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Analyzers.Test.assets.Tes
     <ValidateInputAttribute()>
     Public Class Class4
         <Bind()>
-        <Microsoft.AspNetCore.Authorization.Authorize()>
+        <Microsoft.AspNetCore.Authorization.AuthorizeAttribute>
         Public Sub Method1(
-        <BindAttribute()> ByVal s As String)
+        <BindAttribute> ByVal s As String)
         End Sub
     End Class
 End Namespace

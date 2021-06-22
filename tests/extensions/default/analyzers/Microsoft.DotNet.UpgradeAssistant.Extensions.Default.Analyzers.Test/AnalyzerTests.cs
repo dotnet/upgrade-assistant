@@ -195,14 +195,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0010", new TextSpan(782, 4)),
                     new ExpectedDiagnostic("UA0010", new TextSpan(874, 13)),
 
-                    new ExpectedDiagnostic("UA0010", new TextSpan(362, 9), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(455, 20), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(525, 21), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(548, 33), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(684, 24), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(716, 22), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(775, 4), Language.VisualBasic),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(876, 13), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(295, 11), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(392, 22), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(475, 23), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(500, 33), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(638, 26), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(672, 24), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(733, 6), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(845, 13), Language.VisualBasic),
                 }
             },
         };
@@ -266,7 +266,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Theory]
         public async Task UpgradeCodeFixer(string scenarioName)
         {
-            foreach (var language in new[] { /*Language.CSharp,*/ Language.VisualBasic })
+            foreach (var language in new[] { Language.CSharp, Language.VisualBasic })
             {
                 var expectedDiagnostics = ExpectedDiagnostics[scenarioName].Where(diagnostics => diagnostics.Language == language);
                 if (!expectedDiagnostics.Any())
