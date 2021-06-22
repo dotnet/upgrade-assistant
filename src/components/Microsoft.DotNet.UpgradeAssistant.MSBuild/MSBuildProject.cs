@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private ProjectOutputType GetDefaultOutputType()
         {
-            if (IsSdk && MSBuildConstants.SDKsWithExeDefaultOutputType.Contains(Sdk, StringComparer.OrdinalIgnoreCase))
+            if (Sdk.Any(p => MSBuildConstants.SDKsWithExeDefaultOutputType.Contains(p, StringComparer.OrdinalIgnoreCase)))
             {
                 return ProjectOutputType.Exe;
             }
