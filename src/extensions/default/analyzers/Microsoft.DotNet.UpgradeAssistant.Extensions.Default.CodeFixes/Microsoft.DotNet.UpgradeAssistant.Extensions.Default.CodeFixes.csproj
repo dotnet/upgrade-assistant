@@ -5,10 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
-      <Version>3.9.0</Version>
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces">
-      <Version>3.9.0</Version>
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
     <ProjectReference Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj" />

@@ -9,14 +9,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks.Tests
 {
     public class CentralPackageManagementCheckTests
     {
-        [InlineData("true", false)]
-        [InlineData("True", false)]
-        [InlineData("false", true)]
-        [InlineData("False", true)]
-        [InlineData(null, true)]
-        [InlineData("", true)]
+        [InlineData("true", UpgradeReadiness.NotReady)]
+        [InlineData("True", UpgradeReadiness.NotReady)]
+        [InlineData("false", UpgradeReadiness.Ready)]
+        [InlineData("False", UpgradeReadiness.Ready)]
+        [InlineData(null, UpgradeReadiness.Ready)]
+        [InlineData("", UpgradeReadiness.Ready)]
         [Theory]
-        public async Task ChecksProperty(string isCentrallyManaged, bool isReady)
+        public async Task ChecksProperty(string isCentrallyManaged, UpgradeReadiness isReady)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -27,8 +27,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks.Tests
             var project = mock.Mock<IProject>();
             project.Setup(f => f.GetFile()).Returns(file.Object);
 
+            var options = mock.Mock<UpgradeReadinessOptions>();
+
             // Act
-            var result = await mock.Create<CentralPackageManagementCheck>().IsReadyAsync(project.Object, default).ConfigureAwait(false);
+            var result = await mock.Create<CentralPackageManagementCheck>().IsReadyAsync(project.Object, options.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(isReady, result);

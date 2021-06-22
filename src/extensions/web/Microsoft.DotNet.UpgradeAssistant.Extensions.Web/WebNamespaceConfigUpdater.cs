@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             var project = context.CurrentProject.Required();
 
             var alreadyImportedNamespaces = new List<string>();
-            _viewImportsPath = project.FindFiles(ProjectItemType.Content, ViewImportsRelativePath).FirstOrDefault();
+            _viewImportsPath = project.FindFiles(ViewImportsRelativePath, ProjectItemType.Content).FirstOrDefault();
 
             // Look for a _ViewImports.cstml to see whether any of the namespaces are already imported
             if (_viewImportsPath is null)

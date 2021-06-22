@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
         /// <summary>
         /// Method to override to write changes to the appsettings.json file.
         /// </summary>
-        /// <param name="jsonWriter">appsettings.json writer</param>
+        /// <param name="jsonWriter">appsettings.json writer.</param>
         public abstract void WriteChangesToAppSettings(Utf8JsonWriter jsonWriter);
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 
             var project = context.CurrentProject.Required();
 
-            var jsonConfigFiles = project.FindFiles(ProjectItemType.Content, AppSettingsFileRegex)
+            var jsonConfigFiles = project.FindFiles(AppSettingsFileRegex, ProjectItemType.Content)
                 .Select(f => new AppSettingsFile(f))
                 .ToList();
 

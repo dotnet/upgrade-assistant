@@ -13,6 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         FileInfo FileInfo { get; }
 
+        string Id { get; }
+
         Language Language { get; }
 
         Project GetRoslynProject();
@@ -23,6 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         INuGetReferences NuGetReferences { get; }
 
+        IEnumerable<string> ProjectTypes { get; }
+
         IEnumerable<Reference> References { get; }
 
         IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks { get; }
@@ -31,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         ProjectOutputType OutputType { get; }
 
-        IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher);
+        IEnumerable<string> FindFiles(ProjectItemMatcher matcher, ProjectItemType? itemType = null);
 
         IProjectFile GetFile();
     }

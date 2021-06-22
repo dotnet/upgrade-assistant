@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project>
   <ItemGroup>
-    <AdditionalFiles Include="$(MSBuildThisFileDirectory)\WebTypeReplacements.typemap" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)\WebTypeReplacements.typemap">
+      <Visible>false</Visible>
+    </AdditionalFiles>
   </ItemGroup>
 </Project>

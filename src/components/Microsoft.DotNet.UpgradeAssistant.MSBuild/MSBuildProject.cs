@@ -42,6 +42,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _logger = logger;
         }
 
+        public string Id => Context.SolutionInfo.GetProjectId(FileInfo.FullName);
+
         public IEnumerable<IProject> ProjectReferences => GetRoslynProject().ProjectReferences.Select(p =>
         {
             var project = Context.Workspace.CurrentSolution.GetProject(p.ProjectId);
@@ -90,10 +92,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token)
             => _componentIdentifier.GetComponentsAsync(this, token);
 
-        public IEnumerable<string> FindFiles(ProjectItemType itemType, ProjectItemMatcher matcher)
+        public IEnumerable<string> FindFiles(ProjectItemMatcher matcher, ProjectItemType? itemType = null)
         {
             var items = Project.Items
-                .Where<MBuild.ProjectItem>(i => i.ItemType.Equals(itemType.Name, StringComparison.Ordinal) && matcher.Match(i.EvaluatedInclude));
+                .Where<MBuild.ProjectItem>(i => matcher.Match(i.EvaluatedInclude));
+
+            if (itemType is not null)
+            {
+                items = items.Where(i => i.ItemType.Equals(itemType.Name, StringComparison.Ordinal));
+            }
 
             foreach (var item in items)
             {
@@ -110,6 +117,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
         public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks => new TargetFrameworkMonikerCollection(this, _comparer);
+
+        public IEnumerable<string> ProjectTypes => GetPropertyValue("ProjectTypeGuids").Split(';');
 
         public override bool Equals(object? obj)
         {

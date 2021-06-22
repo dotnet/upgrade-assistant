@@ -19,6 +19,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands
             _logSettings = logSettings ?? throw new ArgumentNullException(nameof(logSettings));
         }
 
+        public override string Id => "Logging";
+
         public override string CommandText => "Configure logging";
 
         private enum LogTarget
