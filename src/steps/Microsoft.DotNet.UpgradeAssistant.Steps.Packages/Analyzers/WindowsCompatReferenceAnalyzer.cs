@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return;
             }
 
-            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, state.TargetFrameworks, false, token).ConfigureAwait(false);
+            var latestVersion = await _loader.GetLatestVersionAsync(PackageName, state.TargetFrameworks, new(), token).ConfigureAwait(false);
 
             if (latestVersion is null)
             {

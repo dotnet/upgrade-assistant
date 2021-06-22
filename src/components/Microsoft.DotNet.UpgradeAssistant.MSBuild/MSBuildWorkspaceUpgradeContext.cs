@@ -20,7 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ITargetFrameworkMonikerComparer _comparer;
         private readonly IComponentIdentifier _componentIdentifier;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
-        private readonly IUpgradeContextProperties _properties;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
         private List<FileInfo>? _entryPointPaths;
@@ -29,6 +28,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private MSBuildWorkspace? _workspace;
 
         public string InputPath { get; }
+
+        public ISolutionInfo SolutionInfo { get; }
 
         public bool InputIsSolution => InputPath.EndsWith(".sln", StringComparison.OrdinalIgnoreCase);
 
@@ -45,11 +46,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        public string? SolutionId => SolutionInfo.SolutionId;
+
         public bool IsComplete { get; set; }
+
+        public UpgradeStep? CurrentStep { get; set; }
 
         public MSBuildWorkspaceUpgradeContext(
             UpgradeOptions options,
             IVisualStudioFinder vsFinder,
+            Func<string, ISolutionInfo> infoGenerator,
             IPackageRestorer restorer,
             ITargetFrameworkMonikerComparer comparer,
             IComponentIdentifier componentIdentifier,
@@ -72,10 +78,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _comparer = comparer;
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            Properties = properties ?? throw new ArgumentNullException(nameof(properties));
 
             _vsPath = vsFinder.GetLatestVisualStudioPath();
-
+            SolutionInfo = infoGenerator(InputPath);
             GlobalProperties = CreateProperties();
             ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
         }
@@ -225,7 +231,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public IUpgradeContextProperties Properties => _properties;
+        public IUpgradeContextProperties Properties { get; }
 
         public void SetCurrentProject(IProject? project)
         {

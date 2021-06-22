@@ -11,11 +11,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IUpgradeContext : IDisposable
     {
+        string? SolutionId { get; }
+
         string InputPath { get; }
 
         bool IsComplete { get; set; }
 
         IEnumerable<IProject> EntryPoints { get; set; }
+
+        /// <summary>
+        /// This property is intended for query operations only and will be updated by UpgraderManager. Changing this property will not change the control flow.
+        /// </summary>
+        UpgradeStep? CurrentStep { get; set; }
 
         IProject? CurrentProject { get; }
 

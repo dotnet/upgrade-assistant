@@ -14,28 +14,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests.Checks
 {
     public class MultiTargetingCheckTests
     {
-        [InlineData(0, false)]
-        [InlineData(1, true)]
-        [InlineData(2, false)]
-        [InlineData(3, false)]
+        [InlineData(0, UpgradeReadiness.NotReady)]
+        [InlineData(1, UpgradeReadiness.Ready)]
+        [InlineData(2, UpgradeReadiness.NotReady)]
+        [InlineData(3, UpgradeReadiness.NotReady)]
         [Theory]
-        public async Task IsReadyTest(int tfmCount, bool isValid)
+        public async Task IsReadyTest(int tfmCount, UpgradeReadiness readiness)
         {
             // Arrange
             var fixture = new Fixture();
             var tfms = fixture.CreateMany<TargetFrameworkMoniker>(tfmCount).ToArray();
 
             using var mock = AutoMock.GetLoose();
-            var readyCheck = mock.Create<TargetFrameworkCheck>();
+            var readyCheck = mock.Create<MultiTargetFrameworkCheck>();
 
             var project = new Mock<IProject>();
             project.Setup(p => p.TargetFrameworks).Returns(tfms);
 
+            var options = mock.Mock<UpgradeReadinessOptions>();
+
             // Act
-            var result = await readyCheck.IsReadyAsync(project.Object, CancellationToken.None).ConfigureAwait(false);
+            var result = await readyCheck.IsReadyAsync(project.Object, options.Object, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(isValid, result);
+            Assert.Equal(readiness, result);
         }
     }
 }

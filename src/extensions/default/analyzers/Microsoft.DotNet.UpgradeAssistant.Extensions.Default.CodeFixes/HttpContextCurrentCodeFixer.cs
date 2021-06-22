@@ -79,16 +79,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var slnEditor = new SolutionEditor(project.Solution);
 
-            // Update Startup.cs to call HttpContextHelper.Initialize
-            var startup = project.Documents.FirstOrDefault(d => d.Name.Equals("Startup.cs", StringComparison.OrdinalIgnoreCase));
-            if (startup is null)
-            {
-                return document.Project.Solution;
-            }
-
-            var startupDocEditor = await slnEditor.GetDocumentEditorAsync(startup.Id, cancellationToken).ConfigureAwait(false);
-            InitializeHttpContextHelperInStartup(startupDocEditor, httpContextHelperClass);
-
             // Update the HttpContext.Current usage to use HttpContextHelper
             var docEditor = await slnEditor.GetDocumentEditorAsync(document.Id, cancellationToken).ConfigureAwait(false);
             var docRoot = (CompilationUnitSyntax)docEditor.OriginalRoot;
@@ -142,43 +132,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             }
 
             return null;
-        }
-
-        private static void InitializeHttpContextHelperInStartup(DocumentEditor editor, INamedTypeSymbol httpContextHelperClass)
-        {
-            var documentRoot = (CompilationUnitSyntax)editor.OriginalRoot;
-
-            // Add using declarations if needed
-            documentRoot = documentRoot
-                .AddImportIfMissing(httpContextHelperClass.ContainingNamespace.ToString()) // For HttpContextHelper
-                .AddImportIfMissing("Microsoft.AspNetCore.Http") // For IHttpContextAccessor
-                .AddImportIfMissing("Microsoft.Extensions.DependencyInjection"); // For AddHttpContextAccessor
-
-            // Add AddHttpContextAccessor call if needed
-            var configureServicesMethod = documentRoot.GetMethodDeclaration<MethodDeclarationSyntax>("ConfigureServices", "IServiceCollection");
-            var serviceCollectionParameter = configureServicesMethod?.ParameterList.Parameters
-                .FirstOrDefault(p => string.Equals(p.Type?.ToString(), "IServiceCollection", StringComparison.Ordinal));
-
-            if (configureServicesMethod != null && serviceCollectionParameter != null)
-            {
-                var configureServicesBody = configureServicesMethod.Body;
-
-                if (configureServicesBody is null)
-                {
-                    return;
-                }
-
-                var addHttpContextAccessorStatement = ParseStatement($"{serviceCollectionParameter.Identifier}.AddHttpContextAccessor();")
-                    .WithWhitespaceTriviaFrom(configureServicesBody.Statements.First());
-
-                // Check whether the statement already exists
-                if (!configureServicesBody.Statements.Any(s => addHttpContextAccessorStatement.IsEquivalentTo(s)))
-                {
-                    documentRoot = documentRoot.ReplaceNode(configureServicesBody, configureServicesBody.AddStatements(addHttpContextAccessorStatement));
-                }
-            }
-
-            editor.ReplaceNode(editor.OriginalRoot, documentRoot);
         }
     }
 }
