@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Autofac.Extras.Moq;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic;
 using Moq;
 using Xunit;
 

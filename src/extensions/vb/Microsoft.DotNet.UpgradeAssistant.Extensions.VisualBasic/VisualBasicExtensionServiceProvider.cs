@@ -3,8 +3,6 @@
 
 using System;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
@@ -21,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
             services.Services.AddUpgradeStep<VisualBasicProjectUpdaterStep>();
             services.Services.AddTransient<IDependencyAnalyzer, MyDotAnalyzer>();
             services.Services.AddTransient<ITargetFrameworkSelectorFilter, MyTypeTargetFrameworkSelectorFilter>();
+            services.Services.AddTransient<IUpgradeReadyCheck, VisualBasicRazorTemplateCheck>();
         }
     }
 }
