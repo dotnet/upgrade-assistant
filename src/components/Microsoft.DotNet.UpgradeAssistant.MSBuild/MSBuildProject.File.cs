@@ -38,25 +38,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        public string Sdk
-        {
-            get
-            {
-                var sdk = ProjectRoot.Sdk;
-
-                if (sdk is null)
-                {
-                    throw new ArgumentOutOfRangeException("Should check IsSdk property first");
-                }
-
-                return sdk;
-            }
-        }
-
-        public bool IsSdk =>
-            ProjectRoot.Sdk is not null && ProjectRoot.Sdk.Contains(MSBuildConstants.DefaultSDK, StringComparison.OrdinalIgnoreCase);
+        public bool IsSdk => Sdk.Any();
 
         public ICollection<string> Imports => new ImportsCollection(ProjectRoot);
+
+        public ICollection<string> Sdk => new SdkCollection(ProjectRoot);
 
         public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this, _comparer).SetTargetFramework(tfm);
 

@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IProjectFile
     {
-        string Sdk { get; }
+        ICollection<string> Sdk { get; }
 
         public bool IsSdk { get; }
 

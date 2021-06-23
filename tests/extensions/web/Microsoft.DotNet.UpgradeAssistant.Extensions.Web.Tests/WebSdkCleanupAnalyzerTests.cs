@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,16 +36,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
         }
 
         [Theory]
-        [InlineData("Microsoft.NET.Sdk.Web", new[] { "Microsoft.AspNetCore.App" }, new[] { "Microsoft.AspNetCore.App" })] // Vanilla positive case
-        [InlineData("Microsoft.NET.Sdk.Web", new[] { "X", "Y", "Microsoft.AspNetCore.App", "Z" }, new[] { "Microsoft.AspNetCore.App" })] // Multiple references
-        [InlineData("Microsoft.NET.Sdk.Web", new[] { "Microsoft.AspNetCore.App", "Microsoft.AspNetCore.App" }, new[] { "Microsoft.AspNetCore.App" })] // Duplicate references
-        [InlineData("microsoft.NET.SDK.Web", new[] { "microsoft.ASPNetCore.App" }, new[] { "microsoft.ASPNetCore.App" })] // Ununusual case
-        [InlineData("Microsoft.NET.Sdk", new[] { "Microsoft.AspNetCore.App" }, new string[0])] // Wrong SDK
-        [InlineData("Microsoft.NET.Sdk.Web", new[] { "A", "B", "C" }, new string[0])] // Wrong framework reference
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, new[] { "Microsoft.AspNetCore.App" }, new[] { "Microsoft.AspNetCore.App" })] // Vanilla positive case
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, new[] { "X", "Y", "Microsoft.AspNetCore.App", "Z" }, new[] { "Microsoft.AspNetCore.App" })] // Multiple references
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, new[] { "Microsoft.AspNetCore.App", "Microsoft.AspNetCore.App" }, new[] { "Microsoft.AspNetCore.App" })] // Duplicate references
+        [InlineData(new[] { "microsoft.NET.SDK.Web" }, new[] { "microsoft.ASPNetCore.App" }, new[] { "microsoft.ASPNetCore.App" })] // Ununusual case
+        [InlineData(new[] { "Microsoft.NET.Sdk" }, new[] { "Microsoft.AspNetCore.App" }, new string[0])] // Wrong SDK
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, new[] { "A", "B", "C" }, new string[0])] // Wrong framework reference
         [InlineData(null, new[] { "Microsoft.AspNetCore.App" }, new string[0])] // No SDK
-        [InlineData("Microsoft.NET.Sdk.Web", new string[0], new string[0])] // No framework reference
-        [InlineData("Microsoft.NET.Sdk.Web", null, new string[0])] // Null framework references
-        public async Task AnalyzeAsyncTests(string? sdk, string[]? frameworkReferences, string[] expectedReferencesToRemove)
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, new string[0], new string[0])] // No framework reference
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, null, new string[0])] // Null framework references
+        public async Task AnalyzeAsyncTests(string[]? sdk, string[]? frameworkReferences, string[] expectedReferencesToRemove)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -86,17 +87,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             await Assert.ThrowsAsync<InvalidOperationException>(() => analyzer.AnalyzeAsync(null!, state.Object, CancellationToken.None)).ConfigureAwait(true);
         }
 
-        private static IProject GetMockProjectAndPackageState(AutoMock mock, string? sdk = null, IEnumerable<Reference>? frameworkReferences = null)
+        private static IProject GetMockProjectAndPackageState(AutoMock mock, string[]? sdk = null, IEnumerable<Reference>? frameworkReferences = null)
         {
             var projectRoot = mock.Mock<IProjectFile>();
             projectRoot.Setup(r => r.IsSdk).Returns(sdk is not null);
             if (sdk is not null)
             {
-                projectRoot.Setup(r => r.Sdk).Returns(sdk);
+                projectRoot.Setup(r => r.Sdk).Returns(new HashSet<string>(sdk, StringComparer.OrdinalIgnoreCase));
             }
             else
             {
-                projectRoot.Setup(r => r.Sdk).Throws<ArgumentOutOfRangeException>();
+                projectRoot.Setup(r => r.Sdk).Returns(Array.Empty<string>());
             }
 
             var project = mock.Mock<IProject>();

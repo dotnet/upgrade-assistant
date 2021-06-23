@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
@@ -27,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var projectFile = mock.Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);
-            projectFile.Setup(f => f.Sdk).Returns(string.Empty);
+            projectFile.Setup(f => f.Sdk).Returns(Array.Empty<string>());
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
             projectFile.Setup(f => f.GetPropertyValue(propertyName)).Returns(value);
 
@@ -45,18 +46,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             Assert.Equal(expected, components);
         }
 
-        [InlineData("", ProjectComponents.None)]
-        [InlineData("Microsoft.NET.Sdk.Web", ProjectComponents.AspNetCore)]
-        [InlineData("Microsoft.NET.Sdk.Desktop", ProjectComponents.WindowsDesktop)]
+        [InlineData(new[] { "" }, ProjectComponents.None)]
+        [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, ProjectComponents.AspNetCore)]
+        [InlineData(new[] { "Microsoft.NET.Sdk.Desktop" }, ProjectComponents.WindowsDesktop)]
         [Theory]
-        public async Task SdkTypesAsync(string sdk, ProjectComponents expected)
+        public async Task SdkTypesAsync(string[] sdk, ProjectComponents expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);
-            projectFile.Setup(f => f.Sdk).Returns(sdk);
+            projectFile.Setup(f => f.Sdk).Returns(new HashSet<string>(sdk, StringComparer.OrdinalIgnoreCase));
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
 
             var project = mock.Mock<IProject>();
@@ -96,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 
             var projectFile = mock.Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);
-            projectFile.Setup(f => f.Sdk).Returns(string.Empty);
+            projectFile.Setup(f => f.Sdk).Returns(Array.Empty<string>());
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
 
             var project = mock.Mock<IProject>();
@@ -135,7 +136,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             using var mock = AutoMock.GetLoose();
 
             var projectFile = mock.Mock<IProjectFile>();
-            projectFile.Setup(f => f.IsSdk).Returns(false);
 
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
