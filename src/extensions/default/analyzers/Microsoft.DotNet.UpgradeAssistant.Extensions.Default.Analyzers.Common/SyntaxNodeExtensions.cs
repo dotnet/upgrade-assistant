@@ -167,37 +167,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(node));
             }
 
-            return node.AncestorsAndSelf().Any(n => n.IncludesImport(namespaceName));
-        }
+            return node.AncestorsAndSelf().Any(n => IncludesImport(n, namespaceName));
 
-        /// <summary>
-        /// Determines if a syntax node includes a using or import statement for a given namespace.
-        /// Will not return true if the node's children include the specified using/import but the node itself does not.
-        /// </summary>
-        /// <param name="node">The node to analyze.</param>
-        /// <param name="namespaceName">The namespace name to check for.</param>
-        /// <returns>True if the node has a direct import or using statement for the given namespace. False otherwise.</returns>
-        private static bool IncludesImport(this SyntaxNode node, string namespaceName)
-        {
-            if (node is null)
+            /// <summary>
+            /// Determines if a syntax node includes a using or import statement for a given namespace.
+            /// Will not return true if the node's children include the specified using/import but the node itself does not.
+            /// </summary>
+            /// <param name="node">The node to analyze.</param>
+            /// <param name="namespaceName">The namespace name to check for.</param>
+            /// <returns>True if the node has a direct import or using statement for the given namespace. False otherwise.</returns>
+            static bool IncludesImport(SyntaxNode node, string namespaceName)
             {
-                throw new ArgumentNullException(nameof(node));
+                if (node is null)
+                {
+                    throw new ArgumentNullException(nameof(node));
+                }
+
+                if (node is CSSyntax.CompilationUnitSyntax || node is VBSyntax.CompilationUnitSyntax)
+                {
+                    return node.RootIncludesImport(namespaceName);
+                }
+
+                // Descend only into VB import statements
+                var nodes = node.DescendantNodesAndSelf(n => VisualBasicExtensions.IsKind(n, VB.SyntaxKind.ImportsStatement), false);
+                var children = node.ChildNodes();
+
+                var usings = children.OfType<CSSyntax.UsingDirectiveSyntax>().Select(u => u.Name.ToString())
+                    .Concat(children.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString()))
+                    .Concat(children.OfType<VBSyntax.ImportsStatementSyntax>().SelectMany(i => i.ImportsClauses.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString())));
+
+                return usings.Any(n => n.Equals(namespaceName, node.GetStringComparison()));
             }
-
-            if (node is CSSyntax.CompilationUnitSyntax || node is VBSyntax.CompilationUnitSyntax)
-            {
-                return node.RootIncludesImport(namespaceName);
-            }
-
-            // Descend only into VB import statements
-            var nodes = node.DescendantNodesAndSelf(n => VisualBasicExtensions.IsKind(n, VB.SyntaxKind.ImportsStatement), false);
-            var children = node.ChildNodes();
-
-            var usings = children.OfType<CSSyntax.UsingDirectiveSyntax>().Select(u => u.Name.ToString())
-                .Concat(children.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString()))
-                .Concat(children.OfType<VBSyntax.ImportsStatementSyntax>().SelectMany(i => i.ImportsClauses.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString())));
-
-            return usings.Any(n => n.Equals(namespaceName, node.Language == LanguageNames.CSharp ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
         }
 
         public static CSSyntax.CompilationUnitSyntax AddImportIfMissing(this CSSyntax.CompilationUnitSyntax documentRoot, string namespaceName)
@@ -280,5 +280,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
             throw new NotImplementedException(Resources.UnknownLanguage);
         }
+
+        public static StringComparison GetStringComparison(this SyntaxNode? node)
+            => node?.Language switch
+            {
+                LanguageNames.CSharp => StringComparison.Ordinal,
+                LanguageNames.VisualBasic => StringComparison.OrdinalIgnoreCase,
+                _ => throw new NotImplementedException(Resources.UnknownLanguage),
+            };
+
+        public static StringComparer GetStringComparer(this SyntaxNode? node)
+            => node?.Language switch
+            {
+                LanguageNames.CSharp => StringComparer.Ordinal,
+                LanguageNames.VisualBasic => StringComparer.OrdinalIgnoreCase,
+                _ => throw new NotImplementedException(Resources.UnknownLanguage),
+            };
     }
 }
