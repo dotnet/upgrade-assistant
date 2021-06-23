@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Updated `HttpContext.Current` analyzer to more correctly identify uses of `HttpContext.Current` that need replaced [#628](https://github.com/dotnet/upgrade-assistant/pull/628).
 - The Upgrade Assistant analyzer package no longer adds a WebTypeReplacements.typemap file to projects it's added to (more precisely, the file is present and available for analyzers to use but isn't visible in the solution explorer anymore) [#632](https://github.com/dotnet/upgrade-assistant/pull/632).
+- Addressed compile time errors that surfaced from Visual Basic Runtime and the My. namespace ([Link](https://github.com/dotnet/upgrade-assistant/pull/629))
 
 ## Version 0.2.231403 - 2021-06-14 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.231403))
 
