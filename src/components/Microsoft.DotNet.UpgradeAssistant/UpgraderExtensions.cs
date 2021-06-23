@@ -5,7 +5,6 @@ using System;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.DotNet.UpgradeAssistant.Checks;
 using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
-using Microsoft.DotNet.UpgradeAssistant.VisualBasic;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -40,7 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
             services.AddTransient<IUpgradeReadyCheck, MultiTargetFrameworkCheck>();
 
-            services.AddTransient<IUpgradeReadyCheck, VisualBasicRazorTemplateCheck>();
             services.AddTransient<IUpgradeReadyCheck, WebFormsCheck>();
             services.AddTransient<IUpgradeReadyCheck, WcfServerCheck>();
 
@@ -59,7 +57,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<ITargetFrameworkSelectorFilter, WebProjectTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, WindowsSdkTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, ExecutableTargetFrameworkSelectorFilter>();
-            services.AddTransient<ITargetFrameworkSelectorFilter, MyTypeTargetFrameworkSelectorFilter>();
         }
     }
 }

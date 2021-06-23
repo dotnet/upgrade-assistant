@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Checks
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 {
     /// <summary>
     /// Users running upgrade-assistant on ASP.NET projects with VBHTML
