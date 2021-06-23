@@ -88,12 +88,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static void AnalyzeCSharpIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TypeMapping> mappings)
         {
             var identifier = (CSSyntax.IdentifierNameSyntax)context.Node;
+
+            // Replacing attributes is handled in a separate analyzer
+            if (identifier.Parent is CSSyntax.AttributeSyntax)
+            {
+                return;
+            }
+
             AnalyzeIdentifier(context, mappings, identifier.Identifier.ValueText);
         }
 
         private static void AnalyzeVBIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TypeMapping> mappings)
         {
             var identifier = (VBSyntax.IdentifierNameSyntax)context.Node;
+
+            // Replacing attributes is handled in a separate analyzer
+            if (identifier.Parent is VBSyntax.AttributeSyntax)
+            {
+                return;
+            }
+
             AnalyzeIdentifier(context, mappings, identifier.Identifier.ValueText);
         }
 
@@ -109,6 +123,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // If the identifier isn't one of the mapped identifiers, bail out
             var mapping = mappings.FirstOrDefault(m => m.SimpleName?.Equals(simpleName, StringComparison.Ordinal) ?? false);
             if (mapping is null)
+            {
+                return;
+            }
+
+            // This analyzer requires a new type
+            if (mapping.NewName is null)
             {
                 return;
             }

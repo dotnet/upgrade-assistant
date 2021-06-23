@@ -61,20 +61,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove [AllowHtml] attribute.
-        /// </summary>
-        internal static string AllowHtmlAttributeTitle {
-            get {
-                return ResourceManager.GetString("AllowHtmlAttributeTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Replace with Microsoft.AspNetCore.Mvc.Controller.
         /// </summary>
         internal static string ApiControllerTitle {
             get {
                 return ResourceManager.GetString("ApiControllerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove attribute.
+        /// </summary>
+        internal static string AttributeRemoveTitle {
+            get {
+                return ResourceManager.GetString("AttributeRemoveTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace attribute.
+        /// </summary>
+        internal static string AttributeUpgradeTitle {
+            get {
+                return ResourceManager.GetString("AttributeUpgradeTitle", resourceCulture);
             }
         }
         

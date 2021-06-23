@@ -117,8 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AllowHtmlAttributeTitle" xml:space="preserve">
-    <value>Remove [AllowHtml] attribute</value>
+  <data name="AttributeUpgradeTitle" xml:space="preserve">
+    <value>Replace attribute</value>
   </data>
   <data name="ApiControllerTitle" xml:space="preserve">
     <value>Replace with Microsoft.AspNetCore.Mvc.Controller</value>
@@ -162,5 +162,8 @@
   <data name="UsingSystemWebTitle" xml:space="preserve">
     <value>Remove using directive</value>
     <comment>The title of the code fix.</comment>
+  </data>
+  <data name="AttributeRemoveTitle" xml:space="preserve">
+    <value>Remove attribute</value>
   </data>
 </root>

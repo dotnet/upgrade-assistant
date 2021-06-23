@@ -84,23 +84,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var generator = SyntaxGenerator.GetGenerator(document);
 
-            // Split the new idenfitier into namespace and name components
-            var namespaceDelimiterIndex = newIdentifier.LastIndexOf('.');
-            var qualifier = namespaceDelimiterIndex >= 0
-                ? newIdentifier.Substring(0, namespaceDelimiterIndex)
-                : null;
-
             // Create new identifier
             var updatedNode = GetUpdatedNode(node, generator, newIdentifier)
-                .WithAdditionalAnnotations(Simplifier.Annotation);
-
-            // The simplifier does not recognize using statements within namespaces, so this
-            // checks whether the necessary using statement is present or not and adds the
-            // AddImportsAnnotation only if it's absent.
-            if (qualifier is not null && !node.HasAccessToNamespace(qualifier))
-            {
-                updatedNode = updatedNode.WithAdditionalAnnotations(Simplifier.AddImportsAnnotation);
-            }
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
             // Preserve white space and comments
             updatedNode = updatedNode.WithTriviaFrom(node);

@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="*\UA*.vb" />
-    <Compile Include="*\UA*.Fixed.vb" />
+    <Compile Remove="*\*.vb" />
+    <Compile Include="*\*.Fixed.vb" />
   </ItemGroup>
   
   <ItemGroup>

@@ -3,7 +3,10 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Editing;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common;
 
 using CS = Microsoft.CodeAnalysis.CSharp;
@@ -152,31 +155,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         }
 
         /// <summary>
-        /// Determines if a syntax node includes a using or import statement for a given namespace.
-        /// Will not return true if the node's children include the specified using/import but the node itself does not.
-        /// </summary>
-        /// <param name="node">The node to analyze.</param>
-        /// <param name="namespaceName">The namespace name to check for.</param>
-        /// <returns>True if the node has a direct import or using statement for the given namespace. False otherwise.</returns>
-        public static bool HasUsingStatement(this SyntaxNode node, string namespaceName)
-        {
-            if (node is null)
-            {
-                throw new ArgumentNullException(nameof(node));
-            }
-
-            // Descend only into VB import statements
-            var nodes = node.DescendantNodesAndSelf(n => VisualBasicExtensions.IsKind(n, VB.SyntaxKind.ImportsStatement), false);
-            var children = node.ChildNodes();
-
-            var usings = children.OfType<CSSyntax.UsingDirectiveSyntax>().Select(u => u.Name.ToString())
-                .Concat(children.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString()))
-                .Concat(children.OfType<VBSyntax.ImportsStatementSyntax>().SelectMany(i => i.ImportsClauses.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString())));
-
-            return usings.Any(n => n.Equals(namespaceName, StringComparison.Ordinal));
-        }
-
-        /// <summary>
         /// Determines if a syntax node is in a scope that includes a using or import statement for a given namespace.
         /// </summary>
         /// <param name="node">The node to analyze for access to the namespace in its scope.</param>
@@ -189,28 +167,104 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(node));
             }
 
-            return node.AncestorsAndSelf().Any(n => n.HasUsingStatement(namespaceName));
+            return node.AncestorsAndSelf().Any(n => IncludesImport(n, namespaceName));
+
+            /// <summary>
+            /// Determines if a syntax node includes a using or import statement for a given namespace.
+            /// Will not return true if the node's children include the specified using/import but the node itself does not.
+            /// </summary>
+            /// <param name="node">The node to analyze.</param>
+            /// <param name="namespaceName">The namespace name to check for.</param>
+            /// <returns>True if the node has a direct import or using statement for the given namespace. False otherwise.</returns>
+            static bool IncludesImport(SyntaxNode node, string namespaceName)
+            {
+                if (node is null)
+                {
+                    throw new ArgumentNullException(nameof(node));
+                }
+
+                if (node is CSSyntax.CompilationUnitSyntax || node is VBSyntax.CompilationUnitSyntax)
+                {
+                    return node.RootIncludesImport(namespaceName);
+                }
+
+                // Descend only into VB import statements
+                var nodes = node.DescendantNodesAndSelf(n => VisualBasicExtensions.IsKind(n, VB.SyntaxKind.ImportsStatement), false);
+                var children = node.ChildNodes();
+
+                var usings = children.OfType<CSSyntax.UsingDirectiveSyntax>().Select(u => u.Name.ToString())
+                    .Concat(children.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString()))
+                    .Concat(children.OfType<VBSyntax.ImportsStatementSyntax>().SelectMany(i => i.ImportsClauses.OfType<VBSyntax.SimpleImportsClauseSyntax>().Select(i => i.Name.ToString())));
+
+                return usings.Any(n => n.Equals(namespaceName, node.GetStringComparison()));
+            }
         }
 
-        /// <summary>
-        /// Adds a using directive for a given namespace to the document root only if the directive is not already present.
-        /// </summary>
-        /// <param name="documentRoot">The document to add the directive to.</param>
-        /// <param name="namespaceName">The namespace to reference with the using directive.</param>
-        /// <returns>An updated document root with the specific using directive.</returns>
-        public static CSSyntax.CompilationUnitSyntax AddUsingIfMissing(this CSSyntax.CompilationUnitSyntax documentRoot, string namespaceName)
+        public static CSSyntax.CompilationUnitSyntax AddImportIfMissing(this CSSyntax.CompilationUnitSyntax documentRoot, string namespaceName)
         {
             if (documentRoot is null)
             {
                 throw new ArgumentNullException(nameof(documentRoot));
             }
 
-            // TODO - remove this helper and use ImportAdder instead.
-            var anyUsings = documentRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal));
-            var usingDirective = CS.SyntaxFactory.UsingDirective(CS.SyntaxFactory.ParseName(namespaceName).WithLeadingTrivia(CS.SyntaxFactory.Whitespace(" ")));
-            var result = anyUsings ? documentRoot : documentRoot.AddUsings(usingDirective);
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                throw new ArgumentException($"'{nameof(namespaceName)}' cannot be null or empty.", nameof(namespaceName));
+            }
 
-            return result;
+            if (documentRoot.RootIncludesImport(namespaceName))
+            {
+                return documentRoot;
+            }
+
+            var usingDirective = CS.SyntaxFactory.UsingDirective(CS.SyntaxFactory.ParseName(namespaceName).WithLeadingTrivia(CS.SyntaxFactory.Whitespace(" ")))
+                .WithTrailingTrivia(CS.SyntaxFactory.CarriageReturnLineFeed);
+            return documentRoot.AddUsings(usingDirective);
+        }
+
+        public static VBSyntax.CompilationUnitSyntax AddImportIfMissing(this VBSyntax.CompilationUnitSyntax documentRoot, string namespaceName)
+        {
+            if (documentRoot is null)
+            {
+                throw new ArgumentNullException(nameof(documentRoot));
+            }
+
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                throw new ArgumentException($"'{nameof(namespaceName)}' cannot be null or empty.", nameof(namespaceName));
+            }
+
+            if (documentRoot.RootIncludesImport(namespaceName))
+            {
+                return documentRoot;
+            }
+
+            var importsStatement = VB.SyntaxFactory.ImportsStatement(VB.SyntaxFactory.SingletonSeparatedList<VBSyntax.ImportsClauseSyntax>(VB.SyntaxFactory.SimpleImportsClause(VB.SyntaxFactory.ParseName(namespaceName).WithLeadingTrivia(VB.SyntaxFactory.Whitespace(" ")))))
+                .WithTrailingTrivia(VB.SyntaxFactory.CarriageReturnLineFeed);
+            return documentRoot.AddImports(importsStatement);
+        }
+
+        /// <summary>
+        /// Determines if a document root element contains a using/import statement for a given namespace.
+        /// </summary>
+        /// <param name="documentRoot">The document root to analyze.</param>
+        /// <param name="namespaceName">The namespace name to look for an import for.</param>
+        /// <returns>True if the documentRoot is a root node and contains a top-level using/import statement for the specified namespace name.</returns>
+        private static bool RootIncludesImport(this SyntaxNode documentRoot, string namespaceName)
+        {
+            if (documentRoot is null)
+            {
+                throw new ArgumentNullException(nameof(documentRoot));
+            }
+
+            return documentRoot switch
+            {
+                CSSyntax.CompilationUnitSyntax csRoot =>
+                    csRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal)),
+                VBSyntax.CompilationUnitSyntax vbRoot =>
+                    vbRoot.Imports.SelectMany(i => i.ImportsClauses.OfType<VBSyntax.SimpleImportsClauseSyntax>()).Any(i => i.Name.ToString().Equals(namespaceName, StringComparison.OrdinalIgnoreCase)),
+                _ => false
+            };
         }
 
         public static SyntaxNode? GetInvocationExpression(this SyntaxNode callerNode)
@@ -226,5 +280,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
             throw new NotImplementedException(Resources.UnknownLanguage);
         }
+
+        public static StringComparison GetStringComparison(this SyntaxNode? node)
+            => node?.Language switch
+            {
+                LanguageNames.CSharp => StringComparison.Ordinal,
+                LanguageNames.VisualBasic => StringComparison.OrdinalIgnoreCase,
+                _ => throw new NotImplementedException(Resources.UnknownLanguage),
+            };
+
+        public static StringComparer GetStringComparer(this SyntaxNode? node)
+            => node?.Language switch
+            {
+                LanguageNames.CSharp => StringComparer.Ordinal,
+                LanguageNames.VisualBasic => StringComparer.OrdinalIgnoreCase,
+                _ => throw new NotImplementedException(Resources.UnknownLanguage),
+            };
     }
 }

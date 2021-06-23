@@ -187,7 +187,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             if (Diagnostics.Any())
             {
-                Logger.LogWarning("Completing source updates with {DiagnosticCount} diagnostics still unaddressed", Diagnostics.Count());
+                Logger.LogInformation("Source updates complete with {DiagnosticCount} diagnostics remaining which require manual updates", Diagnostics.Count());
+                foreach (var diagnostic in Diagnostics)
+                {
+                    Logger.LogWarning("Manual updates needed to address: {DiagnosticId}@{DiagnosticLocation}: {DiagnosticMessage}", diagnostic.Id, diagnostic.Location, diagnostic.GetMessage());
+                }
             }
 
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);

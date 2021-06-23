@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         private const string TypeMapPath = "WebTypeReplacements.typemap";
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
-            new AllowHtmlAttributeAnalyzer(),
+            new AttributeUpgradeAnalyzer(),
             new BinaryFormatterUnsafeDeserializeAnalyzer(),
             new HtmlHelperAnalyzer(),
             new HttpContextCurrentAnalyzer(),
@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             new UrlHelperAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
-            new AllowHtmlAttributeCodeFixer(),
+            new AttributeUpgradeCodeFixer(),
             new BinaryFormatterUnsafeDeserializeCodeFixer(),
             new HtmlHelperCodeFixer(),
             new HttpContextCurrentCodeFixer(),

@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 {
                     new ExpectedDiagnostic("UA0010", new TextSpan(150, 9)),
                     new ExpectedDiagnostic("UA0010", new TextSpan(240, 18)),
-                    new ExpectedDiagnostic("UA0010", new TextSpan(344, 13)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(426, 24)),
                 }
             },
 
@@ -168,18 +168,41 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 "ControllerUpgrade",
                 new[]
                 {
-                    new ExpectedDiagnostic("UA0002", new TextSpan(166, 13)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(594, 29)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(933, 14)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1009, 25)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1058, 10)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1081, 13)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(1139, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(187, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(615, 29)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(954, 14)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1030, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1079, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1102, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1160, 25)),
 
                     new ExpectedDiagnostic("UA0002", new TextSpan(177, 13), Language.VisualBasic),
                     new ExpectedDiagnostic("UA0002", new TextSpan(463, 29), Language.VisualBasic),
                     new ExpectedDiagnostic("UA0002", new TextSpan(982, 10), Language.VisualBasic),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1265, 25), Language.VisualBasic),
+                }
+            },
+            {
+                "AttributesTest",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0010", new TextSpan(370, 9)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(458, 20)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(527, 21)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(549, 33)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(684, 24)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(716, 22)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(782, 4)),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(874, 13)),
+
+                    new ExpectedDiagnostic("UA0010", new TextSpan(295, 11), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(392, 22), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(475, 23), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(500, 33), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(638, 26), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(672, 24), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(733, 6), Language.VisualBasic),
+                    new ExpectedDiagnostic("UA0010", new TextSpan(845, 13), Language.VisualBasic),
                 }
             },
         };
@@ -208,6 +231,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [InlineData("UA0010")]
         [InlineData("UA0012")]
         [InlineData("ControllerUpgrade")]
+        [InlineData("AttributesTest")]
         [Theory]
         public async Task UpgradeAnalyzers(string scenarioName)
         {
@@ -238,6 +262,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [InlineData("UA0010")]
         [InlineData("UA0012")]
         [InlineData("ControllerUpgrade")]
+        [InlineData("AttributesTest")]
         [Theory]
         public async Task UpgradeCodeFixer(string scenarioName)
         {

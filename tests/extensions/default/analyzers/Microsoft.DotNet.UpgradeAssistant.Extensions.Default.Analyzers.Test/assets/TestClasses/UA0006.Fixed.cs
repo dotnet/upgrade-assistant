@@ -1,6 +1,6 @@
-﻿using System.Web;
+﻿using System.Diagnostics;
+using System.Web;
 using AspNetUpgrade;
-using System.Diagnostics;
 
 namespace TestProject.TestClasses
 {

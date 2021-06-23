@@ -13,6 +13,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -84,17 +85,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             // Update the HttpContext.Current reference
             var replacementSyntax = ParseExpression($"{httpContextHelperClass.Name}.Current")
-                .WithTriviaFrom(node);
+                .WithTriviaFrom(node)
+                .WithAdditionalAnnotations(Simplifier.Annotation);
             docRoot = docRoot.ReplaceNode(node, replacementSyntax);
 
-            // Add a using statement, if necessary
-            // This must be done after the diagnostic node is replaced since the node won't be the same
-            // after updating using statements.
-            docRoot = docRoot.AddUsingIfMissing(httpContextHelperClass.ContainingNamespace.ToString())!;
+            // Add an import to access the helper class, if needed
+            if (httpContextHelperClass.ContainingNamespace is not null)
+            {
+                docRoot = docRoot.AddImportIfMissing(httpContextHelperClass.ContainingNamespace.ToString());
+            }
 
             docEditor.ReplaceNode(docEditor.OriginalRoot, docRoot);
+            var updatedDocument = docEditor.GetChangedDocument();
+            updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);
 
-            return slnEditor.GetChangedSolution();
+            return slnEditor.GetChangedSolution()
+                .WithDocumentText(updatedDocument.Id, await updatedDocument.GetTextAsync(cancellationToken).ConfigureAwait(false));
         }
 
         private static async Task<INamedTypeSymbol?> GetHttpContextHelperClassAsync(Project project)
