@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Usage telemetry has been added to help guide product development. See [https://aka.ms/upgrade-assistant-telemetry](https://aka.ms/upgrade-assistant-telemetry) for details [#644](https://github.com/dotnet/upgrade-assistant/pull/644).
 - Command line option to pass options through in the form of `--option KEY=Value` [#651](https://github.com/dotnet/upgrade-assistant/pull/651)
 - Added an analyzer and code fix provider to remove unnecessary attributes and upgrade changed attributes (based on type mappings in registered typemap files) [#641](https://github.com/dotnet/upgrade-assistant/pull/641)
+- The `SourceUpdaterStep` and `RazorSourceUpdater` will now alert the user of any diagnostics from registered analyzers that require manual fixups (because no code fix was available). This allows Upgrade Assistant to notify users of code patterns that it can identify as needing updated but is unable to update automatically. [#662](https://github.com/dotnet/upgrade-assistant/pull/662)
 
 ### Fixed
 - Updated `HttpContext.Current` analyzer to more correctly identify uses of `HttpContext.Current` that need replaced [#628](https://github.com/dotnet/upgrade-assistant/pull/628).
