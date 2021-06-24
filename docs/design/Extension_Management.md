@@ -33,6 +33,12 @@ upgrade-assistant extension remove --name [name]
 This command will remove an installed extension from a current workspace.
 
 ```
+upgrade-assistant extension update [--name [name]]
+```
+
+This command will update all extensions, or a specific one if the name is given.
+
+```
 upgrade-assistant extension restore
 ```
 
