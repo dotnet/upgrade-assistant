@@ -72,7 +72,7 @@ upgrade-assistant extension feed clean --source [source]
 
 This command will allow extension authors to automatically clean up a feed (i.e. if a file has been removed from the storage, this will notify the author as well as remove it from the feed metadata).
 
-## Local Cache
+## Workspace state file
 
 Each workspace already contains a state file that tracks progress of the tool. This state file will be updated to store extension information. This state file should be persisted into source control, which will then ensure developers working on a project will get similar results.
 
@@ -93,8 +93,6 @@ The updated section will look similar to this:
 ```
 
 This will allow `upgrade-assistant` to restore extensions from any source and ensure they are the extension that was originally installed via hash matching.
-
-When installing or restoring, packages will be retrieved from the source and expanded to disk in `%APPDATA%/dotnet/upgrade-assistant/extensions`.
 
 ## Sources
 
