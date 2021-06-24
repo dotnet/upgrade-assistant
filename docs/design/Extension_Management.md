@@ -1,0 +1,147 @@
+# Extension Management
+
+Upgrade Assistant's extensibility provides the ability for users to extend it beyond its original design. As we've worked with developers making extensions, it's clear that there are some issues with discoverability and maintainability of custom extensions. Some of the major pain points:
+
+- **Version management:** Need to be able to specify which extension version a project should use
+- **Distribution** Need to be able easily get a specific version (or update existing ones) of an extension
+- **Consistency between runs** Should be able to register an extension so subsequent runs automatically use it
+
+Throughout this document, the term `workspace` will be used to refer to a solution or project that is being updated along with the state file Upgrade Assistant generates.
+
+## User Experience
+
+Extensions will now be something that are managed at a workspace level. This will allow users to have a consistent experience as well as be able to manage their extensions.
+
+Below are the commands to manage extensions:
+
+```
+upgrade-assistant extension list
+```
+
+This command will list current extensions applied to a project.
+
+```
+upgrade-assistant extension add --name [name] [--source [source]]
+```
+
+This command will allow users to add extensions to a project.
+
+```
+upgrade-assistant extension remove --name [name]
+```
+
+This command will remove an installed extension from a current workspace.
+
+```
+upgrade-assistant extension restore
+```
+
+This command will restore extensions when they are not available
+
+> This may be able to be done automatically, but initially, we'll have it be a separate command
+
+```
+upgrade-assistant extension feed list [--source [source]]
+```
+
+This command will allow someone to list extensions available on a feed
+
+### Extension Author Commands
+
+```
+upgrade-assistant extension feed publish --path [path] --source [source]
+```
+
+This command will allow extension authors to publish an extension.
+
+```
+upgrade-assistant extension feed remove --name [name] --source [source]
+```
+
+This command will allow extension authors to remove a published extension.
+
+```
+upgrade-assistant extension feed clean --source [source]
+```
+
+This command will allow extension authors to automatically clean up a feed (i.e. if a file has been removed from the storage, this will notify the author as well as remove it from the feed metadata).
+
+## Local Cache
+
+Each workspace already contains a state file that tracks progress of the tool. This state file will be updated to store extension information. This state file should be persisted into source control, which will then ensure developers working on a project will get similar results.
+
+The updated section will look similar to this:
+
+```
+{
+    ...
+    "Extensions":[
+        {
+            "Name": "...",
+            "Version": "...",
+            "Source": "...",
+            "MD5": "...",
+        }
+    ]
+}
+```
+
+This will allow `upgrade-assistant` to restore extensions from any source and ensure they are the extension that was originally installed via hash matching.
+
+When installing or restoring, packages will be retrieved from the source and expanded to disk in `%APPDATA%/dotnet/upgrade-assistant/extensions`.
+
+## Sources
+
+Below are discussed a few options for feeds we could use for distribution:
+
+### NuGet
+
+We could use NuGet as a source feed and align extension packages with with the `.nupkg` format. This would provide a number of things out of the box, such as:
+
+- Rights management for feed access
+- Versioning support
+- Validation support
+
+Problems with this approach includes:
+
+- Some extensions can be very large (such as the index files the loose dependency analysis needs)
+- Would require a redesign of how extensions are packaged
+- May be against some ToS of NuGet.org
+
+### Custom Sources
+
+This feature is intended to provide a general mechanism to access and store extensions. Initially, there will be two supported sources:
+
+- File storage
+- Azure blob containers
+
+The access for the storage containers should be done in a way that additional sources could be added later.
+
+The folder structure should adhere to the following structure:
+
+```
+|- extensions.json
+|- [extension1.zip]
+|- [extension2.zip]
+```
+
+where `extensions.json` would point to the versions available:
+
+```
+{
+    "Extensions": [
+        {
+            {
+                "Name": "...",
+                "Versions": [
+                    {
+                        "Version": "...",
+                        "Path": "...",
+                        "MD5": "...",
+                    }
+                ]
+            }
+        }
+    ]
+}
+```
