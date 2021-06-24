@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Use mapped locations so that we only get a number of diagnostics corresponding to the number of cshtml locations that need fixed.
             var mappedDiagnostics = await GetDiagnosticsFromTargetFilesAsync(project, context, inputs.Select(GetGeneratedFilePath), new LocationAndIDComparer(true), token).ConfigureAwait(false);
-            _logger.LogInformation("Identified {DiagnosticCount} fixable diagnostics in Razor files in project {ProjectName}", mappedDiagnostics.Count(), project.Name);
+            _logger.LogInformation("Identified {DiagnosticCount} diagnostics in Razor files in project {ProjectName}", mappedDiagnostics.Count(), project.Name);
             var diagnosticsByFile = mappedDiagnostics.GroupBy(d => d.Location.GetMappedLineSpan().Path);
             foreach (var diagnosticsGroup in diagnosticsByFile)
             {
@@ -124,11 +124,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // in a single file. To minimize the number of time diagnostics are gathered, fix one diagnostic each
             // from multiple files before regenerating diagnostics.
             var diagnostics = await GetDiagnosticsFromTargetFilesAsync(project, context, generatedFilePaths, new LocationAndIDComparer(false), token).ConfigureAwait(false);
+            var fixableDiagnostics = diagnostics.Where(d => _codeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
             var diagnosticsCount = diagnostics.Count();
-            while (diagnosticsCount > 0)
+            while (fixableDiagnostics.Any())
             {
-                // Iterate through the first diagnostic from each document
-                foreach (var diagnostic in diagnostics.GroupBy(d => d.Location.SourceTree?.FilePath).Select(g => g.First()))
+                // Iterate through the first fixable diagnostic from each document
+                foreach (var diagnostic in fixableDiagnostics.GroupBy(d => d.Location.SourceTree?.FilePath).Select(g => g.First()))
                 {
                     var doc = project.GetDocument(diagnostic.Location.SourceTree);
                     if (doc is null)
@@ -141,6 +142,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
 
                 diagnostics = await GetDiagnosticsFromTargetFilesAsync(project, context, generatedFilePaths, new LocationAndIDComparer(false), token).ConfigureAwait(false);
+                fixableDiagnostics = diagnostics.Where(d => _codeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
                 var newDiagnosticCount = diagnostics.Count();
                 if (diagnosticsCount == newDiagnosticCount)
                 {
@@ -165,7 +167,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             if (diagnosticsCount > 0)
             {
-                _logger.LogWarning("Completing Razor source updates with {DiagnosticCount} diagnostics still unaddressed", diagnosticsCount);
+                _logger.LogInformation("Razor source updates complete with {DiagnosticCount} diagnostics remaining which require manual updates", diagnosticsCount);
+                foreach (var diagnostic in diagnostics)
+                {
+                    _logger.LogWarning("Manual updates needed to address: {DiagnosticId}@{DiagnosticLocation}: {DiagnosticMessage}", diagnostic.Id, diagnostic.Location.GetMappedLineSpan(), diagnostic.GetMessage());
+                }
             }
 
             return new FileUpdaterResult(true, textReplacements.Select(r => r.FilePath).Distinct());
@@ -226,11 +232,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             var allDiagnostics = await updatedCompilation.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false);
 
-            // Filter diagnostics to those that can be addressed by available code fix providers and that are located in generated Razor source
+            // Find all diagnostics that registered analyzers produce
+            // Note that this intentionally identifies diagnostics that no code fix providers can
+            // address so that users can be warned about diagnostics that they will need to address manually.
             var ret = allDiagnostics
                 .Where(d => d.Location.IsInSource &&
-                       targetFilePaths.Contains(d.Location.SourceTree.FilePath) &&
-                       _codeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)))
+                       targetFilePaths.Contains(d.Location.SourceTree.FilePath))
                 .Distinct(diagnosticsComparer);
 
             return ret;
