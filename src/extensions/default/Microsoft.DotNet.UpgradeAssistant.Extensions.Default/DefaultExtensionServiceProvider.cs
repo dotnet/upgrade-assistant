@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddTransient<CodeFixProvider, HtmlHelperCodeFixer>();
             services.AddTransient<CodeFixProvider, HttpContextCurrentCodeFixer>();
             services.AddTransient<CodeFixProvider, HttpContextIsDebuggingEnabledCodeFixer>();
-            //services.AddTransient<CodeFixProvider, TypeUpgradeCodeFixer>();
+            services.AddTransient<CodeFixProvider, TypeUpgradeCodeFixer>();
             services.AddTransient<CodeFixProvider, UrlHelperCodeFixer>();
             services.AddTransient<CodeFixProvider, UsingSystemWebCodeFixer>();
         }
