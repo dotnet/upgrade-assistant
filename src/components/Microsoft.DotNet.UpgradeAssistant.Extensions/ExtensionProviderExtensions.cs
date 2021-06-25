@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
@@ -94,6 +95,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     options.ExtensionPaths.Add(path);
                 }
             });
+        }
+
+        public static OptionsBuilder<ExtensionOptions> AddExtensionOption<TOption>(this OptionsBuilder<ExtensionOptions> builder, TOption option)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            var json = JsonSerializer.SerializeToUtf8Bytes(option);
+            using var stream = new MemoryStream(json);
+
+            var config = new ConfigurationBuilder()
+                .AddJsonStream(stream)
+                .Build();
+
+#pragma warning disable CA2000 // Dispose objects before losing scope
+            builder.Services.AddSingleton(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
+#pragma warning restore CA2000 // Dispose objects before losing scope
+
+            return builder;
         }
 
         public static OptionsBuilder<ExtensionOptions> AddFromEnvironmentVariables(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)

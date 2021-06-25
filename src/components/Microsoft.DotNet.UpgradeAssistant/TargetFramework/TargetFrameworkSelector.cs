@@ -17,10 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
         private readonly IEnumerable<ITargetFrameworkSelectorFilter> _selectors;
         private readonly ILogger<TargetFrameworkSelector> _logger;
 
-        private readonly UpgradeTarget _upgradeTarget;
-
         public TargetFrameworkSelector(
-            UpgradeOptions options,
             ITargetFrameworkMonikerComparer comparer,
             IOptions<DefaultTfmOptions> selectorOptions,
             IEnumerable<ITargetFrameworkSelectorFilter> selectors,
@@ -30,8 +27,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             _selectorOptions = selectorOptions?.Value ?? throw new ArgumentNullException(nameof(selectorOptions));
             _selectors = selectors;
             _logger = logger;
-
-            _upgradeTarget = options?.TargetTfmSupport ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async ValueTask<TargetFrameworkMoniker> SelectTargetFrameworkAsync(IProject project, CancellationToken token)
@@ -41,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
                 throw new ArgumentNullException(nameof(project));
             }
 
-            var appBase = _upgradeTarget switch
+            var appBase = _selectorOptions.TargetTfmSupport switch
             {
                 UpgradeTarget.Current => _selectorOptions.Current,
                 UpgradeTarget.Preview => _selectorOptions.Preview,

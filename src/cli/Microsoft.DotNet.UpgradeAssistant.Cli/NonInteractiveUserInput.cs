@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -13,14 +14,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         private readonly TimeSpan _waitPeriod;
 
-        public NonInteractiveUserInput(UpgradeOptions options)
+        public NonInteractiveUserInput(IOptions<NonInteractiveOptions> options)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _waitPeriod = TimeSpan.FromSeconds(options.NonInteractiveWait);
+            _waitPeriod = options.Value.Wait;
         }
 
         public bool IsInteractive => false;

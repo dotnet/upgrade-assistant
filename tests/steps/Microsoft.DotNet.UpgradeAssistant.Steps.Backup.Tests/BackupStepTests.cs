@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extras.Moq;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -30,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             projectPath = Path.GetFullPath(Path.Combine("TestAssets", projectPath));
             expectedBackupPath = Path.GetFullPath(Path.Combine("TestAssets", expectedBackupPath));
 
-            using var mock = GetMock(GetDefaultNonInteractiveOptions());
+            using var mock = GetMock();
             var context = GetContext(mock, inputPath, projectPath);
             var step = mock.Create<BackupStep>();
             var expectedStatus = backupComplete ? UpgradeStepStatus.Complete : UpgradeStepStatus.Incomplete;
@@ -67,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             expectedBaseBackupPath = Path.GetFullPath(Path.Combine("TestAssets", expectedBaseBackupPath));
             expectedBackupPath = Path.GetFullPath(Path.Combine("TestAssets", expectedBackupPath));
 
-            using var mock = GetMock(GetDefaultNonInteractiveOptions());
+            using var mock = GetMock();
             var context = GetContext(mock, inputPath, projectPath);
             var step = mock.Create<BackupStep>();
             step.SetStatus(UpgradeStepStatus.Incomplete);
@@ -106,21 +107,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             }
         }
 
-        private static UpgradeOptions GetDefaultNonInteractiveOptions() =>
-            new()
-            {
-                NonInteractive = true,
-                NonInteractiveWait = 0,
-                SkipBackup = false,
-            };
-
-        private static AutoMock GetMock(UpgradeOptions options)
+        private static AutoMock GetMock()
         {
             var mock = AutoMock.GetLoose(cfg =>
             {
-                cfg.RegisterInstance(options);
                 cfg.RegisterType<MockedUserInput>().As<IUserInput>();
             });
+
+            mock.Mock<IOptions<BackupOptions>>().Setup(o => o.Value).Returns(new BackupOptions());
 
             return mock;
         }

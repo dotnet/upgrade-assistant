@@ -3,6 +3,7 @@
 
 using System;
 using System.CommandLine.Parsing;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public static class UpgradeAssistantHostExtensions
     {
-        public static IHostBuilder UseUpgradeAssistant<TApp>(this IHostBuilder host, UpgradeOptions options)
+        public static IHostBuilder UseUpgradeAssistant<TApp>(this IHostBuilder host, UpgradeOptions upgradeOptions)
             where TApp : class, IAppCommand
         {
             if (host is null)
@@ -25,9 +26,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(host));
             }
 
-            if (options is null)
+            if (upgradeOptions is null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(upgradeOptions));
             }
 
             return host
@@ -44,35 +45,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     });
 
                     services.AddHostedService<ConsoleRunner>();
-
-                    services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
+                    services.AddStateFactory(upgradeOptions);
 
                     services.AddExtensions()
                         .AddDefaultExtensions(context.Configuration)
                         .AddFromEnvironmentVariables(context.Configuration)
-                        .Configure(opts =>
+                        .Configure(options =>
                         {
-                            opts.RetainedProperties = options.Option.ParseOptions();
-                            opts.CurrentVersion = UpgradeVersion.Current.Version;
+                            options.AdditionalOptions = upgradeOptions.Option.ParseOptions();
+                            options.CurrentVersion = UpgradeVersion.Current.Version;
 
-                            foreach (var path in options.Extension)
+                            foreach (var path in upgradeOptions.Extension)
                             {
-                                opts.ExtensionPaths.Add(path);
+                                options.ExtensionPaths.Add(path);
                             }
+                        })
+                        .AddExtensionOption(new
+                        {
+                            Backup = new { Skip = upgradeOptions.SkipBackup },
+                            Solution = new { EntryPoints = upgradeOptions.EntryPoint }
                         });
 
-                    services.AddMsBuild();
-                    services.AddSingleton(options);
+                    services.AddMsBuild(optionss =>
+                    {
+                        optionss.InputPath = upgradeOptions.ProjectPath;
+                    });
 
-                    // Add command handlers
-                    if (options.NonInteractive)
+                    services.AddNuGet(optionss =>
                     {
-                        services.AddTransient<IUserInput, NonInteractiveUserInput>();
-                    }
-                    else
-                    {
-                        services.AddTransient<IUserInput, ConsoleCollectUserInput>();
-                    }
+                        optionss.PackageSourcePath = Path.GetDirectoryName(upgradeOptions.ProjectPath);
+                    });
+
+                    services.AddUserInput(upgradeOptions);
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
@@ -81,7 +85,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton<IProcessRunner, ProcessRunner>();
                     services.AddSingleton<ErrorCodeAccessor>();
 
-                    services.AddStepManagement(context.Configuration.GetSection("DefaultTargetFrameworks").Bind);
+                    services.AddStepManagement();
+                    services.AddTargetFrameworkSelectors(options =>
+                    {
+                        context.Configuration.GetSection("DefaultTargetFrameworks").Bind(options);
+                        options.TargetTfmSupport = upgradeOptions.TargetTfmSupport;
+                    });
+
+                    services.AddReadinessChecks(options =>
+                    {
+                        options.IgnoreUnsupportedFeatures = upgradeOptions.IgnoreUnsupportedFeatures;
+                    });
 
                     services.AddScoped<IAppCommand, TApp>();
                 })
@@ -89,6 +103,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 {
                     options.SuppressStatusMessages = true;
                 });
+        }
+
+        private static void AddStateFactory(this IServiceCollection services, UpgradeOptions upgradeOptions)
+        {
+            services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
+            services
+                .AddOptions<FileStateOptions>()
+                .Configure(options =>
+                {
+                    options.Path = Path.Combine(upgradeOptions.Project.DirectoryName!, ".upgrade-assistant");
+                })
+                .ValidateDataAnnotations();
+        }
+
+        private static void AddUserInput(this IServiceCollection services, UpgradeOptions upgradeOptions)
+        {
+            if (upgradeOptions.NonInteractive)
+            {
+                services.AddTransient<IUserInput, NonInteractiveUserInput>();
+                services
+                    .AddOptions<NonInteractiveOptions>()
+                    .Configure(options =>
+                    {
+                        options.Wait = TimeSpan.FromSeconds(upgradeOptions.NonInteractiveWait);
+                    });
+            }
+            else
+            {
+                services.AddTransient<IUserInput, ConsoleCollectUserInput>();
+            }
         }
 
         public static IHostBuilder UseConsoleUpgradeAssistant<TApp>(
