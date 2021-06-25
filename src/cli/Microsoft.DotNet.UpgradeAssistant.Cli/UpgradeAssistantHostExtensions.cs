@@ -45,8 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     });
 
                     services.AddHostedService<ConsoleRunner>();
-
-                    services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
+                    services.AddStateFactory(upgradeOptions);
 
                     services.AddExtensions()
                         .AddDefaultExtensions(context.Configuration)
@@ -77,17 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         optionss.PackageSourcePath = Path.GetDirectoryName(upgradeOptions.ProjectPath);
                     });
 
-                    services.AddSingleton(upgradeOptions);
-
-                    // Add command handlers
-                    if (upgradeOptions.NonInteractive)
-                    {
-                        services.AddTransient<IUserInput, NonInteractiveUserInput>();
-                    }
-                    else
-                    {
-                        services.AddTransient<IUserInput, ConsoleCollectUserInput>();
-                    }
+                    services.AddUserInput(upgradeOptions);
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
@@ -114,6 +103,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 {
                     options.SuppressStatusMessages = true;
                 });
+        }
+
+        private static void AddStateFactory(this IServiceCollection services, UpgradeOptions upgradeOptions)
+        {
+            services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
+            services
+                .AddOptions<FileStateOptions>()
+                .Configure(options =>
+                {
+                    options.Directory = Path.Combine(upgradeOptions.Project.DirectoryName!, ".upgrade-assistant");
+                });
+        }
+
+        private static void AddUserInput(this IServiceCollection services, UpgradeOptions upgradeOptions)
+        {
+            if (upgradeOptions.NonInteractive)
+            {
+                services.AddTransient<IUserInput, NonInteractiveUserInput>();
+                services
+                    .AddOptions<NonInteractiveOptions>()
+                    .Configure(options =>
+                    {
+                        options.Wait = TimeSpan.FromSeconds(upgradeOptions.NonInteractiveWait);
+                    });
+            }
+            else
+            {
+                services.AddTransient<IUserInput, ConsoleCollectUserInput>();
+            }
         }
 
         public static IHostBuilder UseConsoleUpgradeAssistant<TApp>(
