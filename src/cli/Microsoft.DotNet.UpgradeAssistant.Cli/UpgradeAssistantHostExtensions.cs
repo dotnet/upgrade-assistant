@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+            return host
                 .UseContentRoot(AppContext.BaseDirectory)
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
