@@ -39,8 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Name = GetProcessName(),
             };
 
-            root.AddCommand(new ConsoleAnalyzeCommand(CreateConsoleHost));
-            root.AddCommand(new ConsoleUpgradeCommand(CreateConsoleHost));
+            root.AddCommand(new ConsoleAnalyzeCommand());
+            root.AddCommand(new ConsoleUpgradeCommand());
 
             return new CommandLineBuilder(root)
                 .UseDefaults()
@@ -55,136 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             }
         }
 
-        public static IHostBuilder CreateHost(UpgradeOptions options)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            var hostBuilder = Host.CreateDefaultBuilder()
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .UseContentRoot(AppContext.BaseDirectory)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureServices((context, services) =>
-                {
-                    // Register this first so the first startup step is to check for telemetry opt-out
-                    services.AddTransient<IUpgradeStartup, ConsoleFirstTimeUserNotifier>();
-                    services.AddTelemetry(options =>
-                    {
-                        context.Configuration.GetSection("Telemetry").Bind(options);
-                        options.ProductVersion = UpgradeVersion.Current.FullVersion;
-                    });
-
-                    services.AddHostedService<ConsoleRunner>();
-
-                    services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
-
-                    services.AddExtensions()
-                        .AddDefaultExtensions(context.Configuration)
-                        .AddFromEnvironmentVariables(context.Configuration)
-                        .Configure(opts =>
-                        {
-                            opts.RetainedProperties = options.Option.ParseOptions();
-                            opts.CurrentVersion = UpgradeVersion.Current.Version;
-
-                            foreach (var path in options.Extension)
-                            {
-                                opts.ExtensionPaths.Add(path);
-                            }
-                        });
-
-                    services.AddMsBuild();
-                    services.AddSingleton(options);
-
-                    // Add command handlers
-                    if (options.NonInteractive)
-                    {
-                        services.AddTransient<IUserInput, NonInteractiveUserInput>();
-                    }
-                    else
-                    {
-                        services.AddTransient<IUserInput, ConsoleCollectUserInput>();
-                    }
-
-                    services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
-                    services.AddSingleton<CommandProvider>();
-                    services.TryAddSingleton(new LogSettings(true));
-
-                    services.AddSingleton<IProcessRunner, ProcessRunner>();
-                    services.AddSingleton<ErrorCodeAccessor>();
-
-                    services.AddStepManagement(context.Configuration.GetSection("DefaultTargetFrameworks").Bind);
-                });
-
-            hostBuilder.UseConsoleLifetime(options =>
-            {
-                options.SuppressStatusMessages = true;
-            });
-
-            return hostBuilder;
-        }
-
-        public static async Task<int> RunUpgradeAssistantAsync(this IHostBuilder hostBuilder, CancellationToken token)
-        {
-            if (hostBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(hostBuilder));
-            }
-
-            var host = hostBuilder.Build();
-
-            var errorCode = host.Services.GetRequiredService<ErrorCodeAccessor>();
-
-            try
-            {
-                await host.StartAsync(token).ConfigureAwait(false);
-
-                await host.WaitForShutdownAsync(token).ConfigureAwait(false);
-            }
-            finally
-            {
-                if (host is IAsyncDisposable asyncDisposable)
-                {
-                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
-                }
-                else
-                {
-                    host.Dispose();
-                }
-            }
-
-            return errorCode.ErrorCode;
-        }
-
-        private static IHostBuilder CreateConsoleHost(
-            UpgradeOptions options,
-            ParseResult parseResult)
-        {
-            ConsoleUtils.Clear();
-
-            ShowHeader();
-
-            const string LogFilePath = "log.txt";
-
-            var logSettings = new LogSettings(options.Verbose);
-
-            return CreateHost(options)
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton(logSettings);
-
-                    services.AddSingleton(parseResult);
-                    services.AddTransient<IUpgradeStartup, UsedCommandTelemetry>();
-                })
-                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
-                    .Enrich.FromLogContext()
-                    .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
-                    .WriteTo.Console(levelSwitch: logSettings.Console)
-                    .WriteTo.File(LogFilePath, levelSwitch: logSettings.File));
-        }
-
-        private static void ShowHeader()
+        public static void ShowHeader()
         {
             var title = $"- Microsoft .NET Upgrade Assistant v{UpgradeVersion.Current.FullVersion} -";
             Console.WriteLine(new string('-', title.Length));

@@ -43,7 +43,8 @@ namespace Integration.Tests
                 EntryPoint = new[] { entrypoint },
             };
 
-            var status = await Program.CreateHost(options)
+            var status = await Host.CreateDefaultBuilder()
+                .UseUpgradeAssistant(options)
                 .ConfigureServices(ConsoleUpgradeCommand.ConfigureService)
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {

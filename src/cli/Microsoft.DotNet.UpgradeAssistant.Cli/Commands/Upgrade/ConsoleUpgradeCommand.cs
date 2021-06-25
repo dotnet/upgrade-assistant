@@ -12,12 +12,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class ConsoleUpgradeCommand : UpgradeAssistantCommand
     {
-        public ConsoleUpgradeCommand(CreateConsoleHost createHost)
+        public ConsoleUpgradeCommand()
             : base("upgrade")
         {
-            Handler = CommandHandler.Create<ParseResult, UpgradeOptions, CancellationToken>((result, options, token) => createHost(options, result)
-                .ConfigureServices(ConfigureService)
-                .RunUpgradeAssistantAsync(token));
+            Handler = CommandHandler.Create<ParseResult, UpgradeOptions, CancellationToken>((result, options, token) =>
+                Host.CreateDefaultBuilder()
+                    .UseConsoleUpgradeAssistant(options, result)
+                    .ConfigureServices(ConfigureService)
+                    .RunUpgradeAssistantAsync(token));
 
             AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
             AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option in non-interactive mode."));
