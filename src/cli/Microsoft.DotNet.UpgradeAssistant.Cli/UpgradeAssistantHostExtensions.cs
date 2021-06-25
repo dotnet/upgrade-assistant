@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public static class UpgradeAssistantHostExtensions
     {
-        public static IHostBuilder UseUpgradeAssistant<TApp>(this IHostBuilder host, UpgradeOptions options)
+        public static IHostBuilder UseUpgradeAssistant<TApp>(this IHostBuilder host, UpgradeOptions upgradeOptions)
             where TApp : class, IAppCommand
         {
             if (host is null)
@@ -26,9 +26,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(host));
             }
 
-            if (options is null)
+            if (upgradeOptions is null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(upgradeOptions));
             }
 
             return host
@@ -51,36 +51,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddExtensions()
                         .AddDefaultExtensions(context.Configuration)
                         .AddFromEnvironmentVariables(context.Configuration)
-                        .Configure(opts =>
+                        .Configure(options =>
                         {
-                            opts.RetainedProperties = options.Option.ParseOptions();
-                            opts.CurrentVersion = UpgradeVersion.Current.Version;
+                            options.AdditionalOptions = upgradeOptions.Option.ParseOptions();
+                            options.CurrentVersion = UpgradeVersion.Current.Version;
 
-                            foreach (var path in options.Extension)
+                            foreach (var path in upgradeOptions.Extension)
                             {
-                                opts.ExtensionPaths.Add(path);
+                                options.ExtensionPaths.Add(path);
                             }
                         })
                         .AddExtensionOption(new
                         {
-                            Backup = new { Skip = options.SkipBackup },
-                            Solution = new { EntryPoints = options.EntryPoint }
+                            Backup = new { Skip = upgradeOptions.SkipBackup },
+                            Solution = new { EntryPoints = upgradeOptions.EntryPoint }
                         });
 
-                    services.AddMsBuild(opts =>
+                    services.AddMsBuild(optionss =>
                     {
-                        opts.InputPath = options.ProjectPath;
+                        optionss.InputPath = upgradeOptions.ProjectPath;
                     });
 
-                    services.AddNuGet(opts =>
+                    services.AddNuGet(optionss =>
                     {
-                        opts.PackageSourcePath = Path.GetDirectoryName(options.ProjectPath);
+                        optionss.PackageSourcePath = Path.GetDirectoryName(upgradeOptions.ProjectPath);
                     });
 
-                    services.AddSingleton(options);
+                    services.AddSingleton(upgradeOptions);
 
                     // Add command handlers
-                    if (options.NonInteractive)
+                    if (upgradeOptions.NonInteractive)
                     {
                         services.AddTransient<IUserInput, NonInteractiveUserInput>();
                     }
@@ -97,15 +97,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton<ErrorCodeAccessor>();
 
                     services.AddStepManagement();
-                    services.AddTargetFrameworkSelectors(opts =>
+                    services.AddTargetFrameworkSelectors(options =>
                     {
-                        context.Configuration.GetSection("DefaultTargetFrameworks").Bind(opts);
-                        opts.TargetTfmSupport = options.TargetTfmSupport;
+                        context.Configuration.GetSection("DefaultTargetFrameworks").Bind(options);
+                        options.TargetTfmSupport = upgradeOptions.TargetTfmSupport;
                     });
 
-                    services.AddReadinessChecks(opts =>
+                    services.AddReadinessChecks(options =>
                     {
-                        opts.IgnoreUnsupportedFeatures = options.IgnoreUnsupportedFeatures;
+                        options.IgnoreUnsupportedFeatures = upgradeOptions.IgnoreUnsupportedFeatures;
                     });
 
                     services.AddScoped<IAppCommand, TApp>();
