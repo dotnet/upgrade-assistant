@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _path = options.Value.Directory;
+            _path = options.Value.Path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

@@ -112,8 +112,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 .AddOptions<FileStateOptions>()
                 .Configure(options =>
                 {
-                    options.Directory = Path.Combine(upgradeOptions.Project.DirectoryName!, ".upgrade-assistant");
-                });
+                    options.Path = Path.Combine(upgradeOptions.Project.DirectoryName!, ".upgrade-assistant");
+                })
+                .ValidateDataAnnotations();
         }
 
         private static void AddUserInput(this IServiceCollection services, UpgradeOptions upgradeOptions)
