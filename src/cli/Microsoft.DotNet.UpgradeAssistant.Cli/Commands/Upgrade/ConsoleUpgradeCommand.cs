@@ -5,7 +5,6 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
@@ -17,18 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         {
             Handler = CommandHandler.Create<ParseResult, UpgradeOptions, CancellationToken>((result, options, token) =>
                 Host.CreateDefaultBuilder()
-                    .UseConsoleUpgradeAssistant(options, result)
-                    .ConfigureServices(ConfigureService)
+                    .UseConsoleUpgradeAssistant<ConsoleUpgrade>(options, result)
                     .RunUpgradeAssistantAsync(token));
 
             AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));
             AddOption(new Option<bool>(new[] { "--non-interactive" }, "Automatically select each first option in non-interactive mode."));
             AddOption(new Option<int>(new[] { "--non-interactive-wait" }, "Wait the supplied seconds before moving on to the next option in non-interactive mode."));
-        }
-
-        public static void ConfigureService(IServiceCollection services)
-        {
-            services.AddScoped<IAppCommand, ConsoleUpgrade>();
         }
     }
 }

@@ -17,7 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public static class UpgradeAssistantHostExtensions
     {
-        public static IHostBuilder UseUpgradeAssistant(this IHostBuilder host, UpgradeOptions options)
+        public static IHostBuilder UseUpgradeAssistant<TApp>(this IHostBuilder host, UpgradeOptions options)
+            where TApp : class, IAppCommand
         {
             if (host is null)
             {
@@ -81,6 +82,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton<ErrorCodeAccessor>();
 
                     services.AddStepManagement(context.Configuration.GetSection("DefaultTargetFrameworks").Bind);
+
+                    services.AddScoped<IAppCommand, TApp>();
                 })
                 .UseConsoleLifetime(options =>
                 {
@@ -88,10 +91,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 });
         }
 
-        public static IHostBuilder UseConsoleUpgradeAssistant(
+        public static IHostBuilder UseConsoleUpgradeAssistant<TApp>(
             this IHostBuilder host,
             UpgradeOptions options,
             ParseResult parseResult)
+            where TApp : class, IAppCommand
         {
             if (options is null)
             {
@@ -106,7 +110,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             var logSettings = new LogSettings(options.Verbose);
 
             return host
-                .UseUpgradeAssistant(options)
+                .UseUpgradeAssistant<TApp>(options)
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton(logSettings);

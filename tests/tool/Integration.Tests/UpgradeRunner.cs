@@ -44,8 +44,7 @@ namespace Integration.Tests
             };
 
             var status = await Host.CreateDefaultBuilder()
-                .UseUpgradeAssistant(options)
-                .ConfigureServices(ConsoleUpgradeCommand.ConfigureService)
+                .UseUpgradeAssistant<ConsoleUpgrade>(options)
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
                     builder.RegisterInstance(MSBuildPathInstance.Locator);

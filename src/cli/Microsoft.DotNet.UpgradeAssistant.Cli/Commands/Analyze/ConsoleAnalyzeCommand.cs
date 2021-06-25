@@ -4,7 +4,6 @@
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
@@ -17,14 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             IsHidden = true;
             Handler = CommandHandler.Create<ParseResult, UpgradeOptions, CancellationToken>((result, options, token) =>
                 Host.CreateDefaultBuilder()
-                    .UseConsoleUpgradeAssistant(options, result)
-                    .ConfigureServices(ConfigureService)
+                    .UseConsoleUpgradeAssistant<ConsoleAnalyze>(options, result)
                     .RunUpgradeAssistantAsync(token));
-        }
-
-        public static void ConfigureService(IServiceCollection services)
-        {
-            services.AddScoped<IAppCommand, ConsoleAnalyze>();
         }
     }
 }
