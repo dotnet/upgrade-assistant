@@ -87,11 +87,29 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
     public class SomeOptions
     {
+      public string Value { get; set; }
     }
 }
 ```
 
-This can then be used in a couple of ways:
+In order to set these values, you can either do it via `ExtensionManifest.json`:
+
+
+```json
+{
+  "sectionName": {
+    "Value": "hello"
+  }
+}
+```
+
+or via the command line:
+
+```
+upgrade-assistant [...] --option "sectionName:Value=other"
+```
+
+This can then be access from within an extension in a couple of ways:
 
 ```csharp
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
