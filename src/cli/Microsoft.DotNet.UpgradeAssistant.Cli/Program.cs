@@ -138,9 +138,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                             {
                                 opts.ExtensionPaths.Add(path);
                             }
+                        })
+                        .AddExtensionOption(new
+                        {
+                            Backup = new { Skip = options.SkipBackup },
+                            Solution = new { EntryPoints = options.EntryPoint }
                         });
 
-                    services.AddMsBuild();
+                    services.AddMsBuild(opts =>
+                    {
+                        opts.InputPath = options.ProjectPath;
+                    });
+
+                    services.AddNuGet(opts =>
+                    {
+                        opts.PackageSourcePath = Path.GetDirectoryName(options.ProjectPath);
+                    });
                     services.AddSingleton(options);
 
                     // Add command handlers
@@ -160,7 +173,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton<IProcessRunner, ProcessRunner>();
                     services.AddSingleton<ErrorCodeAccessor>();
 
-                    services.AddStepManagement(context.Configuration.GetSection("DefaultTargetFrameworks").Bind);
+                    services.AddStepManagement();
+                    services.AddTargetFrameworkSelectors(opts =>
+                    {
+                        context.Configuration.GetSection("DefaultTargetFrameworks").Bind(opts);
+                        opts.TargetTfmSupport = options.TargetTfmSupport;
+                    });
+
+                    services.AddReadinessChecks(opts =>
+                    {
+                        opts.IgnoreUnsupportedFeatures = options.IgnoreUnsupportedFeatures;
+                    });
                 });
 
             var host = configure(hostBuilder).UseConsoleLifetime(options =>

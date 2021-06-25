@@ -62,8 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             project.Setup(p => p.TargetFrameworks).Returns(currentTfms.Select(t => ParseTfm(t)).ToArray());
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(components));
 
-            mock.Create<UpgradeOptions>().TargetTfmSupport = target;
-            mock.Mock<IOptions<DefaultTfmOptions>>().Setup(o => o.Value).Returns(_options);
+            mock.Mock<IOptions<DefaultTfmOptions>>().Setup(o => o.Value).Returns(_options with { TargetTfmSupport = target });
 
             var moniker = mock.Mock<ITargetFrameworkMonikerComparer>();
             moniker.Setup(c => c.TryMerge(ParseTfm(current), tfm, out finalTfm)).Returns(true);
