@@ -43,7 +43,8 @@ namespace Integration.Tests
                 EntryPoint = new[] { entrypoint },
             };
 
-            var status = await Program.RunUpgradeAsync(options, host => host
+            var status = await Host.CreateDefaultBuilder()
+                .UseUpgradeAssistant<ConsoleUpgrade>(options)
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
                     builder.RegisterInstance(MSBuildPathInstance.Locator);
@@ -60,8 +61,8 @@ namespace Integration.Tests
                 {
                     logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
-                }),
-                cts.Token).ConfigureAwait(false);
+                })
+                .RunUpgradeAssistantAsync(cts.Token).ConfigureAwait(false);
 
             if (cts.Token.IsCancellationRequested)
             {

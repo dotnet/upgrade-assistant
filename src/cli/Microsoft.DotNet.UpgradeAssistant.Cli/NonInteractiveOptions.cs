@@ -1,10 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-namespace Microsoft.DotNet.UpgradeAssistant
+using System;
+
+namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    public class UpgradeReadinessOptions
+    public class NonInteractiveOptions
     {
-        public bool IgnoreUnsupportedFeatures { get; set; }
+        public TimeSpan Wait { get; set; }
     }
 }

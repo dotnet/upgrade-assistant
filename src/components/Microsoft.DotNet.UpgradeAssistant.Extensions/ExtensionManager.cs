@@ -46,9 +46,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 logger.LogInformation("Loaded {Count} extensions", list.Count);
 
-                if (options.Value.RetainedProperties.Any())
+                if (options.Value.AdditionalOptions.Any())
                 {
-                    list.Add(LoadOptionsExtension(options.Value.RetainedProperties));
+                    list.Add(LoadOptionsExtension(options.Value.AdditionalOptions));
                 }
 
                 return list;

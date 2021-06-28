@@ -1,10 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 {
-    public class UpgradeReadinessOptions
+    public class BackupOptions
     {
-        public bool IgnoreUnsupportedFeatures { get; set; }
+        public bool Skip { get; set; }
     }
 }

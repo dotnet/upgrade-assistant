@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -19,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly ILogger<FileUpgradeStateFactory> _logger;
 
         public FileUpgradeStateFactory(
-            UpgradeOptions options,
+            IOptions<FileStateOptions> options,
             ILogger<FileUpgradeStateFactory> logger)
         {
             if (options is null)
@@ -27,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _path = Path.Combine(options.Project.DirectoryName!, ".upgrade-assistant");
+            _path = options.Value.Path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

@@ -32,16 +32,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly NuGetDownloaderOptions _options;
 
         public PackageLoader(
-            UpgradeOptions upgradeOptions,
             INuGetPackageSourceFactory sourceFactory,
             ILogger<PackageLoader> logger,
             IOptions<NuGetDownloaderOptions> options)
         {
-            if (upgradeOptions is null)
-            {
-                throw new ArgumentNullException(nameof(upgradeOptions));
-            }
-
             if (sourceFactory is null)
             {
                 throw new ArgumentNullException(nameof(sourceFactory));
@@ -52,17 +46,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
-            if (upgradeOptions.ProjectPath is null)
-            {
-                throw new ArgumentException("Project path must be set in UpgradeOptions", nameof(upgradeOptions));
-            }
-
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _nugetLogger = new NuGetLogger(logger);
             _cache = new SourceCacheContext();
-            _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(Path.GetDirectoryName(upgradeOptions.ProjectPath)));
-            _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
             _options = options.Value;
+            _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(_options.PackageSourcePath));
+            _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
         }
 
         public async Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)

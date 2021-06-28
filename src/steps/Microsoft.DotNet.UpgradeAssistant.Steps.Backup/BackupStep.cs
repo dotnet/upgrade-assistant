@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 {
@@ -35,10 +36,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public BackupStep(UpgradeOptions options, ILogger<BackupStep> logger, IUserInput userInput, IUpgradeContextProperties properties)
+        public BackupStep(
+            IUserInput userInput,
+            IOptions<BackupOptions> options,
+            ILogger<BackupStep> logger)
             : base(logger)
         {
-            _skipBackup = options?.SkipBackup ?? throw new ArgumentNullException(nameof(options));
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            _skipBackup = options.Value.Skip;
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
         }
 

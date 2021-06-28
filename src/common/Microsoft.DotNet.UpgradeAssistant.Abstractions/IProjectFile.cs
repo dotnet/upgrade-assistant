@@ -39,6 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void SetPropertyValue(string propertyName, string propertyValue);
 
+        void RemoveProperty(string propertyName);
+
         void SetTFM(TargetFrameworkMoniker targetTFM);
 
         ICollection<string> Imports { get; }

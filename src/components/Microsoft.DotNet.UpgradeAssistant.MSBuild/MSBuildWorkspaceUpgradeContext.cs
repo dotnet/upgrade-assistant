@@ -11,6 +11,7 @@ using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
@@ -53,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public UpgradeStep? CurrentStep { get; set; }
 
         public MSBuildWorkspaceUpgradeContext(
-            UpgradeOptions options,
+            IOptions<WorkspaceOptions> options,
             IVisualStudioFinder vsFinder,
             Func<string, ISolutionInfo> infoGenerator,
             IPackageRestorer restorer,
@@ -62,18 +63,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ILogger<MSBuildWorkspaceUpgradeContext> logger,
             IUpgradeContextProperties properties)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             if (vsFinder is null)
             {
                 throw new ArgumentNullException(nameof(vsFinder));
             }
 
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
-            InputPath = options.ProjectPath;
+            InputPath = options.Value.InputPath;
             _restorer = restorer;
             _comparer = comparer;
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
