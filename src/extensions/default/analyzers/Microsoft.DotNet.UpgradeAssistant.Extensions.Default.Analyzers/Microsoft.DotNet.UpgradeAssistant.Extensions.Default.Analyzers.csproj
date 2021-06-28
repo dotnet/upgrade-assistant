@@ -6,6 +6,12 @@
     <PackageId>*$(MSBuildProjectFullPath)*</PackageId>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="DefaultApiAlerts.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DefaultApiAlerts.json" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
       <Version>3.3.2</Version>
     </PackageReference>

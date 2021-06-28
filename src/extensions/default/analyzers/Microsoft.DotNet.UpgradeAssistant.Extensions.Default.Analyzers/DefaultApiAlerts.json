@@ -1,0 +1,45 @@
+﻿[
+  {
+    "Id": "A",
+    "TargetSyntaxes": [
+      {
+        "FullName": "System.Web.IHttpModule",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      },
+      {
+        "FullName": "System.Web.IHttpHandler",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      }
+    ],
+    "Message": "HTTP modules and HTTP handlers should be rewritten as middleware in ASP.NET Core. https://docs.microsoft.com/en-us/aspnet/core/migration/http-modulesIHttpModule",
+  },
+  {
+    "Id": "B",
+    "TargetSyntaxes": [
+      {
+        "FullName": "System.ServiceModel.ServiceHost",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      },
+      {
+        "FullName": "System.ServiceModel.ServiceHostBase",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      }
+    ],
+    "Message": "WCF server APIs are unsupported on .NET Core. Consider rewriting to use gRPC (https://docs.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers), ASP.NET Core, or CoreWCF (https://github.com/CoreWCF/CoreWCF) instead.",
+  },
+  {
+    "Id": "C",
+    "TargetSyntaxes": [
+      {
+        "FullName": "System.Web.Optimization.BundleCollection",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      }
+    ],
+    "Message": "Script and style bundling works differently in ASP.NET Core. BundleCollection should be replaced by alternative bundling technologies. https://docs.microsoft.com/en-us/aspnet/core/client-side/bundling-and-minification"
+  }
+]

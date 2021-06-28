@@ -61,6 +61,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
+        /// </summary>
+        internal static string ApiAlertGenericDescription {
+            get {
+                return ResourceManager.GetString("ApiAlertGenericDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {}.
+        /// </summary>
+        internal static string ApiAlertGenericMessageFormat {
+            get {
+                return ResourceManager.GetString("ApiAlertGenericMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace unsupported API.
+        /// </summary>
+        internal static string ApiAlertGenericTitle {
+            get {
+                return ResourceManager.GetString("ApiAlertGenericTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This attribute type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
         /// </summary>
         internal static string AttributeUpgradeDescription {
