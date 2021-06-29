@@ -27,9 +27,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 var run = new Run()
                 {
-                    Tool = new Tool
+                    Tool = new()
                     {
-                        Driver = new ToolComponent
+                        Driver = new()
                         {
                             Name = string.Join(" ", toolName, analysis.Key)
                         }
@@ -45,11 +45,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public static IList<Result> ExtractResults(IDependencyAnalysisState? analysisState)
         {
-            IList<Result> results = new List<Result>();
+            var results = new List<Result>();
 
             if (analysisState is null || !analysisState.AreChangesRecommended)
             {
-                results.Add(new Result()
+                results.Add(new()
                 {
                     Message = "No package updates needed".ToMessage()
                 });
