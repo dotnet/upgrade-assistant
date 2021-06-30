@@ -205,6 +205,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0010", new TextSpan(845, 13), Language.VisualBasic),
                 }
             },
+            {
+                "ApiAlert",
+                new[]
+                {
+                    new ExpectedDiagnostic("UA0013_D", new TextSpan(272, 29)),
+                    new ExpectedDiagnostic("UA0013_D", new TextSpan(310, 29)),
+                    new ExpectedDiagnostic("UA0013_A", new TextSpan(534, 11)),
+                    new ExpectedDiagnostic("UA0013_A", new TextSpan(547, 23)),
+                    new ExpectedDiagnostic("UA0013_D", new TextSpan(604, 29)),
+                    new ExpectedDiagnostic("UA0013_D", new TextSpan(848, 29)),
+                    new ExpectedDiagnostic("UA0013_D", new TextSpan(916, 29)),
+                    new ExpectedDiagnostic("UA0013_E", new TextSpan(987, 15)),
+                    new ExpectedDiagnostic("UA0013_B", new TextSpan(1046, 15)),
+                    new ExpectedDiagnostic("UA0013_E", new TextSpan(1091, 39)),
+                    new ExpectedDiagnostic("UA0013_E", new TextSpan(1139, 28)),
+                    new ExpectedDiagnostic("UA0013_B", new TextSpan(1184, 11)),
+                    new ExpectedDiagnostic("UA0013_C", new TextSpan(1249, 16)),
+                    new ExpectedDiagnostic("UA0013_C", new TextSpan(1270, 33)),
+                }
+            },
         };
 
         // No diagnostics expected to show up
@@ -232,6 +252,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [InlineData("UA0012")]
         [InlineData("ControllerUpgrade")]
         [InlineData("AttributesTest")]
+        [InlineData("ApiAlert")]
         [Theory]
         public async Task UpgradeAnalyzers(string scenarioName)
         {

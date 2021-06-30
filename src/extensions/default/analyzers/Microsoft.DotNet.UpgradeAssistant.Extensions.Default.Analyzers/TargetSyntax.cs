@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
@@ -48,6 +46,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         public bool AlertOnAmbiguousMatch { get; }
 
         /// <summary>
+        /// Gets a NameMatcher that can be used to determine whether syntax nodes or symbols
+        /// matche this target syntax.
+        /// </summary>
+        public NameMatcher NameMatcher { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TargetSyntax"/> class.
         /// </summary>
         /// <param name="fullName">The full name of the namespace or API.</param>
@@ -58,6 +62,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             FullName = fullName ?? throw new ArgumentNullException(nameof(fullName));
             SyntaxType = syntaxType;
             AlertOnAmbiguousMatch = alertOnAmbiguousMatch;
+            NameMatcher = syntaxType is TargetSyntaxType.Member
+                ? NameMatcher.MatchMemberAccess(fullName)
+                : NameMatcher.MatchType(fullName);
         }
     }
 }

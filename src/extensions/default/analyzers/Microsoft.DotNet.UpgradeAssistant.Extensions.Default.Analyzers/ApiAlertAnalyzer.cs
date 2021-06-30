@@ -51,8 +51,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// The diagnsotic category for diagnostics produced by this analyzer.
         /// </summary>
         private const string Category = "Upgrade";
-
+        private const string AttributeSuffix = "Attribute";
         private const string DefaultApiAlertsResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.DefaultApiAlerts.json";
+
         private IEnumerable<TargetSyntaxMessage> _targetSyntaxes;
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
@@ -81,7 +82,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             // Also add all API targets specified specifically in embedded resources
             supportedDiagnostics.AddRange(_targetSyntaxes.Select(s =>
-                new DiagnosticDescriptor($"{BaseDiagnosticId}-{s.Id}", $"Replace usage of {string.Join(", ", s.TargetSyntaxes.Select(t => t.FullName))}", s.Message, Category, DiagnosticSeverity.Warning, true, s.Message)));
+                new DiagnosticDescriptor($"{BaseDiagnosticId}_{s.Id}", $"Replace usage of {string.Join(", ", s.TargetSyntaxes.Select(t => t.FullName))}", s.Message, Category, DiagnosticSeverity.Warning, true, s.Message)));
 
             SupportedDiagnostics = supportedDiagnostics.ToImmutable();
         }
@@ -111,55 +112,52 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 var combinedTargetSyntaxes = _targetSyntaxes.Concat(additionalTargetSyntaxes);
 
                 // Register actions for handling both C# and VB identifiers
-                context.RegisterSyntaxNodeAction(context => AnalyzeCSharpIdentifier(context, combinedTargetSyntaxes), CS.SyntaxKind.IdentifierName);
-                context.RegisterSyntaxNodeAction(context => AnalyzeVBIdentifier(context, combinedTargetSyntaxes), VB.SyntaxKind.IdentifierName);
+                context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), CS.SyntaxKind.IdentifierName);
+                context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), VB.SyntaxKind.IdentifierName);
             });
         }
 
-        private void AnalyzeCSharpIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TargetSyntaxMessage> targetSyntaxMessages)
+        private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TargetSyntaxMessage> targetSyntaxMessages)
         {
-            Console.WriteLine();
-            var identifier = (CSSyntax.IdentifierNameSyntax)context.Node;
-            var symbol = identifier.Parent is CSSyntax.AttributeSyntax
-                ? context.SemanticModel.GetTypeInfo(identifier).Type
-                : context.SemanticModel.GetSymbolInfo(identifier).Symbol;
+            var simpleName = context.Node switch
+            {
+                CSSyntax.IdentifierNameSyntax csIdentifier => csIdentifier.Identifier.ValueText,
+                VBSyntax.IdentifierNameSyntax vbIdentifier => vbIdentifier.Identifier.ValueText,
+                _ => throw new InvalidOperationException($"Unsupported syntax kind (expected C# or VB identifier name): {context.Node.GetType()}")
+            };
 
-            AnalyzeIdentifier(context, symbol, targetSyntaxMessages, identifier.Identifier.ValueText);
-        }
-
-        private void AnalyzeVBIdentifier(SyntaxNodeAnalysisContext context, IEnumerable<TargetSyntaxMessage> targetSyntaxMessages)
-        {
-            var identifier = (VBSyntax.IdentifierNameSyntax)context.Node;
-            var symbol = identifier.Parent is VBSyntax.AttributeSyntax
-                ? context.SemanticModel.GetTypeInfo(identifier).Type
-                : context.SemanticModel.GetSymbolInfo(identifier).Symbol;
-
-            AnalyzeIdentifier(context, symbol, targetSyntaxMessages, identifier.Identifier.ValueText);
-        }
-
-        private void AnalyzeIdentifier(SyntaxNodeAnalysisContext context, ISymbol? symbol, IEnumerable<TargetSyntaxMessage> targetSyntaxMessages, string simpleName)
-        {
             // Find target syntax/message mappings that include this node's simple name
-            var possibleMatches = targetSyntaxMessages.SelectMany(m => m.TargetSyntaxes.Select(s => (TargetSyntax: s, Mapping: m))).Where(t => t.TargetSyntax.SimpleName.Equals(simpleName, StringComparison.Ordinal));
+            var fullyQualifiedName = context.Node.GetQualifiedName().ToString();
+            var stringComparison = context.Node.GetStringComparison();
+            var partialMatches = targetSyntaxMessages.SelectMany(m => m.TargetSyntaxes.Select(s => (TargetSyntax: s, Mapping: m)))
+                .Where(t => t.TargetSyntax.SyntaxType is TargetSyntaxType.Member
 
-            if (!possibleMatches.Any())
+                    // For members, check that the syntax is a method access expression and only match the simple name since
+                    // the expression portion of a member access expression may be a local name
+                    ? context.Node.IsMemberAccessExpression() && t.TargetSyntax.SimpleName.Equals(simpleName, stringComparison)
+
+                    // For types and namespaces, the syntax's entire name needs to match the target
+                    : t.TargetSyntax.NameMatcher.MatchesPartiallyQualifiedType(fullyQualifiedName, stringComparison)
+                      || t.TargetSyntax.NameMatcher.MatchesPartiallyQualifiedType($"{fullyQualifiedName}{AttributeSuffix}", stringComparison));
+
+            if (!partialMatches.Any())
             {
                 return;
             }
 
-            foreach (var match in possibleMatches)
+            foreach (var match in partialMatches)
             {
                 if (match.TargetSyntax.SyntaxType switch
                 {
-                    TargetSyntaxType.Member => AnalyzeMember(context.Node, symbol, simpleName, match.TargetSyntax),
-                    TargetSyntaxType.Type => AnalyzeType(context.Node, symbol, simpleName, match.TargetSyntax),
-                    TargetSyntaxType.Namespace => AnalyzeNamespace(context.Node, symbol, simpleName, match.TargetSyntax),
-                    _ => false
+                    TargetSyntaxType.Member => AnalyzeMember(context, match.TargetSyntax),
+                    TargetSyntaxType.Type => AnalyzeType(context, match.TargetSyntax),
+                    TargetSyntaxType.Namespace => AnalyzeNamespace(context, match.TargetSyntax),
+                    _ => false,
                 })
                 {
                     // Get the diagnostic descriptor correspdoning to the target API message map or, if a specific descriptor doesn't exist for it,
                     // get the default (first) one.
-                    var id = $"{BaseDiagnosticId}-{match.Mapping.Id}";
+                    var id = $"{BaseDiagnosticId}_{match.Mapping.Id}";
                     var diagnosticDescriptor = SupportedDiagnostics.FirstOrDefault(d => d.Id.Equals(id, StringComparison.Ordinal)) ?? SupportedDiagnostics.First();
 
                     // Create and report the diagnostic. Note that the fully qualified name's location is used so
@@ -169,22 +167,83 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
         }
 
-        private bool AnalyzeNamespace(SyntaxNode node, ISymbol? symbol, string simpleName, TargetSyntax targetSyntax)
+        private static bool AnalyzeNamespace(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
         {
-            // TODO
+            // If the node is a fully qualified name from the specified namespace, return true
+            // This should cover both import statements and fully qualified type names, so no addtional checks
+            // for import statements are needed.
+            var qualifiedName = context.Node.GetQualifiedName().ToString();
+            if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
+            {
+                return true;
+            }
+
+            // This method intentionally doesn't check type symbols to see if they're part of the
+            // targeted namespace as that diagnostic would likely be too noisy. This will just flag
+            // the import statement or fully-qualified use of the namespace name, instead.
             return false;
         }
 
-        private bool AnalyzeType(SyntaxNode node, ISymbol? symbol, string simpleName, TargetSyntax targetSyntax)
+        private static bool AnalyzeType(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
         {
-            // TODO
-            return false;
+            // If the node matches the target's fully qualified name, return true.
+            var qualifiedName = context.Node.GetQualifiedName().ToString();
+            if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
+            {
+                return true;
+            }
+
+            // Attempt to get the type symbol (either by getting the type symbol directly,
+            // or by getting general symbol info, as required to get the type symbol a ctor
+            // corresponds to)
+            var symbol = context.SemanticModel.GetTypeInfo(context.Node).Type
+                ?? context.SemanticModel.GetSymbolInfo(context.Node).Symbol;
+
+            // If the node's type can be resolved, return true only if it matches
+            // the expected full name. If the node resolves to a non-type symbol,
+            // return false as this could indicate a local variable or something similar
+            // with a name that matches the target.
+            if (symbol is not null)
+            {
+                if (symbol is ITypeSymbol typeSymbol && typeSymbol is not IErrorTypeSymbol)
+                {
+                    return targetSyntax.NameMatcher.Matches(typeSymbol);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            // If the node's full type can't be determined (either by symbol or fully qualified syntax),
+            // return true for the partial match only if ambiguous matching is enabled
+            return targetSyntax.AlertOnAmbiguousMatch;
         }
 
-        private bool AnalyzeMember(SyntaxNode node, ISymbol? symbol, string simpleName, TargetSyntax targetSyntax)
+        private static bool AnalyzeMember(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
         {
-            // TODO
-            return false;
+            // If the node matches the target's fully qualified name, return true.
+            var qualifiedName = context.Node.GetQualifiedName().ToString();
+            if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
+            {
+                return true;
+            }
+
+            // If the parent type's symbol is resolvable, return true if
+            // it corresponds to the target type
+            var typeSyntax = context.Node.GetMAEExpressionSyntax();
+            if (typeSyntax is not null)
+            {
+                var symbol = context.SemanticModel.GetTypeInfo(typeSyntax).Type;
+                if (symbol is not null && symbol is not IErrorTypeSymbol)
+                {
+                    return targetSyntax.NameMatcher.Matches(symbol);
+                }
+            }
+
+            // If the node's full type can't be determined (either by symbol or fully qualified syntax),
+            // return true for the partial match only if ambiguous matching is enabled
+            return targetSyntax.AlertOnAmbiguousMatch;
         }
     }
 }

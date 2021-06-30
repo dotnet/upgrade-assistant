@@ -275,6 +275,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             throw new NotImplementedException(Resources.UnknownLanguage);
         }
 
+        public static SyntaxNode? GetMAEExpressionSyntax(this SyntaxNode memberAccessSyntax) =>
+            memberAccessSyntax switch
+            {
+                CSSyntax.MemberAccessExpressionSyntax csMAE => csMAE.Expression,
+                VBSyntax.MemberAccessExpressionSyntax vbMAE => vbMAE.Expression,
+                _ => null
+            };
+
         public static StringComparison GetStringComparison(this SyntaxNode? node)
             => node?.Language switch
             {

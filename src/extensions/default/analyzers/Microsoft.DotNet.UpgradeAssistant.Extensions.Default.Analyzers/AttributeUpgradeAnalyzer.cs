@@ -77,10 +77,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
 
             // If the attribute name isn't one of the mapped names, bail out
+            var stringComparison = context.Node.GetStringComparison();
             var mapping = mappings.FirstOrDefault(m =>
             {
                 var matcher = NameMatcher.MatchType(m.OldName);
-                return matcher.MatchesPartiallyQualifiedType(attributeName) || matcher.MatchesPartiallyQualifiedType($"{attributeName}{AttributeSuffix}");
+                return matcher.MatchesPartiallyQualifiedType(attributeName, stringComparison) || matcher.MatchesPartiallyQualifiedType($"{attributeName}{AttributeSuffix}", stringComparison);
             });
             if (mapping is null)
             {
