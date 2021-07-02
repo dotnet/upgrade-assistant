@@ -3,6 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Added
+- Added analyzers for identifying common namespaces, types, and members that require manual fixup and will produce diagnostics with links to relevant docs. The list of APIs identified by the analyzer can be expanded by adding to DefaultApiAlerts.json or by adding a .apitargets file to a project's additional files. [#685](https://github.com/dotnet/upgrade-assistant/pull/685)
+
 ## Version 0.2.233001 - 2021-06-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.233001))
 
 ### Added
