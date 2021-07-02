@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AttributeUpgradeDescription), Resources.ResourceManager, typeof(Resources));
         private static readonly DiagnosticDescriptor GenericRule = new(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        private Lazy<IEnumerable<TargetSyntaxMessage>> _targetSyntaxes = new Lazy<IEnumerable<TargetSyntaxMessage>>(() =>
+        private readonly Lazy<IEnumerable<TargetSyntaxMessage>> _targetSyntaxes = new(() =>
         {
             using var resourceStream = new StreamReader(typeof(ApiAlertAnalyzer).Assembly.GetManifestResourceStream(DefaultApiAlertsResourceName));
             return TargetSyntaxMessageLoader.LoadMappings(resourceStream.ReadToEnd())
@@ -48,6 +48,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         });
 
         // Supported diagnostics include all of the specific diagnostics read from DefaultApiAlerts.json and the generic diagnostic used for additional target syntax messages loaded at runtime.
+        // For some reason, Roslyn's analyzer scanning analyzer (that compares diagnostic IDs against AnalyzerReleases.* files) only identifies
+        // the generic UA0013 diagnostic here, so that's the only one added to AnalyzerReleases.Unshipped.md.
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(_targetSyntaxes.Value
             .Select(t => new DiagnosticDescriptor($"{BaseDiagnosticId}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
             .Concat(new[] { GenericRule }));

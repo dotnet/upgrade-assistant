@@ -14,11 +14,3 @@ UA0010 | Upgrade | Warning | AllowHtmlAttributeAnalyzer
 UA0011 | Upgrade | Warning | SystemDeploymentAnalyzer
 UA0012 | Upgrade | Warning | BinaryFormatterUnsafeDeserializeAnalyzer
 UA0013 | Upgrade | Warning | ApiAlert
-UA0013_A | Upgrade | Warning | HttpModuleAnalyzer
-UA0013_B | Upgrade | Warning | ServiceHostAnalyzer
-UA0013_C | Upgrade | Warning | BundleCollectionAnalyzer
-UA0013_D | Upgrade | Warning | SystemDeploymentApplicationAnalyzer
-UA0013_E | Upgrade | Warning | ChildActionOnlyAttributeAnalyzer
-UA0013_F | Upgrade | Warning | AspNetMembership
-UA0013_G | Upgrade | Warning | AspNetIdentity
-UA0013_H | Upgrade | Warning | HttpRequestRawUrl
