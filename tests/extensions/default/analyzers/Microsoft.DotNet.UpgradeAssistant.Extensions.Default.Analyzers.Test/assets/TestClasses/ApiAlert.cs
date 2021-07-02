@@ -32,7 +32,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.as
             ServiceHost x = new ServiceModel.ServiceHostBase();
             BundleCollection b = Web.Optimization.BundleCollection.SomeMethod();
         }
+
+        public static UserManager<string, string> MembershipTest(Foo.Membership membership)
+        {
+            MembershipUser currentUser = Web.Security.Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
+            System.Web.Security.FormsAuthentication.SetAuthCookie(currentUser.UserName);
+            Microsoft.AspNet.Identity.Owin.SignInManager<string, string> = new SignInManager<string, string>();
+        }
+
+        public HttpRequest MemberTest()
+        {
+            var x = HttpRequest.RawUrl;
+            System.Web.HttpRequest request1;
+            Microsoft.AspNetCore.Http.HttpRequest request2;
+            HttpRequest request3;
+            x = request1.RawUrl;
+            x = request2.RawUrl;
+            x = request3.RawUrl;
+
+            var y = System.Web.HttpRequest.RawUrl;
+        }
     }
+
+    public class SignInManager<T, U> { }
 }
 
 namespace Foo

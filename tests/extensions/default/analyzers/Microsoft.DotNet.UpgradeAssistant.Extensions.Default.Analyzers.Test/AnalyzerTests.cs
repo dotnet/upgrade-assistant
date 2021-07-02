@@ -223,6 +223,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0013_B", new TextSpan(1184, 11)),
                     new ExpectedDiagnostic("UA0013_C", new TextSpan(1249, 16)),
                     new ExpectedDiagnostic("UA0013_C", new TextSpan(1270, 33)),
+                    new ExpectedDiagnostic("UA0013_G", new TextSpan(1354, 27)),
+                    new ExpectedDiagnostic("UA0013_F", new TextSpan(1477, 23)),
+                    new ExpectedDiagnostic("UA0013_F", new TextSpan(1568, 39)),
+
+                    // Once for the namespace, once for the type
+                    new ExpectedDiagnostic("UA0013_G", new TextSpan(1658, 25)),
+                    new ExpectedDiagnostic("UA0013_G", new TextSpan(1658, 60)),
+
+                    new ExpectedDiagnostic("UA0013_H", new TextSpan(2057, 15)),
+                    new ExpectedDiagnostic("UA0013_H", new TextSpan(2131, 29)),
                 }
             },
         };

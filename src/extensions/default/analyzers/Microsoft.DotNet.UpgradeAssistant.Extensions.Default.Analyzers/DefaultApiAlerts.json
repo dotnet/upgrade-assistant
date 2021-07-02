@@ -13,7 +13,7 @@
         "AlertOnAmbiguousMatch": true
       }
     ],
-    "Message": "HTTP modules and HTTP handlers should be rewritten as middleware in ASP.NET Core. https://docs.microsoft.com/en-us/aspnet/core/migration/http-modulesIHttpModule",
+    "Message": "HTTP modules and HTTP handlers should be rewritten as middleware in ASP.NET Core. https://docs.microsoft.com/aspnet/core/migration/http-modulesIHttpModule",
   },
   {
     "Id": "B",
@@ -29,7 +29,7 @@
         "AlertOnAmbiguousMatch": true
       }
     ],
-    "Message": "WCF server APIs are unsupported on .NET Core. Consider rewriting to use gRPC (https://docs.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers), ASP.NET Core, or CoreWCF (https://github.com/CoreWCF/CoreWCF) instead.",
+    "Message": "WCF server APIs are unsupported on .NET Core. Consider rewriting to use gRPC (https://docs.microsoft.com/dotnet/architecture/grpc-for-wcf-developers), ASP.NET Core, or CoreWCF (https://github.com/CoreWCF/CoreWCF) instead.",
   },
   {
     "Id": "C",
@@ -40,7 +40,7 @@
         "AlertOnAmbiguousMatch": true
       }
     ],
-    "Message": "Script and style bundling works differently in ASP.NET Core. BundleCollection should be replaced by alternative bundling technologies. https://docs.microsoft.com/en-us/aspnet/core/client-side/bundling-and-minification"
+    "Message": "Script and style bundling works differently in ASP.NET Core. BundleCollection should be replaced by alternative bundling technologies. https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification"
   },
   {
     "Id": "D",
@@ -62,6 +62,59 @@
         "AlertOnAmbiguousMatch": true
       }
     ],
-    "Message": "Child actions should be replaced with view components. For more details, see https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-components and https://www.davepaquette.com/archive/2016/01/02/goodbye-child-actions-hello-view-components.aspx"
+    "Message": "Child actions should be replaced with view components. For more details, see https://docs.microsoft.com/aspnet/core/mvc/views/view-components and https://www.davepaquette.com/archive/2016/01/02/goodbye-child-actions-hello-view-components.aspx"
+  },
+  {
+    "Id": "F",
+    "TargetSyntaxes": [
+      {
+        "FullName": "System.Web.Security.Membership",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      },
+      {
+        "FullName": "System.Web.Security.FormsAuthentication",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      }
+    ],
+    "Message": "ASP.NET membership should be replaced with ASP.NET Core identity. For more details, see https://docs.microsoft.com/aspnet/core/migration/proper-to-2x/membership-to-core-identity"
+  },
+  {
+    "Id": "G",
+    "TargetSyntaxes": [
+      {
+        "FullName": "Microsoft.AspNet.Identity",
+        "SyntaxType": "Namespace",
+        "AlertOnAmbiguousMatch": false
+      },
+      {
+        "FullName": "Microsoft.AspNet.Identity.UserManager",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      },
+      {
+        "FullName": "Microsoft.AspNet.Identity.Owin.SignInManager",
+        "SyntaxType": "Type",
+        "AlertOnAmbiguousMatch": true
+      }
+    ],
+    "Message": "ASP.NET identity should be replaced with ASP.NET Core identity. For more details, see https://docs.microsoft.com/aspnet/core/migration/identity"
+  },
+  {
+    "Id": "H",
+    "TargetSyntaxes": [
+      {
+        "FullName": "Microsoft.AspNetCore.Http.HttpRequest.RawUrl",
+        "SyntaxType": "Member",
+        "AlertOnAmbiguousMatch": false
+      },
+      {
+        "FullName": "System.Web.HttpRequest.RawUrl",
+        "SyntaxType": "Member",
+        "AlertOnAmbiguousMatch": false
+      }
+    ],
+    "Message": "HttpRequest.RawUrl should be replaced with HttpRequest.GetEncodedUrl() or HttpRequest.GetDisplayUrl()"
   }
 ]

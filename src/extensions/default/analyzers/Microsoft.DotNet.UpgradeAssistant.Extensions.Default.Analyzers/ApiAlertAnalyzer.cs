@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using CS = Microsoft.CodeAnalysis.CSharp;
@@ -17,23 +15,6 @@ using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
-    /*
-    Extenders can supply:
-        1. An API to alert on
-        2. Message
-        3. Whether the API needs to resolve to match symbolically or not (maybe call 'support partial syntax match'?)
-
-    Scenarios to support:
-    - Base types and interfaces (name syntax)
-        - HttpApplication, IHttpModule
-    - Attributes (ChildActionOnlyAttribute)
-    - Method calls or property invocations (member access syntax)?
-        Do I need this or not? There are some things that I'd want to flag on the
-        method level but *most* could be on the type level.
-        - global.asax.cs registration APIs (RouteCollection.MapMvcAttributeRoutes)
-        - Removed HttpContext APIs?
-    */
-
     /// <summary>
     /// Analyzer for identifying usage of APIs that should be reported to the
     /// user along with messaging about how the API should be (manually) replaced
@@ -54,38 +35,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private const string AttributeSuffix = "Attribute";
         private const string DefaultApiAlertsResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.DefaultApiAlerts.json";
 
-        private IEnumerable<TargetSyntaxMessage> _targetSyntaxes;
+        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AttributeUpgradeTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AttributeUpgradeMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AttributeUpgradeDescription), Resources.ResourceManager, typeof(Resources));
+        private static readonly DiagnosticDescriptor GenericRule = new(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
-
-        public ApiAlertAnalyzer()
+        private Lazy<IEnumerable<TargetSyntaxMessage>> _targetSyntaxes = new Lazy<IEnumerable<TargetSyntaxMessage>>(() =>
         {
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                AllowTrailingCommas = true,
-            };
-
-            jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-
             using var resourceStream = new StreamReader(typeof(ApiAlertAnalyzer).Assembly.GetManifestResourceStream(DefaultApiAlertsResourceName));
-            _targetSyntaxes = JsonSerializer.Deserialize<TargetSyntaxMessage[]>(resourceStream.ReadToEnd(), jsonSerializerOptions)
+            return TargetSyntaxMessageLoader.LoadMappings(resourceStream.ReadToEnd())
                 ?? throw new InvalidOperationException($"Could not read target syntax messages from resource {DefaultApiAlertsResourceName}");
+        });
 
-            // Assemby the list of supported diagnostics
-            var supportedDiagnostics = ImmutableArray.CreateBuilder<DiagnosticDescriptor>();
-
-            // First, support a generic diagnostic that will be used for API targets specified in additional files
-            var genericTitle = new LocalizableResourceString(nameof(Resources.ApiAlertGenericTitle), Resources.ResourceManager, typeof(Resources));
-            var genericMessageFormat = new LocalizableResourceString(nameof(Resources.ApiAlertGenericMessageFormat), Resources.ResourceManager, typeof(Resources));
-            var genericDesription = new LocalizableResourceString(nameof(Resources.ApiAlertGenericDescription), Resources.ResourceManager, typeof(Resources));
-            supportedDiagnostics.Add(new(BaseDiagnosticId, genericTitle, genericMessageFormat, Category, DiagnosticSeverity.Warning, true, genericDesription));
-
-            // Also add all API targets specified specifically in embedded resources
-            supportedDiagnostics.AddRange(_targetSyntaxes.Select(s =>
-                new DiagnosticDescriptor($"{BaseDiagnosticId}_{s.Id}", $"Replace usage of {string.Join(", ", s.TargetSyntaxes.Select(t => t.FullName))}", s.Message, Category, DiagnosticSeverity.Warning, true, s.Message)));
-
-            SupportedDiagnostics = supportedDiagnostics.ToImmutable();
-        }
+        // Supported diagnostics include all of the specific diagnostics read from DefaultApiAlerts.json and the generic diagnostic used for additional target syntax messages loaded at runtime.
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(_targetSyntaxes.Value
+            .Select(t => new DiagnosticDescriptor($"{BaseDiagnosticId}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
+            .Concat(new[] { GenericRule }));
 
         /// <summary>
         /// Initializes the analyzer by registering analysis callback methods.
@@ -105,15 +70,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 // Load analyzer configuration defining the types that should be mapped.
                 var additionalTargetSyntaxes =
-                    // TODO :
-                    // TargetSyntaxMessageLoader.LoadMappings(context.Options.AdditionalFiles);
-                    Enumerable.Empty<TargetSyntaxMessage>();
+                    TargetSyntaxMessageLoader.LoadMappings(context.Options.AdditionalFiles);
 
-                var combinedTargetSyntaxes = _targetSyntaxes.Concat(additionalTargetSyntaxes);
+                var combinedTargetSyntaxes = _targetSyntaxes.Value.Concat(additionalTargetSyntaxes);
 
                 // Register actions for handling both C# and VB identifiers
-                context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), CS.SyntaxKind.IdentifierName);
-                context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), VB.SyntaxKind.IdentifierName);
+                context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), CS.SyntaxKind.IdentifierName, CS.SyntaxKind.GenericName);
+                context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), VB.SyntaxKind.IdentifierName, VB.SyntaxKind.GenericName);
             });
         }
 
@@ -121,20 +84,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         {
             var simpleName = context.Node switch
             {
-                CSSyntax.IdentifierNameSyntax csIdentifier => csIdentifier.Identifier.ValueText,
-                VBSyntax.IdentifierNameSyntax vbIdentifier => vbIdentifier.Identifier.ValueText,
+                CSSyntax.SimpleNameSyntax csIdentifier => csIdentifier.Identifier.ValueText,
+                VBSyntax.SimpleNameSyntax vbIdentifier => vbIdentifier.Identifier.ValueText,
                 _ => throw new InvalidOperationException($"Unsupported syntax kind (expected C# or VB identifier name): {context.Node.GetType()}")
             };
 
             // Find target syntax/message mappings that include this node's simple name
-            var fullyQualifiedName = context.Node.GetQualifiedName().ToString();
+            var fullyQualifiedName = GetFullName(context.Node);
+
             var stringComparison = context.Node.GetStringComparison();
             var partialMatches = targetSyntaxMessages.SelectMany(m => m.TargetSyntaxes.Select(s => (TargetSyntax: s, Mapping: m)))
                 .Where(t => t.TargetSyntax.SyntaxType is TargetSyntaxType.Member
 
                     // For members, check that the syntax is a method access expression and only match the simple name since
                     // the expression portion of a member access expression may be a local name
-                    ? context.Node.IsMemberAccessExpression() && t.TargetSyntax.SimpleName.Equals(simpleName, stringComparison)
+                    ? (context.Node.Parent?.IsMemberAccessExpression() ?? false) && t.TargetSyntax.SimpleName.Equals(simpleName, stringComparison)
 
                     // For types and namespaces, the syntax's entire name needs to match the target
                     : t.TargetSyntax.NameMatcher.MatchesPartiallyQualifiedType(fullyQualifiedName, stringComparison)
@@ -172,7 +136,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // If the node is a fully qualified name from the specified namespace, return true
             // This should cover both import statements and fully qualified type names, so no addtional checks
             // for import statements are needed.
-            var qualifiedName = context.Node.GetQualifiedName().ToString();
+            var qualifiedName = GetFullName(context.Node);
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -187,7 +151,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static bool AnalyzeType(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
         {
             // If the node matches the target's fully qualified name, return true.
-            var qualifiedName = context.Node.GetQualifiedName().ToString();
+            var qualifiedName = GetFullName(context.Node);
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -205,9 +169,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // with a name that matches the target.
             if (symbol is not null)
             {
-                if (symbol is ITypeSymbol typeSymbol && typeSymbol is not IErrorTypeSymbol)
+                if (symbol is ITypeSymbol typeSymbol)
                 {
-                    return targetSyntax.NameMatcher.Matches(typeSymbol);
+                    // This conditional can't be combined with the previous one because
+                    // failing this condition should not lead to the else clause.
+                    // In other words, if the symbol is a type symbol but is an error type
+                    // symbol then don't return here (rather than returning false as would
+                    // happen for non-type symbols).
+                    if (typeSymbol is not IErrorTypeSymbol)
+                    {
+                        return targetSyntax.NameMatcher.Matches(typeSymbol);
+                    }
                 }
                 else
                 {
@@ -223,7 +195,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static bool AnalyzeMember(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
         {
             // If the node matches the target's fully qualified name, return true.
-            var qualifiedName = context.Node.GetQualifiedName().ToString();
+            var qualifiedName = GetFullName(context.Node);
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -231,7 +203,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             // If the parent type's symbol is resolvable, return true if
             // it corresponds to the target type
-            var typeSyntax = context.Node.GetMAEExpressionSyntax();
+            var typeSyntax = context.Node.Parent?.GetMAEExpressionSyntax();
             if (typeSyntax is not null)
             {
                 var symbol = context.SemanticModel.GetTypeInfo(typeSyntax).Type;
@@ -244,6 +216,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // If the node's full type can't be determined (either by symbol or fully qualified syntax),
             // return true for the partial match only if ambiguous matching is enabled
             return targetSyntax.AlertOnAmbiguousMatch;
+        }
+
+        private static string GetFullName(SyntaxNode node)
+        {
+            var fullName = node.GetQualifiedName().ToString();
+
+            // Ignore generic parameters for now to simplify matching
+            var genericParameterIndex = fullName.IndexOfAny(new[] { '<', '(' });
+            if (genericParameterIndex > 0)
+            {
+                fullName = fullName.Substring(0, genericParameterIndex);
+            }
+
+            return fullName;
         }
     }
 }
