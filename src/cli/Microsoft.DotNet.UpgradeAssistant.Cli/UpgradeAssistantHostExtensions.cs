@@ -18,29 +18,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public static class UpgradeAssistantHostExtensions
     {
-        public static IHostBuilder UseUpgradeAssistantOptions(this IHostBuilder host, UpgradeOptions upgradeOptions)
+        public static void AddNonInteractive(this IServiceCollection services, Action<NonInteractiveOptions> configure, bool isNonInteractive)
         {
-            return host
-                .ConfigureServices(services =>
-                {
-                    if (upgradeOptions.NonInteractive)
-                    {
-                        services.AddTransient<IUserInput, NonInteractiveUserInput>();
-                        services
-                            .AddOptions<NonInteractiveOptions>()
-                            .Configure(options =>
-                            {
-                                options.Wait = TimeSpan.FromSeconds(upgradeOptions.NonInteractiveWait);
-                            });
-                    }
+            if (isNonInteractive)
+            {
+                services.AddTransient<IUserInput, NonInteractiveUserInput>();
+                services
+                    .AddOptions<NonInteractiveOptions>()
+                    .Configure(configure);
+            }
+        }
 
-                    services.AddStepManagement();
-                    services.AddExtensionOption(new
-                    {
-                        Backup = new { Skip = upgradeOptions.SkipBackup },
-                        Solution = new { EntryPoints = upgradeOptions.EntryPoint }
-                    });
-                });
+        public static void AddKnownExtensionOptions(this IServiceCollection services, KnownExtensionOptionsBuilder options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            services.AddExtensionOption(new
+            {
+                Backup = new { Skip = options.SkipBackup },
+                Solution = new { EntryPoints = options.Entrypoints }
+            });
         }
 
         public static IHostBuilder UseUpgradeAssistant<TApp>(this IHostBuilder host, IUpgradeAssistantOptions upgradeOptions)
@@ -65,6 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     });
 
                     services.AddHostedService<ConsoleRunner>();
+                    services.AddStepManagement();
                     services.AddStateFactory(upgradeOptions);
 
                     services.AddExtensions()
