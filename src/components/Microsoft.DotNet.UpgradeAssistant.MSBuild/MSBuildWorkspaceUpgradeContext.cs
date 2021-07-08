@@ -60,8 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             IPackageRestorer restorer,
             ITargetFrameworkMonikerComparer comparer,
             IComponentIdentifier componentIdentifier,
-            ILogger<MSBuildWorkspaceUpgradeContext> logger,
-            IUpgradeContextProperties properties)
+            ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
             if (vsFinder is null)
             {
@@ -74,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _comparer = comparer;
             _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            Properties = new UpgradeContextProperties();
 
             _vsPath = vsFinder.GetLatestVisualStudioPath();
             SolutionInfo = infoGenerator(InputPath);

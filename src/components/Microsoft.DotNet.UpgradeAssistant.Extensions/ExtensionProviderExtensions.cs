@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return services.AddOptions<ExtensionOptions>();
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> ParseOptions(this IEnumerable<string> options)
+        public static IEnumerable<AdditionalOption> ParseOptions(this IEnumerable<string> options)
         {
             if (options is null)
             {
@@ -62,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 if (split.Length == 2)
                 {
-                    yield return new KeyValuePair<string, string>(split[0], split[1]);
+                    yield return new AdditionalOption(split[0], split[1]);
                 }
             }
         }
@@ -97,11 +97,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             });
         }
 
-        public static OptionsBuilder<ExtensionOptions> AddExtensionOption<TOption>(this OptionsBuilder<ExtensionOptions> builder, TOption option)
+        public static IServiceCollection AddExtensionOption<TOption>(this IServiceCollection services, TOption option)
         {
-            if (builder is null)
+            if (services is null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw new ArgumentNullException(nameof(services));
             }
 
             var json = JsonSerializer.SerializeToUtf8Bytes(option);
@@ -112,10 +112,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 .Build();
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
-            builder.Services.AddSingleton(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
+            services.AddSingleton(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
-            return builder;
+            return services;
         }
 
         public static OptionsBuilder<ExtensionOptions> AddFromEnvironmentVariables(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)
