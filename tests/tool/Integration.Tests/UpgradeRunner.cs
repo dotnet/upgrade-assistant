@@ -78,7 +78,7 @@ namespace Integration.Tests
 
             public bool IgnoreUnsupportedFeatures => false;
 
-            public UpgradeTarget TargetTfmSupport => UpgradeTarget.LTS;
+            public UpgradeTarget TargetTfmSupport => UpgradeTarget.Current;
 
             public IReadOnlyCollection<string> Extension => Array.Empty<string>();
 
