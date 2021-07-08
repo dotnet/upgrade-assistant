@@ -4,14 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class UpgradeOptions
+    public class UpgradeOptions : IUpgradeAssistantOptions
     {
         public FileInfo Project { get; set; } = null!;
-
-        public string ProjectPath => Project.FullName;
 
         // Name must be Extension and not plural as the name of the argument that it binds to is `--extension`
         public IReadOnlyCollection<string> Extension { get; set; } = Array.Empty<string>();
@@ -25,6 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public bool Verbose { get; set; }
 
+        public bool IsVerbose => Verbose;
+
         public bool IgnoreUnsupportedFeatures { get; set; }
 
         public bool NonInteractive { get; set; }
@@ -32,5 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public int NonInteractiveWait { get; set; } = 2;
 
         public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.Current;
+
+        public IEnumerable<AdditionalOption> AdditionalOptions => Option.ParseOptions();
     }
 }

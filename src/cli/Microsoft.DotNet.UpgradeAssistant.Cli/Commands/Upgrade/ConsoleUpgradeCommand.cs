@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             Handler = CommandHandler.Create<ParseResult, UpgradeOptions, CancellationToken>((result, options, token) =>
                 Host.CreateDefaultBuilder()
                     .UseConsoleUpgradeAssistant<ConsoleUpgrade>(options, result)
+                    .UseUpgradeAssistantOptions(options)
                     .RunUpgradeAssistantAsync(token));
 
             AddOption(new Option<bool>(new[] { "--skip-backup" }, "Disables backing up the project. This is not recommended unless the project is in source control since this tool will make large changes to both the project and source files."));

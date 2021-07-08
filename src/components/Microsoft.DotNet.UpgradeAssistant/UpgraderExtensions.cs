@@ -14,7 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static void AddStepManagement(this IServiceCollection services)
         {
             services.AddScoped<UpgraderManager>();
-            services.AddTransient<IUpgradeContextProperties, UpgradeContextProperties>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
 
             services.AddContextTelemetry();

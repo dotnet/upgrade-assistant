@@ -2,12 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.MSBuildPath;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -45,6 +47,7 @@ namespace Integration.Tests
 
             var status = await Host.CreateDefaultBuilder()
                 .UseUpgradeAssistant<ConsoleUpgrade>(options)
+                .UseUpgradeAssistantOptions(options)
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
                     builder.RegisterInstance(MSBuildPathInstance.Locator);

@@ -96,10 +96,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The extension instance will dispose of this.")]
-        private static ExtensionInstance LoadOptionsExtension(IEnumerable<KeyValuePair<string, string>> values)
+        private static ExtensionInstance LoadOptionsExtension(IEnumerable<AdditionalOption> values)
         {
+            var collection = values.Select(v => new KeyValuePair<string, string>(v.Name, v.Value));
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(values)
+                .AddInMemoryCollection(collection)
                 .Build();
 
             return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
