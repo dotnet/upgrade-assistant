@@ -28,7 +28,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                             opts.Wait = TimeSpan.FromSeconds(options.NonInteractiveWait);
                         }, options.NonInteractive);
 
-                        services.AddKnownExtensionOptions(new() { SkipBackup = options.SkipBackup, Entrypoints = options.EntryPoint });
+                        services.AddKnownExtensionOptions(new()
+                        {
+                            SkipBackup = options.SkipBackup,
+                            Entrypoints = options.EntryPoint
+                        });
                     })
                     .RunUpgradeAssistantAsync(token));
 

@@ -9,9 +9,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public interface IUpgradeAssistantOptions
     {
-        public bool IsVerbose { get; }
+        bool IsVerbose { get; }
 
-        public FileInfo Project { get; }
+        FileInfo Project { get; }
 
         bool IgnoreUnsupportedFeatures { get; }
 
