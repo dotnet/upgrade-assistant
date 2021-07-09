@@ -104,16 +104,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var json = JsonSerializer.SerializeToUtf8Bytes(option);
-            using var stream = new MemoryStream(json);
+            services.AddOptions<ExtensionOptions>()
+                .Configure(options =>
+                {
+                    var json = JsonSerializer.SerializeToUtf8Bytes(option);
+                    using var stream = new MemoryStream(json);
 
-            var config = new ConfigurationBuilder()
-                .AddJsonStream(stream)
-                .Build();
+                    var config = new ConfigurationBuilder()
+                        .AddJsonStream(stream)
+                        .Build();
 
-#pragma warning disable CA2000 // Dispose objects before losing scope
-            services.AddSingleton(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
-#pragma warning restore CA2000 // Dispose objects before losing scope
+                    options.Extensions.Add(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
+                });
 
             return services;
         }

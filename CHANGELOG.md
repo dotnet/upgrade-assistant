@@ -3,6 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Fixed
+- Fixed regression where `--skip-backup` and `--entrypoint` options were not being passed through [#695](https://github.com/dotnet/upgrade-assistant/pull/695)
+ 
 ## Version 0.2.233001 - 2021-06-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.233001))
 
 ### Added

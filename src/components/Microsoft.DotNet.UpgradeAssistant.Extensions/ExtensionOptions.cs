@@ -13,6 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public IEnumerable<AdditionalOption> AdditionalOptions { get; set; } = Enumerable.Empty<AdditionalOption>();
 
+        public ICollection<ExtensionInstance> Extensions { get; } = new List<ExtensionInstance>();
+
         public Version CurrentVersion { get; set; } = null!;
     }
 }
