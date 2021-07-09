@@ -4,7 +4,7 @@ Upgrade Assistant's extensibility provides the ability for users to extend it be
 
 - **Version management:** Need to be able to specify which extension version a project should use
 - **Distribution** Need to be able easily get a specific version (or update existing ones) of an extension
-- **Consistency between runs** Should be able to register an extension so subsequent runs automatically use it
+- **Consistency between runs** Should be able to register an extension so subsequent runs on any machine automatically use it
 
 Throughout this document, the term `workspace` will be used to refer to a solution or project that is being updated along with the state file Upgrade Assistant generates.
 
@@ -39,14 +39,6 @@ upgrade-assistant extension update [--name [name]]
 This command will update all extensions, or a specific one if the name is given.
 
 ```
-upgrade-assistant extension restore
-```
-
-This command will restore extensions when they are not available
-
-> This may be able to be done automatically, but initially, we'll have it be a separate command
-
-```
 upgrade-assistant extension feed list [--source [source]]
 ```
 
@@ -72,11 +64,15 @@ upgrade-assistant extension feed clean --source [source]
 
 This command will allow extension authors to automatically clean up a feed (i.e. if a file has been removed from the storage, this will notify the author as well as remove it from the feed metadata).
 
+### Behavior changes to UA
+- At startup, the tool will need to restore any extensions that are registered and ensure those get added.
+- Remove the `--extension` option (and additional ways to bring in extensions) to maintain a consistent workspace
+
 ## Workspace state file
 
-Each workspace already contains a state file that tracks progress of the tool. This state file will be updated to store extension information. This state file should be persisted into source control, which will then ensure developers working on a project will get similar results.
+Each workspace already contains a state file that tracks progress of the tool, but this is transient information. A new file will be added to a user's repo that is expected to be persisted that will store information about their workspace which will then ensure developers working on a project will get similar results.
 
-The updated section will look similar to this:
+The file will be json, similar to the state file. The extension section will look similar to this:
 
 ```
 {
@@ -93,6 +89,8 @@ The updated section will look similar to this:
 ```
 
 This will allow `upgrade-assistant` to restore extensions from any source and ensure they are the extension that was originally installed via hash matching.
+
+For now, the name of the file will be `upgrade-assistant.workspace`.
 
 ## Sources
 
