@@ -126,7 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
             context.Object.EntryPoints = Enumerable.Empty<IProject>();
 
             var options = mock.Mock<IOptions<SolutionOptions>>();
-            options.Setup(o => o.Value).Returns(new SolutionOptions { Entrypoints = _fixture.CreateMany<string>().ToList() });
+            options.Setup(o => o.Value).Returns(new SolutionOptions { Entrypoints = _fixture.CreateMany<string>().ToArray() });
 
             var resolver = mock.Mock<IEntrypointResolver>();
             resolver.Setup(r => r.GetEntrypoints(projects, options.Object.Value.Entrypoints)).Returns(new[] { selectedProject });
