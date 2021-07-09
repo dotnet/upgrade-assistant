@@ -124,7 +124,8 @@
     </ProjectReference>
   </ItemGroup>
   <!-- To support building with .NET CLI -->
-  <Target Name="Build" Condition="!Exists('$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets')"/>
+  <Target Name="Build" />
+  <Target Name="Test" />
   <Target Name="_IsProjectRestoreSupported"
           Returns="@(_ValidProjectsForRestore)">
 
