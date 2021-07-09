@@ -139,9 +139,13 @@
       <Project>{2e23fb6c-fad1-41b1-9187-1ecd7548fbcc}</Project>
     </ProjectReference>
   </ItemGroup>
+
   <!-- To support building with .NET CLI -->
-  <Target Name="Build" Condition="!Exists('$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets')" />
-  <Target Name="_IsProjectRestoreSupported" Returns="@(_ValidProjectsForRestore)">
+  <Target Name="Build" />
+  <Target Name="Test" />
+  <Target Name="Pack" />
+  <Target Name="_IsProjectRestoreSupported"
+          Returns="@(_ValidProjectsForRestore)">
     <ItemGroup>
       <_ValidProjectsForRestore Include="$(MSBuildProjectFullPath)" />
     </ItemGroup>
