@@ -9,7 +9,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
     /// the project being upgraded contains certain components.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public sealed class ApplicableComponentsAttribute : Attribute
+#if ABSTRACTIONS
+    public
+#else
+    internal
+#endif
+        sealed class ApplicableComponentsAttribute : Attribute
     {
         /// <summary>
         /// Gets the components that a project must contain for the attributed code fix provider to apply.

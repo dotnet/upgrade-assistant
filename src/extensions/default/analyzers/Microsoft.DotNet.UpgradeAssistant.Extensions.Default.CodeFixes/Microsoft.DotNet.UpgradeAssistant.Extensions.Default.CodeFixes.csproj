@@ -10,9 +10,12 @@
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces">
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
-    <ProjectReference Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ApplicableComponentsAttribute.cs" Link="ApplicableComponentsAttribute.cs" />
+    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ProjectComponents.cs" Link="ProjectComponents.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Templates\*.cs" />

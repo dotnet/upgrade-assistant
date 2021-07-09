@@ -6,7 +6,12 @@ using System;
 namespace Microsoft.DotNet.UpgradeAssistant
 {
     [Flags]
-    public enum ProjectComponents
+#if ABSTRACTIONS
+    public
+#else
+    internal
+#endif
+    enum ProjectComponents
     {
         None = 0,
         WindowsDesktop = 1,
