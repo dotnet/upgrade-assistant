@@ -1,0 +1,12 @@
+<Project>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\eng\DependencyValidation\UpgradeAssistant.layerdiagram" Link="DependencyValidation1.layerdiagram">
+      <Visible>False</Visible>
+    </AdditionalFiles>
+
+    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <!-- TODO: Enable once analysis is done -->
+    <NoWarn>$(NoWarn);DV0001</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="PackageMaps\*.json">
