@@ -5,6 +5,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Telemetry
 {
     public class TelemetryOptions
     {
+        public bool IsEnabled { get; set; }
+
         public string ProductVersion { get; set; } = string.Empty;
 
         public string DisplayName { get; set; } = string.Empty;
