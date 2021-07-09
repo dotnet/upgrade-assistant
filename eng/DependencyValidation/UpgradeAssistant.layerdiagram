@@ -6,12 +6,6 @@
         <dependencyFromLayerToLayer Id="14d5a788-fc82-48e3-ada3-f48eae36550a" direction="Forward">
           <layerMoniker Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" />
         </dependencyFromLayerToLayer>
-        <dependencyFromLayerToLayer Id="bf4401c9-f2af-4ff2-985e-2bfbb1a575e4" direction="Forward">
-          <layerMoniker Id="f963feaf-9149-4f6c-b7dc-4c77d408cdb7" />
-        </dependencyFromLayerToLayer>
-        <dependencyFromLayerToLayer Id="b0852b05-3b5b-49be-a809-0eca56d72ab0" direction="Forward">
-          <layerMoniker Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" />
-        </dependencyFromLayerToLayer>
       </dependencyToLayers>
       <childLayers>
         <layer Id="46a933fd-b02e-436d-b9db-b39340bf6dfb" name="Microsoft.DotNet.UpgradeAssistant.Analysis">
@@ -43,12 +37,53 @@
           </references>
         </layer>
         <layer Id="c08ba687-e246-49b2-81cc-31881746c9dd" name="Microsoft.DotNet.UpgradeAssistant.MSBuild">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="4eb05fc8-7632-4c4d-bd35-79dbe170d726" direction="Forward">
+              <layerMoniker Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="71cb7a7d-2ade-4043-924d-fb1bca0e1ef5" direction="Forward">
+              <layerMoniker Id="f963feaf-9149-4f6c-b7dc-4c77d408cdb7" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
           <references>
             <reference Id="3a172411-9b70-41ab-8d08-d86f6b239e2c" name="Microsoft.DotNet.UpgradeAssistant.MSBuild">
               <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant.MSBuild" Category="CodeSchema_Project" Id="(Assembly=../../src/components/Microsoft.DotNet.UpgradeAssistant.MSBuild/Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj)">
                 <Category Ref="File" />
               </ArtifactNode>
               <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.MSBuild)" Label="Microsoft.DotNet.UpgradeAssistant.MSBuild.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" name="Microsoft.DotNet.UpgradeAssistant.Telemetry">
+          <references>
+            <reference Id="14bb21d8-05b6-469e-be7f-84770830f7fd" name="Microsoft.DotNet.UpgradeAssistant.Telemetry">
+              <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant.Telemetry" Category="CodeSchema_Project" Id="(Assembly=../../src/components/Microsoft.DotNet.UpgradeAssistant.Telemetry/Microsoft.DotNet.UpgradeAssistant.Telemetry.csproj)">
+                <Category Ref="File" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Telemetry)" Label="Microsoft.DotNet.UpgradeAssistant.Telemetry.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="f963feaf-9149-4f6c-b7dc-4c77d408cdb7" name="Microsoft.DotNet.UpgradeAssistant">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="528249c7-8b4c-40bc-8c78-9b0f2654d7e1" direction="Forward">
+              <layerMoniker Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="29296942-0c90-41ba-a82f-06107926be65" name="Microsoft.DotNet.UpgradeAssistant">
+              <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant" Category="CodeSchema_Project" Id="(Assembly=../../src/components/Microsoft.DotNet.UpgradeAssistant/Microsoft.DotNet.UpgradeAssistant.csproj)">
+                <Category Ref="File" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant)" Label="Microsoft.DotNet.UpgradeAssistant.dll" Category="CodeSchema_Assembly">
                 <Category Ref="FileSystem.Category.FileOfType.dll" />
                 <LinkCategory Ref="Produces" />
                 <LinkCategory Ref="Represents" />
@@ -168,25 +203,6 @@
         </layer>
       </childLayers>
     </layer>
-    <layer Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" name="Microsoft.DotNet.UpgradeAssistant.Telemetry">
-      <dependencyToLayers>
-        <dependencyFromLayerToLayer Id="1b3ad29e-40d0-4fcc-bee3-6f746912e5bc" direction="Forward">
-          <layerMoniker Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" />
-        </dependencyFromLayerToLayer>
-      </dependencyToLayers>
-      <references>
-        <reference Id="14bb21d8-05b6-469e-be7f-84770830f7fd" name="Microsoft.DotNet.UpgradeAssistant.Telemetry">
-          <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant.Telemetry" Category="CodeSchema_Project" Id="(Assembly=../../src/components/Microsoft.DotNet.UpgradeAssistant.Telemetry/Microsoft.DotNet.UpgradeAssistant.Telemetry.csproj)">
-            <Category Ref="File" />
-          </ArtifactNode>
-          <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Telemetry)" Label="Microsoft.DotNet.UpgradeAssistant.Telemetry.dll" Category="CodeSchema_Assembly">
-            <Category Ref="FileSystem.Category.FileOfType.dll" />
-            <LinkCategory Ref="Produces" />
-            <LinkCategory Ref="Represents" />
-          </ExpandedNode>
-        </reference>
-      </references>
-    </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">
       <references>
         <reference Id="1c270efd-b624-4981-ab59-92abac31ed44" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">
@@ -201,36 +217,8 @@
         </reference>
       </references>
     </layer>
-    <layer Id="f963feaf-9149-4f6c-b7dc-4c77d408cdb7" name="Microsoft.DotNet.UpgradeAssistant">
-      <dependencyToLayers>
-        <dependencyFromLayerToLayer Id="8646e5f4-35e5-4515-9117-1eed19b1f57a" direction="Forward">
-          <layerMoniker Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" />
-        </dependencyFromLayerToLayer>
-        <dependencyFromLayerToLayer Id="7371b51a-8669-468a-aac2-ee62cd303a30" direction="Forward">
-          <layerMoniker Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" />
-        </dependencyFromLayerToLayer>
-      </dependencyToLayers>
-      <references>
-        <reference Id="29296942-0c90-41ba-a82f-06107926be65" name="Microsoft.DotNet.UpgradeAssistant">
-          <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant" Category="CodeSchema_Project" Id="(Assembly=../../src/components/Microsoft.DotNet.UpgradeAssistant/Microsoft.DotNet.UpgradeAssistant.csproj)">
-            <Category Ref="File" />
-          </ArtifactNode>
-          <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant)" Label="Microsoft.DotNet.UpgradeAssistant.dll" Category="CodeSchema_Assembly">
-            <Category Ref="FileSystem.Category.FileOfType.dll" />
-            <LinkCategory Ref="Produces" />
-            <LinkCategory Ref="Represents" />
-          </ExpandedNode>
-        </reference>
-      </references>
-    </layer>
     <layer Id="39756952-3e40-4123-a0c0-bb48018fb60a" name="Microsoft.DotNet.UpgradeAssistant.Cli">
       <dependencyToLayers>
-        <dependencyFromLayerToLayer Id="bb434753-db4f-425a-bc5d-66884d23a0c8" direction="Forward">
-          <layerMoniker Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" />
-        </dependencyFromLayerToLayer>
-        <dependencyFromLayerToLayer Id="ba322fd7-ce05-4f45-bab9-c9dabbb4c4ba" direction="Forward">
-          <layerMoniker Id="f963feaf-9149-4f6c-b7dc-4c77d408cdb7" />
-        </dependencyFromLayerToLayer>
         <dependencyFromLayerToLayer Id="b22e3ba2-3b6f-41c0-b481-589da3a385e5" direction="Forward">
           <layerMoniker Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" />
         </dependencyFromLayerToLayer>
@@ -246,6 +234,32 @@
           <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Cli)" Label="Microsoft.DotNet.UpgradeAssistant.Cli.dll" Category="CodeSchema_Assembly">
             <Category Ref="FileSystem.Category.FileOfType.dll" />
             <LinkCategory Ref="Produces" />
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+        </reference>
+      </references>
+    </layer>
+    <layer Id="a9443ba7-6840-4dd8-82e8-ae589e769244" name="samples">
+      <dependencyToLayers>
+        <dependencyFromLayerToLayer Id="6ef70d28-03de-4271-98c8-5dcc00559617" direction="Forward">
+          <layerMoniker Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" />
+        </dependencyFromLayerToLayer>
+      </dependencyToLayers>
+      <references>
+        <reference Id="9f186afe-dd51-4aa1-99ab-aa0f23b65217" name="samples">
+          <ArtifactNode Label="samples" Category="CodeSchema_Project" Id="(Assembly=../../samples)">
+            <Category Ref="CodeMap_SolutionFolder" />
+          </ArtifactNode>
+          <ExpandedNode Id="(Assembly=FindReplaceStepSample)" Label="FindReplaceStepSample.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+          <ExpandedNode Id="(Assembly=SourceUpdaterSample)" Label="SourceUpdaterSample.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+          <ExpandedNode Id="(Assembly=UpgradeStepSample)" Label="UpgradeStepSample.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+          <ExpandedNode Id="(Assembly=PackageMapSample)" Label="PackageMapSample.dll" Category="CodeSchema_Assembly">
             <LinkCategory Ref="Represents" />
           </ExpandedNode>
         </reference>

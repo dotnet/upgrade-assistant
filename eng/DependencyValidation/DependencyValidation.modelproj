@@ -34,6 +34,22 @@
     </Validate>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\samples\FindReplaceStepSample\FindReplaceStepSample.csproj">
+      <Name>FindReplaceStepSample</Name>
+      <Project>{5b8e8267-e90e-4e78-a219-a62aedce81ce}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\samples\PackageMapSample\PackageMapSample.csproj">
+      <Name>PackageMapSample</Name>
+      <Project>{63ef08f2-3786-4c47-9f6b-52eaedee1523}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\samples\SourceUpdaterSample\SourceUpdaterSample.csproj">
+      <Name>SourceUpdaterSample</Name>
+      <Project>{af6a2c7f-686f-4daf-81c7-9a36cbd797c0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\samples\UpgradeStepSample\UpgradeStepSample.csproj">
+      <Name>UpgradeStepSample</Name>
+      <Project>{43cf805f-4fa3-4453-b99a-2bb0aa0b9875}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\cli\Microsoft.DotNet.UpgradeAssistant.Cli\Microsoft.DotNet.UpgradeAssistant.Cli.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Cli</Name>
       <Project>{647d258a-4fe1-4dfa-8d02-0e5dbe3b40f7}</Project>
@@ -124,14 +140,11 @@
     </ProjectReference>
   </ItemGroup>
   <!-- To support building with .NET CLI -->
-  <Target Name="Build" Condition="!Exists('$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets')"/>
-  <Target Name="_IsProjectRestoreSupported"
-          Returns="@(_ValidProjectsForRestore)">
-
+  <Target Name="Build" Condition="!Exists('$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets')" />
+  <Target Name="_IsProjectRestoreSupported" Returns="@(_ValidProjectsForRestore)">
     <ItemGroup>
       <_ValidProjectsForRestore Include="$(MSBuildProjectFullPath)" />
     </ItemGroup>
   </Target>
-
   <Import Project="$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets" Condition="Exists('$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets')" />
 </Project>

@@ -22,6 +22,14 @@
     <PackageReference Update="Microsoft.Build.Framework" ExcludeAssets="runtime" />
   </ItemGroup>
 
+  <ItemGroup Condition="$(ValidateLayerDiagram)">
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)eng\DependencyValidation\UpgradeAssistant.layerdiagram" Link="UpgradeAssistant.layerdiagram">
+      <Visible>False</Visible>
+    </AdditionalFiles>
+
+    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" PrivateAssets="All" />
+  </ItemGroup>
+
   <Import Project="$(MSBuildThisFileDirectory)/Extensions.targets" />
 
 </Project>
