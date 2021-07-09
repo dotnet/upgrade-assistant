@@ -12,8 +12,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class TelemetryExtensions
     {
-        public static IDisposable TimeStep(this ITelemetry telemetry, string eventName, UpgradeStep step)
-            => telemetry.TimeEvent($"step/{eventName}", onComplete: (p, _) => p.Add("Step Status", step.Status.ToString()));
+        public static IDisposable TimeStep(this ITelemetry telemetry, string commandName, UpgradeStep step)
+            => telemetry.TimeEvent($"step", onComplete: (p, _) =>
+            {
+                p.Add("CommandName", commandName);
+                p.Add("Step Status", step.Status.ToString());
+            });
 
         public static async Task TrackProjectPropertiesAsync(this ITelemetry telemetry, IUpgradeContext context, CancellationToken token)
         {

@@ -22,6 +22,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public Task<bool> StartupAsync(CancellationToken token)
         {
+            _telemetry.TrackEvent("cli/command", new Dictionary<string, string>
+            {
+                { "Name", _result.CommandResult.Command.Name },
+                { "Type", "command" },
+            });
+
             foreach (var child in _result.CommandResult.Children)
             {
                 var type = child switch
