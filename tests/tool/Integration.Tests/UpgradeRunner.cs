@@ -39,6 +39,7 @@ namespace Integration.Tests
 
             var options = new TestOptions(project);
             var status = await Host.CreateDefaultBuilder()
+                .UseEnvironment(Environments.Development)
                 .UseUpgradeAssistant<ConsoleUpgrade>(options)
                 .ConfigureServices(services =>
                 {

@@ -51,6 +51,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     list.Add(LoadOptionsExtension(options.Value.AdditionalOptions));
                 }
 
+                list.AddRange(options.Value.Extensions);
+
                 return list;
             });
 

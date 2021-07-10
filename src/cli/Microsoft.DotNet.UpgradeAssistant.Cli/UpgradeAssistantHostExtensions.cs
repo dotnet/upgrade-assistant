@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             services.AddExtensionOption(new
             {
                 Backup = new { Skip = options.SkipBackup },
-                Solution = new { EntryPoints = options.Entrypoints }
+                Solution = new { Entrypoints = options.Entrypoints }
             });
         }
 
