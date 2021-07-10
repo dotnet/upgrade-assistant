@@ -3,16 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IAnalyzeResultProvider
+    public interface IAnalyzeResultWriter
     {
-        string AnalysisTypeName { get; }
-
-        [ObsoleteAttribute("This property is WIP, expect changes in this area.", false)]
-        Task<ICollection<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
+        void WriteAsync(Dictionary<string, ICollection<AnalyzeResult>> results, CancellationToken token);
     }
 }

@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public class JsonSerializer : IJsonSerializer
+    public class JsonSerializer : ISerializer
     {
         public Encoding FileEncoding { get; set; } = new UTF8Encoding(false);
 
@@ -40,9 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         {
             if (!File.Exists(filePath))
             {
-#pragma warning disable CA2201 // Do not raise reserved exception types
-                throw new Exception(filePath);
-#pragma warning restore CA2201 // Do not raise reserved exception types
+                throw new FileNotFoundException(filePath);
             }
 
             string contents = File.ReadAllText(filePath);
@@ -53,30 +51,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         {
             string contents = Serialize<T>(obj);
             File.WriteAllText(filePath, contents);
-        }
-
-        public virtual void Write<T>(string filePath, T obj, bool ensureDirectory)
-        {
-            string contents = Serialize<T>(obj);
-
-            if (ensureDirectory)
-            {
-                EnsureDirectoryForFilePath(filePath);
-            }
-
-            File.WriteAllText(filePath, contents);
-        }
-
-        internal virtual bool EnsureDirectoryForFilePath(string filePath)
-        {
-            string directoryName = Path.GetDirectoryName(filePath);
-
-            if (!string.IsNullOrWhiteSpace(directoryName))
-            {
-                return Directory.Exists(directoryName);
-            }
-
-            return false;
         }
     }
 }

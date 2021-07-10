@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
@@ -12,30 +10,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class AnalyzePackageStatus : IAnalyzeResultProvider
     {
-        private const string SarifLogFilePath = "Dependencies.sarif";
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
-        private readonly IProcessResult _processResult;
         private IDependencyAnalysisState? _analysisState;
-        private IJsonSerializer _jsonSerializer;
+        private IAnalyzeResultProcessor _analyzeResultProcessor;
 
         private ILogger Logger { get; }
+
+        public string AnalysisTypeName => "Dependency Analysis";
 
         public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
             ILogger<AnalyzePackageStatus> logger,
-            IProcessResult processResult,
-            IJsonSerializer jsonSerializer)
+            IAnalyzeResultProcessor analyzeResultProcessor)
         {
             Logger = logger;
             _tfmSelector = tfmSelector;
-            _processResult = processResult;
-            _jsonSerializer = jsonSerializer;
+            _analyzeResultProcessor = analyzeResultProcessor;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
         }
 
-        public async Task AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
+        public async Task<ICollection<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
         {
             if (analysis is null)
             {
@@ -43,7 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             var context = analysis.UpgradeContext;
-            var dependencies = analysis.Dependencies;
             var projects = context.Projects.ToList();
 
             foreach (var project in projects)
@@ -70,18 +65,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 }
 
 #pragma warning disable CS8604 // Possible null reference argument.
-                dependencies.Add(project.FileInfo.Name, _analysisState);
+                analysis.Dependencies.Add(project.FileInfo.Name, _analysisState);
 #pragma warning restore CS8604 // Possible null reference argument.
             }
 
-            WriteResults(dependencies);
-        }
-
-        public void WriteResults(Dictionary<string, IDependencyAnalysisState> dependencies)
-        {
-            var writeOutput = new WriteOutput(_jsonSerializer);
-            var sarifLog = WriteOutput.CreateSarifLog(_processResult.RunProcessResult("Package Dependency Analysis for", dependencies));
-            writeOutput.Write(Path.Combine(Directory.GetCurrentDirectory(), SarifLogFilePath), sarifLog);
+            return _analyzeResultProcessor.Execute(analysis);
         }
     }
 }

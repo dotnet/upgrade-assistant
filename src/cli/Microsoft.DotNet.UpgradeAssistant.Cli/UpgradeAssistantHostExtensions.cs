@@ -93,6 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     });
 
                     services.AddUserInput();
+                    services.AddAnalyze();
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();

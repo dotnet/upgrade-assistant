@@ -15,14 +15,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleAnalyze> _logger;
         private readonly IEnumerable<IAnalyzeResultProvider> _providers;
+        private readonly IAnalyzeResultWriter _writer;
 
         public ConsoleAnalyze(
             IEnumerable<IAnalyzeResultProvider> analysisProviders,
             IUpgradeContextFactory contextFactory,
             IUpgradeStateManager stateManager,
+            IAnalyzeResultWriter writer,
             ILogger<ConsoleAnalyze> logger)
         {
             _providers = analysisProviders;
+            _writer = writer;
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -36,10 +39,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             await _stateManager.LoadStateAsync(context, token);
             var analzyerContext = new AnalyzeContext(context);
+            var analyzeResultMap = new Dictionary<string, ICollection<AnalyzeResult>>();
             foreach (var provider in _providers)
             {
-                await provider.AnalyzeAsync(analzyerContext, token);
+                analyzeResultMap.Add(provider.AnalysisTypeName, await provider.AnalyzeAsync(analzyerContext, token));
             }
+
+            _writer.WriteAsync(analyzeResultMap, token);
         }
     }
 }
