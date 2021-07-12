@@ -85,17 +85,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 {
                     foreach (var n in _options.Value.Extensions)
                     {
-                        _logger.LogInformation("Adding extension {Name} from {Source}", n.Name, n.Source);
+                        _logger.LogInformation(LocalizedStrings.AddExtensionDetails, n.Name, n.Source);
 
                         var result = await _extensionManager.AddAsync(n, token);
 
                         if (result is null)
                         {
-                            _logger.LogWarning("Could not find extension {Name} from {Source}", n.Name, n.Source);
+                            _logger.LogWarning(LocalizedStrings.AddExtensionFailed, n.Name, n.Source);
                         }
                         else
                         {
-                            _logger.LogInformation("Added extension {Name} from {Source}", result.Name, result.Source);
+                            _logger.LogInformation(LocalizedStrings.AddExtensionSuccess, result.Name, result.Source);
                         }
                     }
                 }
@@ -123,11 +123,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
                 public Task RunAsync(CancellationToken token)
                 {
-                    _logger.LogInformation("Current extensions:");
+                    _logger.LogInformation(LocalizedStrings.ListExtensionDetails);
 
                     foreach (var n in _extensionManager.Registered)
                     {
-                        _logger.LogInformation("{Name}: {Source}", n.Name, n.Source);
+                        _logger.LogInformation(LocalizedStrings.ListExtensionItem, n.Name, n.Source);
                     }
 
                     return Task.CompletedTask;
@@ -161,11 +161,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 {
                     foreach (var n in _options.Value.Extensions)
                     {
-                        _logger.LogInformation("Removing extension '{Name}'", n.Name);
+                        _logger.LogInformation(LocalizedStrings.RemovingExtension, n.Name);
 
                         if (!_extensionManager.Remove(n.Name))
                         {
-                            _logger.LogWarning("Could not remove extension '{Name}'", n.Name);
+                            _logger.LogWarning(LocalizedStrings.RemovingExtensionFailed, n.Name);
                         }
                     }
 
@@ -200,17 +200,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 {
                     foreach (var n in _options.Value.Extensions)
                     {
-                        _logger.LogInformation("Searching for updates for {Name}", n.Name);
+                        _logger.LogInformation(LocalizedStrings.UpdateExtensionDetails, n.Name);
 
                         var result = await _extensionManager.UpdateAsync(n.Name, token);
 
                         if (result is null)
                         {
-                            _logger.LogInformation("Could not find an update for extension {Name}", n.Name);
+                            _logger.LogInformation(LocalizedStrings.UpdateExtensionFailed, n.Name);
                         }
                         else
                         {
-                            _logger.LogInformation("Found an update for {Name} to {Version}", n.Name, n.Version);
+                            _logger.LogInformation(LocalizedStrings.UpdateExtensionSuccess, n.Name, n.Version);
                         }
                     }
                 }

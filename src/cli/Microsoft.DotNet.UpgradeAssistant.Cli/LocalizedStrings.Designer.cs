@@ -61,6 +61,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Adding extension {Name} from {Source}.
+        /// </summary>
+        internal static string AddExtensionDetails {
+            get {
+                return ResourceManager.GetString("AddExtensionDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find extension {Name} from {Source}.
+        /// </summary>
+        internal static string AddExtensionFailed {
+            get {
+                return ResourceManager.GetString("AddExtensionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Added extension {Name} from {Source}.
+        /// </summary>
+        internal static string AddExtensionSuccess {
+            get {
+                return ResourceManager.GetString("AddExtensionSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name of extension.
         /// </summary>
         internal static string ExtensionManagementName {
@@ -75,6 +102,69 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         internal static string ExtensionManagementSource {
             get {
                 return ResourceManager.GetString("ExtensionManagementSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current extensions:.
+        /// </summary>
+        internal static string ListExtensionDetails {
+            get {
+                return ResourceManager.GetString("ListExtensionDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {Name}: {Source}.
+        /// </summary>
+        internal static string ListExtensionItem {
+            get {
+                return ResourceManager.GetString("ListExtensionItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removing extension &apos;{Name}&apos;.
+        /// </summary>
+        internal static string RemovingExtension {
+            get {
+                return ResourceManager.GetString("RemovingExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not remove extension &apos;{Name}&apos;.
+        /// </summary>
+        internal static string RemovingExtensionFailed {
+            get {
+                return ResourceManager.GetString("RemovingExtensionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching for updates for {Name}.
+        /// </summary>
+        internal static string UpdateExtensionDetails {
+            get {
+                return ResourceManager.GetString("UpdateExtensionDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find an update for extension {Name}.
+        /// </summary>
+        internal static string UpdateExtensionFailed {
+            get {
+                return ResourceManager.GetString("UpdateExtensionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found an update for {Name} to {Version}.
+        /// </summary>
+        internal static string UpdateExtensionSuccess {
+            get {
+                return ResourceManager.GetString("UpdateExtensionSuccess", resourceCulture);
             }
         }
     }
