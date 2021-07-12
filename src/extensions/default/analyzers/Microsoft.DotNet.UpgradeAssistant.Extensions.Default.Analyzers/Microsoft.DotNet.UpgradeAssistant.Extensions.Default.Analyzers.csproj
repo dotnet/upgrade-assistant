@@ -6,10 +6,6 @@
     <PackageId>*$(MSBuildProjectFullPath)*</PackageId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ApplicableComponentsAttribute.cs" Link="ApplicableComponentsAttribute.cs" />
-    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ProjectComponents.cs" Link="ProjectComponents.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
       <Version>3.3.2</Version>
     </PackageReference>

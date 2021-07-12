@@ -14,10 +14,6 @@
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ApplicableComponentsAttribute.cs" Link="ApplicableComponentsAttribute.cs" />
-    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ProjectComponents.cs" Link="ProjectComponents.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Remove="Templates\*.cs" />
     <Compile Update="CodeFixResources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="CodeFixResources.resx" />
     <EmbeddedResource Include="Templates\*.*" />
