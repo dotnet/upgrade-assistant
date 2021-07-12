@@ -39,31 +39,8 @@ upgrade-assistant extension update [--name [name]] [--version [version]]
 
 This command will update all extensions, or a specific one if the name is given.
 
-```
-upgrade-assistant extension feed list [--source [source]]
-```
-
-This command will allow someone to list extensions available on a feed
-
-### Extension Author Commands
-
-```
-upgrade-assistant extension feed publish --path [path] --source [source]
-```
-
-This command will allow extension authors to publish an extension.
-
-```
-upgrade-assistant extension feed remove --name [name] --source [source]
-```
-
-This command will allow extension authors to remove a published extension.
-
-```
-upgrade-assistant extension feed clean --source [source]
-```
-
-This command will allow extension authors to automatically clean up a feed (i.e. if a file has been removed from the storage, this will notify the author as well as remove it from the feed metadata).
+### Future Experiences
+There are scenarios that make sense to have a global set up (i.e. a developer working on multiple projects). Future work can potentially implement a `--global` option for extensions that would update a local list that would apply everywhere.
 
 ### Behavior changes to UA
 - At startup, the tool will need to restore any extensions that are registered and ensure those get added.
