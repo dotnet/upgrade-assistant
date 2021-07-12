@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 using var scope = _services.GetAutofacRoot().BeginLifetimeScope(builder =>
                 {
-                    foreach (var extension in _services.GetRequiredService<IEnumerable<ExtensionInstance>>())
+                    foreach (var extension in _services.GetRequiredService<IExtensionManager>().Instances)
                     {
                         var services = new ServiceCollection();
                         extension.AddServices(services);
