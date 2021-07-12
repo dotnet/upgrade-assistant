@@ -10,9 +10,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class JsonSerializer : ISerializer
     {
-        public Encoding FileEncoding = new UTF8Encoding(false);
+        private readonly Encoding FileEncoding = new UTF8Encoding(false);
 
-        public JsonSerializerSettings Settings = new()
+        private readonly JsonSerializerSettings _settings = new()
         {
             Formatting = Formatting.Indented,
             Culture = CultureInfo.InvariantCulture,
@@ -31,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 
         public virtual string Serialize<T>(T obj)
         {
-            return JsonConvert.SerializeObject(obj, typeof(T), Settings);
+            return JsonConvert.SerializeObject(obj, typeof(T), _settings);
         }
 
         public virtual T Read<T>(string filePath)
