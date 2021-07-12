@@ -49,6 +49,13 @@ If your pull request contains any of the below, it's less likely to be merged:
 **During pull request review**
 A core contributor will review your pull request and provide feedback. To ensure that there is not a large backlog of inactive PRs, the pull request will be marked as stale after two weeks of no activity. After another four days, it will be closed.
 
+### Architecture
+The architecture of project is enforced with validation diagrams and will be run automatically at build. See the `eng/DependencyValidation` project to update or adjust this diagram. The following is currently enforced:
+
+![Dependency diagram](docs/images/dependency-validation.png)
+
+To disable validation for a specific project, set `ValidateLayerDiagram=false`. This is done currently for tests as they are not in the diagram.
+
 ### Resources to help you get started
 Here are some resources to help you get started on how to contribute code or new content.
 * Look at the [Contributor documentation](/README.md) to get started on building the source code on your own.
