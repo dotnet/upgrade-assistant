@@ -85,8 +85,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj" />
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Telemetry\Microsoft.DotNet.UpgradeAssistant.Telemetry.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant\Microsoft.DotNet.UpgradeAssistant.csproj" />
     <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
