@@ -3,7 +3,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Microsoft.DotNet.UpgradeAssistant</RootNamespace>
     <IsPackable>true</IsPackable>
-    <DefineConstants>$(DefineConstants);ABSTRACTIONS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Microsoft.DotNet.UpgradeAssistant.Abstractions</PackageId>
