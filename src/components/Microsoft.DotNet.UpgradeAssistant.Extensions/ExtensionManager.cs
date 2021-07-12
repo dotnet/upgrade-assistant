@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -13,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal sealed class ExtensionManager : IDisposable, IExtensionManager
     {
+        private readonly ILogger<ExtensionManager> _logger;
         private readonly Lazy<IEnumerable<ExtensionInstance>> _extensions;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propogate any exceptions.")]
@@ -21,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             IOptions<ExtensionOptions> options,
             ILogger<ExtensionManager> logger)
         {
+            _logger = logger;
             _extensions = new Lazy<IEnumerable<ExtensionInstance>>(() =>
             {
                 var list = new List<ExtensionInstance>();
@@ -108,6 +112,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
         }
 
+        public bool Remove(string name)
+        {
+            _logger.LogInformation("Remove Not Implemented: {Name}", name);
+            return false;
+        }
+
+        public Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token)
+        {
+            _logger.LogInformation("Update Not Implemented: {Name}", name);
+            return Task.FromResult<ExtensionSource?>(null);
+        }
+
+        public Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token)
+        {
+            _logger.LogInformation("Add Not Implemented: {Name} @{Source}", n.Name, n.Source);
+            return Task.FromResult<ExtensionSource?>(null);
+        }
+
         public IEnumerable<ExtensionInstance> Instances => _extensions.Value;
+
+        public IEnumerable<ExtensionSource> Registered => _extensions.Value.Select(v => new ExtensionSource(v.Name) { Source = v.Location });
     }
 }

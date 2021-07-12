@@ -23,9 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// extensions found in specified paths.
         /// </summary>
         /// <param name="services">The service collection to register services into.</param>
-        /// <param name="currentVersion">The current app version.</param>
-        /// <param name="configuration">The app configuration containing a setting for extension paths and the default extension service providers. These extensions will be registered before those found with the string[] argument.</param>
-        /// <param name="additionalExtensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files. These extensions will be registered after those found from configuration.</param>
         /// <returns>A builder for options</returns>
         public static OptionsBuilder<ExtensionOptions> AddExtensions(this IServiceCollection services)
         {
