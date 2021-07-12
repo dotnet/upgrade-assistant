@@ -7,8 +7,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public record AnalyzeResult
     {
-        public string AnalysisFileLocation { get; init; }
+        public string? AnalysisFileLocation { get; init; }
 
-        public IReadOnlyCollection<string> AnalysisResults { get; init; }
+        public IReadOnlyCollection<string>? AnalysisResults { get; init; }
     }
 }

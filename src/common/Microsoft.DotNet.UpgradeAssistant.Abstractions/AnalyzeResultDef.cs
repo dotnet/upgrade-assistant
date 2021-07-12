@@ -7,8 +7,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public record AnalyzeResultDef
     {
-        public string AnalysisTypeName { get; init; }
+        public string? AnalysisTypeName { get; init; }
 
-        public IAsyncEnumerable<AnalyzeResult> AnalysisResults { get; init; }
+        public IAsyncEnumerable<AnalyzeResult>? AnalysisResults { get; init; }
     }
 }
