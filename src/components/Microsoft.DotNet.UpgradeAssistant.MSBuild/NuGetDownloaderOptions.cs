@@ -6,5 +6,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     public class NuGetDownloaderOptions
     {
         public string? CachePath { get; set; }
+
+        public string? PackageSourcePath { get; set; }
     }
 }

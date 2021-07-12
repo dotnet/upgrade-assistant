@@ -2,12 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.MSBuildPath;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -34,16 +37,15 @@ namespace Integration.Tests
             var project = new FileInfo(inputPath);
             using var cts = new CancellationTokenSource(maxDuration);
 
-            var options = new UpgradeOptions
-            {
-                SkipBackup = true,
-                Project = project,
-                NonInteractive = true,
-                NonInteractiveWait = 0,
-                EntryPoint = new[] { entrypoint },
-            };
-
-            var status = await Program.RunUpgradeAsync(options, host => host
+            var options = new TestOptions(project);
+            var status = await Host.CreateDefaultBuilder()
+                .UseEnvironment(Environments.Development)
+                .UseUpgradeAssistant<ConsoleUpgrade>(options)
+                .ConfigureServices(services =>
+                {
+                    services.AddNonInteractive(options => options.Wait = TimeSpan.Zero, true);
+                    services.AddKnownExtensionOptions(new() { Entrypoints = new[] { entrypoint }, SkipBackup = true });
+                })
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
                     builder.RegisterInstance(MSBuildPathInstance.Locator);
@@ -60,8 +62,8 @@ namespace Integration.Tests
                 {
                     logging.SetMinimumLevel(LogLevel.Trace);
                     logging.AddProvider(new TestOutputHelperLoggerProvider(output));
-                }),
-                cts.Token).ConfigureAwait(false);
+                })
+                .RunUpgradeAssistantAsync(cts.Token).ConfigureAwait(false);
 
             if (cts.Token.IsCancellationRequested)
             {
@@ -69,6 +71,19 @@ namespace Integration.Tests
             }
 
             return status;
+        }
+
+        private record TestOptions(FileInfo Project) : IUpgradeAssistantOptions
+        {
+            public bool IsVerbose => true;
+
+            public bool IgnoreUnsupportedFeatures => false;
+
+            public UpgradeTarget TargetTfmSupport => UpgradeTarget.Current;
+
+            public IReadOnlyCollection<string> Extension => Array.Empty<string>();
+
+            public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
         }
     }
 }

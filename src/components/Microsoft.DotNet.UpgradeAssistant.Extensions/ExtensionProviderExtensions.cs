@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
@@ -48,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return services.AddOptions<ExtensionOptions>();
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> ParseOptions(this IEnumerable<string> options)
+        public static IEnumerable<AdditionalOption> ParseOptions(this IEnumerable<string> options)
         {
             if (options is null)
             {
@@ -61,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 if (split.Length == 2)
                 {
-                    yield return new KeyValuePair<string, string>(split[0], split[1]);
+                    yield return new AdditionalOption(split[0], split[1]);
                 }
             }
         }
@@ -94,6 +95,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     options.ExtensionPaths.Add(path);
                 }
             });
+        }
+
+        public static IServiceCollection AddExtensionOption<TOption>(this IServiceCollection services, TOption option)
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddOptions<ExtensionOptions>()
+                .Configure(options =>
+                {
+                    var json = JsonSerializer.SerializeToUtf8Bytes(option);
+                    using var stream = new MemoryStream(json);
+
+                    var config = new ConfigurationBuilder()
+                        .AddJsonStream(stream)
+                        .Build();
+
+                    options.Extensions.Add(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
+                });
+
+            return services;
         }
 
         public static OptionsBuilder<ExtensionOptions> AddFromEnvironmentVariables(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)

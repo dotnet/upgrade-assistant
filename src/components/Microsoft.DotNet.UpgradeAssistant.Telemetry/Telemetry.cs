@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Telemetry
 
             _options = options.Value;
 
-            Enabled = !EnvironmentHelper.GetEnvironmentVariableAsBool(_options.TelemetryOptout) && PermissionExists(sentinel);
+            Enabled = _options.IsEnabled && !EnvironmentHelper.GetEnvironmentVariableAsBool(_options.TelemetryOptout) && PermissionExists(sentinel);
 
             if (!Enabled)
             {

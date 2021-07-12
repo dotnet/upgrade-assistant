@@ -5,16 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Current
 
+### Fixed
+- Fixed regression where `--skip-backup` and `--entrypoint` options were not being passed through [#695](https://github.com/dotnet/upgrade-assistant/pull/695)
+ 
+## Version 0.2.233001 - 2021-06-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.233001))
+
 ### Added
 - New project readiness checks evaluate if the project contains unsupported technologies to increase awareness before users invest significant time trying to upgrade. [#617](https://github.com/dotnet/upgrade-assistant/pull/617)
 - Usage telemetry has been added to help guide product development. See [https://aka.ms/upgrade-assistant-telemetry](https://aka.ms/upgrade-assistant-telemetry) for details [#644](https://github.com/dotnet/upgrade-assistant/pull/644).
 - Command line option to pass options through in the form of `--option KEY=Value` [#651](https://github.com/dotnet/upgrade-assistant/pull/651)
 - Added an analyzer and code fix provider to remove unnecessary attributes and upgrade changed attributes (based on type mappings in registered typemap files) [#641](https://github.com/dotnet/upgrade-assistant/pull/641)
+- The `SourceUpdaterStep` and `RazorSourceUpdater` will now alert the user of any diagnostics from registered analyzers that require manual fixups (because no code fix was available). This allows Upgrade Assistant to notify users of code patterns that it can identify as needing updated but is unable to update automatically. [#662](https://github.com/dotnet/upgrade-assistant/pull/662)
+- Added RemoveProperty method to enable removal of a property from the project file. [#668](https://github.com/dotnet/upgrade-assistant/pull/668)
 
 ### Fixed
 - Updated `HttpContext.Current` analyzer to more correctly identify uses of `HttpContext.Current` that need replaced [#628](https://github.com/dotnet/upgrade-assistant/pull/628).
 - The Upgrade Assistant analyzer package no longer adds a WebTypeReplacements.typemap file to projects it's added to (more precisely, the file is present and available for analyzers to use but isn't visible in the solution explorer anymore) [#632](https://github.com/dotnet/upgrade-assistant/pull/632).
 - Addressed compile time errors that surfaced from Visual Basic Runtime and the My. namespace ([Link](https://github.com/dotnet/upgrade-assistant/pull/629))
+- Exposed Sdk in IProjectFile to enable development of custom extensions to add/remove Sdk. [#614](https://github.com/dotnet/upgrade-assistant/issues/614)
 
 ## Version 0.2.231403 - 2021-06-14 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.231403))
 

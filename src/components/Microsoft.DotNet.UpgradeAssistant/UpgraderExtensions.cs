@@ -11,18 +11,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class UpgraderExtensions
     {
-        public static void AddStepManagement(this IServiceCollection services, Action<DefaultTfmOptions> options)
+        public static void AddStepManagement(this IServiceCollection services)
         {
             services.AddScoped<UpgraderManager>();
-            services.AddTransient<IUpgradeContextProperties, UpgradeContextProperties>();
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
 
-            services.AddReadinessChecks();
-            services.AddTargetFrameworkSelectors();
-
-            services.AddOptions<DefaultTfmOptions>()
-                .Configure(options)
-                .ValidateDataAnnotations();
             services.AddContextTelemetry();
         }
 
@@ -33,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeContextAccessor>(ctx => ctx.GetRequiredService<UpgradeContextTelemetry>());
         }
 
-        private static void AddReadinessChecks(this IServiceCollection services)
+        public static void AddReadinessChecks(this IServiceCollection services, Action<UpgradeReadinessOptions> configure)
         {
             services.AddTransient<IUpgradeReadyCheck, CanLoadProjectFile>();
             services.AddTransient<IUpgradeReadyCheck, CentralPackageManagementCheck>();
@@ -43,14 +36,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeReadyCheck, WcfServerCheck>();
 
             services.AddOptions<UpgradeReadinessOptions>()
-                .Configure<UpgradeOptions>((upgradeReadinessOptions, upgradeOptions) =>
-                {
-                    upgradeReadinessOptions.IgnoreUnsupportedFeatures = upgradeOptions.IgnoreUnsupportedFeatures;
-                });
+                .Configure(configure);
         }
 
-        private static void AddTargetFrameworkSelectors(this IServiceCollection services)
+        public static void AddTargetFrameworkSelectors(this IServiceCollection services, Action<DefaultTfmOptions> configure)
         {
+            services.AddOptions<DefaultTfmOptions>()
+                .Configure(configure)
+                .ValidateDataAnnotations();
+
             services.AddTransient<ITargetFrameworkSelector, TargetFrameworkSelector>();
 
             services.AddTransient<ITargetFrameworkSelectorFilter, DependencyMinimumTargetFrameworkSelectorFilter>();

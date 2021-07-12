@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -40,7 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             // Solution and project ids are already hashed and so don't need to deal with that
             TryAdd(t.Properties, "Solution Id", context.SolutionId);
-            TryAdd(t.Properties, "Entrypoint Id", string.Join(";", context.EntryPoints.Select(e => e.Id)));
             TryAdd(t.Properties, "Project Id", context.CurrentProject?.Id);
 
             // StepIds should be hashed as they can potentially be extended by external users

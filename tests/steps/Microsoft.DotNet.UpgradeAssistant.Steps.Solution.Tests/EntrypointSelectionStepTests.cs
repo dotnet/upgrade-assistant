@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -29,6 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.EntryPoints).Returns(new[] { new Mock<IProject>().Object });
 
+            mock.Mock<IOptions<SolutionOptions>>().Setup(o => o.Value).Returns(new SolutionOptions());
             var step = mock.Create<EntrypointSelectionStep>();
 
             // Act
@@ -43,6 +45,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
+
+            mock.Mock<IOptions<SolutionOptions>>().Setup(o => o.Value).Returns(new SolutionOptions());
 
             var project = new Mock<IProject>().Object;
             var context = mock.Mock<IUpgradeContext>();
@@ -77,6 +81,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
             }).ToList();
 
             var inputProject = projects[ProjectCount / 2];
+
+            mock.Mock<IOptions<SolutionOptions>>().Setup(o => o.Value).Returns(new SolutionOptions());
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.InputIsSolution).Returns(false);
@@ -119,11 +125,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
             context.Setup(c => c.Projects).Returns(projects);
             context.Object.EntryPoints = Enumerable.Empty<IProject>();
 
-            var options = mock.Create<UpgradeOptions>();
-            options.EntryPoint = _fixture.CreateMany<string>().ToList();
+            var options = mock.Mock<IOptions<SolutionOptions>>();
+            options.Setup(o => o.Value).Returns(new SolutionOptions { Entrypoints = _fixture.CreateMany<string>().ToArray() });
 
             var resolver = mock.Mock<IEntrypointResolver>();
-            resolver.Setup(r => r.GetEntrypoints(projects, options.EntryPoint)).Returns(new[] { selectedProject });
+            resolver.Setup(r => r.GetEntrypoints(projects, options.Object.Value.Entrypoints)).Returns(new[] { selectedProject });
 
             var step = mock.Create<EntrypointSelectionStep>();
 
@@ -144,6 +150,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IUserInput>().Setup(u => u.IsInteractive).Returns(isInteractive);
+
+            mock.Mock<IOptions<SolutionOptions>>().Setup(o => o.Value).Returns(new SolutionOptions());
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.InputIsSolution).Returns(true);

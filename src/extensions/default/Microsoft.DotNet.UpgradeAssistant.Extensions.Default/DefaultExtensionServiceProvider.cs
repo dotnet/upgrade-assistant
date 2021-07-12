@@ -31,12 +31,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
         private static void AddUpgradeSteps(IExtensionServiceCollection services)
         {
-            services.Services.AddBackupStep();
+            services.AddBackupStep();
             services.AddConfigUpdaterStep();
             services.AddPackageUpdaterStep();
             services.AddProjectFormatSteps()
                 .Bind(services.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
-            services.Services.AddSolutionSteps();
+            services.AddSolutionSteps();
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();
         }

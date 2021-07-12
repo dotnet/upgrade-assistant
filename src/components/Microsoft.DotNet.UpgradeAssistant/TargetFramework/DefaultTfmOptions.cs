@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class DefaultTfmOptions
+    public record DefaultTfmOptions
     {
         [Required]
         public string Current { get; set; } = null!;
@@ -15,5 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         [Required]
         public string Preview { get; set; } = null!;
+
+        public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.Current;
     }
 }

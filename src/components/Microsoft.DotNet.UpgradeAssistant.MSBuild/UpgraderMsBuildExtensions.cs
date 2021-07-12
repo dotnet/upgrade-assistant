@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         private static readonly string[] ItemTypesToDeduplicate = new[] { "Compile", "Content" };
 
-        public static void AddMsBuild(this IServiceCollection services)
+        public static void AddMsBuild(this IServiceCollection services, Action<WorkspaceOptions> configure)
         {
             services.AddSingleton<MSBuildPathLocator>();
             services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
@@ -30,10 +30,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeContext>(sp => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
             services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
 
-            services.AddNuGet();
+            services.AddOptions<WorkspaceOptions>()
+                .Configure(configure)
+                .ValidateDataAnnotations();
         }
 
-        private static void AddNuGet(this IServiceCollection services)
+        public static void AddNuGet(this IServiceCollection services, Action<NuGetDownloaderOptions> configure)
         {
             services.AddSingleton<IPackageLoader, PackageLoader>();
             services.AddSingleton<IVersionComparer, NuGetVersionComparer>();
@@ -41,6 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddSingleton<IUpgradeStartup, NuGetCredentialsStartup>();
             services.AddSingleton<INuGetPackageSourceFactory, NuGetPackageSourceFactory>();
             services.AddOptions<NuGetDownloaderOptions>()
+                .Configure(configure)
                 .Configure(options =>
                 {
                     var settings = Settings.LoadDefaultSettings(null);

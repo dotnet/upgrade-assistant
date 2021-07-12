@@ -176,6 +176,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void SetPropertyValue(string propertyName, string propertyValue)
             => Project.SetProperty(propertyName, propertyValue);
 
+        public void RemoveProperty(string propertyName)
+        {
+            var property = Project.GetProperty(propertyName);
+
+            if (property != null)
+            {
+                Project.RemoveProperty(property);
+            }
+         }
+
         private static string GetPathRelativeToProject(string path, string projectDir) =>
             Path.IsPathFullyQualified(path)
             ? path

@@ -4,7 +4,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.Build.Construction;
 
@@ -28,9 +27,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void Add(string item)
         {
-            if (!Contains(item))
+            if (!string.IsNullOrEmpty(_projectRoot.Sdk))
             {
-                _projectRoot.Sdk = string.Concat(_projectRoot.Sdk, ";", item);
+                if (!Contains(item))
+                {
+                    _projectRoot.Sdk = string.Concat(_projectRoot.Sdk, ";", item);
+                }
+            }
+            else
+            {
+                _projectRoot.Sdk = item;
             }
         }
 

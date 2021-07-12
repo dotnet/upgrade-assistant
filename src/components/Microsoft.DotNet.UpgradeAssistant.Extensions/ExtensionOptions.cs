@@ -11,7 +11,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
     {
         public ICollection<string> ExtensionPaths { get; } = new List<string>();
 
-        public IEnumerable<KeyValuePair<string, string>> RetainedProperties { get; set; } = Enumerable.Empty<KeyValuePair<string, string>>();
+        public IEnumerable<AdditionalOption> AdditionalOptions { get; set; } = Enumerable.Empty<AdditionalOption>();
+
+        public ICollection<ExtensionInstance> Extensions { get; } = new List<ExtensionInstance>();
 
         public Version CurrentVersion { get; set; } = null!;
     }

@@ -157,11 +157,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                     var compilationWithAnalyzer = compilation
                         .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
 
-                    // Find all diagnostics that upgrade code fixers can address
+                    // Find all diagnostics that registered analyzers produce
+                    // Note that this intentionally identifies diagnostics that no code fix providers can
+                    // address so that users can be warned about diagnostics that they will need to address manually.
                     Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
-                        .Where(d => d.Location.IsInSource &&
-                               _allCodeFixProviders.Any(f => f.FixableDiagnosticIds.Contains(d.Id)));
-                    Logger.LogDebug("Identified {DiagnosticCount} fixable diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
+                        .Where(d => d.Location.IsInSource);
+                    Logger.LogDebug("Identified {DiagnosticCount} diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
                 }
             }
         }

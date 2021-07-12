@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 {
@@ -14,18 +15,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
     {
         private readonly IPackageRestorer _restorer;
         private readonly IUserInput _userInput;
-        private readonly UpgradeOptions _options;
         private readonly IEntrypointResolver _entrypointResolver;
+        private readonly SolutionOptions _options;
 
         public EntrypointSelectionStep(
-            UpgradeOptions options,
+            IOptions<SolutionOptions> options,
             IEntrypointResolver entrypointResolver,
             IPackageRestorer restorer,
             IUserInput userInput,
             ILogger<EntrypointSelectionStep> logger)
             : base(logger)
         {
-            _options = options;
+            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _entrypointResolver = entrypointResolver ?? throw new ArgumentNullException(nameof(entrypointResolver));
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
@@ -103,7 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
             }
 
-            context.EntryPoints = _entrypointResolver.GetEntrypoints(context.Projects, _options.EntryPoint);
+            context.EntryPoints = _entrypointResolver.GetEntrypoints(context.Projects, _options.Entrypoints);
 
             if (context.EntryPoints.Any())
             {
