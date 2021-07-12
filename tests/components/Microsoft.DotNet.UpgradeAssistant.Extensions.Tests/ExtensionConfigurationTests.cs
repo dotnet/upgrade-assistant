@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using AutoFixture;
@@ -102,7 +103,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
                 c => Assert.Equal(manifests[1].Array, c.Array));
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "These objects will be disposed in the service provider")]
         private static ServiceProvider CreateServiceProvider<T>(IEnumerable<T> manifests)
             where T : class, new()
         {
@@ -111,11 +111,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
 
             builder.AddExtensionOption<T>(nameof(Section<T>.Manifest));
 
-            foreach (var manifest in manifests)
-            {
-                var extension = CreateExtension(manifest);
-                services.AddSingleton(extension);
-            }
+            var extensions = manifests.Select(CreateExtension).ToList();
+
+            var extensionManager = new Mock<IExtensionManager>();
+            extensionManager.Setup(m => m.Instances).Returns(extensions);
+
+            services.AddSingleton(extensionManager.Object);
 
             return services.BuildServiceProvider();
 

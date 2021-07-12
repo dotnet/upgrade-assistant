@@ -14,7 +14,6 @@ using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
-    [ApplicableComponents(ProjectComponents.AspNetCore)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class AttributeUpgradeAnalyzer : DiagnosticAnalyzer
     {
