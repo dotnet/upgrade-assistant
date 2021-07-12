@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             await _stateManager.LoadStateAsync(context, token);
             var analzyerContext = new AnalyzeContext(context);
-            var analyzeResultMap = new List<AnalyzeResultDef>();
+            var analyzeResultMap = new List<AnalyzeResultDefinition>();
             foreach (var provider in _providers)
             {
                 analyzeResultMap.Add(new()

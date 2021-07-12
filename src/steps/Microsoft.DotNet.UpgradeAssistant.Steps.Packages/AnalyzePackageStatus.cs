@@ -66,8 +66,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 analyzeResults.Add(new()
                 {
-                    AnalysisFileLocation = project.FileInfo.Name,
-                    AnalysisResults = ExtractAnalysisResult(_analysisState)
+                    FileLocation = project.FileInfo.Name,
+                    Results = ExtractAnalysisResult(_analysisState)
                 });
             }
 

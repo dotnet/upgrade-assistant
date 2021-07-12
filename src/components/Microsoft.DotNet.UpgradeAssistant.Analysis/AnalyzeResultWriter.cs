@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             this._serializer = serializer;
         }
 
-        private static async Task<List<Run>> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDef> analyzeResults)
+        private static async Task<List<Run>> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResults)
         {
             var runs = new List<Run>();
 
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             var results = new List<Result>();
             await foreach (var r in analyzeResults)
             {
-                results.Add(GetResult(r.AnalysisFileLocation, r.AnalysisResults));
+                results.Add(GetResult(r.FileLocation, r.Results));
             }
 
             return results;
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             };
         }
 
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDef> results, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, CancellationToken token)
         {
             if (results is null)
             {

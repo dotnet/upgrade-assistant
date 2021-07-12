@@ -8,8 +8,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public record AnalyzeResult
     {
-        public string AnalysisFileLocation { get; init; } = string.Empty;
+        public string FileLocation { get; init; } = string.Empty;
 
-        public IReadOnlyCollection<string> AnalysisResults { get; init; } = Array.Empty<string>();
+        public IReadOnlyCollection<string> Results { get; init; } = Array.Empty<string>();
     }
 }

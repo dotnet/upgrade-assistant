@@ -10,7 +10,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class JsonSerializer : ISerializer
     {
-        private readonly Encoding FileEncoding = new UTF8Encoding(false);
+        public Encoding FileEncoding { get; set; } = new UTF8Encoding(false);
 
         private readonly JsonSerializerSettings _settings = new()
         {
