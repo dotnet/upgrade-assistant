@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 });
             }
 
-            _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), token);
+            await _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), token).ConfigureAwait(false);
         }
     }
 }

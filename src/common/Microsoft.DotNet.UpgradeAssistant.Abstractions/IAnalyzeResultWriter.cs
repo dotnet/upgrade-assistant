@@ -11,6 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public interface IAnalyzeResultWriter
     {
-        void WriteAsync(IAsyncEnumerable<AnalyzeResultDef> results, CancellationToken token);
+        Task WriteAsync(IAsyncEnumerable<AnalyzeResultDef> results, CancellationToken token);
     }
 }

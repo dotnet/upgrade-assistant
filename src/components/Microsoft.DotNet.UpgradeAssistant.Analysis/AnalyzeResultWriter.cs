@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             };
         }
 
-        public async void WriteAsync(IAsyncEnumerable<AnalyzeResultDef> results, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDef> results, CancellationToken token)
         {
             if (results is null)
             {
