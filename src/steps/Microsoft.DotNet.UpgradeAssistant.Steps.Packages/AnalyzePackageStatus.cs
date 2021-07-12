@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
@@ -13,7 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
         private IDependencyAnalysisState? _analysisState;
-        private IAnalyzeResultProcessor _analyzeResultProcessor;
 
         private ILogger Logger { get; }
 
@@ -21,17 +21,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
-            ILogger<AnalyzePackageStatus> logger,
-            IAnalyzeResultProcessor analyzeResultProcessor)
+            ILogger<AnalyzePackageStatus> logger)
         {
             Logger = logger;
             _tfmSelector = tfmSelector;
-            _analyzeResultProcessor = analyzeResultProcessor;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
         }
 
-        public async Task<ICollection<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
+        public async Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
         {
             if (analysis is null)
             {
@@ -40,6 +38,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             var context = analysis.UpgradeContext;
             var projects = context.Projects.ToList();
+
+            var analyzeResults = new List<AnalyzeResult>();
 
             foreach (var project in projects)
             {
@@ -64,12 +64,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-#pragma warning disable CS8604 // Possible null reference argument.
-                analysis.Dependencies.Add(project.FileInfo.Name, _analysisState);
-#pragma warning restore CS8604 // Possible null reference argument.
+                analyzeResults.Add(new()
+                {
+                    AnalysisFileLocation = project.FileInfo.Name,
+                    AnalysisResults = ExtractAnalysisResult(_analysisState)
+                });
             }
 
-            return _analyzeResultProcessor.Execute(analysis);
+            return analyzeResults.ToAsyncEnumerable();
+        }
+
+        private static IReadOnlyCollection<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
+        {
+            var results = new List<string>();
+
+            if (analysisState is null || !analysisState.AreChangesRecommended)
+            {
+                results.Add("No package updates needed");
+            }
+            else
+            {
+                GetResults("References to Delete", analysisState.References.Deletions);
+                GetResults("References to Add", analysisState.References.Additions);
+                GetResults("Packages to Delete", analysisState.Packages.Deletions);
+                GetResults("Packages to Add", analysisState.Packages.Additions);
+                GetResults("Framework References to Delete", analysisState.FrameworkReferences.Deletions);
+                GetResults("Framework References to Add", analysisState.FrameworkReferences.Additions);
+
+                void GetResults<T>(string name, IReadOnlyCollection<T> collection)
+                {
+                    if (collection.Any())
+                    {
+                        results.Add(string.Concat(name, " : ", string.Join(" ; ", collection)));
+                    }
+                }
+            }
+
+            return results;
         }
     }
 }

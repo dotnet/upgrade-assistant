@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class AnalysisExtensions
     {
-        public static void AddAnalyze(this IServiceCollection services)
+        public static void AddAnalysis(this IServiceCollection services)
         {
             if (services is null)
             {

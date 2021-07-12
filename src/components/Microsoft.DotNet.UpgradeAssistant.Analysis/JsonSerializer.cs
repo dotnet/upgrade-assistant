@@ -1,25 +1,23 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class JsonSerializer : ISerializer
     {
-        public Encoding FileEncoding { get; set; } = new UTF8Encoding(false);
+        public Encoding FileEncoding = new UTF8Encoding(false);
 
-        public JsonSerializerSettings Settings { get; set; } = new JsonSerializerSettings()
+        public JsonSerializerSettings Settings = new()
         {
             Formatting = Formatting.Indented,
             Culture = CultureInfo.InvariantCulture,
             TypeNameHandling = TypeNameHandling.None,
-            NullValueHandling = NullValueHandling.Ignore
+            NullValueHandling = NullValueHandling.Ignore,
         };
 
         public JsonSerializer()

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
+using System.Linq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -31,21 +33,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        [ObsoleteAttribute("This property is WIP, expect changes in this area.", false)]
         public async Task RunAsync(CancellationToken token)
         {
-            _logger.LogWarning("The Analyze command feature is still under development, expect things to be not fully functional at the moment");
             using var context = await _contextFactory.CreateContext(token);
 
             await _stateManager.LoadStateAsync(context, token);
             var analzyerContext = new AnalyzeContext(context);
-            var analyzeResultMap = new Dictionary<string, ICollection<AnalyzeResult>>();
+            var analyzeResultMap = new List<AnalyzeResultDef>();
             foreach (var provider in _providers)
             {
-                analyzeResultMap.Add(provider.AnalysisTypeName, await provider.AnalyzeAsync(analzyerContext, token));
+                analyzeResultMap.Add(new()
+                {
+                    AnalysisTypeName = provider.AnalysisTypeName,
+                    AnalysisResults = await provider.AnalyzeAsync(analzyerContext, token),
+                });
             }
 
-            _writer.WriteAsync(analyzeResultMap, token);
+            _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), token);
         }
     }
 }

@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public interface IAnalyzeResultWriter
     {
-        void WriteAsync(Dictionary<string, ICollection<AnalyzeResult>> results, CancellationToken token);
+        void WriteAsync(IAsyncEnumerable<AnalyzeResultDef> results, CancellationToken token);
     }
 }

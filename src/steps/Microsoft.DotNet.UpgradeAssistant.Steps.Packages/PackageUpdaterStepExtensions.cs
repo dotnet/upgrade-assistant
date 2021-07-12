@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.IO;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Packages;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.Services.AddUpgradeStep<PackageUpdaterStep>();
             services.Services.AddTransient<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
             services.Services.AddTransient<IAnalyzeResultProvider, AnalyzePackageStatus>();
-            services.Services.AddTransient<IAnalyzeResultProcessor, DependendencyAnalyzeResultProcessor>();
 
             services.AddExtensionOption<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
                 .MapFiles<NuGetPackageMap[]>(t => Path.Combine(t.PackageMapPath, PackageMapExtension));

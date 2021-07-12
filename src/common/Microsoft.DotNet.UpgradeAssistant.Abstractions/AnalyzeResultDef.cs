@@ -1,14 +1,14 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public interface IJsonSerializer : ISerializer
+    public record AnalyzeResultDef
     {
-        JsonSerializerSettings Settings { get; set; }
+        public string AnalysisTypeName { get; init; }
 
-        void Write<T>(string filePath, T obj, bool ensureDirectory);
+        public IAsyncEnumerable<AnalyzeResult> AnalysisResults { get; init; }
     }
 }

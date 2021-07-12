@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Sarif;
@@ -14,19 +12,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class AnalyzeResultWriter : IAnalyzeResultWriter
     {
-        private ISerializer _serializer;
-        private string _sarifLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
+        private readonly string _sarifLogPath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
+        private readonly ISerializer _serializer;
 
         public AnalyzeResultWriter(ISerializer serializer)
         {
-            _serializer = serializer;
+            this._serializer = serializer;
         }
 
-        private static List<Run> ExtractRuns(Dictionary<string, ICollection<AnalyzeResult>> analyzeResults)
+        private static async Task<List<Run>> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDef> analyzeResults)
         {
             var runs = new List<Run>();
 
-            foreach (var kvp in analyzeResults)
+            await foreach (var ar in analyzeResults)
             {
                 var run = new Run()
                 {
@@ -34,10 +32,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                     {
                         Driver = new()
                         {
-                            Name = kvp.Key
-                        }
+                            Name = ar.AnalysisTypeName,
+                        },
                     },
-                    Results = ExtractResults(kvp.Value)
+                    Results = await ExtractResultsAsync(ar.AnalysisResults).ConfigureAwait(false),
                 };
 
                 runs.Add(run);
@@ -46,14 +44,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             return runs;
         }
 
-        private static IList<Result> ExtractResults(ICollection<AnalyzeResult> analyzeResults)
+        private static async Task<IList<Result>> ExtractResultsAsync(IAsyncEnumerable<AnalyzeResult> analyzeResults)
         {
             var results = new List<Result>();
-            foreach (var r in analyzeResults)
+            await foreach (var r in analyzeResults)
             {
-#pragma warning disable CS8604 // Possible null reference argument.
                 results.Add(GetResult(r.AnalysisFileLocation, r.AnalysisResults));
-#pragma warning restore CS8604 // Possible null reference argument.
             }
 
             return results;
@@ -69,19 +65,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                     Description = s.ToMessage(),
                     ArtifactLocation = new()
                     {
-                        Uri = new Uri(Path.GetFullPath(name))
-                    }
+                        Uri = new Uri(Path.GetFullPath(name)),
+                    },
                 });
             }
 
             return new Result()
             {
                 Message = name.ToMessage(),
-                Attachments = attachments
+                Attachments = attachments,
             };
         }
 
-        public void WriteAsync(Dictionary<string, ICollection<AnalyzeResult>> results, CancellationToken token)
+        public async void WriteAsync(IAsyncEnumerable<AnalyzeResultDef> results, CancellationToken token)
         {
             if (results is null)
             {
@@ -92,10 +88,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 Version = SarifVersion.Current,
                 SchemaUri = new Uri("http://json.schemastore.org/sarif-2.1.0"),
-                Runs = ExtractRuns(results)
+                Runs = await ExtractRunsAsync(results).ConfigureAwait(false),
             };
 
-            _serializer.Write(_sarifLogFilePath, sarifLog);
+            _serializer.Write(_sarifLogPath, sarifLog);
         }
     }
 }

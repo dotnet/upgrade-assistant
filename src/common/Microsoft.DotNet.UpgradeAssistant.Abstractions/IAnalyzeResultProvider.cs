@@ -6,13 +6,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public interface IAnalyzeResultProvider
     {
         string AnalysisTypeName { get; }
 
-        [ObsoleteAttribute("This property is WIP, expect changes in this area.", false)]
-        Task<ICollection<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
+        Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
     }
 }

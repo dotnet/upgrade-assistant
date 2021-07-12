@@ -2,17 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public record AnalyzeResult
     {
-        public string? AnalysisName { get; set; }
+        public string AnalysisFileLocation { get; init; }
 
-        public string? AnalysisFileLocation { get; set; }
-
-        public IReadOnlyCollection<string>? AnalysisResults { get; set; }
+        public IReadOnlyCollection<string> AnalysisResults { get; init; }
     }
 }
