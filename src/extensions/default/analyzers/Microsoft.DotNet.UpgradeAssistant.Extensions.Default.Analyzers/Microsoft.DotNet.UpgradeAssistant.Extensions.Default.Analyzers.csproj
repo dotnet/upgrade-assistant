@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic">
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
-    <ProjectReference Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
     <ProjectReference Include="..\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
