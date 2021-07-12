@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                                     {
                                         foreach (var name in opts.Name)
                                         {
-                                            options.Extensions.Add(new(name) { Source = opts.Source });
+                                            options.Extensions.Add(new(name) { Source = opts.Source, Version = opts.Version });
                                         }
                                     });
                               })
@@ -64,8 +64,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 : base("add")
             {
                 AddHandler<AddExtensionAppCommand>();
-                AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName) { Arity = ArgumentArity.OneOrMore });
+                AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName));
                 AddOption(new Option<string>(new[] { "--source" }, () => DefaultSource, LocalizedStrings.ExtensionManagementSource));
+                AddOption(new Option<string>(new[] { "--version" }, () => DefaultSource, LocalizedStrings.ExtensionManagementVersion));
             }
 
             private class AddExtensionAppCommand : IAppCommand
@@ -180,7 +181,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 : base("update")
             {
                 AddHandler<UpdateExtensionAppCommand>();
-                AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName) { Arity = ArgumentArity.ZeroOrMore });
+                AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName));
+                AddOption(new Option<string>(new[] { "--version" }, () => DefaultSource, LocalizedStrings.ExtensionManagementVersion));
             }
 
             private class UpdateExtensionAppCommand : IAppCommand
@@ -233,6 +235,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public IReadOnlyCollection<string> Name { get; set; } = Array.Empty<string>();
 
             public string? Source { get; set; }
+
+            public string? Version { get; set; }
 
             public bool IgnoreUnsupportedFeatures { get; set; }
 

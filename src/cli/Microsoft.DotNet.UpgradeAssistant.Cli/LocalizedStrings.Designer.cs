@@ -106,6 +106,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version of extension.
+        /// </summary>
+        internal static string ExtensionManagementVersion {
+            get {
+                return ResourceManager.GetString("ExtensionManagementVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current extensions:.
         /// </summary>
         internal static string ListExtensionDetails {

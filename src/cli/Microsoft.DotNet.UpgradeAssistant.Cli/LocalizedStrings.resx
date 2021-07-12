@@ -132,6 +132,9 @@
   <data name="ExtensionManagementSource" xml:space="preserve">
     <value>Source of extension</value>
   </data>
+  <data name="ExtensionManagementVersion" xml:space="preserve">
+    <value>Version of extension</value>
+  </data>
   <data name="ListExtensionDetails" xml:space="preserve">
     <value>Current extensions:</value>
   </data>

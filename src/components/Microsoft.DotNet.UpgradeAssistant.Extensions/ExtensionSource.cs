@@ -19,6 +19,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             init => _source = value;
         }
 
-        public Version? Version { get; init; }
+        public string? Version { get; init; }
     }
 }
