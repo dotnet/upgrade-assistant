@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.31422.39
+VisualStudioVersion = 16.0.31506.176
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3FC16DAB-215C-422B-9130-61D566695463}"
 EndProject
@@ -149,7 +149,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maui", "maui", "{E3725E02-CA07-44F1-A47F-792CBE882FAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui", "src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj", "{A122DD5B-4B80-4558-8DB2-8E9EBFF12A1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui", "src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj", "{A122DD5B-4B80-4558-8DB2-8E9EBFF12A1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

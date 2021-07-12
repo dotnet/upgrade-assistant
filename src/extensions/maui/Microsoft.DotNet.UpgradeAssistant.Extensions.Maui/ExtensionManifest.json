@@ -1,0 +1,6 @@
+﻿{
+  "ExtensionName": "MAUI",
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll"
+  ]
+}
