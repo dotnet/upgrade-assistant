@@ -42,8 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     o.Converters.Add(new JsonStringEnumConverter());
                 });
 
-            services.AddSingleton<ExtensionManager>();
-            services.AddTransient<IEnumerable<ExtensionInstance>>(ctx => ctx.GetRequiredService<ExtensionManager>());
+            services.AddSingleton<IExtensionManager, ExtensionManager>();
             services.AddExtensionLoaders();
 
             return services.AddOptions<ExtensionOptions>();

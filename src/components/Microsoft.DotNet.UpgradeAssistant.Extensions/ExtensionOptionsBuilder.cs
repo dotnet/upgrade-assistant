@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             // Since not all TOption instances will implement IFileOption, this is to ensure we are able to access an IFileProvider from the extension
             _services.Services.AddTransient<IConfigureOptions<ICollection<FileOption<TOption>>>>(ctx =>
             {
-                var extensions = ctx.GetRequiredService<IEnumerable<ExtensionInstance>>();
+                var extensions = ctx.GetRequiredService<IExtensionManager>();
 
                 return new AggregateExtensionConfigureOptions<TOption>(_sectionName, extensions);
             });

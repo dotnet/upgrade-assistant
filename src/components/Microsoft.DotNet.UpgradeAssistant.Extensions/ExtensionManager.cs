@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal sealed class ExtensionManager : IDisposable, IEnumerable<ExtensionInstance>
+    internal sealed class ExtensionManager : IDisposable, IExtensionManager
     {
         private readonly Lazy<IEnumerable<ExtensionInstance>> _extensions;
 
@@ -108,8 +108,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
         }
 
-        public IEnumerator<ExtensionInstance> GetEnumerator() => _extensions.Value.GetEnumerator();
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+        public IEnumerable<ExtensionInstance> Instances => _extensions.Value;
     }
 }
