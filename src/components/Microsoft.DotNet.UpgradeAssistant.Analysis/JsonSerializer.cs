@@ -10,7 +10,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class JsonSerializer : ISerializer
     {
-        public Encoding FileEncoding { get; set; } = new UTF8Encoding(false);
+        private readonly Encoding _fileEncoding = new UTF8Encoding(false);
 
         private readonly JsonSerializerSettings _settings = new()
         {
@@ -41,14 +41,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 throw new FileNotFoundException(filePath);
             }
 
-            string contents = File.ReadAllText(filePath);
+            string contents = File.ReadAllText(filePath, _fileEncoding);
             return Deserialize<T>(contents);
         }
 
         public virtual void Write<T>(string filePath, T obj)
         {
             string contents = Serialize<T>(obj);
-            File.WriteAllText(filePath, contents);
+            File.WriteAllText(filePath, contents, _fileEncoding);
         }
     }
 }
