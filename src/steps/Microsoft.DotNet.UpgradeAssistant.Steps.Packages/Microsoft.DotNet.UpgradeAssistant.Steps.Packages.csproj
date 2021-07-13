@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <!-- TODO: Enable once analysis is done -->
-    <NoWarn>$(NoWarn);DV0001</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="PackageMaps\*.json">
@@ -10,7 +8,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj" />
     <ProjectReference Include="..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
 </Project>

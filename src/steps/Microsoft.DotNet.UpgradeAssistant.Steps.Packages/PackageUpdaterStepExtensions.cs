@@ -25,8 +25,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.Services.AddUpgradeStep<PackageUpdaterStep>();
             services.Services.AddTransient<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
             services.Services.AddTransient<IAnalyzeResultProvider, AnalyzePackageStatus>();
-            services.Services.AddTransient<IProcessResult, ProcessDependencyResult>();
-            services.Services.AddTransient<IJsonSerializer, JsonSerializer>();
 
             services.AddExtensionOption<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
                 .MapFiles<NuGetPackageMap[]>(t => Path.Combine(t.PackageMapPath, PackageMapExtension));
