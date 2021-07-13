@@ -1,5 +1,12 @@
 ﻿{
   "ExtensionName": "MAUI",
+
+  "TryConvert": {
+    "Arguments": [
+      "--maui-conversion"
+    ]
+  },
+
   "ExtensionServiceProviders": [
     "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll"
   ]

@@ -40,6 +40,9 @@ namespace Integration.Tests
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
+        [InlineData("MauiSample", "EwDavidForms.sln", "EwDavidForms.csproj")]
+        [InlineData("MauiSample", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
+        [InlineData("MauiSample", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {

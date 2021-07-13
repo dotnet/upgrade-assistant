@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -18,7 +19,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string DotNetCli = "dotnet";
-        private const string TryConvertArgumentsFormat = "\"{0}\" --no-backup -m \"{1}\" --force-web-conversion --keep-current-tfms -p \"{2}\"";
+        private const string TryConvertArgumentsFormat = "\"{0}\" -m \"{1}\" -p \"{2}\" --no-backup ";
+        private const string TryConvertOptions = "--force-web-conversion --keep-current-tfms";
 
         private static readonly string[] ErrorMessages = new[]
         {
@@ -32,10 +34,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         private readonly IProcessRunner _runner;
         private readonly MSBuildPathLocator _locator;
+        private readonly string _tryConvertOptions;
 
         public TryConvertTool(
             IProcessRunner runner,
             IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor,
+            IOptions<ICollection<TryConvertOptions>> tryConvertOptions,
             MSBuildPathLocator locator)
         {
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
@@ -46,6 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
             }
 
+            _tryConvertOptions = string.Join(" ", tryConvertOptions?.Value.SelectMany(v => v.Arguments));
             Path = tryConvertOptionsAccessor.Value.TryConvertPath;
             Version = GetVersion();
         }
@@ -97,6 +102,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Path, GetMSBuildPath(), project.Required().FileInfo);
+        private string GetArguments(IProject project)
+        {
+            var mainArgs = string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Path, GetMSBuildPath(), project.Required().FileInfo);
+            var optionalArgs = string.IsNullOrEmpty(_tryConvertOptions) ? TryConvertOptions : _tryConvertOptions;
+
+            return mainArgs + optionalArgs;
+        }
     }
 }
