@@ -1,7 +1,7 @@
 # Upgrade Assistant
 
 ## Share your feedback on the .NET Upgrade Assistant!
-We're interested to hearing how your experience with the .NET Upgrade Assistant has been going as you upgrade your project(s) from .NET Framework to .NET 5.
+We're interested to hearing how your experience with the .NET Upgrade Assistant has been going as you upgrade your project(s) from .NET Framework to .NET 5 and beyond.
 
 [Share your feedback here](https://www.surveymonkey.com/r/2LBPCXH)!
 
