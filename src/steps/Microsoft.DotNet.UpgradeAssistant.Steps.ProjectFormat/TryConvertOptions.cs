@@ -12,6 +12,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public class TryConvertOptions
     {
-        public string[] Arguments { get; set; }  =  Array.Empty<string>();
+        public string[] Arguments { get; set; } = Array.Empty<string>();
     }
 }

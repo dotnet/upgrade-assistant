@@ -9,7 +9,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     {
         [Required]
         public string TryConvertPath { get; set; } = null!;
-
-        public string TryConvertArguments { get; set; } = null!;
     }
 }
