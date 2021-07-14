@@ -15,10 +15,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         private readonly IEnumerable<ExtensionInstance> _extensions;
         private readonly Lazy<Mapper> _mapper;
 
-        public AggregateExtensionConfigureOptions(string sectionName, IEnumerable<ExtensionInstance> extensions)
+        public AggregateExtensionConfigureOptions(string sectionName, IExtensionManager extensions)
         {
             _sectionName = sectionName;
-            _extensions = extensions;
+            _extensions = extensions.Instances;
             _mapper = new Lazy<Mapper>(() => GetMapper());
         }
 

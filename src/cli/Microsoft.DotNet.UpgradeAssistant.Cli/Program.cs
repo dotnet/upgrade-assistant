@@ -8,6 +8,7 @@ using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement;
 
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Console apps don't have a synchronization context")]
 
@@ -31,6 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             root.AddCommand(new ConsoleAnalyzeCommand());
             root.AddCommand(new ConsoleUpgradeCommand());
+            root.AddCommand(new ExtensionManagementCommand());
 
             return new CommandLineBuilder(root)
                 .UseDefaults()

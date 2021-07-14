@@ -3,15 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public interface IAnalyzeResultProvider
+    public interface IAnalyzeResultWriter
     {
-        string AnalysisTypeName { get; }
-
-        Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
+        Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, CancellationToken token);
     }
 }

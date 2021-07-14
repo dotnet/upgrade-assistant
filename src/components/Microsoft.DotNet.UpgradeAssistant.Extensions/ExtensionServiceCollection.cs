@@ -26,14 +26,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             Services.AddTransient<IConfigureOptions<TOption>>(ctx =>
             {
-                var extensions = ctx.GetRequiredService<IEnumerable<ExtensionInstance>>();
+                var extensions = ctx.GetRequiredService<IExtensionManager>();
 
                 return new AggregateExtensionConfigureOptions<TOption>(sectionName, extensions);
             });
 
             Services.AddTransient<IConfigureOptions<ICollection<TOption>>>(ctx =>
             {
-                var extensions = ctx.GetRequiredService<IEnumerable<ExtensionInstance>>();
+                var extensions = ctx.GetRequiredService<IExtensionManager>();
 
                 return new AggregateExtensionConfigureOptions<TOption>(sectionName, extensions);
             });

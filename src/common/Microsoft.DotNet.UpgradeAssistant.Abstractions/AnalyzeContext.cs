@@ -11,11 +11,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public AnalyzeContext(IUpgradeContext context)
         {
             UpgradeContext = context;
-            Dependencies = new Dictionary<string, IDependencyAnalysisState>();
         }
 
         public IUpgradeContext UpgradeContext { get; }
-
-        public Dictionary<string, IDependencyAnalysisState> Dependencies { get; }
     }
 }
