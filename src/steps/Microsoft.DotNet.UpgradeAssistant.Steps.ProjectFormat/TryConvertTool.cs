@@ -19,8 +19,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string DotNetCli = "dotnet";
-        private const string TryConvertArgumentsFormat = "\"{0}\" -m \"{1}\" -p \"{2}\" --no-backup ";
-        private const string TryConvertOptions = "--force-web-conversion --keep-current-tfms";
+        private const string TryConvertArgumentsFormat = "\"{0}\" --no-backup -m \"{1}\" --force-web-conversion --keep-current-tfms -p \"{2}\"";
+
 
         private static readonly string[] ErrorMessages = new[]
         {
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
             }
 
-            _tryConvertOptions = string.Join(" ", tryConvertOptions?.Value.SelectMany(v => v.Arguments));
+            _tryConvertOptions = " " + string.Join(" ", tryConvertOptions?.Value.SelectMany(v => v.Arguments));
             Path = tryConvertOptionsAccessor.Value.TryConvertPath;
             Version = GetVersion();
         }
@@ -102,12 +102,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private string GetArguments(IProject project)
-        {
-            var mainArgs = string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Path, GetMSBuildPath(), project.Required().FileInfo);
-            var optionalArgs = string.IsNullOrEmpty(_tryConvertOptions) ? TryConvertOptions : _tryConvertOptions;
-
-            return mainArgs + optionalArgs;
-        }
+        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Path, GetMSBuildPath(), project.Required().FileInfo) + _tryConvertOptions;
     }
 }
