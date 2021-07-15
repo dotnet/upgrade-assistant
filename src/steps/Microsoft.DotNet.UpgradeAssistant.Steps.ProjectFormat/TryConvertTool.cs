@@ -21,7 +21,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         private const string DotNetCli = "dotnet";
         private const string TryConvertArgumentsFormat = "\"{0}\" --no-backup -m \"{1}\" --force-web-conversion --keep-current-tfms -p \"{2}\"";
 
-
         private static readonly string[] ErrorMessages = new[]
         {
             "This project has custom imports that are not accepted by try-convert",

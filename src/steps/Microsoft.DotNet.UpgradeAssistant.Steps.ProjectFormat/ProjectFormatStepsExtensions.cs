@@ -24,7 +24,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddExtensionOption<TryConvertOptions>("TryConvert");
             services.Services.AddSingleton<ITryConvertTool, TryConvertTool>();
 
-
             return services.Services.AddOptions<TryConvertProjectConverterStepOptions>()
                 .PostConfigure(options =>
                 {
