@@ -13,6 +13,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="IntegrationScenarios\MauiSample\**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="coverlet.collector">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -27,8 +30,5 @@
     <None Update="ExpectedPackageVersions.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="IntegrationScenarios\MauiSample\" />
   </ItemGroup>
 </Project>

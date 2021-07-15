@@ -149,18 +149,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vb", "vb", "{7402353B-840C-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.Tests", "tests\extensions\vb\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.Tests.csproj", "{A68B41DF-D065-4CD4-A722-3C0C38151496}"
 EndProject
-<<<<<<< HEAD
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maui", "maui", "{E3725E02-CA07-44F1-A47F-792CBE882FAE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui", "src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj", "{A122DD5B-4B80-4558-8DB2-8E9EBFF12A1A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Analysis", "src\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj", "{B5B6D54F-7782-4CAC-AB13-48619B40465B}"
-=======
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Analysis", "src\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj", "{B5B6D54F-7782-4CAC-AB13-48619B40465B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{6D0B9445-40A2-48E6-9F04-A83EA207CC3C}"
 EndProject
 Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "DependencyValidation", "eng\DependencyValidation\DependencyValidation.modelproj", "{7EE540F0-2904-4306-BF35-842F3D654F25}"
->>>>>>> main
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
