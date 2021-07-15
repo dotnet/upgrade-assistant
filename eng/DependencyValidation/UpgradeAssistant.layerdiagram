@@ -201,6 +201,17 @@
             </reference>
           </references>
         </layer>
+        <layer Id="88cba715-32db-48a6-b460-ea07646bc60a" name="maui">
+          <references>
+            <reference Id="f55b4511-5b29-4def-8271-377a13654ff9" name="Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll">
+              <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll" Category="CodeSchema_Assembly" Id="(Assembly=../../artifacts/bin/Microsoft.DotNet.UpgradeAssistant.Extensions.Maui/Debug/netstandard2.0/Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll)" />
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Maui)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">
