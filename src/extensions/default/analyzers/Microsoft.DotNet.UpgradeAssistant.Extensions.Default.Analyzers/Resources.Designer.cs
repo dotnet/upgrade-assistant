@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {}.
+        ///   Looks up a localized string similar to {0}.
         /// </summary>
         internal static string ApiAlertGenericMessageFormat {
             get {

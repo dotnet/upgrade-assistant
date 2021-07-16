@@ -121,7 +121,7 @@
     <value>This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent.</value>
   </data>
   <data name="ApiAlertGenericMessageFormat" xml:space="preserve">
-    <value>{}</value>
+    <value>{0}</value>
   </data>
   <data name="ApiAlertGenericTitle" xml:space="preserve">
     <value>Replace unsupported API</value>

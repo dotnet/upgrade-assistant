@@ -35,9 +35,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private const string AttributeSuffix = "Attribute";
         private const string DefaultApiAlertsResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.DefaultApiAlerts.apitargets";
 
-        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AttributeUpgradeTitle), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AttributeUpgradeMessageFormat), Resources.ResourceManager, typeof(Resources));
-        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.AttributeUpgradeDescription), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiAlertGenericTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiAlertGenericMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ApiAlertGenericDescription), Resources.ResourceManager, typeof(Resources));
         private static readonly DiagnosticDescriptor GenericRule = new(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         private readonly Lazy<IEnumerable<TargetSyntaxMessage>> _targetSyntaxes = new(() =>
