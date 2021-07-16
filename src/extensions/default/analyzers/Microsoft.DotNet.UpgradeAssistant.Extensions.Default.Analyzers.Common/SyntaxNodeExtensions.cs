@@ -275,7 +275,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             throw new NotImplementedException(Resources.UnknownLanguage);
         }
 
-        public static SyntaxNode? GetMAEExpressionSyntax(this SyntaxNode memberAccessSyntax) =>
+        /// <summary>
+        /// Gets the ExpressionSyntax (the left part of the member access) from a C# or VB MemberAccessExpressionSyntax.
+        /// </summary>
+        /// <param name="memberAccessSyntax">The syntax whose expression propety should be returned. Note that this syntax must be of type Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax.</param>
+        /// <returns>The member access expression's expression (the left part of the member access).</returns>
+        public static SyntaxNode? GetChildExpressionSyntax(this SyntaxNode memberAccessSyntax) =>
             memberAccessSyntax switch
             {
                 CSSyntax.MemberAccessExpressionSyntax csMAE => csMAE.Expression,
@@ -298,5 +303,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 LanguageNames.VisualBasic => StringComparer.OrdinalIgnoreCase,
                 _ => throw new NotImplementedException(Resources.UnknownLanguage),
             };
+
+        private static readonly char[] GenericParameterDelimiters = new[] { '<', '>', '(', ')' };
+
+        public static string GetFullName(this SyntaxNode node)
+        {
+            var fullName = node.GetQualifiedName().ToString();
+
+            // Ignore generic parameters for now to simplify matching
+            var genericParameterIndex = fullName.IndexOfAny(GenericParameterDelimiters);
+            if (genericParameterIndex > 0)
+            {
+                fullName = fullName.Substring(0, genericParameterIndex);
+            }
+
+            return fullName;
+        }
     }
 }

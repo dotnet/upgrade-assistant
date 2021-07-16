@@ -10,14 +10,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     /// </summary>
     public class TargetSyntax
     {
-        private string _fullName = default!;
+        private string? _fullName;
 
         /// <summary>
         /// Gets the fully qualified name of the namespace or API.
         /// </summary>
         public string FullName
         {
-            get => _fullName;
+            get => _fullName!;
             private init
             {
                 _fullName = value;

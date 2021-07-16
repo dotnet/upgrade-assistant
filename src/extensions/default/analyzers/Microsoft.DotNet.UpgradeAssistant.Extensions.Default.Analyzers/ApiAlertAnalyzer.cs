@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// </summary>
         private const string Category = "Upgrade";
         private const string AttributeSuffix = "Attribute";
-        private const string DefaultApiAlertsResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.DefaultApiAlerts.json";
+        private const string DefaultApiAlertsResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.DefaultApiAlerts.apitargets";
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.AttributeUpgradeTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.AttributeUpgradeMessageFormat), Resources.ResourceManager, typeof(Resources));
@@ -92,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             };
 
             // Find target syntax/message mappings that include this node's simple name
-            var fullyQualifiedName = GetFullName(context.Node);
+            var fullyQualifiedName = context.Node.GetFullName();
 
             var stringComparison = context.Node.GetStringComparison();
             var partialMatches = targetSyntaxMessages.SelectMany(m => m.TargetSyntaxes.Select(s => (TargetSyntax: s, Mapping: m)))
@@ -138,7 +138,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // If the node is a fully qualified name from the specified namespace, return true
             // This should cover both import statements and fully qualified type names, so no addtional checks
             // for import statements are needed.
-            var qualifiedName = GetFullName(context.Node);
+            var qualifiedName = context.Node.GetFullName();
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static bool AnalyzeType(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
         {
             // If the node matches the target's fully qualified name, return true.
-            var qualifiedName = GetFullName(context.Node);
+            var qualifiedName = context.Node.GetFullName();
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -197,7 +197,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static bool AnalyzeMember(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
         {
             // If the node matches the target's fully qualified name, return true.
-            var qualifiedName = GetFullName(context.Node);
+            var qualifiedName = context.Node.GetFullName();
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -205,7 +205,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             // If the parent type's symbol is resolvable, return true if
             // it corresponds to the target type
-            var typeSyntax = context.Node.Parent?.GetMAEExpressionSyntax();
+            var typeSyntax = context.Node.Parent?.GetChildExpressionSyntax();
             if (typeSyntax is not null)
             {
                 var symbol = context.SemanticModel.GetTypeInfo(typeSyntax).Type;
@@ -218,20 +218,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // If the node's full type can't be determined (either by symbol or fully qualified syntax),
             // return true for the partial match only if ambiguous matching is enabled
             return targetSyntax.AlertOnAmbiguousMatch;
-        }
-
-        private static string GetFullName(SyntaxNode node)
-        {
-            var fullName = node.GetQualifiedName().ToString();
-
-            // Ignore generic parameters for now to simplify matching
-            var genericParameterIndex = fullName.IndexOfAny(new[] { '<', '(' });
-            if (genericParameterIndex > 0)
-            {
-                fullName = fullName.Substring(0, genericParameterIndex);
-            }
-
-            return fullName;
         }
     }
 }

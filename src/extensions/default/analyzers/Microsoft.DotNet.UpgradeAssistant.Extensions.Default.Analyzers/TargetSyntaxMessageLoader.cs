@@ -4,8 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
@@ -16,26 +15,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// The suffix that api/message map files are expected to use.
         /// </summary>
         private const string TargetSyntaxMessageFileSuffix = ".apitargets";
-
-        private static JsonSerializerOptions GetJsonSerializationOptions()
-        {
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                AllowTrailingCommas = true,
-            };
-
-            jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-
-            return jsonSerializerOptions;
-        }
-
-        /// <summary>
-        /// Load target syntax messages from a serialized string.
-        /// </summary>
-        /// <param name="serializedContents">A JSON-serialized array of target syntax messages.</param>
-        /// <returns>An enumerable of TargetSyntaxMessages corresponding to those serialized in the serializedContents argument.</returns>
-        public static IEnumerable<TargetSyntaxMessage>? LoadMappings(string serializedContents) =>
-            JsonSerializer.Deserialize<TargetSyntaxMessage[]>(serializedContents, GetJsonSerializationOptions());
+        private static readonly char[] NewLineCharacters = new[] { '\n', '\r' };
+        private static readonly char[] IdMessageDelimiters = new[] { ':' };
+        private static readonly char[] ApiSyntaxDelimiters = new[] { ',' };
 
         /// <summary>
         /// Load target syntax messages from additional files.
@@ -48,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 if (file.Path.EndsWith(TargetSyntaxMessageFileSuffix, StringComparison.OrdinalIgnoreCase))
                 {
-                    var messageMaps = LoadMappings(file.GetText()?.ToString() ?? "[]");
+                    var messageMaps = LoadMappings(file.GetText()?.ToString() ?? string.Empty);
                     if (messageMaps is null)
                     {
                         continue;
@@ -58,6 +40,83 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     {
                         yield return messageMap;
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Load target syntax messages from a serialized string.
+        /// </summary>
+        /// <param name="serializedContents">A collection of target syntax messages stored as strings.</param>
+        /// <returns>An enumerable of TargetSyntaxMessages corresponding to those serialized in the serializedContents argument.</returns>
+        public static IEnumerable<TargetSyntaxMessage>? LoadMappings(string serializedContents)
+        {
+            // NOTE: This uses a simple text serialization because dependencies like System.Text.Json or Newtonsoft.Json
+            // don't work well in analyzers (which need to run from a variety of hosts with different versions of those
+            // packages (or no version at all) available. A serialization technology common between .NET Framework and .NET Core
+            // like XML serialization could be used, but the serialization needs are simple enough here that just reading strings
+            // works and allows the input files to be more concise.
+            if (string.IsNullOrWhiteSpace(serializedContents))
+            {
+                return Enumerable.Empty<TargetSyntaxMessage>();
+            }
+
+            var ret = new List<TargetSyntaxMessage>();
+            TargetSyntaxMessage? nextMessage = null;
+
+            foreach (var line in serializedContents.Split(NewLineCharacters, StringSplitOptions.RemoveEmptyEntries).Select(l => l.Trim()))
+            {
+                // Skip blank lines and comment lines (lines starting with #)
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                // Check for new target syntax message start (ID: Message)
+                else if (line.Contains(':'))
+                {
+                    AddNextMessageToRet();
+                    var idAndMessage = line.Split(IdMessageDelimiters, 2);
+                    nextMessage = new TargetSyntaxMessage(idAndMessage[0].Trim(), new List<TargetSyntax>(), idAndMessage[1].Trim());
+                }
+
+                // Check for API target syntax (API Type, API name, Alert on Ambiguous match)
+                else if (nextMessage is not null)
+                {
+                    // RemoveEmptyEntries is specified here to allow trailing commas if users prefer that style
+                    var apiTargetSyntax = line.Split(ApiSyntaxDelimiters, StringSplitOptions.RemoveEmptyEntries);
+                    if (apiTargetSyntax.Length != 3)
+                    {
+                        // Syntaxes must have exactly three elements
+                        throw new FormatException($"Invalid API target syntax; API target syntaxes must have exactly three elements delimited by commas: {line}");
+                    }
+
+                    if (!Enum.TryParse<TargetSyntaxType>(apiTargetSyntax[0].Trim(), true, out var targetSyntaxType))
+                    {
+                        // The first element must be an element of the TargetSyntaxType enum
+                        throw new FormatException($"Invalid target syntax type; target syntax types must be an element of the TargetSyntaxType enum: {apiTargetSyntax[0]}");
+                    }
+
+                    if (!bool.TryParse(apiTargetSyntax[2].Trim(), out bool alertOnAmbiguousMatch))
+                    {
+                        // The third element must be a bool
+                        throw new FormatException($"Invalid alert on ambiguous match value; must be 'true' or 'false': {apiTargetSyntax[2]}");
+                    }
+
+                    ((List<TargetSyntax>)nextMessage.TargetSyntaxes).Add(new TargetSyntax(apiTargetSyntax[1].Trim(), targetSyntaxType, alertOnAmbiguousMatch));
+                }
+            }
+
+            AddNextMessageToRet();
+
+            return ret;
+
+            void AddNextMessageToRet()
+            {
+                if (nextMessage is not null)
+                {
+                    ret.Add(nextMessage);
+                    nextMessage = null;
                 }
             }
         }
