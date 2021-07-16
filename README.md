@@ -1,5 +1,10 @@
 # Upgrade Assistant
 
+## Share your feedback on the .NET Upgrade Assistant!
+We're interested to hearing how your experience with the .NET Upgrade Assistant has been going as you upgrade your project(s) from .NET Framework to .NET 5 and beyond.
+
+[Share your feedback here](https://www.surveymonkey.com/r/2LBPCXH)!
+
 ## Status
 
 | |Build (Debug)|Build (Release)|
@@ -86,7 +91,9 @@ dotnet tool update -g upgrade-assistant --add-source https://pkgs.dev.azure.com/
 
 ### Running the tool
 
-The usual usage of the tool is: `upgrade-assistant upgrade <Path to csproj or sln to upgrade>`
+#### Upgrade Path
+
+The usage for upgrade path of the tool is: `upgrade-assistant upgrade <Path to csproj or sln to upgrade>`
 
 Full usage information:
 
@@ -120,6 +127,33 @@ Options:
 ```
 
 >**:warning:** The primary usage of upgrade-assistant is to be used in interactive mode, giving users control over changes/upgrades done to their projects. Usage of upgrade-assistant with --non-interactive mode can leave projects in a broken state and users are advised to use at their own discretion. **:warning:**
+
+#### Analyze Path
+
+In order analyze pacakge dependencies for a project or a solution use the analyze command with the tool like so : `upgrade-assistant analyze <Path to csproj or sln to analyze>`
+
+Full usage information:
+
+```
+Usage:
+  upgrade-assistant analyze [options] <project>
+
+Arguments:
+  <project>
+
+Options:
+  --extension <extension>                        Specifies a .NET Upgrade Assistant extension package to include. This
+                                                 could be an ExtensionManifest.json file, a directory containing an
+                                                 ExtensionManifest.json file, or a zip archive containing an extension.
+                                                 This option can be specified multiple times.
+  -v, --verbose                                  Enable verbose diagnostics
+  --target-tfm-support <Current|LTS|Preview>     Select if you would like the Long Term Support (LTS), Current, or
+                                                 Preview TFM. See
+                                                 https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
+                                                 details for what these mean.
+  --version                                      Show version information
+  -?, -h, --help                                 Show help and usage information
+```
 
 ### Determining upgrade feasibility
 

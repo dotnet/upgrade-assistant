@@ -8,7 +8,6 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 {
-    [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0007 CodeFix Provider")]
     public class HtmlHelperCodeFixer : IdentifierUpgradeCodeFixer
     {

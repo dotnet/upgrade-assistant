@@ -23,9 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// extensions found in specified paths.
         /// </summary>
         /// <param name="services">The service collection to register services into.</param>
-        /// <param name="currentVersion">The current app version.</param>
-        /// <param name="configuration">The app configuration containing a setting for extension paths and the default extension service providers. These extensions will be registered before those found with the string[] argument.</param>
-        /// <param name="additionalExtensionPaths">Paths to probe for additional extensions. Can be paths to ExtensionManifest.json files, directories with such files, or zip files. These extensions will be registered after those found from configuration.</param>
         /// <returns>A builder for options</returns>
         public static OptionsBuilder<ExtensionOptions> AddExtensions(this IServiceCollection services)
         {
@@ -42,14 +39,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     o.Converters.Add(new JsonStringEnumConverter());
                 });
 
-            services.AddSingleton<ExtensionManager>();
-            services.AddTransient<IEnumerable<ExtensionInstance>>(ctx => ctx.GetRequiredService<ExtensionManager>());
+            services.AddSingleton<IExtensionManager, ExtensionManager>();
             services.AddExtensionLoaders();
 
             return services.AddOptions<ExtensionOptions>();
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> ParseOptions(this IEnumerable<string> options)
+        public static IEnumerable<AdditionalOption> ParseOptions(this IEnumerable<string> options)
         {
             if (options is null)
             {
@@ -62,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 if (split.Length == 2)
                 {
-                    yield return new KeyValuePair<string, string>(split[0], split[1]);
+                    yield return new AdditionalOption(split[0], split[1]);
                 }
             }
         }
@@ -97,25 +93,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             });
         }
 
-        public static OptionsBuilder<ExtensionOptions> AddExtensionOption<TOption>(this OptionsBuilder<ExtensionOptions> builder, TOption option)
+        public static IServiceCollection AddExtensionOption<TOption>(this IServiceCollection services, TOption option)
         {
-            if (builder is null)
+            if (services is null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw new ArgumentNullException(nameof(services));
             }
 
-            var json = JsonSerializer.SerializeToUtf8Bytes(option);
-            using var stream = new MemoryStream(json);
+            services.AddOptions<ExtensionOptions>()
+                .Configure(options =>
+                {
+                    var json = JsonSerializer.SerializeToUtf8Bytes(option);
+                    using var stream = new MemoryStream(json);
 
-            var config = new ConfigurationBuilder()
-                .AddJsonStream(stream)
-                .Build();
+                    var config = new ConfigurationBuilder()
+                        .AddJsonStream(stream)
+                        .Build();
 
-#pragma warning disable CA2000 // Dispose objects before losing scope
-            builder.Services.AddSingleton(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
-#pragma warning restore CA2000 // Dispose objects before losing scope
+                    options.Extensions.Add(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
+                });
 
-            return builder;
+            return services;
         }
 
         public static OptionsBuilder<ExtensionOptions> AddFromEnvironmentVariables(this OptionsBuilder<ExtensionOptions> builder, IConfiguration configuration)

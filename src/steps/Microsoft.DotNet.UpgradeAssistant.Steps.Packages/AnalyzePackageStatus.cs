@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,30 +11,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class AnalyzePackageStatus : IAnalyzeResultProvider
     {
-        private const string SarifLogFilePath = "Dependencies.sarif";
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
-        private readonly IProcessResult _processResult;
         private IDependencyAnalysisState? _analysisState;
-        private IJsonSerializer _jsonSerializer;
 
         private ILogger Logger { get; }
 
+        public string AnalysisTypeName => "Dependency Analysis";
+
         public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
-            ILogger<AnalyzePackageStatus> logger,
-            IProcessResult processResult,
-            IJsonSerializer jsonSerializer)
+            ILogger<AnalyzePackageStatus> logger)
         {
             Logger = logger;
             _tfmSelector = tfmSelector;
-            _processResult = processResult;
-            _jsonSerializer = jsonSerializer;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
         }
 
-        public async Task AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
+        public async Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
         {
             if (analysis is null)
             {
@@ -43,8 +37,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
 
             var context = analysis.UpgradeContext;
-            var dependencies = analysis.Dependencies;
             var projects = context.Projects.ToList();
+
+            var analyzeResults = new List<AnalyzeResult>();
 
             foreach (var project in projects)
             {
@@ -69,19 +64,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-#pragma warning disable CS8604 // Possible null reference argument.
-                dependencies.Add(project.FileInfo.Name, _analysisState);
-#pragma warning restore CS8604 // Possible null reference argument.
+                analyzeResults.Add(new()
+                {
+                    FileLocation = project.FileInfo.Name,
+                    Results = ExtractAnalysisResult(_analysisState)
+                });
             }
 
-            WriteResults(dependencies);
+            return analyzeResults.ToAsyncEnumerable();
         }
 
-        public void WriteResults(Dictionary<string, IDependencyAnalysisState> dependencies)
+        private static IReadOnlyCollection<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
         {
-            var writeOutput = new WriteOutput(_jsonSerializer);
-            var sarifLog = WriteOutput.CreateSarifLog(_processResult.RunProcessResult("Package Dependency Analysis for", dependencies));
-            writeOutput.Write(Path.Combine(Directory.GetCurrentDirectory(), SarifLogFilePath), sarifLog);
+            var results = new List<string>();
+
+            if (analysisState is null || !analysisState.AreChangesRecommended)
+            {
+                results.Add("No package updates needed");
+            }
+            else
+            {
+                GetResults("References to Delete", analysisState.References.Deletions);
+                GetResults("References to Add", analysisState.References.Additions);
+                GetResults("Packages to Delete", analysisState.Packages.Deletions);
+                GetResults("Packages to Add", analysisState.Packages.Additions);
+                GetResults("Framework References to Delete", analysisState.FrameworkReferences.Deletions);
+                GetResults("Framework References to Add", analysisState.FrameworkReferences.Additions);
+
+                void GetResults<T>(string name, IReadOnlyCollection<T> collection)
+                {
+                    if (collection.Any())
+                    {
+                        results.Add(string.Concat(name, " : ", string.Join(" ; ", collection)));
+                    }
+                }
+            }
+
+            return results;
         }
     }
 }

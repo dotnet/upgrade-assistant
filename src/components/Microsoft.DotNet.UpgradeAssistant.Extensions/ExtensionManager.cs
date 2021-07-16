@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -11,8 +13,9 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal sealed class ExtensionManager : IDisposable, IEnumerable<ExtensionInstance>
+    internal sealed class ExtensionManager : IDisposable, IExtensionManager
     {
+        private readonly ILogger<ExtensionManager> _logger;
         private readonly Lazy<IEnumerable<ExtensionInstance>> _extensions;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propogate any exceptions.")]
@@ -21,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             IOptions<ExtensionOptions> options,
             ILogger<ExtensionManager> logger)
         {
+            _logger = logger;
             _extensions = new Lazy<IEnumerable<ExtensionInstance>>(() =>
             {
                 var list = new List<ExtensionInstance>();
@@ -50,6 +54,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 {
                     list.Add(LoadOptionsExtension(options.Value.AdditionalOptions));
                 }
+
+                list.AddRange(options.Value.Extensions);
 
                 return list;
             });
@@ -96,17 +102,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The extension instance will dispose of this.")]
-        private static ExtensionInstance LoadOptionsExtension(IEnumerable<KeyValuePair<string, string>> values)
+        private static ExtensionInstance LoadOptionsExtension(IEnumerable<AdditionalOption> values)
         {
+            var collection = values.Select(v => new KeyValuePair<string, string>(v.Name, v.Value));
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(values)
+                .AddInMemoryCollection(collection)
                 .Build();
 
             return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
         }
 
-        public IEnumerator<ExtensionInstance> GetEnumerator() => _extensions.Value.GetEnumerator();
+        public bool Remove(string name)
+        {
+            _logger.LogInformation("Remove Not Implemented: {Name}", name);
+            return false;
+        }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+        public Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token)
+        {
+            _logger.LogInformation("Update Not Implemented: {Name}", name);
+            return Task.FromResult<ExtensionSource?>(null);
+        }
+
+        public Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token)
+        {
+            _logger.LogInformation("Add Not Implemented: {Name} @{Source}", n.Name, n.Source);
+            return Task.FromResult<ExtensionSource?>(null);
+        }
+
+        public IEnumerable<ExtensionInstance> Instances => _extensions.Value;
+
+        public IEnumerable<ExtensionSource> Registered => _extensions.Value.Select(v => new ExtensionSource(v.Name) { Source = v.Location });
     }
 }
