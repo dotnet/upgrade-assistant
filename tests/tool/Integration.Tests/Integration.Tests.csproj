@@ -13,9 +13,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Remove="IntegrationScenarios\MauiSample\**" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="coverlet.collector">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

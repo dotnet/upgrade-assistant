@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## Current
 
+### Changed
+- Updated try-convert tool version from `0.7.226301` to `0.9.232202`
+
 ### Fixed
 - Fixed regression where `--skip-backup` and `--entrypoint` options were not being passed through [#695](https://github.com/dotnet/upgrade-assistant/pull/695)
  
