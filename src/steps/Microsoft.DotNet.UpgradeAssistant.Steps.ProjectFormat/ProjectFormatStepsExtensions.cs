@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.Services.AddUpgradeStep<SetTFMStep>();
             services.Services.AddUpgradeStep<TryConvertProjectConverterStep>();
-            services.AddExtensionOption<TryConvertOptions>("TryConvert");
+            services.AddExtensionOption<TryConvertProjectConverterStepOptions>("TryConvertProjectConverter");
             services.Services.AddSingleton<ITryConvertTool, TryConvertTool>();
 
             return services.Services.AddOptions<TryConvertProjectConverterStepOptions>()
