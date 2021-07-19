@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class ProjectFormatStepsExtensions
     {
-        public static OptionsBuilder<TryConvertProjectConverterStepOptions> AddProjectFormatSteps(this IExtensionServiceCollection services)
+        public static OptionsBuilder<TryConvertOptions> AddProjectFormatSteps(this IExtensionServiceCollection services)
         {
             if (services is null)
             {
@@ -21,17 +21,17 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.Services.AddUpgradeStep<SetTFMStep>();
             services.Services.AddUpgradeStep<TryConvertProjectConverterStep>();
-            services.AddExtensionOption<TryConvertProjectConverterStepOptions>("TryConvertProjectConverter");
+            services.AddExtensionOption<TryConvertOptions>("TryConvert");
             services.Services.AddSingleton<ITryConvertTool, TryConvertTool>();
 
-            return services.Services.AddOptions<TryConvertProjectConverterStepOptions>()
+            return services.Services.AddOptions<TryConvertOptions>()
                 .PostConfigure(options =>
                 {
-                    var path = Environment.ExpandEnvironmentVariables(options.TryConvertPath);
+                    var path = Environment.ExpandEnvironmentVariables(options.ToolPath);
 
                     if (!Path.IsPathRooted(path))
                     {
-                        var fileInfo = services.Files.GetFileInfo(options.TryConvertPath);
+                        var fileInfo = services.Files.GetFileInfo(options.ToolPath);
 
                         if (fileInfo.Exists && fileInfo.PhysicalPath is string physicalPath)
                         {
@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                         }
                     }
 
-                    options.TryConvertPath = path;
+                    options.ToolPath = path;
                 })
                 .ValidateDataAnnotations();
         }

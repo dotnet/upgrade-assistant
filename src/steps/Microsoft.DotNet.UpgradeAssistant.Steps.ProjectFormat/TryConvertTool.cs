@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public TryConvertTool(
             IProcessRunner runner,
-            IOptions<TryConvertProjectConverterStepOptions> tryConvertOptionsAccessor,
+            IOptions<TryConvertOptions> tryConvertOptionsAccessor,
             MSBuildPathLocator locator)
         {
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
 
             _tryConvertOptions = string.Join(" ", tryConvertOptionsAccessor.Value.Arguments);
-            Path = tryConvertOptionsAccessor.Value.TryConvertPath;
+            Path = tryConvertOptionsAccessor.Value.ToolPath;
             Version = GetVersion();
         }
 

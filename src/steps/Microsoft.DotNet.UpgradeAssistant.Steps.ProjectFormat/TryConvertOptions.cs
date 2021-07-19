@@ -6,10 +6,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
-    public class TryConvertProjectConverterStepOptions
+    public class TryConvertOptions
     {
         [Required]
-        public string TryConvertPath { get; set; } = null!;
+        public string ToolPath { get; set; } = null!;
 
         public string[] Arguments { get; set; } = Array.Empty<string>();
     }
