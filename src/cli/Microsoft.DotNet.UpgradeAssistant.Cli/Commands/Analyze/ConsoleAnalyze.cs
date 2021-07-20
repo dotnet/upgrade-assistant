@@ -62,12 +62,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private string GetProviderVersion(IAnalyzeResultProvider provider)
         {
+            const string NullVersion = "0.0.0";
+
             if (_extensionManager.TryGetExtension(provider, out var extension))
             {
-                return extension.Version?.ToString() ?? string.Empty;
+                return extension.Version?.ToString() ?? NullVersion;
             }
 
-            return string.Empty;
+            return NullVersion;
         }
     }
 }
