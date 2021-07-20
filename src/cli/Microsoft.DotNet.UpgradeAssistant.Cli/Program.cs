@@ -6,6 +6,7 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement;
@@ -20,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Console.WriteLine("This tool is not supported on non-Windows platforms due to dependencies on Visual Studio.");
+                Console.WriteLine(LocalizedStrings.NonWindowsWarning);
                 return Task.FromResult(ErrorCodes.PlatformNotSupported);
             }
 
@@ -49,10 +50,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public static void ShowHeader()
         {
-            var title = $"- Microsoft .NET Upgrade Assistant v{UpgradeVersion.Current.FullVersion} -";
-            Console.WriteLine(new string('-', title.Length));
-            Console.WriteLine(title);
-            Console.WriteLine(new string('-', title.Length));
+            var header = string.Format(CultureInfo.InvariantCulture, LocalizedStrings.UpgradeAssistantHeader, UpgradeVersion.Current.FullVersion);
+            var survey = LocalizedStrings.SurveyText;
+            var length = Math.Max(header.Length, survey.Length);
+            var bar = new string('-', length);
+
+            Console.WriteLine(bar);
+            Console.WriteLine(header);
+            Console.WriteLine();
+            Console.WriteLine(survey);
+            Console.WriteLine(bar);
             Console.WriteLine();
         }
 
@@ -67,10 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 ShowHeader();
 
-                const string Title = "Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.\n\n" +
-                                   "This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.\n\n" +
-                                   "This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to the project will highlight the remaining changes needed after the tool runs.\n";
-                WriteHeading(Title, null);
+                WriteHeading(LocalizedStrings.UpgradeAssistantHeaderDetails, null);
             }
         }
     }
