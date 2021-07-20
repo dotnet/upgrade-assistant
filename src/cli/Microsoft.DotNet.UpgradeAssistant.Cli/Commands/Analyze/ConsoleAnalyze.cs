@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     Name = provider.Name,
                     InformationURI = provider.InformationURI,
                     Id = provider.Id,
-                    AnalysisResults = await provider.AnalyzeAsync(analzyerContext, token),
+                    AnalysisResults = provider.AnalyzeAsync(analzyerContext, token),
                 });
             }
 
