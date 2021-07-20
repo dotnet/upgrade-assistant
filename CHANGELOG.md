@@ -3,6 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Current
+
+### Added
+- Link to survey [#735](https://github.com/dotnet/upgrade-assistant/pull/735)
+
 ## Version 0.2.236301 - 2021-07-15 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.236301))
 
 ### Added
