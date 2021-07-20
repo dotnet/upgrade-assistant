@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                     {
                         _logger.LogInformation(LocalizedStrings.RemovingExtension, n.Name);
 
-                        if (!_extensionManager.Remove(n.Name))
+                        if (!_extensionManager.RemoveAsync(n.Name))
                         {
                             _logger.LogWarning(LocalizedStrings.RemovingExtensionFailed, n.Name);
                         }

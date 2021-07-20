@@ -17,37 +17,39 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
     internal sealed class ExtensionManager : IDisposable, IExtensionManager
     {
         private readonly ILogger<ExtensionManager> _logger;
+        private readonly ExtensionOptions _options;
         private readonly Lazy<IEnumerable<ExtensionInstance>> _extensions;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propogate any exceptions.")]
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propogate any exceptions.")]
         public ExtensionManager(
             IEnumerable<IExtensionLoader> loaders,
             IOptions<ExtensionOptions> options,
             ILogger<ExtensionManager> logger)
         {
             _logger = logger;
+            _options = options.Value;
             _extensions = new Lazy<IEnumerable<ExtensionInstance>>(() =>
             {
                 var list = new List<ExtensionInstance>();
 
-                foreach (var path in options.Value.ExtensionPaths)
+                foreach (var path in _options.ExtensionPaths)
                 {
                     LoadPath(path, isDefault: false);
                 }
 
-                foreach (var path in options.Value.DefaultExtensions)
+                foreach (var path in _options.DefaultExtensions)
                 {
                     LoadPath(path, isDefault: true);
                 }
 
                 logger.LogInformation("Loaded {Count} extensions", list.Count);
 
-                if (options.Value.AdditionalOptions.Any())
+                if (_options.AdditionalOptions.Any())
                 {
-                    list.Add(LoadOptionsExtension(options.Value.AdditionalOptions));
+                    list.Add(LoadOptionsExtension(_options.AdditionalOptions));
                 }
 
-                list.AddRange(options.Value.Extensions);
+                list.AddRange(_options.Extensions);
 
                 return list;
 
@@ -57,10 +59,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     {
                         if (isDefault)
                         {
-                            extension = extension with { Version = options.Value.CurrentVersion };
+                            extension = extension with { Version = _options.CurrentVersion };
                         }
 
-                        if (extension.MinUpgradeAssistantVersion is Version minVersion && minVersion < options.Value.CurrentVersion)
+                        if (extension.MinUpgradeAssistantVersion is Version minVersion && minVersion < _options.CurrentVersion)
                         {
                             logger.LogWarning("Could not load extension from {Path}. Requires at least v{Version} of Upgrade Assistant.", path, minVersion);
                         }
@@ -117,7 +119,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The extension instance will dispose of this.")]
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The extension instance will dispose of this.")]
         private static ExtensionInstance LoadOptionsExtension(IEnumerable<AdditionalOption> values)
         {
             var collection = values.Select(v => new KeyValuePair<string, string>(v.Name, v.Value));
@@ -128,10 +130,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
         }
 
-        public bool Remove(string name)
+        public async Task<bool> RemoveAsync(string name, CancellationToken token)
         {
-            _logger.LogInformation("Remove Not Implemented: {Name}", name);
-            return false;
+            var config = await UpgradeAssistantData.LoadAsync(_options.DataFile, token).ConfigureAwait(false);
+
+            var updated = config with
+            {
+                Extensions = config.Extensions.Where(e => !string.Equals(e.Name, name, StringComparison.Ordinal)),
+            };
+
+            return updated.Extensions.SequenceEqual(config.Extensions);
         }
 
         public Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token)

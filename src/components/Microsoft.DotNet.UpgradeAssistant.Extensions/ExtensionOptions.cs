@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -18,5 +20,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public ICollection<ExtensionInstance> Extensions { get; } = new List<ExtensionInstance>();
 
         public Version CurrentVersion { get; set; } = null!;
+
+        public IFileProvider CachedExtensions { get; } = new PhysicalFileProvider(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Upgrade Assistant"));
+
+        public string DataFile { get; } = Path.Combine(Environment.CurrentDirectory, "upgrade-assistant.json");
     }
 }
