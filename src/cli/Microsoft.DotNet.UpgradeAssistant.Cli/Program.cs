@@ -6,7 +6,6 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement;
@@ -50,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public static void ShowHeader()
         {
-            var header = string.Format(CultureInfo.InvariantCulture, LocalizedStrings.UpgradeAssistantHeader, UpgradeVersion.Current.FullVersion);
+            var header = SR.Format(LocalizedStrings.UpgradeAssistantHeader, UpgradeVersion.Current.FullVersion);
             var survey = LocalizedStrings.SurveyText;
             var length = Math.Max(header.Length, survey.Length);
             var bar = new string('-', length);
