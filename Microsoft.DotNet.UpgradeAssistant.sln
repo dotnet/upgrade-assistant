@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		NuGet.config = NuGet.config
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		README.md = README.md
+		stylecop.json = stylecop.json
 		TryConvertInstaller.targets = TryConvertInstaller.targets
 	EndProjectSection
 EndProject
