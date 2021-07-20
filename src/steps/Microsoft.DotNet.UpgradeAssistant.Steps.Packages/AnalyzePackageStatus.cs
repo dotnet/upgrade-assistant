@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
@@ -33,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _analysisState = null;
         }
 
-        public async Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
+        public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
         {
             if (analysis is null)
             {
@@ -42,8 +43,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             var context = analysis.UpgradeContext;
             var projects = context.Projects.ToList();
-
-            var analyzeResults = new List<AnalyzeResult>();
 
             foreach (var project in projects)
             {
@@ -68,14 +67,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-                analyzeResults.Add(new()
+                yield return new()
                 {
                     FileLocation = project.FileInfo.Name,
                     Results = ExtractAnalysisResult(_analysisState)
-                });
+                };
             }
-
-            return analyzeResults.ToAsyncEnumerable();
         }
 
         private static IReadOnlyCollection<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
