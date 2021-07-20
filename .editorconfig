@@ -264,12 +264,6 @@ dotnet_diagnostic.SA1600.severity = none
 # SA1601: Partial elements should be documented
 dotnet_diagnostic.SA1601.severity = none
 
-# SA1629: Documentation text should end with a period
-dotnet_diagnostic.SA1629.severity = warning
-
-# SA1633: The file header is missing or not located at the top of the file
-dotnet_diagnostic.SA1633.severity = warning
-
 # CA1819: Properties should not return arrays
 dotnet_diagnostic.CA1819.severity = none
 
