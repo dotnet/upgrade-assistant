@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 foreach (var path in defaultExtensions)
                 {
-                    options.ExtensionPaths.Add(path);
+                    options.DefaultExtensions.Add(path);
                 }
             });
         }
