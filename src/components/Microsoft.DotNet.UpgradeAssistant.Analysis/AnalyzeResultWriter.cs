@@ -21,6 +21,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             this._serializer = serializer;
         }
 
+        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, CancellationToken token)
+        {
+            if (results is null)
+            {
+                throw new ArgumentNullException(nameof(results));
+            }
+
+            var sarifLog = new SarifLog()
+            {
+                Version = SarifVersion.Current,
+                SchemaUri = new Uri("http://json.schemastore.org/sarif-2.1.0"),
+                Runs = await ExtractRunsAsync(results).ConfigureAwait(false),
+            };
+
+            _serializer.Write(_sarifLogPath, sarifLog);
+        }
+
         private static async Task<List<Run>> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResults)
         {
             var runs = new List<Run>();
@@ -42,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                                 {
                                     Id = ar.Id,
                                     Name = ar.Name,
-                                }
+                                },
                             },
                         },
                     },
@@ -60,50 +77,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             var results = new List<Result>();
             await foreach (var r in result.AnalysisResults)
             {
-                results.Add(GetResult(result.Id, result.Name, r.FileLocation, r.Results));
+                GetResult(result.Id, r, results);
             }
 
             return results;
         }
 
-        private static Result GetResult(string id, string name, string fileLocation, IReadOnlyCollection<string> collection)
+        private static void GetResult(string id, AnalyzeResult analyzeResult, IList<Result> results)
         {
-            var attachments = new List<Attachment>();
-            foreach (var s in collection)
+            foreach (var s in analyzeResult.Results)
             {
-                attachments.Add(new()
+                results.Add(new()
                 {
-                    Description = s.ToMessage(),
-                    ArtifactLocation = new()
+                    RuleId = id,
+                    Message = s.ToMessage(),
+                    Locations = new List<Location>()
                     {
-                        Uri = new Uri(Path.GetFullPath(fileLocation)),
+                        new()
+                        {
+                            PhysicalLocation = new()
+                            {
+                                ArtifactLocation = new()
+                                {
+                                    Uri = new Uri(Path.GetFullPath(analyzeResult.FileLocation)),
+                                },
+                            },
+                        },
                     },
                 });
             }
-
-            return new Result()
-            {
-                RuleId = id,
-                Message = string.Concat(name, " for ", fileLocation).ToMessage(),
-                Attachments = attachments,
-            };
-        }
-
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, CancellationToken token)
-        {
-            if (results is null)
-            {
-                throw new ArgumentNullException(nameof(results));
-            }
-
-            var sarifLog = new SarifLog()
-            {
-                Version = SarifVersion.Current,
-                SchemaUri = new Uri("http://json.schemastore.org/sarif-2.1.0"),
-                Runs = await ExtractRunsAsync(results).ConfigureAwait(false),
-            };
-
-            _serializer.Write(_sarifLogPath, sarifLog);
         }
     }
 }

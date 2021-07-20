@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 yield return new()
                 {
                     FileLocation = project.FileInfo.Name,
-                    Results = ExtractAnalysisResult(_analysisState)
+                    Results = ExtractAnalysisResult(_analysisState),
                 };
             }
         }
@@ -84,18 +84,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
             else
             {
-                GetResults("References to Delete", analysisState.References.Deletions);
-                GetResults("References to Add", analysisState.References.Additions);
-                GetResults("Packages to Delete", analysisState.Packages.Deletions);
-                GetResults("Packages to Add", analysisState.Packages.Additions);
-                GetResults("Framework References to Delete", analysisState.FrameworkReferences.Deletions);
-                GetResults("Framework References to Add", analysisState.FrameworkReferences.Additions);
+                GetResults("Reference to ", " needs to be deleted ", analysisState.References.Deletions);
+                GetResults("Reference to ", " needs to be added ", analysisState.References.Additions);
+                GetResults("Package ", " needs to be deleted ", analysisState.Packages.Deletions);
+                GetResults("Package ", " needs to be added ", analysisState.Packages.Additions);
+                GetResults("Framework Reference to ", " needs to be deleted ", analysisState.FrameworkReferences.Deletions);
+                GetResults("Framework Reference to ", " needs to be added ", analysisState.FrameworkReferences.Additions);
 
-                void GetResults<T>(string name, IReadOnlyCollection<T> collection)
+                void GetResults<T>(string name, string action, IReadOnlyCollection<T> collection)
                 {
                     if (collection.Any())
                     {
-                        results.Add(string.Concat(name, " : ", string.Join(" ; ", collection)));
+                        foreach (var s in collection)
+                        {
+                            results.Add(string.Concat(name, s, action));
+                        }
                     }
                 }
             }
