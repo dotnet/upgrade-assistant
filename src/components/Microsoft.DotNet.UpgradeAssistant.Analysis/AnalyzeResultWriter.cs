@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Sarif;
@@ -32,10 +33,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                     {
                         Driver = new()
                         {
-                            Name = ar.AnalysisTypeName,
+                            Name = ar.Name,
+                            SemanticVersion = ar.Version,
+                            InformationUri = ar.InformationURI,
+                            Rules = new List<ReportingDescriptor>()
+                            {
+                                new()
+                                {
+                                    Id = ar.Id,
+                                    Name = ar.Name,
+                                }
+                            },
                         },
                     },
-                    Results = await ExtractResultsAsync(ar.AnalysisResults).ConfigureAwait(false),
+                    Results = await ExtractResultsAsync(ar).ConfigureAwait(false),
                 };
 
                 runs.Add(run);
@@ -44,18 +55,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             return runs;
         }
 
-        private static async Task<IList<Result>> ExtractResultsAsync(IAsyncEnumerable<AnalyzeResult> analyzeResults)
+        private static async Task<IList<Result>> ExtractResultsAsync(AnalyzeResultDefinition result)
         {
             var results = new List<Result>();
-            await foreach (var r in analyzeResults)
+            await foreach (var r in result.AnalysisResults)
             {
-                results.Add(GetResult(r.FileLocation, r.Results));
+                results.Add(GetResult(result.Id, result.Name, r.FileLocation, r.Results));
             }
 
             return results;
         }
 
-        private static Result GetResult(string name, IReadOnlyCollection<string> collection)
+        private static Result GetResult(string id, string name, string fileLocation, IReadOnlyCollection<string> collection)
         {
             var attachments = new List<Attachment>();
             foreach (var s in collection)
@@ -65,14 +76,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                     Description = s.ToMessage(),
                     ArtifactLocation = new()
                     {
-                        Uri = new Uri(Path.GetFullPath(name)),
+                        Uri = new Uri(Path.GetFullPath(fileLocation)),
                     },
                 });
             }
 
             return new Result()
             {
-                Message = name.ToMessage(),
+                RuleId = id,
+                Message = string.Concat(name, " for ", fileLocation).ToMessage(),
                 Attachments = attachments,
             };
         }

@@ -10,7 +10,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public interface IAnalyzeResultProvider
     {
-        string AnalysisTypeName { get; }
+        string Id { get; }
+
+        string Name { get; }
+
+        Uri InformationURI { get; }
 
         Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
     }
