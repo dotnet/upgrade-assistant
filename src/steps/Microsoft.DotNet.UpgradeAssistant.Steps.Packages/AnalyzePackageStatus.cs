@@ -17,7 +17,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private ILogger Logger { get; }
 
-        public string AnalysisTypeName => "Dependency Analysis";
+        public string Id => "UA101";
+
+        public string Name => "Dependency Analysis";
+
+        public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
         public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
