@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         [AllowNull]
         public string Source
         {
-            get => string.IsNullOrEmpty(_source) ? DefaultSource : _source;
+            get => string.IsNullOrEmpty(_source) ? DefaultSource : _source!;
             init => _source = value;
         }
 

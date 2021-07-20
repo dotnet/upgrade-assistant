@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.FileProviders;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     [DebuggerDisplay("{Name}, {Location}")]
-    public sealed class ExtensionInstance : IDisposable
+    public sealed record ExtensionInstance : IDisposable, IExtensionInstance
     {
         private const string ExtensionServiceProvidersSectionName = "ExtensionServiceProviders";
         public const string ManifestFileName = "ExtensionManifest.json";
@@ -35,6 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             Configuration = configuration;
             Name = GetName(Configuration, location);
 
+            Version = GetOptions<Version>("Version");
             var serviceProviders = GetOptions<string[]>(ExtensionServiceProvidersSectionName);
 
             if (serviceProviders is not null)
@@ -70,7 +72,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public IConfiguration Configuration { get; }
 
-        public Version? Version => GetOptions<Version>("Version");
+        public Version? Version { get; init; }
 
         public Version? MinUpgradeAssistantVersion => GetOptions<Version>("MinRequiredVersion");
 
@@ -82,6 +84,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 disposable.Dispose();
             }
+        }
+
+        public bool IsInExtension(Assembly assembly)
+        {
+            if (_alc is not null && _alc.IsValueCreated)
+            {
+                return AssemblyLoadContext.GetLoadContext(assembly) == _alc.Value;
+            }
+
+            return false;
         }
 
         private static string GetName(IConfiguration configuration, string location)

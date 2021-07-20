@@ -6,6 +6,9 @@
         <dependencyFromLayerToLayer Id="14d5a788-fc82-48e3-ada3-f48eae36550a" direction="Forward">
           <layerMoniker Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" />
         </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="ca5beb93-d957-49cb-908d-e10527cbe7e4" direction="Forward">
+          <layerMoniker Id="87aac048-b443-4d5c-bd87-162b1ff74794" />
+        </dependencyFromLayerToLayer>
       </dependencyToLayers>
       <childLayers>
         <layer Id="46a933fd-b02e-436d-b9db-b39340bf6dfb" name="Microsoft.DotNet.UpgradeAssistant.Analysis">
@@ -41,7 +44,7 @@
             <dependencyFromLayerToLayer Id="4eb05fc8-7632-4c4d-bd35-79dbe170d726" direction="Forward">
               <layerMoniker Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" />
             </dependencyFromLayerToLayer>
-            <dependencyFromLayerToLayer Id="71cb7a7d-2ade-4043-924d-fb1bca0e1ef5" direction="Forward">
+            <dependencyFromLayerToLayer Id="14b2369b-4543-47d6-a84f-d3bf816a66d4" direction="Forward">
               <layerMoniker Id="f963feaf-9149-4f6c-b7dc-4c77d408cdb7" />
             </dependencyFromLayerToLayer>
           </dependencyToLayers>
@@ -225,6 +228,9 @@
         <dependencyFromLayerToLayer Id="af7dde6b-8acb-44d5-b8d4-96055c35dc18" direction="Forward">
           <layerMoniker Id="134a1aec-fef4-43c8-91f7-f35e4d530561" />
         </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="6774b57b-6981-4d0d-93da-1a91ee5db314" direction="Forward">
+          <layerMoniker Id="87aac048-b443-4d5c-bd87-162b1ff74794" />
+        </dependencyFromLayerToLayer>
       </dependencyToLayers>
       <references>
         <reference Id="29b3af84-b65b-43e4-b987-ecda2a20a3a6" name="Microsoft.DotNet.UpgradeAssistant.Cli">
@@ -260,6 +266,19 @@
             <LinkCategory Ref="Represents" />
           </ExpandedNode>
           <ExpandedNode Id="(Assembly=PackageMapSample)" Label="PackageMapSample.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+        </reference>
+      </references>
+    </layer>
+    <layer Id="87aac048-b443-4d5c-bd87-162b1ff74794" name="Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal">
+      <references>
+        <reference Id="358a242c-6f21-4dd6-883d-36a29e83286c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal">
+          <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal" Category="CodeSchema_Project" Id="(Assembly=../../src/common/Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal/Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.csproj)">
+            <Category Ref="File" />
+          </ArtifactNode>
+          <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal)" Label="Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Produces" />
             <LinkCategory Ref="Represents" />
           </ExpandedNode>
         </reference>
