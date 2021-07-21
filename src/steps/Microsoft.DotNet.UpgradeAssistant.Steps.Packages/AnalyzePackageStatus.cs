@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -68,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 yield return new()
                 {
-                    FileLocation = project.FileInfo.Name,
+                    FileLocation = Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name),
                     Results = ExtractAnalysisResult(_analysisState),
                 };
             }

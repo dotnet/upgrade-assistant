@@ -32,19 +32,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 Version = SarifVersion.Current,
                 SchemaUri = new Uri("http://json.schemastore.org/sarif-2.1.0"),
-                Runs = await ExtractRunsAsync(results).ConfigureAwait(false),
+                Runs = await ExtractRunsAsync(results).ToListAsync().ConfigureAwait(false),
             };
 
             _serializer.Write(_sarifLogPath, sarifLog);
         }
 
-        private static async Task<List<Run>> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResults)
+        private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResults)
         {
-            var runs = new List<Run>();
-
             await foreach (var ar in analyzeResults)
             {
-                var run = new Run()
+                yield return new()
                 {
                     Tool = new()
                     {
@@ -65,11 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                     },
                     Results = await ExtractResultsAsync(ar).ConfigureAwait(false),
                 };
-
-                runs.Add(run);
             }
-
-            return runs;
         }
 
         private static async Task<IList<Result>> ExtractResultsAsync(AnalyzeResultDefinition result)
@@ -77,17 +71,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             var results = new List<Result>();
             await foreach (var r in result.AnalysisResults)
             {
-                GetResult(result.Id, r, results);
+                results.AddRange(GetResult(result.Id, r));
             }
 
             return results;
         }
 
-        private static void GetResult(string id, AnalyzeResult analyzeResult, IList<Result> results)
+        private static IEnumerable<Result> GetResult(string id, AnalyzeResult analyzeResult)
         {
             foreach (var s in analyzeResult.Results)
             {
-                results.Add(new()
+                yield return new()
                 {
                     RuleId = id,
                     Message = s.ToMessage(),
@@ -104,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                             },
                         },
                     },
-                });
+                };
             }
         }
     }
