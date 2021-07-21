@@ -87,20 +87,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     var apiTargetSyntax = line.Split(ApiSyntaxDelimiters, StringSplitOptions.RemoveEmptyEntries);
                     if (apiTargetSyntax.Length != 3)
                     {
-                        // Syntaxes must have exactly three elements
-                        throw new FormatException($"Invalid API target syntax; API target syntaxes must have exactly three elements delimited by commas: {line}");
+                        continue;
                     }
 
                     if (!Enum.TryParse<TargetSyntaxType>(apiTargetSyntax[0].Trim(), true, out var targetSyntaxType))
                     {
-                        // The first element must be an element of the TargetSyntaxType enum
-                        throw new FormatException($"Invalid target syntax type; target syntax types must be an element of the TargetSyntaxType enum: {apiTargetSyntax[0]}");
+                        continue;
                     }
 
-                    if (!bool.TryParse(apiTargetSyntax[2].Trim(), out bool alertOnAmbiguousMatch))
+                    if (!bool.TryParse(apiTargetSyntax[2].Trim(), out var alertOnAmbiguousMatch))
                     {
-                        // The third element must be a bool
-                        throw new FormatException($"Invalid alert on ambiguous match value; must be 'true' or 'false': {apiTargetSyntax[2]}");
+                        continue;
                     }
 
                     ((List<TargetSyntax>)nextMessage.TargetSyntaxes).Add(new TargetSyntax(apiTargetSyntax[1].Trim(), targetSyntaxType, alertOnAmbiguousMatch));
