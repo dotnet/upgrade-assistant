@@ -1,6 +1,8 @@
 ﻿# Target syntax messages are defined as an ID and message (formatted as `ID: Message`) followed by APIs that the message applies to.
 # APIs are described by a three-tuple of API type, API name, and a boolean indicating whether the alert should be given in cases where
 # the API is only ambiguously matched.
+#
+# Generic types and members should end with `X where X is the number of generic parameters they take.
 
 A: HTTP modules and HTTP handlers should be rewritten as middleware in ASP.NET Core. https://docs.microsoft.com/aspnet/core/migration/http-modulesIHttpModule
 Type, System.Web.IHttpModule, true
@@ -23,10 +25,11 @@ F: ASP.NET membership should be replaced with ASP.NET Core identity. For more de
 Type, System.Web.Security.Membership, true
 Type, System.Web.Security.FormsAuthentication, true
 
+# Note that generic types should end with `x where x is the number of generic parameters they take
 G: ASP.NET identity should be replaced with ASP.NET Core identity. For more details, see https://docs.microsoft.com/aspnet/core/migration/identity
 Namespace, Microsoft.AspNet.Identity, false
-Type, Microsoft.AspNet.Identity.UserManager, true
-Type, Microsoft.AspNet.Identity.Owin.SignInManager, true
+Type, Microsoft.AspNet.Identity.UserManager`2, true
+Type, Microsoft.AspNet.Identity.Owin.SignInManager`2, true
 
 H: HttpRequest.RawUrl should be replaced with HttpRequest.GetEncodedUrl() or HttpRequest.GetDisplayUrl()
 Member, Microsoft.AspNetCore.Http.HttpRequest.RawUrl, false

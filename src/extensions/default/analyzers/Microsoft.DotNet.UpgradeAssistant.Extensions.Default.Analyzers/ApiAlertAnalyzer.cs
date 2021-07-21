@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using CS = Microsoft.CodeAnalysis.CSharp;
@@ -92,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             };
 
             // Find target syntax/message mappings that include this node's simple name
-            var fullyQualifiedName = context.Node.GetFullName();
+            var fullyQualifiedName = UnbindGenericName(context.Node.GetQualifiedName().ToString());
 
             var stringComparison = context.Node.GetStringComparison();
             var partialMatches = targetSyntaxMessages.SelectMany(m => m.TargetSyntaxes.Select(s => (TargetSyntax: s, Mapping: m)))
@@ -115,9 +116,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 if (match.TargetSyntax.SyntaxType switch
                 {
-                    TargetSyntaxType.Member => AnalyzeMember(context, match.TargetSyntax),
-                    TargetSyntaxType.Type => AnalyzeType(context, match.TargetSyntax),
-                    TargetSyntaxType.Namespace => AnalyzeNamespace(context, match.TargetSyntax),
+                    TargetSyntaxType.Member => AnalyzeMember(context, fullyQualifiedName, match.TargetSyntax),
+                    TargetSyntaxType.Type => AnalyzeType(context, fullyQualifiedName, match.TargetSyntax),
+                    TargetSyntaxType.Namespace => AnalyzeNamespace(context, fullyQualifiedName, match.TargetSyntax),
                     _ => false,
                 })
                 {
@@ -133,12 +134,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
         }
 
-        private static bool AnalyzeNamespace(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
+        private static bool AnalyzeNamespace(SyntaxNodeAnalysisContext context,  string qualifiedName, TargetSyntax targetSyntax)
         {
             // If the node is a fully qualified name from the specified namespace, return true
             // This should cover both import statements and fully qualified type names, so no addtional checks
             // for import statements are needed.
-            var qualifiedName = context.Node.GetFullName();
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -150,10 +150,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return false;
         }
 
-        private static bool AnalyzeType(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
+        private static bool AnalyzeType(SyntaxNodeAnalysisContext context, string qualifiedName, TargetSyntax targetSyntax)
         {
             // If the node matches the target's fully qualified name, return true.
-            var qualifiedName = context.Node.GetFullName();
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -194,10 +193,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return targetSyntax.AlertOnAmbiguousMatch;
         }
 
-        private static bool AnalyzeMember(SyntaxNodeAnalysisContext context, TargetSyntax targetSyntax)
+        private static bool AnalyzeMember(SyntaxNodeAnalysisContext context, string qualifiedName, TargetSyntax targetSyntax)
         {
             // If the node matches the target's fully qualified name, return true.
-            var qualifiedName = context.Node.GetFullName();
             if (qualifiedName.Equals(targetSyntax.FullName, context.Node.GetStringComparison()))
             {
                 return true;
@@ -218,6 +216,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             // If the node's full type can't be determined (either by symbol or fully qualified syntax),
             // return true for the partial match only if ambiguous matching is enabled
             return targetSyntax.AlertOnAmbiguousMatch;
+        }
+
+        private static readonly Regex GenericParameterMatcher = new(@"[<(].*[>)]", RegexOptions.Compiled);
+
+        private static string UnbindGenericName(string name)
+        {
+            if (name is null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            var match = GenericParameterMatcher.Match(name);
+
+            // If the name contains generic parameters, replace them with `x where x is the
+            // number of parameters. Otherwise, return the name as is.
+            return match.Success
+                ? $"{name.Substring(0, match.Index)}`{match.Value.Count(c => c == ',') + 1}"
+                : name;
         }
     }
 }

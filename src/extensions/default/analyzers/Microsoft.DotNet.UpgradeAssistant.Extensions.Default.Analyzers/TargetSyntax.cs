@@ -21,9 +21,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             private init
             {
                 _fullName = value;
-                SimpleName = _fullName.LastIndexOf('.') < 0
-                    ? _fullName
-                    : _fullName.Substring(_fullName.LastIndexOf('.') + 1);
+
+                // The simple name is the identifier after any namespace qualifications and before any generic type parameters
+                var startIndex = _fullName.LastIndexOf('.') + 1;
+                var endIndex = _fullName.IndexOf('`');
+                if (endIndex < 0)
+                {
+                    endIndex = _fullName.Length;
+                }
+
+                SimpleName = startIndex > 0 || endIndex < _fullName.Length
+                    ? _fullName.Substring(startIndex, endIndex - startIndex)
+                    : _fullName;
             }
         }
 

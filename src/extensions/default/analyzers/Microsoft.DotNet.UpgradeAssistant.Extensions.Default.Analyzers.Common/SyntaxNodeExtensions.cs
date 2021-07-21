@@ -303,21 +303,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 LanguageNames.VisualBasic => StringComparer.OrdinalIgnoreCase,
                 _ => throw new NotImplementedException(Resources.UnknownLanguage),
             };
-
-        private static readonly char[] GenericParameterDelimiters = new[] { '<', '>', '(', ')' };
-
-        public static string GetFullName(this SyntaxNode node)
-        {
-            var fullName = node.GetQualifiedName().ToString();
-
-            // Ignore generic parameters for now to simplify matching
-            var genericParameterIndex = fullName.IndexOfAny(GenericParameterDelimiters);
-            if (genericParameterIndex > 0)
-            {
-                fullName = fullName.Substring(0, genericParameterIndex);
-            }
-
-            return fullName;
-        }
     }
 }
