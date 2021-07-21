@@ -15,9 +15,11 @@ We're interested to hearing how your experience with the .NET Upgrade Assistant 
 
 ## Overview
 
-This project enables automation of common tasks related to upgrading .NET Framework projects to .NET 5.0. Note that this is not a complete upgrade tool and work *will* be required after using the tooling to upgrade a project.
+This project enables automation of common tasks related to upgrading .NET Framework projects to .NET 5 and beyond. Note that this is not a complete upgrade tool and work *will* be required after using the tooling to upgrade a project.
 
-When run on a solution, the tool will:
+### Upgrade Solution
+
+When run on a solution in order to upgrade, the tool will:
 
 - Determine which projects need upgraded and recommend the order the projects should be upgraded in
 - Update the project file to be an SDK-style project
@@ -29,7 +31,14 @@ When run on a solution, the tool will:
 - For projects targeting Windows, add a reference to the Microsoft.Windows.Compatibility package
 - Add references to analyzers that help with upgrade, such as the Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers package
 
-After running this tool on a solution, the solution will likely not build until the upgrade is completed manually. Analyzers added to the solution will highlight some of the remaining changes needed after the tool runs.
+After running this tool on a solution to upgrade, the solution will likely not build until the upgrade is completed manually. Analyzers added to the solution will highlight some of the remaining changes needed after the tool runs.
+
+### Analyze Solution prior to Upgrade
+
+When run on a solution in order to analyze dependencies prior to upgrade, the tool will provide an analysis report for each of the projects in the solution containing details on:
+- Package dependencies that need to be removed / added in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
+- References that need to be removed / added in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
+- Framework References that need to be removed / added in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
 
 ## Upgrade documentation
 
@@ -154,7 +163,12 @@ Options:
   --version                                      Show version information
   -?, -h, --help                                 Show help and usage information
 ```
+The output of the analyze command is a report in SARIF format. SARIF is based on JSON and can be viewed using the following viewers:
 
+- Any text editor. 
+- [VS extension for SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=WDGIS.MicrosoftSarifViewer) for a richer experience.
+
+Sample of the report in VS SARIF Viewer : ![Analysis Report](docs/images/AnalysisReport.png)
 ### Determining upgrade feasibility
 
 Note that this tool does not (yet) advise on the feasibility or estimated cost of upgrading projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to .NET 5.0.

@@ -13,7 +13,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         public ConsoleAnalyzeCommand()
             : base("analyze")
         {
-            IsHidden = !FeatureFlags.IsRequested("ANALYZE");
             Handler = CommandHandler.Create<ParseResult, CommandOptions, CancellationToken>((result, options, token) =>
                 Host.CreateDefaultBuilder()
                     .UseConsoleUpgradeAssistant<ConsoleAnalyze>(options, result)
