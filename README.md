@@ -168,7 +168,7 @@ The output of the analyze command is a report in SARIF format. SARIF is based on
 - Any text editor. 
 - [VS extension for SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=WDGIS.MicrosoftSarifViewer) for a richer experience.
 
-Sample of the report in VS SARIF Viewer : ![Analysis Report](docs/images/AnalysisReport.png)
+Sample of the report in VS SARIF Viewer : ![Analysis Report](/docs/images/AnalysisReport.PNG)
 ### Determining upgrade feasibility
 
 Note that this tool does not (yet) advise on the feasibility or estimated cost of upgrading projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to .NET 5.0.
