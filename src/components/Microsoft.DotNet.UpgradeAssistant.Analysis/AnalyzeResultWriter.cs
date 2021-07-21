@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 Version = SarifVersion.Current,
                 SchemaUri = new Uri("http://json.schemastore.org/sarif-2.1.0"),
-                Runs = await ExtractRunsAsync(results).ToListAsync().ConfigureAwait(false),
+                Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
 
             _serializer.Write(_sarifLogPath, sarifLog);
