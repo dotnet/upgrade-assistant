@@ -2,6 +2,6 @@
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
      <!-- Required for https://github.com/DotNetAnalyzers/StyleCopAnalyzers/issues/3092 -->
      <Rule Id="SA0001" Action="None" />
-     <Rule Id="SA1633" Action="None" />
+     <Rule Id="SA1633" Action="Warning" />
    </Rules>
 </RuleSet>

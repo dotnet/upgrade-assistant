@@ -4,14 +4,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public interface IAnalyzeResultProvider
     {
-        string AnalysisTypeName { get; }
+        string Id { get; }
 
-        Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
+        string Name { get; }
+
+        Uri InformationURI { get; }
+
+        IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
     }
 }
