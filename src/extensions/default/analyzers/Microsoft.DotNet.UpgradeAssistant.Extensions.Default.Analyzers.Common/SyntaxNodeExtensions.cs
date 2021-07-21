@@ -91,15 +91,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 throw new ArgumentNullException(nameof(node));
             }
 
-            // If the node is part of a qualified name, we want to get the full qualified name
-            while (node.Parent is CSSyntax.NameSyntax || node.Parent is VBSyntax.NameSyntax)
-            {
-                node = node.Parent;
-            }
-
-            // If the node is part of a member access expression (a static member access, for example), then the
-            // qualified name will be a member access expression rather than a name syntax.
-            if ((node.Parent is CSSyntax.MemberAccessExpressionSyntax csMAE && csMAE.Name.IsEquivalentTo(node))
+            // If the node is part of a qualified name or a member access expression, we want to get the full qualified name
+            // which will be the parent of that node. It's not necessary to recurse to the parent's ancestors since qualified
+            // names and member access expressions are composed of simple names on the right and the entire qualifier on the left.
+            if ((node.Parent is CSSyntax.QualifiedNameSyntax csName && csName.Right.IsEquivalentTo(node))
+                || (node.Parent is VBSyntax.QualifiedNameSyntax vbName && vbName.Right.IsEquivalentTo(node))
+                || (node.Parent is CSSyntax.MemberAccessExpressionSyntax csMAE && csMAE.Name.IsEquivalentTo(node))
                 || (node.Parent is VBSyntax.MemberAccessExpressionSyntax vbMAE && vbMAE.Name.IsEquivalentTo(node)))
             {
                 node = node.Parent;
@@ -277,6 +274,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 
             throw new NotImplementedException(Resources.UnknownLanguage);
         }
+
+        /// <summary>
+        /// Gets the ExpressionSyntax (the left part of the member access) from a C# or VB MemberAccessExpressionSyntax.
+        /// </summary>
+        /// <param name="memberAccessSyntax">The syntax whose expression propety should be returned. Note that this syntax must be of type Microsoft.CodeAnalysis.CSharp.Syntax.MemberAccessExpressionSyntax or Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax.</param>
+        /// <returns>The member access expression's expression (the left part of the member access).</returns>
+        public static SyntaxNode? GetChildExpressionSyntax(this SyntaxNode memberAccessSyntax) =>
+            memberAccessSyntax switch
+            {
+                CSSyntax.MemberAccessExpressionSyntax csMAE => csMAE.Expression,
+                VBSyntax.MemberAccessExpressionSyntax vbMAE => vbMAE.Expression,
+                _ => null
+            };
 
         public static StringComparison GetStringComparison(this SyntaxNode? node)
             => node?.Language switch

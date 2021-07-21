@@ -1,0 +1,36 @@
+﻿# Target syntax messages are defined as an ID and message (formatted as `ID: Message`) followed by APIs that the message applies to.
+# APIs are described by a three-tuple of API type, API name, and a boolean indicating whether the alert should be given in cases where
+# the API is only ambiguously matched.
+#
+# Generic types and members should end with `X where X is the number of generic parameters they take.
+
+A: HTTP modules and HTTP handlers should be rewritten as middleware in ASP.NET Core. https://docs.microsoft.com/aspnet/core/migration/http-modulesIHttpModule
+Type, System.Web.IHttpModule, true
+Type, System.Web.IHttpHandler, true
+
+B: WCF server APIs are unsupported on .NET Core. Consider rewriting to use gRPC (https://docs.microsoft.com/dotnet/architecture/grpc-for-wcf-developers), ASP.NET Core, or CoreWCF (https://github.com/CoreWCF/CoreWCF) instead.
+Type, System.ServiceModel.ServiceHost, true
+Type, System.ServiceModel.ServiceHostBase, true
+
+C: Script and style bundling works differently in ASP.NET Core. BundleCollection should be replaced by alternative bundling technologies. https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+Type, System.Web.Optimization.BundleCollection, true
+
+D: Although ClickOnce is supported on .NET 5+, apps do not have access to the System.Deployment.Application namespace. For more details see https://github.com/dotnet/deployment-tools/issues/27 and https://github.com/dotnet/deployment-tools/issues/53
+Namespace, System.Deployment.Application, false
+
+E: Child actions should be replaced with view components. For more details, see https://docs.microsoft.com/aspnet/core/mvc/views/view-components and https://www.davepaquette.com/archive/2016/01/02/goodbye-child-actions-hello-view-components.aspx
+Type, System.Web.Mvc.ChildActionOnlyAttribute, true
+
+F: ASP.NET membership should be replaced with ASP.NET Core identity. For more details, see https://docs.microsoft.com/aspnet/core/migration/proper-to-2x/membership-to-core-identity
+Type, System.Web.Security.Membership, true
+Type, System.Web.Security.FormsAuthentication, true
+
+# Note that generic types should end with `x where x is the number of generic parameters they take
+G: ASP.NET identity should be replaced with ASP.NET Core identity. For more details, see https://docs.microsoft.com/aspnet/core/migration/identity
+Namespace, Microsoft.AspNet.Identity, false
+Type, Microsoft.AspNet.Identity.UserManager`2, true
+Type, Microsoft.AspNet.Identity.Owin.SignInManager`2, true
+
+H: HttpRequest.RawUrl should be replaced with HttpRequest.GetEncodedUrl() or HttpRequest.GetDisplayUrl()
+Member, Microsoft.AspNetCore.Http.HttpRequest.RawUrl, false
+Member, System.Web.HttpRequest.RawUrl, false
