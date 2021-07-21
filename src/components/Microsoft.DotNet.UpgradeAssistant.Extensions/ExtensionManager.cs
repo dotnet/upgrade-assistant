@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,8 +32,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 foreach (var path in options.Value.ExtensionPaths)
                 {
+                    LoadPath(path, isDefault: false);
+                }
+
+                foreach (var path in options.Value.DefaultExtensions)
+                {
+                    LoadPath(path, isDefault: true);
+                }
+
+                logger.LogInformation("Loaded {Count} extensions", list.Count);
+
+                if (options.Value.AdditionalOptions.Any())
+                {
+                    list.Add(LoadOptionsExtension(options.Value.AdditionalOptions));
+                }
+
+                list.AddRange(options.Value.Extensions);
+
+                return list;
+
+                void LoadPath(string path, bool isDefault)
+                {
                     if (LoadExtension(path) is ExtensionInstance extension)
                     {
+                        if (isDefault)
+                        {
+                            extension = extension with { Version = options.Value.CurrentVersion };
+                        }
+
                         if (extension.MinUpgradeAssistantVersion is Version minVersion && minVersion < options.Value.CurrentVersion)
                         {
                             logger.LogWarning("Could not load extension from {Path}. Requires at least v{Version} of Upgrade Assistant.", path, minVersion);
@@ -47,17 +74,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         logger.LogWarning("Could not load extension from {Path}", path);
                     }
                 }
-
-                logger.LogInformation("Loaded {Count} extensions", list.Count);
-
-                if (options.Value.AdditionalOptions.Any())
-                {
-                    list.Add(LoadOptionsExtension(options.Value.AdditionalOptions));
-                }
-
-                list.AddRange(options.Value.Extensions);
-
-                return list;
             });
 
             ExtensionInstance? LoadExtension(string path)
@@ -130,7 +146,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return Task.FromResult<ExtensionSource?>(null);
         }
 
-        public IEnumerable<ExtensionInstance> Instances => _extensions.Value;
+        public bool TryGetExtension(object service, [MaybeNullWhen(false)] out IExtensionInstance extensionInstance)
+        {
+            var assembly = service.GetType().Assembly;
+            extensionInstance = _extensions.Value.FirstOrDefault(i => i.IsInExtension(assembly));
+
+            return extensionInstance is not null;
+        }
+
+        public IEnumerable<IExtensionInstance> Instances => _extensions.Value;
 
         public IEnumerable<ExtensionSource> Registered => _extensions.Value.Select(v => new ExtensionSource(v.Name) { Source = v.Location });
     }

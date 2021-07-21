@@ -34,7 +34,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             new HttpContextIsDebuggingEnabledAnalyzer(),
             new TypeUpgradeAnalyzer(),
             new UsingSystemWebAnalyzer(),
-            new UrlHelperAnalyzer());
+            new UrlHelperAnalyzer(),
+            new ApiAlertAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new AttributeUpgradeCodeFixer(),

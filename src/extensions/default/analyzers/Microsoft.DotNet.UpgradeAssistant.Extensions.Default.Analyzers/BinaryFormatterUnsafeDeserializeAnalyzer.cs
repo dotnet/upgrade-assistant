@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        public static NameMatcher BinaryFormatterUnsafeDeserialize { get; } = NameMatcher.MatchPropertyAccess(QualifiedTargetSymbolName, TargetMember);
+        public static NameMatcher BinaryFormatterUnsafeDeserialize { get; } = NameMatcher.MatchMemberAccess(QualifiedTargetSymbolName, TargetMember);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

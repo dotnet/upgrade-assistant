@@ -133,6 +133,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This tool is not supported on non-Windows platforms due to dependencies on Visual Studio..
+        /// </summary>
+        internal static string NonWindowsWarning {
+            get {
+                return ResourceManager.GetString("NonWindowsWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Removing extension &apos;{Name}&apos;.
         /// </summary>
         internal static string RemovingExtension {
@@ -147,6 +156,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         internal static string RemovingExtensionFailed {
             get {
                 return ResourceManager.GetString("RemovingExtensionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We are interested in your feedback! Please use the following link to open a survey: https://aka.ms/DotNetUASurvey.
+        /// </summary>
+        internal static string SurveyText {
+            get {
+                return ResourceManager.GetString("SurveyText", resourceCulture);
             }
         }
         
@@ -174,6 +192,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         internal static string UpdateExtensionSuccess {
             get {
                 return ResourceManager.GetString("UpdateExtensionSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft .NET Upgrade Assistant v{0}.
+        /// </summary>
+        internal static string UpgradeAssistantHeader {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.
+        /// 
+        ///This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.
+        ///
+        ///This tool&apos;s purpose is to automate some of the &apos;routine&apos; upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers a [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string UpgradeAssistantHeaderDetails {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantHeaderDetails", resourceCulture);
             }
         }
     }

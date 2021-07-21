@@ -9,6 +9,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public class ExtensionOptions
     {
+        public ICollection<string> DefaultExtensions { get; } = new List<string>();
+
         public ICollection<string> ExtensionPaths { get; } = new List<string>();
 
         public IEnumerable<AdditionalOption> AdditionalOptions { get; set; } = Enumerable.Empty<AdditionalOption>();
