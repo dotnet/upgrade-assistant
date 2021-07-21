@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
+  "settings": {
+    "documentationRules": {
+      "documentExposedElements": false,
+      "documentInternalElements": false,
+      "companyName": ".NET Foundation",
+      "copyrightText": "Licensed to the {companyName} under one or more agreements.\nThe {companyName} licenses this file to you under the {licenseName} license.",
+      "xmlHeader": false,
+      "variables": {
+        "licenseName": "MIT",
+        "licenseFile": "LICENSE"
+      }
+    }
+  }
+}
