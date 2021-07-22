@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Updated try-convert tool version from `0.7.226301` to `0.9.232202`
+### Added
+- Added analyzers for identifying common namespaces, types, and members that require manual fixup and will produce diagnostics with links to relevant docs. The list of APIs identified by the analyzer can be expanded by adding to DefaultApiAlerts.json or by adding a .apitargets file to a project's additional files. [#685](https://github.com/dotnet/upgrade-assistant/pull/685)
+- Link to survey [#735](https://github.com/dotnet/upgrade-assistant/pull/735)
+
+## Version 0.2.236301 - 2021-07-15 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.236301))
+
+### Added
+- `analyze` command to provide pre-upgrade package analysis and produce a sarif log of the results [#24](https://github.com/dotnet/upgrade-assistant/issues/24)
+- Validation diagram to help maintain the architectural decisions so far and codify it into the build process. [#696](https://github.com/dotnet/upgrade-assistant/pull/696)
 
 ### Fixed
 - Fixed regression where `--skip-backup` and `--entrypoint` options were not being passed through [#695](https://github.com/dotnet/upgrade-assistant/pull/695)

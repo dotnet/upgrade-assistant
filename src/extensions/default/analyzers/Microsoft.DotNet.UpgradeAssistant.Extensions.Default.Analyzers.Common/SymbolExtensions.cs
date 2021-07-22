@@ -34,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         /// <summary>
         /// Finds all members including those on the base classes.
         /// </summary>
-        /// <param name="symbol">Symbol to search</param>
+        /// <param name="symbol">Symbol to search.</param>
         /// <returns>A collection of base members.</returns>
         public static IEnumerable<ISymbol> GetAllMembers(this INamedTypeSymbol? symbol)
         {

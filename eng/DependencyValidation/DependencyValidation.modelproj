@@ -54,6 +54,10 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Cli</Name>
       <Project>{647d258a-4fe1-4dfa-8d02-0e5dbe3b40f7}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal</Name>
+      <Project>{c1aa58af-224e-428a-8a27-bc8bb18f2e2e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Abstractions</Name>
       <Project>{9c3b9bc2-1066-4052-8188-baafec9faa42}</Project>

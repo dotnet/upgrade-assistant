@@ -1,8 +1,12 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
@@ -17,7 +21,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private ILogger Logger { get; }
 
-        public string AnalysisTypeName => "Dependency Analysis";
+        public string Id => "UA101";
+
+        public string Name => "Dependency Analysis";
+
+        public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
         public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
@@ -29,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _analysisState = null;
         }
 
-        public async Task<IAsyncEnumerable<AnalyzeResult>> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token)
+        public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
         {
             if (analysis is null)
             {
@@ -38,8 +46,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             var context = analysis.UpgradeContext;
             var projects = context.Projects.ToList();
-
-            var analyzeResults = new List<AnalyzeResult>();
 
             foreach (var project in projects)
             {
@@ -64,14 +70,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-                analyzeResults.Add(new()
+                yield return new()
                 {
-                    FileLocation = project.FileInfo.Name,
-                    Results = ExtractAnalysisResult(_analysisState)
-                });
+                    FileLocation = Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name),
+                    Results = ExtractAnalysisResult(_analysisState),
+                };
             }
-
-            return analyzeResults.ToAsyncEnumerable();
         }
 
         private static IReadOnlyCollection<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
@@ -84,18 +88,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
             else
             {
-                GetResults("References to Delete", analysisState.References.Deletions);
-                GetResults("References to Add", analysisState.References.Additions);
-                GetResults("Packages to Delete", analysisState.Packages.Deletions);
-                GetResults("Packages to Add", analysisState.Packages.Additions);
-                GetResults("Framework References to Delete", analysisState.FrameworkReferences.Deletions);
-                GetResults("Framework References to Add", analysisState.FrameworkReferences.Additions);
+                GetResults("Reference to ", " needs to be deleted ", analysisState.References.Deletions);
+                GetResults("Reference to ", " needs to be added ", analysisState.References.Additions);
+                GetResults("Package ", " needs to be deleted ", analysisState.Packages.Deletions);
+                GetResults("Package ", " needs to be added ", analysisState.Packages.Additions);
+                GetResults("Framework Reference to ", " needs to be deleted ", analysisState.FrameworkReferences.Deletions);
+                GetResults("Framework Reference to ", " needs to be added ", analysisState.FrameworkReferences.Additions);
 
-                void GetResults<T>(string name, IReadOnlyCollection<T> collection)
+                void GetResults<T>(string name, string action, IReadOnlyCollection<T> collection)
                 {
                     if (collection.Any())
                     {
-                        results.Add(string.Concat(name, " : ", string.Join(" ; ", collection)));
+                        foreach (var s in collection)
+                        {
+                            results.Add(string.Concat(name, s, action));
+                        }
                     }
                 }
             }
