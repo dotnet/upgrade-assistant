@@ -56,6 +56,15 @@ The architecture of project is enforced with validation diagrams and will be run
 
 To disable validation for a specific project, set `ValidateLayerDiagram=false`. This is done currently for tests as they are not in the diagram.
 
+Steps to add new project for validation :
+
+ - Add the new project as a reference to the DependencyValidation Project
+ - Open Class View Window from Architecture Menu
+ - Open the UpgradeAssistant.layerdiagram
+ - Drag and Drop the new project from Class View to the correct area of the Dependency Diagram.
+
+>Do not ignore the Missing Workloads Installation popup. If you did, check that your VS install has the .NET desktop development workload and the optional Architecture and Analysis Tools component. Look at the documentation for [Dependency Diagrams](https://docs.microsoft.com/en-us/visualstudio/modeling/layer-diagrams-guidelines?view=vs-2019#what-is-a-dependency-diagram)
+
 ### Resources to help you get started
 Here are some resources to help you get started on how to contribute code or new content.
 * Look at the [Contributor documentation](/README.md) to get started on building the source code on your own.

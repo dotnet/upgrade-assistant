@@ -156,6 +156,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 properties.Add("VSINSTALLDIR", _vsPath);
                 properties.Add("MSBuildExtensionsPath32", Path.Combine(_vsPath, "MSBuild"));
+                properties.Add("MSBuildExtensionsPath", Path.Combine(_vsPath, "MSBuild"));
             }
 
             return properties;
