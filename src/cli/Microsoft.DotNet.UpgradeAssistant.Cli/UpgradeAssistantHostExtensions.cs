@@ -136,6 +136,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private static void AddUserInput(this IServiceCollection services)
             => services.AddTransient<IUserInput, ConsoleCollectUserInput>();
 
+        /// <summary>
+        /// Configures common services for Upgrade Assistant CLI execution, including an IAppCommand that will run when the host starts.
+        /// </summary>
+        /// <typeparam name="TApp">The type of command to start running.</typeparam>
+        /// <param name="host">The host builder to register services in.</param>
+        /// <param name="options">Options provided by the user on the command line.</param>
+        /// <param name="parseResult">The result of parsing command line arguments.</param>
+        /// <returns>The host builder updated to include services necessary to run Upgrade Assistant as a command line app.</returns>
         public static IHostBuilder UseConsoleUpgradeAssistant<TApp>(
             this IHostBuilder host,
             IUpgradeAssistantOptions options,

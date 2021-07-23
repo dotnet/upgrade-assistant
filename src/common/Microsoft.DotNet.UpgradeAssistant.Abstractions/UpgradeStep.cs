@@ -56,11 +56,17 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets the IDs of upgrade steps that must run before this upgrade step executes. 'DependsOn' steps are not children or parents (in that the steps don't contain one another). Instead, these are separate upgrade steps that must execute before this upgrade step can execute.
         /// </summary>
+        /// <remarks>
+        /// Dependencies are of type string so that upgrade steps can specify dependencies which may or may not be in used without needing to have a reference to those steps' assemblies.
+        /// </remarks>
         public virtual IEnumerable<string> DependsOn => Enumerable.Empty<string>();
 
         /// <summary>
         /// Gets the IDs of upgrade steps that must not run before this upgrade step executes. 'DependencyOf' steps are not children or parents (in that the steps don't contain one another). Instead, these are separate upgrade steps that must not execute before this upgrade step can execute.
         /// </summary>
+        /// <remarks>
+        /// Dependencies are of type string so that upgrade steps can specify dependencies which may or may not be in used without needing to have a reference to those steps' assemblies.
+        /// </remarks>
         public virtual IEnumerable<string> DependencyOf => Enumerable.Empty<string>();
 
         /// <summary>
@@ -97,11 +103,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// </summary>
         /// <param name="context">The upgrade context to evaluate.</param>
         /// <returns>True if the upgrade step makes sense to evaluate and display for the given context, false otherwise.</returns>
-        /// <param name="token"></param>
+        /// <param name="token">A cancellation token.</param>
         protected abstract Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token);
 
         /// <summary>
-        /// Implementers should use this method to initialize Status and any other state needed.
+        /// Implementers should use this method to initialize Status and any other state needed. This method will be called when determining whether
+        /// this step should be the next to execute. Returning Complete means that the step does not need to make any changes and can be skipped whereas
+        /// returning incomplete means that there are changes the step needs to apply.
         /// </summary>
         protected abstract Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token);
 
@@ -199,9 +207,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// checks whether the any existing upgrade step status is still valid or whether the context
         /// has changed sufficiently that the upgrade step status should be reset.
         /// </summary>
+        /// <remarks>This method is called every time the upgrade manager gets the next step, so it's important that it run
+        /// as quickly as possible. It doesn't need to determine if a step needs to run or not, rather just whether it *might*
+        /// be interesting for a given project so that the tool knows whether to include it in the list of upgrade steps or not.</remarks>
         /// <param name="context">The upgrade context to evaluate.</param>
         /// <returns>True if the upgrade step makes sense to evaluate and display for the given context, false otherwise.</returns>
-        /// <param name="token"></param>
+        /// <param name="token">A cancellation token.</param>
         public virtual async Task<bool> IsApplicableAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
@@ -251,6 +262,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         /// <summary>
         /// Resets upgrade step status as if the step had not yet been initialized or applied. Useful for re-running a upgrade step when upgrade context changes.
+        /// Upgrade steps that have additional internal state should override this method to reset that state (effectively undoing changes made by InitializeImplAsync
+        /// and ApplyImplAsync).
         /// </summary>
         public virtual UpgradeStepInitializeResult Reset()
         {

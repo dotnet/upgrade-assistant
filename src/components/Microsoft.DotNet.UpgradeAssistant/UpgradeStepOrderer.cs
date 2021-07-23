@@ -9,6 +9,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
+    /// <summary>
+    /// Orders upgrade steps such that their `DependsOn` and `DependencyOf` properties are satisfied.
+    /// These properties allow upgrade steps to specify other upgrade steps by name that they need to either run before or after.
+    /// If an upgrade step lists a step in its `DependsOn` property, then the depended-upon step must be present and ordered before this step.
+    /// If an upgrade step lists a step in its `DependencyOf` property, that other step does *not* need to be present but, if it is, it must be ordered after this step.
+    /// </summary>
     public class UpgradeStepOrderer : IUpgradeStepOrderer
     {
         private readonly ILogger<UpgradeStepOrderer> _logger;
