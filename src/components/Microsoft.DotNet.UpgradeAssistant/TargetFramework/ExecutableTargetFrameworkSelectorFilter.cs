@@ -2,11 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 {
     public class ExecutableTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
     {
+        private readonly ILogger<ExecutableTargetFrameworkSelectorFilter> _logger;
+
+        public ExecutableTargetFrameworkSelectorFilter(ILogger<ExecutableTargetFrameworkSelectorFilter> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
         public void Process(ITargetFrameworkSelectorFilterState tfm)
         {
             if (tfm is null)
@@ -16,7 +24,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
             if (tfm.Project.OutputType == ProjectOutputType.Exe)
             {
-                tfm.TryUpdate(tfm.AppBase);
+                if (tfm.TryUpdate(tfm.AppBase))
+                {
+                    _logger.LogInformation("Recommending executable TFM {TFM} because the project builds to an executable", tfm.AppBase);
+                }
             }
         }
     }
