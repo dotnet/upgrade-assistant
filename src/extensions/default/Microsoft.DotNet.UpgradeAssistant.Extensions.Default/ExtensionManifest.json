@@ -7,8 +7,8 @@
     ]
   },
 
-  "TryConvertProjectConverter": {
-    "TryConvertPath": "./try-convert/try-convert.dll"
+  "TryConvert": {
+    "ToolPath": "./try-convert/try-convert.dll"
   },
 
   "PackageUpdater": {
