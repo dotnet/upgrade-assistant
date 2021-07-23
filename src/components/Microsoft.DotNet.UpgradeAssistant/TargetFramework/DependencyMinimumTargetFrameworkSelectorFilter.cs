@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 {
@@ -13,11 +14,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
     /// </summary>
     public class DependencyMinimumTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
     {
+        private readonly ILogger<DependencyMinimumTargetFrameworkSelectorFilter> _logger;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
 
-        public DependencyMinimumTargetFrameworkSelectorFilter(ITargetFrameworkMonikerComparer comparer)
+        public DependencyMinimumTargetFrameworkSelectorFilter(ITargetFrameworkMonikerComparer comparer, ILogger<DependencyMinimumTargetFrameworkSelectorFilter> logger)
         {
-            _tfmComparer = comparer;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _tfmComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         }
 
         public void Process(ITargetFrameworkSelectorFilterState tfm)
@@ -35,7 +38,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
                 if (min is not null)
                 {
-                    tfm.TryUpdate(min);
+                    if (tfm.TryUpdate(min))
+                    {
+                        _logger.LogInformation("Recommending TFM {TFM} because of dependency on project {Dependency}", min, dep.GetFile().FilePath);
+                    }
                 }
             }
         }
