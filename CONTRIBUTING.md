@@ -51,7 +51,7 @@ A core contributor will review your pull request and provide feedback. To ensure
 
 ## Architecture
 
-To make sure that documentation is fresh, most explanations of Upgrade Assistant's architecture reside in in-code comments which version with the code. Below are the key components to be familiar with in Upgrade Assistant with links to their source files where in-code comments will provide more details on architectural decisions.
+To make sure that documentation is fresh, most explanations of Upgrade Assistant's architecture reside in comments which version with the code. Below are the key components to be familiar with in Upgrade Assistant with links to their source files where in-code comments will provide more details on architectural decisions.
 
 ### Startup and hosting
 
@@ -97,7 +97,13 @@ To make sure that documentation is fresh, most explanations of Upgrade Assistant
 
 ### Other services
 
-- [`IUpgradeReadyCheck`](src/common/Microsoft.DotNet.UpgradeAssistant.Abstractions/IUpgradeReadyCheck.cs) implementations are used by the `CurrentProjectSelectionStep` to validate that projects are able to be meaningfully upgraded by Upgrade Assistant and can be successfully loaded.
+- [`IUpgradeReadyCheck`](src/common/Microsoft.DotNet.UpgradeAssistant.Abstractions/IUpgradeReadyCheck.cs) implementations are used by the `CurrentProjectSelectionStep` to validate that projects are able to be meaningfully upgraded by Upgrade Assistant and can be successfully loaded. Ready checks can indicate that a project either represents unsupported scenarios (but the tool can run anyhow and will partially work) or that the project cannot be upgraded at all. Current ready check implementations include:
+  - [`CanLoadProjectFile`](src/components/Microsoft.DotNet.UpgradeAssistant/Checks/CanLoadProjectFile.cs) verifies that the project can be successfully loaded (the project file is well-formed and necessary imports are present).
+  - [`CentralPackageManagementCheck`](src/components/Microsoft.DotNet.UpgradeAssistant/Checks/CentralPackageManagementCheck.cs) confirms that central NuGet package version management isn't in use as this is not yet supported by Upgrade Assistant.
+  - [`MultiTargetFrameworkCheck`](src/components/Microsoft.DotNet.UpgradeAssistant/Checks/MultiTargetFrameworkCheck.cs) ensures that SDK-style projects being upgraded have a `<TargetFramework>` property rather than a `<TargetFrameworks>` property as multiple TFMs are not yet supported.
+  - [`WcfServerCheck`](src/components/Microsoft.DotNet.UpgradeAssistant/Checks/WcfServerCheck.cs) checks whether WCF server-side APIs (like ServiceHost) are in use as these project types often cannot be upgraded very well. Because it is possible for Upgrade Assistant to run on such a project (it will just leave the WCF server code unchanged), this check can be bypassed.
+  - [`WebFormsCheck`](src/components/Microsoft.DotNet.UpgradeAssistant/Checks/WebFormsCheck.cs) checks for WebForms usage as WebForms projects cannot be upgraded very usefully by the tool. Because it is possible for Upgrade Assistant to run on a WebForms project (it will just ignore all the WebForms dependencies), this check can be bypassed.
+  - [`VisualBasicRazorTemplateCheck`](src/extensions/vb/Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic/VisualBasicRazorTemplateCheck.cs) checks for the existence of vbhtml views in the project since vbhtml is unsupported on .NET Core. Because projects with these dependencies can still be upgraded (the VB Razor views will just be ignored), this check can be bypassed.
 - [Roslyn analyzers and code fix providers](src/extensions/default/analyzers) are used by the `SourceUpdaterStep` and `RazorUpdaterStep` to identify patterns in source code that users will need to update and, if a code fix provider is available, will automatically make those fixes. Extensions can add their own analyzers and code fix providers to extend this functionality.
 
 ### TFM selection
@@ -107,7 +113,7 @@ To make sure that documentation is fresh, most explanations of Upgrade Assistant
   - [`WebProjectTargetFrameworkSelectorFilter`](src/components/Microsoft.DotNet.UpgradeAssistant/TargetFramework/WebProjectTargetFrameworkSelectorFilter.cs) ensures that web projects build against executable .NET targets since ASP.NET and ASP.NET Core apps should target .NET Core 3.1, .NET 5, or .NET 6 after upgrade rather than .NET Standard.
   - [`DependencyMinimumTargetFrameworkSelectorFilter`](src/components/Microsoft.DotNet.UpgradeAssistant/TargetFramework/DependencyMinimumTargetFrameworkSelectorFilter.cs) ensures the TFM a project is upgraded to is not less than the TFMs of that project's dependencies. So, for example, a project that has dependencies built against .NET 5 must target at least .NET 5 (not 3.1 or netstandard2.0) itself.
   - [`WindowsSdkTargetFrameworkSelectorFilter`](src/components/Microsoft.DotNet.UpgradeAssistant/TargetFramework/WindowsSdkTargetFrameworkSelectorFilter.cs) ensures that projects with Windows-specific dependencies (WinForms, WPF, etc.) use a TFM with the -windows target.
-  -[ `MyTypeTargetFrameworkSelectorFilter`](src/extensions/vb/Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic/MyTypeTargetFrameworkSelectorFilter.cs) ensures that VB projects using the MyType node upgrade to at least net5.0-windows.
+  -[`MyTypeTargetFrameworkSelectorFilter`](src/extensions/vb/Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic/MyTypeTargetFrameworkSelectorFilter.cs) ensures that VB projects using the MyType node upgrade to at least net5.0-windows.
 
 ### Extensibility
 
