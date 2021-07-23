@@ -8,7 +8,7 @@ Start a discussion on the [repository issue tracker](https://github.com/dotnet/u
 ## Bugs and feature requests?
 For non-security related bugs, please [log a new issue](https://github.com/dotnet/upgrade-assistant/issues) or simply click [this link](https://github.com/dotnet/upgrade-assistant/issues/new?assignees=&labels=bug&template=20_bug_report.md).
 
-## How to submit a PR 
+## How to submit a PR
 
 We are always happy to see PRs from community members both for bug fixes as well as new features.
 To help you be successful we've put together a few simple rules to follow when you prepare to contribute to our codebase:
@@ -49,28 +49,18 @@ If your pull request contains any of the below, it's less likely to be merged:
 **During pull request review**
 A core contributor will review your pull request and provide feedback. To ensure that there is not a large backlog of inactive PRs, the pull request will be marked as stale after two weeks of no activity. After another four days, it will be closed.
 
-### Architecture
-The architecture of project is enforced with validation diagrams and will be run automatically at build. See the `eng/DependencyValidation` project to update or adjust this diagram. The following is currently enforced:
+## Architecture
 
-![Dependency diagram](docs/images/dependency-validation.png)
+Before contributing to Upgrade Assistant, you should be familiar with the logical components that comprise the tool and architecture validation processes, as described in the [Upgrade Assistant architecture documentation](docs/architecture.md).
 
-To disable validation for a specific project, set `ValidateLayerDiagram=false`. This is done currently for tests as they are not in the diagram.
+## Resources to help you get started
 
-Steps to add new project for validation :
-
- - Add the new project as a reference to the DependencyValidation Project
- - Open Class View Window from Architecture Menu
- - Open the UpgradeAssistant.layerdiagram
- - Drag and Drop the new project from Class View to the correct area of the Dependency Diagram.
-
->Do not ignore the Missing Workloads Installation popup. If you did, check that your VS install has the .NET desktop development workload and the optional Architecture and Analysis Tools component. Look at the documentation for [Dependency Diagrams](https://docs.microsoft.com/en-us/visualstudio/modeling/layer-diagrams-guidelines?view=vs-2019#what-is-a-dependency-diagram)
-
-### Resources to help you get started
 Here are some resources to help you get started on how to contribute code or new content.
+
 * Look at the [Contributor documentation](/README.md) to get started on building the source code on your own.
 * ["Help wanted" issues](https://github.com/dotnet/upgrade-assistant/labels/help%20wanted) - these issues are up for grabs. Comment on an issue if you want to create a fix.
 * ["Good first issue" issues](https://github.com/dotnet/upgrade-assistant/labels/good%20first%20issue) - we think these are a good for newcomers.
-* [Best Practices for Roslyn Analyzers and Code Fixers](./docs/roslyn_best_practices.md) - our goal is to build analyzers that are performant and available for both C# and Visual Basic by default. 
+* [Best Practices for Roslyn Analyzers and Code Fixers](./docs/roslyn_best_practices.md) - our goal is to build analyzers that are performant and available for both C# and Visual Basic by default.
 
 ### Identifying the scale
 
@@ -91,7 +81,6 @@ If you don't know what a pull request is read this article: https://help.github.
 - Data generation Framework used is [AutoFixture](https://github.com/AutoFixture/AutoFixture/wiki/Cheat-Sheet).
 
 Tests need to be provided for every bug/feature(except docs or samples) that is completed.
-
 
 ### Feedback
 
