@@ -25,6 +25,12 @@
     ]
   },
 
+  "TryConvert": {
+    "Arguments": [
+      "--force-web-conversion"
+    ]
+  },
+
   "ExtensionServiceProviders": [
     "Microsoft.DotNet.UpgradeAssistant.Extensions.Web.dll"
   ]

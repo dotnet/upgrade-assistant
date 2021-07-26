@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string DotNetCli = "dotnet";
-        private const string TryConvertArgumentsFormat = "\"{0}\" --no-backup -m \"{1}\" --force-web-conversion --keep-current-tfms -p \"{2}\" \"{3}\"";
+        private const string TryConvertArgumentsFormat = "\"{0}\" --no-backup -m \"{1}\" --keep-current-tfms -p \"{2}\" \"{3}\"";
 
         private static readonly string[] ErrorMessages = new[]
         {
