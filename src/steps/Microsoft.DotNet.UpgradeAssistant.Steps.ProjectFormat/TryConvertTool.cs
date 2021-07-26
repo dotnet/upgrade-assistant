@@ -110,8 +110,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             var sb = new CommandLineBuilder();
 
             sb.AddQuotedString(Path);
-            sb.AddArgument("--no-backup");
-            sb.AddArgument("--keep-current-tfms");
             sb.AddArgument("-m", GetMSBuildPath());
             sb.AddArgument("-p", project.FileInfo.FullName);
 
@@ -134,7 +132,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             public void AddArgument(string arg, string? value = null)
             {
+                var containsSpace = arg.Contains(' ');
+
                 AddSpaceIfNeeded();
+
                 _sb.Append(arg);
 
                 if (value is not null)
