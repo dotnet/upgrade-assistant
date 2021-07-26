@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 
@@ -23,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// extensions found in specified paths.
         /// </summary>
         /// <param name="services">The service collection to register services into.</param>
-        /// <returns>A builder for options</returns>
+        /// <returns>A builder for options.</returns>
         public static OptionsBuilder<ExtensionOptions> AddExtensions(this IServiceCollection services)
         {
             if (services is null)
@@ -41,6 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             services.AddSingleton<IExtensionManager, ExtensionManager>();
             services.AddExtensionLoaders();
+            services.TryAddSingleton<IUpgradeAssistantConfigurationLoader, DefaultUpgradeAssistantConfigurationLoader>();
 
             return services.AddOptions<ExtensionOptions>();
         }

@@ -14,40 +14,55 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal sealed class ExtensionManager : IDisposable, IExtensionManager
+    public sealed class ExtensionManager : IDisposable, IExtensionManager
     {
+        private readonly IUpgradeAssistantConfigurationLoader _configurationLoader;
         private readonly ILogger<ExtensionManager> _logger;
+        private readonly ExtensionOptions _options;
         private readonly Lazy<IEnumerable<ExtensionInstance>> _extensions;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propogate any exceptions.")]
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propagate any exceptions.")]
         public ExtensionManager(
             IEnumerable<IExtensionLoader> loaders,
+            IUpgradeAssistantConfigurationLoader configurationLoader,
             IOptions<ExtensionOptions> options,
             ILogger<ExtensionManager> logger)
         {
-            _logger = logger;
+            if (loaders is null)
+            {
+                throw new ArgumentNullException(nameof(loaders));
+            }
+
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            _configurationLoader = configurationLoader ?? throw new ArgumentNullException(nameof(configurationLoader));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options.Value;
             _extensions = new Lazy<IEnumerable<ExtensionInstance>>(() =>
             {
                 var list = new List<ExtensionInstance>();
 
-                foreach (var path in options.Value.ExtensionPaths)
+                foreach (var path in _options.ExtensionPaths)
                 {
                     LoadPath(path, isDefault: false);
                 }
 
-                foreach (var path in options.Value.DefaultExtensions)
+                foreach (var path in _options.DefaultExtensions)
                 {
                     LoadPath(path, isDefault: true);
                 }
 
                 logger.LogInformation("Loaded {Count} extensions", list.Count);
 
-                if (options.Value.AdditionalOptions.Any())
+                if (_options.AdditionalOptions.Any())
                 {
-                    list.Add(LoadOptionsExtension(options.Value.AdditionalOptions));
+                    list.Add(LoadOptionsExtension(_options.AdditionalOptions));
                 }
 
-                list.AddRange(options.Value.Extensions);
+                list.AddRange(_options.Extensions);
 
                 return list;
 
@@ -57,10 +72,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     {
                         if (isDefault)
                         {
-                            extension = extension with { Version = options.Value.CurrentVersion };
+                            extension = extension with { Version = _options.CurrentVersion };
                         }
 
-                        if (extension.MinUpgradeAssistantVersion is Version minVersion && minVersion < options.Value.CurrentVersion)
+                        if (extension.MinUpgradeAssistantVersion is Version minVersion && minVersion < _options.CurrentVersion)
                         {
                             logger.LogWarning("Could not load extension from {Path}. Requires at least v{Version} of Upgrade Assistant.", path, minVersion);
                         }
@@ -117,7 +132,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The extension instance will dispose of this.")]
+        [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The extension instance will dispose of this.")]
         private static ExtensionInstance LoadOptionsExtension(IEnumerable<AdditionalOption> values)
         {
             var collection = values.Select(v => new KeyValuePair<string, string>(v.Name, v.Value));
@@ -128,10 +143,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
         }
 
-        public bool Remove(string name)
+        public async Task<bool> RemoveAsync(string name, CancellationToken token)
         {
-            _logger.LogInformation("Remove Not Implemented: {Name}", name);
-            return false;
+            var config = await _configurationLoader.LoadAsync(token).ConfigureAwait(false);
+            var existing = config.Extensions.FirstOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase));
+
+            if (existing is null)
+            {
+                return false;
+            }
+
+            var updated = config with
+            {
+                Extensions = config.Extensions.Remove(existing)
+            };
+
+            await _configurationLoader.SaveAsync(updated, token).ConfigureAwait(false);
+
+            return true;
         }
 
         public Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token)
@@ -140,14 +169,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return Task.FromResult<ExtensionSource?>(null);
         }
 
-        public Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token)
+        public async Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token)
         {
-            _logger.LogInformation("Add Not Implemented: {Name} @{Source}", n.Name, n.Source);
-            return Task.FromResult<ExtensionSource?>(null);
+            if (n is null)
+            {
+                throw new ArgumentNullException(nameof(n));
+            }
+
+            var config = await _configurationLoader.LoadAsync(token).ConfigureAwait(false);
+
+            // TODO: Verify/download/etc
+            var updated = config with
+            {
+                Extensions = config.Extensions.Add(n)
+            };
+
+            await _configurationLoader.SaveAsync(updated, token).ConfigureAwait(false);
+
+            return n;
         }
 
         public bool TryGetExtension(object service, [MaybeNullWhen(false)] out IExtensionInstance extensionInstance)
         {
+            if (service is null)
+            {
+                throw new ArgumentNullException(nameof(service));
+            }
+
             var assembly = service.GetType().Assembly;
             extensionInstance = _extensions.Value.FirstOrDefault(i => i.IsInExtension(assembly));
 
