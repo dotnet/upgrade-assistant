@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -19,7 +19,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
     public class TryConvertTool : ITryConvertTool
     {
         private const string DotNetCli = "dotnet";
-        private const string TryConvertArgumentsFormat = "\"{0}\" --no-backup -m \"{1}\" --keep-current-tfms -p \"{2}\" \"{3}\"";
 
         private static readonly string[] ErrorMessages = new[]
         {
@@ -33,23 +32,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         private readonly IProcessRunner _runner;
         private readonly MSBuildPathLocator _locator;
-        private readonly string _tryConvertOptions;
+        private readonly IEnumerable<string> _arguments;
 
         public TryConvertTool(
             IProcessRunner runner,
-            IOptions<TryConvertOptions> tryConvertOptionsAccessor,
+            IOptions<ICollection<TryConvertOptions>> allOptions,
+            IOptions<TryConvertOptions> options,
             MSBuildPathLocator locator)
         {
-            _runner = runner ?? throw new ArgumentNullException(nameof(runner));
-            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
-
-            if (tryConvertOptionsAccessor is null)
+            if (allOptions is null)
             {
-                throw new ArgumentNullException(nameof(tryConvertOptionsAccessor));
+                throw new ArgumentNullException(nameof(allOptions));
             }
 
-            _tryConvertOptions = string.Join(" ", tryConvertOptionsAccessor.Value.Arguments);
-            Path = tryConvertOptionsAccessor.Value.ToolPath;
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            _runner = runner ?? throw new ArgumentNullException(nameof(runner));
+            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
+            _arguments = allOptions.Value.SelectMany(o => o.Arguments);
+
+            Path = options.Value.ToolPath;
             Version = GetVersion();
         }
 
@@ -100,6 +105,65 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             return null;
         }
 
-        private string GetArguments(IProject project) => string.Format(CultureInfo.InvariantCulture, TryConvertArgumentsFormat, Path, GetMSBuildPath(), project.Required().FileInfo, _tryConvertOptions);
+        private string GetArguments(IProject project)
+        {
+            var sb = new CommandLineBuilder();
+
+            sb.AddQuotedString(Path);
+            sb.AddArgument("--no-backup");
+            sb.AddArgument("--keep-current-tfms");
+            sb.AddArgument("-m", GetMSBuildPath());
+            sb.AddArgument("-p", project.FileInfo.FullName);
+
+            foreach (var argument in _arguments)
+            {
+                sb.AddArgument(argument);
+            }
+
+            return sb.ToString();
+        }
+
+        private class CommandLineBuilder
+        {
+            private const char Space = ' ';
+            private const char Quote = '"';
+
+            private readonly StringBuilder _sb = new();
+
+            private bool _hasAtLeastOne;
+
+            public void AddArgument(string arg, string? value = null)
+            {
+                AddSpaceIfNeeded();
+                _sb.Append(arg);
+
+                if (value is not null)
+                {
+                    AddQuotedString(value);
+                }
+            }
+
+            public void AddQuotedString(string value)
+            {
+                AddSpaceIfNeeded();
+                _sb.Append(Quote);
+                _sb.Append(value);
+                _sb.Append(Quote);
+            }
+
+            private void AddSpaceIfNeeded()
+            {
+                if (_hasAtLeastOne)
+                {
+                    _sb.Append(Space);
+                }
+                else
+                {
+                    _hasAtLeastOne = true;
+                }
+            }
+
+            public override string ToString() => _sb.ToString();
+        }
     }
 }
