@@ -105,6 +105,9 @@
     <Extension Include="..\..\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj">
       <Name>maui</Name>
     </Extension>
+    <Extension Include="..\..\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.csproj">
+      <Name>windows</Name>
+    </Extension>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="LocalizedStrings.Designer.cs">

@@ -1,0 +1,7 @@
+﻿{
+  "ExtensionName": "windows",
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.dll"
+  ]
+}

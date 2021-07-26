@@ -215,6 +215,19 @@
             </reference>
           </references>
         </layer>
+        <layer Id="e7273546-c5b9-4a0d-adf4-7dd3c8f7bb1f" name="windows">
+          <references>
+            <reference Id="56ef7c3d-da87-420a-93f8-1ea2899143dd" name="windows">
+              <ArtifactNode Label="windows" Category="CodeSchema_Project" Id="(Assembly=../../src/extensions/windows)">
+                <Category Ref="CodeMap_SolutionFolder" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Windows)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">

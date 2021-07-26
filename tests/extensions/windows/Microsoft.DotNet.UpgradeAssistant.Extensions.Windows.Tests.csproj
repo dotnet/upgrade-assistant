@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsUnitTestProject>true</IsUnitTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extras.Moq">
+      <Version>6.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+      <Version>3.0.2</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.csproj" />
+    <ProjectReference Include="..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
+  </ItemGroup>
+</Project>

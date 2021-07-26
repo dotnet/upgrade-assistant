@@ -4,7 +4,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 {
     public class WebProjectTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
     {
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
         {
             if (tfm is null)
             {
-                throw new System.ArgumentNullException(nameof(tfm));
+                throw new ArgumentNullException(nameof(tfm));
             }
 
             if (tfm.Components.HasFlag(ProjectComponents.AspNet) || tfm.Components.HasFlag(ProjectComponents.AspNetCore))

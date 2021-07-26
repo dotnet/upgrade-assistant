@@ -18,6 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
             services.Services.AddTransient<IDependencyAnalyzer, NewtonsoftReferenceAnalyzer>();
             services.Services.AddScoped<IUpdater<ConfigFile>, WebNamespaceConfigUpdater>();
+            services.Services.AddTransient<ITargetFrameworkSelectorFilter, WebProjectTargetFrameworkSelectorFilter>();
             services.Services.AddRazorUpdaterStep();
         }
     }
