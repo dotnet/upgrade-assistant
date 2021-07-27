@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             public IEnumerable<AdditionalOption> AdditionalOptions => Option.ParseOptions();
 
-            public DirectoryInfo? VsPath { get; set; }
+            public DirectoryInfo? VSPath { get; set; }
         }
     }
 }

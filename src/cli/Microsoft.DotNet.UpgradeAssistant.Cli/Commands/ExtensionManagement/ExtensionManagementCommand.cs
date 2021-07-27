@@ -243,7 +243,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
             public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
 
-            public DirectoryInfo? VsPath { get; set; }
+            public DirectoryInfo? VSPath { get; set; }
         }
     }
 }

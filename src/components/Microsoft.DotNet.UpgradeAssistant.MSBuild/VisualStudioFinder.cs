@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public string? GetLatestVisualStudioPath()
         {
-            if (_options.Value.VsPath is string expectedPath)
+            if (_options.Value.VisualStudioPath is string expectedPath)
             {
                 _logger.LogInformation("Using supplied path for Visual Studio [Path]", expectedPath);
                 return expectedPath;
