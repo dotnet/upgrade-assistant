@@ -79,6 +79,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 components |= ProjectComponents.Wpf;
             }
 
+            var targetFrameworkNames = project.TargetFrameworks.Select(r => r.Name);
+            string[] androidTFM = new[] { TargetFrameworkMoniker.Net60_Android.ToString() };
+            string[] iosTFM = new[] { TargetFrameworkMoniker.Net60_iOS.ToString() };
+            if (targetFrameworkNames.Any(r => androidTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.XamarinAndroid;
+            }
+
+            if (targetFrameworkNames.Any(r => iosTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.XamariniOS;
+            }
+
             return components;
         }
 
