@@ -25,7 +25,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
         public ExtensionManagementCommand()
             : base("extensions")
         {
-            IsHidden = !FeatureFlags.IsRequested("EXTENSION_MANAGEMENT");
             AddCommand(new AddExtensionCommand());
             AddCommand(new ListExtensionCommand());
             AddCommand(new RemoveExtensionCommand());
@@ -66,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 AddHandler<AddExtensionAppCommand>();
                 AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName));
                 AddOption(new Option<string>(new[] { "--source" }, () => DefaultSource, LocalizedStrings.ExtensionManagementSource));
-                AddOption(new Option<string>(new[] { "--version" }, () => DefaultSource, LocalizedStrings.ExtensionManagementVersion));
+                AddOption(new Option<string>(new[] { "--version" }, LocalizedStrings.ExtensionManagementVersion));
             }
 
             private class AddExtensionAppCommand : IAppCommand
@@ -158,19 +157,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                     _logger = logger;
                 }
 
-                public Task RunAsync(CancellationToken token)
+                public async Task RunAsync(CancellationToken token)
                 {
                     foreach (var n in _options.Value.Extensions)
                     {
                         _logger.LogInformation(LocalizedStrings.RemovingExtension, n.Name);
 
-                        if (!_extensionManager.Remove(n.Name))
+                        if (!await _extensionManager.RemoveAsync(n.Name, token))
                         {
                             _logger.LogWarning(LocalizedStrings.RemovingExtensionFailed, n.Name);
                         }
                     }
-
-                    return Task.CompletedTask;
                 }
             }
         }

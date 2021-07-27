@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
@@ -18,5 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public ICollection<ExtensionInstance> Extensions { get; } = new List<ExtensionInstance>();
 
         public Version CurrentVersion { get; set; } = null!;
+
+        public string ConfigurationFilePath { get; } = Path.Combine(Environment.CurrentDirectory, "upgrade-assistant.json");
     }
 }
