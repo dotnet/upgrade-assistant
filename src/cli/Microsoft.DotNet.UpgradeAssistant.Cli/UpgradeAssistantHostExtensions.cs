@@ -85,6 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddMsBuild(optionss =>
                     {
                         optionss.InputPath = upgradeOptions.Project.FullName;
+                        optionss.VsPath = upgradeOptions.VsPath?.FullName;
                     });
 
                     services.AddNuGet(optionss =>

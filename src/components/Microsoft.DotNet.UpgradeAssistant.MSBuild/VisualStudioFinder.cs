@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Setup.Configuration;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
@@ -21,15 +22,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private const int REGDB_E_CLASSNOTREG = unchecked((int)0x80040154);
 
+        private readonly IOptions<WorkspaceOptions> _options;
         private readonly ILogger<VisualStudioFinder> _logger;
 
-        public VisualStudioFinder(ILogger<VisualStudioFinder> logger)
+        public VisualStudioFinder(IOptions<WorkspaceOptions> options, ILogger<VisualStudioFinder> logger)
         {
-            _logger = logger;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string? GetLatestVisualStudioPath()
         {
+            if (_options.Value.VsPath is string expectedPath)
+            {
+                _logger.LogInformation("Using supplied path for VS: {Path}", expectedPath);
+                return expectedPath;
+            }
+
             var latest = GetLatestPath();
 
             if (latest is null)
@@ -43,19 +52,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (Directory.Exists(installation))
             {
-                _logger.LogDebug("Found Visual Studio {VsVersion} at {VsPath}", version, installation);
+                _logger.LogInformation("Using Visual Studio v{VsVersion} at {VsPath}", version, installation);
 
                 return installation;
             }
             else
             {
-                _logger.LogInformation("Found Visual Studio {VsVersion}, but directory '{VsPath}' does not exist.", version, installation);
+                _logger.LogWarning("Found Visual Studio {VsVersion}, but directory '{VsPath}' does not exist.", version, installation);
 
                 return null;
             }
         }
 
-        private static ISetupInstance2? GetLatestPath()
+        private ISetupInstance2? GetLatestPath()
         {
             var result = default(ISetupInstance2);
             var resultVersion = new Version(0, 0);
@@ -100,10 +109,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                             }
                         }
 
-                        if (instanceHasMSBuild && instance is not null && version > resultVersion)
+                        if (instanceHasMSBuild && instance is not null)
                         {
-                            result = instance;
-                            resultVersion = version;
+                            _logger.LogInformation("Found Visual Studio v{Version} [{Path}]", version, instance.GetInstallationPath());
+
+                            if (version > resultVersion)
+                            {
+                                result = instance;
+                                resultVersion = version;
+                            }
                         }
                     }
                 }
