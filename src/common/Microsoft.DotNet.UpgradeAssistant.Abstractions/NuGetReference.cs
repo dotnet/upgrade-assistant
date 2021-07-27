@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -18,5 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
 
         public string? PrivateAssets { get; set; }
+
+        public IEnumerable<string>? ActionDetails { get; set; }
     }
 }

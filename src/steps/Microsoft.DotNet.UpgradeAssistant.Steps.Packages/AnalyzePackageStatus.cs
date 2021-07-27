@@ -101,7 +101,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     {
                         foreach (var s in collection)
                         {
-                            results.Add(string.Concat(name, s, action));
+                            var mc = s as NuGetReference;
+                            if (mc != null && mc.ActionDetails != null && mc.ActionDetails.Any() && !results.Intersect(mc.ActionDetails).Any())
+                            {
+                                results.AddRange(mc.ActionDetails);
+                            }
+                            else
+                            {
+                                results.Add(string.Concat(name, s, action));
+                            }
                         }
                     }
                 }

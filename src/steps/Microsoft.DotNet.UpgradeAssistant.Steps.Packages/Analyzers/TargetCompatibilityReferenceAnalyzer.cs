@@ -2,7 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
@@ -53,6 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     // If the package won't work on the target Framework, check newer versions of the package
                     var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, state.TargetFrameworks, new() { LatestMinorAndBuildOnly = true }, token).ConfigureAwait(false);
                     var updatedReference = newerVersions.FirstOrDefault();
+                    var details = new List<string>();
 
                     if (updatedReference == null)
                     {
@@ -65,13 +68,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
                         if (isMajorChange)
                         {
+                            details.Add(string.Concat("Package ", packageReference.Name, " needs to be upgraded across major versions (", packageReference.Version, " -> ", updatedReference.Version, ") which may introduce breaking changes"));
                             _logger.LogWarning("Package {NuGetPackage} has been upgraded across major versions ({OldVersion} -> {NewVersion}) which may introduce breaking changes", packageReference.Name, packageReference.Version, updatedReference.Version);
                         }
 
                         if (updatedReference.IsPrerelease)
                         {
+                            details.Add(string.Concat("Package ", packageReference.Name, " needs to be upgraded to a prerelease version (", updatedReference.Version, ") because no released version supports target(s) ", string.Join(", ", state.TargetFrameworks)));
                             _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", state.TargetFrameworks));
                         }
+
+                        if (!isMajorChange && !updatedReference.IsPrerelease)
+                        {
+                            details.Add(string.Concat("Package ", packageReference.Name, " needs to be upgraded from ", packageReference.Version, " to ", updatedReference.Version));
+                        }
+
+                        updatedReference.ActionDetails = packageReference.ActionDetails = details;
 
                         state.Packages.Remove(packageReference);
                         state.Packages.Add(updatedReference, isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
