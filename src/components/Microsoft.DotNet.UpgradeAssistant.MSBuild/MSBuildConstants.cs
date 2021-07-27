@@ -22,9 +22,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         // SDKs
         public const string DefaultSDK = "Microsoft.NET.Sdk";
 
+        private const string WebSdk = "Microsoft.NET.Sdk.Web";
+
         public static readonly string[] SDKsWithExeDefaultOutputType = new[]
         {
-            ""
+            WebSdk
         };
     }
 }

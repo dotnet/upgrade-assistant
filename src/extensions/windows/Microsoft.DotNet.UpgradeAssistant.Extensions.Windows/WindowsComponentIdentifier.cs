@@ -9,33 +9,23 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
-    public class WpfComponentIdentifier : IComponentIdentifier
+    public class WindowsComponentIdentifier : IComponentIdentifier
     {
         private const string DesktopSdk = "Microsoft.NET.Sdk.Desktop";
 
-        private readonly string[] WinFormsFrameworkReferences = new[]
-        {
-            "Microsoft.WindowsDesktop.App.WindowsForms",
-        };
-
-        private readonly string[] WpfFrameworkReferences = new[]
-        {
-            "Microsoft.WindowsDesktop.App.WPF",
-        };
-
-        private readonly string[] DesktopFrameworkReferences = new[]
+        private readonly string[] _desktopFrameworkReferences = new[]
         {
             "Microsoft.WindowsDesktop.App",
             "Microsoft.WindowsDesktop.App.WindowsForms",
             "Microsoft.WindowsDesktop.App.WPF"
         };
 
-        private readonly string[] WinFormsReferences = new[]
+        private readonly string[] _winFormsReferences = new[]
         {
             "System.Windows.Forms"
         };
 
-        private readonly string[] WpfReferences = new[]
+        private readonly string[] _wpfReferences = new[]
         {
             "System.Xaml",
             "PresentationCore",
@@ -43,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             "WindowsBase"
         };
 
-        private readonly string[] WinRTPackages = new[]
+        private readonly string[] _winRTPackages = new[]
         {
             "Microsoft.Windows.SDK.Contracts"
         };
@@ -65,13 +55,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             var references = project.References.Select(r => r.Name);
 
-            if (references.Any(r => WinFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            if (references.Any(r => _winFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.WindowsDesktop;
                 components |= ProjectComponents.WinForms;
             }
 
-            if (references.Any(r => WpfReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            if (references.Any(r => _wpfReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.WindowsDesktop;
                 components |= ProjectComponents.Wpf;
@@ -98,17 +88,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
                 var frameworkReferenceNames = project.FrameworkReferences.Select(r => r.Name);
 
-                if (frameworkReferenceNames.Any(f => DesktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                if (frameworkReferenceNames.Any(f => _desktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
                 {
                     components |= ProjectComponents.WindowsDesktop;
                 }
 
-                if (frameworkReferenceNames.Any(f => WinFormsReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                if (frameworkReferenceNames.Any(f => _winFormsReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
                 {
                     components |= ProjectComponents.WinForms;
                 }
 
-                if (frameworkReferenceNames.Any(f => WpfReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                if (frameworkReferenceNames.Any(f => _wpfReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
                 {
                     components |= ProjectComponents.Wpf;
                 }
@@ -118,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         }
 
         private ValueTask<bool> IsWinRt(IProject project, CancellationToken token) =>
-            WinRTPackages
+            _winRTPackages
                 .ToAsyncEnumerable()
                 .AnyAwaitAsync(package => project.NuGetReferences.IsTransitivelyAvailableAsync(package, token), cancellationToken: token);
     }

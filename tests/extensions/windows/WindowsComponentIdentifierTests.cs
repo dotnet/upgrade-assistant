@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
 
-            var componentIdentifier = mock.Create<WpfComponentIdentifier>();
+            var componentIdentifier = mock.Create<WindowsComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
-            var componentIdentifier = mock.Create<WpfComponentIdentifier>();
+            var componentIdentifier = mock.Create<WindowsComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
-            var componentIdentifier = mock.Create<WpfComponentIdentifier>();
+            var componentIdentifier = mock.Create<WindowsComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
-            var componentIdentifier = mock.Create<WpfComponentIdentifier>();
+            var componentIdentifier = mock.Create<WindowsComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
@@ -168,7 +168,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.NuGetReferences).Returns(nugetPackages.Object);
 
-            var componentIdentifier = mock.Create<WpfComponentIdentifier>();
+            var componentIdentifier = mock.Create<WindowsComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);

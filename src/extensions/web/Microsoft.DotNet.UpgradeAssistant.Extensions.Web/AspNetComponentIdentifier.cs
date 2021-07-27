@@ -11,14 +11,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 {
     public class AspNetComponentIdentifier : IComponentIdentifier
     {
+        private const string WebApplicationTargets = "Microsoft.WebApplication.targets";
         private const string WebSdk = "Microsoft.NET.Sdk.Web";
 
-        private readonly string[] WebFrameworkReferences = new[]
+        private readonly string[] _webFrameworkReferences = new[]
         {
             "Microsoft.AspNetCore.App"
         };
 
-        private readonly string[] WebReferences = new[]
+        private readonly string[] _webReferences = new[]
         {
             "System.Web",
             "System.Web.Abstractions",
@@ -27,8 +28,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             "System.Web.Routing",
             "System.Web.WebPages"
         };
-
-        private const string WebApplicationTargets = "Microsoft.WebApplication.targets";
 
         public ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token)
         {
@@ -42,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
             var references = project.References.Select(r => r.Name);
             if ((file.Imports != null && file.Imports.Contains(WebApplicationTargets, StringComparer.OrdinalIgnoreCase)) ||
-                references.Any(r => WebReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                references.Any(r => _webReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.AspNet;
             }
@@ -56,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
                 else
                 {
                     var frameworkReferenceNames = project.FrameworkReferences.Select(r => r.Name);
-                    if (frameworkReferenceNames.Any(f => WebFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
+                    if (frameworkReferenceNames.Any(f => _webFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))
                     {
                         components |= ProjectComponents.AspNetCore;
                     }
