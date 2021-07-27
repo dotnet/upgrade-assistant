@@ -118,6 +118,10 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Razor</Name>
       <Project>{117fff7e-019e-400e-9f51-a4f7f9f3195d}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.Windows</Name>
+      <Project>{69b55184-9db6-4492-9501-e54207f4bed7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Backup</Name>
       <Project>{7a96cca0-4d47-48c6-a889-b560048e0c16}</Project>

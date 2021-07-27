@@ -3,13 +3,14 @@
 
 using Autofac.Extras.Moq;
 using AutoFixture;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows;
 using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Moq;
 using Xunit;
 
 using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 {
     public class WindowsSdkTargetFrameworkSelectorFilterTests
     {

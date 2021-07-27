@@ -154,13 +154,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maui", "maui", "{E3725E02-C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui", "src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj", "{A122DD5B-4B80-4558-8DB2-8E9EBFF12A1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Analysis", "src\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj", "{B5B6D54F-7782-4CAC-AB13-48619B40465B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Analysis", "src\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj", "{B5B6D54F-7782-4CAC-AB13-48619B40465B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eng", "eng", "{6D0B9445-40A2-48E6-9F04-A83EA207CC3C}"
 EndProject
 Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "DependencyValidation", "eng\DependencyValidation\DependencyValidation.modelproj", "{7EE540F0-2904-4306-BF35-842F3D654F25}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal", "src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.csproj", "{C1AA58AF-224E-428A-8A27-BC8BB18F2E2E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{1D8A46E6-D0C5-429A-A7B6-8F1BE9551AD7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows", "src\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.csproj", "{69B55184-9DB6-4492-9501-E54207F4BED7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{98B57945-2141-4880-B6C2-51B44C67E300}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests", "tests\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests.csproj", "{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -700,6 +708,30 @@ Global
 		{C1AA58AF-224E-428A-8A27-BC8BB18F2E2E}.Release|x64.Build.0 = Release|Any CPU
 		{C1AA58AF-224E-428A-8A27-BC8BB18F2E2E}.Release|x86.ActiveCfg = Release|Any CPU
 		{C1AA58AF-224E-428A-8A27-BC8BB18F2E2E}.Release|x86.Build.0 = Release|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Debug|x64.Build.0 = Debug|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Debug|x86.Build.0 = Debug|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Release|x64.ActiveCfg = Release|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Release|x64.Build.0 = Release|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Release|x86.ActiveCfg = Release|Any CPU
+		{69B55184-9DB6-4492-9501-E54207F4BED7}.Release|x86.Build.0 = Release|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Debug|x64.Build.0 = Debug|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Debug|x86.Build.0 = Debug|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|x64.ActiveCfg = Release|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|x64.Build.0 = Release|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|x86.ActiveCfg = Release|Any CPU
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -768,6 +800,10 @@ Global
 		{B5B6D54F-7782-4CAC-AB13-48619B40465B} = {28247E7B-243D-4901-B26A-7A7615EBADDC}
 		{7EE540F0-2904-4306-BF35-842F3D654F25} = {6D0B9445-40A2-48E6-9F04-A83EA207CC3C}
 		{C1AA58AF-224E-428A-8A27-BC8BB18F2E2E} = {DF2E1ED9-DC44-4DD4-B6A1-165304E88118}
+		{1D8A46E6-D0C5-429A-A7B6-8F1BE9551AD7} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
+		{69B55184-9DB6-4492-9501-E54207F4BED7} = {1D8A46E6-D0C5-429A-A7B6-8F1BE9551AD7}
+		{98B57945-2141-4880-B6C2-51B44C67E300} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
+		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56} = {98B57945-2141-4880-B6C2-51B44C67E300}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

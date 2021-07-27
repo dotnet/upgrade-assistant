@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     public class WindowsSdkTargetFrameworkSelectorFilter : ITargetFrameworkSelectorFilter
     {
@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
         {
             if (tfm is null)
             {
-                throw new System.ArgumentNullException(nameof(tfm));
+                throw new ArgumentNullException(nameof(tfm));
             }
 
             if (TryGetMoniker(tfm, out var result))
