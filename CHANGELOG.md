@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Updated try-convert tool version from `0.7.226301` to `0.9.232202`
 
 ### Added
-- Added command line argument to select VS version (`--vs-path`) in cases where multiple are installed
+- Added command line argument to select VS version (`--vs-path`) in cases where multiple are installed [#753](https://github.com/dotnet/upgrade-assistant/pull/753)
 - Added analyzers for identifying common namespaces, types, and members that require manual fixup and will produce diagnostics with links to relevant docs. The list of APIs identified by the analyzer can be expanded by adding to DefaultApiAlerts.json or by adding a .apitargets file to a project's additional files. [#685](https://github.com/dotnet/upgrade-assistant/pull/685)
 - Link to survey [#735](https://github.com/dotnet/upgrade-assistant/pull/735)
 
