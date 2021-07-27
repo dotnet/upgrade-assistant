@@ -79,5 +79,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             "Microsoft.Windows.SDK.Contracts"
         };
+
+        public static readonly string[] XamarinAndroidReferences = new[]
+        {
+            "Mono.Android"
+        };
+
+        public static readonly string[] XamariniOSReferences = new[]
+        {
+            "Xamarin.iOS"
+        };
     }
 }

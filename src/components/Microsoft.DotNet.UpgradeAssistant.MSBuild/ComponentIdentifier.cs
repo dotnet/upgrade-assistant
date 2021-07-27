@@ -119,6 +119,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 components |= ProjectComponents.Wpf;
             }
 
+            if (references.Any(r => MSBuildConstants.XamarinAndroidReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.XamarinAndroid;
+            }
+
+            if (references.Any(r => MSBuildConstants.XamariniOSReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.XamariniOS;
+            }
+
             return components;
         }
     }
