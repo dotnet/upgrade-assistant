@@ -16,6 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             services.Services.AddTransient<ITargetFrameworkSelectorFilter, WindowsSdkTargetFrameworkSelectorFilter>();
+            services.Services.AddTransient<IComponentIdentifier, WpfComponentIdentifier>();
         }
     }
 }
