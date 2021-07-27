@@ -1,13 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Microsoft.DotNet.UpgradeAssistant</RootNamespace>
+    <IsUnitTestProject>false</IsUnitTestProject>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Autofac.Extras.Moq">
-      <Version>6.0.0</Version>
-    </PackageReference>
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
