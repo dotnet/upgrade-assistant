@@ -100,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                             }
                         }
 
-                        if (instanceHasMSBuild && instance is not null && version.Major != 17 && version > resultVersion)
+                        if (instanceHasMSBuild && instance is not null && version > resultVersion)
                         {
                             result = instance;
                             resultVersion = version;
