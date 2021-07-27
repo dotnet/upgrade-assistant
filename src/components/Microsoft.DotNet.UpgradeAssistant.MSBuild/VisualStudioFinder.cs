@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             if (_options.Value.VsPath is string expectedPath)
             {
-                _logger.LogInformation("Using supplied path for VS: {Path}", expectedPath);
+                _logger.LogInformation("Using supplied path for Visual Studio [Path]", expectedPath);
                 return expectedPath;
             }
 
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (Directory.Exists(installation))
             {
-                _logger.LogInformation("Using Visual Studio v{VsVersion} at {VsPath}", version, installation);
+                _logger.LogDebug("Using Visual Studio v{VsVersion} [{VsPath}]", version, installation);
 
                 return installation;
             }

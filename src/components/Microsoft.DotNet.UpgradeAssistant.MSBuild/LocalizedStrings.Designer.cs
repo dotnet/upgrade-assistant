@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load project. Please ensure the selected VS instance has the correct workloads installed for your projects. If Upgrade Assistant selected the incorrect VS version, please pass the argument --vs-path with the appropriate path..
+        ///   Looks up a localized string similar to Could not load project. Please ensure the selected VS instance has the correct workloads installed for your projects. If Upgrade Assistant selected the incorrect VS version, please pass the argument --vs-path with the appropriate path. You can see the Visual Studio instances searched by running with the --verbose flag..
         /// </summary>
         internal static string InvalidProjectError {
             get {
