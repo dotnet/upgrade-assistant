@@ -3,7 +3,7 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
-    internal interface IExtensionLoader
+    public interface IExtensionLoader
     {
         ExtensionInstance? LoadExtension(string path);
     }

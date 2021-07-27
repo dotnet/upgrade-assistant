@@ -3,11 +3,10 @@
 
 using Autofac.Extras.Moq;
 using AutoFixture;
-using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Moq;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 {
     public class WebProjectTargetFrameworkSelectorFilterTests
     {

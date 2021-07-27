@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         IEnumerable<ExtensionSource> Registered { get; }
 
-        bool Remove(string name);
+        Task<bool> RemoveAsync(string name, CancellationToken token);
 
         Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token);
 
