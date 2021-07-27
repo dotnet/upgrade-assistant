@@ -130,16 +130,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             private bool _hasAtLeastOne;
 
-            public void AddArgument(string arg, string? value = null)
+            public void AddArgument(string arg)
             {
                 AddSpaceIfNeeded();
 
                 _sb.Append(arg);
+            }
 
-                if (value is not null)
+            public void AddArgument(string arg, string? value)
+            {
+                if (value is null)
                 {
-                    AddQuotedString(value);
+                    return;
                 }
+
+                AddSpaceIfNeeded();
+
+                _sb.Append(arg);
+                AddQuotedString(value);
             }
 
             public void AddQuotedString(string value)
