@@ -139,7 +139,7 @@ Options:
 
 #### Analyze Path
 
-In order analyze pacakge dependencies for a project or a solution use the analyze command with the tool like so : `upgrade-assistant analyze <Path to csproj or sln to analyze>`
+In order analyze package dependencies for a project or a solution use the analyze command with the tool like so : `upgrade-assistant analyze <Path to csproj or sln to analyze>`
 
 Full usage information:
 
