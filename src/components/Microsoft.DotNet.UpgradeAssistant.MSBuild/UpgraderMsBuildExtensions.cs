@@ -22,8 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
             services.AddTransient<IUpgradeStartup, MSBuildRegistrationStartup>();
             services.AddTransient<ISolutionInfo, SolutionInfo>();
-            services.AddSingleton<IUpgradeContextFactory, MSBuildUpgradeContextFactory>();
-            services.AddSingleton<IComponentIdentifier, ComponentIdentifier>();
+            services.AddTransient<IUpgradeContextFactory, MSBuildUpgradeContextFactory>();
 
             // Instantiate the upgrade context with a func to avoid needing MSBuild types prior to MSBuild registration
             services.AddTransient<MSBuildWorkspaceUpgradeContext>();

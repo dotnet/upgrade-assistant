@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     internal partial class MSBuildProject : IProject
     {
         private readonly ILogger _logger;
-        private readonly IComponentIdentifier _componentIdentifier;
+        private readonly IEnumerable<IComponentIdentifier> _componentIdentifiers;
         private readonly IPackageRestorer _restorer;
         private readonly ITargetFrameworkMonikerComparer _comparer;
 
@@ -27,19 +27,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public MSBuildProject(
             MSBuildWorkspaceUpgradeContext context,
-            IComponentIdentifier componentIdentifier,
+            IEnumerable<IComponentIdentifier> componentIdentifiers,
             IPackageRestorer restorer,
             ITargetFrameworkMonikerComparer comparer,
             FileInfo file,
             ILogger logger)
         {
-            FileInfo = file;
-            Context = context;
+            FileInfo = file ?? throw new ArgumentNullException(nameof(file));
+            Context = context ?? throw new ArgumentNullException(nameof(context));
 
-            _componentIdentifier = componentIdentifier;
-            _restorer = restorer;
-            _comparer = comparer;
-            _logger = logger;
+            _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
+            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string Id => Context.SolutionInfo.GetProjectId(FileInfo.FullName);
@@ -81,6 +81,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         private ProjectOutputType GetDefaultOutputType()
         {
+            _logger.LogDebug("Could not find an output type");
+
             if (Sdk.Any(p => MSBuildConstants.SDKsWithExeDefaultOutputType.Contains(p, StringComparer.OrdinalIgnoreCase)))
             {
                 return ProjectOutputType.Exe;
@@ -89,8 +91,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return ProjectOutputType.Library;
         }
 
-        public ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token)
-            => _componentIdentifier.GetComponentsAsync(this, token);
+        public async ValueTask<ProjectComponents> GetComponentsAsync(CancellationToken token)
+        {
+            var component = ProjectComponents.None;
+
+            foreach (var identifier in _componentIdentifiers)
+            {
+                component |= await identifier.GetComponentsAsync(this, token).ConfigureAwait(false);
+            }
+
+            return component;
+        }
 
         public IEnumerable<string> FindFiles(ProjectItemMatcher matcher, ProjectItemType? itemType = null)
         {

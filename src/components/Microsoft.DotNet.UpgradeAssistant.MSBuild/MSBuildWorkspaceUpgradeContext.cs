@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private readonly IPackageRestorer _restorer;
         private readonly ITargetFrameworkMonikerComparer _comparer;
-        private readonly IComponentIdentifier _componentIdentifier;
+        private readonly IEnumerable<IComponentIdentifier> _componentIdentifiers;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             Func<string, ISolutionInfo> infoGenerator,
             IPackageRestorer restorer,
             ITargetFrameworkMonikerComparer comparer,
-            IComponentIdentifier componentIdentifier,
+            IEnumerable<IComponentIdentifier> componentIdentifiers,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
             if (vsFinder is null)
@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             InputPath = options.Value.InputPath;
             _restorer = restorer;
             _comparer = comparer;
-            _componentIdentifier = componentIdentifier ?? throw new ArgumentNullException(nameof(componentIdentifier));
+            _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Properties = new UpgradeContextProperties();
 
@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifier, _restorer, _comparer, path, _logger);
+            var project = new MSBuildProject(this, _componentIdentifiers, _restorer, _comparer, path, _logger);
 
             _projectCache.Add(path.FullName, project);
 

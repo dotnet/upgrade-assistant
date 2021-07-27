@@ -6,7 +6,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     internal static class MSBuildConstants
     {
         // Common target imports
-        public const string WebApplicationTargets = "Microsoft.WebApplication.targets";
 
         // Property and element names
         public const string OutputTypePropertyName = "OutputType";
@@ -22,62 +21,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         // SDKs
         public const string DefaultSDK = "Microsoft.NET.Sdk";
-        public const string DesktopSdk = "Microsoft.NET.Sdk.Desktop";
-        public const string WebSdk = "Microsoft.NET.Sdk.Web";
+
+        private const string WebSdk = "Microsoft.NET.Sdk.Web";
 
         public static readonly string[] SDKsWithExeDefaultOutputType = new[]
         {
             WebSdk
-        };
-
-        public static readonly string[] WebFrameworkReferences = new[]
-        {
-            "Microsoft.AspNetCore.App"
-        };
-
-        public static readonly string[] WinFormsFrameworkReferences = new[]
-        {
-            "Microsoft.WindowsDesktop.App.WindowsForms",
-        };
-
-        public static readonly string[] WpfFrameworkReferences = new[]
-        {
-            "Microsoft.WindowsDesktop.App.WPF",
-        };
-
-        public static readonly string[] DesktopFrameworkReferences = new[]
-        {
-            "Microsoft.WindowsDesktop.App",
-            "Microsoft.WindowsDesktop.App.WindowsForms",
-            "Microsoft.WindowsDesktop.App.WPF"
-        };
-
-        public static readonly string[] WebReferences = new[]
-        {
-            "System.Web",
-            "System.Web.Abstractions",
-            "System.Web.Mvc",
-            "System.Web.Razor",
-            "System.Web.Routing",
-            "System.Web.WebPages"
-        };
-
-        public static readonly string[] WinFormsReferences = new[]
-        {
-            "System.Windows.Forms"
-        };
-
-        public static readonly string[] WpfReferences = new[]
-        {
-            "System.Xaml",
-            "PresentationCore",
-            "PresentationFramework",
-            "WindowsBase"
-        };
-
-        public static readonly string[] WinRTPackages = new[]
-        {
-            "Microsoft.Windows.SDK.Contracts"
         };
     }
 }
