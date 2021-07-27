@@ -30,6 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Name = GetProcessName(),
             };
 
+            // Top-level commands (upgrade, analyze, etc.) are registered as commands and parse with System.CommandLine
             root.AddCommand(new ConsoleAnalyzeCommand());
             root.AddCommand(new ConsoleUpgradeCommand());
             root.AddCommand(new ExtensionManagementCommand());

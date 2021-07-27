@@ -45,7 +45,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
 
         /// <summary>
-        /// Finds and returns the next applicable and incomplete step for the given upgrade context.
+        /// Finds and returns the next applicable and incomplete step for the given upgrade context. This will check whether each step
+        /// is applicable (via IsApplicableAsync) and then iterate through the steps, intitializing those with a status of unknown,
+        /// until one is found whose status is not complete or skipped. Then that step is returned.
         /// </summary>
         /// <param name="context">The upgrade context to evaluate upgrade steps against.</param>
         /// <returns>The next applicable but incomplete upgrade step, which should be the next upgrade step applied.
@@ -61,6 +63,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             context.CurrentStep = null;
 
+            // Get only steps that are applicable. This will check whether steps should be reset, reset them if necessary, and
+            // check applicability.
             var steps = GetStepsForContextAsync(context, AllSteps);
 
             if (!await steps.AnyAsync(cancellationToken: token).ConfigureAwait(false))
@@ -140,6 +144,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     }
                 }
 
+                // Recurse into substeps, return them first, and then return the parent step if it is still incomplete
                 if (step.SubSteps.Any())
                 {
                     var applicableSubSteps = GetStepsForContextAsync(context, step.SubSteps);
