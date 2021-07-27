@@ -132,8 +132,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             public void AddArgument(string arg, string? value = null)
             {
-                var containsSpace = arg.Contains(' ');
-
                 AddSpaceIfNeeded();
 
                 _sb.Append(arg);
