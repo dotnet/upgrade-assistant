@@ -53,6 +53,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // Get package maps as an array here so that they're only loaded once (as opposed to each iteration through the loop)
             var packageMaps = state.TargetFrameworks.Any(c => c.IsFramework) ? _packageMaps.Where(x => x.NetCorePackagesWorkOnNetFx).ToArray() : _packageMaps;
 
+            // Legacy Xamarin projects don't have TargetFramework property, try-convert sets it to ""net11",adding check to include XamarinPackageMap
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+            if (components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
+            {
+                packageMaps = packageMaps.Concat(_packageMaps.Where(x => x.PackageSetName.Contains("Xamarin")).ToArray());
+            }
+
             foreach (var packageReference in state.Packages)
             {
                 foreach (var map in packageMaps.Where(m => ContainsPackageReference(m.NetFrameworkPackages, packageReference.Name, packageReference.Version)))

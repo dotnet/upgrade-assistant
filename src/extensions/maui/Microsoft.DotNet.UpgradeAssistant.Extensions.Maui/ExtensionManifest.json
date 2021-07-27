@@ -7,6 +7,10 @@
     ]
   },
 
+  "PackageUpdater": {
+    "PackageMapPath": "PackageMaps"
+  },
+
   "ExtensionServiceProviders": [
     "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll"
   ]
