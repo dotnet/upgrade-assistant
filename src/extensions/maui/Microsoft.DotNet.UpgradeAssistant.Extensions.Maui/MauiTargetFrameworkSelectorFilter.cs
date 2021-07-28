@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 throw new ArgumentNullException(nameof(tfm));
             }
-            
+
             if (tfm.Components.HasFlag(ProjectComponents.XamarinAndroid))
             {
                 _logger.LogInformation("Project {Name} is of type Xamarin.Android, migration to .NET MAUI requires to be least net6.0-android.", tfm.Project);

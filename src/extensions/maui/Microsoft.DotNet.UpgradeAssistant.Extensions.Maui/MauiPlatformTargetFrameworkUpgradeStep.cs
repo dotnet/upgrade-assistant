@@ -98,10 +98,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 return false;
             }
 
+            if (context.CurrentProject is null)
+            {
+                return false;
+            }
+
             var project = context.CurrentProject.Required();
+
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
 
-            if(components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
+            if (components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
             {
                 return true;
             }
