@@ -20,5 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         IReadOnlyCollection<string> Extension { get; }
 
         IEnumerable<AdditionalOption> AdditionalOptions { get; }
+
+        DirectoryInfo? VSPath { get; set; }
     }
 }
