@@ -88,6 +88,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         {
                             optionss.InputPath = fullname;
                         }
+
+                        optionss.VisualStudioPath = upgradeOptions.VSPath?.FullName;
                     });
 
                     services.AddNuGet(optionss =>

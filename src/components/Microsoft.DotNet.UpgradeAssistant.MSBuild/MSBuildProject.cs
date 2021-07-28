@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Build.Exceptions;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
@@ -67,7 +68,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 _ => Language.Unknown
             };
 
-        public MBuild.Project Project => Context.ProjectCollection.LoadProject(FileInfo.FullName);
+        public MBuild.Project Project
+        {
+            get
+            {
+                try
+                {
+                    return Context.ProjectCollection.LoadProject(FileInfo.FullName);
+                }
+                catch (InvalidProjectFileException ex)
+                {
+                    throw new UpgradeException(LocalizedStrings.InvalidProjectError, ex);
+                }
+            }
+        }
 
         public ProjectOutputType OutputType =>
             ProjectRoot.Properties.FirstOrDefault(p => p.Name.Equals(MSBuildConstants.OutputTypePropertyName, StringComparison.OrdinalIgnoreCase))?.Value switch
