@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -19,6 +20,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         Version? MinUpgradeAssistantVersion { get; }
 
         string Name { get; }
+
+        string Description { get; }
+
+        IReadOnlyCollection<string> Authors { get; }
 
         Version? Version { get; }
 

@@ -30,6 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             AddCommand(new RemoveExtensionCommand());
             AddCommand(new RestoreExtensionCommand());
             AddCommand(new UpdateExtensionCommand());
+            AddCommand(new CreateExtensionCommand());
         }
 
         private class ExtensionCommandBase : Command
@@ -37,20 +38,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public ExtensionCommandBase(string name)
                 : base(name)
             {
+                AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
             }
 
             protected void AddHandler<TAppCommand>()
                 where TAppCommand : class, IAppCommand
-                => Handler = CommandHandler.Create<ExtensionOptions, ParseResult, CancellationToken>((opts, parseResult, token)
+                => Handler = CommandHandler.Create<ExtensionUpgradeAssistantOptions, ParseResult, CancellationToken>((opts, parseResult, token)
                        => Host.CreateDefaultBuilder()
                               .UseConsoleUpgradeAssistant<TAppCommand>(opts, parseResult)
                               .ConfigureServices(services =>
                               {
+                                  services.AddOptions<ExtensionOptions>()
+                                      .Configure(options =>
+                                      {
+                                          options.LoadExtensions = false;
+                                      });
+
                                   services.AddOptions<ExtensionNameOptions>()
                                     .Configure(options =>
                                     {
+                                        options.Path = opts.Path;
+
                                         foreach (var name in opts.Name)
                                         {
+                                            var source = opts.Source;
+
+                                            if (source is not null && source.StartsWith('.'))
+                                            {
+                                                source = Path.GetFullPath(source, Environment.CurrentDirectory);
+                                            }
+
                                             options.Extensions.Add(new(name) { Source = opts.Source, Version = opts.Version });
                                         }
                                     });
@@ -99,6 +116,63 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                             _logger.LogInformation(LocalizedStrings.AddExtensionSuccess, result.Name, result.Source);
                         }
                     }
+                }
+            }
+        }
+
+        private class CreateExtensionCommand : ExtensionCommandBase
+        {
+            public CreateExtensionCommand()
+                : base("create")
+            {
+                AddHandler<CreateExtensionAppCommand>();
+                AddArgument(new Argument<string>("path", LocalizedStrings.ExtensionManagementName));
+            }
+
+            private class CreateExtensionAppCommand : IAppCommand
+            {
+                private readonly IOptions<ExtensionNameOptions> _options;
+                private readonly IExtensionManager _extensionManager;
+                private readonly ILogger<CreateExtensionAppCommand> _logger;
+
+                public CreateExtensionAppCommand(IOptions<ExtensionNameOptions> options, IExtensionManager extensionManager, ILogger<CreateExtensionAppCommand> logger)
+                {
+                    _options = options;
+                    _extensionManager = extensionManager;
+                    _logger = logger;
+                }
+
+                public Task RunAsync(CancellationToken token)
+                {
+                    var options = _options.Value;
+
+                    if (string.IsNullOrEmpty(options.Path))
+                    {
+                        _logger.LogError("Path must be set");
+                        return Task.CompletedTask;
+                    }
+
+                    var extension = _extensionManager.LoadExtension(options.Path);
+
+                    if (extension?.Version is null)
+                    {
+                        _logger.LogError("Incorrectly formed extension.");
+                        return Task.CompletedTask;
+                    }
+
+                    var output = Path.Combine(Environment.CurrentDirectory, $"{extension.Name}.{extension.Version}.nupkg");
+
+                    using var fs = File.Open(output, FileMode.Create, FileAccess.ReadWrite);
+                    if (_extensionManager.CreateExtensionFromDirectory(extension, fs))
+                    {
+                        _logger.LogInformation("Created extension '{Name}' to file {Path}", extension.Name, output);
+                    }
+                    else
+                    {
+                        _logger.LogError("Error creating extension");
+                    }
+
+                    return Task.CompletedTask;
                 }
             }
         }
@@ -246,9 +320,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
         private class ExtensionNameOptions
         {
             public ICollection<ExtensionSource> Extensions { get; } = new List<ExtensionSource>();
+
+            public string? Path { get; set; }
         }
 
-        private class ExtensionOptions : IUpgradeAssistantOptions
+        private class ExtensionUpgradeAssistantOptions : IUpgradeAssistantOptions
         {
             public bool Verbose { get; set; }
 
@@ -261,6 +337,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public string? Source { get; set; }
 
             public string? Version { get; set; }
+
+            public string? Path { get; set; }
 
             public bool IgnoreUnsupportedFeatures { get; set; }
 

@@ -8,8 +8,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Configuration;
@@ -31,7 +33,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly NuGet.Common.ILogger _nugetLogger;
         private readonly Dictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
         private readonly NuGetDownloaderOptions _options;
-        private readonly INuGetPackageSourceFactory _sourceFactory;
 
         public PackageLoader(
             INuGetPackageSourceFactory sourceFactory,
@@ -52,7 +53,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _nugetLogger = new NuGetLogger(logger);
             _cache = new SourceCacheContext();
             _options = options.Value;
-            _sourceFactory = sourceFactory;
             _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(_options.PackageSourcePath));
             _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
         }
@@ -83,26 +83,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return SearchByNameAsync(reference.Name, tfms, options, currentVersion: reference.GetNuGetVersion(), token: token);
+            return SearchByNameAsync(reference.Name, tfms, options, currentVersion: reference.GetNuGetVersion(), _packageSources.Value, token: token);
         }
 
-        public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
+        public Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
+            => GetLatestVersionAsync(packageName, tfms, options, default, token);
+
+        private async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, IEnumerable<PackageSource>? sources, CancellationToken token)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var result = await SearchByNameAsync(packageName, tfms, options, null, token: token).ConfigureAwait(false);
+            var result = await SearchByNameAsync(packageName, tfms, options, null, sources, token: token).ConfigureAwait(false);
 
             return result.LastOrDefault();
         }
 
-        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, NuGetVersion? currentVersion = null, CancellationToken token = default)
+        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, NuGetVersion? currentVersion = null, IEnumerable<PackageSource>? sources = null, CancellationToken token = default)
         {
             var results = new List<IPackageSearchMetadata>();
 
-            foreach (var source in _packageSources.Value)
+            if (sources is null)
+            {
+                sources = _packageSources.Value;
+            }
+
+            foreach (var source in sources)
             {
                 try
                 {
@@ -266,9 +274,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private async Task<Stream> GetPackageStream(NuGetReference packageReference, string source, CancellationToken token)
         {
             var ms = new MemoryStream();
-            var packageSource = _sourceFactory.GetPackageSources(source);
+            var packageSource = new[] { new PackageSource(source) };
 
             await DownloadPackageToStreamAsync(packageReference, ms, packageSource, token).ConfigureAwait(false);
+
+            ms.Position = 0;
 
             return ms;
         }
@@ -390,18 +400,99 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return false;
             }
 
-            using var zip = new ZipArchive(stream);
+            try
+            {
+                using var zip = new ZipArchive(stream);
 
-            zip.ExtractToDirectory(path);
+                zip.ExtractToDirectory(path);
+
+                return true;
+            }
+            catch (InvalidDataException)
+            {
+            }
+            catch (IOException)
+            {
+            }
+
+            _logger.LogError("Invalid package file.");
+
+            return false;
+        }
+
+        public bool CreateArchive(IExtensionInstance extension, Stream stream)
+        {
+            if (extension is null)
+            {
+                throw new ArgumentNullException(nameof(extension));
+            }
+
+            if (!PackageIdValidator.IsValidPackageId(extension.Name))
+            {
+                _logger.LogError("Invalid extension name to create package.");
+                return false;
+            }
+
+            if (extension.Version is null)
+            {
+                _logger.LogError("Version must not be empty to create package.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(extension.Description))
+            {
+                _logger.LogError("Description must not be empty to create package");
+                return false;
+            }
+
+            if (extension.Authors.Count == 0)
+            {
+                _logger.LogError("Must include an author to create a package");
+                return false;
+            }
+
+            var builder = new PackageBuilder
+            {
+                Id = extension.Name,
+                Version = NuGetVersion.Parse(extension.Version.ToString()),
+                Description = extension.Description,
+            };
+
+            builder.Authors.AddRange(extension.Authors);
+            builder.Files.Add(new EmptyFile(Path.Combine("content", "_.txt")));
+
+            builder.Save(stream);
 
             return true;
+        }
+
+        private class EmptyFile : IPackageFile
+        {
+            public EmptyFile(string path)
+            {
+                TargetFramework = FrameworkNameUtility.ParseFrameworkNameFromFilePath(path, out var effective);
+                Path = path;
+                EffectivePath = effective;
+            }
+
+            public string Path { get; }
+
+            public string EffectivePath { get; }
+
+            public FrameworkName TargetFramework { get; }
+
+            public NuGetFramework NuGetFramework => null!;
+
+            public DateTimeOffset LastWriteTime => DateTimeOffset.UtcNow;
+
+            public Stream GetStream() => Stream.Null;
         }
 
         public async ValueTask<NuGetReference?> GetNuGetReference(string name, string? version, string source, CancellationToken token)
         {
             if (version is null)
             {
-                return await GetLatestVersionAsync(name, Enumerable.Empty<TargetFrameworkMoniker>(), new(), token).ConfigureAwait(false);
+                return await GetLatestVersionAsync(name, Enumerable.Empty<TargetFrameworkMoniker>(), new(), new[] { new PackageSource(source) }, token).ConfigureAwait(false);
             }
             else
             {

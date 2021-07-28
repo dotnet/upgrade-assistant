@@ -3,8 +3,10 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -24,6 +26,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token);
 
         Task<bool> RestoreExtensionsAsync(CancellationToken token);
+
+        IExtensionInstance? LoadExtension(string path);
+
+        bool CreateExtensionFromDirectory(IExtensionInstance extension, Stream stream);
 
         /// <summary>
         /// Attempts to find the extension in which a service is registered.

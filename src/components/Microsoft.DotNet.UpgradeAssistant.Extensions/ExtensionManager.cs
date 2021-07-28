@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,11 +20,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
     {
         private readonly Lazy<IPackageDownloader> _packageDownloader;
         private readonly IUpgradeAssistantConfigurationLoader _configurationLoader;
+        private readonly IEnumerable<IExtensionLoader> _loaders;
         private readonly ILogger<ExtensionManager> _logger;
         private readonly ExtensionOptions _options;
         private readonly Lazy<IEnumerable<ExtensionInstance>> _extensions;
 
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propagate any exceptions.")]
         public ExtensionManager(
             IEnumerable<IExtensionLoader> loaders,
             IUpgradeAssistantConfigurationLoader configurationLoader,
@@ -43,10 +44,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             _packageDownloader = packageDownloader;
             _configurationLoader = configurationLoader ?? throw new ArgumentNullException(nameof(configurationLoader));
+            _loaders = loaders;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options.Value;
             _extensions = new Lazy<IEnumerable<ExtensionInstance>>(() =>
             {
+                if (!_options.LoadExtensions)
+                {
+                    return Enumerable.Empty<ExtensionInstance>();
+                }
+
                 var list = new List<ExtensionInstance>();
 
                 foreach (var path in _options.ExtensionPaths)
@@ -59,15 +66,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     LoadPath(path, isDefault: true);
                 }
 
-                logger.LogInformation("Loaded {Count} extensions", list.Count);
-
-                if (_options.AdditionalOptions.Any())
-                {
-                    list.Add(LoadOptionsExtension(_options.AdditionalOptions));
-                }
-
-                list.AddRange(_options.Extensions);
-
                 try
                 {
                     foreach (var path in Registered.Select(GetPath))
@@ -78,6 +76,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 catch (OperationCanceledException)
                 {
                 }
+
+                logger.LogInformation("Loaded {Count} extensions", list.Count);
+
+                if (_options.AdditionalOptions.Any())
+                {
+                    list.Add(LoadOptionsExtension(_options.AdditionalOptions));
+                }
+
+                list.AddRange(_options.Extensions);
 
                 return list;
 
@@ -105,35 +112,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     }
                 }
             });
-
-            ExtensionInstance? LoadExtension(string path)
-            {
-                foreach (var loader in loaders)
-                {
-                    try
-                    {
-                        if (loader.LoadExtension(path) is ExtensionInstance instance)
-                        {
-                            if (instance.Version is Version version)
-                            {
-                                logger.LogDebug("Found extension '{Name}' v{Version} [{Location}]", instance.Name, version, instance.Location);
-                            }
-                            else
-                            {
-                                logger.LogDebug("Found extension '{Name}' [{Location}]", instance.Name, instance.Location);
-                            }
-
-                            return instance;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e, "There was an error loading an extension from {Path}", path);
-                    }
-                }
-
-                return null;
-            }
         }
 
         public void Dispose()
@@ -191,9 +169,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 throw new ArgumentNullException(nameof(n));
             }
 
+            if (string.IsNullOrEmpty(n.Version))
+            {
+                var result = await _packageDownloader.Value.GetNuGetReference(n.Name, n.Version, n.Source, token).ConfigureAwait(false);
+
+                if (result is null)
+                {
+                    _logger.LogError("Could not find a version for extension {Name}", n.Name);
+                    return null;
+                }
+
+                _logger.LogInformation("Found version for extension {Name}: {Version}", n.Name, n.Version);
+
+                n = n with { Version = result.Version };
+            }
+
+            var path = await RestoreAsync(n, token).ConfigureAwait(false);
+
+            if (path is null)
+            {
+                _logger.LogError("Could not install extension {Name} [{Version}] from {Source}", n.Name, n.Version, n.Source);
+                return null;
+            }
+
             var config = await _configurationLoader.LoadAsync(token).ConfigureAwait(false);
 
-            // TODO: Verify/download/etc
             var updated = config with
             {
                 Extensions = config.Extensions.Add(n)
@@ -241,15 +241,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             if (Directory.Exists(path))
             {
+                _logger.LogDebug("{Name} is already restored at {Path}", source.Name, path);
                 return path;
             }
+
+            _logger.LogDebug("Creating driectory {Path} for extension {Name}", path, source.Name);
 
             Directory.CreateDirectory(path);
             var package = new NuGetReference(source.Name, source.Version);
 
-            await _packageDownloader.Value.DownloadPackageToDirectoryAsync(path, package, source.Source, token).ConfigureAwait(false);
+            if (await _packageDownloader.Value.DownloadPackageToDirectoryAsync(path, package, source.Source, token).ConfigureAwait(false))
+            {
+                return path;
+            }
 
-            return path;
+            Directory.Delete(path, true);
+
+            return null;
         }
 
         public bool TryGetExtension(object service, [MaybeNullWhen(false)] out IExtensionInstance extensionInstance)
@@ -263,6 +271,70 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             extensionInstance = Instances.FirstOrDefault(i => i.IsInExtension(assembly));
 
             return extensionInstance is not null;
+        }
+
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propagate any exceptions.")]
+        public IExtensionInstance? LoadExtension(string path)
+        {
+            foreach (var loader in _loaders)
+            {
+                try
+                {
+                    if (loader.LoadExtension(path) is ExtensionInstance instance)
+                    {
+                        if (instance.Version is Version version)
+                        {
+                            _logger.LogDebug("Found extension '{Name}' v{Version} [{Location}]", instance.Name, version, instance.Location);
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Found extension '{Name}' [{Location}]", instance.Name, instance.Location);
+                        }
+
+                        return instance;
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "There was an error loading an extension from {Path}", path);
+                }
+            }
+
+            return null;
+        }
+
+        public bool CreateExtensionFromDirectory(IExtensionInstance extension, Stream stream)
+        {
+            if (extension is null)
+            {
+                throw new ArgumentNullException(nameof(extension));
+            }
+
+            if (stream is null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
+
+            if (!_packageDownloader.Value.CreateArchive(extension, stream))
+            {
+                return false;
+            }
+
+            stream.Position = 0;
+
+            using var zip = new ZipArchive(stream, ZipArchiveMode.Update);
+
+            foreach (var file in extension.FileProvider.GetFiles("*"))
+            {
+                var entry = zip.CreateEntry(file.Stem);
+
+                using var entryStream = entry.Open();
+                using var fileStream = extension.FileProvider.GetFileInfo(file.Stem).CreateReadStream();
+
+                fileStream.CopyTo(entryStream);
+            }
+
+            return true;
         }
 
         IEnumerable<IExtensionInstance> IExtensionManager.Instances => Instances;

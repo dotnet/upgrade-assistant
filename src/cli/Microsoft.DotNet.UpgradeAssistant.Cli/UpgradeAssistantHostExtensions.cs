@@ -84,12 +84,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddMsBuild(optionss =>
                     {
-                        optionss.InputPath = upgradeOptions.Project.FullName;
+                        if (upgradeOptions.Project?.FullName is string fullname)
+                        {
+                            optionss.InputPath = fullname;
+                        }
                     });
 
                     services.AddNuGet(optionss =>
                     {
-                        optionss.PackageSourcePath = Path.GetDirectoryName(upgradeOptions.Project.FullName);
+                        if (upgradeOptions.Project?.FullName is string fullname)
+                        {
+                            optionss.PackageSourcePath = Path.GetDirectoryName(fullname);
+                        }
                     });
 
                     services.AddUserInput();
@@ -128,7 +134,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 .AddOptions<FileStateOptions>()
                 .Configure(options =>
                 {
-                    options.Path = Path.Combine(upgradeOptions.Project.DirectoryName!, ".upgrade-assistant");
+                    if (upgradeOptions.Project?.DirectoryName is string directory)
+                    {
+                        options.Path = Path.Combine(directory, ".upgrade-assistant");
+                    }
                 })
                 .ValidateDataAnnotations();
         }
