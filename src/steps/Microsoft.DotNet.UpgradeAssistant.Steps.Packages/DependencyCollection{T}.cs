@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             return false;
         }
 
-        bool IDependencyCollection<T>.Add(T item, OperationDetails od)
+        public bool Add(T item, OperationDetails od)
         {
             var operation = new Operation<T>(item, od);
 
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             return false;
         }
 
-        bool IDependencyCollection<T>.Remove(T item, OperationDetails od)
+        public bool Remove(T item, OperationDetails od)
         {
             var operation = new Operation<T>(item, od);
 
@@ -89,42 +89,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        [Obsolete("Use the newer Add API", error: false)]
+        [Obsolete("This API will be removed sometime after September 1, 2021. Please refactor to use a supported overload", error: false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         bool IDependencyCollection<T>.Add(T item, BuildBreakRisk risk)
         {
-            var operation = new Operation<T>(item, new() { Risk = risk });
-            if (Contains(item))
-            {
-                return false;
-            }
-
-            if (Additions.Add(operation))
-            {
-                _setRisk(operation.Action.Risk);
-                return true;
-            }
-
-            return false;
+            return Add(item, new() { Risk = risk });
         }
 
-        [Obsolete("Use the newer Remove API", error: false)]
+        [Obsolete("This API will be removed sometime after September 1, 2021. Please refactor to use a supported overload", error: false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         bool IDependencyCollection<T>.Remove(T item, BuildBreakRisk risk)
         {
-            var operation = new Operation<T>(item, new() { Risk = risk });
-            if (!Contains(item))
-            {
-                return false;
-            }
-
-            if (Deletions.Add(operation))
-            {
-                _setRisk(operation.Action.Risk);
-                return true;
-            }
-
-            return false;
+            return Remove(item, new() { Risk = risk });
         }
 
         public bool HasChanges => Additions.Any() || Deletions.Any();

@@ -10,6 +10,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
     {
         public string FileLocation { get; init; } = string.Empty;
 
-        public IReadOnlyCollection<string> Results { get; init; } = Array.Empty<string>();
+        public HashSet<string> Results { get; init; } = new HashSet<string>();
     }
 }

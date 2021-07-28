@@ -78,9 +78,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
         }
 
-        private static IReadOnlyCollection<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
+        private static HashSet<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
         {
-            var results = new List<string>();
+            var results = new HashSet<string>();
 
             if (analysisState is null || !analysisState.AreChangesRecommended)
             {
@@ -101,9 +101,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     {
                         foreach (var s in collection)
                         {
-                            if (s.Action != null && s.Action.Details != null && s.Action.Details.Any() && !results.Intersect(s.Action.Details).Any())
+                            if (s.OperationDetails is not null && s.OperationDetails.Details is not null && s.OperationDetails.Details.Any())
                             {
-                                results.AddRange(s.Action.Details);
+                                results.UnionWith(s.OperationDetails.Details);
                             }
                             else
                             {

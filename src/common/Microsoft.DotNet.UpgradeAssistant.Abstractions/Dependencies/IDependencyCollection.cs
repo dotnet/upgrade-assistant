@@ -14,11 +14,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 
         bool Remove(T item, OperationDetails details);
 
-        [Obsolete("Use the newer Add API", error: false)]
+        [Obsolete("This API will be removed sometime after September 1, 2021. Please refactor to use a supported overload", error: false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         bool Add(T item, BuildBreakRisk risk = BuildBreakRisk.None);
 
-        [Obsolete("Use the newer Remove API", error: false)]
+        [Obsolete("This API will be removed sometime after September 1, 2021. Please refactor to use a supported overload", error: false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         bool Remove(T item, BuildBreakRisk risk = BuildBreakRisk.None);
 
@@ -39,11 +39,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
         public Operation(T item, OperationDetails details)
         {
             Item = item;
-            Action = details;
+            OperationDetails = details;
         }
 
         public T Item { get; }
 
-        public OperationDetails Action { get; }
+        public OperationDetails OperationDetails { get; }
     }
 }
