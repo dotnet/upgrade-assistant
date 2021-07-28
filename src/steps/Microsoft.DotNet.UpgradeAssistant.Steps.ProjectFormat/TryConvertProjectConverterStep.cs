@@ -54,10 +54,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // TODO Sweek add has Xam compoonent check before adding property
             var project = context.CurrentProject.Required();
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-            context.Properties.SetPropertyValue("componentFlag", components.ToString(), true);
+            if (components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
+            {
+                context.Properties.SetPropertyValue("componentFlag", components.ToString(), true);
+            }
 
             var result = await RunTryConvertAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 

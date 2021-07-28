@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
     /// <summary>
-    /// Users using Xamarin.Forms lower than version 4.8 should be informed to update to a higher version 
+    /// Users using Xamarin.Forms lower than version 4.8 should be informed to update to a higher version
     /// before they run this tool.
     /// </summary>
     public class XamarinFormsCheck : IUpgradeReadyCheck

@@ -4,16 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
     public class MauiPlatformTargetFrameworkUpgradeStep : UpgradeStep
     {
-
         private readonly ITargetFrameworkSelector _tfmSelector;
 
         public override string Title => "Add TargetFramework for .NET MAUI Project";
@@ -28,7 +26,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
-            // Project should be backed up before changing source
             WellKnownStepIds.BackupStepId,
             WellKnownStepIds.TryConvertProjectConverterStepId,
         };
@@ -36,7 +33,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
             WellKnownStepIds.NextProjectStepId,
-            // Project should have correct TFM
             WellKnownStepIds.SetTFMStepId,
         };
 
@@ -48,6 +44,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
+            if (componentFlagProperty is null)
+            {
+                throw new ArgumentNullException(nameof(context), "componentFlag property was null");
+            }
+
             var targetTfm = TargetFrameworkMoniker.Net60_Android;
             if (componentFlagProperty.Equals(ProjectComponents.XamariniOS.ToString(), StringComparison.Ordinal))
             {
@@ -65,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFM {targetTfm} to MAUI project ");
         }
 
-        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -74,6 +75,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var project = context.CurrentProject.Required();
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
+            if (componentFlagProperty is null)
+            {
+                throw new ArgumentNullException(nameof(context), "componentFlag property was null");
+            }
+
             var targetTfm = TargetFrameworkMoniker.Net60_Android;
             if (componentFlagProperty.Equals(ProjectComponents.XamariniOS.ToString(), StringComparison.Ordinal))
             {
@@ -82,12 +88,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             if (project.TargetFrameworks.Any(tfm => tfm == targetTfm))
             {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None);
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None));
             }
             else
             {
                 Logger.LogInformation("TFM needs updated to {TargetTFM}", targetTfm);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High);
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High));
             }
         }
 
