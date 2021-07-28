@@ -68,12 +68,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     return;
                 }
 
-                state.Packages.Remove(existing);
+                state.Packages.Remove(existing, new());
             }
 
             _logger.LogInformation("Adding {PackageName} {Version}", PackageName, latestVersion.Version);
 
-            state.Packages.Add(new NuGetReference(PackageName, latestVersion.Version));
+            state.Packages.Add(new NuGetReference(PackageName, latestVersion.Version), new());
         }
     }
 }

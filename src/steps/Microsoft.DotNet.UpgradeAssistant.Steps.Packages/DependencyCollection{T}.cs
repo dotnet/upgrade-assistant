@@ -11,45 +11,59 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     internal class DependencyCollection<T> : IDependencyCollection<T>
     {
-        private readonly IEnumerable<T> _initial;
+        private readonly IEnumerable<Operation<T>> _initial;
         private readonly Action<BuildBreakRisk> _setRisk;
 
         public DependencyCollection(IEnumerable<T> initial, Action<BuildBreakRisk> setRisk)
         {
-            _initial = initial;
+            _initial = initial.Select(i => new Operation<T>(i, new()));
             _setRisk = setRisk;
         }
 
-        public HashSet<T> Additions { get; } = new HashSet<T>();
+        public HashSet<Operation<T>> Additions { get; } = new HashSet<Operation<T>>();
 
-        public HashSet<T> Deletions { get; } = new HashSet<T>();
+        public HashSet<Operation<T>> Deletions { get; } = new HashSet<Operation<T>>();
 
-        bool IDependencyCollection<T>.Add(T item, BuildBreakRisk risk)
+        public bool Contains(T item)
         {
-            if (_initial.Contains(item))
+            if (_initial.Any(i => i.Item != null && i.Item.Equals(item)))
             {
-                return false;
-            }
-
-            if (Additions.Add(item))
-            {
-                _setRisk(risk);
                 return true;
             }
 
             return false;
         }
 
-        bool IDependencyCollection<T>.Remove(T item, BuildBreakRisk risk)
+        bool IDependencyCollection<T>.Add(T item, OperationDetails od)
         {
-            if (!_initial.Contains(item))
+            var operation = new Operation<T>(item, od);
+
+            if (Contains(item))
             {
                 return false;
             }
 
-            if (Deletions.Add(item))
+            if (Additions.Add(operation))
             {
-                _setRisk(risk);
+                _setRisk(od.Risk);
+                return true;
+            }
+
+            return false;
+        }
+
+        bool IDependencyCollection<T>.Remove(T item, OperationDetails od)
+        {
+            var operation = new Operation<T>(item, od);
+
+            if (!Contains(item))
+            {
+                return false;
+            }
+
+            if (Deletions.Add(operation))
+            {
+                _setRisk(od.Risk);
                 return true;
             }
 
@@ -62,22 +76,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             {
                 if (!Deletions.Contains(item))
                 {
-                    yield return item;
+                    yield return item.Item;
                 }
             }
 
             foreach (var additions in Additions)
             {
-                yield return additions;
+                yield return additions.Item;
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        public bool Add(T item, OperationDetails details)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Remove(T item, OperationDetails details)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool HasChanges => Additions.Any() || Deletions.Any();
 
-        IReadOnlyCollection<T> IDependencyCollection<T>.Additions => Additions;
+        IReadOnlyCollection<Operation<T>> IDependencyCollection<T>.Additions => Additions;
 
-        IReadOnlyCollection<T> IDependencyCollection<T>.Deletions => Deletions;
+        IReadOnlyCollection<Operation<T>> IDependencyCollection<T>.Deletions => Deletions;
     }
 }

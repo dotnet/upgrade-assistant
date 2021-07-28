@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
@@ -144,13 +145,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                     if (_analysisState is not null)
                     {
-                        projectFile.RemoveReferences(_analysisState.References.Deletions);
+                        projectFile.RemoveReferences(_analysisState.References.Deletions.Select(i => i.Item));
 
-                        projectFile.RemovePackages(_analysisState.Packages.Deletions);
-                        projectFile.AddPackages(_analysisState.Packages.Additions);
+                        projectFile.RemovePackages(_analysisState.Packages.Deletions.Select(i => i.Item));
+                        projectFile.AddPackages(_analysisState.Packages.Additions.Select(i => i.Item));
 
-                        projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferences.Deletions);
-                        projectFile.AddFrameworkReferences(_analysisState.FrameworkReferences.Additions);
+                        projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferences.Deletions.Select(i => i.Item));
+                        projectFile.AddFrameworkReferences(_analysisState.FrameworkReferences.Additions.Select(i => i.Item));
 
                         await projectFile.SaveAsync(token).ConfigureAwait(false);
                         count++;

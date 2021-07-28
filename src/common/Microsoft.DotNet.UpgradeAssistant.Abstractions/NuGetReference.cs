@@ -19,7 +19,5 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
 
         public string? PrivateAssets { get; set; }
-
-        public IEnumerable<string>? ActionDetails { get; set; }
     }
 }

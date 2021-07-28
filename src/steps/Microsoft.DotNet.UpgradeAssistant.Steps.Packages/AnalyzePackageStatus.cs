@@ -95,20 +95,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 GetResults("Framework Reference to ", " needs to be deleted ", analysisState.FrameworkReferences.Deletions);
                 GetResults("Framework Reference to ", " needs to be added ", analysisState.FrameworkReferences.Additions);
 
-                void GetResults<T>(string name, string action, IReadOnlyCollection<T> collection)
+                void GetResults<T>(string name, string action, IReadOnlyCollection<Operation<T>> collection)
                 {
                     if (collection.Any())
                     {
                         foreach (var s in collection)
                         {
-                            var mc = s as NuGetReference;
-                            if (mc != null && mc.ActionDetails != null && mc.ActionDetails.Any() && !results.Intersect(mc.ActionDetails).Any())
+                            if (s.Action != null && s.Action.Details != null && s.Action.Details.Any() && !results.Intersect(s.Action.Details).Any())
                             {
-                                results.AddRange(mc.ActionDetails);
+                                results.AddRange(s.Action.Details);
                             }
                             else
                             {
-                                results.Add(string.Concat(name, s, action));
+                                results.Add(string.Concat(name, s.Item, action));
                             }
                         }
                     }
