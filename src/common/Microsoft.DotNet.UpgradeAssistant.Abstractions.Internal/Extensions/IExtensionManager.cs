@@ -10,6 +10,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public interface IExtensionManager
     {
+        /// <summary>
+        /// Gets the extensions that are currently loaded. This can only be retrieved after extensions have been loaded.
+        /// </summary>
         IEnumerable<IExtensionInstance> Instances { get; }
 
         IEnumerable<ExtensionSource> Registered { get; }
@@ -19,6 +22,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token);
 
         Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token);
+
+        Task<bool> RestoreExtensionsAsync(CancellationToken token);
 
         /// <summary>
         /// Attempts to find the extension in which a service is registered.

@@ -21,5 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public Version CurrentVersion { get; set; } = null!;
 
         public string ConfigurationFilePath { get; } = Path.Combine(Environment.CurrentDirectory, "upgrade-assistant.json");
+
+        public string ExtensionCachePath { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "dotnet", "upgrade-assisistant", "extensions");
     }
 }

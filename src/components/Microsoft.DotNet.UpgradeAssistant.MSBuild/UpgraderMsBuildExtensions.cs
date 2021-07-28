@@ -36,7 +36,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static void AddNuGet(this IServiceCollection services, Action<NuGetDownloaderOptions> configure)
         {
-            services.AddSingleton<IPackageLoader, PackageLoader>();
+            services.AddSingleton<PackageLoader>();
+            services.AddTransient<IPackageLoader>(ctx => ctx.GetRequiredService<PackageLoader>());
+            services.AddTransient<IPackageDownloader>(ctx => ctx.GetRequiredService<PackageLoader>());
             services.AddSingleton<IVersionComparer, NuGetVersionComparer>();
             services.AddTransient<ITargetFrameworkMonikerComparer, NuGetTargetFrameworkMonikerComparer>();
             services.AddSingleton<IUpgradeStartup, NuGetCredentialsStartup>();

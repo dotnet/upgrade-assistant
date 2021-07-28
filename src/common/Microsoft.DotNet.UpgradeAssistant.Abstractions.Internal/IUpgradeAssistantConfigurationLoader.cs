@@ -11,5 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         Task SaveAsync(UpgradeAssistantConfiguration configuration, CancellationToken token);
 
         Task<UpgradeAssistantConfiguration> LoadAsync(CancellationToken token);
+
+        UpgradeAssistantConfiguration Load();
     }
 }

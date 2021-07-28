@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -20,7 +21,7 @@ using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
-    public sealed class PackageLoader : IPackageLoader, IDisposable
+    public sealed class PackageLoader : IPackageLoader, IPackageDownloader, IDisposable
     {
         private const int MaxRetries = 3;
 
@@ -30,6 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly NuGet.Common.ILogger _nugetLogger;
         private readonly Dictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
         private readonly NuGetDownloaderOptions _options;
+        private readonly INuGetPackageSourceFactory _sourceFactory;
 
         public PackageLoader(
             INuGetPackageSourceFactory sourceFactory,
@@ -50,6 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _nugetLogger = new NuGetLogger(logger);
             _cache = new SourceCacheContext();
             _options = options.Value;
+            _sourceFactory = sourceFactory;
             _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(_options.PackageSourcePath));
             _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
         }
@@ -240,6 +243,72 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             return ret;
         }
 
+        private Stream? GetCachedPackage(NuGetReference packageReference)
+        {
+            // First look in the local NuGet cache for the archive
+            if (_options.CachePath is string cachePath)
+            {
+                var archivePath = Path.Combine(cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
+                if (File.Exists(archivePath))
+                {
+                    _logger.LogDebug("NuGet package {NuGetPackage} loaded from {PackagePath}", packageReference, archivePath);
+                    return File.Open(archivePath, FileMode.Open);
+                }
+                else
+                {
+                    _logger.LogDebug("NuGet package {NuGetPackage} not found in package cache", packageReference);
+                }
+            }
+
+            return null;
+        }
+
+        private async Task<Stream> GetPackageStream(NuGetReference packageReference, string source, CancellationToken token)
+        {
+            var ms = new MemoryStream();
+            var packageSource = _sourceFactory.GetPackageSources(source);
+
+            await DownloadPackageToStreamAsync(packageReference, ms, packageSource, token).ConfigureAwait(false);
+
+            return ms;
+        }
+
+        private async Task<bool> DownloadPackageToStreamAsync(NuGetReference packageReference, Stream stream, IEnumerable<PackageSource>? sources, CancellationToken token)
+        {
+            // Attempt to download the package from the sources
+            var packageVersion = packageReference.GetNuGetVersion();
+            var packageSources = sources ?? _packageSources.Value;
+
+            foreach (var source in packageSources)
+            {
+                var repo = GetSourceRepository(source);
+                try
+                {
+                    var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
+                    if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
+                    {
+                        if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, stream, _cache, _nugetLogger, token).ConfigureAwait(false))
+                        {
+                            _logger.LogDebug("Package {NuGetPackage} downloaded from feed {NuGetFeed}", packageReference, source.Source);
+                            return true;
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Failed to download package {NuGetPackage} from source {NuGetFeed}", packageReference, source.Source);
+                        }
+                    }
+                }
+                catch (NuGetProtocolException)
+                {
+                    _logger.LogWarning("Failed to get package finder from source {PackageSource} due to a NuGet protocol error, skipping this source", source.Source);
+                    _logger.LogInformation("If NuGet packages are coming from an authenticated source, Upgrade Assistant requires a .NET Core-compatible v2 credential provider be installed. To authenticate with an Azure DevOps NuGet source, for example, see https://github.com/microsoft/artifacts-credprovider#setup");
+                }
+            }
+
+            return false;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Package archive will clean up streams")]
         private async Task<PackageArchiveReader?> GetPackageArchiveAsync(NuGetReference packageReference, CancellationToken token)
         {
             if (packageReference is null)
@@ -252,52 +321,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentException("Package references must have specific versions to get package archives", nameof(packageReference));
             }
 
-            // First look in the local NuGet cache for the archive
-            if (_options.CachePath is string cachePath)
+            if (GetCachedPackage(packageReference) is Stream cached)
             {
-                var archivePath = Path.Combine(cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
-                if (File.Exists(archivePath))
-                {
-                    _logger.LogDebug("NuGet package {NuGetPackage} loaded from {PackagePath}", packageReference, archivePath);
-                    return new PackageArchiveReader(File.Open(archivePath, FileMode.Open), false);
-                }
-                else
-                {
-                    _logger.LogDebug("NuGet package {NuGetPackage} not found in package cache", packageReference);
-                }
+                return new PackageArchiveReader(cached, false);
             }
 
-            // Attempt to download the package from the sources
-            var packageVersion = packageReference.GetNuGetVersion();
-            foreach (var source in _packageSources.Value)
+            var ms = new MemoryStream();
+
+            if (await DownloadPackageToStreamAsync(packageReference, ms, sources: default, token).ConfigureAwait(false))
             {
-                var repo = GetSourceRepository(source);
-                try
-                {
-                    var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
-                    if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
-                    {
-                        var memoryStream = new MemoryStream();
-                        if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, memoryStream, _cache, _nugetLogger, token).ConfigureAwait(false))
-                        {
-                            _logger.LogDebug("Package {NuGetPackage} downloaded from feed {NuGetFeed}", packageReference, source.Source);
-                            return new PackageArchiveReader(memoryStream, false);
-                        }
-                        else
-                        {
-                            _logger.LogDebug("Failed to download package {NuGetPackage} from source {NuGetFeed}", packageReference, source.Source);
-                            memoryStream.Close();
-                        }
-                    }
-                }
-                catch (NuGetProtocolException)
-                {
-                    _logger.LogWarning("Failed to get package finder from source {PackageSource} due to a NuGet protocol error, skipping this source", source.Source);
-                    _logger.LogInformation("If NuGet packages are coming from an authenticated source, Upgrade Assistant requires a .NET Core-compatible v2 credential provider be installed. To authenticate with an Azure DevOps NuGet source, for example, see https://github.com/microsoft/artifacts-credprovider#setup");
-                }
+                return new PackageArchiveReader(ms, false);
             }
 
-            _logger.LogWarning("NuGet package {NuGetPackage} not found", packageReference);
+            ms.Dispose();
             return null;
         }
 
@@ -332,6 +368,45 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 Owners = nuspec.GetOwners()
             };
+        }
+
+        public async Task<bool> DownloadPackageToDirectoryAsync(string path, NuGetReference nugetReference, string source, CancellationToken token)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException($"'{nameof(path)}' cannot be null or empty.", nameof(path));
+            }
+
+            if (nugetReference is null)
+            {
+                throw new ArgumentNullException(nameof(nugetReference));
+            }
+
+            using var stream = GetCachedPackage(nugetReference) ?? await GetPackageStream(nugetReference, source, token).ConfigureAwait(false);
+
+            if (stream is null)
+            {
+                _logger.LogWarning("Could not find {Package} [{Version}]", nugetReference.Name, nugetReference.Version);
+                return false;
+            }
+
+            using var zip = new ZipArchive(stream);
+
+            zip.ExtractToDirectory(path);
+
+            return true;
+        }
+
+        public async ValueTask<NuGetReference?> GetNuGetReference(string name, string? version, string source, CancellationToken token)
+        {
+            if (version is null)
+            {
+                return await GetLatestVersionAsync(name, Enumerable.Empty<TargetFrameworkMoniker>(), new(), token).ConfigureAwait(false);
+            }
+            else
+            {
+                return new NuGetReference(name, version);
+            }
         }
     }
 }

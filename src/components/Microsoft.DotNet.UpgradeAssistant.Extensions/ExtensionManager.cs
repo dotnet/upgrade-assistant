@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public sealed class ExtensionManager : IDisposable, IExtensionManager
     {
+        private readonly Lazy<IPackageDownloader> _packageDownloader;
         private readonly IUpgradeAssistantConfigurationLoader _configurationLoader;
         private readonly ILogger<ExtensionManager> _logger;
         private readonly ExtensionOptions _options;
@@ -25,6 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public ExtensionManager(
             IEnumerable<IExtensionLoader> loaders,
             IUpgradeAssistantConfigurationLoader configurationLoader,
+            Lazy<IPackageDownloader> packageDownloader,
             IOptions<ExtensionOptions> options,
             ILogger<ExtensionManager> logger)
         {
@@ -38,6 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 throw new ArgumentNullException(nameof(options));
             }
 
+            _packageDownloader = packageDownloader;
             _configurationLoader = configurationLoader ?? throw new ArgumentNullException(nameof(configurationLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options.Value;
@@ -63,6 +67,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 }
 
                 list.AddRange(_options.Extensions);
+
+                try
+                {
+                    foreach (var path in Registered.Select(GetPath))
+                    {
+                        LoadPath(path, isDefault: false);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                }
 
                 return list;
 
@@ -189,6 +204,54 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return n;
         }
 
+        public async Task<bool> RestoreExtensionsAsync(CancellationToken token)
+        {
+            var success = true;
+
+            foreach (var extension in Registered)
+            {
+                if (await RestoreAsync(extension, token).ConfigureAwait(false) is null)
+                {
+                    success = false;
+                }
+            }
+
+            return success;
+        }
+
+        private string GetPath(ExtensionSource source)
+        {
+            if (string.IsNullOrEmpty(source.Version))
+            {
+                throw new UpgradeException("Cannot get path of source without version");
+            }
+
+            return Path.Combine(_options.ExtensionCachePath, source.Name, source.Version);
+        }
+
+        private async Task<string?> RestoreAsync(ExtensionSource source, CancellationToken token)
+        {
+            if (string.IsNullOrEmpty(source.Version))
+            {
+                _logger.LogWarning("Cannot restore a source {Name} with no version", source.Name);
+                return null;
+            }
+
+            var path = GetPath(source);
+
+            if (Directory.Exists(path))
+            {
+                return path;
+            }
+
+            Directory.CreateDirectory(path);
+            var package = new NuGetReference(source.Name, source.Version);
+
+            await _packageDownloader.Value.DownloadPackageToDirectoryAsync(path, package, source.Source, token).ConfigureAwait(false);
+
+            return path;
+        }
+
         public bool TryGetExtension(object service, [MaybeNullWhen(false)] out IExtensionInstance extensionInstance)
         {
             if (service is null)
@@ -197,13 +260,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             var assembly = service.GetType().Assembly;
-            extensionInstance = _extensions.Value.FirstOrDefault(i => i.IsInExtension(assembly));
+            extensionInstance = Instances.FirstOrDefault(i => i.IsInExtension(assembly));
 
             return extensionInstance is not null;
         }
 
-        public IEnumerable<IExtensionInstance> Instances => _extensions.Value;
+        IEnumerable<IExtensionInstance> IExtensionManager.Instances => Instances;
 
-        public IEnumerable<ExtensionSource> Registered => _extensions.Value.Select(v => new ExtensionSource(v.Name) { Source = v.Location });
+        private IEnumerable<ExtensionInstance> Instances => _extensions.Value;
+
+        public IEnumerable<ExtensionSource> Registered => _configurationLoader.Load().Extensions;
     }
 }

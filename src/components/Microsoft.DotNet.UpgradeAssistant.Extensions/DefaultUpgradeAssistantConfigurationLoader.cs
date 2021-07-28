@@ -34,6 +34,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public UpgradeAssistantConfiguration Load()
+        {
+            if (File.Exists(_path))
+            {
+                var bytes = File.ReadAllBytes(_path);
+
+                try
+                {
+                    var data = JsonSerializer.Deserialize<UpgradeAssistantConfiguration>(bytes, _options);
+
+                    if (data is not null)
+                    {
+                        return data;
+                    }
+                }
+                catch (JsonException e)
+                {
+                    _logger.LogError(e, "Unexpected error reading configuration file at {Path}", _path);
+                }
+            }
+
+            return new();
+        }
+
         public async Task<UpgradeAssistantConfiguration> LoadAsync(CancellationToken token)
         {
             if (File.Exists(_path))

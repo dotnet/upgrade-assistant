@@ -28,6 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             AddCommand(new AddExtensionCommand());
             AddCommand(new ListExtensionCommand());
             AddCommand(new RemoveExtensionCommand());
+            AddCommand(new RestoreExtensionCommand());
             AddCommand(new UpdateExtensionCommand());
         }
 
@@ -131,6 +132,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                     }
 
                     return Task.CompletedTask;
+                }
+            }
+        }
+
+        private class RestoreExtensionCommand : ExtensionCommandBase
+        {
+            public RestoreExtensionCommand()
+                : base("restore")
+            {
+                AddHandler<RestoreExtensionAppCommand>();
+            }
+
+            private class RestoreExtensionAppCommand : IAppCommand
+            {
+                private readonly IExtensionManager _extensionManager;
+                private readonly ILogger<RestoreExtensionAppCommand> _logger;
+
+                public RestoreExtensionAppCommand(IExtensionManager extensionManager, ILogger<RestoreExtensionAppCommand> logger)
+                {
+                    _extensionManager = extensionManager;
+                    _logger = logger;
+                }
+
+                public Task RunAsync(CancellationToken token)
+                {
+                    return _extensionManager.RestoreExtensionsAsync(token);
                 }
             }
         }
@@ -242,6 +269,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public IReadOnlyCollection<string> Extension => Array.Empty<string>();
 
             public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
+
+            public DirectoryInfo? VSPath { get; set; }
         }
     }
 }
