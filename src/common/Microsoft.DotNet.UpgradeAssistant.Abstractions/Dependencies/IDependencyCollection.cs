@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
@@ -12,6 +13,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
         bool Add(T item, OperationDetails details);
 
         bool Remove(T item, OperationDetails details);
+
+        [Obsolete("Use the newer Add API", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool Add(T item, BuildBreakRisk risk = BuildBreakRisk.None);
+
+        [Obsolete("Use the newer Remove API", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool Remove(T item, BuildBreakRisk risk = BuildBreakRisk.None);
 
         IReadOnlyCollection<Operation<T>> Additions { get; }
 

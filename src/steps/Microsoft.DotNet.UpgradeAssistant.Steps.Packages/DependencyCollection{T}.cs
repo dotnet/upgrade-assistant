@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
@@ -88,14 +89,42 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public bool Add(T item, OperationDetails details)
+        [Obsolete("Use the newer Add API", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool IDependencyCollection<T>.Add(T item, BuildBreakRisk risk)
         {
-            throw new NotImplementedException();
+            var operation = new Operation<T>(item, new() { Risk = risk });
+            if (Contains(item))
+            {
+                return false;
+            }
+
+            if (Additions.Add(operation))
+            {
+                _setRisk(operation.Action.Risk);
+                return true;
+            }
+
+            return false;
         }
 
-        public bool Remove(T item, OperationDetails details)
+        [Obsolete("Use the newer Remove API", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        bool IDependencyCollection<T>.Remove(T item, BuildBreakRisk risk)
         {
-            throw new NotImplementedException();
+            var operation = new Operation<T>(item, new() { Risk = risk });
+            if (!Contains(item))
+            {
+                return false;
+            }
+
+            if (Deletions.Add(operation))
+            {
+                _setRisk(operation.Action.Risk);
+                return true;
+            }
+
+            return false;
         }
 
         public bool HasChanges => Additions.Any() || Deletions.Any();

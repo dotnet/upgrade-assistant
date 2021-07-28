@@ -83,8 +83,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                             details.Add(string.Concat("Package ", packageReference.Name, " needs to be upgraded from ", packageReference.Version, " to ", updatedReference.Version));
                         }
 
-                        state.Packages.Remove(packageReference, new() { Risk = BuildBreakRisk.None, Details = details });
-                        state.Packages.Add(updatedReference, new() { Risk = isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.Low, Details = details });
+                        state.Packages.Remove(packageReference, new OperationDetails() { Risk = BuildBreakRisk.None, Details = details });
+                        state.Packages.Add(updatedReference, new OperationDetails() { Risk = isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.Low, Details = details });
                     }
                 }
             }

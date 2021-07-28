@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 foreach (var map in packageMaps.Where(m => ContainsPackageReference(m.NetFrameworkPackages, packageReference.Name, packageReference.Version)))
                 {
                     _logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
-                    state.Packages.Remove(packageReference, new() { Risk = BuildBreakRisk.Medium });
+                    state.Packages.Remove(packageReference, new OperationDetails() { Risk = BuildBreakRisk.Medium });
                     await AddNetCoreReferences(map, state, token).ConfigureAwait(false);
                 }
             }
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 foreach (var map in packageMaps.Where(m => m.ContainsAssemblyReference(reference.Name)))
                 {
                     _logger.LogInformation("Marking assembly reference {ReferenceName} for removal based on package mapping configuration {PackageMapSet}", reference.Name, map.PackageSetName);
-                    state.References.Remove(reference, new() { Risk = BuildBreakRisk.Medium });
+                    state.References.Remove(reference, new OperationDetails() { Risk = BuildBreakRisk.Medium });
                     await AddNetCoreReferences(map, state, token).ConfigureAwait(false);
                 }
             }
@@ -114,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     }
                 }
 
-                if (state.Packages.Add(packageToAdd, new()))
+                if (state.Packages.Add(packageToAdd, new OperationDetails()))
                 {
                     _logger.LogInformation("Adding package {PackageName} based on package mapping configuration {PackageMapSet}", packageToAdd.Name, packageMap.PackageSetName);
                 }
@@ -122,7 +122,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             foreach (var frameworkReference in packageMap.NetCoreFrameworkReferences)
             {
-                if (state.FrameworkReferences.Add(frameworkReference, new()))
+                if (state.FrameworkReferences.Add(frameworkReference, new OperationDetails()))
                 {
                     _logger.LogInformation("Adding framework reference {FrameworkReference} based on package mapping configuration {PackageMapSet}", frameworkReference.Name, packageMap.PackageSetName);
                 }

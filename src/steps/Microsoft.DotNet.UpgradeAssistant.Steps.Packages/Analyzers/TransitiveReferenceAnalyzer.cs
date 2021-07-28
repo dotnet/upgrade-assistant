@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 if (await project.NuGetReferences.IsTransitiveDependencyAsync(packageReference, token).ConfigureAwait(false))
                 {
                     _logger.LogInformation("Marking package {PackageName} for removal because it appears to be a transitive dependency", packageReference.Name);
-                    state.Packages.Remove(packageReference, new());
+                    state.Packages.Remove(packageReference, new OperationDetails());
                 }
             }
         }

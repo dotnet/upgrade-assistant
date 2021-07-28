@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             if (aspNetCoreReference is not null)
             {
                 _logger.LogInformation("Removing framework reference Microsoft.AspNetCore.App it is already included as part of the Microsoft.NET.Sdk.Web SDK");
-                state.FrameworkReferences.Remove(aspNetCoreReference, new());
+                state.FrameworkReferences.Remove(aspNetCoreReference, new OperationDetails());
             }
 
             return Task.FromResult(state);

@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
                     // 1>C:\{ProjectDir}\My Project\Settings.Designer.vb(57,10): error BC30002: Type 'Global.System.Configuration.UserScopedSettingAttribute' is not defined.
                     // 1>C:\{ProjectDir}\My Project\Settings.Designer.vb(59,10): error BC30002: Type 'Global.System.Configuration.DefaultSettingValueAttribute' is not defined.
                     _logger.LogInformation("Reference to configuration package ({SystemConfigurationPackageName}, version {SystemConfigurationPackageVersion}) needs added", SystemConfigurationPackageName, systemConfigurationPackage.Version);
-                    state.Packages.Add(systemConfigurationPackage, new());
+                    state.Packages.Add(systemConfigurationPackage, new OperationDetails());
                 }
                 else
                 {
