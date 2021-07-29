@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
         }
 
         [Fact]
-        public async Task UpdateIsNotUpdated()
+        public async Task UpdateIsUpdated()
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
