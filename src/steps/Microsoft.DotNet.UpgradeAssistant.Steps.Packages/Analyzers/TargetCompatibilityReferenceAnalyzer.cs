@@ -2,7 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
@@ -53,6 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                     // If the package won't work on the target Framework, check newer versions of the package
                     var newerVersions = await _packageLoader.GetNewerVersionsAsync(packageReference, state.TargetFrameworks, new() { LatestMinorAndBuildOnly = true }, token).ConfigureAwait(false);
                     var updatedReference = newerVersions.FirstOrDefault();
+                    var details = new List<string>();
 
                     if (updatedReference == null)
                     {
@@ -65,16 +68,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
                         if (isMajorChange)
                         {
-                            _logger.LogWarning("Package {NuGetPackage} has been upgraded across major versions ({OldVersion} -> {NewVersion}) which may introduce breaking changes", packageReference.Name, packageReference.Version, updatedReference.Version);
+                            var logString = SR.Format("Package {0} needs to be upgraded across major versions ({1} -> {2}) which may introduce breaking changes", packageReference.Name, packageReference.Version, updatedReference.Version);
+                            details.Add(logString);
+                            _logger.LogWarning(logString);
                         }
 
                         if (updatedReference.IsPrerelease)
                         {
-                            _logger.LogWarning("Package {NuGetPackage} has been upgraded to a prerelease version ({NewVersion}) because no released version supports target(s) {TFM}", packageReference.Name, updatedReference.Version, string.Join(", ", state.TargetFrameworks));
+                            var logString = SR.Format("Package {0} needs to be upgraded to a prerelease version ({1}) because no released version supports target(s) {2}", packageReference.Name, updatedReference.Version, string.Join(", ", state.TargetFrameworks));
+                            details.Add(logString);
+                            _logger.LogWarning(logString);
                         }
 
-                        state.Packages.Remove(packageReference);
-                        state.Packages.Add(updatedReference, isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.Low);
+                        if (!isMajorChange && !updatedReference.IsPrerelease)
+                        {
+                            details.Add(SR.Format("Package {0} needs to be upgraded from {1} to {2}.", packageReference.Name, packageReference.Version, updatedReference.Version));
+                        }
+
+                        state.Packages.Remove(packageReference, new OperationDetails() { Risk = BuildBreakRisk.None, Details = details });
+                        state.Packages.Add(updatedReference, new OperationDetails() { Risk = isMajorChange ? BuildBreakRisk.Medium : BuildBreakRisk.Low, Details = details });
                     }
                 }
             }

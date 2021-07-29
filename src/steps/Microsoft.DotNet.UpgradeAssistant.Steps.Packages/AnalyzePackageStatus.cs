@@ -78,9 +78,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
         }
 
-        private static IReadOnlyCollection<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
+        private static HashSet<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
         {
-            var results = new List<string>();
+            var results = new HashSet<string>();
 
             if (analysisState is null || !analysisState.AreChangesRecommended)
             {
@@ -95,13 +95,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 GetResults("Framework Reference to ", " needs to be deleted ", analysisState.FrameworkReferences.Deletions);
                 GetResults("Framework Reference to ", " needs to be added ", analysisState.FrameworkReferences.Additions);
 
-                void GetResults<T>(string name, string action, IReadOnlyCollection<T> collection)
+                void GetResults<T>(string name, string action, IReadOnlyCollection<Operation<T>> collection)
                 {
                     if (collection.Any())
                     {
                         foreach (var s in collection)
                         {
-                            results.Add(string.Concat(name, s, action));
+                            if (s.OperationDetails is not null && s.OperationDetails.Details is not null && s.OperationDetails.Details.Any())
+                            {
+                                results.UnionWith(s.OperationDetails.Details);
+                            }
+                            else
+                            {
+                                results.Add(string.Concat(name, s.Item, action));
+                            }
                         }
                     }
                 }
