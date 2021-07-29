@@ -16,7 +16,6 @@ trigger:
   branches:
     include:
       - main
-      - swsat/maui-nuget-tfm
 pr:
   branches:
     include:
@@ -81,11 +80,6 @@ stages:
             packageType: sdk
             version: 5.0.103
             installationPath: $(Build.SourcesDirectory)/.dotnet
-        - task: PowerShell@2
-          displayName: Install .NET MAUI workloads
-          inputs:
-            targetType: 'inline'
-            script: 'dotnet workload install maui'
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
           - task: PowerShell@2
             displayName: Setup Private Feeds Credentials
@@ -95,7 +89,6 @@ stages:
               arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
-
         - script: eng\common\cibuild.cmd
             -configuration $(_BuildConfig) 
             -prepareMachine
