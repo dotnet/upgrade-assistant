@@ -89,6 +89,11 @@ stages:
               arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
+          - task: PowerShell@2
+            displayName: Install .NET MAUI workloads
+            inputs:
+              targetType: 'inline'
+              script: 'dotnet workload install maui'
         - script: eng\common\cibuild.cmd
             -configuration $(_BuildConfig) 
             -prepareMachine
