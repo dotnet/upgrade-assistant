@@ -59,19 +59,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
                                         if (opts.Name is not null)
                                         {
+                                            var source = opts.Source;
+
+                                            if (source is not null && source.StartsWith('.'))
+                                            {
+                                                source = Path.GetFullPath(source, Environment.CurrentDirectory);
+                                            }
+
+                                            if (source is null)
+                                            {
+                                                source = extensionOptions.Value.DefaultSource;
+                                            }
+
                                             foreach (var name in opts.Name)
                                             {
-                                                var source = opts.Source;
-
-                                                if (source is not null && source.StartsWith('.'))
-                                                {
-                                                    source = Path.GetFullPath(source, Environment.CurrentDirectory);
-                                                }
-
-                                                if (source is null)
-                                                {
-                                                    source = extensionOptions.Value.DefaultSource;
-                                                }
 
                                                 options.Extensions.Add(new(name) { Source = source, Version = opts.Version });
                                             }

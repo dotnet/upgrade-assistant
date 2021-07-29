@@ -65,15 +65,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     LoadPath(path, isDefault: true);
                 }
 
-                try
+                foreach (var path in Registered.Select(_extensionDownloader.GetInstallPath))
                 {
-                    foreach (var path in Registered.Select(_extensionDownloader.GetInstallPath))
-                    {
-                        LoadPath(path, isDefault: false);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
+                    LoadPath(path, isDefault: false);
                 }
 
                 logger.LogInformation("Loaded {Count} extensions", list.Count);
