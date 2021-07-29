@@ -73,7 +73,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
                                             foreach (var name in opts.Name)
                                             {
-
                                                 options.Extensions.Add(new(name) { Source = source, Version = opts.Version });
                                             }
                                         }
