@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         Task<bool> RestoreExtensionsAsync(CancellationToken token);
 
-        IExtensionInstance? LoadExtension(string path);
+        IExtensionInstance? OpenExtension(string path);
 
         bool CreateExtensionFromDirectory(IExtensionInstance extension, Stream stream);
 

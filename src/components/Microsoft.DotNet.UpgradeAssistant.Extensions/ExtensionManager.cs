@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 void LoadPath(string path, bool isDefault)
                 {
-                    if (LoadExtension(path) is ExtensionInstance extension)
+                    if (OpenExtension(path) is ExtensionInstance extension)
                     {
                         if (isDefault)
                         {
@@ -274,7 +274,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         }
 
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propagate any exceptions.")]
-        public IExtensionInstance? LoadExtension(string path)
+        public IExtensionInstance? OpenExtension(string path)
         {
             foreach (var loader in _loaders)
             {

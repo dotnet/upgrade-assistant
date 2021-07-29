@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public ExtensionCommandBase(string name)
                 : base(name)
             {
-                AddOption(new Option<bool>(new[] { "--verbose", "-v" }, "Enable verbose diagnostics"));
+                AddOption(new Option<bool>(new[] { "--verbose", "-v" }, LocalizedStrings.VerboseCommand));
             }
 
             protected void AddHandler<TAppCommand>()
@@ -152,7 +152,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                         return Task.CompletedTask;
                     }
 
-                    var extension = _extensionManager.LoadExtension(options.Path);
+                    var extension = _extensionManager.OpenExtension(options.Path);
 
                     if (extension?.Version is null)
                     {
