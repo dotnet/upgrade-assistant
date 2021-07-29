@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
             var expected = config with { Extensions = ImmutableArray.Create(latestSource) };
 
             mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.Load()).Returns(config);
-            mock.Mock<IExtensionDownloader>().Setup(l => l.GetLatestVersionAsync(extension, default)).ReturnsAsync(latestVersion);
+            mock.Mock<IExtensionDownloader>().Setup(l => l.GetLatestVersionAsync(It.Is<ExtensionSource>(e => e.Name == extension.Name), default)).ReturnsAsync(latestVersion);
 
             // Act
             var result = await mock.Create<ExtensionManager>().UpdateAsync(extension.Name, default).ConfigureAwait(false);
