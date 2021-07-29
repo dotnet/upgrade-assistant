@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _nugetLogger = new NuGetLogger(logger);
-            _cache = new SourceCacheContext();
+            _cache = new SourceCacheContext { NoCache = true };
             _options = options.Value;
             _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(_options.PackageSourcePath));
             _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();

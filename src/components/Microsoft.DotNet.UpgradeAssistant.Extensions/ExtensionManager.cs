@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -165,7 +166,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return null;
             }
 
-            var latestVersion = await _extensionDownloader.GetLatestVersionAsync(existing, token).ConfigureAwait(false);
+            var latestVersion = await _extensionDownloader.GetLatestVersionAsync(existing with { Version = null }, token).ConfigureAwait(false);
 
             if (latestVersion is null)
             {
@@ -175,7 +176,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             var latest = existing with { Version = latestVersion };
 
-            _logger.LogInformation("Installing latest version {Version} of extension '{Extension}'", latest.Version, latest.Name);
+            _logger.LogInformation("Updating to latest version {Version} of extension '{Extension}'", latest.Version, latest.Name);
 
             await _extensionDownloader.RestoreAsync(latest, token).ConfigureAwait(false);
 
@@ -206,9 +207,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     return null;
                 }
 
-                _logger.LogInformation("Found version for extension {Name}: {Version}", n.Name, n.Version);
-
                 n = n with { Version = version };
+
+                _logger.LogInformation("Found version for extension {Name}: {Version}", n.Name, n.Version);
             }
 
             var path = await _extensionDownloader.RestoreAsync(n, token).ConfigureAwait(false);
@@ -237,6 +238,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             foreach (var extension in Registered)
             {
+                _logger.LogInformation("Restoring {Extension}", extension.Name);
+
                 if (await _extensionDownloader.RestoreAsync(extension, token).ConfigureAwait(false) is null)
                 {
                     success = false;
@@ -262,6 +265,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Loading an extension should not propagate any exceptions.")]
         public IExtensionInstance? OpenExtension(string path)
         {
+            path = Path.GetFullPath(path);
+
             foreach (var loader in _loaders)
             {
                 try

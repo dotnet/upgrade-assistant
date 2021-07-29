@@ -20,8 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 {
     internal class ExtensionManagementCommand : Command
     {
-        private const string DefaultSource = "https://api.nuget.org/v3/index.json";
-
         public ExtensionManagementCommand()
             : base("extensions")
         {
@@ -55,20 +53,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                                       });
 
                                   services.AddOptions<ExtensionNameOptions>()
-                                    .Configure(options =>
+                                    .Configure<IOptions<ExtensionOptions>>((options, extensionOptions) =>
                                     {
                                         options.Path = opts.Path;
 
-                                        foreach (var name in opts.Name)
+                                        if (opts.Name is not null)
                                         {
-                                            var source = opts.Source;
-
-                                            if (source is not null && source.StartsWith('.'))
+                                            foreach (var name in opts.Name)
                                             {
-                                                source = Path.GetFullPath(source, Environment.CurrentDirectory);
-                                            }
+                                                var source = opts.Source;
 
-                                            options.Extensions.Add(new(name) { Source = opts.Source, Version = opts.Version });
+                                                if (source is not null && source.StartsWith('.'))
+                                                {
+                                                    source = Path.GetFullPath(source, Environment.CurrentDirectory);
+                                                }
+
+                                                if (source is null)
+                                                {
+                                                    source = extensionOptions.Value.DefaultSource;
+                                                }
+
+                                                options.Extensions.Add(new(name) { Source = source, Version = opts.Version });
+                                            }
                                         }
                                     });
                               })
@@ -82,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             {
                 AddHandler<AddExtensionAppCommand>();
                 AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName));
-                AddOption(new Option<string>(new[] { "--source" }, () => DefaultSource, LocalizedStrings.ExtensionManagementSource));
+                AddOption(new Option<string>(new[] { "--source" }, LocalizedStrings.ExtensionManagementSource));
                 AddOption(new Option<string>(new[] { "--version" }, LocalizedStrings.ExtensionManagementVersion));
             }
 
@@ -235,9 +241,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                     _logger = logger;
                 }
 
-                public Task RunAsync(CancellationToken token)
+                public async Task RunAsync(CancellationToken token)
                 {
-                    return _extensionManager.RestoreExtensionsAsync(token);
+                    _logger.LogInformation("Restoring extensions...");
+                    await _extensionManager.RestoreExtensionsAsync(token);
+                    _logger.LogInformation("Done restoring extensions...");
                 }
             }
         }
@@ -285,8 +293,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 : base("update")
             {
                 AddHandler<UpdateExtensionAppCommand>();
-                AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName));
-                AddOption(new Option<string>(new[] { "--version" }, () => DefaultSource, LocalizedStrings.ExtensionManagementVersion));
+                AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName) { Arity = ArgumentArity.ZeroOrMore });
             }
 
             private class UpdateExtensionAppCommand : IAppCommand
@@ -304,20 +311,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
                 public async Task RunAsync(CancellationToken token)
                 {
-                    foreach (var n in _options.Value.Extensions)
+                    foreach (var packageName in PackagesToUpdate)
                     {
-                        _logger.LogInformation(LocalizedStrings.UpdateExtensionDetails, n.Name);
+                        _logger.LogInformation(LocalizedStrings.UpdateExtensionDetails, packageName);
 
-                        var result = await _extensionManager.UpdateAsync(n.Name, token);
+                        var result = await _extensionManager.UpdateAsync(packageName, token);
 
                         if (result is null)
                         {
-                            _logger.LogInformation(LocalizedStrings.UpdateExtensionFailed, n.Name);
+                            _logger.LogInformation(LocalizedStrings.UpdateExtensionFailed, packageName);
                         }
                         else
                         {
-                            _logger.LogInformation(LocalizedStrings.UpdateExtensionSuccess, n.Name, n.Version);
+                            _logger.LogInformation(LocalizedStrings.UpdateExtensionSuccess, result.Name, result.Version);
                         }
+                    }
+                }
+
+                private IEnumerable<string> PackagesToUpdate
+                {
+                    get
+                    {
+                        var requested = _options.Value.Extensions;
+
+                        if (requested.Count > 0)
+                        {
+                            return requested.Select(r => r.Name);
+                        }
+
+                        return _extensionManager.Registered.Select(e => e.Name);
                     }
                 }
             }

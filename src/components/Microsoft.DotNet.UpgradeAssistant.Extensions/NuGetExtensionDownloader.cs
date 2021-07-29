@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 throw new ArgumentNullException(nameof(n));
             }
 
-            var result = await _packageDownloader.Value.GetNuGetReference(n.Name, n.Version, n.Source, token).ConfigureAwait(false);
+            var result = await _packageDownloader.Value.GetNuGetReference(n.Name, n.Version, n.Source ?? _options.Value.DefaultSource, token).ConfigureAwait(false);
 
             return result?.Version;
         }
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             Directory.CreateDirectory(path);
             var package = new NuGetReference(source.Name, source.Version);
 
-            if (await _packageDownloader.Value.DownloadPackageToDirectoryAsync(path, package, source.Source, token).ConfigureAwait(false))
+            if (await _packageDownloader.Value.DownloadPackageToDirectoryAsync(path, package, source.Source ?? _options.Value.DefaultSource, token).ConfigureAwait(false))
             {
                 return path;
             }
