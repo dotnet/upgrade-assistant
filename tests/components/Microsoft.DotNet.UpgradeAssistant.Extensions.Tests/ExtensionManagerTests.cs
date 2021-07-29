@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -25,11 +26,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
             // Arrange
             using var mock = AutoMock.GetLoose();
 
+            var options = _fixture.Create<ExtensionOptions>();
             var extension = _fixture.Create<ExtensionSource>();
             var config = new UpgradeAssistantConfiguration();
             var expected = config with { Extensions = ImmutableArray.Create(extension) };
 
             mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.LoadAsync(default)).ReturnsAsync(config);
+            mock.Mock<IOptions<ExtensionOptions>>().Setup(l => l.Value).Returns(options);
 
             // Act
             await mock.Create<ExtensionManager>().AddAsync(extension, default).ConfigureAwait(false);
