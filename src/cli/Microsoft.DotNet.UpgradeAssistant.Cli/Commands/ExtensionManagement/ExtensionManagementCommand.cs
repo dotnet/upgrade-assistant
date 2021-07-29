@@ -131,15 +131,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
             private class CreateExtensionAppCommand : IAppCommand
             {
-                private readonly IOptions<ExtensionNameOptions> _options;
                 private readonly IExtensionManager _extensionManager;
+                private readonly IExtensionCreator _extensionCreator;
+                private readonly IOptions<ExtensionNameOptions> _options;
                 private readonly ILogger<CreateExtensionAppCommand> _logger;
 
-                public CreateExtensionAppCommand(IOptions<ExtensionNameOptions> options, IExtensionManager extensionManager, ILogger<CreateExtensionAppCommand> logger)
+                public CreateExtensionAppCommand(
+                    IExtensionManager extensionManager,
+                    IExtensionCreator extensionCreator,
+                    IOptions<ExtensionNameOptions> options,
+                    ILogger<CreateExtensionAppCommand> logger)
                 {
-                    _options = options;
-                    _extensionManager = extensionManager;
-                    _logger = logger;
+                    _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
+                    _extensionCreator = extensionCreator ?? throw new ArgumentNullException(nameof(extensionCreator));
+                    _options = options ?? throw new ArgumentNullException(nameof(options));
+                    _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 }
 
                 public Task RunAsync(CancellationToken token)
@@ -163,7 +169,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                     var output = Path.Combine(Environment.CurrentDirectory, $"{extension.Name}.{extension.Version}.nupkg");
 
                     using var fs = File.Open(output, FileMode.Create, FileAccess.ReadWrite);
-                    if (_extensionManager.CreateExtensionFromDirectory(extension, fs))
+                    if (_extensionCreator.TryCreateExtensionFromDirectory(extension, fs))
                     {
                         _logger.LogInformation("Created extension '{Name}' to file {Path}", extension.Name, output);
                     }

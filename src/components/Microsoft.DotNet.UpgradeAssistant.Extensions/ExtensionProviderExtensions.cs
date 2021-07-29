@@ -43,6 +43,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             services.AddSingleton<IExtensionManager, ExtensionManager>();
             services.AddExtensionLoaders();
             services.TryAddSingleton<IUpgradeAssistantConfigurationLoader, DefaultUpgradeAssistantConfigurationLoader>();
+            services.TryAddTransient<IExtensionDownloader, NuGetExtensionDownloader>();
+            services.TryAddTransient<IExtensionCreator, NuGetExtensionPackageCreator>();
 
             return services.AddOptions<ExtensionOptions>();
         }

@@ -1,7 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
@@ -28,17 +31,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
 
             var options = _fixture.Create<ExtensionOptions>();
             var extension = _fixture.Create<ExtensionSource>();
+            var restoredPath = _fixture.Create<string>();
             var config = new UpgradeAssistantConfiguration();
             var expected = config with { Extensions = ImmutableArray.Create(extension) };
 
-            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.LoadAsync(default)).ReturnsAsync(config);
             mock.Mock<IOptions<ExtensionOptions>>().Setup(l => l.Value).Returns(options);
+            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.Load()).Returns(config);
+            mock.Mock<IExtensionDownloader>().Setup(l => l.RestoreAsync(extension, default)).ReturnsAsync(restoredPath);
 
             // Act
             await mock.Create<ExtensionManager>().AddAsync(extension, default).ConfigureAwait(false);
 
             // Assert
-            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.SaveAsync(expected, default));
+            mock.Mock<IUpgradeAssistantConfigurationLoader>().Verify(l => l.Save(Match(expected)), Times.Once);
         }
 
         [Fact]
@@ -51,14 +56,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
             var config = new UpgradeAssistantConfiguration { Extensions = ImmutableArray.Create(extension) };
             var expected = config with { Extensions = config.Extensions.Remove(extension) };
 
-            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.LoadAsync(default)).ReturnsAsync(config);
+            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.Load()).Returns(config);
 
             // Act
             var result = await mock.Create<ExtensionManager>().RemoveAsync(extension.Name, default).ConfigureAwait(false);
 
             // Assert
             Assert.True(result);
-            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.SaveAsync(expected, default));
+            mock.Mock<IUpgradeAssistantConfigurationLoader>().Verify(l => l.Save(Match(expected)), Times.Once);
         }
 
         [Fact]
@@ -69,16 +74,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
 
             var extension = _fixture.Create<ExtensionSource>();
             var config = new UpgradeAssistantConfiguration { Extensions = ImmutableArray.Create(extension) };
-            var expected = config with { Extensions = config.Extensions.Remove(extension) };
+            var latestVersion = _fixture.Create<Version>().ToString();
+            var latestSource = extension with { Version = latestVersion };
+            var expected = config with { Extensions = ImmutableArray.Create(latestSource) };
 
-            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.LoadAsync(default)).ReturnsAsync(config);
+            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.Load()).Returns(config);
+            mock.Mock<IExtensionDownloader>().Setup(l => l.GetLatestVersionAsync(extension, default)).ReturnsAsync(latestVersion);
 
             // Act
             var result = await mock.Create<ExtensionManager>().UpdateAsync(extension.Name, default).ConfigureAwait(false);
 
             // Assert
-            Assert.Null(result);
-            mock.Mock<IUpgradeAssistantConfigurationLoader>().Setup(l => l.SaveAsync(expected, default));
+            Assert.Equal(latestSource, result);
+            mock.Mock<IUpgradeAssistantConfigurationLoader>().Verify(l => l.Save(Match(expected)), Times.Once);
         }
+
+        private static UpgradeAssistantConfiguration Match(UpgradeAssistantConfiguration expected)
+            => It.Is<UpgradeAssistantConfiguration>(actual => Compare(actual, expected));
+
+        private static bool Compare(UpgradeAssistantConfiguration actual, UpgradeAssistantConfiguration expected)
+            => actual.Extensions.SequenceEqual(expected.Extensions, EqualityComparer<ExtensionSource>.Default);
     }
 }

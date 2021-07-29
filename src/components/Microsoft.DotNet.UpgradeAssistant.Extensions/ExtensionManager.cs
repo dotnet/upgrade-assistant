@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,8 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public sealed class ExtensionManager : IDisposable, IExtensionManager
     {
-        private readonly Lazy<IPackageDownloader> _packageDownloader;
         private readonly IUpgradeAssistantConfigurationLoader _configurationLoader;
+        private readonly IExtensionDownloader _extensionDownloader;
         private readonly IEnumerable<IExtensionLoader> _loaders;
         private readonly ILogger<ExtensionManager> _logger;
         private readonly ExtensionOptions _options;
@@ -28,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public ExtensionManager(
             IEnumerable<IExtensionLoader> loaders,
             IUpgradeAssistantConfigurationLoader configurationLoader,
-            Lazy<IPackageDownloader> packageDownloader,
+            IExtensionDownloader extensionDownloader,
             IOptions<ExtensionOptions> options,
             ILogger<ExtensionManager> logger)
         {
@@ -42,8 +40,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _packageDownloader = packageDownloader;
             _configurationLoader = configurationLoader ?? throw new ArgumentNullException(nameof(configurationLoader));
+            _extensionDownloader = extensionDownloader;
             _loaders = loaders;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options.Value;
@@ -68,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 try
                 {
-                    foreach (var path in Registered.Select(GetPath))
+                    foreach (var path in Registered.Select(_extensionDownloader.GetInstallPath))
                     {
                         LoadPath(path, isDefault: false);
                     }
@@ -136,14 +134,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
         }
 
-        public async Task<bool> RemoveAsync(string name, CancellationToken token)
+        public Task<bool> RemoveAsync(string name, CancellationToken token)
         {
-            var config = await _configurationLoader.LoadAsync(token).ConfigureAwait(false);
+            var config = _configurationLoader.Load();
             var existing = config.Extensions.FirstOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase));
 
             if (existing is null)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             var updated = config with
@@ -151,15 +149,44 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 Extensions = config.Extensions.Remove(existing)
             };
 
-            await _configurationLoader.SaveAsync(updated, token).ConfigureAwait(false);
+            _configurationLoader.Save(updated);
 
-            return true;
+            return Task.FromResult(true);
         }
 
-        public Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token)
+        public async Task<ExtensionSource?> UpdateAsync(string name, CancellationToken token)
         {
-            _logger.LogInformation("Update Not Implemented: {Name}", name);
-            return Task.FromResult<ExtensionSource?>(null);
+            var config = _configurationLoader.Load();
+            var existing = config.Extensions.FirstOrDefault(e => string.Equals(e.Name, name, StringComparison.OrdinalIgnoreCase));
+
+            if (existing is null)
+            {
+                _logger.LogWarning("Extension '{Name}' is not installed.", name);
+                return null;
+            }
+
+            var latestVersion = await _extensionDownloader.GetLatestVersionAsync(existing, token).ConfigureAwait(false);
+
+            if (latestVersion is null)
+            {
+                _logger.LogWarning("Could not find extension '{Name}' in source '{Source}'", existing.Name, existing.Source);
+                return null;
+            }
+
+            var latest = existing with { Version = latestVersion };
+
+            _logger.LogInformation("Installing latest version {Version} of extension '{Extension}'", latest.Version, latest.Name);
+
+            await _extensionDownloader.RestoreAsync(latest, token).ConfigureAwait(false);
+
+            var updated = config with
+            {
+                Extensions = config.Extensions.Replace(existing, latest)
+            };
+
+            _configurationLoader.Save(updated);
+
+            return latest;
         }
 
         public async Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token)
@@ -171,9 +198,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             if (string.IsNullOrEmpty(n.Version))
             {
-                var result = await _packageDownloader.Value.GetNuGetReference(n.Name, n.Version, n.Source, token).ConfigureAwait(false);
+                var version = await _extensionDownloader.GetLatestVersionAsync(n, token).ConfigureAwait(false);
 
-                if (result is null)
+                if (version is null)
                 {
                     _logger.LogError("Could not find a version for extension {Name}", n.Name);
                     return null;
@@ -181,10 +208,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 _logger.LogInformation("Found version for extension {Name}: {Version}", n.Name, n.Version);
 
-                n = n with { Version = result.Version };
+                n = n with { Version = version };
             }
 
-            var path = await RestoreAsync(n, token).ConfigureAwait(false);
+            var path = await _extensionDownloader.RestoreAsync(n, token).ConfigureAwait(false);
 
             if (path is null)
             {
@@ -192,14 +219,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return null;
             }
 
-            var config = await _configurationLoader.LoadAsync(token).ConfigureAwait(false);
+            var config = _configurationLoader.Load();
 
             var updated = config with
             {
                 Extensions = config.Extensions.Add(n)
             };
 
-            await _configurationLoader.SaveAsync(updated, token).ConfigureAwait(false);
+            _configurationLoader.Save(updated);
 
             return n;
         }
@@ -210,54 +237,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             foreach (var extension in Registered)
             {
-                if (await RestoreAsync(extension, token).ConfigureAwait(false) is null)
+                if (await _extensionDownloader.RestoreAsync(extension, token).ConfigureAwait(false) is null)
                 {
                     success = false;
                 }
             }
 
             return success;
-        }
-
-        private string GetPath(ExtensionSource source)
-        {
-            if (string.IsNullOrEmpty(source.Version))
-            {
-                throw new UpgradeException("Cannot get path of source without version");
-            }
-
-            return Path.Combine(_options.ExtensionCachePath, source.Name, source.Version);
-        }
-
-        private async Task<string?> RestoreAsync(ExtensionSource source, CancellationToken token)
-        {
-            if (string.IsNullOrEmpty(source.Version))
-            {
-                _logger.LogWarning("Cannot restore a source {Name} with no version", source.Name);
-                return null;
-            }
-
-            var path = GetPath(source);
-
-            if (Directory.Exists(path))
-            {
-                _logger.LogDebug("{Name} is already restored at {Path}", source.Name, path);
-                return path;
-            }
-
-            _logger.LogDebug("Creating driectory {Path} for extension {Name}", path, source.Name);
-
-            Directory.CreateDirectory(path);
-            var package = new NuGetReference(source.Name, source.Version);
-
-            if (await _packageDownloader.Value.DownloadPackageToDirectoryAsync(path, package, source.Source, token).ConfigureAwait(false))
-            {
-                return path;
-            }
-
-            Directory.Delete(path, true);
-
-            return null;
         }
 
         public bool TryGetExtension(object service, [MaybeNullWhen(false)] out IExtensionInstance extensionInstance)
@@ -301,40 +287,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             return null;
-        }
-
-        public bool CreateExtensionFromDirectory(IExtensionInstance extension, Stream stream)
-        {
-            if (extension is null)
-            {
-                throw new ArgumentNullException(nameof(extension));
-            }
-
-            if (stream is null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            if (!_packageDownloader.Value.CreateArchive(extension, stream))
-            {
-                return false;
-            }
-
-            stream.Position = 0;
-
-            using var zip = new ZipArchive(stream, ZipArchiveMode.Update);
-
-            foreach (var file in extension.FileProvider.GetFiles("*"))
-            {
-                var entry = zip.CreateEntry(file.Stem);
-
-                using var entryStream = entry.Open();
-                using var fileStream = extension.FileProvider.GetFileInfo(file.Stem).CreateReadStream();
-
-                fileStream.CopyTo(entryStream);
-            }
-
-            return true;
         }
 
         IEnumerable<IExtensionInstance> IExtensionManager.Instances => Instances;

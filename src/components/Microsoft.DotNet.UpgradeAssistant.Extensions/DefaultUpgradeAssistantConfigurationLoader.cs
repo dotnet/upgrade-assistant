@@ -4,8 +4,6 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -58,35 +56,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new();
         }
 
-        public async Task<UpgradeAssistantConfiguration> LoadAsync(CancellationToken token)
+        public void Save(UpgradeAssistantConfiguration configuration)
         {
-            if (File.Exists(_path))
-            {
-                using var stream = File.OpenRead(_path);
-
-                try
-                {
-                    var data = await JsonSerializer.DeserializeAsync<UpgradeAssistantConfiguration>(stream, _options, token).ConfigureAwait(false);
-
-                    if (data is not null)
-                    {
-                        return data;
-                    }
-                }
-                catch (JsonException e)
-                {
-                    _logger.LogError(e, "Unexpected error reading configuration file at {Path}", _path);
-                }
-            }
-
-            return new();
-        }
-
-        public async Task SaveAsync(UpgradeAssistantConfiguration configuration, CancellationToken token)
-        {
-            using var stream = File.OpenWrite(_path);
-
-            await JsonSerializer.SerializeAsync(stream, configuration, _options, token).ConfigureAwait(false);
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(configuration, _options);
+            File.WriteAllBytes(_path, bytes);
         }
     }
 }
