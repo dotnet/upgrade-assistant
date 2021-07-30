@@ -4,8 +4,6 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -34,15 +32,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<UpgradeAssistantConfiguration> LoadAsync(CancellationToken token)
+        public UpgradeAssistantConfiguration Load()
         {
             if (File.Exists(_path))
             {
-                using var stream = File.OpenRead(_path);
+                var bytes = File.ReadAllBytes(_path);
 
                 try
                 {
-                    var data = await JsonSerializer.DeserializeAsync<UpgradeAssistantConfiguration>(stream, _options, token).ConfigureAwait(false);
+                    var data = JsonSerializer.Deserialize<UpgradeAssistantConfiguration>(bytes, _options);
 
                     if (data is not null)
                     {
@@ -58,11 +56,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return new();
         }
 
-        public async Task SaveAsync(UpgradeAssistantConfiguration configuration, CancellationToken token)
+        public void Save(UpgradeAssistantConfiguration configuration)
         {
-            using var stream = File.OpenWrite(_path);
-
-            await JsonSerializer.SerializeAsync(stream, configuration, _options, token).ConfigureAwait(false);
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(configuration, _options);
+            File.WriteAllBytes(_path, bytes);
         }
     }
 }

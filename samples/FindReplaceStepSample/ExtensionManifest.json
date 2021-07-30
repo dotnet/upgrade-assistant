@@ -1,7 +1,16 @@
 {
   // This optional property gives a friendly name used for the extension
   // while running and logging output from Upgrade Assistant.
-  "ExtensionName": "Find-and-replace sample extension",
+  "ExtensionName": "FindReplace",
+  "Version": "0.0.1",
+
+  // The authors that created this extension
+  "Authors": [
+    "Microsoft"
+  ],
+
+  // Describes what the extension does
+  "Description": "An example of how to do a find a replace",
 
   // Config settings can be provided for this or other extensions.
   // Extensions can update config settings used by other extensions

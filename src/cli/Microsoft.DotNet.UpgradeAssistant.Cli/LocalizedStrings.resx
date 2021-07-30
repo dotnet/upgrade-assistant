@@ -172,4 +172,7 @@ This tool does not completely automate the upgrade process and it is expected th
 
 This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to the project will highlight the remaining changes needed after the tool runs.</value>
   </data>
+  <data name="VerboseCommand" xml:space="preserve">
+    <value>Enable verbose diagnostics</value>
+  </data>
 </root>

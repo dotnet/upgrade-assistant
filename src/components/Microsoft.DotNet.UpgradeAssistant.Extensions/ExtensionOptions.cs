@@ -10,6 +10,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public class ExtensionOptions
     {
+        public string DefaultSource { get; set; } = string.Empty;
+
         public ICollection<string> DefaultExtensions { get; } = new List<string>();
 
         public ICollection<string> ExtensionPaths { get; } = new List<string>();
@@ -20,6 +22,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public Version CurrentVersion { get; set; } = null!;
 
+        public bool LoadExtensions { get; set; } = true;
+
         public string ConfigurationFilePath { get; } = Path.Combine(Environment.CurrentDirectory, "upgrade-assistant.json");
+
+        public string ExtensionCachePath { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "DotNet Upgrade Assisistant", "extensions");
     }
 }

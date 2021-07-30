@@ -216,5 +216,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
                 return ResourceManager.GetString("UpgradeAssistantHeaderDetails", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable verbose diagnostics.
+        /// </summary>
+        internal static string VerboseCommand {
+            get {
+                return ResourceManager.GetString("VerboseCommand", resourceCulture);
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         bool IsVerbose { get; }
 
-        FileInfo Project { get; }
+        FileInfo? Project { get; }
 
         bool IgnoreUnsupportedFeatures { get; }
 
