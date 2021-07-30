@@ -3,7 +3,7 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Current
+## Version 0.2.237901 - 2021-07-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.237901))
 
 ### Changed
 - Updated try-convert tool version from `0.7.226301` to `0.9.232202`
