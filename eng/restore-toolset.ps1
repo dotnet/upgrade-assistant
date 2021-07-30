@@ -1,5 +1,5 @@
 try {
-    dotnet workload install maui --verbosity diag
+    dotnet workload install microsoft-android-sdk-full microsoft-ios-sdk-full --verbosity diag
 }
 catch {
   Write-Host $_.ScriptStackTrace
