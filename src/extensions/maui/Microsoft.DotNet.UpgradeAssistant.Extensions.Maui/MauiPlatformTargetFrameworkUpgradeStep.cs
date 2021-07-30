@@ -46,14 +46,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
             if (componentFlagProperty is null)
             {
-                throw new ArgumentNullException(nameof(context), "componentFlag property was null");
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"componentFlag Context property was null.");
             }
 
-            var targetTfm = TargetFrameworkMoniker.Net60_Android;
-            if (componentFlagProperty.Equals(ProjectComponents.XamariniOS.ToString(), StringComparison.Ordinal))
-            {
-                targetTfm = TargetFrameworkMoniker.Net60_iOS;
-            }
+            var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
 
             var project = context.CurrentProject.Required();
             var file = project.GetFile();
@@ -74,17 +70,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             var project = context.CurrentProject.Required();
+
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
             if (componentFlagProperty is null)
             {
-                throw new ArgumentNullException(nameof(context), "componentFlag property was null");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "componentFlag Property in Context was null", BuildBreakRisk.High));
             }
 
-            var targetTfm = TargetFrameworkMoniker.Net60_Android;
-            if (componentFlagProperty.Equals(ProjectComponents.XamariniOS.ToString(), StringComparison.Ordinal))
-            {
-                targetTfm = TargetFrameworkMoniker.Net60_iOS;
-            }
+            var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
 
             if (project.TargetFrameworks.Any(tfm => tfm == targetTfm))
             {
@@ -94,6 +87,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 Logger.LogInformation("TFM needs updated to {TargetTFM}", targetTfm);
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High));
+            }
+        }
+
+        private static TargetFrameworkMoniker GetExpectedTargetFramework(string componentFlagProperty)
+        {
+            var propertyValue = Enum.Parse(typeof(ProjectComponents), componentFlagProperty);
+            if (ProjectComponents.XamarinAndroid.CompareTo(propertyValue) == 0)
+            {
+                return TargetFrameworkMoniker.Net60_Android;
+            }
+            else
+            {
+                return TargetFrameworkMoniker.Net60_iOS;
             }
         }
 
