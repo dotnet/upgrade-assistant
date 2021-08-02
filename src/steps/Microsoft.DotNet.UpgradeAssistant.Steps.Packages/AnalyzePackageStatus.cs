@@ -72,19 +72,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 yield return new()
                 {
-                    FileLocation = Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name),
-                    Results = ExtractAnalysisResult(_analysisState),
+                    Results = ExtractAnalysisResult(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name), _analysisState),
                 };
             }
         }
 
-        private static HashSet<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
+        private static HashSet<ResultObj> ExtractAnalysisResult(string fileLocation, IDependencyAnalysisState? analysisState)
         {
-            var results = new HashSet<string>();
+            var results = new HashSet<ResultObj>();
 
             if (analysisState is null || !analysisState.AreChangesRecommended)
             {
-                results.Add("No package updates needed");
+                results.Add(new()
+                {
+                    FileLocation = fileLocation,
+                    ResultMessage = "No package updates needed",
+                });
             }
             else
             {
@@ -103,11 +106,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         {
                             if (s.OperationDetails is not null && s.OperationDetails.Details is not null && s.OperationDetails.Details.Any())
                             {
-                                results.UnionWith(s.OperationDetails.Details);
+                                results.UnionWith(s.OperationDetails.Details.Select(s => new ResultObj() { FileLocation = fileLocation, ResultMessage = s }));
                             }
                             else
                             {
-                                results.Add(string.Concat(name, s.Item, action));
+                                results.Add(new()
+                                {
+                                    FileLocation = fileLocation,
+                                    ResultMessage = string.Concat(name, s.Item, action),
+                                });
                             }
                         }
                     }

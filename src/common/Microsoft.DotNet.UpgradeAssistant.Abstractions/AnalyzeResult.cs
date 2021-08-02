@@ -8,8 +8,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public record AnalyzeResult
     {
+        public HashSet<ResultObj> Results { get; init; } = new HashSet<ResultObj>();
+    }
+
+    public record ResultObj
+    {
+        public int LineNumber { get; init; }
+
         public string FileLocation { get; init; } = string.Empty;
 
-        public HashSet<string> Results { get; init; } = new HashSet<string>();
+        public string ResultMessage { get; init; } = string.Empty;
     }
 }

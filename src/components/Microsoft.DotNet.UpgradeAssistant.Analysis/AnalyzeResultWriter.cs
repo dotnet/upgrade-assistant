@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 yield return new()
                 {
                     RuleId = id,
-                    Message = s.ToMessage(),
+                    Message = s.ResultMessage.ToMessage(),
                     Locations = new List<Location>()
                     {
                         new()
@@ -93,7 +93,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                             {
                                 ArtifactLocation = new()
                                 {
-                                    Uri = new Uri(Path.GetFullPath(analyzeResult.FileLocation)),
+                                    Uri = new Uri(Path.GetFullPath(s.FileLocation)),
+                                },
+                                Region = new()
+                                {
+                                    StartLine = s.LineNumber,
                                 },
                             },
                         },
