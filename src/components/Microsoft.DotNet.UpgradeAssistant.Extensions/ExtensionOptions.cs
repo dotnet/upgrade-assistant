@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         public ICollection<ExtensionInstance> Extensions { get; } = new List<ExtensionInstance>();
 
-        public bool IsDevelopment { get; set; } = true;
+        public bool CheckMinimumVersion { get; set; } = true;
 
         public Version CurrentVersion { get; set; } = null!;
 

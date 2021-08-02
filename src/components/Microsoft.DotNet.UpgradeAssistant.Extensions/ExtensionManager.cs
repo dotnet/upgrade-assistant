@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                             extension = extension with { Version = _options.CurrentVersion };
                         }
 
-                        if (!_options.IsDevelopment && extension.MinUpgradeAssistantVersion is Version minVersion && minVersion > _options.CurrentVersion)
+                        if (_options.CheckMinimumVersion && extension.MinUpgradeAssistantVersion is Version minVersion && minVersion > _options.CurrentVersion)
                         {
                             logger.LogWarning("Could not load extension from {Path}. Requires at least v{Version} of Upgrade Assistant and current version is {UpgradeAssistantVersion}.", path, minVersion, _options.CurrentVersion);
                         }
