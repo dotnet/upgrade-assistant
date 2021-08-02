@@ -74,6 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         .Configure(options =>
                         {
                             options.AdditionalOptions = upgradeOptions.AdditionalOptions;
+                            options.CheckMinimumVersion = !UpgradeVersion.Current.IsDevelopment;
                             options.CurrentVersion = UpgradeVersion.Current.Version;
 
                             foreach (var path in upgradeOptions.Extension)
