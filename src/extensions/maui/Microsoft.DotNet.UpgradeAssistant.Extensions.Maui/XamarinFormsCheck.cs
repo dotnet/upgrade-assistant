@@ -20,18 +20,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private const string CATEGORY = ".NET MAUI Upgrade";
         private const string UPGRADE_LINK = "https://aka.ms/upgradeassistant/maui/requirements";
         private const string XAMARIN_FORMS_MESSAGE = "Support for {0} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {1}";
-        private const double MINIMUM_XAMARIN_VERSION = 4.8;
+        private const string MINIMUM_XAMARIN_VERSION = "4.8";
 
         private readonly ILogger<XamarinFormsCheck> _logger;
+        private readonly IVersionComparer _comparer;
 
-        public XamarinFormsCheck(ILogger<XamarinFormsCheck> logger)
+        public XamarinFormsCheck(IVersionComparer comparer, ILogger<XamarinFormsCheck> logger)
         {
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public string Id => "Xamarin.Forms minimum version check";
 
-        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, XAMARIN_FORMS_MESSAGE, CATEGORY, UPGRADE_LINK);
+        public string UpgradeMessage => SR.Format(XAMARIN_FORMS_MESSAGE, CATEGORY, UPGRADE_LINK);
 
         public async Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
@@ -48,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             if (components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
             {
-                if (!DoesHaveMinimumXamarinVersion(project))
+                if (!DoesHaveMinimumXamarinVersion(project, _comparer))
                 {
                     _logger.LogError(XAMARIN_FORMS_MESSAGE, CATEGORY, UPGRADE_LINK);
                     return UpgradeReadiness.Unsupported;
@@ -58,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             return UpgradeReadiness.Ready;
         }
 
-        private static bool DoesHaveMinimumXamarinVersion(IProject project)
+        private static bool DoesHaveMinimumXamarinVersion(IProject project, IVersionComparer comparer)
         {
             var packageReferences = project.NuGetReferences.PackageReferences;
 
@@ -66,7 +68,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 if (package.Name == "Xamarin.Forms")
                 {
-                    return Convert.ToDouble(package.Version.Substring(0, 3), CultureInfo.InvariantCulture) >= MINIMUM_XAMARIN_VERSION;
+                    if (comparer.Compare(package.Version, MINIMUM_XAMARIN_VERSION) > 0)
+                    {
+                        return true;
+                    }
                 }
             }
 
