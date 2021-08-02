@@ -15,5 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         Wpf = 1 << 3,
         WinForms = 1 << 4,
         AspNetCore = 1 << 5,
+        XamarinAndroid = 1 << 6,
+        XamariniOS = 1 << 7,
     }
 }

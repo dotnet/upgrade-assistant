@@ -170,6 +170,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{98B5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests", "tests\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests.csproj", "{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maui", "maui", "{7304F25F-0F4D-450F-A529-3C7AFE9D98CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests", "tests\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests.csproj", "{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -732,6 +736,18 @@ Global
 		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|x64.Build.0 = Release|Any CPU
 		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|x86.ActiveCfg = Release|Any CPU
 		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}.Release|x86.Build.0 = Release|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Debug|x64.Build.0 = Debug|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Debug|x86.Build.0 = Debug|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|x64.ActiveCfg = Release|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|x64.Build.0 = Release|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|x86.ActiveCfg = Release|Any CPU
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -804,6 +820,8 @@ Global
 		{69B55184-9DB6-4492-9501-E54207F4BED7} = {1D8A46E6-D0C5-429A-A7B6-8F1BE9551AD7}
 		{98B57945-2141-4880-B6C2-51B44C67E300} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
 		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56} = {98B57945-2141-4880-B6C2-51B44C67E300}
+		{7304F25F-0F4D-450F-A529-3C7AFE9D98CA} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
+		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3} = {7304F25F-0F4D-450F-A529-3C7AFE9D98CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}
