@@ -2,7 +2,7 @@ try {
     $dotnetSDKVersion = $GlobalJson.tools.dotnet
     # $dotnetRoot = Join-Path $RepoRoot '.dotnet'
     # Write-Host 'dotnetRoot check' Join-Path $dotnetRoot "\sdk\$dotnetSDKVersion"
-    dotnet --sdk-version $dotnetSDKVersion workload install microsoft-android-sdk-full microsoft-ios-sdk-full
+    dotnet workload install microsoft-android-sdk-full microsoft-ios-sdk-full --sdk-version $dotnetSDKVersion
 }
 catch {
   Write-Host $_.ScriptStackTrace
