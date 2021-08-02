@@ -32,5 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             return Version.Parse(newVersionString);
         }
+
+        public bool IsDevelopment => FullVersion.EndsWith("dev", StringComparison.Ordinal);
     }
 }

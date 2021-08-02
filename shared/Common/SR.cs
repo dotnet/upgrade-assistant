@@ -11,5 +11,8 @@ namespace System
 
         public static string Format(string str, object? arg0, object? arg1)
            => string.Format(System.Globalization.CultureInfo.InvariantCulture, str, arg0, arg1);
+           
+        public static string Format(string str, object? arg0, object? arg1, object? arg2)
+            => string.Format(System.Globalization.CultureInfo.InvariantCulture, str, arg0, arg1, arg2);
     }
 }

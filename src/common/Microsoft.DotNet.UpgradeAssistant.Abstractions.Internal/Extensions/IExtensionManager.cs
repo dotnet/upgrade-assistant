@@ -20,6 +20,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         Task<ExtensionSource?> AddAsync(ExtensionSource n, CancellationToken token);
 
+        Task<bool> RestoreExtensionsAsync(CancellationToken token);
+
+        IExtensionInstance? OpenExtension(string path);
+
         /// <summary>
         /// Attempts to find the extension in which a service is registered.
         /// </summary>

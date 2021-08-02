@@ -43,6 +43,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             services.AddSingleton<IExtensionManager, ExtensionManager>();
             services.AddExtensionLoaders();
             services.TryAddSingleton<IUpgradeAssistantConfigurationLoader, DefaultUpgradeAssistantConfigurationLoader>();
+            services.TryAddTransient<IExtensionDownloader, NuGetExtensionDownloader>();
+            services.TryAddTransient<IExtensionCreator, NuGetExtensionPackageCreator>();
 
             return services.AddOptions<ExtensionOptions>();
         }
@@ -82,17 +84,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return builder.Configure(options =>
             {
                 const string ExtensionDirectory = "extensions";
-                const string DefaultExtensionsSection = "DefaultExtensions";
 
-                var defaultExtensions = configuration.GetSection(DefaultExtensionsSection)
-                    .Get<string[]>()
+                var settings = configuration.GetSection("Extensions").Get<ExtensionSettings>();
+                var defaultExtensions = settings.Default
                     .Select(n => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ExtensionDirectory, n)));
+
+                options.DefaultSource = settings.Source;
 
                 foreach (var path in defaultExtensions)
                 {
                     options.DefaultExtensions.Add(path);
                 }
             });
+        }
+
+        private class ExtensionSettings
+        {
+            public string Source { get; set; } = string.Empty;
+
+            public string[] Default { get; set; } = Array.Empty<string>();
         }
 
         public static IServiceCollection AddExtensionOption<TOption>(this IServiceCollection services, TOption option)

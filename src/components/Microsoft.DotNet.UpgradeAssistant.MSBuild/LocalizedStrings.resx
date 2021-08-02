@@ -117,62 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AddExtensionDetails" xml:space="preserve">
-    <value>Adding extension {Name} from {Source}</value>
-  </data>
-  <data name="AddExtensionFailed" xml:space="preserve">
-    <value>Could not find extension {Name} from {Source}</value>
-  </data>
-  <data name="AddExtensionSuccess" xml:space="preserve">
-    <value>Added extension {Name} from {Source}</value>
-  </data>
-  <data name="ExtensionManagementName" xml:space="preserve">
-    <value>Name of extension</value>
-  </data>
-  <data name="ExtensionManagementSource" xml:space="preserve">
-    <value>Source of extension</value>
-  </data>
-  <data name="ExtensionManagementVersion" xml:space="preserve">
-    <value>Version of extension</value>
-  </data>
-  <data name="ListExtensionDetails" xml:space="preserve">
-    <value>Current extensions:</value>
-  </data>
-  <data name="ListExtensionItem" xml:space="preserve">
-    <value>{Name}: {Source}</value>
-  </data>
-  <data name="NonWindowsWarning" xml:space="preserve">
-    <value>This tool is not supported on non-Windows platforms due to dependencies on Visual Studio.</value>
-  </data>
-  <data name="RemovingExtension" xml:space="preserve">
-    <value>Removing extension '{Name}'</value>
-  </data>
-  <data name="RemovingExtensionFailed" xml:space="preserve">
-    <value>Could not remove extension '{Name}'</value>
-  </data>
-  <data name="SurveyText" xml:space="preserve">
-    <value>We are interested in your feedback! Please use the following link to open a survey: https://aka.ms/DotNetUASurvey</value>
-  </data>
-  <data name="UpdateExtensionDetails" xml:space="preserve">
-    <value>Searching for updates for {Name}</value>
-  </data>
-  <data name="UpdateExtensionFailed" xml:space="preserve">
-    <value>Could not find an update for extension {Name}</value>
-  </data>
-  <data name="UpdateExtensionSuccess" xml:space="preserve">
-    <value>Found an update for {Name} to {Version}</value>
-  </data>
-  <data name="UpgradeAssistantHeader" xml:space="preserve">
-    <value>Microsoft .NET Upgrade Assistant v{0}</value>
-  </data>
-  <data name="UpgradeAssistantHeaderDetails" xml:space="preserve">
-    <value>Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.
- 
-This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.
-
-This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to the project will highlight the remaining changes needed after the tool runs.</value>
-  </data>
-  <data name="VerboseCommand" xml:space="preserve">
-    <value>Enable verbose diagnostics</value>
+  <data name="InvalidProjectError" xml:space="preserve">
+    <value>Could not load project. Please ensure the selected VS instance has the correct workloads installed for your projects. If Upgrade Assistant selected the incorrect VS version, please pass the argument --vs-path with the appropriate path. You can see the Visual Studio instances searched by running with the --verbose flag.</value>
   </data>
 </root>

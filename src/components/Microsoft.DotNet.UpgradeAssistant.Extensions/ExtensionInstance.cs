@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -75,6 +76,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         public Version? Version { get; init; }
 
         public Version? MinUpgradeAssistantVersion => GetOptions<Version>("MinRequiredVersion");
+
+        public string Description => GetOptions<string>("Description") ?? string.Empty;
+
+        public IReadOnlyCollection<string> Authors => GetOptions<string[]>("Authors") ?? Array.Empty<string>();
 
         public T? GetOptions<T>(string sectionName) => Configuration.GetSection(sectionName).Get<T>();
 

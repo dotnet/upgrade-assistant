@@ -105,8 +105,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             else
             {
                 _logger.LogWarning("Upgrade process was canceled. Quitting....");
-                return;
             }
+
+            token.ThrowIfCancellationRequested();
         }
 
         private async ValueTask<bool> ExecuteAndTimeCommand(IUpgradeContext context, UpgradeStep step, UpgradeCommand command, CancellationToken token)

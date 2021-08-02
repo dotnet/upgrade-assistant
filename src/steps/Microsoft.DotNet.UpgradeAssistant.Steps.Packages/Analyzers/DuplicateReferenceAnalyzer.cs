@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 foreach (var package in duplicates.Where(p => p != highestVersion))
                 {
                     _logger.LogInformation("Marking package {NuGetPackage} for removal because it is referenced elsewhere in the project with a higher version", package);
-                    state.Packages.Remove(package);
+                    state.Packages.Remove(package, new OperationDetails());
                 }
             }
 
