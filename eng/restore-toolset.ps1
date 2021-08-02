@@ -1,5 +1,7 @@
+$dotnetRoot = Join-Path $RepoRoot '.dotnet'
+
 try {
-    dotnet workload install microsoft-android-sdk-full microsoft-ios-sdk-full --verbosity diag
+    dotnet workload install microsoft-android-sdk-full microsoft-ios-sdk-full --verbosity diag --temp-dir $dotnetRoot
 }
 catch {
   Write-Host $_.ScriptStackTrace
