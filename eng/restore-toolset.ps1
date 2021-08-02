@@ -1,7 +1,4 @@
 try {
-    $dotnetSDKVersion = $GlobalJson.tools.dotnet
-    # $dotnetRoot = Join-Path $RepoRoot '.dotnet'
-    # Write-Host 'dotnetRoot check' Join-Path $dotnetRoot "\sdk\$dotnetSDKVersion"
     dotnet workload install microsoft-android-sdk-full microsoft-ios-sdk-full --verbosity diag
 }
 catch {
