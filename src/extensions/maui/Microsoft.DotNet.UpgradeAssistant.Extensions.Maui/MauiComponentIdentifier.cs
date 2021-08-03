@@ -43,12 +43,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             if (targetFrameworkNames.Any(r => _androidTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
-                components |= ProjectComponents.XamarinAndroid;
+                components |= ProjectComponents.MauiAndroid;
             }
 
             if (targetFrameworkNames.Any(r => _iosTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
-                components |= ProjectComponents.XamariniOS;
+                components |= ProjectComponents.MauiiOS;
             }
 
             return new ValueTask<ProjectComponents>(components);

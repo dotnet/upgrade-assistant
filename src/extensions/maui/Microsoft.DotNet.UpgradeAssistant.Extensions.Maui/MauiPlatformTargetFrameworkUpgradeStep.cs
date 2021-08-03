@@ -59,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             await file.SaveAsync(token).ConfigureAwait(false);
 
             Logger.LogInformation("Added TFM to {TargetTFM}", targetTfm);
-            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFM {targetTfm} to MAUI project ");
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFM {targetTfm} to .NET MAUI project ");
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
@@ -120,6 +120,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
 
             if (components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
+            {
+                return true;
+            }
+
+            if (components.HasFlag(ProjectComponents.MauiAndroid) || components.HasFlag(ProjectComponents.MauiiOS))
             {
                 return true;
             }
