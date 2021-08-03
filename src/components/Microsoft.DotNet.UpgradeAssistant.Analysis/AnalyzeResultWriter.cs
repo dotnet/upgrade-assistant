@@ -38,10 +38,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             _serializer.Write(_sarifLogPath, sarifLog);
         }
 
-        private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResults)
+        private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)
         {
-            await foreach (var ar in analyzeResults)
+            await foreach (var ar in analyzeResultDefinitions)
             {
+                var analyzeResults = await ar.AnalysisResults.ToListAsync();
                 yield return new()
                 {
                     Tool = new()
@@ -51,40 +52,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                             Name = ar.Name,
                             SemanticVersion = ar.Version,
                             InformationUri = ar.InformationURI,
-                            Rules = new List<ReportingDescriptor>()
+                            Rules = analyzeResults.GroupBy(x => x.RuleId).Select(a => new ReportingDescriptor()
                             {
-                                new()
-                                {
-                                    Id = ar.Id,
-                                    Name = ar.Name,
-                                },
-                            },
+                                Id = a.Key,
+                                FullDescription = new() { Text = a.First().RuleName, },
+                            }).ToList(),
                         },
                     },
-                    Results = await ExtractResultsAsync(ar).ConfigureAwait(false),
+                    Results = ExtractResults(analyzeResults),
                 };
             }
         }
 
-        private static async Task<IList<Result>> ExtractResultsAsync(AnalyzeResultDefinition result)
+        private static IList<Result> ExtractResults(IList<AnalyzeResult> analyzeResults)
         {
             var results = new List<Result>();
-            await foreach (var r in result.AnalysisResults)
+            foreach (var r in analyzeResults)
             {
-                results.AddRange(GetResult(result.Id, r));
-            }
-
-            return results;
-        }
-
-        private static IEnumerable<Result> GetResult(string id, AnalyzeResult analyzeResult)
-        {
-            foreach (var s in analyzeResult.Results)
-            {
-                yield return new()
+                results.Add(new()
                 {
-                    RuleId = s.RuleId,
-                    Message = s.ResultMessage.ToMessage(),
+                    RuleId = r.RuleId,
+                    Message = r.ResultMessage.ToMessage(),
                     Locations = new List<Location>()
                     {
                         new()
@@ -93,17 +81,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                             {
                                 ArtifactLocation = new()
                                 {
-                                    Uri = new Uri(Path.GetFullPath(s.FileLocation)),
+                                    Uri = new Uri(Path.GetFullPath(r.FileLocation)),
                                 },
                                 Region = new()
                                 {
-                                    StartLine = s.LineNumber,
+                                    StartLine = r.LineNumber,
                                 },
                             },
                         },
                     },
-                };
+                });
             }
+
+            return results;
         }
     }
 }

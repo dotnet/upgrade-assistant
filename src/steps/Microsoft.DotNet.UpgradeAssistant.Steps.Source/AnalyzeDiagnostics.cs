@@ -20,8 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
         private readonly ILogger _logger;
 
-        public string Id => "UA102";
-
         public string Name => "API Upgradability";
 
         public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
@@ -57,21 +55,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             {
                 var diagnostics = await this.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
 
-                yield return new()
+                foreach (var r in ProcessDiagnostics(diagnostics))
                 {
-                    Results = ProcessDiagnostics(diagnostics),
-                };
+                    yield return r;
+                }
             }
         }
 
-        private static HashSet<ResultObj> ProcessDiagnostics(IEnumerable<Diagnostic> diagnostics)
+        private static HashSet<AnalyzeResult> ProcessDiagnostics(IEnumerable<Diagnostic> diagnostics)
         {
-            var results = new HashSet<ResultObj>();
+            var results = new HashSet<AnalyzeResult>();
             foreach (var diag in diagnostics)
             {
                 results.Add(new()
                 {
                     RuleId = diag.Id,
+                    RuleName = diag.Descriptor.Title.ToString(System.Globalization.CultureInfo.InvariantCulture),
 
                     // Since the first line in a file is defined as line 0 (zero based line
                     // numbering) by the LinePostion struct offsetting by one to support VS 1-based line numbering.

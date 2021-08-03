@@ -9,8 +9,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public interface IAnalyzeResultProvider
     {
-        string Id { get; }
-
         string Name { get; }
 
         Uri InformationURI { get; }
