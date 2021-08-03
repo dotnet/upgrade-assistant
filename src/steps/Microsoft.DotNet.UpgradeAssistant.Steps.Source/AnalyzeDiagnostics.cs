@@ -20,8 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
         private readonly ILogger _logger;
 
-        internal IEnumerable<Diagnostic> Diagnostics { get; set; } = Enumerable.Empty<Diagnostic>();
-
         public string Id => "UA102";
 
         public string Name => "API Upgradability";
@@ -41,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             _logger = logger;
-            _allAnalyzers = analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id);
+            _allAnalyzers = analyzers;
             _additionalTexts = ImmutableArray.CreateRange(additionalTexts);
         }
 
@@ -57,23 +55,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             foreach (var project in projects)
             {
-                await GetDiagnosticsAsync(project, token).ConfigureAwait(false);
+                var diagnostics = await this.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
 
                 yield return new()
                 {
-                    Results = ProcessDiagnostics(),
+                    Results = ProcessDiagnostics(diagnostics),
                 };
             }
         }
 
-        private HashSet<ResultObj> ProcessDiagnostics()
+        private static HashSet<ResultObj> ProcessDiagnostics(IEnumerable<Diagnostic> diagnostics)
         {
             var results = new HashSet<ResultObj>();
-            foreach (var diag in Diagnostics)
+            foreach (var diag in diagnostics)
             {
                 results.Add(new()
                 {
-                    // Diagnostic line numbers are zero-based so offsetting by one
+                    // Since the first line in a file is defined as line 0 (zero based line
+                    // numbering) by the LinePostion struct offsetting by one to support VS 1-based line numbering.
                     LineNumber = diag.Location.GetLineSpan().Span.End.Line + 1,
                     FileLocation = diag.Location.GetLineSpan().Path,
                     ResultMessage = diag.Descriptor.Description.ToString(System.Globalization.CultureInfo.InvariantCulture),
@@ -83,12 +82,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return results;
         }
 
-        public async Task GetDiagnosticsAsync(IProject project, CancellationToken token)
+        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
+            => analyzers.ToAsyncEnumerable()
+                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
+
+        private async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(IProject project, CancellationToken token)
         {
+            var diagnostics = Enumerable.Empty<Diagnostic>();
             if (project is null)
             {
                 _logger.LogWarning("No project available.");
-                return;
+                return diagnostics;
             }
 
             var roslynProject = project.GetRoslynProject();
@@ -96,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             if (roslynProject is null)
             {
                 _logger.LogWarning("No project available.");
-                return;
+                return diagnostics;
             }
 
             _logger.LogInformation("Running analyzers on {ProjectName}", roslynProject.Name);
@@ -104,32 +108,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             // Compile with analyzers enabled
             var applicableAnalyzers = await GetApplicableAnalyzersAsync(_allAnalyzers, project).ToListAsync(token).ConfigureAwait(false);
 
-            if (!applicableAnalyzers.Any())
-            {
-                Diagnostics = Enumerable.Empty<Diagnostic>();
-            }
-            else
+            if (applicableAnalyzers.Any())
             {
                 var compilation = await roslynProject.GetCompilationAsync(token).ConfigureAwait(false);
-                if (compilation is null)
-                {
-                    Diagnostics = Enumerable.Empty<Diagnostic>();
-                }
-                else
+                if (compilation is not null)
                 {
                     var compilationWithAnalyzer = compilation
                         .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
 
                     // Find all diagnostics that registered analyzers produce
-                    Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false)).Where(d => d.Location.IsInSource);
-                    _logger.LogInformation("Identified {DiagnosticCount} diagnostics in project {ProjectName}", Diagnostics.Count(), roslynProject.Name);
+                    diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false)).Where(d => d.Location.IsInSource);
+                    _logger.LogInformation("Identified {DiagnosticCount} diagnostics in project {ProjectName}", diagnostics.Count(), roslynProject.Name);
                 }
             }
-        }
 
-        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
-            => analyzers.ToAsyncEnumerable()
-                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
+            return diagnostics;
+        }
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
         {
