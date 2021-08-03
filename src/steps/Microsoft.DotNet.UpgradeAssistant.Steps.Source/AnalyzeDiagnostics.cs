@@ -71,6 +71,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             {
                 results.Add(new()
                 {
+                    RuleId = diag.Id,
+
                     // Since the first line in a file is defined as line 0 (zero based line
                     // numbering) by the LinePostion struct offsetting by one to support VS 1-based line numbering.
                     LineNumber = diag.Location.GetLineSpan().Span.End.Line + 1,

@@ -12,6 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 
     public record ResultObj
     {
+        public string RuleId { get; init; } = string.Empty;
+
         public int LineNumber { get; init; }
 
         public string FileLocation { get; init; } = string.Empty;

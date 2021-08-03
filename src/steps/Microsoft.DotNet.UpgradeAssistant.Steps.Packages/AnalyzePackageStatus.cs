@@ -72,12 +72,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 yield return new()
                 {
-                    Results = ExtractAnalysisResult(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name), _analysisState),
+                    Results = this.ExtractAnalysisResult(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name), _analysisState),
                 };
             }
         }
 
-        private static HashSet<ResultObj> ExtractAnalysisResult(string fileLocation, IDependencyAnalysisState? analysisState)
+        private HashSet<ResultObj> ExtractAnalysisResult(string fileLocation, IDependencyAnalysisState? analysisState)
         {
             var results = new HashSet<ResultObj>();
 
@@ -85,6 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             {
                 results.Add(new()
                 {
+                    RuleId = this.Id,
                     FileLocation = fileLocation,
                     ResultMessage = "No package updates needed",
                 });
@@ -106,12 +107,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         {
                             if (s.OperationDetails is not null && s.OperationDetails.Details is not null && s.OperationDetails.Details.Any())
                             {
-                                results.UnionWith(s.OperationDetails.Details.Select(s => new ResultObj() { FileLocation = fileLocation, ResultMessage = s }));
+                                results.UnionWith(s.OperationDetails.Details.Select(s => new ResultObj()
+                                {
+                                    RuleId = this.Id,
+                                    FileLocation = fileLocation,
+                                    ResultMessage = s,
+                                }));
                             }
                             else
                             {
                                 results.Add(new()
                                 {
+                                    RuleId = this.Id,
                                     FileLocation = fileLocation,
                                     ResultMessage = string.Concat(name, s.Item, action),
                                 });

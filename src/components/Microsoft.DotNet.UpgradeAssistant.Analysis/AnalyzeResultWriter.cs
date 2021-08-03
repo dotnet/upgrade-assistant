@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 yield return new()
                 {
-                    RuleId = id,
+                    RuleId = s.RuleId,
                     Message = s.ResultMessage.ToMessage(),
                     Locations = new List<Location>()
                     {
