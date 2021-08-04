@@ -83,10 +83,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return results;
         }
 
-        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
-            => analyzers.ToAsyncEnumerable()
-                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
-
         private async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(IProject project, CancellationToken token)
         {
             if (project is null)
@@ -106,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             _logger.LogInformation("Running analyzers on {ProjectName}", roslynProject.Name);
 
             // Compile with analyzers enabled
-            var applicableAnalyzers = await GetApplicableAnalyzersAsync(_allAnalyzers, project).ToListAsync(token).ConfigureAwait(false);
+            var applicableAnalyzers = _allAnalyzers.ToList();
 
             if (applicableAnalyzers.Any())
             {

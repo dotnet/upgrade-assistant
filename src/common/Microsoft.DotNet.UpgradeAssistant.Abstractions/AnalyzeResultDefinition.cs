@@ -15,11 +15,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         /// <summary>
         /// Gets version of Analysis Tool.
         /// </summary>
-        public string Id { get; init; } = string.Empty;
-
-        /// <summary>
-        /// Gets version of Analysis Tool.
-        /// </summary>
         public string Version { get; init; } = string.Empty;
 
         /// <summary>
