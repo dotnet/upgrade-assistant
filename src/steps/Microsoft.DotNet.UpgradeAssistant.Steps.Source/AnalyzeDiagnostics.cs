@@ -3,12 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.Extensions.Logging;
 
@@ -16,19 +13,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
     public class AnalyzeDiagnostics : IAnalyzeResultProvider
     {
-        private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
-        private readonly ImmutableArray<AdditionalText> _additionalTexts;
+        private readonly IDiagnosticAnalysisRunner _diagnosticAnalysisRunner;
         private readonly ILogger _logger;
 
         public string Name => "API Upgradability";
 
         public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
-        public AnalyzeDiagnostics(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<AdditionalText> additionalTexts, ILogger<AnalyzeDiagnostics> logger)
+        public AnalyzeDiagnostics(IDiagnosticAnalysisRunner diagnosticAnalysisRunner, ILogger<AnalyzeDiagnostics> logger)
         {
-            if (additionalTexts is null)
+            if (diagnosticAnalysisRunner is null)
             {
-                throw new ArgumentNullException(nameof(additionalTexts));
+                throw new ArgumentNullException(nameof(diagnosticAnalysisRunner));
             }
 
             if (logger is null)
@@ -36,9 +32,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentNullException(nameof(logger));
             }
 
+            _diagnosticAnalysisRunner = diagnosticAnalysisRunner;
             _logger = logger;
-            _allAnalyzers = analyzers;
-            _additionalTexts = ImmutableArray.CreateRange(additionalTexts);
         }
 
         public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
@@ -53,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             foreach (var project in projects)
             {
-                var diagnostics = await this.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
+                var diagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
 
                 foreach (var r in ProcessDiagnostics(diagnostics))
                 {
@@ -81,50 +76,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             return results;
-        }
-
-        private async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(IProject project, CancellationToken token)
-        {
-            if (project is null)
-            {
-                _logger.LogWarning("No project available.");
-                return Enumerable.Empty<Diagnostic>();
-            }
-
-            var roslynProject = project.GetRoslynProject();
-
-            if (roslynProject is null)
-            {
-                _logger.LogWarning("No project available.");
-                return Enumerable.Empty<Diagnostic>();
-            }
-
-            _logger.LogInformation("Running analyzers on {ProjectName}", roslynProject.Name);
-
-            // Compile with analyzers enabled
-            var applicableAnalyzers = _allAnalyzers.ToList();
-
-            if (applicableAnalyzers.Any())
-            {
-                var compilation = await roslynProject.GetCompilationAsync(token).ConfigureAwait(false);
-                if (compilation is not null)
-                {
-                    var compilationWithAnalyzer = compilation
-                        .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
-
-                    // Find all diagnostics that registered analyzers produce
-                    var diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false)).Where(d => d.Location.IsInSource);
-                    _logger.LogInformation("Identified {DiagnosticCount} diagnostics in project {ProjectName}", diagnostics.Count(), roslynProject.Name);
-                    return diagnostics;
-                }
-            }
-
-            return Enumerable.Empty<Diagnostic>();
-        }
-
-        private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
-        {
-            _logger.LogError(exc, "Analyzer error while running analyzer {AnalyzerId}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)));
         }
     }
 }

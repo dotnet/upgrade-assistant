@@ -23,6 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         // This stores a reference to the parent source updater step, which will have all the diagnostics for the project.
         private readonly SourceUpdaterStep _sourceUpdater;
         private readonly CodeFixProvider _fixProvider;
+        private readonly IDiagnosticAnalysisRunner _diagnosticAnalysisRunner;
 
         private IEnumerable<Diagnostic> Diagnostics => _sourceUpdater.Diagnostics.Where(d => _fixProvider.FixableDiagnosticIds.Contains(d.Id, StringComparer.Ordinal));
 
@@ -40,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public override string Title { get; }
 
-        public CodeFixerStep(SourceUpdaterStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, ILogger logger)
+        public CodeFixerStep(SourceUpdaterStep parentStep, IEnumerable<DiagnosticDescriptor> diagnostics, CodeFixProvider fixProvider, IDiagnosticAnalysisRunner diagnosticAnalysisRunner, ILogger logger)
             : base(logger)
         {
             if (logger is null)
@@ -48,6 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentNullException(nameof(logger));
             }
 
+            _diagnosticAnalysisRunner = diagnosticAnalysisRunner ?? throw new ArgumentNullException(nameof(diagnosticAnalysisRunner));
             _fixProvider = fixProvider ?? throw new ArgumentNullException(nameof(fixProvider));
             _sourceUpdater = parentStep ?? throw new ArgumentNullException(nameof(parentStep)); // The parent step has the compilation/diagnostics
 
@@ -122,12 +124,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 }
 
                 // Re-build and get an updated list of diagnostics
-                await _sourceUpdater.GetDiagnosticsAsync(token).ConfigureAwait(false);
+                var newDiagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(_sourceUpdater.Project, token).ConfigureAwait(false);
 
                 // There should be less diagnostics for the given diagnostic ID after applying code fixes.
                 // Confirm that that's true to guard against a project in a bad state or a bad analyzer/code fix provider
                 // pair causing an infinite loop.
-                var newDiagnosticCount = Diagnostics.Count();
+                var newDiagnosticCount = newDiagnostics.Count();
                 if (diagnosticCount == newDiagnosticCount)
                 {
                     Logger.LogWarning("Diagnostic {DiagnosticId} was not fixed as expected. This may be caused by the project being in a bad state (did NuGet packages restore correctly?) or by errors in analyzers or code fix providers related to this diagnostic.", DiagnosticId);
