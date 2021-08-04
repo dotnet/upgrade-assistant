@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         {
             await foreach (var ar in analyzeResultDefinitions)
             {
-                var analyzeResults = await ar.AnalysisResults.ToListAsync();
+                var analyzeResults = await ar.AnalysisResults.ToListAsync().ConfigureAwait(false);
                 yield return new()
                 {
                     Tool = new()
