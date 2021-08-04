@@ -89,11 +89,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         private async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(IProject project, CancellationToken token)
         {
-            var diagnostics = Enumerable.Empty<Diagnostic>();
             if (project is null)
             {
                 _logger.LogWarning("No project available.");
-                return diagnostics;
+                return Enumerable.Empty<Diagnostic>();
             }
 
             var roslynProject = project.GetRoslynProject();
@@ -101,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             if (roslynProject is null)
             {
                 _logger.LogWarning("No project available.");
-                return diagnostics;
+                return Enumerable.Empty<Diagnostic>();
             }
 
             _logger.LogInformation("Running analyzers on {ProjectName}", roslynProject.Name);
@@ -118,12 +117,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                         .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
 
                     // Find all diagnostics that registered analyzers produce
-                    diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false)).Where(d => d.Location.IsInSource);
+                    var diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false)).Where(d => d.Location.IsInSource);
                     _logger.LogInformation("Identified {DiagnosticCount} diagnostics in project {ProjectName}", diagnostics.Count(), roslynProject.Name);
+                    return diagnostics;
                 }
             }
 
-            return diagnostics;
+            return Enumerable.Empty<Diagnostic>();
         }
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
