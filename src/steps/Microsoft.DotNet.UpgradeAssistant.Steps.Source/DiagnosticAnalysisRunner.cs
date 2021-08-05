@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             _logger.LogInformation("Running analyzers on {ProjectName}", roslynProject.Name);
 
             // Compile with analyzers enabled
-            var applicableAnalyzers = _allAnalyzers.ToList();
+            var applicableAnalyzers = await GetApplicableAnalyzersAsync(_allAnalyzers, project).ToListAsync(token).ConfigureAwait(false);
 
             if (applicableAnalyzers.Any())
             {
@@ -80,5 +80,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         {
             _logger.LogError(exc, "Analyzer error while running analyzer {AnalyzerId}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)));
         }
+
+        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
+            => analyzers.ToAsyncEnumerable()
+                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
     }
 }

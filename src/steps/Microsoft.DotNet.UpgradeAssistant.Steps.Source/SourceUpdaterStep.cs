@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IDiagnosticAnalysisRunner diagnosticAnalysisRunner, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, IDiagnosticAnalysisRunner diagnosticAnalysisRunner, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
             if (logger is null)
@@ -59,12 +59,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            _diagnosticAnalysisRunner = diagnosticAnalysisRunner;
+            if (additionalTexts is null)
+            {
+                throw new ArgumentNullException(nameof(additionalTexts));
+            }
+
             _allAnalyzers = analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id);
             _allCodeFixProviders = codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First());
+            _diagnosticAnalysisRunner = diagnosticAnalysisRunner;
 
             // Add sub-steps for each analyzer that will be run
-            SubSteps = new List<UpgradeStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, _diagnosticAnalysisRunner, logger)));
+            SubSteps = new List<UpgradeStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
         }
 
         // Gets supported diagnostics from analyzers that are fixable by a given code fixer
@@ -102,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
-            Diagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(Project, token).ConfigureAwait(false);
+            RefreshDiagnostics(Project, token);
 
             foreach (var step in SubSteps)
             {
@@ -140,6 +145,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
+        }
+
+        public async void RefreshDiagnostics(IProject project, CancellationToken token)
+        {
+            Diagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
         }
     }
 }
