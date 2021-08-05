@@ -25,6 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         INuGetReferences NuGetReferences { get; }
 
+        // Returns for Evaluated
         IEnumerable<string> ProjectTypes { get; }
 
         IEnumerable<Reference> References { get; }
@@ -38,5 +39,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
         IEnumerable<string> FindFiles(ProjectItemMatcher matcher, ProjectItemType? itemType = null);
 
         IProjectFile GetFile();
+
+        // Returns unevaluated properties
+        IProjectPropertyElements GetProjectPropertyElements();
+
     }
 }

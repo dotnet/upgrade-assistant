@@ -13,6 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests
     {
         [InlineData(ProjectComponents.XamarinAndroid, Net60_Android, true)]
         [InlineData(ProjectComponents.XamariniOS, Net60_iOS, true)]
+        [InlineData(ProjectComponents.MauiAndroid, Net60_Android, true)]
+        [InlineData(ProjectComponents.MauiiOS, Net60_iOS, true)]
         [Theory]
         public void ProcessTests(ProjectComponents components, string expectedTfmString, bool tryUpdate)
         {

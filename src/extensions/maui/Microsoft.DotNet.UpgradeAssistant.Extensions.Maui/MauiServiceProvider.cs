@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             services.Services.AddTransient<ITargetFrameworkSelectorFilter, MauiTargetFrameworkSelectorFilter>();
             services.Services.AddTransient<IComponentIdentifier, MauiComponentIdentifier>();
             services.Services.AddUpgradeStep<MauiPlatformTargetFrameworkUpgradeStep>();
+            services.Services.AddUpgradeStep<MauiAddProjectPropertiesStep>();
         }
     }
 }

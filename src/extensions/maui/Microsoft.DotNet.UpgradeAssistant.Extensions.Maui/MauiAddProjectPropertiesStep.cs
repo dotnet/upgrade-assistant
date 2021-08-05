@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
@@ -44,26 +45,73 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var project = context.CurrentProject.Required();
             var file = project.GetFile();
+            var projectproperties = project.GetProjectPropertyElements();
 
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-            var types = project.ProjectTypes;
             if (components.HasFlag(ProjectComponents.MauiAndroid))
             {
-                // add runtimeidentifier
+                // confirm final mappings https://github.com/xamarin/xamarin-android/blob/main/Documentation/guides/OneDotNet.md#changes-to-msbuild-properties
+                //var runtimeprops = projectproperties.GetProjectPropertyValue("AndroidSupportedAbis").Distinct();
+
+
             }
 
             if (components.HasFlag(ProjectComponents.MauiiOS))
             {
-                // add runtimeidentifier
+                // following conversion mapping here : https://github.com/xamarin/xamarin-macios/wiki/Project-file-properties-dotnet-migration
+                var runtimeprops = projectproperties.GetProjectPropertyValue("MtouchArch").Distinct();
+                var runtimeIdentifierString = string.Empty;
+                bool multiple = false;
+                foreach (var prop in runtimeprops)
+                {
+                    if (string.Equals(prop, "x86_64", StringComparison.Ordinal))
+                    {
+                        runtimeIdentifierString += "iossimulator-x64;";
+                    }
+
+                    if (string.Equals(prop, "i386", StringComparison.Ordinal))
+                    {
+                        runtimeIdentifierString += "iossimulator-x86;";
+                    }
+
+                    if (string.Equals(prop, "ARM64", StringComparison.Ordinal))
+                    {
+                        runtimeIdentifierString += "ios-arm64;";
+                    }
+
+                    if (string.Equals(prop, "x86_64+i386", StringComparison.Ordinal))
+                    {
+                        runtimeIdentifierString += "iossimulator-x86;iossimulator-x64;";
+                        multiple = true;
+                    }
+
+                    if (string.Equals(prop, "ARMv7+ARM64+i386", StringComparison.Ordinal))
+                    {
+                        runtimeIdentifierString += "ios-arm;ios-arm64;";
+                        multiple = true;
+                    }
+                }
+
+                // remove old properties before adding new
+                projectproperties.RemoveProjectProperty("MtouchArch");
+                await file.SaveAsync(token).ConfigureAwait(false);
+
+                if (multiple)
+                {
+                    file.SetPropertyValue("RuntimeIdentifiers", runtimeIdentifierString);
+                }
+                else
+                {
+                    file.SetPropertyValue("RuntimeIdentifier", runtimeIdentifierString);
+                }
             }
 
             // Use MAUI tag
             file.SetPropertyValue("UseMaui", "true");
             await file.SaveAsync(token).ConfigureAwait(false);
 
-            Logger.LogInformation("Added TFM to {TargetTFM}", "prop");
-
-            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added Project Properties for {components.ToString()} to MAUI project ");
+            Logger.LogInformation("Added .NET MAUI Project Properties successfully");
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added Project Properties for {components.ToString()} to .NET MAUI project ");
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
@@ -74,9 +122,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             var project = context.CurrentProject.Required();
-            var types = project.ProjectTypes;
-
-            return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"TFM needs to be updated to {project}", BuildBreakRisk.High));
+            var file = project.GetFile();
+            //var properties =  project.GetProjectPropertyElements();
+            if (string.IsNullOrEmpty(file.GetPropertyValue("UseMaui")))
+            {
+                Logger.LogInformation(".NET MAUI Project Properties need to be added.");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project Properties need to be added", BuildBreakRisk.High));
+            }
+            else
+            {
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project Properties already added.", BuildBreakRisk.None));
+            }
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)

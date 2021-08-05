@@ -112,6 +112,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        public static void RemoveProjectProperty(this ProjectRootElement projectRoot, ProjectPropertyElement element)
+        {
+            var itemGroup = element.Parent;
+            itemGroup.RemoveChild(element);
+
+            if (!itemGroup.Children.Any())
+            {
+                // If no element remain in the item group, remove it
+                itemGroup.Parent.RemoveChild(itemGroup);
+            }
+        }
+
         public static ProjectItemGroupElement GetOrCreateItemGroup(this ProjectRootElement projectRoot, string itemType)
         {
             var itemGroup = projectRoot.ItemGroups.FirstOrDefault(g => g.Items.Any(i => i.ItemType.Equals(itemType, StringComparison.OrdinalIgnoreCase)));

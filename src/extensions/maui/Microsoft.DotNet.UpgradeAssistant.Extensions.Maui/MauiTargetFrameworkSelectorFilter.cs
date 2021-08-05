@@ -30,9 +30,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 tfm.TryUpdate(TargetFrameworkMoniker.Net60_Android);
             }
 
-            if (tfm.Components.HasFlag(ProjectComponents.XamariniOS))
+            if (tfm.Components.HasFlag(ProjectComponents.XamariniOS) || tfm.Components.HasFlag(ProjectComponents.MauiiOS))
             {
                 _logger.LogInformation("Project {Name} is of type Xamarin.iOS, migration to .NET MAUI requires to be least net6.0-ios.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net60_iOS);
+            }
+
+            if (tfm.Components.HasFlag(ProjectComponents.MauiAndroid))
+            {
+                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:Android, migration to .NET MAUI requires to be least net6.0-android.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net60_Android);
+            }
+
+            if (tfm.Components.HasFlag(ProjectComponents.MauiiOS))
+            {
+                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:iOS, migration to .NET MAUI requires to be least net6.0-ios.", tfm.Project);
                 tfm.TryUpdate(TargetFrameworkMoniker.Net60_iOS);
             }
         }
