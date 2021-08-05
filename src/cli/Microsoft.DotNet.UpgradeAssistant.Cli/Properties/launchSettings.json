@@ -2,11 +2,8 @@
   "profiles": {
     "Microsoft.DotNet.UpgradeAssistant.Cli": {
       "commandName": "Project",
-      "commandLineArgs1": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms.sln",
-      "commandLineArgs2": "upgrade C:\\code\\ArtAuction\\ArtAuction.iOS\\ArtAuction.iOS.csproj",
-      "commandLineArgs3": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms\\EwDavidForms\\EwDavidForms.csproj",
-      "commandLineArgs4": "upgrade C:\\code\\upgradethings\\TestAREA\\WPFSample\\BeanTraderClient\\BeanTraderClient.csproj",
-      "commandLineArgs": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms\\EwDavidForms.iOS\\EwDavidForms.iOS.csproj  ",
+      "commandLineArgs1": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms\\EwDavidForms.iOS\\EwDavidForms.iOS.csproj",
+      "commandLineArgs": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms\\EwDavidForms.Android\\EwDavidForms.Android.csproj  ",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

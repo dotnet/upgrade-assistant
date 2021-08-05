@@ -7,6 +7,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Build.Construction;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
@@ -21,8 +22,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void RemoveProjectProperty(string propertyName)
         {
-            var test = Project.Xml.Properties.Where(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-            ProjectRoot.RemoveProjectProperty(test);
+            var propertiesToDelete = Project.Xml.Properties.Where(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+            foreach (var property in propertiesToDelete)
+            {
+                _logger.LogInformation("Removing Project Property: {ProjectProperty} Value : {PropertyValue}", property.Name, property.Value);
+                ProjectRoot.RemoveProjectProperty(property);
+            }
         }
     }
 }

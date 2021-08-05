@@ -3,11 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
@@ -51,9 +50,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             if (components.HasFlag(ProjectComponents.MauiAndroid))
             {
                 // confirm final mappings https://github.com/xamarin/xamarin-android/blob/main/Documentation/guides/OneDotNet.md#changes-to-msbuild-properties
-                //var runtimeprops = projectproperties.GetProjectPropertyValue("AndroidSupportedAbis").Distinct();
+                // remove uneeded properties
+                projectproperties.RemoveProjectProperty("AndroidApplication");
+                projectproperties.RemoveProjectProperty("AndroidResgenFile");
+                projectproperties.RemoveProjectProperty("AndroidResgenClass");
+                projectproperties.RemoveProjectProperty("MonoAndroidAssetsPrefix");
+                projectproperties.RemoveProjectProperty("MonoAndroidAssetsPrefix");
+                projectproperties.RemoveProjectProperty("AndroidUseLatestPlatformSdk");
+                projectproperties.RemoveProjectProperty("AndroidEnableSGenConcurrent");
+                projectproperties.RemoveProjectProperty("AndroidHttpClientHandlerType");
+                projectproperties.RemoveProjectProperty("AndroidManagedSymbols");
+                projectproperties.RemoveProjectProperty("AndroidUseSharedRuntime");
+                projectproperties.RemoveProjectProperty("MonoAndroidResourcePrefix");
+                projectproperties.RemoveProjectProperty("UseInterpreter");
+                projectproperties.RemoveProjectProperty("AndroidUseAapt2");
 
+                projectproperties.RemoveProjectProperty("AndroidSupportedAbis");
+                file.SetPropertyValue("UseInterpreter", "false");
 
+                var androidLinkMode = projectproperties.GetProjectPropertyValue("AndroidLinkMode");
+                foreach ( var linkMode in androidLinkMode)
+                {
+                    projectproperties.RemoveProjectProperty("AndroidLinkMode");
+                    if (string.Equals(linkMode, "SdkOnly", StringComparison.Ordinal) || string.Equals(linkMode, "Full", StringComparison.Ordinal))
+                    {
+                        file.SetPropertyValue("PublishTrimmed", "true");
+                        file.SetPropertyValue("TrimMode", "link");
+                    }
+                }
             }
 
             if (components.HasFlag(ProjectComponents.MauiiOS))
@@ -61,42 +85,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 // following conversion mapping here : https://github.com/xamarin/xamarin-macios/wiki/Project-file-properties-dotnet-migration
                 var runtimeprops = projectproperties.GetProjectPropertyValue("MtouchArch").Distinct();
                 var runtimeIdentifierString = string.Empty;
-                bool multiple = false;
+                int count = 0;
                 foreach (var prop in runtimeprops)
                 {
                     if (string.Equals(prop, "x86_64", StringComparison.Ordinal))
                     {
                         runtimeIdentifierString += "iossimulator-x64;";
+                        count++;
                     }
 
                     if (string.Equals(prop, "i386", StringComparison.Ordinal))
                     {
                         runtimeIdentifierString += "iossimulator-x86;";
+                        count++;
                     }
 
                     if (string.Equals(prop, "ARM64", StringComparison.Ordinal))
                     {
                         runtimeIdentifierString += "ios-arm64;";
+                        count++;
                     }
 
                     if (string.Equals(prop, "x86_64+i386", StringComparison.Ordinal))
                     {
                         runtimeIdentifierString += "iossimulator-x86;iossimulator-x64;";
-                        multiple = true;
+                        count++;
                     }
 
                     if (string.Equals(prop, "ARMv7+ARM64+i386", StringComparison.Ordinal))
                     {
                         runtimeIdentifierString += "ios-arm;ios-arm64;";
-                        multiple = true;
+                        count++;
                     }
                 }
 
                 // remove old properties before adding new
                 projectproperties.RemoveProjectProperty("MtouchArch");
-                await file.SaveAsync(token).ConfigureAwait(false);
-
-                if (multiple)
+                if (count > 1)
                 {
                     file.SetPropertyValue("RuntimeIdentifiers", runtimeIdentifierString);
                 }
@@ -104,6 +129,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 {
                     file.SetPropertyValue("RuntimeIdentifier", runtimeIdentifierString);
                 }
+
+                var enablesgen = projectproperties.GetProjectPropertyValue("MtouchEnableSGenConc").FirstOrDefault();
+                if (string.IsNullOrEmpty(enablesgen))
+                {
+                    projectproperties.RemoveProjectProperty("MtouchEnableSGenConc");
+                    file.SetPropertyValue("EnableSGenConc", enablesgen);
+                }
+
+                var mtouchhttpclienthandler = projectproperties.GetProjectPropertyValue("MtouchHttpClientHandler").FirstOrDefault();
+                if (string.IsNullOrEmpty(mtouchhttpclienthandler))
+                {
+                    projectproperties.RemoveProjectProperty("MtouchHttpClientHandler");
+
+                    if (string.Equals(mtouchhttpclienthandler, "HttpClientHandler", StringComparison.Ordinal))
+                    {
+                        file.SetPropertyValue("UseNativeHttpHandler", "false");
+                    }
+                }
+
+                var httpclienthandler = projectproperties.GetProjectPropertyValue("HttpClientHandler").FirstOrDefault();
+                if (string.IsNullOrEmpty(httpclienthandler))
+                {
+                    projectproperties.RemoveProjectProperty("MtouchHttpClientHandler");
+
+                    if (string.Equals(httpclienthandler, "HttpClientHandler", StringComparison.Ordinal))
+                    {
+                        file.SetPropertyValue("UseNativeHttpHandler", "false");
+                    }
+                }
+
+                // remove unneeded Properties
+                projectproperties.RemoveProjectProperty("IPhoneResourcePrefix");
             }
 
             // Use MAUI tag
@@ -123,7 +180,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var project = context.CurrentProject.Required();
             var file = project.GetFile();
-            //var properties =  project.GetProjectPropertyElements();
+
+            // var properties =  project.GetProjectPropertyElements();
             if (string.IsNullOrEmpty(file.GetPropertyValue("UseMaui")))
             {
                 Logger.LogInformation(".NET MAUI Project Properties need to be added.");
