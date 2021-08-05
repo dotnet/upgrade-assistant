@@ -86,6 +86,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
             try
             {
+                var test = await _templateProvider.GetTemplatesAsync(project, token).ConfigureAwait(false);
+                var test2 = IsTemplateNeeded(project, test.FirstOrDefault().Value);
+
                 _itemsToAdd = (await _templateProvider.GetTemplatesAsync(project, token).ConfigureAwait(false))
                     .Where(kvp => IsTemplateNeeded(project, kvp.Value))
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);

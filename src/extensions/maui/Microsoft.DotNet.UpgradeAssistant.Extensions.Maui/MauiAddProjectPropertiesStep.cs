@@ -62,11 +62,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 projectproperties.RemoveProjectProperty("AndroidManagedSymbols");
                 projectproperties.RemoveProjectProperty("AndroidUseSharedRuntime");
                 projectproperties.RemoveProjectProperty("MonoAndroidResourcePrefix");
-                projectproperties.RemoveProjectProperty("UseInterpreter");
                 projectproperties.RemoveProjectProperty("AndroidUseAapt2");
 
                 projectproperties.RemoveProjectProperty("AndroidSupportedAbis");
-                file.SetPropertyValue("UseInterpreter", "false");
+                file.SetPropertyValue("RuntimeIdentifiers", "android-arm;android-arm64;android-x86;android-x64");
 
                 var androidLinkMode = projectproperties.GetProjectPropertyValue("AndroidLinkMode");
                 foreach ( var linkMode in androidLinkMode)

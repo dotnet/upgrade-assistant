@@ -11,6 +11,12 @@
     "PackageMapPath": "PackageMaps"
   },
 
+  "TemplateInserter": {
+    "TemplateConfigFiles": [
+      "Templates\\MauiAndroid\\MauiAndroidTemplates.json"
+    ]
+  },
+
   "ExtensionServiceProviders": [
     "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll"
   ]

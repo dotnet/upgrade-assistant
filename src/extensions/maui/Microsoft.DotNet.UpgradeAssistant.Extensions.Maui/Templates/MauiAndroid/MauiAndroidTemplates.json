@@ -1,0 +1,22 @@
+{
+  "Replacements": {
+    "MauiAndroidApp1": "$(RootNamespace)"
+  },
+  "TemplateItems": [
+    {
+      "Path": "MainApplication.cs",
+      "Type": "Compile",
+      "Keywords": [
+        "MainApplication",
+        "Microsoft.Maui"
+      ]
+    }
+  ],
+  "TemplateOutputType": [
+    "Exe"
+  ],
+  "TemplateLanguage": "CSharp",
+  "TemplateAppliesTo": [
+    "MauiAndroid"
+  ]
+}

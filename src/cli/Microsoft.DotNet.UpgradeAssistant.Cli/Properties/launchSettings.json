@@ -3,7 +3,8 @@
     "Microsoft.DotNet.UpgradeAssistant.Cli": {
       "commandName": "Project",
       "commandLineArgs1": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms\\EwDavidForms.iOS\\EwDavidForms.iOS.csproj",
-      "commandLineArgs": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms\\EwDavidForms.Android\\EwDavidForms.Android.csproj  ",
+      "commandLineArgs": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms\\EwDavidForms.Android\\EwDavidForms.Android.csproj",
+      "commandLineArgs3": "upgrade C:\\code\\upgradethings\\TestAREA\\EwDavidForms\\EwDavidForms.sln",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
