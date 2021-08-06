@@ -107,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
-            RefreshDiagnostics(Project, token);
+            await RefreshDiagnostics(Project, token).ConfigureAwait(false);
 
             foreach (var step in SubSteps)
             {
@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
         }
 
-        public async void RefreshDiagnostics(IProject project, CancellationToken token)
+        public async Task RefreshDiagnostics(IProject project, CancellationToken token)
         {
             Diagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
         }
