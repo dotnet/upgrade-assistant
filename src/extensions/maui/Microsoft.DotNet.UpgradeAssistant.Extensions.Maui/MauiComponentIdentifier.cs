@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private readonly string[] _xamariniOSReferences = new[] { "Xamarin.iOS" };
         private readonly string[] _androidTFM = new[] { TargetFrameworkMoniker.Net60_Android.ToString() };
         private readonly string[] _iosTFM = new[] { TargetFrameworkMoniker.Net60_iOS.ToString() };
+        private readonly string _xamarinFormsPackage = "Xamarin.Forms";
+        private readonly string _useMauiProperty = "TargetFrameworks";
 
         public ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token)
         {
@@ -25,6 +27,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             var file = project.GetFile();
+            var pacakgeReferences = project.NuGetReferences.PackageReferences;
+            var projectProperties = project.GetProjectPropertyElements();
+
             var components = ProjectComponents.None;
 
             var references = project.References.Select(r => r.Name);
@@ -49,6 +54,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             if (targetFrameworkNames.Any(r => _iosTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
                 components |= ProjectComponents.MauiiOS;
+            }
+
+            if (pacakgeReferences.Any(x => x.Name.Equals(_xamarinFormsPackage, StringComparison.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.Maui;
+            }
+
+            var mauiProperty = projectProperties.GetProjectPropertyValue(_useMauiProperty);
+            if (mauiProperty.Any())
+            {
+                components |= ProjectComponents.Maui;
             }
 
             return new ValueTask<ProjectComponents>(components);

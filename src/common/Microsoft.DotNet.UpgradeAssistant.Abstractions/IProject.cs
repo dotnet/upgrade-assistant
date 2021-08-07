@@ -42,6 +42,5 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         // Returns unevaluated properties
         IProjectPropertyElements GetProjectPropertyElements();
-
     }
 }

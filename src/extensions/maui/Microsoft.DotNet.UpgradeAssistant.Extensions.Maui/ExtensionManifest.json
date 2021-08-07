@@ -13,7 +13,8 @@
 
   "TemplateInserter": {
     "TemplateConfigFiles": [
-      "Templates\\MauiAndroid\\MauiAndroidTemplates.json"
+      "Templates\\MauiAndroid\\MauiAndroidTemplates.json",
+      "Templates\\MauiHead\\MauiHeadTemplates.json"
     ]
   },
 

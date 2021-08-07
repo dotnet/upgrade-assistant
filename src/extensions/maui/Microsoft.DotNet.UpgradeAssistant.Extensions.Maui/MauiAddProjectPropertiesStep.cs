@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 file.SetPropertyValue("RuntimeIdentifiers", "android-arm;android-arm64;android-x86;android-x64");
 
                 var androidLinkMode = projectproperties.GetProjectPropertyValue("AndroidLinkMode");
-                foreach ( var linkMode in androidLinkMode)
+                foreach (var linkMode in androidLinkMode)
                 {
                     projectproperties.RemoveProjectProperty("AndroidLinkMode");
                     if (string.Equals(linkMode, "SdkOnly", StringComparison.Ordinal) || string.Equals(linkMode, "Full", StringComparison.Ordinal))
@@ -162,6 +162,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 projectproperties.RemoveProjectProperty("IPhoneResourcePrefix");
             }
 
+            // MAUI Head Project
+            if (components.HasFlag(ProjectComponents.Maui))
+            {
+                // check project structre for trameworks to add
+                // add <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+                var test = context.Projects;
+            }
+
             // Use MAUI tag
             file.SetPropertyValue("UseMaui", "true");
             await file.SaveAsync(token).ConfigureAwait(false);
@@ -206,7 +214,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var project = context.CurrentProject.Required();
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-            if (components.HasFlag(ProjectComponents.MauiAndroid) || components.HasFlag(ProjectComponents.MauiiOS))
+            if (components.HasFlag(ProjectComponents.MauiAndroid) || components.HasFlag(ProjectComponents.MauiiOS) || components.HasFlag(ProjectComponents.Maui))
             {
                 return true;
             }
