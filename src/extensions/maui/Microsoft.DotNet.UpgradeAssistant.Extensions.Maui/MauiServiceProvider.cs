@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
@@ -13,6 +14,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 throw new ArgumentNullException(nameof(services));
             }
+
+            services.Services.AddTransient<IUpgradeReadyCheck, XamarinFormsCheck>();
+            services.Services.AddTransient<ITargetFrameworkSelectorFilter, MauiTargetFrameworkSelectorFilter>();
+            services.Services.AddTransient<IComponentIdentifier, MauiComponentIdentifier>();
+            services.Services.AddUpgradeStep<MauiPlatformTargetFrameworkUpgradeStep>();
         }
     }
 }

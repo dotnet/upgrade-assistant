@@ -54,6 +54,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(context));
             }
 
+            var project = context.CurrentProject.Required();
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+            if (components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
+            {
+                context.Properties.SetPropertyValue("componentFlag", components.ToString(), true);
+            }
+
             var result = await RunTryConvertAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
             await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);

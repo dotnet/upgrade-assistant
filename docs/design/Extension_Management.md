@@ -9,6 +9,8 @@ Upgrade Assistant's extensibility provides the ability for users to extend it be
 
 Throughout this document, the term `workspace` will be used to refer to a solution or project that is being updated along with the state file Upgrade Assistant generates.
 
+> This feature is currently in a preview/testing phase. In order to enable it, you'll need to set the following environment variable: `UA_FEATURES=EXTENSION_MANAGEMENT`
+
 ## User Experience
 
 Extensions will now be something that are managed at a workspace level. This will allow users to have a consistent experience as well as be able to manage their extensions.
@@ -20,6 +22,14 @@ upgrade-assistant extension list
 ```
 
 This command will list current extensions applied to a project.
+
+```
+upgrade-assistant extension restore
+```
+
+This command will restore current extensions applied to a project.
+
+> NOTE: This will hopefully be removed in the near future
 
 ```
 upgrade-assistant extension add --name [name] [--version [version]] [--source [source]]
@@ -38,6 +48,12 @@ upgrade-assistant extension update [--name [name]] [--version [version]]
 ```
 
 This command will update all extensions, or a specific one if the name is given.
+
+```
+upgrade-assistant extension create [path]
+```
+
+This command will create a valid NuGet package given an extension path.
 
 ### Future Experiences
 There are scenarios that make sense to have a global set up (i.e. a developer working on multiple projects). Future work can potentially implement a `--global` option for extensions that would update a local list that would apply everywhere.
@@ -60,7 +76,6 @@ The file will be json, similar to the state file. The extension section will loo
             "Name": "...",
             "Version": "...",
             "Source": "...",
-            "MD5": "...",
         }
     ]
 }
@@ -77,8 +92,12 @@ We will use NuGet as a source feed and align extension packages with with the `.
 - Rights management for feed access
 - Versioning support
 - Validation support
+- Signing validation if required
 
-Problems with this approach includes:
+## Local cache
 
-- Would require a redesign of how extensions are packaged
-- May be against some ToS of NuGet.org
+Extensions will be downloaded to `%LOCALAPPDATA%\Microsoft\DotNet Upgrade Assisistant\[source]\[name]\[version]` where:
+
+- `[source]` is a SHA256 hash of the source path
+- `[name]` is the name of the extension
+- `[version]` is the version of the extension

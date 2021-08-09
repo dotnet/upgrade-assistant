@@ -35,6 +35,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public const string Net60_Windows_10_0_5 = "net6.0-windows10.0.5";
         public const string Net60_Windows_10_1_5 = "net6.0-windows10.1.5";
         public const string Net60_Windows_10_0_19041_0 = "net6.0-windows10.0.19041.0";
+        public const string Net60_Android = "net6.0-android";
+        public const string Net60_iOS = "net6.0-ios";
 
         public const string Current = Net50;
         public const string Preview = Net60;
@@ -68,6 +70,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             { Net60_Windows_10_0_5, TargetFrameworkMoniker.Net60_Windows with { PlatformVersion = new Version(10, 0, 5) } },
             { Net60_Windows_10_1_5, TargetFrameworkMoniker.Net60_Windows with { PlatformVersion = new Version(10, 1, 5) } },
             { Net60_Windows_10_0_19041_0, TargetFrameworkMoniker.Net60_Windows with { PlatformVersion = new Version(10, 0, 19041, 0) } },
+            { Net60_Android, TargetFrameworkMoniker.Net60_Android },
+            { Net60_iOS, TargetFrameworkMoniker.Net60_iOS },
         };
 
         [return: NotNullIfNotNull("input")]

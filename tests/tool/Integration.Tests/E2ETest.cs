@@ -40,6 +40,8 @@ namespace Integration.Tests
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
+        [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
+        [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
@@ -61,7 +63,7 @@ namespace Integration.Tests
             FileHelpers.CleanupBuildArtifacts(workingDir);
 
             AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages, workingDir);
-            await AssertDirectoriesEqualAsync(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir).ConfigureAwait(false);
+            AssertDirectoriesEqual(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir);
         }
 
         private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
@@ -81,7 +83,7 @@ namespace Integration.Tests
             Assert.False(true, $"Integration tests tried to access NuGet.{Environment.NewLine}The list of packages not yet \"pinned\" has been written to:{Environment.NewLine}{outputFile}");
         }
 
-        private async Task AssertDirectoriesEqualAsync(string expectedDir, string actualDir)
+        private void AssertDirectoriesEqual(string expectedDir, string actualDir)
         {
             var expectedFiles = Directory.GetFiles(expectedDir, "*", SearchOption.AllDirectories).Select(p => p[(expectedDir.Length + 1)..])
                 .OrderBy(fileName => fileName)
@@ -110,17 +112,27 @@ namespace Integration.Tests
 
             foreach (var file in expectedFiles)
             {
-                var expectedText = await File.ReadAllTextAsync(Path.Combine(expectedDir, file)).ConfigureAwait(false);
-                var actualText = await File.ReadAllTextAsync(Path.Combine(actualDir, file)).ConfigureAwait(false);
-                try
+                var expectedText = ReadFile(expectedDir, file);
+                var actualText = ReadFile(actualDir, file);
+
+                if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
                 {
-                    Assert.Equal(expectedText, actualText);
-                }
-                catch (EqualException ex)
-                {
-                    Assert.True(false, $"The contents of \"{file}\" do not match.{Environment.NewLine}{ex.Message}");
+                    var message = $"The contents of \"{file}\" do not match.";
+
+                    _output.WriteLine(message);
+                    _output.WriteLine(string.Empty);
+                    _output.WriteLine("Expected contents:");
+                    _output.WriteLine(expectedText);
+                    _output.WriteLine(string.Empty);
+                    _output.WriteLine("Actual contents:");
+                    _output.WriteLine(actualText);
+
+                    Assert.True(false, message);
                 }
             }
+
+            static string ReadFile(string directory, string file)
+                => File.ReadAllText(Path.Combine(directory, file));
         }
 
         public void Dispose()

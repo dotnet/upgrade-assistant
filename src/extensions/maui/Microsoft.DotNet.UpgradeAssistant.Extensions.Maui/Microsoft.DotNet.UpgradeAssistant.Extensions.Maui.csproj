@@ -13,9 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ExtensionManifest.json">
+    
+    <Content Include="ExtensionManifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
+
+    <Content Include="PackageMaps\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    
   </ItemGroup>
 
 </Project>
