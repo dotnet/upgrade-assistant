@@ -1,7 +1,7 @@
 $dotnetRoot = Join-Path $RepoRoot '.dotnet'
 
 try {
-    dotnet workload install microsoft-android-sdk-full microsoft-ios-sdk-full --verbosity diag --temp-dir $dotnetRoot
+    dotnet workload install maui --verbosity diag --temp-dir $dotnetRoot
 }
 catch {
   Write-Host $_.ScriptStackTrace
