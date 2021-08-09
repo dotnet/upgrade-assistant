@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant;
@@ -113,24 +112,27 @@ namespace Integration.Tests
 
             foreach (var file in expectedFiles)
             {
-                var expectedText = File.ReadAllText(Path.Combine(expectedDir, file));
-                var actualText = File.ReadAllText(Path.Combine(actualDir, file));
+                var expectedText = ReadFile(expectedDir, file);
+                var actualText = ReadFile(actualDir, file);
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
                 {
-                    var sb = new StringBuilder();
+                    var message = $"The contents of \"{file}\" do not match.";
 
-                    sb.AppendLine($"The contents of \"{file}\" do not match.");
-                    sb.AppendLine();
-                    sb.AppendLine("Expected contents:");
-                    sb.AppendLine(expectedText);
-                    sb.AppendLine();
-                    sb.AppendLine("Actual contents:");
-                    sb.AppendLine(actualText);
+                    _output.WriteLine(message);
+                    _output.WriteLine(string.Empty);
+                    _output.WriteLine("Expected contents:");
+                    _output.WriteLine(expectedText);
+                    _output.WriteLine(string.Empty);
+                    _output.WriteLine("Actual contents:");
+                    _output.WriteLine(actualText);
 
-                    Assert.True(false, sb.ToString());
+                    Assert.True(false, message);
                 }
             }
+
+            static string ReadFile(string directory, string file)
+                => File.ReadAllText(Path.Combine(directory, file));
         }
 
         public void Dispose()
