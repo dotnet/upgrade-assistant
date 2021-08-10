@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
-    public interface IDiagnosticAnalysisRunner
+    public interface IRoslynDiagnosticProvider
     {
         Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(IProject project, CancellationToken token);
     }

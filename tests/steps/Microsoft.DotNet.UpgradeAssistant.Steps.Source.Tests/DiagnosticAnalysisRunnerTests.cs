@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            var loggerMock = new Mock<ILogger<DiagnosticAnalysisRunner>>();
+            var loggerMock = new Mock<ILogger<RoslynDiagnosticProvider>>();
 
             var project = CreateProject(mock);
             project.Setup(p => p.GetRoslynProject()).Returns(() =>
@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
-            var diagnosticAnalysisRunner = new DiagnosticAnalysisRunner(GetAnalyzers(false), Array.Empty<AdditionalText>(), loggerMock.Object);
+            var diagnosticAnalysisRunner = new RoslynDiagnosticProvider(GetAnalyzers(false), Array.Empty<AdditionalText>(), loggerMock.Object);
 
             // Act
             var diagnostics = await diagnosticAnalysisRunner.GetDiagnosticsAsync(project.Object, CancellationToken.None).ConfigureAwait(false);
@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            var loggerMock = new Mock<ILogger<DiagnosticAnalysisRunner>>();
+            var loggerMock = new Mock<ILogger<RoslynDiagnosticProvider>>();
 
             var project = CreateProject(mock);
             project.Setup(p => p.GetRoslynProject()).Returns(() =>
@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
-            var diagnosticAnalysisRunner = new DiagnosticAnalysisRunner(GetAnalyzers(includeLocation), Array.Empty<AdditionalText>(), loggerMock.Object);
+            var diagnosticAnalysisRunner = new RoslynDiagnosticProvider(GetAnalyzers(includeLocation), Array.Empty<AdditionalText>(), loggerMock.Object);
 
             // Act
             var diagnostics = await diagnosticAnalysisRunner.GetDiagnosticsAsync(project.Object, CancellationToken.None).ConfigureAwait(false);

@@ -24,8 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             services.Services.AddUpgradeStep<SourceUpdaterStep>();
-            services.Services.AddTransient<IAnalyzeResultProvider, AnalyzeDiagnostics>();
-            services.Services.AddTransient<IDiagnosticAnalysisRunner, DiagnosticAnalysisRunner>();
+            services.Services.AddTransient<IAnalyzeResultProvider, DiagnosticAnalyzerResultProvider>();
+            services.Services.AddTransient<IRoslynDiagnosticProvider, RoslynDiagnosticProvider>();
             services.AddExtensionOption<SourceUpdaterOptions>(SourceUpdaterOptionsSection);
 
             // TODO - In the future, this should map the options to IEnumerable<AdditionalText> using

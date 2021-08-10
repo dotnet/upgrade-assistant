@@ -121,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 }
 
                 // Re-build and get an updated list of diagnostics
-                await _sourceUpdater.RefreshDiagnostics(_sourceUpdater.Project, token).ConfigureAwait(false);
+                await _sourceUpdater.RefreshDiagnosticsAsync(_sourceUpdater.Project, token).ConfigureAwait(false);
 
                 // There should be less diagnostics for the given diagnostic ID after applying code fixes.
                 // Confirm that that's true to guard against a project in a bad state or a bad analyzer/code fix provider

@@ -14,13 +14,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
-    public class DiagnosticAnalysisRunner : IDiagnosticAnalysisRunner
+    public class RoslynDiagnosticProvider : IRoslynDiagnosticProvider
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
         private readonly ILogger _logger;
 
-        public DiagnosticAnalysisRunner(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<AdditionalText> additionalTexts, ILogger<DiagnosticAnalysisRunner> logger)
+        public RoslynDiagnosticProvider(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<AdditionalText> additionalTexts, ILogger<RoslynDiagnosticProvider> logger)
         {
             if (additionalTexts is null)
             {

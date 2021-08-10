@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
         private readonly IEnumerable<CodeFixProvider> _allCodeFixProviders;
-        private readonly IDiagnosticAnalysisRunner _diagnosticAnalysisRunner;
+        private readonly IRoslynDiagnosticProvider _diagnosticAnalysisRunner;
 
         internal IProject? Project { get; private set; }
 
@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, IDiagnosticAnalysisRunner diagnosticAnalysisRunner, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, IRoslynDiagnosticProvider diagnosticAnalysisRunner, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
             if (logger is null)
@@ -107,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
-            await RefreshDiagnostics(Project, token).ConfigureAwait(false);
+            await RefreshDiagnosticsAsync(Project, token).ConfigureAwait(false);
 
             foreach (var step in SubSteps)
             {
@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
         }
 
-        public async Task RefreshDiagnostics(IProject project, CancellationToken token)
+        public async Task RefreshDiagnosticsAsync(IProject project, CancellationToken token)
         {
             Diagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
         }

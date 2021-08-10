@@ -11,16 +11,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 {
-    public class AnalyzeDiagnostics : IAnalyzeResultProvider
+    public class DiagnosticAnalyzerResultProvider : IAnalyzeResultProvider
     {
-        private readonly IDiagnosticAnalysisRunner _diagnosticAnalysisRunner;
+        private readonly IRoslynDiagnosticProvider _diagnosticAnalysisRunner;
         private readonly ILogger _logger;
 
         public string Name => "API Upgradability";
 
         public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
-        public AnalyzeDiagnostics(IDiagnosticAnalysisRunner diagnosticAnalysisRunner, ILogger<AnalyzeDiagnostics> logger)
+        public DiagnosticAnalyzerResultProvider(IRoslynDiagnosticProvider diagnosticAnalysisRunner, ILogger<DiagnosticAnalyzerResultProvider> logger)
         {
             if (diagnosticAnalysisRunner is null)
             {
