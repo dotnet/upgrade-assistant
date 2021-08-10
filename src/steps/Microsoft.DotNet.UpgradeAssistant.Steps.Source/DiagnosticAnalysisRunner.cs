@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
         private readonly ILogger _logger;
 
-        public DiagnosticAnalysisRunner(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<AdditionalText> additionalTexts, ILogger<AnalyzeDiagnostics> logger)
+        public DiagnosticAnalysisRunner(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<AdditionalText> additionalTexts, ILogger<DiagnosticAnalysisRunner> logger)
         {
             if (additionalTexts is null)
             {
