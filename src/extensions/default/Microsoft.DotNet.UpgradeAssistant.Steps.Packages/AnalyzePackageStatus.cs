@@ -15,13 +15,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class AnalyzePackageStatus : IAnalyzeResultProvider
     {
+        private const string Id = "UA101";
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
         private IDependencyAnalysisState? _analysisState;
 
         private ILogger Logger { get; }
-
-        public string Id => "UA101";
 
         public string Name => "Dependency Analysis";
 
@@ -70,21 +69,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-                yield return new()
+                foreach (var r in this.ExtractAnalysisResult(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name), _analysisState))
                 {
-                    FileLocation = Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name),
-                    Results = ExtractAnalysisResult(_analysisState),
-                };
+                    yield return r;
+                }
             }
         }
 
-        private static HashSet<string> ExtractAnalysisResult(IDependencyAnalysisState? analysisState)
+        private HashSet<AnalyzeResult> ExtractAnalysisResult(string fileLocation, IDependencyAnalysisState? analysisState)
         {
-            var results = new HashSet<string>();
+            var results = new HashSet<AnalyzeResult>();
 
             if (analysisState is null || !analysisState.AreChangesRecommended)
             {
-                results.Add("No package updates needed");
+                results.Add(new()
+                {
+                    RuleId = Id,
+                    RuleName = this.Name,
+                    FileLocation = fileLocation,
+                    ResultMessage = "No package updates needed",
+                });
             }
             else
             {
@@ -103,11 +107,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         {
                             if (s.OperationDetails is not null && s.OperationDetails.Details is not null && s.OperationDetails.Details.Any())
                             {
-                                results.UnionWith(s.OperationDetails.Details);
+                                results.UnionWith(s.OperationDetails.Details.Select(s => new AnalyzeResult()
+                                {
+                                    RuleId = Id,
+                                    RuleName = this.Name,
+                                    FileLocation = fileLocation,
+                                    ResultMessage = s,
+                                }));
                             }
                             else
                             {
-                                results.Add(string.Concat(name, s.Item, action));
+                                results.Add(new()
+                                {
+                                    RuleId = Id,
+                                    RuleName = this.Name,
+                                    FileLocation = fileLocation,
+                                    ResultMessage = string.Concat(name, s.Item, action),
+                                });
                             }
                         }
                     }

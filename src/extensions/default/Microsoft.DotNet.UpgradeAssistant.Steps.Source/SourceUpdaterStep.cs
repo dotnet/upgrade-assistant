@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
         private readonly IEnumerable<CodeFixProvider> _allCodeFixProviders;
-        private readonly ImmutableArray<AdditionalText> _additionalTexts;
+        private readonly IRoslynDiagnosticProvider _diagnosticAnalysisRunner;
 
         internal IProject? Project { get; private set; }
 
@@ -51,22 +51,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, IRoslynDiagnosticProvider diagnosticAnalysisRunner, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
-            if (additionalTexts is null)
-            {
-                throw new ArgumentNullException(nameof(additionalTexts));
-            }
-
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
+            if (additionalTexts is null)
+            {
+                throw new ArgumentNullException(nameof(additionalTexts));
+            }
+
             _allAnalyzers = analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id);
             _allCodeFixProviders = codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First());
-            _additionalTexts = ImmutableArray.CreateRange(additionalTexts);
+            _diagnosticAnalysisRunner = diagnosticAnalysisRunner;
 
             // Add sub-steps for each analyzer that will be run
             SubSteps = new List<UpgradeStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
@@ -107,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             Logger.LogDebug("Opening project {ProjectPath}", projectPath);
 
-            await GetDiagnosticsAsync(token).ConfigureAwait(false);
+            await RefreshDiagnosticsAsync(Project, token).ConfigureAwait(false);
 
             foreach (var step in SubSteps)
             {
@@ -119,57 +119,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{Diagnostics.Count()} upgrade diagnostics need fixed", BuildBreakRisk.None) :
                 new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No upgrade diagnostics found", BuildBreakRisk.None);
         }
-
-        public async Task GetDiagnosticsAsync(CancellationToken token)
-        {
-            if (Project is null)
-            {
-                Logger.LogWarning("No project available.");
-                return;
-            }
-
-            var project = Project.GetRoslynProject();
-
-            if (project is null)
-            {
-                Logger.LogWarning("No project available.");
-                return;
-            }
-
-            Logger.LogTrace("Running upgrade analyzers on {ProjectName}", project.Name);
-
-            // Compile with upgrade analyzers enabled
-            var applicableAnalyzers = await GetApplicableAnalyzersAsync(_allAnalyzers, Project).ToListAsync(token).ConfigureAwait(false);
-
-            if (!applicableAnalyzers.Any())
-            {
-                Diagnostics = Enumerable.Empty<Diagnostic>();
-            }
-            else
-            {
-                var compilation = await project.GetCompilationAsync(token).ConfigureAwait(false);
-                if (compilation is null)
-                {
-                    Diagnostics = Enumerable.Empty<Diagnostic>();
-                }
-                else
-                {
-                    var compilationWithAnalyzer = compilation
-                        .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
-
-                    // Find all diagnostics that registered analyzers produce
-                    // Note that this intentionally identifies diagnostics that no code fix providers can
-                    // address so that users can be warned about diagnostics that they will need to address manually.
-                    Diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
-                        .Where(d => d.Location.IsInSource);
-                    Logger.LogDebug("Identified {DiagnosticCount} diagnostics in project {ProjectName}", Diagnostics.Count(), project.Name);
-                }
-            }
-        }
-
-        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
-            => analyzers.ToAsyncEnumerable()
-                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -198,9 +147,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
         }
 
-        private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
+        public async Task RefreshDiagnosticsAsync(IProject project, CancellationToken token)
         {
-            Logger.LogError(exc, "Analyzer error while running analyzer {AnalyzerId}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)));
+            Diagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
         }
     }
 }

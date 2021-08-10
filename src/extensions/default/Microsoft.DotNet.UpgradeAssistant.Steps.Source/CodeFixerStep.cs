@@ -50,7 +50,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             _fixProvider = fixProvider ?? throw new ArgumentNullException(nameof(fixProvider));
             _sourceUpdater = parentStep ?? throw new ArgumentNullException(nameof(parentStep)); // The parent step has the compilation/diagnostics
-
             ParentStep = parentStep;
 
             // Get titles for all the diagnostics this step can fix
@@ -122,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 }
 
                 // Re-build and get an updated list of diagnostics
-                await _sourceUpdater.GetDiagnosticsAsync(token).ConfigureAwait(false);
+                await _sourceUpdater.RefreshDiagnosticsAsync(_sourceUpdater.Project, token).ConfigureAwait(false);
 
                 // There should be less diagnostics for the given diagnostic ID after applying code fixes.
                 // Confirm that that's true to guard against a project in a bad state or a bad analyzer/code fix provider

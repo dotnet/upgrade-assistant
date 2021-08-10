@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             services.Services.AddUpgradeStep<SourceUpdaterStep>();
+            services.Services.AddTransient<IAnalyzeResultProvider, DiagnosticAnalyzerResultProvider>();
+            services.Services.AddTransient<IRoslynDiagnosticProvider, RoslynDiagnosticProvider>();
             services.AddExtensionOption<SourceUpdaterOptions>(SourceUpdaterOptionsSection);
 
             // TODO - In the future, this should map the options to IEnumerable<AdditionalText> using
