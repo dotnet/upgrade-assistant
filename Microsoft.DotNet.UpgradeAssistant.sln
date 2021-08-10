@@ -93,13 +93,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "components", "components", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj", "{DBE3FD1D-811C-416B-AE2E-08D468ABA4D6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests.csproj", "{F9BA18A4-53E7-4747-A55A-061ED26BA520}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests.csproj", "{F9BA18A4-53E7-4747-A55A-061ED26BA520}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests.csproj", "{A58297FF-2276-415F-9A9C-75F9F1656E8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests.csproj", "{A58297FF-2276-415F-9A9C-75F9F1656E8C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Telemetry", "src\components\Microsoft.DotNet.UpgradeAssistant.Telemetry\Microsoft.DotNet.UpgradeAssistant.Telemetry.csproj", "{C6ACCD43-DDD9-4CD0-8F25-8975B3348005}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.csproj", "{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.csproj", "{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor", "src\extensions\web\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj", "{117FFF7E-019E-400E-9F51-A4F7F9F3195D}"
 EndProject
@@ -109,9 +109,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8B8F1470-B862-4BF8-B41D-F078D43277FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests.csproj", "{16141B3F-F785-4CFD-9FD2-67E9D76C4827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests.csproj", "{16141B3F-F785-4CFD-9FD2-67E9D76C4827}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests.csproj", "{61A3EF4A-68CC-442E-87EC-F05B874A4C98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests.csproj", "{61A3EF4A-68CC-442E-87EC-F05B874A4C98}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common", "src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj", "{91391896-C591-43FD-B6F6-7D9150DB3CB2}"
 EndProject
