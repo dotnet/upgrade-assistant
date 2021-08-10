@@ -18,11 +18,11 @@ using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
 {
-    public class DiagnosticAnalysisRunnerTests
+    public class RoslynDiagnosticProviderTests
     {
         private readonly Fixture _fixture;
 
-        public DiagnosticAnalysisRunnerTests()
+        public RoslynDiagnosticProviderTests()
         {
             _fixture = new Fixture();
         }
@@ -39,12 +39,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
             {
                 var ws = new AdhocWorkspace();
                 var name = Path.GetFileNameWithoutExtension("TestProject.csproj")!;
-                return ws.AddProject(ProjectInfo.Create(ProjectId.CreateNewId(), VersionStamp.Default, name, name, "C#", filePath: "TestProject.csproj"));
+                return ws.AddProject(ProjectInfo.Create(ProjectId.CreateNewId(), VersionStamp.Default, name, name, "C#"));
             });
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
-            var diagnosticAnalysisRunner = new RoslynDiagnosticProvider(GetAnalyzers(false), Array.Empty<AdditionalText>(), loggerMock.Object);
+            var analyzers = new List<DiagnosticAnalyzer>() { GetAnalyzer(false) };
+            var diagnosticAnalysisRunner = new RoslynDiagnosticProvider(analyzers, Array.Empty<AdditionalText>(), loggerMock.Object);
 
             // Act
             var diagnostics = await diagnosticAnalysisRunner.GetDiagnosticsAsync(project.Object, CancellationToken.None).ConfigureAwait(false);
@@ -75,7 +76,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
-            var diagnosticAnalysisRunner = new RoslynDiagnosticProvider(GetAnalyzers(includeLocation), Array.Empty<AdditionalText>(), loggerMock.Object);
+            var analyzers = new List<DiagnosticAnalyzer>() { GetAnalyzer(includeLocation) };
+            var diagnosticAnalysisRunner = new RoslynDiagnosticProvider(analyzers, Array.Empty<AdditionalText>(), loggerMock.Object);
 
             // Act
             var diagnostics = await diagnosticAnalysisRunner.GetDiagnosticsAsync(project.Object, CancellationToken.None).ConfigureAwait(false);
@@ -98,7 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
             return project;
         }
 
-        private IEnumerable<DiagnosticAnalyzer> GetAnalyzers(bool includeLocation)
+        private DiagnosticAnalyzer GetAnalyzer(bool includeLocation)
         {
             var analyzer = new Mock<DiagnosticAnalyzer>();
             var descriptor = new DiagnosticDescriptor($"Test1", $"Test diagnostic 1", $"Test message 1", "Test", DiagnosticSeverity.Warning, true);
@@ -110,7 +112,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
                 x.ReportDiagnostic(diagnostic);
             }));
 
-            return new List<DiagnosticAnalyzer>() { analyzer.Object };
+            return analyzer.Object;
         }
     }
 }
