@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests
                 var ws = new AdhocWorkspace();
                 var name = Path.GetFileNameWithoutExtension("TestProject.csproj")!;
                 var projectInfo = ProjectInfo.Create(ProjectId.CreateNewId(), VersionStamp.Default, name, name, "C#", filePath: "TestProject.csproj");
-                var documents = new List<DocumentInfo>() { DocumentInfo.Create(DocumentId.CreateNewId(projectInfo.Id), "Foo.cs").WithFilePath(@"assets\TestClasses\Foo.cs") };
+                var documents = new List<DocumentInfo>() { DocumentInfo.Create(DocumentId.CreateNewId(projectInfo.Id), "Foo.cs") };
                 var proj = ws.AddProject(projectInfo.WithDocuments(documents));
                 return proj;
             });
