@@ -1,6 +1,6 @@
 {
   "Replacements": {
-    "MauiApp": "$(RootNamespace)"
+    "MauiApp1": "$(RootNamespace)"
   },
   "TemplateItems": [
     {
@@ -13,6 +13,7 @@
     }
   ],
   "TemplateOutputType": [
+    "Library"
   ],
 
   "TemplateLanguage": "CSharp",

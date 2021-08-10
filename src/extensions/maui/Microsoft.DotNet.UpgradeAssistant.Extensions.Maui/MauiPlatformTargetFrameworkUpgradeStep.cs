@@ -51,16 +51,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             // This block checks TFMs for .NET MAUI Head Project
             if (components.HasFlag(ProjectComponents.Maui) && file.IsSdk)
             {
-                if (!projectproperties.GetProjectPropertyValue("TargetFramework").Equals(TargetFrameworkMoniker.NetStandard20))
+                if (string.Equals(projectproperties.GetProjectPropertyValue("TargetFramework").FirstOrDefault(), TargetFrameworkMoniker.NetStandard20.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    projectproperties.RemoveProjectProperty("TargetFramework");
+                    file.SetPropertyValue("TargetFrameworks", "net6.0-android;net6.0-ios");
+                    Logger.LogInformation("Added TFMs to .NET MAUI project");
+                    await file.SaveAsync(token).ConfigureAwait(false);
+                    return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI Head project ");
+
+                }
+                else
                 {
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Project is not of type Maui Head Project");
                 }
-
-                projectproperties.RemoveProjectProperty("TargetFramework");
-                file.SetPropertyValue("TargetFrameworks", "net6.0-ios;net6.0-android");
-                Logger.LogInformation("Added TFMs to .NET MAUI project");
-                await file.SaveAsync(token).ConfigureAwait(false);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI Head project ");
             }
 
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
@@ -156,17 +159,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 return true;
             }
 
-            if (components.HasFlag(ProjectComponents.MauiAndroid) || components.HasFlag(ProjectComponents.MauiiOS))
+            if (components.HasFlag(ProjectComponents.MauiAndroid) || components.HasFlag(ProjectComponents.MauiiOS) || components.HasFlag(ProjectComponents.Maui))
             {
                 return true;
             }
 
             if (!string.IsNullOrWhiteSpace(context.Properties.GetPropertyValue("componentFlag")))
-            {
-                return true;
-            }
-
-            if (components.HasFlag(ProjectComponents.Maui))
             {
                 return true;
             }

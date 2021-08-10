@@ -83,23 +83,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
         }
 
-        protected async override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
-        {
-            if (context is null)
-            {
-                return false;
-            }
-
-            var project = context.CurrentProject.Required();
-            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-
-            // Skip SET TFM for .NET MAUI Head project.
-            if (components.HasFlag(ProjectComponents.Maui))
-            {
-                return false;
-            }
-
-            return true;
-        }
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
     }
 }

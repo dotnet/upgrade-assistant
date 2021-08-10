@@ -162,12 +162,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 projectproperties.RemoveProjectProperty("IPhoneResourcePrefix");
             }
 
-            // MAUI Head Project
             if (components.HasFlag(ProjectComponents.Maui))
             {
-                // check project structre for trameworks to add
-                // add <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-                var test = context.Projects;
+                // remove unneeded Properties
+                projectproperties.RemoveProjectProperty("DebugType");
+                projectproperties.RemoveProjectProperty("DebugSymbols");
+
             }
 
             // Use MAUI tag

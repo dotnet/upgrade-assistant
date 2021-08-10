@@ -6,7 +6,7 @@ using Microsoft.Maui.Controls.Xaml;
 
 [assembly: XamlCompilationAttribute(XamlCompilationOptions.Compile)]
 
-namespace MauiApp1
+namespace EwDavidForms
 {
 	public class Startup : IStartup
 	{
