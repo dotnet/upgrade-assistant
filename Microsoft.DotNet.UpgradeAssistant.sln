@@ -168,7 +168,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{98B57945-2141-4880-B6C2-51B44C67E300}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests", "tests\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests.csproj", "{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests", "tests\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests.csproj", "{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maui", "maui", "{7304F25F-0F4D-450F-A529-3C7AFE9D98CA}"
 EndProject
