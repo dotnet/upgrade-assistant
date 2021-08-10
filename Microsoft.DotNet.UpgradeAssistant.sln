@@ -27,11 +27,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TryConvertInstaller.targets = TryConvertInstaller.targets
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj", "{9D38A783-B8EE-44C9-825A-DCCCA972FF0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj", "{9D38A783-B8EE-44C9-825A-DCCCA972FF0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj", "{18C0711F-2B26-49D8-89AB-F68499A0EB9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj", "{18C0711F-2B26-49D8-89AB-F68499A0EB9B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Source", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj", "{C04E2349-B339-4AEF-89FB-AD8DCD9B117A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Source", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj", "{C04E2349-B339-4AEF-89FB-AD8DCD9B117A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers", "src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj", "{7176CD56-0822-410E-9318-C3440D24A0BB}"
 EndProject
@@ -51,11 +51,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{60D2D4E3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.MSBuild", "src\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj", "{EDAC1981-61FC-4030-AA5F-C9A4D054CF00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Templates", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Templates\Microsoft.DotNet.UpgradeAssistant.Steps.Templates.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Templates", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Templates\Microsoft.DotNet.UpgradeAssistant.Steps.Templates.csproj", "{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj", "{B6C71468-2074-44DF-89E1-1B97E4A3DFDE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj", "{7A96CCA0-4D47-48C6-A889-B560048E0C16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj", "{7A96CCA0-4D47-48C6-A889-B560048E0C16}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant", "src\components\Microsoft.DotNet.UpgradeAssistant\Microsoft.DotNet.UpgradeAssistant.csproj", "{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB}"
 EndProject
@@ -67,15 +67,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Integration.Tests", "tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests", "tests\components\Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests\Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests.csproj", "{326A3938-5C0B-4280-9175-7E059679731B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration", "src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj", "{9F99DC5B-DAD0-4C43-BFFF-8027E4077334}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj", "{9F99DC5B-DAD0-4C43-BFFF-8027E4077334}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions", "src\components\Microsoft.DotNet.UpgradeAssistant.Extensions\Microsoft.DotNet.UpgradeAssistant.Extensions.csproj", "{F3C03589-20A5-4D6E-A2C5-4143A11F03B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cli", "cli", "{72016889-9414-472E-AC99-17B0876B8F06}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{AA22EE67-3BBE-49A2-8868-531FE68FE162}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "steps", "steps", "{76CD255A-B5BB-4CB2-91C4-EDEA98C61289}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "default", "default", "{4D21C152-7EF3-4248-B424-530F7BE51FD3}"
 EndProject
@@ -95,15 +93,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "components", "components", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default", "src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.csproj", "{DBE3FD1D-811C-416B-AE2E-08D468ABA4D6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "steps", "steps", "{421DCA6B-467F-4CE3-AD9D-7B2001CFD299}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests.csproj", "{F9BA18A4-53E7-4747-A55A-061ED26BA520}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests.csproj", "{F9BA18A4-53E7-4747-A55A-061ED26BA520}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests.csproj", "{A58297FF-2276-415F-9A9C-75F9F1656E8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests.csproj", "{A58297FF-2276-415F-9A9C-75F9F1656E8C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Telemetry", "src\components\Microsoft.DotNet.UpgradeAssistant.Telemetry\Microsoft.DotNet.UpgradeAssistant.Telemetry.csproj", "{C6ACCD43-DDD9-4CD0-8F25-8975B3348005}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.csproj", "{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Tests.csproj", "{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor", "src\extensions\web\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj", "{117FFF7E-019E-400E-9F51-A4F7F9F3195D}"
 EndProject
@@ -113,9 +109,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8B8F1470-B862-4BF8-B41D-F078D43277FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests.csproj", "{16141B3F-F785-4CFD-9FD2-67E9D76C4827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests.csproj", "{16141B3F-F785-4CFD-9FD2-67E9D76C4827}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests.csproj", "{61A3EF4A-68CC-442E-87EC-F05B874A4C98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests.csproj", "{61A3EF4A-68CC-442E-87EC-F05B874A4C98}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common", "src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj", "{91391896-C591-43FD-B6F6-7D9150DB3CB2}"
 EndProject
@@ -168,13 +164,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{98B57945-2141-4880-B6C2-51B44C67E300}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests", "tests\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests.csproj", "{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests", "tests\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests.csproj", "{025C3A17-0FBB-4B5E-9386-6A5E979FAA56}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maui", "maui", "{7304F25F-0F4D-450F-A529-3C7AFE9D98CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests", "tests\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests.csproj", "{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests", "tests\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests.csproj", "{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests", "tests\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests.csproj", "{60A96474-2199-49B5-AAB5-FA7AF2C0B595}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests", "tests\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests\Microsoft.DotNet.UpgradeAssistant.Steps.Source.Tests.csproj", "{134CE4A1-E9A4-49C0-A998-7C531E6207CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -750,18 +746,18 @@ Global
 		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|x64.Build.0 = Release|Any CPU
 		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|x86.ActiveCfg = Release|Any CPU
 		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3}.Release|x86.Build.0 = Release|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Debug|x64.Build.0 = Debug|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Debug|x86.Build.0 = Debug|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Release|Any CPU.Build.0 = Release|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Release|x64.ActiveCfg = Release|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Release|x64.Build.0 = Release|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Release|x86.ActiveCfg = Release|Any CPU
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595}.Release|x86.Build.0 = Release|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Debug|x64.Build.0 = Debug|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Debug|x86.Build.0 = Debug|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Release|x64.ActiveCfg = Release|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Release|x64.Build.0 = Release|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Release|x86.ActiveCfg = Release|Any CPU
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -769,28 +765,27 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{647D258A-4FE1-4DFA-8D02-0E5DBE3B40F7} = {72016889-9414-472E-AC99-17B0876B8F06}
 		{9C3B9BC2-1066-4052-8188-BAAFEC9FAA42} = {DF2E1ED9-DC44-4DD4-B6A1-165304E88118}
-		{9D38A783-B8EE-44C9-825A-DCCCA972FF0B} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
-		{18C0711F-2B26-49D8-89AB-F68499A0EB9B} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
-		{C04E2349-B339-4AEF-89FB-AD8DCD9B117A} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{9D38A783-B8EE-44C9-825A-DCCCA972FF0B} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
+		{18C0711F-2B26-49D8-89AB-F68499A0EB9B} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
+		{C04E2349-B339-4AEF-89FB-AD8DCD9B117A} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
 		{7176CD56-0822-410E-9318-C3440D24A0BB} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
 		{6D52D932-7890-4269-8F05-FDEA6DE45B42} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
 		{12080E4D-027D-4880-8A94-AA22DCD15F07} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
 		{517E6A56-5FFA-4FD0-B645-02C295C968C3} = {597F6238-6E57-445B-A9A0-3DEB5BD92471}
 		{2A80B702-C4AB-409F-AFD5-CE7AC809785F} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
 		{EDAC1981-61FC-4030-AA5F-C9A4D054CF00} = {28247E7B-243D-4901-B26A-7A7615EBADDC}
-		{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
-		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
-		{7A96CCA0-4D47-48C6-A889-B560048E0C16} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{2E23FB6C-FAD1-41B1-9187-1ECD7548FBCC} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
+		{B6C71468-2074-44DF-89E1-1B97E4A3DFDE} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
+		{7A96CCA0-4D47-48C6-A889-B560048E0C16} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
 		{3B9E0D18-FE40-4E36-A07B-9198CA5CDBBB} = {28247E7B-243D-4901-B26A-7A7615EBADDC}
 		{90C3DBB8-97BC-4265-B635-1A512CF32C46} = {1BA017ED-6BA7-42F0-BC5E-613495A55A6B}
 		{358837A0-FA02-42C5-B1B0-327D7CFDAA76} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
 		{7AE37670-7570-4EB1-8E66-94DE225CC63E} = {7B2C772E-8C8A-4FB3-AB75-D2179FB53866}
 		{326A3938-5C0B-4280-9175-7E059679731B} = {1BA017ED-6BA7-42F0-BC5E-613495A55A6B}
-		{9F99DC5B-DAD0-4C43-BFFF-8027E4077334} = {76CD255A-B5BB-4CB2-91C4-EDEA98C61289}
+		{9F99DC5B-DAD0-4C43-BFFF-8027E4077334} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
 		{F3C03589-20A5-4D6E-A2C5-4143A11F03B3} = {28247E7B-243D-4901-B26A-7A7615EBADDC}
 		{72016889-9414-472E-AC99-17B0876B8F06} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{AA22EE67-3BBE-49A2-8868-531FE68FE162} = {3FC16DAB-215C-422B-9130-61D566695463}
-		{76CD255A-B5BB-4CB2-91C4-EDEA98C61289} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{4D21C152-7EF3-4248-B424-530F7BE51FD3} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
 		{DF2E1ED9-DC44-4DD4-B6A1-165304E88118} = {3FC16DAB-215C-422B-9130-61D566695463}
 		{597F6238-6E57-445B-A9A0-3DEB5BD92471} = {4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C}
@@ -800,17 +795,16 @@ Global
 		{4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
 		{1BA017ED-6BA7-42F0-BC5E-613495A55A6B} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
 		{DBE3FD1D-811C-416B-AE2E-08D468ABA4D6} = {4D21C152-7EF3-4248-B424-530F7BE51FD3}
-		{421DCA6B-467F-4CE3-AD9D-7B2001CFD299} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
-		{F9BA18A4-53E7-4747-A55A-061ED26BA520} = {421DCA6B-467F-4CE3-AD9D-7B2001CFD299}
-		{A58297FF-2276-415F-9A9C-75F9F1656E8C} = {421DCA6B-467F-4CE3-AD9D-7B2001CFD299}
+		{F9BA18A4-53E7-4747-A55A-061ED26BA520} = {4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C}
+		{A58297FF-2276-415F-9A9C-75F9F1656E8C} = {4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C}
 		{C6ACCD43-DDD9-4CD0-8F25-8975B3348005} = {28247E7B-243D-4901-B26A-7A7615EBADDC}
-		{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7} = {421DCA6B-467F-4CE3-AD9D-7B2001CFD299}
+		{FFB7401A-9AF6-4FCE-B305-B7BE2B1361D7} = {4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C}
 		{117FFF7E-019E-400E-9F51-A4F7F9F3195D} = {E0B28CEA-41C6-4907-ABAE-9E2F5D0A92C7}
 		{D41E4E00-B3F2-4F31-B890-C27F9E997B71} = {AC17CD64-6601-43B2-BF1E-EFD7FFEEC012}
 		{DA7F5186-9971-4BC0-9BDB-AD5F9058C4C3} = {8B8F1470-B862-4BF8-B41D-F078D43277FA}
 		{8B8F1470-B862-4BF8-B41D-F078D43277FA} = {60D2D4E3-E055-4A9C-BDB1-7328DAA9BD5C}
-		{16141B3F-F785-4CFD-9FD2-67E9D76C4827} = {421DCA6B-467F-4CE3-AD9D-7B2001CFD299}
-		{61A3EF4A-68CC-442E-87EC-F05B874A4C98} = {421DCA6B-467F-4CE3-AD9D-7B2001CFD299}
+		{16141B3F-F785-4CFD-9FD2-67E9D76C4827} = {4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C}
+		{61A3EF4A-68CC-442E-87EC-F05B874A4C98} = {4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C}
 		{91391896-C591-43FD-B6F6-7D9150DB3CB2} = {2A80B702-C4AB-409F-AFD5-CE7AC809785F}
 		{5B8E8267-E90E-4E78-A219-A62AEDCE81CE} = {EE464F98-73F3-4858-8B5C-5254EECFA3B3}
 		{AF6A2C7F-686F-4DAF-81C7-9A36CBD797C0} = {EE464F98-73F3-4858-8B5C-5254EECFA3B3}
@@ -836,7 +830,7 @@ Global
 		{025C3A17-0FBB-4B5E-9386-6A5E979FAA56} = {98B57945-2141-4880-B6C2-51B44C67E300}
 		{7304F25F-0F4D-450F-A529-3C7AFE9D98CA} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
 		{CEDAAB8D-613C-4A3F-8114-7D6B480F1EE3} = {7304F25F-0F4D-450F-A529-3C7AFE9D98CA}
-		{60A96474-2199-49B5-AAB5-FA7AF2C0B595} = {421DCA6B-467F-4CE3-AD9D-7B2001CFD299}
+		{134CE4A1-E9A4-49C0-A998-7C531E6207CE} = {4E12F429-CEC0-4080-B0FE-39F9B8B9AE4C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

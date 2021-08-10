@@ -103,77 +103,6 @@
         </dependencyFromLayerToLayer>
       </dependencyToLayers>
       <childLayers>
-        <layer Id="a31bdb07-b3da-4a5a-8d6d-51b1d4da19af" name="steps">
-          <references>
-            <reference Id="5de52aef-0e62-46dd-a420-d75d7bb62dfc" name="steps">
-              <ArtifactNode Label="steps" Category="CodeSchema_Project" Id="(Assembly=../../src/steps)">
-                <Category Ref="CodeMap_SolutionFolder" />
-              </ArtifactNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Packages)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Packages.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Source)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Source.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Templates)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Templates.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Solution)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Solution.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Backup)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Backup.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Configuration)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-            </reference>
-          </references>
-        </layer>
-        <layer Id="ceb938b4-32b2-446d-a1e1-ddbc9a1d5134" name="default">
-          <dependencyToLayers>
-            <dependencyFromLayerToLayer Id="e61ab778-88c9-4a30-8938-bd92c031fccd" direction="Forward">
-              <layerMoniker Id="a31bdb07-b3da-4a5a-8d6d-51b1d4da19af" />
-            </dependencyFromLayerToLayer>
-          </dependencyToLayers>
-          <references>
-            <reference Id="27b04636-0231-4439-a18c-072ca6ba58c0" name="default">
-              <ArtifactNode Label="default" Category="CodeSchema_Project" Id="(Assembly=../../src/extensions/default)">
-                <Category Ref="CodeMap_SolutionFolder" />
-              </ArtifactNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.dll" Category="CodeSchema_Assembly">
-                <Category Ref="FileSystem.Category.FileOfType.dll" />
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-            </reference>
-          </references>
-        </layer>
         <layer Id="42f898d2-cf30-4e9d-ab77-96ef4fb7f844" name="vb">
           <references>
             <reference Id="3944df41-ae8c-4f1c-b3a7-9c4d45215b22" name="vb">
@@ -223,6 +152,51 @@
               </ArtifactNode>
               <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Windows)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.dll" Category="CodeSchema_Assembly">
                 <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="8918b436-d958-4125-b519-fb14baa7dd53" name="default">
+          <references>
+            <reference Id="0cef9483-399b-4e54-955f-0961ffb2cf9f" name="default">
+              <ArtifactNode Label="default" Category="CodeSchema_Project" Id="(Assembly=../../src/extensions/default)">
+                <Category Ref="CodeMap_SolutionFolder" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Source)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Source.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Templates)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Templates.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Solution)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Solution.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Backup)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Backup.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Configuration)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Steps.Packages)" Label="Microsoft.DotNet.UpgradeAssistant.Steps.Packages.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.Default)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.dll" Category="CodeSchema_Assembly">
                 <LinkCategory Ref="Represents" />
               </ExpandedNode>
             </reference>
