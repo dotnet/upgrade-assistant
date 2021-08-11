@@ -20,6 +20,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ApplicableComponentsAttribute.cs" Link="ApplicableComponentsAttribute.cs" />
+    <Compile Include="..\..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\ProjectComponents.cs" Link="ProjectComponents.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

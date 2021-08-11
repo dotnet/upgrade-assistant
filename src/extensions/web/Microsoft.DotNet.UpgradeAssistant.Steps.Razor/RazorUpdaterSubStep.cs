@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Check the updater for an [ApplicableComponents] attribute
             // If one exists, the step only applies if the project has the indicated components
-            return await _updater.GetType().AppliesToProjectAsync(context.CurrentProject, token).ConfigureAwait(false);
+            return await context.CurrentProject.IsApplicableAsync(_updater, token).ConfigureAwait(false);
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

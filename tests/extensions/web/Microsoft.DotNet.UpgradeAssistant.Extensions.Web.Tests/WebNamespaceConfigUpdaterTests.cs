@@ -26,14 +26,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            var webNamespaceConfigUpdater = typeof(WebNamespaceConfigUpdater);
-            var project = mock.Mock<IProject>();
+            var webNamespaceConfigUpdater = mock.Create<WebNamespaceConfigUpdater>();
+            var project = new Mock<IProject>();
             project.Setup(p => p.Language).Returns(language);
             project.Setup(p => p.GetComponentsAsync(It.IsAny<CancellationToken>()))
-                .Returns(new ValueTask<ProjectComponents>(Task.FromResult(components)));
+                .ReturnsAsync(components);
 
             // Act
-            var actual = await webNamespaceConfigUpdater.AppliesToProjectAsync(project.Object, default).ConfigureAwait(false);
+            var actual = await project.Object.IsApplicableAsync(webNamespaceConfigUpdater, default).ConfigureAwait(false);
 
             // Assert
             if (expected)

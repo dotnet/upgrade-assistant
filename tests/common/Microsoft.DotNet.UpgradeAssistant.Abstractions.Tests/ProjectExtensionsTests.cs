@@ -4,8 +4,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
-using Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests.TestAssets;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Moq;
 using Xunit;
 
@@ -31,14 +31,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            var testCodefixer = typeof(TestCodeFixer);
+            var testobj = new TestCodeFixer();
             var project = mock.Mock<IProject>();
             project.Setup(p => p.Language).Returns(language);
             project.Setup(p => p.GetComponentsAsync(It.IsAny<CancellationToken>()))
-                .Returns(new ValueTask<ProjectComponents>(Task.FromResult(components)));
+                .ReturnsAsync(components);
 
             // Act
-            var actual = await testCodefixer.AppliesToProjectAsync(project.Object, default).ConfigureAwait(false);
+            var actual = await project.Object.IsApplicableAsync(testobj, default).ConfigureAwait(false);
 
             // Assert
             if (expected)
@@ -66,14 +66,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
-            var testConfigUpdater = typeof(TestConfigUpdater);
+            var testobj = new TestObjectMultipleLanguage();
             var project = mock.Mock<IProject>();
             project.Setup(p => p.Language).Returns(language);
             project.Setup(p => p.GetComponentsAsync(It.IsAny<CancellationToken>()))
-                .Returns(new ValueTask<ProjectComponents>(Task.FromResult(components)));
+                .ReturnsAsync(components);
 
             // Act
-            var actual = await testConfigUpdater.AppliesToProjectAsync(project.Object, default).ConfigureAwait(false);
+            var actual = await project.Object.IsApplicableAsync(testobj, default).ConfigureAwait(false);
 
             // Assert
             if (expected)
@@ -84,6 +84,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
             {
                 Assert.False(actual, "TestConfigUpdater only applies to C# and F# for ASP.NET Core");
             }
+        }
+
+        [ApplicableComponents(ProjectComponents.AspNetCore)]
+        [ApplicableLanguage(Language.CSharp, Language.FSharp)]
+        private class TestObjectMultipleLanguage
+        {
+        }
+
+        [ApplicableComponents(ProjectComponents.AspNetCore)]
+        [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.FSharp, Name = "UHOH1 CodeFix Provider")]
+        private class TestCodeFixer
+        {
         }
     }
 }

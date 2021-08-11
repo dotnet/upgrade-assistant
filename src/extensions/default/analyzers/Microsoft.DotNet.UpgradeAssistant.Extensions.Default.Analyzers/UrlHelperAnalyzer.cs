@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
+    [ApplicableComponents(ProjectComponents.AspNetCore)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class UrlHelperAnalyzer : DiagnosticAnalyzer
     {
