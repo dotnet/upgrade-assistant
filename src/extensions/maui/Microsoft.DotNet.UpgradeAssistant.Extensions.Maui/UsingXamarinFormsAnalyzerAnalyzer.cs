@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UsingXamarinFormsAnalyzerAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "Using Xamarin.Forms Analyzer";
+        public const string DiagnosticId = "XamarinForms";
         private const string Category = "Upgrade";
         private static readonly string[] DisallowedNamespaces = new[] { "Xamarin.Forms" };
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.UsingXamarinFormsAnalyzerTitle), Resources.ResourceManager, typeof(Resources));

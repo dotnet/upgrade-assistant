@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UsingXamarinEssentialsAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "Using Xamarin.Essentials Analyzer";
+        public const string DiagnosticId = "XamarinEssentials";
         private const string Category = "Upgrade";
         private static readonly string[] DisallowedNamespaces = new[] { "Xamarin.Essentials" };
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.UsingXamarinEssentialsAnalyzerTitle), Resources.ResourceManager, typeof(Resources));

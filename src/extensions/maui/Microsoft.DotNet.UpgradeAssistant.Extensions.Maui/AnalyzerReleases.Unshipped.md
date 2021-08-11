@@ -4,5 +4,5 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-Using Xamarin.Forms Analyzer | Upgrade | Warning | UsingXamarinFormsAnalyzerAnalyzer
-Using Xamarin.Essentials Analyzer | Upgrade | Warning | UsingXamarinEssentialsAnalyzer
+XamarinForms | Upgrade | Warning | UsingXamarinFormsAnalyzerAnalyzer
+XamarinEssentials | Upgrade | Warning | UsingXamarinEssentialsAnalyzer
