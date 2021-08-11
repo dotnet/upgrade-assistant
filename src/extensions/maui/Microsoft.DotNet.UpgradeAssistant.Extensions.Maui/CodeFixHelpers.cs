@@ -23,8 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 throw new ArgumentException($"'{nameof(namespaceName)}' cannot be null or empty.", nameof(namespaceName));
             }
 
-            var test = documentRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal));
-            if (test)
+            if (documentRoot.Usings.Any(u => u.Name.ToString().Equals(namespaceName, StringComparison.Ordinal)))
             {
                 return documentRoot;
             }
