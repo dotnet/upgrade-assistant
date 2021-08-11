@@ -58,7 +58,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     Logger.LogInformation("Added TFMs to .NET MAUI project");
                     await file.SaveAsync(token).ConfigureAwait(false);
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI Head project ");
-
                 }
                 else
                 {

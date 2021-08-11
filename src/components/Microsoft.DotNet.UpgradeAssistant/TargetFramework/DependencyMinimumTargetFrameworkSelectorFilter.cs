@@ -36,7 +36,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             }
             else
             {
-
                 foreach (var dep in tfm.Project.ProjectReferences)
                 {
                     var min = dep.TargetFrameworks.OrderBy(t => t, _tfmComparer)

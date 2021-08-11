@@ -167,7 +167,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 // remove unneeded Properties
                 projectproperties.RemoveProjectProperty("DebugType");
                 projectproperties.RemoveProjectProperty("DebugSymbols");
-
             }
 
             // Use MAUI tag
