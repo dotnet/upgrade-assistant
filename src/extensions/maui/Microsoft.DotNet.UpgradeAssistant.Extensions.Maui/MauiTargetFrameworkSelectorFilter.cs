@@ -47,7 +47,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 _logger.LogInformation("Project {Name} is of type .NET MAUI Target:iOS, migration to .NET MAUI requires to be least net6.0-ios.", tfm.Project);
                 tfm.TryUpdate(TargetFrameworkMoniker.Net60_iOS);
-
             }
 
             if (tfm.Components.HasFlag(ProjectComponents.Maui))
