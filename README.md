@@ -36,9 +36,11 @@ After running this tool on a solution to upgrade, the solution will likely not b
 ### Analyze Solution prior to Upgrade
 
 When run on a solution in order to analyze dependencies prior to upgrade, the tool will provide an analysis report for each of the projects in the solution containing details on:
-- Package dependencies that need to be removed / added in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
-- References that need to be removed / added in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
-- Framework References that need to be removed / added in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
+- Package dependencies that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
+- References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
+- Framework References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
+- Call out if there is a package upgrade across major versions that could lead towards having breaking changes.
+- Unsupported API for the chosen TFM (.NET 5.0 and beyond) used in the projects with pointers to recommended path forward if one is available.
 
 ## Upgrade documentation
 

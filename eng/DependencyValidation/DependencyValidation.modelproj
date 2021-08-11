@@ -102,6 +102,34 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.Default</Name>
       <Project>{dbe3fd1d-811c-416b-ae2e-08d468aba4d6}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Backup</Name>
+      <Project>{7a96cca0-4d47-48c6-a889-b560048e0c16}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Configuration</Name>
+      <Project>{9f99dc5b-dad0-4c43-bfff-8027e4077334}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Packages</Name>
+      <Project>{18c0711f-2b26-49d8-89ab-f68499a0eb9b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat</Name>
+      <Project>{9d38a783-b8ee-44c9-825a-dccca972ff0b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Solution</Name>
+      <Project>{b6c71468-2074-44df-89e1-1b97e4a3dfde}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Source</Name>
+      <Project>{c04e2349-b339-4aef-89fb-ad8dcd9b117a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Templates\Microsoft.DotNet.UpgradeAssistant.Steps.Templates.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Templates</Name>
+      <Project>{2e23fb6c-fad1-41b1-9187-1ecd7548fbcc}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.Maui</Name>
       <Project>{a122dd5b-4b80-4558-8db2-8e9ebff12a1a}</Project>
@@ -114,41 +142,9 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.Web</Name>
       <Project>{dba122c2-7c2e-432d-b538-53bb7c09c446}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\extensions\web\Microsoft.DotNet.UpgradeAssistant.Steps.Razor\Microsoft.DotNet.UpgradeAssistant.Steps.Razor.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Razor</Name>
-      <Project>{117fff7e-019e-400e-9f51-a4f7f9f3195d}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.Windows</Name>
       <Project>{69b55184-9db6-4492-9501-e54207f4bed7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Backup\Microsoft.DotNet.UpgradeAssistant.Steps.Backup.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Backup</Name>
-      <Project>{7a96cca0-4d47-48c6-a889-b560048e0c16}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration\Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Configuration</Name>
-      <Project>{9f99dc5b-dad0-4c43-bfff-8027e4077334}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Packages\Microsoft.DotNet.UpgradeAssistant.Steps.Packages.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Packages</Name>
-      <Project>{18c0711f-2b26-49d8-89ab-f68499a0eb9b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat</Name>
-      <Project>{9d38a783-b8ee-44c9-825a-dccca972ff0b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Solution</Name>
-      <Project>{b6c71468-2074-44df-89e1-1b97e4a3dfde}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Source</Name>
-      <Project>{c04e2349-b339-4aef-89fb-ad8dcd9b117a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\steps\Microsoft.DotNet.UpgradeAssistant.Steps.Templates\Microsoft.DotNet.UpgradeAssistant.Steps.Templates.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Templates</Name>
-      <Project>{2e23fb6c-fad1-41b1-9187-1ecd7548fbcc}</Project>
     </ProjectReference>
   </ItemGroup>
   <!-- To support building with .NET CLI -->
