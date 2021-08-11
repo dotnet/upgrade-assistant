@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -18,21 +18,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
     {
         private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
-        private readonly ILogger _logger;
+        private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
+        private readonly ILogger<RoslynDiagnosticProvider> _logger;
 
-        public RoslynDiagnosticProvider(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<AdditionalText> additionalTexts, ILogger<RoslynDiagnosticProvider> logger)
+        public RoslynDiagnosticProvider(
+            IEnumerable<DiagnosticAnalyzer> analyzers,
+            IEnumerable<AdditionalText> additionalTexts,
+            IEnumerable<CodeFixProvider> codeFixProviders,
+            ILogger<RoslynDiagnosticProvider> logger)
         {
+            if (analyzers is null)
+            {
+                throw new ArgumentNullException(nameof(analyzers));
+            }
+
             if (additionalTexts is null)
             {
                 throw new ArgumentNullException(nameof(additionalTexts));
             }
 
-            if (logger is null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-
-            _logger = logger;
+            _codeFixProviders = codeFixProviders ?? throw new ArgumentNullException(nameof(codeFixProviders));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _allAnalyzers = analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id);
             _additionalTexts = ImmutableArray.CreateRange(additionalTexts);
         }
@@ -56,7 +62,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             _logger.LogInformation("Running analyzers on {ProjectName}", roslynProject.Name);
 
             // Compile with analyzers enabled
-            var applicableAnalyzers = await GetApplicableAnalyzersAsync(_allAnalyzers, project).ToListAsync(token).ConfigureAwait(false);
+            var applicableAnalyzers = await _allAnalyzers
+                .ToAsyncEnumerable()
+                .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token))
+                .ToListAsync(token).ConfigureAwait(false);
 
             if (applicableAnalyzers.Any())
             {
@@ -74,15 +83,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             return Enumerable.Empty<Diagnostic>();
+
+            void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
+            {
+                _logger.LogError(exc, "Analyzer error while running analyzer {AnalyzerId}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)));
+            }
         }
 
-        private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic)
-        {
-            _logger.LogError(exc, "Analyzer error while running analyzer {AnalyzerId}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)));
-        }
+        public IEnumerable<CodeFixProvider> GetCodeFixProviders() => _codeFixProviders;
 
-        private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project)
-            => analyzers.ToAsyncEnumerable()
-                        .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
+        public IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptors(CodeFixProvider provider)
+            => _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => provider.FixableDiagnosticIds.Contains(d.Id));
     }
 }

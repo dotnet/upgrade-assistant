@@ -3,13 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
@@ -20,9 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
     /// </summary>
     public class SourceUpdaterStep : UpgradeStep
     {
-        private readonly IEnumerable<DiagnosticAnalyzer> _allAnalyzers;
-        private readonly IEnumerable<CodeFixProvider> _allCodeFixProviders;
-        private readonly IRoslynDiagnosticProvider _diagnosticAnalysisRunner;
+        private readonly IRoslynDiagnosticProvider _diagnosticProvider;
 
         internal IProject? Project { get; private set; }
 
@@ -51,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public SourceUpdaterStep(IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<CodeFixProvider> codeFixProviders, IEnumerable<AdditionalText> additionalTexts, IRoslynDiagnosticProvider diagnosticAnalysisRunner, ILogger<SourceUpdaterStep> logger)
+        public SourceUpdaterStep(IRoslynDiagnosticProvider diagnosticProvider, ILogger<SourceUpdaterStep> logger)
             : base(logger)
         {
             if (logger is null)
@@ -59,22 +54,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            if (additionalTexts is null)
-            {
-                throw new ArgumentNullException(nameof(additionalTexts));
-            }
-
-            _allAnalyzers = analyzers.OrderBy(a => a.SupportedDiagnostics.First().Id);
-            _allCodeFixProviders = codeFixProviders.OrderBy(c => c.FixableDiagnosticIds.First());
-            _diagnosticAnalysisRunner = diagnosticAnalysisRunner;
+            _diagnosticProvider = diagnosticProvider;
 
             // Add sub-steps for each analyzer that will be run
-            SubSteps = new List<UpgradeStep>(_allCodeFixProviders.Select(fixer => new CodeFixerStep(this, GetDiagnosticDescriptorsForCodeFixer(fixer), fixer, logger)));
+            SubSteps = _diagnosticProvider
+                .GetCodeFixProviders()
+                .OrderBy(c => c.FixableDiagnosticIds.First())
+                .Select(fixer => new CodeFixerStep(this, _diagnosticProvider.GetDiagnosticDescriptors(fixer), fixer, logger))
+                .ToList();
         }
-
-        // Gets supported diagnostics from analyzers that are fixable by a given code fixer
-        private IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptorsForCodeFixer(CodeFixProvider fixer) =>
-            _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => fixer.FixableDiagnosticIds.Contains(d.Id));
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -149,7 +137,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public async Task RefreshDiagnosticsAsync(IProject project, CancellationToken token)
         {
-            Diagnostics = await _diagnosticAnalysisRunner.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
+            Diagnostics = await _diagnosticProvider.GetDiagnosticsAsync(project, token).ConfigureAwait(false);
         }
     }
 }
