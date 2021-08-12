@@ -32,15 +32,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Checks to see if the type represents something the user should see as part of the upgrade journey.
         /// </summary>
-        /// <param name="type">A type that represents an upgrade-assistant feature.</param>
         /// <param name="project">The project currently being upgraded.</param>
+        /// <param name="obj">The object to check if it is applicable.</param>
         /// <param name="token">The cancellation token.</param>
-        /// <returns>A valueTask containing a bool. True if this is something the user should see.</returns>
-        public static async ValueTask<bool> AppliesToProjectAsync(this Type type, IProject project, CancellationToken token)
+        /// <returns><c>true</c> if this is something the user should see.</returns>
+        public static async ValueTask<bool> IsApplicableAsync(this IProject project, object obj, CancellationToken token)
         {
-            if (type is null)
+            if (obj is null)
             {
-                throw new ArgumentNullException(nameof(type));
+                throw new ArgumentNullException(nameof(obj));
             }
 
             if (project is null)
@@ -48,12 +48,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 throw new ArgumentNullException(nameof(project));
             }
 
+            var type = obj.GetType();
+
             // Check whether the type has an [ApplicableComponents] attribute.
             // If one exists, the type only applies to the project if the project has the indicated components.
             var applicableComponentsAttr = type.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName.Equals(typeof(ApplicableComponentsAttribute).FullName, StringComparison.Ordinal));
             if (applicableComponentsAttr is not null)
             {
-                var applicableComponents = applicableComponentsAttr.ConstructorArguments.Single().Value as int?;
+                var applicableComponents = applicableComponentsAttr.ConstructorArguments.FirstOrDefault().Value as int?;
                 if (applicableComponents.HasValue)
                 {
                     var projectComponents = (ProjectComponents)applicableComponents.Value;
@@ -68,12 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             // Check whether the type has an [DiagnosticAnalyzer] attribute
             // If one exists, the type only applies to the project if the language matches
-            if (!AppliesToLanguage(type, project))
-            {
-                return false;
-            }
-
-            return true;
+            return AppliesToLanguage(type, project);
         }
 
         /// <summary>

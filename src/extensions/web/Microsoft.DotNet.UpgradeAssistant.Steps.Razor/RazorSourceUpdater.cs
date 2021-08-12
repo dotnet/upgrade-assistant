@@ -287,7 +287,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
         }
 
         private static IAsyncEnumerable<DiagnosticAnalyzer> GetApplicableAnalyzersAsync(IEnumerable<DiagnosticAnalyzer> analyzers, IProject project) =>
-            analyzers.ToAsyncEnumerable().WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token));
+            analyzers.ToAsyncEnumerable().WhereAwaitWithCancellation((a, token) => project.IsApplicableAsync(a, token));
 
         private void ProcessAnalyzerException(Exception exc, DiagnosticAnalyzer analyzer, Diagnostic diagnostic) =>
             _logger.LogError(exc, "Analyzer error while running analyzer {AnalyzerId}", string.Join(", ", analyzer.SupportedDiagnostics.Select(d => d.Id)));

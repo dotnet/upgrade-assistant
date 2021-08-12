@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             // Compile with analyzers enabled
             var applicableAnalyzers = await _allAnalyzers
                 .ToAsyncEnumerable()
-                .WhereAwaitWithCancellation((a, token) => a.GetType().AppliesToProjectAsync(project, token))
+                .WhereAwaitWithCancellation((a, token) => project.IsApplicableAsync(a, token))
                 .ToListAsync(token).ConfigureAwait(false);
 
             if (applicableAnalyzers.Any())

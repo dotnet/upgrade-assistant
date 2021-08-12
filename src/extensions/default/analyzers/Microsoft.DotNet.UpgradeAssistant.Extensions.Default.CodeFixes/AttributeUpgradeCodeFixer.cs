@@ -19,6 +19,7 @@ using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 {
+    [ApplicableComponents(ProjectComponents.AspNetCore)]
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "UA0010 CodeFix Provider")]
     public class AttributeUpgradeCodeFixer : CodeFixProvider
     {
