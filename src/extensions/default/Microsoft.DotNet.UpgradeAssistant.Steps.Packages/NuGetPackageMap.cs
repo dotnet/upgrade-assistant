@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         /// </summary>
         public bool NetCorePackagesWorkOnNetFx { get; set; }
 
+        public string PackageSetWarning { get; set; } = string.Empty;
+
         public IEnumerable<Reference> NetFrameworkAssemblies { get; set; } = Enumerable.Empty<Reference>();
 
         public IEnumerable<NuGetReference> NetFrameworkPackages { get; set; } = Enumerable.Empty<NuGetReference>();
