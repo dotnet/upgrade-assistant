@@ -73,6 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 {
                     file.SetPropertyValue(newPropertyName, newPropertyValue);
                 }
+
                 if (string.IsNullOrEmpty(newPropertyValue))
                 {
                     file.SetPropertyValue(newPropertyName, currentPropertyValue);
