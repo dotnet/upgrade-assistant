@@ -89,5 +89,7 @@ Your pull request will now go through extensive checks by the subject matter exp
 ### Dev Environment FAQ
 The tool may produce long file paths during build, in order to not run into PathTooLongException either change the LongPathsEnabled setting under registry or build upgrade-assistant from a folder location with a shorter path.
 
+More information on DevOps, check this [link](./docs/devops.md).
+
 ## Code of conduct
 See [CODE-OF-CONDUCT.md](./CODE-OF-CONDUCT.md)
