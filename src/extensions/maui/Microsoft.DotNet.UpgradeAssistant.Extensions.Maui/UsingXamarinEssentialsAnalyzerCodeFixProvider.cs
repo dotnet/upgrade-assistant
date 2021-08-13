@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "Using Microsoft.Maui.Essentials code fixer")]
     public class UsingXamarinEssentialsAnalyzerCodeFixProvider : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UsingXamarinFormsAnalyzerAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UsingXamarinEssentialsAnalyzer.DiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -42,9 +42,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    Resources.UsingXamarinFormsTitle,
+                    Resources.UsingXamarinEssentialsTitle,
                     cancellationToken => ReplaceNodeAsync(context.Document, node, cancellationToken),
-                    nameof(Resources.UsingXamarinFormsTitle)),
+                    nameof(Resources.UsingXamarinEssentialsTitle)),
                 context.Diagnostics);
         }
 

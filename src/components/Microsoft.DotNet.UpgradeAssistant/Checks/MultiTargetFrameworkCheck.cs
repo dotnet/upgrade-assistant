@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, "Please see {0} to request this feature.", FEATURE_LINK);
 
-        public async Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
+        public Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
             if (project is null)
             {
@@ -37,25 +37,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             }
 
             var tfms = project.TargetFrameworks;
-            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
 
             if (tfms.Count == 1)
             {
                 _logger.LogTrace("Confirmed project {Project} has a valid TFM ({TFM})", project.FileInfo, tfms.First());
-                return UpgradeReadiness.Ready;
+                return Task.FromResult(UpgradeReadiness.Ready);
             }
             else
             {
-                if (components.HasFlag(ProjectComponents.Maui))
-                {
-                    _logger.LogTrace("Confirmed project {Project} is of type .NET MAUI Head with TFMs : ({TFM}))", project.FileInfo, tfms.First());
-                    return UpgradeReadiness.NotReady;
-                }
-                else
-                {
-                    _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. Please see {FeatureLink} to request this feature.", project.FileInfo, FEATURE_LINK);
-                    return UpgradeReadiness.NotReady;
-                }
+                _logger.LogError("Project {Project} cannot be upgraded. Input projects must have exactly one target framework. Please see {FeatureLink} to request this feature.", project.FileInfo, FEATURE_LINK);
+                return Task.FromResult(UpgradeReadiness.NotReady);
             }
         }
     }

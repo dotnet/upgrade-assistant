@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = "Using Microsoft.Maui code fixer")]
+    [ExportCodeFixProvider(LanguageNames.CSharp)]
     public class UsingXamarinFormsAnalyzerCodeFixProvider : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UsingXamarinFormsAnalyzerAnalyzer.DiagnosticId);
@@ -51,9 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private static async Task<Document> ReplaceNodeAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-
             var documentRoot = (CompilationUnitSyntax)editor.OriginalRoot;
-
             documentRoot = documentRoot.RemoveNode(node, SyntaxRemoveOptions.KeepNoTrivia);
             documentRoot = documentRoot?.AddUsingIfMissing("Microsoft.Maui");
             documentRoot = documentRoot?.AddUsingIfMissing("Microsoft.Maui.Controls");

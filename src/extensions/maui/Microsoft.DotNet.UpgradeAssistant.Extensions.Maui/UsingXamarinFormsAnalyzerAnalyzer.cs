@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     {
         public const string DiagnosticId = "UA0014";
         private const string Category = "Upgrade";
-        private static readonly string[] DisallowedNamespaces = new[] { "Xamarin.Forms", "Xamarin.Essentials" };
+        private static readonly string[] DisallowedNamespaces = new[] { "Xamarin.Forms" };
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.UsingXamarinFormsAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.UsingXamarinFormsAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.UsingXamarinFormsAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
