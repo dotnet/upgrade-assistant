@@ -2,7 +2,6 @@
   "profiles": {
     "Microsoft.DotNet.UpgradeAssistant.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "analyze C:\\Repos\\WindowsFormsApp1\\App_DeprecatedControls.csproj",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
