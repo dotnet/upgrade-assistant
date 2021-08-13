@@ -4,5 +4,4 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-XamarinForms | Upgrade | Warning | UsingXamarinFormsAnalyzerAnalyzer
-XamarinEssentials | Upgrade | Warning | UsingXamarinEssentialsAnalyzer
+UA0014 | Upgrade | Warning | UsingXamarinFormsAnalyzerAnalyzer

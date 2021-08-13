@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,42 +61,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Namespace &apos;{0}&apos; should not be referenced in .NET MAUI projects.
-        /// </summary>
-        internal static string UsingXamarinEssentialsAnalyzerMessageFormat {
-            get {
-                return ResourceManager.GetString("UsingXamarinEssentialsAnalyzerMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .NET MAUI projects should not reference Xamarin.Essentials namespaces.
-        /// </summary>
-        internal static string UsingXamarinEssentialsAnalyzerTitle {
-            get {
-                return ResourceManager.GetString("UsingXamarinEssentialsAnalyzerTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This using directive is not supported on .NET MAUI and should be replaced..
-        /// </summary>
-        internal static string UsingXamarinEssentialsDescription {
-            get {
-                return ResourceManager.GetString("UsingXamarinEssentialsDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Replace using directive.
-        /// </summary>
-        internal static string UsingXamarinEssentialsTitle {
-            get {
-                return ResourceManager.GetString("UsingXamarinEssentialsTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This using directive is not supported on .NET MAUI and should be replaced..
         /// </summary>
         internal static string UsingXamarinFormsAnalyzerDescription {
@@ -115,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .NET MAUI projects should not reference Xamarin.Forms namespaces.
+        ///   Looks up a localized string similar to .NET MAUI projects should not reference Xamarin.Forms or Xamarin.Essentials namespaces.
         /// </summary>
         internal static string UsingXamarinFormsAnalyzerTitle {
             get {

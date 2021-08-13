@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
             file.SetTFM(targetTfm);
-            Logger.LogInformation("Added TFM to {TargetTFM}", targetTfm);
+            Logger.LogInformation("TFM set to {TargetTFM}", targetTfm);
 
             await file.SaveAsync(token).ConfigureAwait(false);
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFM {targetTfm} to .NET MAUI project ");

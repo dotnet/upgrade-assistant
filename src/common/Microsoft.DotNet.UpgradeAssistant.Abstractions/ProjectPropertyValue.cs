@@ -10,11 +10,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public record ProjectPropertyValue
     {
         /// <summary>
-        /// Gets the name and value of unevalualted properties in csproj.
+        /// Gets the name and value of unevaluated properties in csproj.
         /// </summary>
-        public string? PropertyName { get; init; }
+        public string PropertyName { get; init; }
 
-        public string? PropertyValue { get; init; }
+        public string PropertyValue { get; init; }
 
         public ProjectPropertyValue(string name, string value)
         {

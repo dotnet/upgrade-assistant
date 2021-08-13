@@ -117,18 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="UsingXamarinEssentialsAnalyzerMessageFormat" xml:space="preserve">
-    <value>Namespace '{0}' should not be referenced in .NET MAUI projects</value>
-  </data>
-  <data name="UsingXamarinEssentialsAnalyzerTitle" xml:space="preserve">
-    <value>.NET MAUI projects should not reference Xamarin.Essentials namespaces</value>
-  </data>
-  <data name="UsingXamarinEssentialsDescription" xml:space="preserve">
-    <value>This using directive is not supported on .NET MAUI and should be replaced.</value>
-  </data>
-  <data name="UsingXamarinEssentialsTitle" xml:space="preserve">
-    <value>Replace using directive</value>
-  </data>
   <data name="UsingXamarinFormsAnalyzerDescription" xml:space="preserve">
     <value>This using directive is not supported on .NET MAUI and should be replaced.</value>
   </data>
@@ -136,7 +124,7 @@
     <value>Namespace '{0}' should not be referenced in .NET MAUI projects</value>
   </data>
   <data name="UsingXamarinFormsAnalyzerTitle" xml:space="preserve">
-    <value>.NET MAUI projects should not reference Xamarin.Forms namespaces</value>
+    <value>.NET MAUI projects should not reference Xamarin.Forms or Xamarin.Essentials namespaces</value>
   </data>
   <data name="UsingXamarinFormsTitle" xml:space="preserve">
     <value>Replace using directive</value>
