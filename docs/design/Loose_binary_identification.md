@@ -18,21 +18,33 @@ The main scenario this will focus on is one where a project has downloaded an as
 - Identify what package the dependency came from
 - Update a project file to reference the NuGet package rather than a binary reference
 
-The expected UX for this will be to implement it as an extension that a user can opt into. As a user, in order to run the extension, they will obtain the extension (ie `UpgradeAssitant-Loose-Assembly-Identification.zip`) and then run as they normally would:
+As a user, in order to run the extension, they will need to add the extension to the project:
 
-```
-upgrade-assistant some-project.vbproj --extension .\path\to\UpgradeAssitant-Loose-Assembly-Identification.zip
-```
+1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
+2. Install the extension for identifying loose assemblies:
+   ```
+   upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly`
+   ```
+3. Install the extension for the data to match against NuGet.org:
+   ```
+   upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly.NuGet
+   ```
 
-### Decoupling the data
-Initially, any data needed will be provided with the extension. This data would be what is used to map the fingerprints to actual packages. They often range around the 100mb-200mb range for useful data, but could be potentially larger if desired.
+After these have been installed, users on a new machine must restore the packages:
 
-However, it may be nice to decouple the data from the actual extension itself so they can be updated independently. In order to support this, Upgrade Assistant should provide a way for steps/extensions to provide step-dependent data. This could be something that a step could register it as having, and then Upgrade Assistant could provide commands to view and update. An example of what this might look like is the following:
+1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
+2. Restore the extensions installed
+   ```
+   upgrade-assistant extensions restore
+   ```
 
-- `upgrade-assistant manage-data list`: List registered data sources
-- `upgrade-assistant manage-data update --name [name]`: Update a registered data source (managed by the step itself)
+In order to update to the latest versions, the extensions may be updated:
 
-There are potentially many questions here as to how to handle the data. This is provided solely as a way to demonstrate a potential way to decouple the data required. Initially, the data will be included with the extension, but potentially have optional indexes (or indexes that carry more data and are much larger) will require some sort of way to manage the data.
+1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
+2. Update the extensions installed
+   ```
+   upgrade-assistant extensions update
+   ```
 
 ## Challenges
 
