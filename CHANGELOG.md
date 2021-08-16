@@ -7,7 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Analyze command now supports flagging of unsupported API usage in project / solution [#764](https://github.com/dotnet/upgrade-assistant/pull/764)
 - Added dependency analyzer for System.Windows.Forms.DataVisualization [#792](https://github.com/dotnet/upgrade-assistant/pull/792)
-
+- Added .NET MAUI extension steps for add TFMs for .NET MAUI, adds templates files per project, manages project property transforms as per migration requirements ,and makes C# source code updates for new .NET MAUI APIs. [#790](https://github.com/dotnet/upgrade-assistant/pull/790)
+- 
 ## Version 0.2.237901 - 2021-07-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.237901))
 
 ### Changed
