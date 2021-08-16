@@ -1,6 +1,10 @@
 ﻿{
   "ExtensionName": "windows",
 
+  "PackageUpdater": {
+    "PackageMapPath": "PackageMaps"
+  },
+
   "ExtensionServiceProviders": [
     "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.dll"
   ]

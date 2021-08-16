@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         /// </summary>
         public bool NetCorePackagesWorkOnNetFx { get; set; }
 
+        public Details Details { get; set; } = new();
+
         public IEnumerable<Reference> NetFrameworkAssemblies { get; set; } = Enumerable.Empty<Reference>();
 
         public IEnumerable<NuGetReference> NetFrameworkPackages { get; set; } = Enumerable.Empty<NuGetReference>();
@@ -32,5 +34,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         /// <returns>True if the reference exists in the map's .NET Framework assembly references. Otherwise, false.</returns>
         public bool ContainsAssemblyReference(string name) =>
             NetFrameworkAssemblies.Any(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public record Details
+    {
+        public string Message { get; set; } = string.Empty;
+
+        public string Risk { get; set; } = "Warning";
     }
 }

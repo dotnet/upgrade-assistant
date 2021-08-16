@@ -1,0 +1,27 @@
+﻿[
+  {
+    "PackageSetName": "WinForms",
+    "NetCorePackagesWorkOnNetFx": false,
+    "Details": {
+      "Message": "System.Windows.Forms.DataVisualization is deprecated, for more details - https://github.com/dotnet/winforms-datavisualization",
+      "Risk": "Warning"
+    },
+    "NetFrameworkAssemblies": [
+      {
+        "Name": "System.Windows.Forms.DataVisualization"
+      }
+    ],
+    "NetFrameworkPackages": [
+      {
+        "Name": "System.Windows.Forms.DataVisualization",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "System.Windows.Forms.DataVisualization",
+        "Version": "1.0.0-prerelease.20110.1"
+      }
+    ]
+  }
+]
