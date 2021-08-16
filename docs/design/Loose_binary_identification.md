@@ -11,28 +11,42 @@ The algorithm used to match the binaries makes use of fingerprints that may be u
 
 Work has already been done to generate a database of known packages along these and other identity dimensions. This data can then be used to generate potential indexes that could be used from within Upgrade Assistant to identify along these potential dimensions, both for notification and even to update a project file to reference the NuGet package rather than the loose assembly.
 
-## User Experience
+## How to Use
 
-The main scenario this will focus on is one where a project has downloaded an assembly and added it to its repo and referenced it from various projects. The end result of this work should be able to:
+The main scenario this focuses on is one where a project has downloaded an assembly and added it to its repo and referenced it from various projects. The end result of this work should be able to:
 
 - Identify what package the dependency came from
 - Update a project file to reference the NuGet package rather than a binary reference
 
-The expected UX for this will be to implement it as an extension that a user can opt into. As a user, in order to run the extension, they will obtain the extension (ie `UpgradeAssitant-Loose-Assembly-Identification.zip`) and then run as they normally would:
+In order to add this feature to your project, you will need to add the extension to the project:
 
-```
-upgrade-assistant some-project.vbproj --extension .\path\to\UpgradeAssitant-Loose-Assembly-Identification.zip
-```
+1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
+2. Install the extension for identifying loose assemblies:
+   ```
+   upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly`
+   ```
+3. Install the extension for the data to match against NuGet.org:
+   ```
+   upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly.NuGet
+   ```
 
-### Decoupling the data
-Initially, any data needed will be provided with the extension. This data would be what is used to map the fingerprints to actual packages. They often range around the 100mb-200mb range for useful data, but could be potentially larger if desired.
+After these have been installed, users on a new machine must restore the packages:
 
-However, it may be nice to decouple the data from the actual extension itself so they can be updated independently. In order to support this, Upgrade Assistant should provide a way for steps/extensions to provide step-dependent data. This could be something that a step could register it as having, and then Upgrade Assistant could provide commands to view and update. An example of what this might look like is the following:
+1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
+2. Restore the extensions installed
+   ```
+   upgrade-assistant extensions restore
+   ```
 
-- `upgrade-assistant manage-data list`: List registered data sources
-- `upgrade-assistant manage-data update --name [name]`: Update a registered data source (managed by the step itself)
+In order to update to the latest versions, the extensions may be updated:
 
-There are potentially many questions here as to how to handle the data. This is provided solely as a way to demonstrate a potential way to decouple the data required. Initially, the data will be included with the extension, but potentially have optional indexes (or indexes that carry more data and are much larger) will require some sort of way to manage the data.
+1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
+2. Update the extensions installed
+   ```
+   upgrade-assistant extensions update
+   ```
+
+With the extension installed and restored, you can now run Upgrade Assistant however you normally would (ie in `upgrade` or `analyze` modes). Information related to loose assembly identification will automatically be surfaced now wherever appropriate.
 
 ## Challenges
 
@@ -44,21 +58,6 @@ There are a number of challenges with this, as it is completely based on heurist
 - Some loose assemblies may be "ride-along" in packages that they do not actually belong to (ie Newtonsoft.Json is included in a number of packages)
 - Early NuGet days had evolving best practice
 - NetStandard and other modern patterns are represented as bifurcations in package publish (ex. Foo and Foo.NetStandard packages)
-
-## Planned Work
-
-Below are the main work items that will be explored broken into two sprints. There is currently a pre-analysis migration effort being worked on, and this work may be updated to ensure that the information flows as expected into the reports generated there as those features become available.
-
-### Sprint 1
-- As a user, I can consume an extension that identifies loose assemblies (#482)
-- As a user, I can identify what loose assemblies I have (#483)
-- As a user, I can replace my loose assemblies with identified packages (#484)
-- As a user, I know which loose assemblies do not have any available matches (#485)
-
-### Sprint 2
-- As a user, I can update my loose assembly data index independently of the extension (#486)
-- As a user, I can manage data steps need at a global level (#487)
-- As a user, I can receive recommendations from multiple indexes for loose assembly identification (#488)
 
 ## Out of scope/Future Work
 

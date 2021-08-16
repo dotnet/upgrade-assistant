@@ -42,6 +42,20 @@ When run on a solution in order to analyze dependencies prior to upgrade, the to
 - Call out if there is a package upgrade across major versions that could lead towards having breaking changes.
 - Unsupported API for the chosen TFM (.NET 5.0 and beyond) used in the projects with pointers to recommended path forward if one is available.
 
+### Experimental Features
+
+> Be aware that these features are subject to change and/or removal. Feedback on them is welcome, but they may not be in their final form while still under the feature flag.
+
+Some features within Upgrade Assistant may be available behind experimental feature flags. These take the form of an environment variable `UA_FEATURES` that is a semi-colon delimited list of features. A list of existing experimental features are listed below.
+
+**Loose Assembly Identification**
+
+Some projects incorporate what we call "loose assemblies" where assemblies are added directly to a repo. An experimental feature described [here](docs/design/Loose_binary_identification.md) can be used to help identify these and convert them to available NuGet packages.
+
+**Solution wide extension management**
+
+Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md)
+
 ## Upgrade documentation
 
 As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [porting documentation](https://docs.microsoft.com/dotnet/core/porting/).
