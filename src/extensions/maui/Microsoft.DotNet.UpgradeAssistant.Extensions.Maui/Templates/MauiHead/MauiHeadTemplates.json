@@ -1,0 +1,23 @@
+{
+  "Replacements": {
+    "MauiApp1": "$(RootNamespace)"
+  },
+  "TemplateItems": [
+    {
+      "Path": "Startup.cs",
+      "Type": "Compile",
+      "Keywords": [
+        "Startup",
+        "Microsoft.Maui"
+      ]
+    }
+  ],
+  "TemplateOutputType": [
+    "Library"
+  ],
+
+  "TemplateLanguage": "CSharp",
+  "TemplateAppliesTo": [
+    "Maui"
+  ]
+}

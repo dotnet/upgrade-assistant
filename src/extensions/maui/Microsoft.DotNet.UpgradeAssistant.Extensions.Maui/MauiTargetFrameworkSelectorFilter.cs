@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
@@ -34,6 +35,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 _logger.LogInformation("Project {Name} is of type Xamarin.iOS, migration to .NET MAUI requires to be least net6.0-ios.", tfm.Project);
                 tfm.TryUpdate(TargetFrameworkMoniker.Net60_iOS);
+            }
+
+            if (tfm.Components.HasFlag(ProjectComponents.MauiAndroid))
+            {
+                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:Android, migration to .NET MAUI requires to be least net6.0-android.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net60_Android);
+            }
+
+            if (tfm.Components.HasFlag(ProjectComponents.MauiiOS))
+            {
+                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:iOS, migration to .NET MAUI requires to be least net6.0-ios.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net60_iOS);
+            }
+
+            if (tfm.Components.HasFlag(ProjectComponents.Maui))
+            {
+                if (tfm.Project?.TargetFrameworks.Count > 1)
+                {
+                    tfm.TryUpdate(tfm.Project.TargetFrameworks.FirstOrDefault());
+                }
+                else
+                {
+                    _logger.LogInformation("Project {Name} is of type .NET MAUI Target: MAUI head, migration to .NET MAUI requires to be multiplatform", tfm.Project);
+                    tfm.TryUpdate(TargetFrameworkMoniker.Net60_Android);
+                }
             }
         }
     }

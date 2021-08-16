@@ -17,5 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         AspNetCore = 1 << 5,
         XamarinAndroid = 1 << 6,
         XamariniOS = 1 << 7,
+        Maui = 1 << 8,
+        MauiAndroid = 1 << 9,
+        MauiiOS = 1 << 10,
     }
 }

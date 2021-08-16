@@ -231,7 +231,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 // NOTE: the hidden assumption is that the UpgradeGuidance messages that were collected will be printed
                 // to console by the IUpgradeReadyCheck. We make these messages accessible by property so that they can be integrated into a UI in the future
                 // but assume that the IUpgradeReadyCheck displays them via logging because semantic logging provides color highlighting that we want to preserve.
-                Logger.LogError($"Project {{Name}} uses feature(s) that are not supported.{Environment.NewLine}If you would like to upgrade-assistant to continue anways please use the \"{{UnsupportedFeatures}}\" option.",
+                Logger.LogError($"Project {{Name}} uses feature(s) that are not supported.{Environment.NewLine}If you would like upgrade-assistant to continue anyways please use the \"{{UnsupportedFeatures}}\" option.",
                     project.FileInfo,
                     "--ignore-unsupported-features");
 

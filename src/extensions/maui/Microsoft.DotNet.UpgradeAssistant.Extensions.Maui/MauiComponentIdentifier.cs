@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private readonly string[] _xamariniOSReferences = new[] { "Xamarin.iOS" };
         private readonly string[] _androidTFM = new[] { TargetFrameworkMoniker.Net60_Android.ToString() };
         private readonly string[] _iosTFM = new[] { TargetFrameworkMoniker.Net60_iOS.ToString() };
+        private readonly string _xamarinFormsPackage = "Xamarin.Forms";
+        private readonly string _useMauiProperty = "TargetFrameworks";
 
         public ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token)
         {
@@ -25,6 +27,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             var file = project.GetFile();
+            var packageReferences = project.NuGetReferences.PackageReferences;
+            var projectProperties = project.GetProjectPropertyElements();
+
             var components = ProjectComponents.None;
 
             var references = project.References.Select(r => r.Name);
@@ -39,16 +44,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 components |= ProjectComponents.XamariniOS;
             }
 
-            var targetFrameworkNames = project.TargetFrameworks.Select(r => r.Name);
-
-            if (targetFrameworkNames.Any(r => _androidTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            if (packageReferences.Any(x => x.Name.Equals(_xamarinFormsPackage, StringComparison.OrdinalIgnoreCase)) && project.TargetFrameworks.FirstOrDefault().Equals(TargetFrameworkMoniker.NetStandard20))
             {
-                components |= ProjectComponents.XamarinAndroid;
+                components |= ProjectComponents.Maui;
             }
 
-            if (targetFrameworkNames.Any(r => _iosTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            var mauiProperty = projectProperties.GetProjectPropertyValue(_useMauiProperty);
+            if (mauiProperty.Any())
             {
-                components |= ProjectComponents.XamariniOS;
+                components |= ProjectComponents.Maui;
+            }
+
+            var targetFrameworkNames = project.TargetFrameworks.Select(r => r.Name);
+            if (targetFrameworkNames.Count() > 1)
+            {
+                components |= ProjectComponents.Maui;
+            }
+            else
+            {
+                if (targetFrameworkNames.Any(r => _androidTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                {
+                    components |= ProjectComponents.MauiAndroid;
+                }
+
+                if (targetFrameworkNames.Any(r => _iosTFM.Contains(r, StringComparer.OrdinalIgnoreCase)))
+                {
+                    components |= ProjectComponents.MauiiOS;
+                }
             }
 
             return new ValueTask<ProjectComponents>(components);

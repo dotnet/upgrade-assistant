@@ -1,4 +1,4 @@
-# Upgrade Assistant architeture
+# Upgrade Assistant architecture
 
 ## Architectural components
 

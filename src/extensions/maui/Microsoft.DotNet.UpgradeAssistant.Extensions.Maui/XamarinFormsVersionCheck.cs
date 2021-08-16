@@ -2,9 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -15,17 +12,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     /// Users using Xamarin.Forms lower than version 4.8 should be informed to update to a higher version
     /// before they run this tool.
     /// </summary>
-    public class XamarinFormsCheck : IUpgradeReadyCheck
+    public class XamarinFormsVersionCheck : IUpgradeReadyCheck
     {
         private const string CATEGORY = ".NET MAUI Upgrade";
         private const string UPGRADE_LINK = "https://aka.ms/upgradeassistant/maui/requirements";
-        private const string XAMARIN_FORMS_MESSAGE = "Support for {0} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {1}";
+        private const string XAMARIN_FORMS_MESSAGE = "Support for upgrading to {0} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {1}";
         private const string MINIMUM_XAMARIN_VERSION = "4.8";
 
-        private readonly ILogger<XamarinFormsCheck> _logger;
+        private readonly ILogger<XamarinFormsVersionCheck> _logger;
         private readonly IVersionComparer _comparer;
 
-        public XamarinFormsCheck(IVersionComparer comparer, ILogger<XamarinFormsCheck> logger)
+        public XamarinFormsVersionCheck(IVersionComparer comparer, ILogger<XamarinFormsVersionCheck> logger)
         {
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
