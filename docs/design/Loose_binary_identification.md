@@ -11,7 +11,7 @@ The algorithm used to match the binaries makes use of fingerprints that may be u
 
 Work has already been done to generate a database of known packages along these and other identity dimensions. This data can then be used to generate potential indexes that could be used from within Upgrade Assistant to identify along these potential dimensions, both for notification and even to update a project file to reference the NuGet package rather than the loose assembly.
 
-## User Experience
+## How to Use
 
 The main scenario this will focus on is one where a project has downloaded an assembly and added it to its repo and referenced it from various projects. The end result of this work should be able to:
 
@@ -56,21 +56,6 @@ There are a number of challenges with this, as it is completely based on heurist
 - Some loose assemblies may be "ride-along" in packages that they do not actually belong to (ie Newtonsoft.Json is included in a number of packages)
 - Early NuGet days had evolving best practice
 - NetStandard and other modern patterns are represented as bifurcations in package publish (ex. Foo and Foo.NetStandard packages)
-
-## Planned Work
-
-Below are the main work items that will be explored broken into two sprints. There is currently a pre-analysis migration effort being worked on, and this work may be updated to ensure that the information flows as expected into the reports generated there as those features become available.
-
-### Sprint 1
-- As a user, I can consume an extension that identifies loose assemblies (#482)
-- As a user, I can identify what loose assemblies I have (#483)
-- As a user, I can replace my loose assemblies with identified packages (#484)
-- As a user, I know which loose assemblies do not have any available matches (#485)
-
-### Sprint 2
-- As a user, I can update my loose assembly data index independently of the extension (#486)
-- As a user, I can manage data steps need at a global level (#487)
-- As a user, I can receive recommendations from multiple indexes for loose assembly identification (#488)
 
 ## Out of scope/Future Work
 
