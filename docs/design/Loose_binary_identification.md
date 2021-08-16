@@ -13,12 +13,12 @@ Work has already been done to generate a database of known packages along these 
 
 ## How to Use
 
-The main scenario this will focus on is one where a project has downloaded an assembly and added it to its repo and referenced it from various projects. The end result of this work should be able to:
+The main scenario this focuses on is one where a project has downloaded an assembly and added it to its repo and referenced it from various projects. The end result of this work should be able to:
 
 - Identify what package the dependency came from
 - Update a project file to reference the NuGet package rather than a binary reference
 
-As a user, in order to run the extension, they will need to add the extension to the project:
+In order to add this feature to your project, you will need to add the extension to the project:
 
 1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
 2. Install the extension for identifying loose assemblies:
@@ -45,6 +45,8 @@ In order to update to the latest versions, the extensions may be updated:
    ```
    upgrade-assistant extensions update
    ```
+
+With the extension installed and restored, you can now run Upgrade Assistant however you normally would (ie in `upgrade` or `analyze` modes). Information related to loose assembly identification will automatically be surfaced now wherever appropriate.
 
 ## Challenges
 
