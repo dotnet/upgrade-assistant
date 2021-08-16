@@ -96,12 +96,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             // If all projects related to the entry point project are complete or invalid, then the upgrade is done
             var allProjectsAreUpgraded = await _orderedProjects.ToAsyncEnumerable()
-                .SelectAwait(async p => await IsCompletedAsync(context, p, token).ConfigureAwait(false))
+                .SelectAwait(async p => await IsCompletedAsync(context, p, token).ConfigureAwait(false) || !await RunChecksAsync(p, token).ConfigureAwait(false))
                 .AllAsync(b => b, token).ConfigureAwait(false);
-
-            //var allProjectsAreUpgradedReady = await _orderedProjects.ToAsyncEnumerable()
-            //    .SelectAwait(async p => !await RunChecksAsync(p, token).ConfigureAwait(false))
-            //    .AllAsync(b => b, token).ConfigureAwait(false);
 
             if (allProjectsAreUpgraded)
             {
