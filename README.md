@@ -48,8 +48,13 @@ When run on a solution in order to analyze dependencies prior to upgrade, the to
 
 Some features within Upgrade Assistant may be available behind experimental feature flags. These take the form of an environment variable `UA_FEATURES` that is a semi-colon delimited list of features. A list of existing experimental features are listed below.
 
-- Some projects incorporate what we call "loose assemblies" where assemblies are added directly to a repo. An experimental feature described [here](docs/design/Loose_binary_identification.md) can be used to help identify these and convert them to available NuGet packages.
-- Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md)
+**Loose Assembly Identification**
+
+Some projects incorporate what we call "loose assemblies" where assemblies are added directly to a repo. An experimental feature described [here](docs/design/Loose_binary_identification.md) can be used to help identify these and convert them to available NuGet packages.
+
+**Solution wide extension management**
+
+Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md)
 
 ## Upgrade documentation
 
