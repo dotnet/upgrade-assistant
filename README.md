@@ -42,6 +42,10 @@ When run on a solution in order to analyze dependencies prior to upgrade, the to
 - Call out if there is a package upgrade across major versions that could lead towards having breaking changes.
 - Unsupported API for the chosen TFM (.NET 5.0 and beyond) used in the projects with pointers to recommended path forward if one is available.
 
+### Experimental Features
+
+- Some projects incorporate what we call "loose assemblies" where assemblies are added directly to a repo. An experimental feature described [here](docs/design/Loose_binary_identification.md) can be used to help identify these and convert them to available NuGet packages.
+
 ## Upgrade documentation
 
 As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [porting documentation](https://docs.microsoft.com/dotnet/core/porting/).
