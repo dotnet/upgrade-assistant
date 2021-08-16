@@ -2,7 +2,10 @@
   {
     "PackageSetName": "WinForms",
     "NetCorePackagesWorkOnNetFx": false,
-    "PackageSetWarning": "System.Windows.Forms.DataVisualization is deprecated, for more details - https://github.com/dotnet/winforms-datavisualization",
+    "Details": {
+      "Message": "System.Windows.Forms.DataVisualization is deprecated, for more details - https://github.com/dotnet/winforms-datavisualization",
+      "Risk": "Warning"
+    },
     "NetFrameworkAssemblies": [
       {
         "Name": "System.Windows.Forms.DataVisualization"

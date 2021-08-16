@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 foreach (var map in packageMaps.Where(m => ContainsPackageReference(m.NetFrameworkPackages, packageReference.Name, packageReference.Version)))
                 {
                     _logger.LogInformation("Marking package {PackageName} for removal based on package mapping configuration {PackageMapSet}", packageReference.Name, map.PackageSetName);
-                    state.Packages.Remove(packageReference, new OperationDetails() { Details = ProcessReferenceWarnings(map.PackageSetWarning), Risk = BuildBreakRisk.Medium });
+                    state.Packages.Remove(packageReference, new OperationDetails() { Details = ProcessReferenceWarnings(map.Details), Risk = BuildBreakRisk.Medium });
                     await AddNetCoreReferences(map, state, token).ConfigureAwait(false);
                 }
             }
@@ -68,22 +68,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 foreach (var map in packageMaps.Where(m => m.ContainsAssemblyReference(reference.Name)))
                 {
                     _logger.LogInformation("Marking assembly reference {ReferenceName} for removal based on package mapping configuration {PackageMapSet}", reference.Name, map.PackageSetName);
-                    state.References.Remove(reference, new OperationDetails() { Details = ProcessReferenceWarnings(map.PackageSetWarning), Risk = BuildBreakRisk.Medium });
+                    state.References.Remove(reference, new OperationDetails() { Details = ProcessReferenceWarnings(map.Details), Risk = BuildBreakRisk.Medium });
                     await AddNetCoreReferences(map, state, token).ConfigureAwait(false);
                 }
             }
         }
 
-        private IEnumerable<string> ProcessReferenceWarnings(string warning)
+        private IEnumerable<string> ProcessReferenceWarnings(Details details)
         {
-            var details = new List<string>();
-            if (!string.IsNullOrEmpty(warning))
+            var operationDetails = new List<string>();
+            if (!string.IsNullOrEmpty(details.Message))
             {
-                _logger.LogWarning(warning);
-                details.Add(warning);
+                _logger.Log(GetMessageLogLevel(details.Risk), details.Message);
+                operationDetails.Add(details.Message);
             }
 
-            return details;
+            return operationDetails;
+        }
+
+        private static LogLevel GetMessageLogLevel(string risk)
+        {
+            return risk switch
+            {
+                "Warning" => LogLevel.Warning,
+                "Error" => LogLevel.Error,
+                "Debug" => LogLevel.Debug,
+                "Trace" => LogLevel.Trace,
+                _ => LogLevel.Information,
+            };
         }
 
         /// <summary>
