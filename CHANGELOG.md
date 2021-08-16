@@ -3,7 +3,7 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Latest
+## Version 0.2.241603 - 2021-08-16 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.241603))
 ### Added
 - Analyze command now supports flagging of unsupported API usage in project / solution [#764](https://github.com/dotnet/upgrade-assistant/pull/764)
 - Added dependency analyzer for System.Windows.Forms.DataVisualization [#792](https://github.com/dotnet/upgrade-assistant/pull/792)
