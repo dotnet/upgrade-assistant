@@ -12,8 +12,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
     [ApplicableComponents(ProjectComponents.Maui)]
-    [ApplicableComponents(ProjectComponents.MauiAndroid)]
-    [ApplicableComponents(ProjectComponents.MauiiOS)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UsingXamarinEssentialsAnalyzer : DiagnosticAnalyzer
     {
