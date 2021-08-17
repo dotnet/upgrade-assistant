@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -31,14 +32,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         };
 
         private readonly IProcessRunner _runner;
-        private readonly MSBuildPathLocator _locator;
         private readonly IEnumerable<string> _arguments;
+        private readonly IOptions<WorkspaceOptions> _workspaceOptions;
 
         public TryConvertTool(
             IProcessRunner runner,
             IOptions<ICollection<TryConvertOptions>> allOptions,
-            IOptions<TryConvertOptions> options,
-            MSBuildPathLocator locator)
+            IOptions<WorkspaceOptions> workspaceOptions,
+            IOptions<TryConvertOptions> options)
         {
             if (allOptions is null)
             {
@@ -51,8 +52,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             }
 
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
-            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
             _arguments = allOptions.Value.SelectMany(o => o.Arguments);
+            _workspaceOptions = workspaceOptions ?? throw new ArgumentNullException(nameof(workspaceOptions));
 
             Path = options.Value.ToolPath;
             Version = GetVersion();
@@ -69,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         private string? GetMSBuildPath()
         {
-            return _locator.MSBuildPath?.Replace("\\", "\\\\");
+            return _workspaceOptions.Value.MSBuildPath?.Replace("\\", "\\\\");
         }
 
         public Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token)

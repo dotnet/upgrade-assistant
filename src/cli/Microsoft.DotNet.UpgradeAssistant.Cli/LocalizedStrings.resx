@@ -162,6 +162,30 @@
   <data name="UpdateExtensionSuccess" xml:space="preserve">
     <value>Found an update for {Name} to {Version}</value>
   </data>
+  <data name="UpgradeAssistantCommandEntrypoint" xml:space="preserve">
+    <value>Provides the entry-point project to start the upgrade process. This may include globbing patterns such as '*' for match.</value>
+  </data>
+  <data name="UpgradeAssistantCommandExtension" xml:space="preserve">
+    <value>Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times.</value>
+  </data>
+  <data name="UpgradeAssistantCommandIgnoreUnsupported" xml:space="preserve">
+    <value>Acknowledges that upgrade-assistant will not be able to completely upgrade a project. This indicates that the solution must be redesigned (e.g. consider Blazor to replace Web Forms).</value>
+  </data>
+  <data name="UpgradeAssistantCommandMsbuild" xml:space="preserve">
+    <value>Path to a MSBuild install directory to be used. If not provided, the latest installed version will be used.</value>
+  </data>
+  <data name="UpgradeAssistantCommandOption" xml:space="preserve">
+    <value>Specifies an option that should be added to Upgrade Assistant that may be used by extensions.</value>
+  </data>
+  <data name="UpgradeAssistantCommandProject" xml:space="preserve">
+    <value>The path to a project or solution file to be used.</value>
+  </data>
+  <data name="UpgradeAssistantCommandTargetTfm" xml:space="preserve">
+    <value>Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean.</value>
+  </data>
+  <data name="UpgradeAssistantCommandVS" xml:space="preserve">
+    <value>Path to a VS install directory to be used for %VSINSTALLDIR%. If not provided, the latest installed version will be used.</value>
+  </data>
   <data name="UpgradeAssistantHeader" xml:space="preserve">
     <value>Microsoft .NET Upgrade Assistant v{0}</value>
   </data>

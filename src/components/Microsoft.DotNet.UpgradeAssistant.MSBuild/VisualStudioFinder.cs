@@ -18,27 +18,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     /// <remarks>
     /// The package is not supported on .NET 5, so we copied the COM declarations to use instead.
     /// </remarks>
-    internal class VisualStudioFinder : IVisualStudioFinder
+    internal class VisualStudioFinder : IConfigureOptions<WorkspaceOptions>
     {
         private const int REGDB_E_CLASSNOTREG = unchecked((int)0x80040154);
-
-        private readonly IOptions<WorkspaceOptions> _options;
         private readonly ILogger<VisualStudioFinder> _logger;
 
-        public VisualStudioFinder(IOptions<WorkspaceOptions> options, ILogger<VisualStudioFinder> logger)
+        public VisualStudioFinder(ILogger<VisualStudioFinder> logger)
         {
-            _options = options ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public void Configure(WorkspaceOptions options)
+        {
+            if (options.VisualStudioPath is string expectedPath)
+            {
+                _logger.LogInformation("Using supplied path for Visual Studio [{Path}]", expectedPath);
+            }
+            else
+            {
+                options.VisualStudioPath = GetLatestVisualStudioPath();
+            }
         }
 
         public string? GetLatestVisualStudioPath()
         {
-            if (_options.Value.VisualStudioPath is string expectedPath)
-            {
-                _logger.LogInformation("Using supplied path for Visual Studio [Path]", expectedPath);
-                return expectedPath;
-            }
-
             var latest = GetLatestPath();
 
             if (latest is null)

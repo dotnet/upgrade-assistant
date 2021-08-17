@@ -8,12 +8,25 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     [Collection(AnalyzerTestCollection.Name)]
     public class AnalyzerTests
     {
+        private readonly ITestOutputHelper _output;
+
+        public AnalyzerTests(ITestOutputHelper output, RestoreTestProjectFixture fixture)
+        {
+            _output = output;
+
+            foreach (var message in fixture.Messages)
+            {
+                _output.WriteLine(message);
+            }
+        }
+
         private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new()
         {
             // Using System.Web scenarios
@@ -314,6 +327,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
                 var expectedText = (await expectedSource!.GetTextAsync().ConfigureAwait(false)).ToString();
                 var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+
+                _output.WriteLine("Expected:");
+                _output.WriteLine(expectedText);
+                _output.WriteLine("Actual:");
+                _output.WriteLine(fixedText);
+
                 Assert.Equal(expectedText, fixedText);
             }
         }
