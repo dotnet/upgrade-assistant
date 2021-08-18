@@ -8,7 +8,7 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
 
-    <!-- 
+    <!--
       Use version 3.8.0 of CodeAnalysis assemblies to preserve compatibility
       with Visual Studio 2019 16.8
     -->
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DotNetBuildFromSource)' == 'true'">
-    <!--    
+    <!--
       When building using source-build the process is:
       - Newtonsoft.Json versions 9.0.1 and 12.0.2 are built by source-build
       - Version 12.0.2 is written to Version.props
@@ -33,9 +33,11 @@
     -->
     <MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>$(MicrosoftCodeAnalysisVersion)</MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>
   </PropertyGroup>
- <!-- Common properties regarding language version, CA rulesets, output paths, etc. -->
+  <!-- Common properties regarding language version, CA rulesets, output paths, etc. -->
   <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>preview</LangVersion>
+    <!-- C# 10 preview flags redundant usings, but .NET 5 targets still need them -->
+    <NoWarn>$(NoWarn);CS0105</NoWarn>
     <WarningLevel>9999</WarningLevel>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
