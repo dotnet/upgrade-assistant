@@ -34,3 +34,63 @@ Type, Microsoft.AspNet.Identity.Owin.SignInManager`2, true
 H: HttpRequest.RawUrl should be replaced with HttpRequest.GetEncodedUrl() or HttpRequest.GetDisplayUrl()
 Member, Microsoft.AspNetCore.Http.HttpRequest.RawUrl, false
 Member, System.Web.HttpRequest.RawUrl, false
+
+I: Windows Forms Deprecated controls : Microsoft.Reporting.WinForms.ReportViewer is no longer supported.
+Type, Microsoft.Reporting.WinForms.ReportViewer, true
+
+J: Windows Forms Deprecated controls : StatusBar needs to be replaced with StatusStrip. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/windows-forms/5.0/winforms-deprecated-controls
+Type, System.Windows.Forms.StatusBar, true
+Type, System.Windows.Forms.StatusBarDrawItemEventArgs, true
+Type, System.Windows.Forms.StatusBarDrawItemEventHandler, true
+
+K: Windows Forms Deprecated controls : StatusBarPanel needs to be replaced with ToolStripStatusLabel. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/windows-forms/5.0/winforms-deprecated-controls
+Type, System.Windows.Forms.StatusBarPanel, true
+Type, System.Windows.Forms.StatusBarPanelAutoSize, true
+Type, System.Windows.Forms.StatusBarPanelBorderStyle, true
+Type, System.Windows.Forms.StatusBarPanelClickEventArgs, true
+Type, System.Windows.Forms.StatusBarPanelClickEventHandler, true
+Type, System.Windows.Forms.StatusBarPanelStyle, true
+
+L: Windows Forms Deprecated controls : ContextMenu needs to be replaced with ContextMenuStrip. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.ContextMenu, true
+
+M: Windows Forms Deprecated controls : DataGrid needs to be replaced with DataGridView. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.GridColumnStylesCollection, true
+Type, System.Windows.Forms.GridTablesFactory, true
+Type, System.Windows.Forms.GridTableStylesCollection, true
+Type, System.Windows.Forms.IDataGridEditingService, true
+Type, System.Windows.Forms.DataGrid, true
+Type, System.Windows.Forms.DataGrid.HitTestType, true
+Type, System.Windows.Forms.DataGridBoolColumn, true
+Type, System.Windows.Forms.DataGridCell, true
+Type, System.Windows.Forms.DataGridColumnStyle, true
+Type, System.Windows.Forms.DataGridLineStyle, true
+Type, System.Windows.Forms.DataGridParentRowsLabelStyle, true
+Type, System.Windows.Forms.DataGridPreferredColumnWidthTypeConverter, true
+Type, System.Windows.Forms.DataGridTableStyle, true
+Type, System.Windows.Forms.DataGridTextBox, true
+Type, System.Windows.Forms.DataGridTextBoxColumn, true
+
+N: Windows Forms Deprecated controls : MainMenu needs to be replaced with MenuStrip. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.MainMenu, true
+
+O: Windows Forms Deprecated controls : Menu needs to be replaced with ToolStripDropDown, ToolStripDropDownMenu. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.Menu, true
+Type, System.Windows.Forms.Menu.MenuItemCollection, true
+
+P: Windows Forms Deprecated controls : MenuItem needs to be replaced with ToolStripMenuItem. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.MenuItem, true
+
+Q: Windows Forms Deprecated controls : ToolBar needs to be replaced with ToolStrip. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.ToolBar, true
+Type, System.Windows.Forms.ToolBar.ToolBarButtonCollection, true
+Type, System.Windows.Forms.ToolBarAppearance, true
+
+R: Windows Forms Deprecated controls : ToolBarButton needs to be replaced with ToolStripButton. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.ToolBarButton, true
+Type, System.Windows.Forms.ToolBarButtonClickEventArgs, true
+Type, System.Windows.Forms.ToolBarButtonStyle, true
+Type, System.Windows.Forms.ToolBarTextAlign, true
+
+S: Windows Forms Deprecated controls : System.Windows.Forms.Design.IMenuEditorService no longer supported. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+Type, System.Windows.Forms.Design.IMenuEditorService, true
