@@ -1,7 +1,9 @@
 $dotnetRoot = Join-Path $RepoRoot '.dotnet'
 
 try {
-    dotnet workload install maui --verbosity diag --temp-dir $dotnetRoot
+    # dotnet workload install maui --verbosity diag --temp-dir $dotnetRoot
+    dotnet tool install -g Redth.Net.Maui.Check
+    Maui-check —main —force-dotnet --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 }
 catch {
   Write-Host $_.ScriptStackTrace
