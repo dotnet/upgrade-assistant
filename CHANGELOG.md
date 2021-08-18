@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## vNext
 
 ### Added
+- Alert users about the deprecated controls in Windows Forms [#800](https://github.com/dotnet/upgrade-assistant/pull/800)
 - Added a command line option to specifiy a path to msbuild via `--msbuild-path` ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
 
 ### Changed
 - Removed a check that wouldn't include preview .NET SDK instances ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
-- Alert users about the deprecated controls in Windows Forms [#800](https://github.com/dotnet/upgrade-assistant/pull/800)
 
 ## Version 0.2.241603 - 2021-08-16 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.241603))
 ### Added
