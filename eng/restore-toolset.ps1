@@ -1,12 +1,13 @@
 $dotnetRoot = Join-Path $RepoRoot '.dotnet'
+$dotnetSdkVersion = $GlobalJson.tools.dotnet
 
 try {
+  
     dotnet workload install maui --verbosity diag --temp-dir $dotnetRoot
+    dotnet workload repair 
+    dotnet workload update --sdk-version $dotnetSdkVersion --no-cache --disable-parallel
+    dotnet workload install --sdk-version $dotnetSdkVersion --no-cache --disable-parallel android-aot ios maui wasm-tools --skip-manifest-update --verbosity diag --temp-dir $dotnetRoot
 
-    dotnet tool install -g Redth.Net.Maui.Check
-    maui-check --main --force-dotnet --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
-
-    maui-check --main --force-dotnet --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 }
 catch {
   Write-Host $_.ScriptStackTrace
