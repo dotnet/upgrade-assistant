@@ -10,6 +10,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         [Required]
         public string InputPath { get; set; } = null!;
 
+        public string? MSBuildPath { get; set; }
+
         public string? VisualStudioPath { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NuGet.Configuration;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -17,8 +18,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static void AddMsBuild(this IServiceCollection services, Action<WorkspaceOptions> configure)
         {
-            services.AddSingleton<MSBuildPathLocator>();
-            services.AddSingleton<IVisualStudioFinder, VisualStudioFinder>();
+            services.AddOptions<WorkspaceOptions>()
+                .Configure(configure)
+                .ValidateDataAnnotations();
+
+            services.AddTransient<IConfigureOptions<WorkspaceOptions>, VisualStudioFinder>();
+            services.AddTransient<IConfigureOptions<WorkspaceOptions>, MSBuildWorkspaceOptionsConfigure>();
             services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
             services.AddTransient<IUpgradeStartup, MSBuildRegistrationStartup>();
             services.AddTransient<ISolutionInfo, SolutionInfo>();
@@ -28,10 +33,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<MSBuildWorkspaceUpgradeContext>();
             services.AddTransient<IUpgradeContext>(sp => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
             services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
-
-            services.AddOptions<WorkspaceOptions>()
-                .Configure(configure)
-                .ValidateDataAnnotations();
         }
 
         public static void AddNuGet(this IServiceCollection services, Action<NuGetDownloaderOptions> configure)

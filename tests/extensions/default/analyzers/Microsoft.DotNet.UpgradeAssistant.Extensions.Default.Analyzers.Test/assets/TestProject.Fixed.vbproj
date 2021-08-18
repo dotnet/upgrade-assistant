@@ -16,8 +16,4 @@
     <Compile Include="*\*.Fixed.vb" />
   </ItemGroup>
   
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Analyzers\AspNetUpgrader.Analyzers\AspNetUpgrader.Analyzers.csproj" />
-  </ItemGroup>
-  
 </Project>

@@ -11,7 +11,6 @@ using Autofac;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.DotNet.UpgradeAssistant.MSBuildPath;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
@@ -48,9 +47,6 @@ namespace Integration.Tests
                 })
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
-                    builder.RegisterInstance(MSBuildPathInstance.Locator);
-                    builder.RegisterDecorator<MSBuildPathLocatorInterceptor, MSBuildPathLocator>();
-
                     builder.RegisterType<KnownPackages>()
                         .SingleInstance()
                         .AsSelf();
@@ -85,7 +81,9 @@ namespace Integration.Tests
 
             public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
 
-            public DirectoryInfo? VSPath { get; set; }
+            public DirectoryInfo? VSPath { get; }
+
+            public DirectoryInfo? MSBuildPath { get; }
         }
     }
 }

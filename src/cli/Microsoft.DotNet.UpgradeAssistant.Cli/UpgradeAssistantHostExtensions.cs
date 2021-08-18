@@ -90,7 +90,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                             optionss.InputPath = fullname;
                         }
 
-                        optionss.VisualStudioPath = upgradeOptions.VSPath?.FullName;
+                        if (upgradeOptions.VSPath?.FullName is string vspath)
+                        {
+                            optionss.VisualStudioPath = vspath;
+                        }
+
+                        if (upgradeOptions.MSBuildPath?.FullName is string msbuildPath)
+                        {
+                            optionss.MSBuildPath = msbuildPath;
+                        }
                     });
 
                     services.AddNuGet(optionss =>

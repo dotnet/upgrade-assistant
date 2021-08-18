@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -12,135 +11,101 @@ using System.Threading.Tasks;
 using Microsoft.Build.Locator;
 using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     public class MSBuildRegistrationStartup : IUpgradeStartup
     {
-        private static readonly object _sync = new object();
-
-        // MSBuildInstance is stored in a static so that multiple
-        // instances of MSBuildRegistrationStartup (which should only
-        // happen in test scenarios) will share a single instance
-        // per process.
-        private static VisualStudioInstance? _instance;
+        private static readonly object _sync = new();
+        private static string? _version;
 
         private readonly ITelemetry _telemetry;
+        private readonly IOptions<WorkspaceOptions> _options;
         private readonly ILogger _logger;
-        private readonly MSBuildPathLocator _locator;
 
-        public MSBuildRegistrationStartup(ITelemetry telemetry, MSBuildPathLocator locator, ILogger<MSBuildRegistrationStartup> logger)
+        public MSBuildRegistrationStartup(
+            ITelemetry telemetry,
+            IOptions<WorkspaceOptions> options,
+            ILogger<MSBuildRegistrationStartup> logger)
         {
+            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _locator = locator ?? throw new ArgumentNullException(nameof(locator));
-            _telemetry = telemetry;
-            _logger = logger;
         }
 
         public Task<bool> StartupAsync(CancellationToken token)
+            => Task.FromResult(Register());
+
+        public bool Register()
         {
-            RegisterMSBuildInstance();
-            return Task.FromResult(true);
+            var msbuildPath = _options.Value.MSBuildPath;
+
+            if (msbuildPath is null)
+            {
+                throw new UpgradeException("No MSBuild path found");
+            }
+
+            var version = RegisterMSBuild(msbuildPath);
+
+            _telemetry.TrackEvent("msbuild", new Dictionary<string, string> { { "MSBuild Version", version } });
+
+            _logger.LogInformation("Registered MSBuild at {Path}", msbuildPath);
+
+            return true;
         }
 
-        public string RegisterMSBuildInstance()
+        private string RegisterMSBuild(string msbuildPath)
         {
-            if (_instance is null)
+            // Can only register MSBuild once, so we verify that before proceeding to register
+            if (_version is null)
             {
                 lock (_sync)
                 {
-                    // This may be null if called concurrently
-#pragma warning disable CA1508 // Avoid dead conditional code
-                    if (_instance is null)
-#pragma warning restore CA1508 // Avoid dead conditional code
+                    if (_version is null)
                     {
-                        // TODO : Harden this and allow MSBuild location to be read from env vars.
-                        var msBuildInstances = FilterForBitness(MSBuildLocator.QueryVisualStudioInstances()).ToList();
+                        var instance = MSBuildLocator.QueryVisualStudioInstances()
+                            .FirstOrDefault(i => string.Equals(msbuildPath, i.MSBuildPath, StringComparison.OrdinalIgnoreCase));
 
-                        if (msBuildInstances.Count == 0)
+                        if (instance is null)
                         {
-                            _logger.LogError($"No supported MSBuild found. Ensure `dotnet --list-sdks` show an install that is {ExpectedBitness}");
-                            throw new UpgradeException("MSBuild not found");
+                            _logger.LogError("No MSBuild instance was found at {Path}", msbuildPath);
+                            throw new UpgradeException();
                         }
-                        else
+
+                        // Must register instance rather than just path so everything gets set correctly for .NET SDK instances
+                        MSBuildLocator.RegisterInstance(instance);
+
+                        var resolver = new AssemblyDependencyResolver(msbuildPath);
+
+                        AssemblyLoadContext.Default.Resolving += ResolveAssembly;
+
+                        _version = instance.Version.ToString();
+                        return _version;
+
+                        Assembly? ResolveAssembly(AssemblyLoadContext context, AssemblyName assemblyName)
                         {
-                            foreach (var instance in msBuildInstances)
+                            if (context is null || assemblyName is null)
                             {
-                                _logger.LogDebug("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
+                                return null;
                             }
 
-                            var orderedInstances = msBuildInstances
-                                .OrderByDescending(m => m.Version);
+                            if (resolver.ResolveAssemblyToPath(assemblyName) is string path)
+                            {
+                                _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, path);
+                                return context.LoadFromAssemblyPath(path);
+                            }
 
-                            _instance = orderedInstances.FirstOrDefault(vsi => !vsi.MSBuildPath.Contains("preview", StringComparison.OrdinalIgnoreCase))
-                                ?? orderedInstances.First();
-                            _logger.LogInformation("MSBuild registered from {MSBuildPath}", _instance.MSBuildPath);
-                            _locator.MSBuildPath = _instance.MSBuildPath;
-                            MSBuildLocator.RegisterInstance(_instance);
-                            AssemblyLoadContext.Default.Resolving += ResolveAssembly;
+                            _logger.LogDebug("Unable to resolve assembly {AssemblyName}", assemblyName.FullName);
+                            return null;
                         }
                     }
                 }
             }
 
-            _telemetry.TrackEvent("msbuild", new Dictionary<string, string> { { "MSBuild Version", _instance.Version.ToString() } });
+            _logger.LogWarning("MSBuild already registered {Version}", _version);
 
-            return _instance.MSBuildPath;
-        }
-
-        private IEnumerable<VisualStudioInstance> FilterForBitness(IEnumerable<VisualStudioInstance> instances)
-        {
-            foreach (var instance in instances)
-            {
-                var is32bit = instance.MSBuildPath.Contains("x86", StringComparison.OrdinalIgnoreCase);
-
-                if (Environment.Is64BitProcess == !is32bit)
-                {
-                    yield return instance;
-                }
-                else
-                {
-                    _logger.LogDebug("Skipping {Path} as it is {Bitness}", instance.MSBuildPath, ExpectedBitness);
-                }
-            }
-        }
-
-        private static string ExpectedBitness => Environment.Is64BitProcess ? "64-bit" : "32-bit";
-
-        private Assembly? ResolveAssembly(AssemblyLoadContext context, AssemblyName assemblyName)
-        {
-            if (context is null || assemblyName is null || _instance is null)
-            {
-                return null;
-            }
-
-            // If the assembly has a culture, check for satellite assemblies
-            if (assemblyName.CultureInfo != null)
-            {
-                var satellitePath = Path.Combine(_instance.MSBuildPath, assemblyName.CultureInfo.Name, $"{assemblyName.Name}.dll");
-                if (File.Exists(satellitePath))
-                {
-                    _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
-                    return context.LoadFromAssemblyPath(satellitePath);
-                }
-
-                satellitePath = Path.Combine(_instance.MSBuildPath, assemblyName.CultureInfo.TwoLetterISOLanguageName, $"{assemblyName.Name}.dll");
-                if (File.Exists(satellitePath))
-                {
-                    _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, satellitePath);
-                    return context.LoadFromAssemblyPath(satellitePath);
-                }
-            }
-
-            var assemblyPath = Path.Combine(_instance.MSBuildPath, $"{assemblyName.Name}.dll");
-            if (File.Exists(assemblyPath))
-            {
-                _logger.LogDebug("Assembly {AssemblyName} loaded into context {ContextName} from {AssemblyPath}", assemblyName.FullName, context.Name, assemblyPath);
-                return context.LoadFromAssemblyPath(assemblyPath);
-            }
-
-            _logger.LogDebug("Unable to resolve assembly {AssemblyName}", assemblyName.FullName);
-            return null;
+            return _version;
         }
     }
 }

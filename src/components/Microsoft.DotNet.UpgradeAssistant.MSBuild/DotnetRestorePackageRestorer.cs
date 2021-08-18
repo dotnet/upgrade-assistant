@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         // Run `dotnet restore` using quiet mode since some warnings and errors are
         // expected. As long as a lock file is produced (which is checked elsewhere),
         // the tool was successful enough.
-        private Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token) =>
+        public Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token) =>
             _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = "dotnet",

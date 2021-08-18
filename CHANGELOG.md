@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Alert users about the deprecated controls in Windows Forms [#800](https://github.com/dotnet/upgrade-assistant/pull/800)
+- Added a command line option to specifiy a path to msbuild via `--msbuild-path` ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
+
+### Changed
+- Removed a check that wouldn't include preview .NET SDK instances ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
 
 ## Version 0.2.241603 - 2021-08-16 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.241603))
 ### Added
@@ -49,7 +53,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Updated `HttpContext.Current` analyzer to more correctly identify uses of `HttpContext.Current` that need replaced [#628](https://github.com/dotnet/upgrade-assistant/pull/628).
 - The Upgrade Assistant analyzer package no longer adds a WebTypeReplacements.typemap file to projects it's added to (more precisely, the file is present and available for analyzers to use but isn't visible in the solution explorer anymore) [#632](https://github.com/dotnet/upgrade-assistant/pull/632).
-- Addressed compile time errors that surfaced from Visual Basic Runtime and the My. namespace ([Link](https://github.com/dotnet/upgrade-assistant/pull/629))
+- Addressed compile time errors that surfaced from Visual Basic Runtime and the My. namespace ([629](https://github.com/dotnet/upgrade-assistant/pull/629))
 - Exposed Sdk in IProjectFile to enable development of custom extensions to add/remove Sdk. [#614](https://github.com/dotnet/upgrade-assistant/issues/614)
 
 ## Version 0.2.231403 - 2021-06-14 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.231403))

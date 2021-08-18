@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         IEnumerable<AdditionalOption> AdditionalOptions { get; }
 
-        DirectoryInfo? VSPath { get; set; }
+        DirectoryInfo? VSPath { get; }
+
+        DirectoryInfo? MSBuildPath { get; }
     }
 }

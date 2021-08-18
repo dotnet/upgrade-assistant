@@ -13,9 +13,5 @@
   <ItemGroup>
     <Compile Remove="*\*.Fixed.cs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Analyzers\AspNetUpgrader.Analyzers\AspNetUpgrader.Analyzers.csproj" />
-  </ItemGroup>
   
 </Project>

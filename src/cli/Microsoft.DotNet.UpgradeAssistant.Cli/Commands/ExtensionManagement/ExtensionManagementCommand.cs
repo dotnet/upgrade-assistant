@@ -377,6 +377,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
 
             public DirectoryInfo? VSPath { get; set; }
+
+            public DirectoryInfo? MSBuildPath { get; set; }
         }
     }
 }

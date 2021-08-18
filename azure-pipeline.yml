@@ -7,6 +7,8 @@ variables:
     value: true
   - name: _DotNetArtifactsCategory
     value: .NETCore
+  - name: MSBuildEnableWorkloadResolver # TODO: Remove when fixed -- https://github.com/dotnet/sdk/issues/17461
+    value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: AzureDevOps-Artifact-Feeds-Pats
     - group: UpgradeAssistant_SDL_Settings
@@ -90,6 +92,7 @@ stages:
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
         - script: eng\common\cibuild.cmd
+            /p:MSBuildEnableWorkloadResolver=$(MSBuildEnableWorkloadResolver)
             -configuration $(_BuildConfig) 
             -prepareMachine
             $(_BuildArgs)
