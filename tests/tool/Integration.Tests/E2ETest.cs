@@ -40,8 +40,8 @@ namespace Integration.Tests
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
-        [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
-        [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
+        [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj", Skip = "Workload loading is broken")]
+        [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj", Skip = "Workload loading is broken")]
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
