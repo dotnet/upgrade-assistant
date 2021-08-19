@@ -3,14 +3,14 @@ $dotnetSdkVersion = $GlobalJson.tools.dotnet
 
 try {
   
-  dotnet workload install maui --disable-parallel --verbosity diag --temp-dir $dotnetRoot
-  dotnet workload install android --disable-parallel --verbosity diag --temp-dir $dotnetRoot
-  dotnet workload install ios --disable-parallel --verbosity diag --temp-dir $dotnetRoot
+  # dotnet workload install maui --disable-parallel --verbosity diag --temp-dir $dotnetRoot
+  # dotnet workload install android --disable-parallel --verbosity diag --temp-dir $dotnetRoot
+  # dotnet workload install ios --disable-parallel --verbosity diag --temp-dir $dotnetRoot
 
   dotnet tool install -g Redth.Net.Maui.Check
-  maui-check --main --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
+  maui-check --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 
-  maui-check --main --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
+  # maui-check --main --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 
 
   # dotnet workload install maui --sdk-version $dotnetSdkVersion --disable-parallel --verbosity diag --temp-dir $dotnetRoot
