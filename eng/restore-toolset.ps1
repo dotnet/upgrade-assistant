@@ -8,7 +8,7 @@ try {
   # dotnet workload install ios --disable-parallel --verbosity diag --temp-dir $dotnetRoot
 
   dotnet tool install -g Redth.Net.Maui.Check
-  maui-check --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
+  maui-check --main --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 
   # maui-check --main --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 
