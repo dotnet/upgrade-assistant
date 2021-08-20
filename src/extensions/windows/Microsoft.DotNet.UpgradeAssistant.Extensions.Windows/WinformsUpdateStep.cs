@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            SubSteps = new List<UpgradeStep>(winformsUpdaters.Select(updater => new WinformsUpdaterSubStep(this, updater, logger)));
+            SubSteps = winformsUpdaters.Select(updater => new WinformsUpdaterSubStep(this, updater, logger)).ToList();
         }
 
         /// <summary>
