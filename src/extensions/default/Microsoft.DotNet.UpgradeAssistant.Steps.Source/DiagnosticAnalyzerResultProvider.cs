@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.Extensions.Logging;
@@ -34,6 +35,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
             _diagnosticAnalysisRunner = diagnosticAnalysisRunner;
             _logger = logger;
+        }
+
+        public async Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
+        {
+            return true;
         }
 
         public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)

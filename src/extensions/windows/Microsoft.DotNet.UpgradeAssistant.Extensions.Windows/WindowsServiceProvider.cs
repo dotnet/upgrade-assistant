@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
@@ -17,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             services.Services.AddTransient<ITargetFrameworkSelectorFilter, WindowsSdkTargetFrameworkSelectorFilter>();
             services.Services.AddTransient<IComponentIdentifier, WindowsComponentIdentifier>();
+            services.Services.AddTransient<IAnalyzeResultProvider, WinformsResultProvider>();
+            services.Services.AddWinformsUpdaterStep();
         }
     }
 }
