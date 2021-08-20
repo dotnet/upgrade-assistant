@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public async Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
         {
-            return true;
+            return await Task.Run(() => true);
         }
 
         public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)

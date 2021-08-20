@@ -16,7 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     public class WinformsResultProvider : IAnalyzeResultProvider
     {
-        private ILogger _logger { get; }
+        private ILogger Logger { get; }
+
         private readonly IUpdater<IProject> _updater;
         private readonly string _id = "UA102";
 
@@ -27,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         public WinformsResultProvider(IUpdater<IProject> updater,
            ILogger<WinformsResultProvider> logger)
         {
-            _logger = logger;
+            Logger = logger;
             _updater = updater ?? throw new ArgumentNullException(nameof(updater));
         }
 
@@ -78,14 +79,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
                 else
                 {
-                    _logger.LogInformation("Winforms Updater not applicable to the project(s) selected");
+                    Logger.LogInformation("Winforms Updater not applicable to the project(s) selected");
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                _logger.LogCritical(exc, "Unexpected exception analyzing winforms references");
+                Logger.LogCritical(exc, "Unexpected exception analyzing winforms references");
             }
 
             foreach (var r in results)
