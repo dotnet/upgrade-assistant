@@ -59,28 +59,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             var context = analysis.UpgradeContext;
             var projects = context.Projects.ToImmutableArray();
-            var results = new HashSet<AnalyzeResult>();
-
+            var updaterResult = new WinformsUpdaterResult(false, string.Empty, new List<string>());
             try
             {
-                var updaterResult = (WinformsUpdaterResult)(await _updater.IsApplicableAsync(context, projects, token).ConfigureAwait(false));
-                if (updaterResult.Result)
-                {
-                    foreach (var s in updaterResult.FileLocations)
-                    {
-                        results.Add(new()
-                        {
-                            RuleId = this._id,
-                            RuleName = this.Name,
-                            FileLocation = s,
-                            ResultMessage = updaterResult.Message,
-                        });
-                    }
-                }
-                else
-                {
-                    Logger.LogInformation("Winforms Updater not applicable to the project(s) selected");
-                }
+                var result = await _updater.IsApplicableAsync(context, projects, token).ConfigureAwait(false);
+                updaterResult = (WinformsUpdaterResult)result;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
@@ -89,9 +72,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 Logger.LogCritical(exc, "Unexpected exception analyzing winforms references");
             }
 
-            foreach (var r in results)
+            if (updaterResult.Result)
             {
-                yield return r;
+                foreach (var s in updaterResult.FileLocations)
+                {
+                    yield return new()
+                    {
+                        RuleId = this._id,
+                        RuleName = this.Name,
+                        FileLocation = s,
+                        ResultMessage = updaterResult.Message,
+                    };
+                }
+            }
+            else
+            {
+                Logger.LogInformation("Winforms Updater not applicable to the project(s) selected");
             }
         }
     }

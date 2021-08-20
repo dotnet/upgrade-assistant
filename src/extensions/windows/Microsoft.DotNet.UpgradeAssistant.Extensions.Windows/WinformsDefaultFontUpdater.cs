@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any() ? true : false, this.Description, fileLocations);
+            return new WinformsUpdaterResult(fileLocations.Any(), this.Description, fileLocations);
         }
     }
 }

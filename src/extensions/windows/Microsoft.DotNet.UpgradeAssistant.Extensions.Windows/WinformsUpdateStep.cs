@@ -92,11 +92,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 : new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Winforms updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
         }
 
-        public override UpgradeStepInitializeResult Reset()
-        {
-            return base.Reset();
-        }
-
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
