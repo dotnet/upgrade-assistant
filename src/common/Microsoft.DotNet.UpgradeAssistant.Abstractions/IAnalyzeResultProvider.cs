@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
@@ -12,6 +13,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         string Name { get; }
 
         Uri InformationURI { get; }
+
+        Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token);
 
         IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
     }

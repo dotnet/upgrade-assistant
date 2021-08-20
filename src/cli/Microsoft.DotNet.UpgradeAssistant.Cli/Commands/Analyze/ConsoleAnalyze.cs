@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             var analzyerContext = new AnalyzeContext(context);
             var analyzeResultMap = new List<AnalyzeResultDefinition>();
 
-            foreach (var provider in _providers)
+            await foreach (var provider in _providers.ToAsyncEnumerable().WhereAwait(async i => await i.IsApplicableAsync(analzyerContext, token)))
             {
                 analyzeResultMap.Add(new()
                 {
