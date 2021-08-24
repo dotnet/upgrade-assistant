@@ -5,7 +5,7 @@ try {
   # dotnet workload install maui
 
   dotnet tool install -g Redth.Net.Maui.Check
-  maui-check --main --ci --non-interactive --fix --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
+  maui-check --main --ci --non-interactive --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 
   dotnet workload install ios --source "https://aka.ms/dotnet/maui/main/index.json"
   dotnet workload install macos --source "https://aka.ms/dotnet/maui/main/index.json"
