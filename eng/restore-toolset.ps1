@@ -1,9 +1,13 @@
-$dotnetRoot = Join-Path $RepoRoot '.dotnet'
-$dotnetSdkVersion = $GlobalJson.tools.dotnet
+# $dotnetRoot = Join-Path $RepoRoot '.dotnet'
+# $dotnetSdkVersion = $GlobalJson.tools.dotnet
 
 try {
-  
-  dotnet workload install maui
+  # dotnet workload install maui
+
+  dotnet workload install android-aot --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet workload install ios --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet workload install maui --source "https://aka.ms/dotnet/maui/main/index.json"
+
   # dotnet workload install maui --disable-parallel --verbosity diag --temp-dir $dotnetRoot
   # dotnet workload install android --disable-parallel --verbosity diag --temp-dir $dotnetRoot
   # dotnet workload install ios --disable-parallel --verbosity diag --temp-dir $dotnetRoot
