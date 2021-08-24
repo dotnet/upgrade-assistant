@@ -1,9 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <InstallTryConvert>true</InstallTryConvert>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Abstractions\MSBuild.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.Facts\MSBuild.Conversion.Facts.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.Package\MSBuild.Conversion.Package.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.Project\MSBuild.Conversion.Project.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.SDK\MSBuild.Conversion.SDK.csproj" />
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.csproj" />
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>

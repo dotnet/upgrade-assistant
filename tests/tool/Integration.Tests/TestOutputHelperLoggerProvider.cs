@@ -51,6 +51,11 @@ namespace Integration.Tests
                 var formatted = formatter(state, exception);
 
                 _output.WriteLine($"[{logLevel}] {formatted}");
+
+                if (exception is not null)
+                {
+                    _output.WriteLine(exception.ToString());
+                }
             }
         }
     }
