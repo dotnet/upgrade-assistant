@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             Console = new LoggingLevelSwitch();
             File = new LoggingLevelSwitch();
             SetConsoleLevel(verbose ? LogLevel.Trace : LogLevel.Information);
-            SetFileLevel(verbose ? LogLevel.Trace : LogLevel.Information);
+            SetFileLevel(LogLevel.Debug);
         }
 
         public LoggingLevelSwitch Console { get; }
