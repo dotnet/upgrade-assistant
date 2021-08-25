@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Formatting.Compact;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -178,7 +179,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             ConsoleUtils.Clear();
             Program.ShowHeader();
 
-            const string LogFilePath = "log.txt";
+            const string LogFilePath = "upgrade-assistant.log";
 
             var logSettings = new LogSettings(options.IsVerbose);
 
@@ -195,7 +196,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     .Enrich.FromLogContext()
                     .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
                     .WriteTo.Console(levelSwitch: logSettings.Console)
-                    .WriteTo.File(LogFilePath, levelSwitch: logSettings.File));
+                    .WriteTo.File(new CompactJsonFormatter(), LogFilePath, levelSwitch: logSettings.File));
         }
 
         public static async Task<int> RunUpgradeAssistantAsync(this IHostBuilder hostBuilder, CancellationToken token)
