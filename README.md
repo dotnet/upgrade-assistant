@@ -231,7 +231,7 @@ Concepts referred to in this repository which may have unclear meaning are expla
 
 ## Viewing log files
 
-The project outputs a log file by default in the working directory called `upgrade-assistant.log` that can be viewed with tools such as [Compact Log Format Viewer](https://github.com/warrenbuckley/Compact-Log-Format-Viewer) available via the [Windows Store](https://www.microsoft.com/store/apps/9N8RV8LKTXRJ?cid=storebadge&ocid=badge).
+The project outputs a log file by default in the working directory called `upgrade-assistant.clef` that can be viewed with tools such as [Compact Log Format Viewer](https://github.com/warrenbuckley/Compact-Log-Format-Viewer) available via the [Windows Store](https://www.microsoft.com/store/apps/9N8RV8LKTXRJ?cid=storebadge&ocid=badge).
 
 ## Roadmap
 Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to .NET 5 and beyond in the [roadmap](docs/roadmap.md).

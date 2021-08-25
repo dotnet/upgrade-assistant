@@ -12,6 +12,7 @@
     <FileSignInfo Include="Serilog.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.Extensions.Hosting.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.Extensions.Logging.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="Serilog.Formatting.Compact.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.Sinks.Console.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.Sinks.File.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="CsvHelper.dll" CertificateName="3PartySHA2" />

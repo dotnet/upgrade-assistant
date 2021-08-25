@@ -179,7 +179,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             ConsoleUtils.Clear();
             Program.ShowHeader();
 
-            const string LogFilePath = "upgrade-assistant.log";
+            const string LogFilePath = "upgrade-assistant.clef";
 
             var logSettings = new LogSettings(options.IsVerbose);
 
