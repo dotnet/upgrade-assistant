@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -15,11 +16,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         private const string ALC_Prefix = "UA_";
 
         private readonly ExtensionInstance _extension;
+        private readonly ILogger _logger;
 
-        public ExtensionAssemblyLoadContext(ExtensionInstance extension, string[] assemblies)
-            : base(ALC_Prefix + extension.Name)
+        public ExtensionAssemblyLoadContext(string instanceKey, ExtensionInstance extension, string[] assemblies, ILogger logger)
+            : base(string.Concat(ALC_Prefix, extension.Name, instanceKey), isCollectible: true)
         {
-            _extension = extension;
+            if (assemblies is null)
+            {
+                throw new ArgumentNullException(nameof(assemblies));
+            }
+
+            _extension = extension ?? throw new ArgumentNullException(nameof(extension));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            Unloading += _ => _logger.LogDebug("{Name} extension is unloading", Name);
+
             Load(extension, assemblies);
         }
 
@@ -33,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                     if (!fileInfo.Exists)
                     {
-                        Console.WriteLine($"ERROR: Could not find extension service provider assembly {path} in extension {extension.Name}");
+                        _logger.LogError(" Could not find extension service provider assembly {Path} in extension {Name}", path, extension.Name);
                         continue;
                     }
 
@@ -57,6 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             if (inDefault is Assembly existing)
             {
+                _logger.LogDebug("Loaded {Name} from default context instead of {Extension}", assemblyName, Name);
                 return existing;
             }
 
@@ -70,14 +82,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 var pdb = $"{assemblyName.Name}.pdb";
                 var pdbFile = _extension.FileProvider.GetFileInfo(pdb);
 
-                if (pdbFile.Exists)
+                try
                 {
-                    using var pdbStream = GetSeekableStream(pdbFile);
-                    return LoadFromStream(dllStream, pdbStream);
+                    if (pdbFile.Exists)
+                    {
+                        _logger.LogDebug("Loading {Name} with pdb from {Extension}", assemblyName, Name);
+
+                        using var pdbStream = GetSeekableStream(pdbFile);
+                        return LoadFromStream(dllStream, pdbStream);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Loading {Name} without pdb from {Extension}", assemblyName, Name);
+                        return LoadFromStream(dllStream);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    return LoadFromStream(dllStream);
+                    _logger.LogError(e, "Could not load {Name} in {Extension}", assemblyName, Name);
+                    throw;
                 }
             }
 
