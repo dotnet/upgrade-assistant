@@ -18,7 +18,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             "Consider re-running the command with --interactive",
             "ATTENTION: User interaction required",
             "*****************************",
-            "To sign in, use a web browser"
+            "To sign in, use a web browser",
+            "FromWorkload",
+            "workload",
         };
 
         private readonly IUserInput _userInput;
