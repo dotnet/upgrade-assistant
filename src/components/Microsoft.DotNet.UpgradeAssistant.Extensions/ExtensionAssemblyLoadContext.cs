@@ -64,7 +64,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         protected override Assembly? Load(AssemblyName assemblyName)
         {
             // If available in the default, we want to ensure that is used.
-            var inDefault = Default.Assemblies.FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName.Name, StringComparison.Ordinal));
+            var inDefault = Default.Assemblies
+                .Where(a => !a.GetName().Name!.Contains("NuGet", StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName.Name, StringComparison.Ordinal));
 
             if (inDefault is Assembly existing)
             {

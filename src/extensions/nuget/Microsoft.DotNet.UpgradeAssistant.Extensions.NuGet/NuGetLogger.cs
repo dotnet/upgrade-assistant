@@ -8,7 +8,7 @@ using NuGet.Common;
 using ILogger = NuGet.Common.ILogger;
 using LogLevel = NuGet.Common.LogLevel;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetLogger : ILogger
     {

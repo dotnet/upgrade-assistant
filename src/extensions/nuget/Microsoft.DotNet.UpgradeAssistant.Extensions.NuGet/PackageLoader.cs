@@ -11,7 +11,6 @@ using System.Net.Http;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Configuration;
@@ -21,7 +20,7 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public sealed class PackageLoader : IPackageLoader, IPackageDownloader, IDisposable
     {
@@ -30,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly SourceCacheContext _cache;
         private readonly Lazy<IEnumerable<PackageSource>> _packageSources;
         private readonly ILogger<PackageLoader> _logger;
-        private readonly NuGet.Common.ILogger _nugetLogger;
+        private readonly global::NuGet.Common.ILogger _nugetLogger;
         private readonly Dictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
         private readonly NuGetDownloaderOptions _options;
 

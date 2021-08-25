@@ -23,6 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly Dictionary<string, IProject> _projectCache;
         private readonly IOptions<WorkspaceOptions> _options;
+        private readonly Factories _factories;
 
         private List<FileInfo>? _entryPointPaths;
         private FileInfo? _projectPath;
@@ -58,6 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             IOptions<WorkspaceOptions> options,
             Func<string, ISolutionInfo> infoGenerator,
             IPackageRestorer restorer,
+            Factories factories,
             ITargetFrameworkMonikerComparer comparer,
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
@@ -67,6 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new ArgumentNullException(nameof(infoGenerator));
             }
 
+            _factories = factories ?? throw new ArgumentNullException(nameof(factories));
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
@@ -96,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifiers, _restorer, _comparer, path, _logger);
+            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, path, _logger);
 
             _projectCache.Add(path.FullName, project);
 

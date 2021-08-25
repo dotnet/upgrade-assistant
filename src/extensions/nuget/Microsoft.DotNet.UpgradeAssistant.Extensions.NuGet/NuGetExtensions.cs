@@ -4,7 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using NuGet.Versioning;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public static class NuGetExtensions
     {
