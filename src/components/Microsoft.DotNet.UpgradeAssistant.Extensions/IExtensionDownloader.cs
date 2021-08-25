@@ -8,8 +8,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public interface IExtensionDownloader
     {
-        string GetInstallPath(ExtensionSource extensionSource);
-
         Task<string?> GetLatestVersionAsync(ExtensionSource n, CancellationToken token);
 
         Task<string?> RestoreAsync(ExtensionSource source, CancellationToken token);

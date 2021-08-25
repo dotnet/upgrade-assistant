@@ -9,6 +9,7 @@ using System.Text.Json;
 using AutoFixture;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -113,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
 
             var extensions = manifests.Select(CreateExtension).ToList();
 
-            var extensionManager = new Mock<IExtensionManager>();
+            var extensionManager = new Mock<IExtensionProvider>();
             extensionManager.Setup(m => m.Instances).Returns(extensions);
 
             services.AddSingleton(extensionManager.Object);
@@ -133,7 +134,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
 
                 fileProvider.Setup(f => f.GetFileInfo(ExtensionInstance.ManifestFileName)).Returns(file.Object);
 
-                return new ExtensionInstance(fileProvider.Object, string.Empty);
+                var factory = new ExtensionInstanceFactory(new Mock<ILogger<ExtensionInstance>>().Object);
+
+                return factory.Create(fileProvider.Object, string.Empty);
             }
         }
 
