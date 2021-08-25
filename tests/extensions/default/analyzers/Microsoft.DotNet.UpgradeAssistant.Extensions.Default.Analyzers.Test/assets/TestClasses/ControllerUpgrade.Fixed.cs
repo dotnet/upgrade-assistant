@@ -45,7 +45,7 @@ namespace TestProject.TestClasses
 
     public partial class Controller2 : Microsoft.AspNetCore.Mvc.Controller
     {
-        public Controller DoSomething(Microsoft.AspNetCore.Mvc.ControllerBase a)
+        public Microsoft.AspNetCore.Mvc.Controller DoSomething(Microsoft.AspNetCore.Mvc.ControllerBase a)
         {
             var x = new List<Microsoft.AspNetCore.Mvc.Controller>();
             return new Controller2();

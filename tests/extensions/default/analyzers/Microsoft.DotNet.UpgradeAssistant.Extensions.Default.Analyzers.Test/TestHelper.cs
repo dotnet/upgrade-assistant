@@ -11,8 +11,12 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp.Formatting;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Xunit;
@@ -62,9 +66,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             using var workspace = MSBuildWorkspace.Create();
+
             var projectLanguage = lang.GetFileExtension();
             var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
             var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
+
             return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
 
@@ -147,8 +153,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
             while (diagnosticFixed);
 
-            project = solution.GetProject(projectId)!;
-            return project.Documents.First(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
+            return await solution.GetProject(projectId)!
+                .Documents
+                .First(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal))
+                .SimplifyAsync(default);
         }
 
         private static async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
