@@ -23,7 +23,7 @@ In order to add this feature to your project, you will need to add the extension
 1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
 2. Install the extension for identifying loose assemblies:
    ```
-   upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly`
+   upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly
    ```
 3. Install the extension for the data to match against NuGet.org:
    ```
