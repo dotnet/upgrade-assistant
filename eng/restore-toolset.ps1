@@ -2,7 +2,10 @@
 # $dotnetSdkVersion = $GlobalJson.tools.dotnet
 
 try {
-  # dotnet workload install maui
+  dotnet workload install maui --skip-manifest-update --verbosity diag
+  dotnet workload install ios --skip-manifest-update --verbosity diag
+  dotnet workload install android --skip-manifest-update --verbosity diag
+
 
   # dotnet tool install -g Redth.Net.Maui.Check
   # maui-check --main --ci --non-interactive --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
