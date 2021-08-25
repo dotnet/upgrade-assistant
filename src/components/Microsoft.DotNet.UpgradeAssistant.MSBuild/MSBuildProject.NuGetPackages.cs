@@ -152,8 +152,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             if (target is null)
             {
-                _logger.LogError("Target is still unavailable after restore. Please verify that the project has been restored.");
-                throw new UpgradeException("Cannot find targets. Please ensure that the project is fully restored.");
+                _logger.LogError("NuGet target in project.assets.json is still unavailable after restore. Please verify that the project has been restored.");
+                throw new UpgradeException("Restore has not restored the expected TFMs. Please review any warnings from dotnet-restore.");
             }
 
             foreach (var library in target.Libraries)
