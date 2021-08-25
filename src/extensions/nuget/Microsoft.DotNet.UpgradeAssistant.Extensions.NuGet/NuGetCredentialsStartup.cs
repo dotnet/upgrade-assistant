@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NuGet.Credentials;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetCredentialsStartup : IUpgradeStartup
     {

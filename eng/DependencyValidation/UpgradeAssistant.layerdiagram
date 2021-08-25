@@ -205,6 +205,19 @@
             </reference>
           </references>
         </layer>
+        <layer Id="9905d4a3-87a3-46c4-abe5-202ee7b985ff" name="nuget">
+          <references>
+            <reference Id="2a788024-d9b8-419e-aa0a-d502a0e6aa6d" name="nuget">
+              <ArtifactNode Label="nuget" Category="CodeSchema_Project" Id="(Assembly=../../src/extensions/nuget)">
+                <Category Ref="CodeMap_SolutionFolder" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">

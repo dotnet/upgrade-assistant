@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using NuGet.Frameworks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetTargetFrameworkMonikerComparer : ITargetFrameworkMonikerComparer
     {

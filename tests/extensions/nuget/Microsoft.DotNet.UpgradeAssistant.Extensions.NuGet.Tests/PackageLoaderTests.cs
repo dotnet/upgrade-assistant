@@ -12,9 +12,8 @@ using NuGet.Packaging.Core;
 using NuGet.Protocol.Core.Types;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
 {
-    [Collection(MSBuildStepTestCollection.Name)]
     public class PackageLoaderTests
     {
         private readonly Fixture _fixture;

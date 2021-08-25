@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ILogger _logger;
         private readonly IEnumerable<IComponentIdentifier> _componentIdentifiers;
         private readonly IPackageRestorer _restorer;
-        private readonly ITargetFrameworkMonikerComparer _comparer;
+        private readonly Factories _factories;
 
         public MSBuildWorkspaceUpgradeContext Context { get; }
 
@@ -29,6 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public MSBuildProject(
             MSBuildWorkspaceUpgradeContext context,
             IEnumerable<IComponentIdentifier> componentIdentifiers,
+            Factories factories,
             IPackageRestorer restorer,
             ITargetFrameworkMonikerComparer comparer,
             FileInfo file,
@@ -37,9 +38,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             FileInfo = file ?? throw new ArgumentNullException(nameof(file));
             Context = context ?? throw new ArgumentNullException(nameof(context));
 
+            _factories = factories ?? throw new ArgumentNullException(nameof(factories));
             _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
-            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -141,7 +142,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public IEnumerable<Reference> References =>
             ProjectRoot.GetAllReferences().Select(r => r.AsReference()).ToList();
 
-        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks => new TargetFrameworkMonikerCollection(this, _comparer);
+        public IReadOnlyCollection<TargetFrameworkMoniker> TargetFrameworks => _factories.CreateTfmCollection(this);
 
         public IEnumerable<string> ProjectTypes => GetPropertyValue("ProjectTypeGuids").Split(';');
 

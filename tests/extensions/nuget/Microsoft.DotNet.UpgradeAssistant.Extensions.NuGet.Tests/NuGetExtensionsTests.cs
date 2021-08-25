@@ -4,9 +4,8 @@
 using System;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
 {
-    [Collection(MSBuildStepTestCollection.Name)]
     public class NuGetExtensionsTests
     {
         [Fact]
