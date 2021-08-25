@@ -1,7 +1,6 @@
 ﻿Imports System.Web.Http
 Imports System.Web.Mvc
 Imports System.Collections.Generic
-Imports Microsoft.AspNetCore.Mvc
 
 Namespace TestProject.TestClasses
 
@@ -35,7 +34,7 @@ Namespace TestProject.TestClasses
     End Class
 
     Public Class ValuesController3
-        Inherits Controller
+        Inherits Microsoft.AspNetCore.Mvc.Controller
 
         ' GET api/values
         Public Function GetValues() As IEnumerable(Of String)
