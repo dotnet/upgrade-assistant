@@ -7,13 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    public class AnalyzePackageStatus : IAnalyzeResultProvider
+    public class PackageAnalyzerResultProvider : IAnalyzeResultProvider
     {
         private const string Id = "UA101";
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
@@ -26,14 +27,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
-        public AnalyzePackageStatus(IDependencyAnalyzerRunner packageAnalyzer,
+        public PackageAnalyzerResultProvider(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
-            ILogger<AnalyzePackageStatus> logger)
+            ILogger<PackageAnalyzerResultProvider> logger)
         {
             Logger = logger;
             _tfmSelector = tfmSelector;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
+        }
+
+        public async Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
+        {
+            return await Task.FromResult(true);
         }
 
         public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)

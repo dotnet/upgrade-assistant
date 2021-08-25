@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         private readonly IEnumerable<IExtensionInstance> _extensions;
         private readonly Lazy<Mapper> _mapper;
 
-        public AggregateExtensionConfigureOptions(string sectionName, IExtensionManager extensions)
+        public AggregateExtensionConfigureOptions(string sectionName, IExtensionProvider extensions)
         {
             _sectionName = sectionName;
             _extensions = extensions.Instances;

@@ -9,6 +9,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal class ManifestDirectoryExtensionLoader : IExtensionLoader
     {
+        private readonly ExtensionInstanceFactory _factory;
+
+        public ManifestDirectoryExtensionLoader(ExtensionInstanceFactory factory)
+        {
+            _factory = factory;
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The file provider will be disposed when the extension instance is disposed.")]
         public ExtensionInstance? LoadExtension(string path)
         {
@@ -21,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             if (ExtensionInstance.ManifestFileName.Equals(filename, StringComparison.OrdinalIgnoreCase))
             {
                 var dir = Path.GetDirectoryName(path) ?? string.Empty;
-                return new ExtensionInstance(new PhysicalFileProvider(dir), dir);
+                return _factory.Create(new PhysicalFileProvider(dir), dir);
             }
 
             return null;

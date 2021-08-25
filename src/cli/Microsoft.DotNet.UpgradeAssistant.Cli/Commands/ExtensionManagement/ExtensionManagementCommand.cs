@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                                   services.AddOptions<ExtensionNameOptions>()
                                     .Configure<IOptions<ExtensionOptions>>((options, extensionOptions) =>
                                     {
-                                        options.Path = opts.Path;
+                                        options.Path = opts.ExtensionPath;
 
                                         if (opts.Name is not null)
                                         {
@@ -132,23 +132,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 : base("create")
             {
                 AddHandler<CreateExtensionAppCommand>();
-                AddArgument(new Argument<string>("path", LocalizedStrings.ExtensionManagementName));
+                AddArgument(new Argument<string>("extensionPath", LocalizedStrings.ExtensionManagementName));
             }
 
             private class CreateExtensionAppCommand : IAppCommand
             {
-                private readonly IExtensionManager _extensionManager;
+                private readonly IExtensionProvider _extensionProvider;
                 private readonly IExtensionCreator _extensionCreator;
                 private readonly IOptions<ExtensionNameOptions> _options;
                 private readonly ILogger<CreateExtensionAppCommand> _logger;
 
                 public CreateExtensionAppCommand(
-                    IExtensionManager extensionManager,
+                    IExtensionProvider extensionProvider,
                     IExtensionCreator extensionCreator,
                     IOptions<ExtensionNameOptions> options,
                     ILogger<CreateExtensionAppCommand> logger)
                 {
-                    _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
+                    _extensionProvider = extensionProvider ?? throw new ArgumentNullException(nameof(extensionProvider));
                     _extensionCreator = extensionCreator ?? throw new ArgumentNullException(nameof(extensionCreator));
                     _options = options ?? throw new ArgumentNullException(nameof(options));
                     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                         return Task.CompletedTask;
                     }
 
-                    var extension = _extensionManager.OpenExtension(options.Path);
+                    var extension = _extensionProvider.OpenExtension(options.Path);
 
                     if (extension?.Version is null)
                     {
@@ -199,12 +199,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
             private class ListExtensionAppCommand : IAppCommand
             {
-                private readonly IExtensionManager _extensionManager;
+                private readonly IExtensionProvider _extensionProvider;
                 private readonly ILogger<ListExtensionAppCommand> _logger;
 
-                public ListExtensionAppCommand(IExtensionManager extensionManager, ILogger<ListExtensionAppCommand> logger)
+                public ListExtensionAppCommand(IExtensionProvider extensionProvider, ILogger<ListExtensionAppCommand> logger)
                 {
-                    _extensionManager = extensionManager;
+                    _extensionProvider = extensionProvider;
                     _logger = logger;
                 }
 
@@ -212,7 +212,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 {
                     _logger.LogInformation(LocalizedStrings.ListExtensionDetails);
 
-                    foreach (var n in _extensionManager.Registered)
+                    foreach (var n in _extensionProvider.Registered)
                     {
                         _logger.LogInformation(LocalizedStrings.ListExtensionItem, n.Name, n.Source);
                     }
@@ -299,14 +299,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             private class UpdateExtensionAppCommand : IAppCommand
             {
                 private readonly IOptions<ExtensionNameOptions> _options;
+                private readonly IExtensionProvider _extensionProvider;
                 private readonly IExtensionManager _extensionManager;
                 private readonly ILogger<UpdateExtensionAppCommand> _logger;
 
-                public UpdateExtensionAppCommand(IOptions<ExtensionNameOptions> options, IExtensionManager extensionManager, ILogger<UpdateExtensionAppCommand> logger)
+                public UpdateExtensionAppCommand(IOptions<ExtensionNameOptions> options, IExtensionProvider extensionProvider, IExtensionManager extensionManager, ILogger<UpdateExtensionAppCommand> logger)
                 {
-                    _options = options;
-                    _extensionManager = extensionManager;
-                    _logger = logger;
+                    _options = options ?? throw new ArgumentNullException(nameof(options));
+                    _extensionProvider = extensionProvider ?? throw new ArgumentNullException(nameof(extensionProvider));
+                    _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
+                    _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 }
 
                 public async Task RunAsync(CancellationToken token)
@@ -339,7 +341,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                             return requested.Select(r => r.Name);
                         }
 
-                        return _extensionManager.Registered.Select(e => e.Name);
+                        return _extensionProvider.Registered.Select(e => e.Name);
                     }
                 }
             }
@@ -366,7 +368,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
             public string? Version { get; set; }
 
-            public string? Path { get; set; }
+            public string? ExtensionPath { get; set; }
+
+            public string? Path => null;
 
             public bool IgnoreUnsupportedFeatures { get; set; }
 
@@ -377,6 +381,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
 
             public DirectoryInfo? VSPath { get; set; }
+
+            public DirectoryInfo? MSBuildPath { get; set; }
         }
     }
 }

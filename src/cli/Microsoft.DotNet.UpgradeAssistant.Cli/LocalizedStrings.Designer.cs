@@ -196,6 +196,78 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Provides the entry-point project to start the upgrade process. This may include globbing patterns such as &apos;*&apos; for match..
+        /// </summary>
+        internal static string UpgradeAssistantCommandEntrypoint {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandEntrypoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times..
+        /// </summary>
+        internal static string UpgradeAssistantCommandExtension {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Acknowledges that upgrade-assistant will not be able to completely upgrade a project. This indicates that the solution must be redesigned (e.g. consider Blazor to replace Web Forms)..
+        /// </summary>
+        internal static string UpgradeAssistantCommandIgnoreUnsupported {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandIgnoreUnsupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path to a MSBuild install directory to be used. If not provided, the latest installed version will be used..
+        /// </summary>
+        internal static string UpgradeAssistantCommandMsbuild {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandMsbuild", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies an option that should be added to Upgrade Assistant that may be used by extensions..
+        /// </summary>
+        internal static string UpgradeAssistantCommandOption {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path to a project or solution file to be used..
+        /// </summary>
+        internal static string UpgradeAssistantCommandProject {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean..
+        /// </summary>
+        internal static string UpgradeAssistantCommandTargetTfm {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandTargetTfm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path to a VS install directory to be used for %VSINSTALLDIR%. If not provided, the latest installed version will be used..
+        /// </summary>
+        internal static string UpgradeAssistantCommandVS {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandVS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Microsoft .NET Upgrade Assistant v{0}.
         /// </summary>
         internal static string UpgradeAssistantHeader {

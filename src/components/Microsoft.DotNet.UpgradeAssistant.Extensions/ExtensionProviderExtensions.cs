@@ -40,10 +40,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     o.Converters.Add(new JsonStringEnumConverter());
                 });
 
-            services.AddSingleton<IExtensionManager, ExtensionManager>();
+            services.AddSingleton<ExtensionInstanceFactory>();
+            services.AddTransient<IExtensionManager, ExtensionManager>();
+            services.AddSingleton<IExtensionProvider, ExtensionProvider>();
             services.AddExtensionLoaders();
             services.TryAddSingleton<IUpgradeAssistantConfigurationLoader, DefaultUpgradeAssistantConfigurationLoader>();
             services.TryAddTransient<IExtensionDownloader, NuGetExtensionDownloader>();
+            services.AddTransient<IExtensionLocator, ExtensionLocator>();
             services.TryAddTransient<IExtensionCreator, NuGetExtensionPackageCreator>();
 
             return services.AddOptions<ExtensionOptions>();
@@ -113,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             services.AddOptions<ExtensionOptions>()
-                .Configure(options =>
+                .Configure<ExtensionInstanceFactory>((options, factory) =>
                 {
                     var json = JsonSerializer.SerializeToUtf8Bytes(option);
                     using var stream = new MemoryStream(json);
@@ -122,7 +125,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                         .AddJsonStream(stream)
                         .Build();
 
-                    options.Extensions.Add(new ExtensionInstance(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
+                    options.Extensions.Add(factory.Create(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config));
                 });
 
             return services;

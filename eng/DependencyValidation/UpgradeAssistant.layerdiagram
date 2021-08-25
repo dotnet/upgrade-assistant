@@ -101,6 +101,9 @@
         <dependencyFromLayerToLayer Id="153f1107-fc9d-4101-843e-a911901b91e4" direction="Forward">
           <layerMoniker Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" />
         </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="c9747cf9-f7c8-42a1-a265-263d589593bf" direction="Forward">
+          <layerMoniker Id="87aac048-b443-4d5c-bd87-162b1ff74794" />
+        </dependencyFromLayerToLayer>
       </dependencyToLayers>
       <childLayers>
         <layer Id="42f898d2-cf30-4e9d-ab77-96ef4fb7f844" name="vb">

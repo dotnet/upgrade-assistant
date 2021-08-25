@@ -19,5 +19,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public const string RazorUpdaterStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Razor.RazorUpdaterStep";
         public const string TemplateInserterStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep";
         public const string VisualBasicProjectUpdaterStepId = "Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.VisualBasicProjectUpdaterStep";
+        public const string WinformsProjectUpdaterStepId = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.WinformsUpdateStep";
     }
 }

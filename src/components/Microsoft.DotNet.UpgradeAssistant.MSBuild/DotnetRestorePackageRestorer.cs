@@ -18,7 +18,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             "Consider re-running the command with --interactive",
             "ATTENTION: User interaction required",
             "*****************************",
-            "To sign in, use a web browser"
+            "To sign in, use a web browser",
+            "FromWorkload",
+            "workload",
         };
 
         private readonly IUserInput _userInput;
@@ -58,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         // Run `dotnet restore` using quiet mode since some warnings and errors are
         // expected. As long as a lock file is produced (which is checked elsewhere),
         // the tool was successful enough.
-        private Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token) =>
+        public Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token) =>
             _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = "dotnet",

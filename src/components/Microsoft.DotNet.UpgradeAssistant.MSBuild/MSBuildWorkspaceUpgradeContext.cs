@@ -21,14 +21,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ITargetFrameworkMonikerComparer _comparer;
         private readonly IEnumerable<IComponentIdentifier> _componentIdentifiers;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
-        private readonly string? _vsPath;
         private readonly Dictionary<string, IProject> _projectCache;
+        private readonly IOptions<WorkspaceOptions> _options;
+
         private List<FileInfo>? _entryPointPaths;
         private FileInfo? _projectPath;
 
         private MSBuildWorkspace? _workspace;
 
-        public string InputPath { get; }
+        public string InputPath => _options.Value.InputPath;
 
         public ISolutionInfo SolutionInfo { get; }
 
@@ -55,27 +56,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public MSBuildWorkspaceUpgradeContext(
             IOptions<WorkspaceOptions> options,
-            IVisualStudioFinder vsFinder,
             Func<string, ISolutionInfo> infoGenerator,
             IPackageRestorer restorer,
             ITargetFrameworkMonikerComparer comparer,
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
-            if (vsFinder is null)
+            if (infoGenerator is null)
             {
-                throw new ArgumentNullException(nameof(vsFinder));
+                throw new ArgumentNullException(nameof(infoGenerator));
             }
 
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
-            InputPath = options.Value.InputPath;
-            _restorer = restorer;
-            _comparer = comparer;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Properties = new UpgradeContextProperties();
 
-            _vsPath = vsFinder.GetLatestVisualStudioPath();
             SolutionInfo = infoGenerator(InputPath);
             GlobalProperties = CreateProperties();
             ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
@@ -152,11 +151,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             var properties = new Dictionary<string, string>();
 
-            if (_vsPath is not null)
+            if (_options.Value.VisualStudioPath is string vsPath)
             {
-                properties.Add("VSINSTALLDIR", _vsPath);
-                properties.Add("MSBuildExtensionsPath32", Path.Combine(_vsPath, "MSBuild"));
-                properties.Add("MSBuildExtensionsPath", Path.Combine(_vsPath, "MSBuild"));
+                properties.Add("VSINSTALLDIR", vsPath);
+                properties.Add("MSBuildExtensionsPath32", Path.Combine(vsPath, "MSBuild"));
+                properties.Add("MSBuildExtensionsPath", Path.Combine(vsPath, "MSBuild"));
             }
 
             return properties;

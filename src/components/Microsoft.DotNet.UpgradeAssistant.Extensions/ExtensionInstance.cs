@@ -11,6 +11,7 @@ using System.Runtime.Loader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
@@ -25,12 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         private readonly Lazy<AssemblyLoadContext>? _alc;
 
-        public ExtensionInstance(IFileProvider fileProvider, string location)
-            : this(fileProvider, location, CreateConfiguration(fileProvider))
-        {
-        }
-
-        public ExtensionInstance(IFileProvider fileProvider, string location, IConfiguration configuration)
+        public ExtensionInstance(string instanceKey, IFileProvider fileProvider, string location, IConfiguration configuration, ILogger<ExtensionInstance> logger)
         {
             FileProvider = fileProvider;
             Location = location;
@@ -42,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             if (serviceProviders is not null)
             {
-                _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(this, serviceProviders));
+                _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(instanceKey, this, serviceProviders, logger));
             }
         }
 
@@ -88,6 +84,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             if (FileProvider is IDisposable disposable)
             {
                 disposable.Dispose();
+
+                if (_alc is not null && _alc.IsValueCreated)
+                {
+                    _alc.Value.Unload();
+                }
             }
         }
 
@@ -114,20 +115,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             return DefaultExtensionName;
-        }
-
-        private static IConfiguration CreateConfiguration(IFileProvider fileProvider)
-        {
-            try
-            {
-                return new ConfigurationBuilder()
-                    .AddJsonFile(fileProvider, ManifestFileName, optional: false, reloadOnChange: false)
-                    .Build();
-            }
-            catch (FileNotFoundException e)
-            {
-                throw new UpgradeException("Could not find manifest file", e);
-            }
         }
     }
 }
