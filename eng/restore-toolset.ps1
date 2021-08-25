@@ -7,11 +7,13 @@ try {
   # dotnet tool install -g Redth.Net.Maui.Check
   # maui-check --main --ci --non-interactive --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
 
-  # dotnet workload install ios --source "https://aka.ms/dotnet/maui/main/index.json"
-  # dotnet workload install macos --source "https://aka.ms/dotnet/maui/main/index.json"
-  # dotnet workload install maccatalyst --source "https://aka.ms/dotnet/maui/main/index.json"
-  # dotnet workload install android-aot --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet workload install ios --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet workload install macos --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet workload install maccatalyst --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet workload install android-aot --source "https://aka.ms/dotnet/maui/main/index.json"
   dotnet workload install maui --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet --version
+  dotnet --info
 
   # dotnet workload install maui --disable-parallel --verbosity diag --temp-dir $dotnetRoot
   # dotnet workload install android --disable-parallel --verbosity diag --temp-dir $dotnetRoot
@@ -32,7 +34,7 @@ try {
   # trying peppers 
   # dotnet workload update --from-rollback-file workload.json --verbosity diag
   # dotnet workload install maui --skip-manifest-update --verbosity diag
-  
+  # dotnet workload install maui --source "https://aka.ms/dotnet/maui/main/index.json" --skip-manifest-update --verbosity diag
 }
 catch {
   Write-Host $_.ScriptStackTrace
