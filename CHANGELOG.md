@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Removed a check that wouldn't include preview .NET SDK instances ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
+- Log file outputs structured logging rather than just text ([#822](https://github.com/dotnet/upgrade-assistant/pull/822))
 
 ## Version 0.2.241603 - 2021-08-16 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.241603))
 ### Added
