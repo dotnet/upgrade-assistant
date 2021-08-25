@@ -8,6 +8,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal class ZipExtensionLoader : IExtensionLoader
     {
+        private readonly ExtensionInstanceFactory _factory;
+
+        public ZipExtensionLoader(ExtensionInstanceFactory factory)
+        {
+            _factory = factory;
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The file provider will be disposed when the extension instance is disposed.")]
         public ExtensionInstance? LoadExtension(string path)
         {
@@ -22,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 try
                 {
-                    return new ExtensionInstance(provider, path);
+                    return _factory.Create(provider, path);
                 }
 
                 // If the manifest file couldn't be found, let's try looking at one layer deep with the name
@@ -32,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 {
                     var subpath = Path.GetFileNameWithoutExtension(path);
                     var subprovider = new SubFileProvider(provider, subpath);
-                    return new ExtensionInstance(subprovider, path);
+                    return _factory.Create(subprovider, path);
                 }
             }
 
