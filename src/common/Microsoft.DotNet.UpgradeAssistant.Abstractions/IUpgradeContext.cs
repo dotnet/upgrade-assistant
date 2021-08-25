@@ -34,8 +34,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         bool UpdateSolution(Solution updatedSolution);
 
-        Solution Solution { get; }
-
         IDictionary<string, string> GlobalProperties { get; }
 
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
