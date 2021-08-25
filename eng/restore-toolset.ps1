@@ -11,7 +11,7 @@ try {
   # dotnet workload install macos --source "https://aka.ms/dotnet/maui/main/index.json"
   # dotnet workload install maccatalyst --source "https://aka.ms/dotnet/maui/main/index.json"
   # dotnet workload install android-aot --source "https://aka.ms/dotnet/maui/main/index.json"
-  # dotnet workload install maui --source "https://aka.ms/dotnet/maui/main/index.json"
+  dotnet workload install maui --source "https://aka.ms/dotnet/maui/main/index.json"
 
   # dotnet workload install maui --disable-parallel --verbosity diag --temp-dir $dotnetRoot
   # dotnet workload install android --disable-parallel --verbosity diag --temp-dir $dotnetRoot
@@ -30,8 +30,8 @@ try {
   # dotnet workload install ios --sdk-version $dotnetSdkVersion --disable-parallel --verbosity diag --temp-dir $dotnetRoot
 
   # trying peppers 
-  dotnet workload update --from-rollback-file workload.json --verbosity diag
-  dotnet workload install maui --skip-manifest-update --verbosity diag
+  # dotnet workload update --from-rollback-file workload.json --verbosity diag
+  # dotnet workload install maui --skip-manifest-update --verbosity diag
   
 }
 catch {
