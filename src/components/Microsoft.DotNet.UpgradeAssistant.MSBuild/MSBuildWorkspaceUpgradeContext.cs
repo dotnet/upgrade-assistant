@@ -54,6 +54,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public UpgradeStep? CurrentStep { get; set; }
 
+        public Solution Solution => Workspace.CurrentSolution;
+
         public MSBuildWorkspaceUpgradeContext(
             IOptions<WorkspaceOptions> options,
             Func<string, ISolutionInfo> infoGenerator,

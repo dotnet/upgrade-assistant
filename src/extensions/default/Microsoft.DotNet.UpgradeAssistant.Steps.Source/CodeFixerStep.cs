@@ -151,6 +151,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 }
             }
 
+            if (!context.UpdateSolution(await context.Solution.SimplifyAsync(token)))
+            {
+                Logger.LogWarning("Failed to update solution after simplifying codefixer changes");
+            }
+
             Logger.LogDebug("All instances of {DiagnosticId} fixed", DiagnosticId);
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
@@ -190,8 +195,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return null;
             }
 
-            return await applyOperation.ChangedSolution
-                .SimplifyAsync(token);
+            return applyOperation.ChangedSolution;
         }
     }
 }
