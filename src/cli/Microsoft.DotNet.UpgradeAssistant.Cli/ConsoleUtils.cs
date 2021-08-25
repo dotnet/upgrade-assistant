@@ -19,13 +19,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 return Console.WindowWidth;
             }
         }
-
-        public static void Clear()
-        {
-            if (!Console.IsOutputRedirected)
-            {
-                Console.Clear();
-            }
-        }
     }
 }

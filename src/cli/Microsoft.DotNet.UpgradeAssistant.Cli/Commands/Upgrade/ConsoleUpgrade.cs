@@ -98,11 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
                 Console.ResetColor();
             }
-            else if (await _input.WaitToProceedAsync(token))
-            {
-                ConsoleUtils.Clear();
-            }
-            else
+            else if (!await _input.WaitToProceedAsync(token))
             {
                 _logger.LogWarning("Upgrade process was canceled. Quitting....");
             }
@@ -120,6 +116,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         private async Task ShowUpgradeStepsAsync(IEnumerable<UpgradeStep> steps, IUpgradeContext context, CancellationToken token, UpgradeStep? currentStep = null, int offset = 0)
         {
+            if (!_input.IsInteractive)
+            {
+                return;
+            }
+
             if (steps is null || !steps.Any())
             {
                 return;

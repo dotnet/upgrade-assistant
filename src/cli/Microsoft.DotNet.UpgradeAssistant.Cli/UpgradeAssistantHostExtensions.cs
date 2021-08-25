@@ -175,7 +175,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(options));
             }
 
-            ConsoleUtils.Clear();
             Program.ShowHeader();
 
             const string LogFilePath = "log.txt";
