@@ -22,9 +22,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis">
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build.Locator">
-      <Version>1.4.1</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features">
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
@@ -32,9 +29,6 @@
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
-      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild">
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
     <PackageReference Include="coverlet.collector">
@@ -59,7 +53,6 @@
     <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj" />
-    <ProjectReference Include="..\..\..\..\..\src\components\Microsoft.DotNet.UpgradeAssistant.MSBuild\Microsoft.DotNet.UpgradeAssistant.MSBuild.csproj" />
     <ProjectReference Include="..\..\..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>

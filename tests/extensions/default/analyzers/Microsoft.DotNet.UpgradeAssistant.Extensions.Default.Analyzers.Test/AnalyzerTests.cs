@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -12,19 +13,13 @@ using Xunit.Abstractions;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
-    [Collection(AnalyzerTestCollection.Name)]
     public class AnalyzerTests
     {
         private readonly ITestOutputHelper _output;
 
-        public AnalyzerTests(ITestOutputHelper output, RestoreTestProjectFixture fixture)
+        public AnalyzerTests(ITestOutputHelper output)
         {
             _output = output;
-
-            foreach (var message in fixture.Messages)
-            {
-                _output.WriteLine(message);
-            }
         }
 
         private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new()
@@ -244,7 +239,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0013_G", new TextSpan(1658, 25)),
                     new ExpectedDiagnostic("UA0013_G", new TextSpan(1658, 60)),
 
-                    new ExpectedDiagnostic("UA0013_H", new TextSpan(2057, 15)),
+                    new ExpectedDiagnostic("UA0013_H", new TextSpan(2023, 15)),
                     new ExpectedDiagnostic("UA0013_H", new TextSpan(2131, 29)),
                 }
             },
@@ -254,10 +249,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task NegativeTest()
         {
-            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", TestHelper.AllAnalyzers
+            var analyzers = TestHelper.AllAnalyzers
                 .SelectMany(a => a.SupportedDiagnostics)
                 .Select(d => d.Id)
-                .ToArray()).ConfigureAwait(false);
+                .ToArray();
+            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", analyzers, isFramework: true).ConfigureAwait(false);
 
             Assert.Empty(diagnostics);
         }
@@ -281,15 +277,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         {
             foreach (var language in new[] { Language.CSharp, Language.VisualBasic })
             {
-                var expectedDiagnostics = ExpectedDiagnostics[scenarioName].Where(diagnostics => diagnostics.Language == language);
+                var expectedDiagnostics = ExpectedDiagnostics[scenarioName]
+                    .Where(diagnostics => diagnostics.Language == language);
                 if (!expectedDiagnostics.Any())
                 {
                     // nothing to see here, move along
                     continue;
                 }
 
-                var fileExtension = language.GetFileExtension();
-                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, $"{scenarioName}.{fileExtension}", expectedDiagnostics.Select(e => e.Id).Distinct()).ConfigureAwait(false);
+                var expectedDiagnosticIds = expectedDiagnostics
+                    .Select(e => e.Id)
+                    .Distinct();
+
+                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, scenarioName, isFramework: true, expectedDiagnosticIds);
                 AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
             }
         }
@@ -319,14 +319,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     continue;
                 }
 
-                var extension = language.GetFileExtension();
-                var fixedSource = await TestHelper.FixSourceAsync(language, $"{scenarioName}.{extension}", expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
-                var expectedSource = await TestHelper.GetSourceAsync(language, $"{scenarioName}.Fixed.{extension}").ConfigureAwait(false);
-
-                Assert.NotNull(expectedSource);
-
-                var expectedText = (await expectedSource!.GetTextAsync().ConfigureAwait(false)).ToString();
+                var fixedSource = await TestHelper.FixSourceAsync(language, scenarioName, expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
                 var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
+
+                var expectedText = TestHelper.GetSource(language, $"{scenarioName}.Fixed");
 
                 _output.WriteLine("Expected:");
                 _output.WriteLine(expectedText);
@@ -339,7 +335,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, IEnumerable<ExpectedDiagnostic> expectedDiagnostics)
         {
-            Assert.Equal(expectedDiagnostics.Count(), diagnostics.Count());
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
@@ -348,6 +343,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected {expectedDiagnostics.ElementAt(count).Language} diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}; actually at {d.Location.SourceSpan}");
                 count++;
             }
+
+            Assert.Equal(expectedDiagnostics.Count(), count);
         }
     }
 }

@@ -12,7 +12,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Xunit;
@@ -49,23 +50,63 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         private static ImmutableArray<AdditionalText> AdditionalTexts => ImmutableArray.Create<AdditionalText>(new AdditionalFileText(Path.Combine(AppContext.BaseDirectory, TypeMapPath)));
 
-        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, IEnumerable<string> diagnosticIds)
+        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, IEnumerable<string> diagnosticIds, bool isFramework)
         {
-            return GetDiagnosticsAsync(Language.CSharp, documentPath, diagnosticIds);
+            return GetDiagnosticsAsync(Language.CSharp, documentPath, isFramework, diagnosticIds);
         }
 
-        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(Language lang, string documentPath, IEnumerable<string> diagnosticIds)
+        public static async Task<Project> CreateProjectAsync(Language language, bool isFramework, CancellationToken cancellationToken = default)
+        {
+            var workspace = new AdhocWorkspace();
+
+            var project = workspace.AddProject("testProject", language.ToLanguageName());
+
+            ReferenceAssemblies GetReferenceAssemblies()
+            {
+                if (isFramework)
+                {
+                    var packages = new[]
+                    {
+                        new PackageIdentity("Microsoft.AspNet.Razor", "5.2.7"),
+                        new PackageIdentity("Microsoft.AspNet.Mvc", "5.2.7"),
+                        new PackageIdentity("Microsoft.Owin", "4.2.0")
+                    };
+
+                    return ReferenceAssemblies.NetFramework.Net48.Default
+                        .AddPackages(ImmutableArray.Create(packages))
+                        .AddAssemblies(ImmutableArray.Create("System.Web"));
+                }
+                else
+                {
+                    return ReferenceAssemblies.NetCore.NetCoreApp31
+                        .AddPackages(ImmutableArray.Create(new PackageIdentity("Microsoft.AspNetCore.App.Ref", "3.1.10")));
+                }
+            }
+
+            var references = await GetReferenceAssemblies().ResolveAsync(language.ToLanguageName(), cancellationToken);
+
+            project = project.WithMetadataReferences(references);
+
+            foreach (var file in Directory.EnumerateFiles("assets", $"*.{language.GetFileExtension()}", SearchOption.AllDirectories))
+            {
+                if (!file.Contains(".Fixed."))
+                {
+                    project = project.AddDocument(Path.GetFileName(file), File.ReadAllText(file))
+                        .Project;
+                }
+            }
+
+            return project;
+        }
+
+        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(Language lang, string documentPath, bool isFramework, IEnumerable<string> diagnosticIds)
         {
             if (documentPath is null)
             {
                 throw new ArgumentNullException(nameof(documentPath));
             }
 
-            using var workspace = MSBuildWorkspace.Create();
-
-            var projectLanguage = lang.GetFileExtension();
-            var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
-            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
+            var project = await CreateProjectAsync(lang, isFramework);
 
             return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
@@ -82,26 +123,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
 
             var compilationWithAnalyzers = compilation
-                            .WithAnalyzers(ImmutableArray.Create(analyzersToUse.ToArray()), new AnalyzerOptions(AdditionalTexts));
+                .WithAnalyzers(ImmutableArray.Create(analyzersToUse.ToArray()), new AnalyzerOptions(AdditionalTexts));
 
             return (await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false))
-                .Where(d => d.Location.IsInSource && documentPath.Equals(Path.GetFileName(d.Location.GetLineSpan().Path), StringComparison.Ordinal))
+                .Where(d => d.Location.IsInSource && documentPath.Equals(Path.GetFileNameWithoutExtension(d.Location.GetLineSpan().Path), StringComparison.Ordinal))
                 .Where(d => diagnosticIds.Contains(d.Id, StringComparer.Ordinal));
         }
 
-        public static async Task<Document?> GetSourceAsync(Language lang, string documentPath)
+        public static string GetSource(Language lang, string documentPath)
         {
             if (documentPath is null)
             {
                 throw new ArgumentNullException(nameof(documentPath));
             }
 
-            using var workspace = MSBuildWorkspace.Create();
-            var projectLanguage = lang.GetFileExtension();
-            var path = TestProjectPath.Replace("{lang}", $"Fixed.{projectLanguage}", StringComparison.OrdinalIgnoreCase);
-            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
+            var path = Directory.EnumerateFiles("assets", $"{documentPath}.{lang.GetFileExtension()}", SearchOption.AllDirectories)
+                .First();
 
-            return project.Documents.FirstOrDefault(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal));
+            return File.ReadAllText(path);
         }
 
         public static async Task<Document> FixSourceAsync(Language lang, string documentPath, IEnumerable<string> diagnosticIds)
@@ -111,15 +150,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 throw new ArgumentNullException(nameof(documentPath));
             }
 
-            using var workspace = MSBuildWorkspace.Create();
-            var projectLanguage = lang.GetFileExtension();
-            var path = TestProjectPath.Replace("{lang}", projectLanguage, StringComparison.OrdinalIgnoreCase);
-            var project = await workspace.OpenProjectAsync(path).ConfigureAwait(false);
-
+            var project = await CreateProjectAsync(lang, isFramework: false);
             var projectId = project.Id;
 
             var diagnosticFixed = false;
-            var solution = workspace.CurrentSolution;
+            var solution = project.Solution;
+
             const int MAX_TRIES = 100;
             var fixAttempts = 0;
             do
@@ -149,10 +185,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             }
             while (diagnosticFixed);
 
-            return await solution.GetProject(projectId)!
-                .Documents
-                .First(d => documentPath.Equals(Path.GetFileName(d.FilePath), StringComparison.Ordinal))
-                .SimplifyAsync(default);
+            project = solution.GetProject(projectId)!;
+            return project.Documents.First(d => documentPath.Equals(Path.GetFileNameWithoutExtension(d.Name), StringComparison.Ordinal));
         }
 
         private static async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)

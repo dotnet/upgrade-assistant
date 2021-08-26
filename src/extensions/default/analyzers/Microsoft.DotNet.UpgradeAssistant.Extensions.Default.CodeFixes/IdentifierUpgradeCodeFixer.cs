@@ -76,16 +76,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         /// <returns>An updated document with the given node replaced with the new identifier.</returns>
         private static async Task<Document> UpdateIdentifierTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
+            var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            if (documentRoot is null)
+            {
+                return document;
+            }
+
+            var generator = SyntaxGenerator.GetGenerator(document);
 
             // Create new identifier
-            var updatedNode = GetUpdatedNode(node, editor.Generator, newIdentifier)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation)
-                .WithTriviaFrom(node);
+            var updatedNode = GetUpdatedNode(node, generator, newIdentifier)
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
 
-            editor.ReplaceNode(node, updatedNode);
+            // Preserve white space and comments
+            updatedNode = updatedNode.WithTriviaFrom(node);
 
-            return editor.GetChangedDocument();
+            if (updatedNode is null)
+            {
+                return document;
+            }
+
+            // Replace the node
+            var updatedRoot = documentRoot.ReplaceNode(node, updatedNode);
+            var updatedDocument = document.WithSyntaxRoot(updatedRoot);
+
+            // Add using declaration if needed
+            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
+
+            // Simplify the call, if possible
+            updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);
+
+            return updatedDocument;
         }
 
         private static SyntaxNode GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string name)
