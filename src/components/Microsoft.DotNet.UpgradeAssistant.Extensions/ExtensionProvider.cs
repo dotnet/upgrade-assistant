@@ -50,6 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
                 var opts = options.Value;
 
+                // Required extensions are required for all commands UA may handle, as opposed to other extensions that augment certain commands
                 foreach (var path in opts.RequiredExtensions)
                 {
                     LoadPath(path, isDefault: true);

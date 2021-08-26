@@ -38,6 +38,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        public IEnumerable<NuGetReference> PackageReferences => ProjectRoot.GetAllPackageReferences().Select(p => p.AsNuGetReference());
+
         public bool IsSdk => Sdk.Any();
 
         public ICollection<string> Imports => new ImportsCollection(ProjectRoot);

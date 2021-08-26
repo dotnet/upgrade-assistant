@@ -9,17 +9,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private readonly Func<IUpgradeContext, IProject, INuGetReferences> _nugetReferenceFactory;
         private readonly Func<IProjectFile, ITargetFrameworkCollection> _tfmCollectionFactory;
+        private readonly Func<string, ISolutionInfo> _infoGenerator;
 
         public Factories(
             Func<IUpgradeContext, IProject, INuGetReferences> nugetReferenceFactory,
-            Func<IProjectFile, ITargetFrameworkCollection> tfmCollectionFactory)
+            Func<IProjectFile, ITargetFrameworkCollection> tfmCollectionFactory,
+            Func<string, ISolutionInfo> infoGenerator)
         {
             _nugetReferenceFactory = nugetReferenceFactory;
             _tfmCollectionFactory = tfmCollectionFactory;
+            _infoGenerator = infoGenerator;
         }
 
         public INuGetReferences CreateNuGetReferences(IUpgradeContext context, IProject project) => _nugetReferenceFactory(context, project);
 
         public ITargetFrameworkCollection CreateTfmCollection(IProjectFile project) => _tfmCollectionFactory(project);
+
+        public ISolutionInfo CreateSolutionInfo(string name) => _infoGenerator(name);
     }
 }

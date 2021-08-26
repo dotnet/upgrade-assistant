@@ -60,6 +60,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public Language Language => ParseLanguageByProjectFileExtension(FileInfo.Extension);
 
+        public INuGetReferences NuGetReferences => _factories.CreateNuGetReferences(Context, this);
+
         private static Language ParseLanguageByProjectFileExtension(string extension)
             => extension.ToUpperInvariant() switch
             {
