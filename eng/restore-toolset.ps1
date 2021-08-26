@@ -3,9 +3,13 @@
 
 try {
   dotnet workload install maui --skip-manifest-update --verbosity diag
-  dotnet workload install ios --skip-manifest-update --verbosity diag
-  dotnet workload install android --skip-manifest-update --verbosity diag
-
+  dotnet workload install maui-core --skip-manifest-update --verbosity diag
+  dotnet workload install maui-android --skip-manifest-update --verbosity diag
+  dotnet workload install maui-desktop --skip-manifest-update --verbosity diag
+  dotnet workload install maui-ios --skip-manifest-update --verbosity diag
+  dotnet workload install maui-mobile --skip-manifest-update --verbosity diag
+  dotnet workload install microsoft-android-sdk-full --skip-manifest-update --verbosity diag
+  dotnet workload install microsoft-ios-sdk-full --skip-manifest-update --verbosity diag
 
   # dotnet tool install -g Redth.Net.Maui.Check
   # maui-check --main --ci --non-interactive --skip androidsdk --skip xcode --skip vswin --skip vsmac --skip edgewebview2
