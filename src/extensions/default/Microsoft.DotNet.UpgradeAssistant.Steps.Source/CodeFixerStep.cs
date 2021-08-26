@@ -190,8 +190,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return null;
             }
 
-            return await applyOperation.ChangedSolution
-                .SimplifyAsync(token);
+            return applyOperation.ChangedSolution;
         }
     }
 }

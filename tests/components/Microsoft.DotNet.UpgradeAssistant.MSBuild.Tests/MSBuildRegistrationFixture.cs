@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Fixtures
+namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
     public class MSBuildRegistrationFixture : IDisposable
     {

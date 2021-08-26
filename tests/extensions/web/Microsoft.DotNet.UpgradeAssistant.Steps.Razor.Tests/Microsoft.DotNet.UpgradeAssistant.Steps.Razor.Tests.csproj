@@ -11,6 +11,22 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Remove="MappedSubTextTestData.cs" />
     <Content Include="MappedSubTextTestData.cs">

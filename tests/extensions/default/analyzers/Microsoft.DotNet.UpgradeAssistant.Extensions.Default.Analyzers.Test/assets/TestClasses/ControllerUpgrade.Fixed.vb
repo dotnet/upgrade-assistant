@@ -1,11 +1,12 @@
 ﻿Imports System.Web.Http
 Imports System.Web.Mvc
 Imports System.Collections.Generic
+Imports Microsoft.AspNetCore.Mvc
 
 Namespace TestProject.TestClasses
 
     Public Class ValuesController2
-        Inherits Microsoft.AspNetCore.Mvc.ControllerBase
+        Inherits ControllerBase
 
         ' GET api/values
         Public Function GetValues() As IEnumerable(Of String)
@@ -16,7 +17,7 @@ Namespace TestProject.TestClasses
     End Class
 
     Public Class MoviesController2
-        Inherits Microsoft.AspNetCore.Mvc.ControllerBase
+        Inherits ControllerBase
 
         ' GET api/movies
         Public Function GetMovies() As IEnumerable(Of String)
@@ -34,7 +35,7 @@ Namespace TestProject.TestClasses
     End Class
 
     Public Class ValuesController3
-        Inherits Microsoft.AspNetCore.Mvc.Controller
+        Inherits Controller
 
         ' GET api/values
         Public Function GetValues() As IEnumerable(Of String)
@@ -45,7 +46,7 @@ Namespace TestProject.TestClasses
     End Class
 
     Public Class MoviesController3
-        Inherits Microsoft.AspNetCore.Mvc.Controller
+        Inherits Controller
 
         ' GET api/movies
         Public Function GetMovies() As IEnumerable(Of String)
