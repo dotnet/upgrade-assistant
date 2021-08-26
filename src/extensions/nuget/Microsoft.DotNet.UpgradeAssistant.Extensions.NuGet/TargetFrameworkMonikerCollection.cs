@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using NuGet.Frameworks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
-    public class TargetFrameworkMonikerCollection : IReadOnlyCollection<TargetFrameworkMoniker>
+    public class TargetFrameworkMonikerCollection : IReadOnlyCollection<TargetFrameworkMoniker>, ITargetFrameworkCollection
     {
         private const string SdkSingleTargetFramework = "TargetFramework";
         private const string SdkMultipleTargetFrameworks = "TargetFrameworks";

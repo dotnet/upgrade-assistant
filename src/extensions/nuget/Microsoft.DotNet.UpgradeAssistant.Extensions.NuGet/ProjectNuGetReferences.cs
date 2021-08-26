@@ -14,11 +14,26 @@ using NuGet.Frameworks;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
-    internal partial class MSBuildProject : INuGetReferences
+    public class ProjectNuGetReferences : INuGetReferences
     {
-        public INuGetReferences NuGetReferences => this;
+        private readonly IUpgradeContext _context;
+        private readonly IProject _project;
+        private readonly IPackageRestorer _restorer;
+        private readonly ILogger<ProjectNuGetReferences> _logger;
+
+        public ProjectNuGetReferences(
+            IUpgradeContext context,
+            IProject project,
+            IPackageRestorer restorer,
+            ILogger<ProjectNuGetReferences> logger)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _project = project ?? throw new ArgumentNullException(nameof(project));
+            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public NugetPackageFormat PackageReferenceFormat
         {
@@ -28,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     return NugetPackageFormat.PackageConfig;
                 }
-                else if (ProjectRoot.GetAllPackageReferences().ToList() is IEnumerable<Build.Construction.ProjectItemElement> list && list.Any())
+                else if (_project.GetFile().PackageReferences.Any())
                 {
                     return NugetPackageFormat.PackageReference;
                 }
@@ -39,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        private string? GetPackagesConfigPath() => FindFiles("packages.config", ProjectItemType.Content).FirstOrDefault();
+        private string? GetPackagesConfigPath() => _project.FindFiles("packages.config", ProjectItemType.Content).FirstOrDefault();
 
         public IEnumerable<NuGetReference> PackageReferences
         {
@@ -49,9 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 if (packagesConfig is null)
                 {
-                    var packages = ProjectRoot.GetAllPackageReferences();
-
-                    return packages.Select(p => p.AsNuGetReference());
+                    return _project.GetFile().PackageReferences;
                 }
                 else
                 {
@@ -70,10 +83,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public async ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token)
             => PackageReferences.Any(p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase))
-            || (PackageReferenceFormat == NugetPackageFormat.PackageReference && await TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token).ConfigureAwait(false));
+            || (PackageReferenceFormat == NugetPackageFormat.PackageReference && await _project.TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token).ConfigureAwait(false));
 
         public async ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token)
-            => PackageReferenceFormat == NugetPackageFormat.PackageReference && await TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token).ConfigureAwait(false);
+            => PackageReferenceFormat == NugetPackageFormat.PackageReference && await _project.TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token).ConfigureAwait(false);
 
         private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
@@ -133,13 +146,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 // Break if there are no packages in the project. Otherwise, we end up performing restores too often.
                 if (!PackageReferences.Any())
                 {
-                    _logger.LogDebug("Skipping restore as no package references exist in project file {Path}", FileInfo.FullName);
+                    _logger.LogDebug("Skipping restore as no package references exist in project file {Path}", _project.FileInfo.FullName);
                     yield break;
                 }
 
-                _logger.LogDebug("Attempting a restore to retrieve missing lock file data {Path}", FileInfo.FullName);
+                _logger.LogDebug("Attempting a restore to retrieve missing lock file data {Path}", _project.FileInfo.FullName);
 
-                await _restorer.RestorePackagesAsync(Context, this, token).ConfigureAwait(false);
+                await _restorer.RestorePackagesAsync(_context, _project, token).ConfigureAwait(false);
 
                 // If the LockFilePath is defined but does not exist, there are no libraries
                 if (!File.Exists(LockFilePath))
@@ -163,7 +176,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             LockFileTarget? GetLockFileTarget(NuGetFramework parsedTfm)
             {
-                var lockFile = LockFileUtilities.GetLockFile(LockFilePath, NuGet.Common.NullLogger.Instance);
+                var lockFile = LockFileUtilities.GetLockFile(LockFilePath, global::NuGet.Common.NullLogger.Instance);
 
                 if (lockFile?.Targets is null)
                 {
@@ -181,7 +194,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             get
             {
-                var lockFilePath = Path.Combine(GetPropertyValue("MSBuildProjectExtensionsPath"), "project.assets.json");
+                var lockFilePath = Path.Combine(_project.GetFile().GetPropertyValue("MSBuildProjectExtensionsPath"), "project.assets.json");
 
                 if (string.IsNullOrEmpty(lockFilePath))
                 {
@@ -190,7 +203,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 if (!Path.IsPathFullyQualified(lockFilePath))
                 {
-                    lockFilePath = Path.Combine(FileInfo.DirectoryName ?? string.Empty, lockFilePath);
+                    lockFilePath = Path.Combine(_project.FileInfo.DirectoryName ?? string.Empty, lockFilePath);
                 }
 
                 return lockFilePath;

@@ -46,14 +46,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             _extensions = new Lazy<IEnumerable<ExtensionInstance>>(() =>
             {
+                var list = new List<ExtensionInstance>();
+
                 var opts = options.Value;
 
-                if (!opts.LoadExtensions)
+                // Required extensions are required for all commands UA may handle, as opposed to other extensions that augment certain commands
+                foreach (var path in opts.RequiredExtensions)
                 {
-                    return Enumerable.Empty<ExtensionInstance>();
+                    LoadPath(path, isDefault: true);
                 }
 
-                var list = new List<ExtensionInstance>();
+                // Required extensions must load, otherwise they may be turned off
+                if (!opts.LoadExtensions)
+                {
+                    return list;
+                }
 
                 foreach (var path in opts.ExtensionPaths)
                 {

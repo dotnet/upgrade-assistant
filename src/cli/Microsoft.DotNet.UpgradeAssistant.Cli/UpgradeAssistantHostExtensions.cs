@@ -102,14 +102,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         }
                     });
 
-                    services.AddNuGet(optionss =>
-                    {
-                        if (upgradeOptions.Project?.FullName is string fullname)
-                        {
-                            optionss.PackageSourcePath = Path.GetDirectoryName(fullname);
-                        }
-                    });
-
                     services.AddUserInput();
                     services.AddAnalysis();
 
@@ -176,7 +168,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(options));
             }
 
-            ConsoleUtils.Clear();
             Program.ShowHeader();
 
             const string LogFilePath = "upgrade-assistant.clef";

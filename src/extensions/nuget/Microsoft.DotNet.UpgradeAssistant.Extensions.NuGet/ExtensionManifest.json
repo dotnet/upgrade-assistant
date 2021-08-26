@@ -1,0 +1,7 @@
+﻿{
+  "ExtensionName": "NuGet",
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.dll"
+  ]
+}

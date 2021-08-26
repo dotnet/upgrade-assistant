@@ -3,9 +3,8 @@
 
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
 {
-    [Collection(MSBuildStepTestCollection.Name)]
     public class NuGetVersionComparerTests
     {
         [InlineData("1.0", "1.0", 0)]

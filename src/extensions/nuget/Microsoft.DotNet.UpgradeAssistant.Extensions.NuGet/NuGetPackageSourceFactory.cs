@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using NuGet.Configuration;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetPackageSourceFactory : INuGetPackageSourceFactory
     {

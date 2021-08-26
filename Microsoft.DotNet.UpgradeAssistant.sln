@@ -184,6 +184,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSBuild.Conversion.Project"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSBuild.Conversion.SDK", "modules\try-convert\src\MSBuild.Conversion.SDK\MSBuild.Conversion.SDK.csproj", "{410E4BE0-F259-4844-8774-A7EE47F1AD14}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{021F1610-F2D0-4F00-81C7-AD7397DA296C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet", "src\extensions\nuget\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.csproj", "{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{824AFFC6-40A2-4AD6-8010-B939841CA16E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests", "tests\extensions\nuget\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests.csproj", "{58633641-85F3-4F8E-AC18-0EFACC36D142}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -830,6 +838,30 @@ Global
 		{410E4BE0-F259-4844-8774-A7EE47F1AD14}.Release|x64.Build.0 = Release|Any CPU
 		{410E4BE0-F259-4844-8774-A7EE47F1AD14}.Release|x86.ActiveCfg = Release|Any CPU
 		{410E4BE0-F259-4844-8774-A7EE47F1AD14}.Release|x86.Build.0 = Release|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Debug|x64.Build.0 = Debug|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Debug|x86.Build.0 = Debug|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Release|x64.ActiveCfg = Release|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Release|x64.Build.0 = Release|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB}.Release|x86.Build.0 = Release|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Debug|x64.Build.0 = Debug|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Debug|x86.Build.0 = Debug|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|x64.ActiveCfg = Release|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|x64.Build.0 = Release|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|x86.ActiveCfg = Release|Any CPU
+		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -909,6 +941,10 @@ Global
 		{C94B874A-6CF6-4DBE-85D6-97AC803C8F4C} = {459862F1-3E21-40F7-8981-939E690C811F}
 		{3A029C76-AE6D-488F-84B9-51E4C963E2FA} = {459862F1-3E21-40F7-8981-939E690C811F}
 		{410E4BE0-F259-4844-8774-A7EE47F1AD14} = {459862F1-3E21-40F7-8981-939E690C811F}
+		{021F1610-F2D0-4F00-81C7-AD7397DA296C} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
+		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB} = {021F1610-F2D0-4F00-81C7-AD7397DA296C}
+		{824AFFC6-40A2-4AD6-8010-B939841CA16E} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
+		{58633641-85F3-4F8E-AC18-0EFACC36D142} = {824AFFC6-40A2-4AD6-8010-B939841CA16E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}
