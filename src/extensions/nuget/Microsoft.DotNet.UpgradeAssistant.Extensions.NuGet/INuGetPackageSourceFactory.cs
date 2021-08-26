@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using NuGet.Configuration;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public interface INuGetPackageSourceFactory
     {

@@ -38,13 +38,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        public IEnumerable<NuGetReference> PackageReferences => ProjectRoot.GetAllPackageReferences().Select(p => p.AsNuGetReference());
+
         public bool IsSdk => Sdk.Any();
 
         public ICollection<string> Imports => new ImportsCollection(ProjectRoot);
 
         public ICollection<string> Sdk => new SdkCollection(ProjectRoot);
 
-        public void SetTFM(TargetFrameworkMoniker tfm) => new TargetFrameworkMonikerCollection(this, _comparer).SetTargetFramework(tfm);
+        public void SetTFM(TargetFrameworkMoniker tfm) => _factories.CreateTfmCollection(this).SetTargetFramework(tfm);
 
         public void AddPackages(IEnumerable<NuGetReference> references)
         {
@@ -61,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void RemovePackages(IEnumerable<NuGetReference> references)
         {
-            foreach (var reference in PackageReferences)
+            foreach (var reference in NuGetReferences.PackageReferences)
             {
                 if (references.Contains(reference))
                 {
@@ -184,7 +186,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 Project.RemoveProperty(property);
             }
-         }
+        }
 
         private static string GetPathRelativeToProject(string path, string projectDir) =>
             Path.IsPathFullyQualified(path)

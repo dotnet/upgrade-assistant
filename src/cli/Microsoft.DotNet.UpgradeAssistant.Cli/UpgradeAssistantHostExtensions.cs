@@ -102,14 +102,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         }
                     });
 
-                    services.AddNuGet(optionss =>
-                    {
-                        if (upgradeOptions.Project?.FullName is string fullname)
-                        {
-                            optionss.PackageSourcePath = Path.GetDirectoryName(fullname);
-                        }
-                    });
-
                     services.AddUserInput();
                     services.AddAnalysis();
 

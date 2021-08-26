@@ -8,7 +8,6 @@ using Microsoft.Build.Evaluation;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NuGet.Configuration;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -22,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 .Configure(configure)
                 .ValidateDataAnnotations();
 
+            services.AddTransient<Factories>();
+
             services.AddTransient<IConfigureOptions<WorkspaceOptions>, VisualStudioFinder>();
             services.AddTransient<IConfigureOptions<WorkspaceOptions>, MSBuildWorkspaceOptionsConfigure>();
             services.AddTransient<IPackageRestorer, DotnetRestorePackageRestorer>();
@@ -33,24 +34,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<MSBuildWorkspaceUpgradeContext>();
             services.AddTransient<IUpgradeContext>(sp => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
             services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
-        }
-
-        public static void AddNuGet(this IServiceCollection services, Action<NuGetDownloaderOptions> configure)
-        {
-            services.AddSingleton<PackageLoader>();
-            services.AddTransient<IPackageLoader>(ctx => ctx.GetRequiredService<PackageLoader>());
-            services.AddTransient<IPackageDownloader>(ctx => ctx.GetRequiredService<PackageLoader>());
-            services.AddSingleton<IVersionComparer, NuGetVersionComparer>();
-            services.AddTransient<ITargetFrameworkMonikerComparer, NuGetTargetFrameworkMonikerComparer>();
-            services.AddSingleton<IUpgradeStartup, NuGetCredentialsStartup>();
-            services.AddSingleton<INuGetPackageSourceFactory, NuGetPackageSourceFactory>();
-            services.AddOptions<NuGetDownloaderOptions>()
-                .Configure(configure)
-                .Configure(options =>
-                {
-                    var settings = Settings.LoadDefaultSettings(null);
-                    options.CachePath = SettingsUtility.GetGlobalPackagesFolder(settings);
-                });
         }
 
         // TEMPORARY WORKAROUND
