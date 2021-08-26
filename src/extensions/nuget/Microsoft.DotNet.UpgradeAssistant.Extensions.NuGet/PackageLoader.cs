@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
@@ -455,6 +456,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 Id = extension.Name,
                 Version = NuGetVersion.Parse(extension.Version.ToString()),
                 Description = extension.Description,
+                PackageTypes = new[] { new PackageType("UpgradeAssistantExtension", new Version(1, 0, 0)) }
             };
 
             builder.Authors.AddRange(extension.Authors);
