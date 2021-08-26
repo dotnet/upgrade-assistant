@@ -15,7 +15,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         string? Version { get; }
 
         Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token);
-
-        string GetCommandLine(IProject project);
     }
 }
