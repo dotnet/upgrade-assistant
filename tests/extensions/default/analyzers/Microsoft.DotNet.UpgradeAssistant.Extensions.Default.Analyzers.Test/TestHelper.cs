@@ -13,7 +13,6 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Xunit;
@@ -143,7 +142,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return File.ReadAllText(path);
         }
 
-        public static async Task<Document> FixSourceAsync(Language lang, string documentPath, IEnumerable<string> diagnosticIds)
+        public static async Task<string> FixSourceAsync(Language lang, string documentPath, IEnumerable<string> diagnosticIds)
         {
             if (documentPath is null)
             {
@@ -186,7 +185,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             while (diagnosticFixed);
 
             project = solution.GetProject(projectId)!;
-            return project.Documents.First(d => documentPath.Equals(Path.GetFileNameWithoutExtension(d.Name), StringComparison.Ordinal));
+
+            var result = await project.Documents
+                .First(d => documentPath.Equals(Path.GetFileNameWithoutExtension(d.Name), StringComparison.Ordinal))
+                .GetTextAsync();
+
+            return result.ToString();
         }
 
         private static async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)

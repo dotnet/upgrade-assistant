@@ -319,9 +319,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     continue;
                 }
 
-                var fixedSource = await TestHelper.FixSourceAsync(language, scenarioName, expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
-                var fixedText = (await fixedSource.GetTextAsync().ConfigureAwait(false)).ToString();
-
+                var fixedText = await TestHelper.FixSourceAsync(language, scenarioName, expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
                 var expectedText = TestHelper.GetSource(language, $"{scenarioName}.Fixed");
 
                 _output.WriteLine("Expected:");
@@ -335,6 +333,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, IEnumerable<ExpectedDiagnostic> expectedDiagnostics)
         {
+            Assert.Equal(expectedDiagnostics.Count(), count);
+
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
@@ -343,8 +343,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected {expectedDiagnostics.ElementAt(count).Language} diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}; actually at {d.Location.SourceSpan}");
                 count++;
             }
-
-            Assert.Equal(expectedDiagnostics.Count(), count);
         }
     }
 }

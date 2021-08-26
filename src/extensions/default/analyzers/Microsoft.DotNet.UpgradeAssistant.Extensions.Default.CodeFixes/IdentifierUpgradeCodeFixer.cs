@@ -86,10 +86,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             // Create new identifier
             var updatedNode = GetUpdatedNode(node, generator, newIdentifier)
-                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation);
-
-            // Preserve white space and comments
-            updatedNode = updatedNode.WithTriviaFrom(node);
+                .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation)
+                .WithTriviaFrom(node);
 
             if (updatedNode is null)
             {

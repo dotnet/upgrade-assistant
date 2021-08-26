@@ -102,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 foreach (var diagnostic in Diagnostics.GroupBy(d => d.Location.SourceTree?.FilePath).Select(g => g.First()))
                 {
                     var doc = _sourceUpdater.Project.GetRoslynProject().GetDocument(diagnostic.Location.SourceTree)!;
-                    var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc).ConfigureAwait(false);
+                    var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc, token).ConfigureAwait(false);
 
                     if (updatedSolution is null)
                     {
@@ -155,7 +155,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
 
-        private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
+        private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document, CancellationToken token)
         {
             if (diagnostic is null)
             {
@@ -168,7 +168,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
 
             CodeAction? fixAction = null;
-            var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, CancellationToken.None);
+            var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, token);
             await _fixProvider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
             // fixAction may not be null if the code fixer is applied.
@@ -180,7 +180,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 return null;
             }
 
-            var applyOperation = (await fixAction.GetOperationsAsync(CancellationToken.None).ConfigureAwait(false)).OfType<ApplyChangesOperation>().FirstOrDefault();
+            var applyOperation = (await fixAction.GetOperationsAsync(token).ConfigureAwait(false))
+                .OfType<ApplyChangesOperation>()
+                .FirstOrDefault();
 
             if (applyOperation is null)
             {
