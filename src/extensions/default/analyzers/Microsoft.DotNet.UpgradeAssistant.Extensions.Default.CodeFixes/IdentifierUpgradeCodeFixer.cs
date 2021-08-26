@@ -76,27 +76,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         /// <returns>An updated document with the given node replaced with the new identifier.</returns>
         private static async Task<Document> UpdateIdentifierTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
-            var documentRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-            if (documentRoot is null)
-            {
-                return document;
-            }
-
-            var generator = SyntaxGenerator.GetGenerator(document);
+            var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
 
             // Create new identifier
-            var updatedNode = GetUpdatedNode(node, generator, newIdentifier)
+            var updatedNode = GetUpdatedNode(node, editor.Generator, newIdentifier)
                 .WithAdditionalAnnotations(Simplifier.Annotation, Simplifier.AddImportsAnnotation)
                 .WithTriviaFrom(node);
 
-            if (updatedNode is null)
-            {
-                return document;
-            }
+            editor.ReplaceNode(node, updatedNode);
 
-            // Replace the node
-            var updatedRoot = documentRoot.ReplaceNode(node, updatedNode);
-            var updatedDocument = document.WithSyntaxRoot(updatedRoot);
+            var updatedDocument = editor.GetChangedDocument();
 
             // Add using declaration if needed
             updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
