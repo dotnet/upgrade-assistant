@@ -333,7 +333,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, IEnumerable<ExpectedDiagnostic> expectedDiagnostics)
         {
-            Assert.Equal(expectedDiagnostics.Count(), count);
+            Assert.Equal(expectedDiagnostics.Count(), diagnostics.Count());
 
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
