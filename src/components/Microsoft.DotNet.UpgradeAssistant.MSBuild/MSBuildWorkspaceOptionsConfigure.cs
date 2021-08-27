@@ -21,17 +21,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void Configure(WorkspaceOptions options)
         {
-            if (options.MSBuildPath is string expectedPath)
-            {
-                _logger.LogInformation("Using supplied path for MSBuild [{Path}]", expectedPath);
-            }
-            else
+            if (options.MSBuildPath is null)
             {
                 options.MSBuildPath = FindMSBuildPath();
             }
         }
 
-        public string FindMSBuildPath()
+        private string FindMSBuildPath()
         {
             // TODO : Harden this and allow MSBuild location to be read from env vars.
             var msBuildInstances = FilterForBitness(MSBuildLocator.QueryVisualStudioInstances())
@@ -47,12 +43,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 foreach (var instance in msBuildInstances)
                 {
-                    _logger.LogInformation("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
+                    _logger.LogTrace("Found candidate MSBuild instances: {Path}", instance.MSBuildPath);
                 }
 
                 var selected = msBuildInstances.First();
-
-                _logger.LogInformation("MSBuild registered from {MSBuildPath}", selected.MSBuildPath);
 
                 return selected.MSBuildPath;
             }

@@ -50,8 +50,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _telemetry.TrackEvent("msbuild", new Dictionary<string, string> { { "MSBuild Version", version } });
 
-            _logger.LogInformation("Registered MSBuild at {Path}", msbuildPath);
-
             return true;
         }
 
