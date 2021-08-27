@@ -8,10 +8,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Added
 - Alert users about the deprecated controls in Windows Forms [#800](https://github.com/dotnet/upgrade-assistant/pull/800)
 - Added a command line option to specifiy a path to msbuild via `--msbuild-path` ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
+- Support for running on .NET 6 Preview 7 ([#832](https://github.com/dotnet/upgrade-assistant/pull/832))
 
 ### Changed
 - Removed a check that wouldn't include preview .NET SDK instances ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
 - Log file outputs structured logging rather than just text ([#822](https://github.com/dotnet/upgrade-assistant/pull/822))
+- Fixed an issue where running against VS 2017 wouldn't resolve targets in installed workloads ([#832](https://github.com/dotnet/upgrade-assistant/pull/832))
+- Do not clear console in between runs so log files aren't lost ([#826](https://github.com/dotnet/upgrade-assistant/pull/826))
+- `try-convert` is now hosted in process. If there are any issues with the hosted version, you may revert to old behavior using the feature flag `UA_FEATURES=TRY_CONVERT_EXE` ([#826](https://github.com/dotnet/upgrade-assistant/pull/825))
 
 ## Version 0.2.241603 - 2021-08-16 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.241603))
 ### Added
