@@ -70,10 +70,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            Properties = new UpgradeContextProperties();
 
+            Properties = new UpgradeContextProperties();
             SolutionInfo = factories.CreateSolutionInfo(InputPath);
-            GlobalProperties = CreateProperties();
+            GlobalProperties = CreateProperties(options.Value);
             ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
         }
 
@@ -144,15 +144,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        private Dictionary<string, string> CreateProperties()
+        private static Dictionary<string, string> CreateProperties(WorkspaceOptions options)
         {
             var properties = new Dictionary<string, string>();
 
-            if (_options.Value.VisualStudioPath is string vsPath)
+            if (options.VisualStudioPath is string vsPath)
             {
                 properties.Add("VSINSTALLDIR", vsPath);
                 properties.Add("MSBuildExtensionsPath32", Path.Combine(vsPath, "MSBuild"));
                 properties.Add("MSBuildExtensionsPath", Path.Combine(vsPath, "MSBuild"));
+            }
+
+            if (options.VisualStudioVersion is int version)
+            {
+                properties.Add("VisualStudioVersion", $"{version}.0");
             }
 
             return properties;
@@ -165,8 +170,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             if (_workspace is null)
             {
-                var properties = CreateProperties();
-                var workspace = MSBuildWorkspace.Create(properties);
+                var workspace = MSBuildWorkspace.Create(GlobalProperties);
 
                 workspace.WorkspaceFailed += Workspace_WorkspaceFailed;
 

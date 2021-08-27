@@ -10,5 +10,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public string? MSBuildPath { get; set; }
 
         public string? VisualStudioPath { get; set; }
+
+        public int? VisualStudioVersion { get; set; }
     }
 }

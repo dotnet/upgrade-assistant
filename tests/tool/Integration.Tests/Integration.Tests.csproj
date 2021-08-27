@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'net6.0' ">6.0.0-preview.7.21377.19</RuntimeFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="IntegrationScenarios\**" />
