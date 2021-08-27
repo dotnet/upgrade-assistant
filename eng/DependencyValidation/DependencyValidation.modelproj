@@ -134,6 +134,10 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.Maui</Name>
       <Project>{a122dd5b-4b80-4558-8db2-8e9ebff12a1a}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\nuget\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet</Name>
+      <Project>{e18a3cb0-bfdb-4672-ad53-7eaaf26c52ab}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\extensions\vb\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic</Name>
       <Project>{608e7ce5-5674-49eb-8728-719a468fc62e}</Project>

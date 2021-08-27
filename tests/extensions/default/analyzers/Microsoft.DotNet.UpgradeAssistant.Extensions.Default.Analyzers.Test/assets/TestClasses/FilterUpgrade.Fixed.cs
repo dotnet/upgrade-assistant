@@ -12,7 +12,7 @@ namespace TestProject.TestClasses
 
         public void OnResultExecuting(ResultExecutingContext filterContext)
         {
-            var x = (ResultExecutingContext)new TestProject.MyNamespace.ResultExecutingContext();
+            ResultExecutingContext x = (ResultExecutingContext)new TestProject.MyNamespace.ResultExecutingContext();
             throw new NotImplementedException();
         }
     }

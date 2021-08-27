@@ -36,18 +36,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
             else
             {
-                options.VisualStudioPath = GetLatestVisualStudioPath();
+                (options.VisualStudioPath, options.VisualStudioVersion) = GetLatestVisualStudioPath();
             }
         }
 
-        public string? GetLatestVisualStudioPath()
+        private (string? Path, int? Version) GetLatestVisualStudioPath()
         {
             var latest = GetLatestPath();
 
             if (latest is null)
             {
                 _logger.LogWarning("Did not find a Visual Studio instance");
-                return null;
+                return default;
             }
 
             var version = Version.Parse(latest.GetInstallationVersion());
@@ -57,13 +57,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 _logger.LogDebug("Using Visual Studio v{VsVersion} [{VsPath}]", version, installation);
 
-                return installation;
+                return (installation, version?.Major);
             }
             else
             {
                 _logger.LogWarning("Found Visual Studio {VsVersion}, but directory '{VsPath}' does not exist.", version, installation);
 
-                return null;
+                return default;
             }
         }
 

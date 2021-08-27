@@ -76,11 +76,12 @@ stages:
         steps:
         - checkout: self
           clean: true
+          submodules: true
         - task: UseDotNet@2
           displayName: 'Use .NET Core sdk'
           inputs:
             packageType: sdk
-            version: 5.0.103
+            version: 5.0.400
             installationPath: $(Build.SourcesDirectory)/.dotnet
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
           - task: PowerShell@2

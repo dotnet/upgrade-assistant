@@ -3,8 +3,6 @@
 
 using Autofac.Extras.Moq;
 using AutoFixture;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows;
-using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Moq;
 using Xunit;
 

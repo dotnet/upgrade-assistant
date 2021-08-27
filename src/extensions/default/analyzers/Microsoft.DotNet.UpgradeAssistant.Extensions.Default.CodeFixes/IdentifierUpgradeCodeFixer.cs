@@ -85,7 +85,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             editor.ReplaceNode(node, updatedNode);
 
-            return editor.GetChangedDocument();
+            var updatedDocument = editor.GetChangedDocument();
+
+            // Add using declaration if needed
+            updatedDocument = await ImportAdder.AddImportsAsync(updatedDocument, Simplifier.AddImportsAnnotation, null, cancellationToken).ConfigureAwait(false);
+
+            // Simplify the call, if possible
+            updatedDocument = await Simplifier.ReduceAsync(updatedDocument, Simplifier.Annotation, null, cancellationToken).ConfigureAwait(false);
+
+            return updatedDocument;
         }
 
         private static SyntaxNode GetUpdatedNode(SyntaxNode node, SyntaxGenerator generator, string name)

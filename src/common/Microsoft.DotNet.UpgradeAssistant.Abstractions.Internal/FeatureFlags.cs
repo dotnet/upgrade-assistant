@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Cli
+namespace Microsoft.DotNet.UpgradeAssistant
 {
-    internal static class FeatureFlags
+    public static class FeatureFlags
     {
         private static ICollection<string> _features = CreateFeatures();
 
@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 return Array.Empty<string>();
             }
 
-            return new HashSet<string>(features.Split(';', StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+            return new HashSet<string>(features.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
         }
 
         public static bool IsRequested(string name) => _features.Contains(name);

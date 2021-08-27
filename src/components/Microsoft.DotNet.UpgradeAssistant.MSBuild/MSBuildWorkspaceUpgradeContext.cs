@@ -23,6 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly Dictionary<string, IProject> _projectCache;
         private readonly IOptions<WorkspaceOptions> _options;
+        private readonly Factories _factories;
 
         private List<FileInfo>? _entryPointPaths;
         private FileInfo? _projectPath;
@@ -56,27 +57,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public MSBuildWorkspaceUpgradeContext(
             IOptions<WorkspaceOptions> options,
-            Func<string, ISolutionInfo> infoGenerator,
             IPackageRestorer restorer,
+            Factories factories,
             ITargetFrameworkMonikerComparer comparer,
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
-            if (infoGenerator is null)
-            {
-                throw new ArgumentNullException(nameof(infoGenerator));
-            }
-
+            _factories = factories ?? throw new ArgumentNullException(nameof(factories));
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            Properties = new UpgradeContextProperties();
 
-            SolutionInfo = infoGenerator(InputPath);
-            GlobalProperties = CreateProperties();
+            Properties = new UpgradeContextProperties();
+            SolutionInfo = factories.CreateSolutionInfo(InputPath);
+            GlobalProperties = CreateProperties(options.Value);
             ProjectCollection = new ProjectCollection(globalProperties: GlobalProperties);
         }
 
@@ -96,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifiers, _restorer, _comparer, path, _logger);
+            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, path, _logger);
 
             _projectCache.Add(path.FullName, project);
 
@@ -147,15 +144,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        private Dictionary<string, string> CreateProperties()
+        private static Dictionary<string, string> CreateProperties(WorkspaceOptions options)
         {
             var properties = new Dictionary<string, string>();
 
-            if (_options.Value.VisualStudioPath is string vsPath)
+            if (options.VisualStudioPath is string vsPath)
             {
                 properties.Add("VSINSTALLDIR", vsPath);
                 properties.Add("MSBuildExtensionsPath32", Path.Combine(vsPath, "MSBuild"));
                 properties.Add("MSBuildExtensionsPath", Path.Combine(vsPath, "MSBuild"));
+            }
+
+            if (options.VisualStudioVersion is int version)
+            {
+                properties.Add("VisualStudioVersion", $"{version}.0");
             }
 
             return properties;
@@ -168,8 +170,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             if (_workspace is null)
             {
-                var properties = CreateProperties();
-                var workspace = MSBuildWorkspace.Create(properties);
+                var workspace = MSBuildWorkspace.Create(GlobalProperties);
 
                 workspace.WorkspaceFailed += Workspace_WorkspaceFailed;
 

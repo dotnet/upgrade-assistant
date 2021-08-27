@@ -8,9 +8,8 @@ using Xunit;
 
 using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
 {
-    [Collection(MSBuildStepTestCollection.Name)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Assertions", "xUnit2013:Do not use equality check to check for collection size.", Justification = "Need to verify .Count property")]
     public class TargetFrameworkMonikerCollectionTests
     {

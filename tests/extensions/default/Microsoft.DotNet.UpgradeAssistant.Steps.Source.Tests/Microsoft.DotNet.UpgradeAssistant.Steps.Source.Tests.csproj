@@ -5,6 +5,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj" />
     <ProjectReference Include="..\..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>

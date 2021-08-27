@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     internal static class PackageConfig
     {

@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'net6.0' ">6.0.0-preview.7.21377.19</RuntimeFrameworkVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
@@ -108,6 +109,9 @@
     </Extension>
     <Extension Include="..\..\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.csproj">
       <Name>windows</Name>
+    </Extension>
+    <Extension Include="..\..\extensions\NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.csproj">
+      <Name>nuget</Name>
     </Extension>
   </ItemGroup>
   <ItemGroup>

@@ -7,9 +7,8 @@ using Xunit;
 
 using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
 
-namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
 {
-    [Collection(MSBuildStepTestCollection.Name)]
     public class NuGetTargetFrameworkMonikerComparerTests
     {
         [InlineData(Net50, NetCoreApp31, true)]

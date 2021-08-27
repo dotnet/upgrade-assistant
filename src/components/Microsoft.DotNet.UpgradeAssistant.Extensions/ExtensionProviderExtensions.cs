@@ -87,16 +87,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             return builder.Configure(options =>
             {
                 const string ExtensionDirectory = "extensions";
-
                 var settings = configuration.GetSection("Extensions").Get<ExtensionSettings>();
-                var defaultExtensions = settings.Default
-                    .Select(n => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ExtensionDirectory, n)));
 
                 options.DefaultSource = settings.Source;
 
-                foreach (var path in defaultExtensions)
+                AddExtensions(options.DefaultExtensions, settings.Default);
+                AddExtensions(options.RequiredExtensions, settings.Required);
+
+                static void AddExtensions(ICollection<string> collection, string[] names)
                 {
-                    options.DefaultExtensions.Add(path);
+                    var extensionFullPaths = names
+                        .Select(n => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, ExtensionDirectory, n)));
+
+                    foreach (var path in extensionFullPaths)
+                    {
+                        collection.Add(path);
+                    }
                 }
             });
         }
@@ -106,6 +112,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             public string Source { get; set; } = string.Empty;
 
             public string[] Default { get; set; } = Array.Empty<string>();
+
+            public string[] Required { get; set; } = Array.Empty<string>();
         }
 
         public static IServiceCollection AddExtensionOption<TOption>(this IServiceCollection services, TOption option)

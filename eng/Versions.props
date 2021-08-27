@@ -3,7 +3,7 @@
   <PropertyGroup>
     <!-- This repo version -->
     <MajorVersion>0</MajorVersion>
-    <MinorVersion>2</MinorVersion>
+    <MinorVersion>3</MinorVersion>
     <!-- Build release-only package. -->
     <PreReleaseVersionLabel />
     <SkipPackagePublishingVersionChecks>true</SkipPackagePublishingVersionChecks>
@@ -88,5 +88,14 @@
     <MicrosoftDotNetXHarnessCLIVersion>1.0.0-prerelease.21103.1</MicrosoftDotNetXHarnessCLIVersion>
     <MicrosoftSymbolUploaderBuildTaskVersion>1.1.156402</MicrosoftSymbolUploaderBuildTaskVersion>
     <MicrosoftSymbolUploaderVersion>1.1.152002</MicrosoftSymbolUploaderVersion>
+    <MicrosoftBuildLocatorVersion>1.4.1</MicrosoftBuildLocatorVersion>
+    <MicrosoftBuildVersion>16.7</MicrosoftBuildVersion>
+    <MicrosoftWin32RegistryVersion>5.0.0-rc.1.20451.14</MicrosoftWin32RegistryVersion>
+    <NewtonsoftJsonVersion>12.0.3</NewtonsoftJsonVersion>
+    <NuGetVersioningVersion>5.8.0-preview.3.6823</NuGetVersioningVersion>
+    <SystemCollectionsImmutableVersion>5.0.0-rc.1.20451.14</SystemCollectionsImmutableVersion>
+    <SystemCommandLineVersion>2.0.0-beta1.20371.2</SystemCommandLineVersion>
+    <SystemConfigurationConfigurationManagerVersion>5.0.0-rc.1.20451.14</SystemConfigurationConfigurationManagerVersion>
+    <SystemSecurityPrincipalWindowsVersion>5.0.0-rc.1.20451.14</SystemSecurityPrincipalWindowsVersion>
   </PropertyGroup>
 </Project>
