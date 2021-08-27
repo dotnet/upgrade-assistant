@@ -7,6 +7,7 @@ try {
   dotnet workload install ios --source https://aka.ms/dotnet/maui/rc1/index.json
 
   dotnet workload list
+  dotnet workload search
 }
 catch {
   Write-Host $_.ScriptStackTrace
