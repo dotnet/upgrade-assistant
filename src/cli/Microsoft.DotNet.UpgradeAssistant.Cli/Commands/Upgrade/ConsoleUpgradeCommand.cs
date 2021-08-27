@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             public bool NonInteractive { get; set; }
 
-            public int NonInteractiveWait { get; set; } = 2;
+            public int NonInteractiveWait { get; set; }
         }
     }
 }
