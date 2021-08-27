@@ -2,9 +2,11 @@
 # $dotnetSdkVersion = $GlobalJson.tools.dotnet
 
 try {
+  dotnet workload install maui --source https://aka.ms/dotnet/maui/rc1/index.json
   dotnet workload install android-aot --source https://aka.ms/dotnet/maui/rc1/index.json
   dotnet workload install ios --source https://aka.ms/dotnet/maui/rc1/index.json
-  dotnet workload install maui --source https://aka.ms/dotnet/maui/rc1/index.json
+
+  dotnet workload list
 }
 catch {
   Write-Host $_.ScriptStackTrace
