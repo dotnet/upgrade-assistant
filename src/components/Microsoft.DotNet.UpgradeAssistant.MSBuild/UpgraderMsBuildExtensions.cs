@@ -7,6 +7,7 @@ using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -19,7 +20,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             services.AddOptions<WorkspaceOptions>()
                 .Configure(configure)
-                .ValidateDataAnnotations();
+                .PostConfigure<ILogger<WorkspaceOptions>>((options, logger) =>
+                {
+                    logger.LogInformation("Using MSBuild from {Path}", options.MSBuildPath);
+
+                    if (options.VisualStudioPath is string vsPath)
+                    {
+                        logger.LogInformation("Using Visual Studio install from {Path} [v{Version}]", options.VisualStudioPath, options.VisualStudioVersion);
+                    }
+                });
 
             services.AddTransient<Factories>();
 

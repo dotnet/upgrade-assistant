@@ -30,19 +30,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void Configure(WorkspaceOptions options)
         {
-            if (options.VisualStudioPath is string expectedPath)
-            {
-                _logger.LogInformation("Using supplied path for Visual Studio [{Path}]", expectedPath);
-            }
-            else
-            {
-                (options.VisualStudioPath, options.VisualStudioVersion) = GetLatestVisualStudioPath();
-            }
+            (options.VisualStudioPath, options.VisualStudioVersion) = GetLatestVisualStudioPath(options.VisualStudioPath);
         }
 
-        private (string? Path, int? Version) GetLatestVisualStudioPath()
+        private (string? Path, int? Version) GetLatestVisualStudioPath(string? suppliedPath)
         {
-            var latest = GetLatestPath();
+            var latest = GetLatestPath(suppliedPath);
 
             if (latest is null)
             {
@@ -67,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        private ISetupInstance2? GetLatestPath()
+        private ISetupInstance2? GetLatestPath(string? suppliedPath)
         {
             var result = default(ISetupInstance2);
             var resultVersion = new Version(0, 0);
@@ -114,10 +107,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                         if (instanceHasMSBuild && instance is not null)
                         {
-                            _logger.LogInformation("Found Visual Studio v{Version} [{Path}]", version, instance.GetInstallationPath());
-
-                            if (version > resultVersion)
+                            if (suppliedPath is not null && string.Equals(suppliedPath, instance.GetInstallationPath(), StringComparison.OrdinalIgnoreCase))
                             {
+                                _logger.LogTrace("Identified supplied path for Visual Studio v{Version} [{Path}]", version, instance.GetInstallationPath());
+
+                                return instance;
+                            }
+                            else if (version > resultVersion)
+                            {
+                                _logger.LogTrace("Found Visual Studio v{Version} [{Path}]", version, instance.GetInstallationPath());
+
                                 result = instance;
                                 resultVersion = version;
                             }
