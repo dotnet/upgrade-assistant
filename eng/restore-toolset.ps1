@@ -1,4 +1,4 @@
-$mauiSource = https://aka.ms/dotnet/maui/rc1/index.json
+[string] $mauiSource = 'https://aka.ms/dotnet/maui/rc1/index.json'
 # $dotnetSdkVersion = $GlobalJson.tools.dotnet
 
 try {
