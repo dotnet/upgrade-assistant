@@ -1,10 +1,15 @@
-$dotnetRoot = Join-Path $RepoRoot '.dotnet'
+$mauiSource = https://aka.ms/dotnet/maui/rc1/index.json
+# $dotnetSdkVersion = $GlobalJson.tools.dotnet
 
 try {
-  dotnet workload install ios --source https://aka.ms/dotnet/maui/rc1/index.json
-  dotnet workload install android-aot --source https://aka.ms/dotnet/maui/rc1/index.json
-  dotnet workload install maccatalyst --source https://aka.ms/dotnet/maui/rc1/index.json
-  dotnet workload install maui --source https://aka.ms/dotnet/maui/rc1/index.json
+  dotnet workload install ios --source $mauiSource
+  dotnet workload install android-aot --source $mauiSource
+  dotnet workload install android --source $mauiSource
+  dotnet workload install maccatalyst --source $mauiSource
+  dotnet workload install maui --source $mauiSource
+
+  dotnet workload list
+
 }
 catch {
   Write-Host $_.ScriptStackTrace
