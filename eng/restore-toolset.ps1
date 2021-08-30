@@ -6,6 +6,10 @@ try {
   dotnet workload install android-aot --source https://aka.ms/dotnet/maui/rc1/index.json
   dotnet workload install maccatalyst --source https://aka.ms/dotnet/maui/rc1/index.json
   dotnet workload install maui --source https://aka.ms/dotnet/maui/rc1/index.json
+  dotnet workload install maui-android --source https://aka.ms/dotnet/maui/rc1/index.json
+  dotnet workload install maui-ios --source https://aka.ms/dotnet/maui/rc1/index.json
+  dotnet workload install maui-maccatalyst --source https://aka.ms/dotnet/maui/rc1/index.json
+  dotnet workload install maui-mobile --source https://aka.ms/dotnet/maui/rc1/index.json
 
   dotnet workload list
   dotnet workload search
