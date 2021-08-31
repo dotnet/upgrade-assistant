@@ -8,6 +8,20 @@ Start a discussion on the [repository issue tracker](https://github.com/dotnet/u
 ## Bugs and feature requests?
 For non-security related bugs, please [log a new issue](https://github.com/dotnet/upgrade-assistant/issues) or simply click [this link](https://github.com/dotnet/upgrade-assistant/issues/new?assignees=&labels=bug&template=20_bug_report.md).
 
+## Get and build source code
+
+In order to get the source, clone the repo with submodules:
+
+```
+git clone https://github.com/dotnet/upgrade-assistant
+git submodule update --init --recursive
+```
+
+The project is always targeting the latest SDK, so if you don't have that installed, you can set up a local dev environment by doing the following:
+
+1. Run `./build.bat` to ensure download the correct SDK
+2. Launch `Microsoft.DotNet.UpgradeAssistant.sln` from that directory
+
 ## How to submit a PR
 
 We are always happy to see PRs from community members both for bug fixes as well as new features.
