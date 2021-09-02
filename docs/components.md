@@ -8,21 +8,21 @@ The following are the current components in the project with a summary of what c
 
 ### ASP.NET
 
-> Implemented in [AspNetComponentIdentifier](../src/extensions/web/Microsoft.DotNet.UpgradeAssistant.Extensions.Web/AspNetComponentIdentifier.cs)
+> Implemented in [WebComponentIdentifier](../src/extensions/web/Microsoft.DotNet.UpgradeAssistant.Extensions.Web/AspNetComponentIdentifier.cs)
 
 - References `System.Web.*` assemblies
 - Contains `Microsoft.WebApplication.targets` import in the project file
 
 ### ASP.NET Core
 
-> Implemented in [AspNetComponentIdentifier](../src/extensions/web/Microsoft.DotNet.UpgradeAssistant.Extensions.Web/AspNetComponentIdentifier.cs)
+> Implemented in [WebComponentIdentifier](../src/extensions/web/Microsoft.DotNet.UpgradeAssistant.Extensions.Web/WebComponentIdentifier.cs)
 
 - Is an SDK project and uses the `Microsoft.NET.Sdk.Web` SDK
 - References the framework package `Microsoft.AspNetCore.App`
 
 ### Windows Desktop
 
-> Implemented in [AspNetComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
+> Implemented in [WindowsComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
 
 - If the project has either `WinForms` or `Wpf` comnponents
 - References the `Microsoft.WindowsDesktop.App` package
@@ -30,7 +30,7 @@ The following are the current components in the project with a summary of what c
 
 ### WinForms
 
-> Implemented in [AspNetComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
+> Implemented in [WindowsComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
 
 - Contains a references to the assembly `System.Windows.Forms`
 - Is an SDK project and has the property `UseWindowsForms=true`
@@ -38,7 +38,7 @@ The following are the current components in the project with a summary of what c
 
 ### Wpf
 
-> Implemented in [AspNetComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
+> Implemented in [WindowsComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
 
 - References `System.Xaml`, `PresentationCore`, `PresentationFramework`, or `WindowsBase`
 - Is an SDK project and has the property `UseWPF=true`
@@ -46,7 +46,7 @@ The following are the current components in the project with a summary of what c
 
 ### WinRT
 
-> Implemented in [AspNetComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
+> Implemented in [WindowsComponentIdentifier](../src/extensions/windows/Microsoft.DotNet.UpgradeAssistant.Extensions.Windows/WindowsComponentIdentifier.cs)
 
 - Contains a references to `Microsoft.Windows.SDK.Contracts`
 
