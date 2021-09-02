@@ -190,6 +190,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return sb.ToString();
         }
 
+        public bool IsPlatform(string platform) => string.Equals(Platform, platform, StringComparison.OrdinalIgnoreCase);
+
         public bool IsFramework
         {
             get

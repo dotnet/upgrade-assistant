@@ -5,6 +5,7 @@ using Autofac.Extras.Moq;
 using AutoFixture;
 using Moq;
 using Xunit;
+
 using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests
