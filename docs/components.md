@@ -1,10 +1,10 @@
 # Components in Upgrade Assistant
 
-Components are a concept in Upgrade Assistant that allows various services to understand what kind of technologies are in a given project. A project's components by design will change through the lifetime of an upgrade. The components a project has at the start will not (most likely) be the same at the end.
+Components are a concept in Upgrade Assistant that allows various services to understand what kind of technologies are in a given project. A project's components by design may change through the lifetime of an upgrade (for example ASP.NET to ASP.NET Core, XamarinAndroid to MauiAndroid).
 
 Components are defined by implementing the [IComponentIdentifier](../src/common/Microsoft.DotNet.UpgradeAssistant.Abstractions/IComponentIdentifier.cs) and all registered implementations are run when identifying components.
 
-The following are the current components in the project with a summary of what conditions will trigger that component from being included:
+The following are the current components in the project with a summary of what conditions will trigger that component to be included:
 
 ### ASP.NET
 
