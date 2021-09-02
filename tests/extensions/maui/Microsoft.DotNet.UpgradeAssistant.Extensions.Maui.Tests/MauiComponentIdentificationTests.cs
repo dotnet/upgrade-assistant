@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests
     public class MauiComponentIdentificationTests
     {
         [InlineData(new string[] { }, ProjectComponents.None)]
-        [InlineData(new [] { NetStandard20, NetStandard21 }, ProjectComponents.None)]
+        [InlineData(new[] { NetStandard20, NetStandard21 }, ProjectComponents.None)]
         [InlineData(new[] { Net60_Android }, ProjectComponents.MauiAndroid)]
         [InlineData(new[] { Net60_Windows }, ProjectComponents.None)]
         [InlineData(new[] { Net60_iOS }, ProjectComponents.MauiiOS)]
