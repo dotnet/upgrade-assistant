@@ -1,12 +1,11 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Linq;
-using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
 using Moq;
 using Xunit;
+
 using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests
