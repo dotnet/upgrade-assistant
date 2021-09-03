@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
-    [ApplicableComponents(ProjectComponents.AspNetCore)]
+    [ApplicableComponents(ProjectComponents.AspNetCore | ProjectComponents.AspNet)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class HttpContextIsDebuggingEnabledAnalyzer : DiagnosticAnalyzer
     {

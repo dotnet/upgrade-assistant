@@ -33,7 +33,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeIdentifiers, SyntaxKind.IdentifierName);
+            context.RegisterCompilationStartAction(context =>
+            {
+                if (!context.Compilation.TargetsAspNetCore())
+                {
+                    return;
+                }
+
+                context.RegisterSyntaxNodeAction(AnalyzeIdentifiers, SyntaxKind.IdentifierName);
+            });
         }
 
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.UrlHelperTitle), Resources.ResourceManager, typeof(Resources));

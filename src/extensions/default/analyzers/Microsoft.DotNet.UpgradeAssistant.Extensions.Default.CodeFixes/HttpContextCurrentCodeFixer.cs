@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     public class HttpContextCurrentCodeFixer : CodeFixProvider
     {
         private const string HttpContextHelperName = "HttpContextHelper";
+        private const string DefaultNamespace = "HttpHelpers";
         private const string HttpContextHelperResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.Templates.HttpContextHelper.cs";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HttpContextCurrentAnalyzer.DiagnosticId);
@@ -68,7 +69,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             if (httpContextHelperClass is null)
             {
                 using var sr = new StreamReader(typeof(HttpContextCurrentCodeFixer).Assembly.GetManifestResourceStream(HttpContextHelperResourceName));
-                project = document.Project.AddDocument($"{HttpContextHelperName}.cs", await sr.ReadToEndAsync().ConfigureAwait(false)).Project;
+                var ns = project.DefaultNamespace ?? DefaultNamespace;
+                var contents = sr.ReadToEnd().Replace("/*{{NAMESPACE}}*/", ns);
+                project = document.Project.AddDocument($"{HttpContextHelperName}.cs", contents).Project;
                 httpContextHelperClass = await GetHttpContextHelperClassAsync(project).ConfigureAwait(false);
             }
 
