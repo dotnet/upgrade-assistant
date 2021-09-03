@@ -166,4 +166,7 @@
   <data name="AttributeRemoveTitle" xml:space="preserve">
     <value>Remove attribute</value>
   </data>
+  <data name="AdapterRefactorTitle" xml:space="preserve">
+    <value>Refactor usage to alternate API</value>
+  </data>
 </root>

@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AdapterRefactorDescription" xml:space="preserve">
+    <value>Refactor usage to another type.</value>
+  </data>
+  <data name="AdapterRefactorMessageFormat" xml:space="preserve">
+    <value>Refactor usage of type {0} to {1}</value>
+  </data>
+  <data name="AdapterRefactorTitle" xml:space="preserve">
+    <value>Refactor usage of type to another type</value>
+  </data>
   <data name="ApiAlertGenericDescription" xml:space="preserve">
     <value>This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent.</value>
   </data>
