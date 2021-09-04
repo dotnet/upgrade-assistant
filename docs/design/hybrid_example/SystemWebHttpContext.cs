@@ -1,5 +1,4 @@
-﻿#if NETFRAMEWORK
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Web;
 
 namespace HybridExample
@@ -32,4 +31,3 @@ namespace HybridExample
         }
     }
 }
-#endif

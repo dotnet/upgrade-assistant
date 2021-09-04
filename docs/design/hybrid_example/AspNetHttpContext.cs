@@ -1,5 +1,4 @@
-﻿#if NET6_0
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace HybridExample
 {
@@ -31,4 +30,3 @@ namespace HybridExample
         }
     }
 }
-#endif
