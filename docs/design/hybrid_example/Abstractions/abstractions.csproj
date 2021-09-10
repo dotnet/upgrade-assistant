@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard2.0;net45;net6.0</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);UA0014</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Web" />
     <Compile Include="SystemWebHttpContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.0-dev" />
   </ItemGroup>
 
 </Project>

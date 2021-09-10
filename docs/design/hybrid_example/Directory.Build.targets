@@ -1,1 +1,5 @@
-<Project />
+<Project>
+  <ItemGroup>
+    <!--<Analyzer Include="E:\Work\migration\UpgradeAssistant\artifacts\bin\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Debug\netstandard2.0\*.dll"/>-->
+  </ItemGroup>
+</Project>

@@ -96,3 +96,4 @@ PublishScripts/
 # Bundled dotnet tools
 .tools/
 tools/
+/docs/design/hybrid_example/packages
