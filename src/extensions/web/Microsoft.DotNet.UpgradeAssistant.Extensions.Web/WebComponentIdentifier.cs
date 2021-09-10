@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 {
-    public class AspNetComponentIdentifier : IComponentIdentifier
+    public class WebComponentIdentifier : IComponentIdentifier
     {
         private const string WebApplicationTargets = "Microsoft.WebApplication.targets";
         private const string WebSdk = "Microsoft.NET.Sdk.Web";
