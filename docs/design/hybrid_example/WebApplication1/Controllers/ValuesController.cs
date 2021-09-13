@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using hybrid_example;
+using WebApplication1;
 
 namespace WebApplication1.Controllers
 {
@@ -10,7 +11,7 @@ namespace WebApplication1.Controllers
         public IEnumerable<string> Get()
         {
             var c = new Class1();
-            return new string[] { c.Method(System.Web.HttpContext.Current) };
+            return new string[] { c.Method(HttpContextHelper.Current) };
         }
 
         // GET api/values/5

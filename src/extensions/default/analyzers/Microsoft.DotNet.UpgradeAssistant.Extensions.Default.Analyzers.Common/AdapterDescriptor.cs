@@ -87,7 +87,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         {
             var result = ImmutableArray.CreateBuilder<AdapterDescriptor>();
 
-            Parse(result, compilation.Assembly);
+            if (!Parse(result, compilation.Assembly))
+            {
+                return ImmutableArray.Create<AdapterDescriptor>();
+            }
 
             foreach (var reference in compilation.References)
             {
@@ -100,20 +103,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return result.ToImmutable();
         }
 
-        private static void Parse(ImmutableArray<AdapterDescriptor>.Builder collection, IAssemblySymbol assembly)
+        private static bool Parse(ImmutableArray<AdapterDescriptor>.Builder collection, IAssemblySymbol assembly)
         {
             foreach (var a in assembly.GetAttributes())
             {
-                if (string.Equals(a.AttributeClass?.Name, "AdapterDescriptor", StringComparison.OrdinalIgnoreCase) &&
-                    a.ConstructorArguments.Length == 2 &&
-                    a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
-                    a.ConstructorArguments[1].Kind == TypedConstantKind.Type &&
-                    a.ConstructorArguments[0].Value is ITypeSymbol destination &&
-                    a.ConstructorArguments[1].Value is ITypeSymbol concreteType)
+                if (string.Equals(a.AttributeClass?.Name, "AdapterDescriptor", StringComparison.OrdinalIgnoreCase))
                 {
-                    collection.Add(new AdapterDescriptor(destination, concreteType));
+                    if (a.ConstructorArguments.Length == 1 &&
+                        a.ConstructorArguments[0].Kind == TypedConstantKind.Primitive &&
+                        a.ConstructorArguments[0].Value is bool v &&
+                        v)
+                    {
+                        return false;
+                    }
+
+                    if (a.ConstructorArguments.Length == 2 &&
+                        a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
+                        a.ConstructorArguments[1].Kind == TypedConstantKind.Type &&
+                        a.ConstructorArguments[0].Value is ITypeSymbol destination &&
+                        a.ConstructorArguments[1].Value is ITypeSymbol concreteType)
+                    {
+                        collection.Add(new AdapterDescriptor(destination, concreteType));
+                    }
                 }
             }
+
+            return true;
         }
     }
 }

@@ -287,6 +287,60 @@ namespace RefactorTest
                 .RunAsync();
         }
 
+        [Fact]
+        public async Task ChangeTwice2()
+        {
+            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+namespace RefactorTest
+{
+    public static class Test
+    {
+        public static void Helper({|#0:SomeClass|} c)
+        {
+        }
+    }
+
+    public class SomeClass
+    {
+    }
+
+    public interface ISome
+    {
+    }
+}";
+
+            const string withFix = @"
+namespace RefactorTest
+{
+    public static class Test
+    {
+        public static void Helper(ISome c)
+        {
+        }
+
+        public static void Helper2(ISome c)
+            => Helper(c);
+    }
+
+    public class SomeClass
+    {
+    }
+
+    public interface ISome
+    {
+    }
+}";
+
+            var diagnostic1 = VerifyCS.Diagnostic().WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic2 = VerifyCS.Diagnostic().WithLocation(1).WithArguments(refactor.Original, refactor.Destination);
+            await CreateTest(refactor)
+                .WithSource(testFile)
+                .WithExpectedDiagnostics(diagnostic1, diagnostic2)
+                .WithFixed(withFix)
+                .RunAsync();
+        }
+
         public ICodeFixTest CreateTest(AdapterDescriptor? attributeDescriptor = null, bool withFix = true)
         {
             const string Attribute = @"

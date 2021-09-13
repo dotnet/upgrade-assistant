@@ -50,6 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                             var dotted = editor.Generator.DottedName(result);
                             var exp = dotted
                                 .WithTriviaFrom(node)
+                                .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
                                 .WithAdditionalAnnotations(Simplifier.Annotation);
                             editor.ReplaceNode(node, exp);
 

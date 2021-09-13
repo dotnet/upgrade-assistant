@@ -161,6 +161,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="HttpContextHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +249,10 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Abstractions\abstractions.csproj">
+      <Project>{7531207e-59ca-4c41-bbc3-6cfd7cec763d}</Project>
+      <Name>abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\library\library.csproj">
       <Project>{3C616D3D-7E2D-4708-B14C-BAA61AF1E90B}</Project>
       <Name>library</Name>
