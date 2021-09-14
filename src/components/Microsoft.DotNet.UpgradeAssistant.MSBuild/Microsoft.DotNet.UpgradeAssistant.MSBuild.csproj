@@ -37,6 +37,18 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild">
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" PrivateAssets="runtime">
       <!-- This package is mostly COM definitions which can be loaded in .NET 5 runtime just fine -->
       <NoWarn>NU1701</NoWarn>
