@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public class AdapterRefactorCodeFixer : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterRefactorAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterRefactorAnalyzer.RefactorDiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {

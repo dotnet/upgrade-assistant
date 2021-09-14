@@ -71,7 +71,7 @@ Namespace RefactorTest
     End Interface
 End Namespace";
 
-            var diagnostic = VerifyVB.Diagnostic().WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic = VerifyVB.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
             await CreateTest(refactor)
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(diagnostic)
@@ -113,7 +113,7 @@ Namespace RefactorTest
     End Interface
 End Namespace";
 
-            var diagnostic = VerifyVB.Diagnostic().WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic = VerifyVB.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
             await CreateTest(refactor)
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(diagnostic)
@@ -151,7 +151,7 @@ Namespace RefactorTest
     End Interface
 End Namespace";
 
-            var diagnostic = VerifyVB.Diagnostic().WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic = VerifyVB.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
             await CreateTest(refactor)
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(diagnostic)
@@ -189,7 +189,7 @@ Namespace RefactorTest
     End Interface
 End Namespace";
 
-            var diagnostic = VerifyVB.Diagnostic().WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic = VerifyVB.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
             await CreateTest(refactor)
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(diagnostic)
