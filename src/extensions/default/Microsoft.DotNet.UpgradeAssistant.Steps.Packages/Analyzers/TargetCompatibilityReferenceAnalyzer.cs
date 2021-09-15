@@ -42,6 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
+            // Making a copy of state.Packages collection to avoid modifying a collection that is being enumerated.
             var packages = state.Packages.ToList();
 
             foreach (var packageReference in packages)
