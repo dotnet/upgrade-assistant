@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            IDependencyCollection<NuGetReference> packages = state.Packages;
+            var packages = state.Packages.ToList();
 
             foreach (var packageReference in packages)
             {
