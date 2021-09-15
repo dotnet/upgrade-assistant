@@ -42,7 +42,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            foreach (var packageReference in state.Packages)
+            // Making a copy of state.Packages collection to avoid modifying a collection that is being enumerated.
+            var packages = state.Packages.ToList();
+
+            foreach (var packageReference in packages)
             {
                 // If the package doesn't target the right framework but a newer version does, mark it for removal and the newer version for addition
                 if (await _packageLoader.DoesPackageSupportTargetFrameworksAsync(packageReference, state.TargetFrameworks, token).ConfigureAwait(false))
