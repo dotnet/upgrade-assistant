@@ -3,7 +3,7 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Version 0.3.246501 - 2021-08-31 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.246501))
+## Version 0.3.246501 - 2021-09-15 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.246501))
 ### Fixed
 - Fixed issue with Package Analyzer to not enumerate the same collection that is being modified. [#836](https://github.com/dotnet/upgrade-assistant/issues/836)
 
