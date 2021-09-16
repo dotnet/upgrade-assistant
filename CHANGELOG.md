@@ -3,8 +3,11 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## vNext
+## Version 0.3.246501 - 2021-09-15 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.246501))
+### Fixed
+- Fixed issue with Package Analyzer to not enumerate the same collection that is being modified. [#836](https://github.com/dotnet/upgrade-assistant/issues/836)
 
+## Version 0.3.242703 - 2021-08-31 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.242703))
 ### Added
 - Alert users about the deprecated controls in Windows Forms [#800](https://github.com/dotnet/upgrade-assistant/pull/800)
 - Added a command line option to specifiy a path to msbuild via `--msbuild-path` ([#802](https://github.com/dotnet/upgrade-assistant/pull/802))
