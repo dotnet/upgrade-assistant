@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.NuGet</AssemblyName>
+    <DownloadLooseAssemblyIndex Condition=" '$(DownloadLooseAssemblyIndex)' == '' ">false</DownloadLooseAssemblyIndex>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="ExtensionManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="DownloadIndexFile" Condition=" '$(DownloadLooseAssemblyIndex)' " BeforeTargets="AssignTargetPaths">
+    <PropertyGroup>
+      <BlobBase>https://upgradeassistant.blob.core.windows.net/indexes/</BlobBase>
+      <IndexName>2021_09_17.index</IndexName>
+      <FullBlobPath>$(BlobBase)$(IndexName)</FullBlobPath>
+    </PropertyGroup>
+
+    <DownloadFile SourceUrl="$(FullBlobPath)" DestinationFolder=".data">
+      <Output TaskParameter="DownloadedFile" ItemName="TheFile" />
+    </DownloadFile>
+
+    <ItemGroup>
+      <None Include="@(TheFile)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <Link>nuget.index</Link>
+      </None>
+    </ItemGroup>
+  </Target>
+
+  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
+
+</Project>
+
