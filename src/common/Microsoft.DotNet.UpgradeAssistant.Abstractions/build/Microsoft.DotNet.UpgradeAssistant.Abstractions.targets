@@ -193,7 +193,7 @@
   <!-- Ensure the extension is published on build -->
   <Target Name="SetUpgradeAssistantExtensionInfo" AfterTargets="Build">
     <PropertyGroup>
-      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)</ExtensionOutputDirectory>
+      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)publish\</ExtensionOutputDirectory>
       <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
     </PropertyGroup>
     <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
