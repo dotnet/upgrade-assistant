@@ -192,6 +192,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{824AFFC6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests", "tests\extensions\nuget\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests.csproj", "{58633641-85F3-4F8E-AC18-0EFACC36D142}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "looseassembly", "looseassembly", "{C982FE5E-797F-4A68-B8F0-F9312960FC1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LooseAssembly", "src\extensions\looseassembly\LooseAssembly\LooseAssembly.csproj", "{6FF1BF91-58BC-4214-8C38-B87E45BC345D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -862,6 +866,18 @@ Global
 		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|x64.Build.0 = Release|Any CPU
 		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|x86.ActiveCfg = Release|Any CPU
 		{58633641-85F3-4F8E-AC18-0EFACC36D142}.Release|x86.Build.0 = Release|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Debug|x64.Build.0 = Debug|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Debug|x86.Build.0 = Debug|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|x64.ActiveCfg = Release|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|x64.Build.0 = Release|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|x86.ActiveCfg = Release|Any CPU
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -945,6 +961,8 @@ Global
 		{E18A3CB0-BFDB-4672-AD53-7EAAF26C52AB} = {021F1610-F2D0-4F00-81C7-AD7397DA296C}
 		{824AFFC6-40A2-4AD6-8010-B939841CA16E} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
 		{58633641-85F3-4F8E-AC18-0EFACC36D142} = {824AFFC6-40A2-4AD6-8010-B939841CA16E}
+		{C982FE5E-797F-4A68-B8F0-F9312960FC1A} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
+		{6FF1BF91-58BC-4214-8C38-B87E45BC345D} = {C982FE5E-797F-4A68-B8F0-F9312960FC1A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}
