@@ -61,6 +61,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add member to abstraction..
+        /// </summary>
+        internal static string AdapterAddMemberDescription {
+            get {
+                return ResourceManager.GetString("AdapterAddMemberDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add member {0} to abstraction {1}.
+        /// </summary>
+        internal static string AdapterAddMemberMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterAddMemberMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add member to abstraction.
+        /// </summary>
+        internal static string AdapterAddMemberTitle {
+            get {
+                return ResourceManager.GetString("AdapterAddMemberTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refactor usage to another type..
         /// </summary>
         internal static string AdapterRefactorDescription {

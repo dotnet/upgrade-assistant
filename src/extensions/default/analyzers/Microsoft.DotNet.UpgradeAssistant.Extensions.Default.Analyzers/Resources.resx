@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AdapterAddMemberDescription" xml:space="preserve">
+    <value>Add member to abstraction.</value>
+  </data>
+  <data name="AdapterAddMemberMessageFormat" xml:space="preserve">
+    <value>Add member {0} to abstraction {1}</value>
+  </data>
+  <data name="AdapterAddMemberTitle" xml:space="preserve">
+    <value>Add member to abstraction.</value>
+  </data>
   <data name="AdapterRefactorDescription" xml:space="preserve">
     <value>Refactor usage to another type.</value>
   </data>
