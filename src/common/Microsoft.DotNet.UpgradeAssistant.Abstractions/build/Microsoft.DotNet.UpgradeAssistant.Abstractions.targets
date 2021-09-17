@@ -2,14 +2,14 @@
 
   <!--
     This is a list of all the host-supplied files that should not be contained within an extension.
-    
+
     To create a new list, go to the output of the CLI and run the following sommand in PowerShell:
-    
+
     Get-ChildItem *.dll -Recurse -Exclude extensions `
       |% { $_.FullName.Replace("$pwd\", "") } `
       |% { "<_UpgradeExtensionExclude Include=`"$_`" />" } `
       | Set-Clipboard
-     
+
     An updated list will now be on the clipboard and can be pasted below.
   -->
   <ItemGroup>
@@ -180,18 +180,50 @@
     <_UpgradeExtensionExclude Include="System.Linq.Async.dll" />
   </ItemGroup>
 
+
   <!-- Ensure the extension is published on build -->
-  <Target Name="PublishUpgradeAssistant" AfterTargets="Build" DependsOnTargets="Publish">
+  <Target Name="PublishUpgradeAssistant" AfterTargets="UpdateUpgradeAssistantVersion" DependsOnTargets="Publish">
     <PropertyGroup>
       <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)</ExtensionOutputDirectory>
+      <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
+    </PropertyGroup>
+    <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
+  </Target>
+
+  <!-- Ensure the extension is published on build -->
+  <Target Name="SetUpgradeAssistantExtensionInfo" AfterTargets="Build">
+    <PropertyGroup>
+      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)</ExtensionOutputDirectory>
+      <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
+    </PropertyGroup>
+    <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
+  </Target>
+
+  <!-- Update version if set -->
+  <Target Name="UpdateUpgradeAssistantVersion" Condition=" '$(Version)' != '' AND Exists($(ExtensionManifestPath)) " AfterTargets="SetUpgradeAssistantExtensionInfo">
+    <ItemGroup>
+      <_ExistingManifestContents Include="$([System.IO.File]::ReadAllText('$(ExtensionManifestPath)'))" />
+      <_UpdatedManfiestContents Include="@(_ExistingManifestContents->Replace('[Version]', $(Version)))" />
+    </ItemGroup>
+    <ItemGroup>
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(ExtensionManifestPath)" Lines="@(_UpdatedManfiestContents)" Overwrite="true" />
+
+  </Target>
+
+  <!-- Zip extension if desired -->
+  <Target Name="ZipPublishUpgradeAssistant" Condition="$(ZipExtensionMethod)" AfterTargets="PublishUpgradeAssistant">
+    <PropertyGroup>
       <ExtensionOutputPath>$(ExtensionOutputDirectory)$(AssemblyName).zip</ExtensionOutputPath>
     </PropertyGroup>
-        <ZipDirectory
-            Overwrite="true"
-            SourceDirectory="$(PublishDir)"
-            DestinationFile="$(ExtensionOutputPath)" />
-        <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputPath)" />
+    <ZipDirectory
+        Overwrite="true"
+        SourceDirectory="$(PublishDir)"
+        DestinationFile="$(ExtensionOutputPath)" />
+    <Message Importance="High" Text="Zipped Upgrade Assistant Extension: $(ExtensionOutputPath)"/>
   </Target>
+
 
   <!-- Remove host supplied assemblies -->
   <Target Name="RemoveUpgradeAssistantHostProvidedAssemblies"

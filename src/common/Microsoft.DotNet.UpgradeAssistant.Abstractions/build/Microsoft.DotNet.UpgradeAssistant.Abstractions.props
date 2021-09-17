@@ -1,2 +1,5 @@
 ﻿<Project>
+  <PropertyGroup>
+    <ZipExtensionMethod>false</ZipExtensionMethod>
+  </PropertyGroup>
 </Project>

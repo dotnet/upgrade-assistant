@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31313.381
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31710.8
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3FC16DAB-215C-422B-9130-61D566695463}"
 EndProject
@@ -194,7 +194,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "looseassembly", "looseassembly", "{C982FE5E-797F-4A68-B8F0-F9312960FC1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LooseAssembly", "src\extensions\looseassembly\LooseAssembly\LooseAssembly.csproj", "{6FF1BF91-58BC-4214-8C38-B87E45BC345D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LooseAssembly", "src\extensions\looseassembly\LooseAssembly\LooseAssembly.csproj", "{6FF1BF91-58BC-4214-8C38-B87E45BC345D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Indexing", "src\extensions\looseassembly\Indexing\Indexing.csproj", "{07177276-0BE9-4D5D-8461-648124F3BD61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -878,6 +880,18 @@ Global
 		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|x64.Build.0 = Release|Any CPU
 		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|x86.ActiveCfg = Release|Any CPU
 		{6FF1BF91-58BC-4214-8C38-B87E45BC345D}.Release|x86.Build.0 = Release|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Debug|x64.Build.0 = Debug|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Debug|x86.Build.0 = Debug|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Release|x64.ActiveCfg = Release|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Release|x64.Build.0 = Release|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Release|x86.ActiveCfg = Release|Any CPU
+		{07177276-0BE9-4D5D-8461-648124F3BD61}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -963,6 +977,7 @@ Global
 		{58633641-85F3-4F8E-AC18-0EFACC36D142} = {824AFFC6-40A2-4AD6-8010-B939841CA16E}
 		{C982FE5E-797F-4A68-B8F0-F9312960FC1A} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
 		{6FF1BF91-58BC-4214-8C38-B87E45BC345D} = {C982FE5E-797F-4A68-B8F0-F9312960FC1A}
+		{07177276-0BE9-4D5D-8461-648124F3BD61} = {C982FE5E-797F-4A68-B8F0-F9312960FC1A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Chem.Indexing.Client
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
 {
     /// <summary>
     /// Provides a definition for the structure of the file header for the index file.
@@ -47,12 +47,12 @@ namespace Chem.Indexing.Client
         /// <summary>
         /// A timestamp for the time the file is written.
         /// </summary>
-        public uint Timestamp; //seconds since the unix "epoch"
+        public uint Timestamp; // seconds since the unix "epoch"
 
         public IndexHeader(ushort schemaVersion)
         {
-            Magic1 = 0x4d454843; //UTF8 bytes for "CHEM"
-            Magic2 = 0x584e; //UTF8 bytes for "NX"
+            Magic1 = 0x4d454843; // UTF8 bytes for "CHEM"
+            Magic2 = 0x584e; // UTF8 bytes for "NX"
             SchemaVersion = schemaVersion;
             HashCount = 0;
             AssemblyNameIndexSize = 0;

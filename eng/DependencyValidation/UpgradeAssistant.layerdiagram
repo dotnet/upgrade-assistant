@@ -218,6 +218,23 @@
             </reference>
           </references>
         </layer>
+        <layer Id="3098c52e-16c3-4546-ab3b-145170abb10d" name="looseassembly">
+          <references>
+            <reference Id="e7f8fed4-49c9-4737-8e2a-be28dc0c7812" name="looseassembly">
+              <ArtifactNode Label="looseassembly" Category="CodeSchema_Project" Id="(Assembly=../../src/extensions/looseassembly)">
+                <Category Ref="CodeMap_SolutionFolder" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">

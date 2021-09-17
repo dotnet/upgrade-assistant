@@ -8,7 +8,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Chem.Indexing.Client
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
 {
     /// <summary>
     /// Represents a hash token used to establish content identity for a file.
@@ -19,13 +19,12 @@ namespace Chem.Indexing.Client
         /// The underlying bytes of the hash token
         /// NOTE: These are converted to local endianness, so they have appropriate values for comparisons.
         /// </summary>
-        private readonly ulong _LowBytes;
-        private readonly ulong _HighBytes;
+        private readonly ulong _lowBytes;
+        private readonly ulong _highBytes;
 
         /// <summary>
         /// Creates a token from a full SHA256 hash hex string.
         /// </summary>
-        /// <returns></returns>
         public static HashToken FromSha256String(string sha256Hash)
         {
             var hashTokenStringSpan = sha256Hash.AsSpan()[^32..];
@@ -40,8 +39,8 @@ namespace Chem.Indexing.Client
 
         private HashToken(ulong highBytes, ulong lowBytes)
         {
-            _HighBytes = highBytes;
-            _LowBytes = lowBytes;
+            _highBytes = highBytes;
+            _lowBytes = lowBytes;
         }
 
         /// <summary>
@@ -86,10 +85,9 @@ namespace Chem.Indexing.Client
         /// Indicates the position across the keyspace that the hash is located.
         /// This is helpful in selecting a starting probe of an ordered index.
         /// </summary>
-        /// <returns></returns>
         public double GetKeySpaceLocation()
         {
-            return _HighBytes / (double)ulong.MaxValue;
+            return _highBytes / (double)ulong.MaxValue;
         }
 
         /// <summary>
@@ -97,13 +95,13 @@ namespace Chem.Indexing.Client
         /// </summary>
         public int CompareTo(HashToken other)
         {
-            var value = _HighBytes.CompareTo(other._HighBytes);
+            var value = _highBytes.CompareTo(other._highBytes);
             if (value != 0)
             {
                 return value;
             }
 
-            return _LowBytes.CompareTo(other._LowBytes);
+            return _lowBytes.CompareTo(other._lowBytes);
         }
 
         /// <summary>
@@ -129,7 +127,7 @@ namespace Chem.Indexing.Client
         /// </summary>
         public bool Equals(HashToken other)
         {
-            return _HighBytes == other._HighBytes && _LowBytes == other._LowBytes;
+            return _highBytes == other._highBytes && _lowBytes == other._lowBytes;
         }
 
         /// <summary>
@@ -138,14 +136,14 @@ namespace Chem.Indexing.Client
         public ReadOnlySpan<byte> GetBytes()
         {
             Span<byte> bytes = new byte[16];
-            BinaryPrimitives.WriteUInt64BigEndian(bytes, _HighBytes);
-            BinaryPrimitives.WriteUInt64BigEndian(bytes[8..], _LowBytes);
+            BinaryPrimitives.WriteUInt64BigEndian(bytes, _highBytes);
+            BinaryPrimitives.WriteUInt64BigEndian(bytes[8..], _lowBytes);
             return bytes;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(_HighBytes, _LowBytes);
+            return HashCode.Combine(_highBytes, _lowBytes);
         }
 
         public override string ToString()

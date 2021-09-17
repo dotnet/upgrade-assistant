@@ -10,13 +10,15 @@ using System.Security.Cryptography;
 using System.Text;
 using Marklio.Metadata;
 
-namespace Chem.Indexing.Client
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
 {
     /// <summary>
     /// Encapsulates the operations to use a NuGet Package Lookup Index.
     /// </summary>
     public class NuGetPackageLookupIndex : IDisposable
     {
+        private const double RANGE = .000002;
+
         /// <summary>
         /// The number of bytes that each hash record takes up (16 for hash + 4 for offset).
         /// </summary>
@@ -25,36 +27,36 @@ namespace Chem.Indexing.Client
         /// <summary>
         /// The memory-mapped file instance over the index.
         /// </summary>
-        private readonly MemoryMappedFile _Index;
+        private readonly MemoryMappedFile _index;
 
         /// <summary>
         /// The manager for the hash lookup section of the file.
         /// </summary>
-        private readonly ReadOnlyMemoryMappedManager _HashLookup;
+        private readonly ReadOnlyMemoryMappedManager _hashLookup;
 
         /// <summary>
         /// The dictionary lookup for the assembly name lookup section of the file.
         /// NOTE: this is written completely by the time the constructor exits.
         /// </summary>
-        private readonly Dictionary<StrongNameInfo, uint> _AssemblyNameLookup;
+        private readonly Dictionary<StrongNameInfo, uint> _assemblyNameLookup;
 
         /// <summary>
         /// The manager for the packages section of the file.
         /// </summary>
-        private readonly ReadOnlyMemoryMappedManager _Packages;
+        private readonly ReadOnlyMemoryMappedManager _packages;
 
         /// <summary>
-        /// The number of hash entries in the file.
+        /// Gets the number of hash entries in the file.
         /// </summary>
         public uint HashCount { get; }
 
         /// <summary>
-        /// The timestamp for the index file.
+        /// Gets the timestamp for the index file.
         /// </summary>
         public DateTime Timestamp { get; }
 
         /// <summary>
-        /// Creates an index over an index file at the provided path.
+        /// Initializes a new instance of the <see cref="NuGetPackageLookupIndex"/> class. Creates an index over an index file at the provided path.
         /// </summary>
         /// <remarks>
         /// This opens the file for reading, with file sharing for read access (so read handles could be opened).
@@ -85,12 +87,12 @@ namespace Chem.Indexing.Client
 
             // Create the main memory-mapped file
             // NOTE: we pass leaveOpen as false to give lifetime management of the stream to the MMF.
-            _Index = MemoryMappedFile.CreateFromFile(stream, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, leaveOpen: false);
+            _index = MemoryMappedFile.CreateFromFile(stream, null, 0, MemoryMappedFileAccess.Read, HandleInheritability.None, leaveOpen: false);
 
             // TODO: Should we just slice the memory rather than partition by view accessors? It's not really buying us much
 
             // create a temporary manager for the header bytes
-            using var header = new ReadOnlyMemoryMappedManager(_Index.CreateViewAccessor(0, headerSize, MemoryMappedFileAccess.Read));
+            using var header = new ReadOnlyMemoryMappedManager(_index.CreateViewAccessor(0, headerSize, MemoryMappedFileAccess.Read));
 
             // do validation of the header
             var indexHeader = header.GetSpan().Read<IndexHeader>();
@@ -133,11 +135,11 @@ namespace Chem.Indexing.Client
             }
 
             // create managers for the various sections of the index, being careful to get sizes correct
-            _HashLookup = new ReadOnlyMemoryMappedManager(_Index.CreateViewAccessor(hashIndexOffset, hashesSize, MemoryMappedFileAccess.Read));
+            _hashLookup = new ReadOnlyMemoryMappedManager(_index.CreateViewAccessor(hashIndexOffset, hashesSize, MemoryMappedFileAccess.Read));
 
             // we will read all the contents of the assembly name index, so we don't need to save it past construction
-            using var assemblyNameLookup = new ReadOnlyMemoryMappedManager(_Index.CreateViewAccessor(assemblyNameIndexOffset, assemblyNameIndexBytes, MemoryMappedFileAccess.Read));
-            _Packages = new ReadOnlyMemoryMappedManager(_Index.CreateViewAccessor(packagesOffset, packagesSize, MemoryMappedFileAccess.Read));
+            using var assemblyNameLookup = new ReadOnlyMemoryMappedManager(_index.CreateViewAccessor(assemblyNameIndexOffset, assemblyNameIndexBytes, MemoryMappedFileAccess.Read));
+            _packages = new ReadOnlyMemoryMappedManager(_index.CreateViewAccessor(packagesOffset, packagesSize, MemoryMappedFileAccess.Read));
 
             // read the assembly name index into memory, since lookups can't be on quickly as-is
             // NOTE: the use of inline function is useful to get us an iterator
@@ -200,7 +202,7 @@ namespace Chem.Indexing.Client
             }
 
             // read the lookup using our function
-            _AssemblyNameLookup = new(EnumerateAssemblyNameEntries());
+            _assemblyNameLookup = new(EnumerateAssemblyNameEntries());
         }
 
         /// <summary>
@@ -208,7 +210,7 @@ namespace Chem.Indexing.Client
         /// </summary>
         public IEnumerable<(HashToken HashToken, NuGetPackageVersion PackageVersion)> EnumerateHashTokenEntries()
         {
-            var hashLookupMemory = _HashLookup.Memory;
+            var hashLookupMemory = _hashLookup.Memory;
 
             // our approach here is to just walk the bytes, slicing off the front each time we read a record
             while (hashLookupMemory.Length > 0)
@@ -231,11 +233,10 @@ namespace Chem.Indexing.Client
         /// <summary>
         /// Enumerates the assembly name owner package entries in the file. This is mainly useful for testing the integrity of the index.
         /// </summary>
-        /// <returns></returns>
-        public IEnumerable<(StrongNameInfo strongName, string owningPackageId)> EnumerateAssemblyNameOwnerPackageEntries()
+        public IEnumerable<(StrongNameInfo StrongName, string OwningPackageId)> EnumerateAssemblyNameOwnerPackageEntries()
         {
             // just loop through the lookup entries and render the offsets as package ids
-            foreach (var (strongName, offset) in _AssemblyNameLookup)
+            foreach (var (strongName, offset) in _assemblyNameLookup)
             {
                 yield return (strongName, GetPackageIdFromOffset(offset));
             }
@@ -251,7 +252,7 @@ namespace Chem.Indexing.Client
         {
             // TODO: validate the package marker?
             var intOffset = checked((int)(packageIdOffset + 2)); // NOTE: the offsets that come out of the index point to the package id prefix marker, so we have to skip it (+2)
-            return _Packages.GetSpan()[intOffset..].ReadNullTerminatedUtf8String(out _);
+            return _packages.GetSpan()[intOffset..].ReadNullTerminatedUtf8String(out _);
         }
 
         /// <summary>
@@ -262,7 +263,7 @@ namespace Chem.Indexing.Client
         /// </remarks>
         public IEnumerable<NuGetPackageVersion> EnumeratePackageEntries()
         {
-            var packagesMemory = _Packages.Memory;
+            var packagesMemory = _packages.Memory;
 
             // this holds the "current" package id, since this isn't duplicated for each version
             var currentPackageId = default(string);
@@ -330,7 +331,6 @@ namespace Chem.Indexing.Client
 
         private void FindNuGetPackageInfoForFile(FileExplorer file, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
         {
-
             assemblyNameOwnerId = null;
             containingPackage = null;
 
@@ -380,15 +380,13 @@ namespace Chem.Indexing.Client
 
             // look it up in the index
             if (TrySmartSearchForHashToken(hashToken, out var entry, out var probes))
-
-            // if (!TryBinarySearchForHashToken(_HashLookup.GetSpan(), hashToken, out var entry, out var probes))
             {
                 var offset = entry[16..].Read<uint>();
                 containingPackage = GetNuGetPackageVersionFromOffset(offset);
             }
 
             // look up the assembly name in that index
-            if (_AssemblyNameLookup.TryGetValue(strongName, out var packageOffset))
+            if (_assemblyNameLookup.TryGetValue(strongName, out var packageOffset))
             {
                 assemblyNameOwnerId = GetPackageIdFromOffset(packageOffset);
             }
@@ -399,7 +397,7 @@ namespace Chem.Indexing.Client
         /// </summary>
         private NuGetPackageVersion GetNuGetPackageVersionFromOffset(uint offset)
         {
-            var packages = _Packages.GetSpan();
+            var packages = _packages.GetSpan();
             var intOffset = checked((int)offset);
 
             // we should be at the version
@@ -441,8 +439,6 @@ namespace Chem.Indexing.Client
             return new NuGetPackageVersion(id, versionString);
         }
 
-        private const double RANGE = .000002;
-
         /// <summary>
         /// This is our "smart" lookup algorithm that uses it's knowledge of the keyspace to do better than a simple binary search.
         /// TODO: tune this.
@@ -459,7 +455,7 @@ namespace Chem.Indexing.Client
 
             // check that location
             probes++;
-            var lookupSpan = _HashLookup.GetSpan();
+            var lookupSpan = _hashLookup.GetSpan();
             var entrySpan = lookupSpan.Slice(index * PERHASH_SIZE, PERHASH_SIZE);
             var compareValue = hashToken.CompareTo(entrySpan);
             if (compareValue == 0)
@@ -500,7 +496,7 @@ namespace Chem.Indexing.Client
                     else
                     {
                         // ok, lets binary search between them
-                        var result = TryBinarySearchForHashToken(lookupSpan[((newIndex + 1) * PERHASH_SIZE)..(((index - 1) * PERHASH_SIZE))], hashToken, out entry, out var newProbes);
+                        var result = TryBinarySearchForHashToken(lookupSpan[((newIndex + 1) * PERHASH_SIZE)..((index - 1) * PERHASH_SIZE)], hashToken, out entry, out var newProbes);
                         probes += newProbes;
                         return result;
                     }
@@ -537,7 +533,7 @@ namespace Chem.Indexing.Client
                     else
                     {
                         // ok, lets binary search between them
-                        var result = TryBinarySearchForHashToken(lookupSpan[((index + 1) * PERHASH_SIZE)..(((newIndex - 1) * PERHASH_SIZE))], hashToken, out entry, out var newProbes);
+                        var result = TryBinarySearchForHashToken(lookupSpan[((index + 1) * PERHASH_SIZE)..((newIndex - 1) * PERHASH_SIZE)], hashToken, out entry, out var newProbes);
                         probes += newProbes;
                         return result;
                     }
@@ -588,9 +584,9 @@ namespace Chem.Indexing.Client
 
         public virtual void Dispose()
         {
-            _HashLookup.Dispose();
-            _Packages.Dispose();
-            _Index.Dispose();
+            _hashLookup.Dispose();
+            _packages.Dispose();
+            _index.Dispose();
         }
     }
 }
