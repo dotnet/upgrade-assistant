@@ -310,6 +310,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// </summary>
         /// <param name="assemblyNameOwnerId">If an "owning package" for the assembly name was found, this will be non-null.</param>
         /// <param name="containingPackage">If there was a precise match for the file, this is the earliest NuGet package version in which it was found.</param>
+        public void FindNuGetPackageInfoForFile(string filePath, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
+        {
+            using var stream = File.OpenRead(filePath);
+            FindNuGetPackageInfoForFile(stream, out assemblyNameOwnerId, out containingPackage);
+        }
+
+        /// <summary>
+        /// Finds the package that contains the file.
+        /// </summary>
+        /// <param name="assemblyNameOwnerId">If an "owning package" for the assembly name was found, this will be non-null.</param>
+        /// <param name="containingPackage">If there was a precise match for the file, this is the earliest NuGet package version in which it was found.</param>
         public void FindNuGetPackageInfoForFile(Stream fileStream, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
         {
             assemblyNameOwnerId = null;

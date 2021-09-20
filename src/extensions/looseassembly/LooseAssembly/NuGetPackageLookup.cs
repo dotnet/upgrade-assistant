@@ -71,9 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
         {
             foreach (var index in _indexes.Value)
             {
-                using var stream = File.OpenRead(path);
-
-                index.FindNuGetPackageInfoForFile(stream, out var ownerPackageId, out var containingPackage);
+                index.FindNuGetPackageInfoForFile(path, out var ownerPackageId, out var containingPackage);
 
                 var result = (ownerPackageId, containingPackage) switch
                 {
