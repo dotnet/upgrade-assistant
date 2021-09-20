@@ -310,45 +310,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// </summary>
         /// <param name="assemblyNameOwnerId">If an "owning package" for the assembly name was found, this will be non-null.</param>
         /// <param name="containingPackage">If there was a precise match for the file, this is the earliest NuGet package version in which it was found.</param>
-        public void FindNuGetPackageInfoForFile(string filePath, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
-        {
-            using var stream = File.OpenRead(filePath);
-            FindNuGetPackageInfoForFile(stream, out assemblyNameOwnerId, out containingPackage);
-        }
-
-        /// <summary>
-        /// Finds the package that contains the file.
-        /// </summary>
-        /// <param name="assemblyNameOwnerId">If an "owning package" for the assembly name was found, this will be non-null.</param>
-        /// <param name="containingPackage">If there was a precise match for the file, this is the earliest NuGet package version in which it was found.</param>
-        public void FindNuGetPackageInfoForFile(Stream fileStream, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
+        public void FindNuGetPackageInfo(LookupToken token, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
         {
             assemblyNameOwnerId = null;
             containingPackage = null;
 
-            var strongName = StrongNameInfo.GetStrongName(fileStream);
-
-            // we need to do some validation on the file to see if it is viable before trying to do a lookup
-            // we won't have any non-PEs
-            if (strongName is null)
-            {
-                return;
-            }
-
-            // TODO: lookup whether it is a Framework or other "well-known" binary.
-            // get the hash from the file.
-            fileStream.Position = 0;
-            var hashToken = HashToken.FromStream(fileStream);
-
             // look it up in the index
-            if (TrySmartSearchForHashToken(hashToken, out var entry, out var probes))
+            if (TrySmartSearchForHashToken(token.HashToken, out var entry, out var probes))
             {
                 var offset = entry[16..].Read<uint>();
                 containingPackage = GetNuGetPackageVersionFromOffset(offset);
             }
 
             // look up the assembly name in that index
-            if (_assemblyNameLookup.TryGetValue(strongName, out var packageOffset))
+            if (_assemblyNameLookup.TryGetValue(token.StrongName, out var packageOffset))
             {
                 assemblyNameOwnerId = GetPackageIdFromOffset(packageOffset);
             }

@@ -69,9 +69,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
 
         public async IAsyncEnumerable<NuGetReference> SearchAsync(string path, IEnumerable<TargetFrameworkMoniker> tfms, [EnumeratorCancellation] CancellationToken token)
         {
+            var lookupToken = LookupToken.Create(path)!;
+
+            if (!lookupToken.HasValue)
+            {
+                _logger.LogWarning("Could not create a lookup token for {Path}", path);
+                yield break;
+            }
+
             foreach (var index in _indexes.Value)
             {
-                index.FindNuGetPackageInfoForFile(path, out var ownerPackageId, out var containingPackage);
+                index.FindNuGetPackageInfo(lookupToken.Value, out var ownerPackageId, out var containingPackage);
 
                 var result = (ownerPackageId, containingPackage) switch
                 {
