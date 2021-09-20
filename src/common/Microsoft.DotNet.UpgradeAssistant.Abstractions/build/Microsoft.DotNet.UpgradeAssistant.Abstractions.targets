@@ -180,41 +180,29 @@
     <_UpgradeExtensionExclude Include="System.Linq.Async.dll" />
   </ItemGroup>
 
-
   <!-- Ensure the extension is published on build -->
-  <Target Name="PublishUpgradeAssistant" AfterTargets="UpdateUpgradeAssistantVersion" DependsOnTargets="Publish">
+  <Target Name="PublishUpgradeAssistant" AfterTargets="Build" DependsOnTargets="Publish">
     <PropertyGroup>
-      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)</ExtensionOutputDirectory>
+      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(PublishDir)</ExtensionOutputDirectory>
       <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
-    </PropertyGroup>
-    <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
-  </Target>
-
-  <!-- Ensure the extension is published on build -->
-  <Target Name="SetUpgradeAssistantExtensionInfo" AfterTargets="Build">
-    <PropertyGroup>
-      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)publish\</ExtensionOutputDirectory>
-      <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
-      <ExtensionVersion>$(Version)</ExtensionVersion>
+      <ExtensionVersion Condition=" '$(ExtensionVersion)' == '' ">$(Version)</ExtensionVersion>
       <ExtensionVersion Condition=" '$(ExtensionVersion)' == '' ">0.0.0</ExtensionVersion>
     </PropertyGroup>
-    <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
+    <Message Importance="High" Text="Publishing Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
   </Target>
 
-  <Target Name="VerifyExtensionManifestAvailable" Condition="!Exists($(ExtensionManifestPath))" AfterTargets="SetUpgradeAssistantExtensionInfo">
+  <Target Name="VerifyExtensionManifestAvailable" Condition="!Exists($(ExtensionManifestPath))" AfterTargets="PublishUpgradeAssistant">
     <Warning Text="Extension manifest $(ExtensionManifestPath) was not found" />
   </Target>
 
-  <Target Name="UpdateUpgradeAssistantVersion" Condition="Exists($(ExtensionManifestPath))" AfterTargets="SetUpgradeAssistantExtensionInfo">
+  <Target Name="UpdateExtensionVersion" Condition="Exists($(ExtensionManifestPath))" AfterTargets="PublishUpgradeAssistant">
     <ItemGroup>
       <_ExistingManifestContents Include="$([System.IO.File]::ReadAllText('$(ExtensionManifestPath)'))" />
       <_UpdatedManfiestContents Include="@(_ExistingManifestContents->Replace('[Version]', $(ExtensionVersion)))" />
     </ItemGroup>
-    <ItemGroup>
-    </ItemGroup>
 
+    <Message Importance="High" Text="Updating extension version to $(ExtensionVersion)" />
     <WriteLinesToFile File="$(ExtensionManifestPath)" Lines="@(_UpdatedManfiestContents)" Overwrite="true" />
-
   </Target>
 
   <!-- Zip extension if desired -->
