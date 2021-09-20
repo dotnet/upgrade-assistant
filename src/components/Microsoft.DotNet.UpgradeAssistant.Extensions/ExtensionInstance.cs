@@ -33,13 +33,45 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             Configuration = configuration;
             Name = GetName(Configuration, location);
 
-            Version = GetOptions<Version>("Version");
+            Version = GetVersion();
             var serviceProviders = GetOptions<string[]>(ExtensionServiceProvidersSectionName);
 
             if (serviceProviders is not null)
             {
                 _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(instanceKey, this, serviceProviders, logger));
             }
+        }
+
+        /// <summary>
+        /// Version needs to fit into a <see cref="Version"/> at the moment. Versions may have a '+' or '-' in it per semantic versioning so we'll just take the first part.
+        /// </summary>
+        private Version? GetVersion()
+        {
+            // Currently needs to fit a version, so we'll just skip any '-' or '+'
+            var version = GetOptions<string>("Version");
+
+            if (version is null)
+            {
+                return null;
+            }
+
+            var span = version.AsSpan();
+
+            var index = span.IndexOf('-');
+
+            if (index > 0)
+            {
+                span = span.Slice(0, index);
+            }
+
+            index = span.IndexOf('+');
+
+            if (index > 0)
+            {
+                span = span.Slice(0, index);
+            }
+
+            return Version.Parse(span);
         }
 
         public string Name { get; }
