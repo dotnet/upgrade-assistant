@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +71,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
         {
             foreach (var index in _indexes.Value)
             {
-                index.FindNuGetPackageInfoForFile(path, out var ownerPackageId, out var containingPackage);
+                using var stream = File.OpenRead(path);
+
+                index.FindNuGetPackageInfoForFile(stream, out var ownerPackageId, out var containingPackage);
 
                 var result = (ownerPackageId, containingPackage) switch
                 {

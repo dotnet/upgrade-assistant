@@ -6,9 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Security.Cryptography;
 using System.Text;
-using Marklio.Metadata;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
@@ -312,71 +310,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// </summary>
         /// <param name="assemblyNameOwnerId">If an "owning package" for the assembly name was found, this will be non-null.</param>
         /// <param name="containingPackage">If there was a precise match for the file, this is the earliest NuGet package version in which it was found.</param>
-        public void FindNuGetPackageInfoForFile(string filePath, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
-        {
-            using var file = new FileExplorer(filePath);
-            FindNuGetPackageInfoForFile(file, out assemblyNameOwnerId, out containingPackage);
-        }
-
-        /// <summary>
-        /// Finds the package that contains the file.
-        /// </summary>
-        /// <param name="assemblyNameOwnerId">If an "owning package" for the assembly name was found, this will be non-null.</param>
-        /// <param name="containingPackage">If there was a precise match for the file, this is the earliest NuGet package version in which it was found.</param>
         public void FindNuGetPackageInfoForFile(Stream fileStream, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
-        {
-            using var file = new FileExplorer(fileStream);
-            FindNuGetPackageInfoForFile(file, out assemblyNameOwnerId, out containingPackage);
-        }
-
-        private void FindNuGetPackageInfoForFile(FileExplorer file, out string? assemblyNameOwnerId, out NuGetPackageVersion? containingPackage)
         {
             assemblyNameOwnerId = null;
             containingPackage = null;
 
+            var strongName = StrongNameInfo.GetStrongName(fileStream);
+
             // we need to do some validation on the file to see if it is viable before trying to do a lookup
             // we won't have any non-PEs
-            if (!file.IsPE)
+            if (strongName is null)
             {
                 return;
-            }
-
-            using var pe = new PEExplorer(file);
-
-            // we won't have any non-assemblies
-            if (!pe.HasClrData)
-            {
-                return;
-            }
-
-            // we need to construct the strong name, so open up the metadata and pull the assembly info out
-            using var md = new MDSkimmer(pe);
-            var assembly = new AssemblyToken(md, 1).GetRow();
-            var assemblyName = assembly.Name.ToString();
-            StrongNameInfo strongName;
-            if (assembly.PublicKey.Value == 0)
-            {
-                strongName = new(assemblyName);
-            }
-            else
-            {
-                var publicKey = assembly.PublicKey.GetBlob();
-                if (publicKey.Length == 8)
-                {
-                    // if it's 8 long, it's just the PKT
-                    strongName = new(assemblyName, new(publicKey));
-                }
-                else
-                {
-                    // otherwise, we need to construct the PKT (last 8 bytes of SHA1 hash of public key)
-                    strongName = new(assemblyName, PublicKeyToken.FromPublicKey(publicKey));
-                }
             }
 
             // TODO: lookup whether it is a Framework or other "well-known" binary.
             // get the hash from the file.
-            var fullHash = file.GetHash(SHA256.Create());
-            var hashToken = HashToken.FromSha256Bytes(fullHash);
+            fileStream.Position = 0;
+            var hashToken = HashToken.FromStream(fileStream);
 
             // look it up in the index
             if (TrySmartSearchForHashToken(hashToken, out var entry, out var probes))

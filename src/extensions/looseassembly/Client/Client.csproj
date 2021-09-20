@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marklio.Metadata" Version="1.3.2-alpha" />
+    <PackageReference Include="System.Reflection.Metadata" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

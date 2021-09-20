@@ -2,6 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.IO;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
@@ -38,6 +41,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
             StrongNameInfo sn => Equals(sn),
             _ => false,
         };
+
+        public static StrongNameInfo? GetStrongName(Stream stream)
+        {
+            try
+            {
+                using var peReader = new PEReader(stream);
+
+                if (!peReader.HasMetadata)
+                {
+                    return default;
+                }
+
+                var reader = peReader.GetMetadataReader();
+
+                if (!reader.IsAssembly)
+                {
+                    return default;
+                }
+
+                var assemblyName = reader.GetAssemblyDefinition().GetAssemblyName();
+
+                return new(assemblyName.Name, new(assemblyName.GetPublicKeyToken()));
+            }
+            catch (IOException)
+            {
+                return default;
+            }
+            catch (BadImageFormatException)
+            {
+                return default;
+            }
+        }
 
         public override string ToString() => $"{Name}, PublicKeyToken={PublicKeyToken}";
 

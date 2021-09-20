@@ -4,8 +4,8 @@
 using System;
 using System.Buffers.Binary;
 using System.Globalization;
-using System.Net;
-using System.Runtime.InteropServices;
+using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
@@ -15,6 +15,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
     /// </summary>
     public readonly struct HashToken : IEquatable<HashToken>, IComparable<HashToken>
     {
+        private static readonly SHA256 Sha256 = SHA256.Create();
+
         /// <summary>
         /// The underlying bytes of the hash token
         /// NOTE: These are converted to local endianness, so they have appropriate values for comparisons.
@@ -51,6 +53,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
             var tokenSpan = sha256Hash.AsSpan()[^16..];
             return FromTokenBytes(tokenSpan);
         }
+
+        public static HashToken FromStream(Stream stream)
+            => FromSha256Bytes(Sha256.ComputeHash(stream));
 
         /// <summary>
         /// Creates a token from the byte representation.
