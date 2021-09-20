@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
             _ => false,
         };
 
-        public static StrongNameInfo? GetStrongName(Stream stream)
+        public static StrongNameInfo? Get(Stream stream)
         {
             try
             {

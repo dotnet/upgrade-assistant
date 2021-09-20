@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client.Test
 
             // Act
             using var stream = File.OpenRead(assembly.Location);
-            var strongNameInfo = StrongNameInfo.GetStrongName(stream)!;
+            var strongNameInfo = StrongNameInfo.Get(stream)!;
 
             // Assert
             Assert.NotNull(strongNameInfo);
@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client.Test
             using var stream = new MemoryStream();
 
             // Act
-            var strongNameInfo = StrongNameInfo.GetStrongName(stream)!;
+            var strongNameInfo = StrongNameInfo.Get(stream)!;
 
             // Assert
             Assert.Null(strongNameInfo);

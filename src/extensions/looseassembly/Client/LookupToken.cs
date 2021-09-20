@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         {
             using var stream = File.OpenRead(fileName);
 
-            var strongName = StrongNameInfo.GetStrongName(stream);
+            var strongName = StrongNameInfo.Get(stream);
 
             if (strongName is null)
             {
