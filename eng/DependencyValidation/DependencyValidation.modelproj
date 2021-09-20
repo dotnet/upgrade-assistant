@@ -130,9 +130,13 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Templates</Name>
       <Project>{2e23fb6c-fad1-41b1-9187-1ecd7548fbcc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\extensions\looseassembly\Indexing\Indexing.csproj">
-      <Name>Indexing</Name>
-      <Project>{07177276-0be9-4d5d-8461-648124f3bd61}</Project>
+    <ProjectReference Include="..\..\src\extensions\looseassembly\Client\Client.csproj">
+      <Name>Client</Name>
+      <Project>{cbe4039d-c56e-42a8-a610-2e93656e4bf1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\looseassembly\LooseAssembly.NuGet\LooseAssembly.NuGet.csproj">
+      <Name>LooseAssembly.NuGet</Name>
+      <Project>{e28e89ba-3569-4f92-a449-17ef31c97d4e}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\extensions\looseassembly\LooseAssembly\LooseAssembly.csproj">
       <Name>LooseAssembly</Name>

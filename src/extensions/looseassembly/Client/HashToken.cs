@@ -8,7 +8,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
     /// <summary>
     /// Represents a hash token used to establish content identity for a file.

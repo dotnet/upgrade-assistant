@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
     /// <summary>
     /// Encapsulates a public key token.

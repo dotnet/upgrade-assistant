@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
     /// <summary>
     /// Provides a definition for the structure of the file header for the index file.

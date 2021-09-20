@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
     /// <summary>
     /// Encapsulates a strong name "family" identity (name and public key token).

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.props"/>
+  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.props" />
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
-    <ProjectReference Include="..\Indexing\Indexing.csproj" />
+    <ProjectReference Include="..\Client\Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +19,7 @@
     </None>
   </ItemGroup>
 
-  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets"/>
+  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
 
 </Project>
 

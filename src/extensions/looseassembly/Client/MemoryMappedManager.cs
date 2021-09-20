@@ -5,7 +5,7 @@ using System;
 using System.Buffers;
 using System.IO.MemoryMappedFiles;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
     /// <summary>
     /// This class implements MemoryManager over a memory-mapped view accessor.

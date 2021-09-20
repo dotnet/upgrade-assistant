@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	  <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing</AssemblyName>
-	  <RootNamespace>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing</RootNamespace>
+	  <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client</AssemblyName>
+	  <RootNamespace>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

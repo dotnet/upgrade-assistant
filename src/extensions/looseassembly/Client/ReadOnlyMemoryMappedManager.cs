@@ -4,7 +4,7 @@
 using System;
 using System.IO.MemoryMappedFiles;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
     /// <summary>
     /// This provides a read-only-enforced view over a MemoryMappedViewAccessor.

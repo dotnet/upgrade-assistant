@@ -2,7 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.IO;
-using Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client;
 using Microsoft.Extensions.FileProviders;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly

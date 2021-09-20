@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Marklio.Metadata;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Indexing
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
     /// <summary>
     /// Encapsulates the operations to use a NuGet Package Lookup Index.
