@@ -195,15 +195,20 @@
     <PropertyGroup>
       <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)publish\</ExtensionOutputDirectory>
       <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
+      <ExtensionVersion>$(Version)</ExtensionVersion>
+      <ExtensionVersion Condition=" '$(ExtensionVersion)' == '' ">0.0.0</ExtensionVersion>
     </PropertyGroup>
     <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
   </Target>
 
-  <!-- Update version if set -->
-  <Target Name="UpdateUpgradeAssistantVersion" Condition=" '$(Version)' != '' AND Exists($(ExtensionManifestPath)) " AfterTargets="SetUpgradeAssistantExtensionInfo">
+  <Target Name="VerifyExtensionManifestAvailable" Condition="!Exists($(ExtensionManifestPath))" AfterTargets="SetUpgradeAssistantExtensionInfo">
+    <Warning Text="Extension manifest $(ExtensionManifestPath) was not found" />
+  </Target>
+
+  <Target Name="UpdateUpgradeAssistantVersion" Condition="Exists($(ExtensionManifestPath))" AfterTargets="SetUpgradeAssistantExtensionInfo">
     <ItemGroup>
       <_ExistingManifestContents Include="$([System.IO.File]::ReadAllText('$(ExtensionManifestPath)'))" />
-      <_UpdatedManfiestContents Include="@(_ExistingManifestContents->Replace('[Version]', $(Version)))" />
+      <_UpdatedManfiestContents Include="@(_ExistingManifestContents->Replace('[Version]', $(ExtensionVersion)))" />
     </ItemGroup>
     <ItemGroup>
     </ItemGroup>
