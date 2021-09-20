@@ -1,0 +1,12 @@
+﻿{
+  "ExtensionName": "Microsoft.DotNet.UpgradeAssistant.LooseAssembly",
+  "Version": "[Version]",
+  "MinRequiredVersion": "0.2.231602",
+  "Description":"Provides some services for the .NET Upgrade Assistant to identify loose dependencies based off of available NuGet feeds.",
+  "Authors": [
+    "Microsoft"
+  ],
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.dll"
+  ]
+}

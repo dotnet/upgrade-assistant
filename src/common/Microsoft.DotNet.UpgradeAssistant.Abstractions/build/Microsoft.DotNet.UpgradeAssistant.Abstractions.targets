@@ -2,14 +2,14 @@
 
   <!--
     This is a list of all the host-supplied files that should not be contained within an extension.
-    
+
     To create a new list, go to the output of the CLI and run the following sommand in PowerShell:
-    
+
     Get-ChildItem *.dll -Recurse -Exclude extensions `
       |% { $_.FullName.Replace("$pwd\", "") } `
       |% { "<_UpgradeExtensionExclude Include=`"$_`" />" } `
       | Set-Clipboard
-     
+
     An updated list will now be on the clipboard and can be pasted below.
   -->
   <ItemGroup>
@@ -183,15 +183,40 @@
   <!-- Ensure the extension is published on build -->
   <Target Name="PublishUpgradeAssistant" AfterTargets="Build" DependsOnTargets="Publish">
     <PropertyGroup>
-      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)</ExtensionOutputDirectory>
+      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(PublishDir)</ExtensionOutputDirectory>
+      <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
+      <ExtensionVersion Condition=" '$(ExtensionVersion)' == '' ">$(Version)</ExtensionVersion>
+      <ExtensionVersion Condition=" '$(ExtensionVersion)' == '' ">0.0.0</ExtensionVersion>
+    </PropertyGroup>
+    <Message Importance="High" Text="Publishing Upgrade Assistant Extension: $(ExtensionOutputDirectory)"/>
+  </Target>
+
+  <Target Name="VerifyExtensionManifestAvailable" Condition="!Exists($(ExtensionManifestPath))" AfterTargets="PublishUpgradeAssistant">
+    <Warning Text="Extension manifest $(ExtensionManifestPath) was not found" />
+  </Target>
+
+  <Target Name="UpdateExtensionVersion" Condition="Exists($(ExtensionManifestPath))" AfterTargets="PublishUpgradeAssistant">
+    <ItemGroup>
+      <_ExistingManifestContents Include="$([System.IO.File]::ReadAllText('$(ExtensionManifestPath)'))" />
+      <_UpdatedManfiestContents Include="@(_ExistingManifestContents->Replace('[Version]', $(ExtensionVersion)))" />
+    </ItemGroup>
+
+    <Message Importance="High" Text="Updating extension version to $(ExtensionVersion)" />
+    <WriteLinesToFile File="$(ExtensionManifestPath)" Lines="@(_UpdatedManfiestContents)" Overwrite="true" />
+  </Target>
+
+  <!-- Zip extension if desired -->
+  <Target Name="ZipPublishUpgradeAssistant" Condition="$(ZipExtensionMethod)" AfterTargets="PublishUpgradeAssistant">
+    <PropertyGroup>
       <ExtensionOutputPath>$(ExtensionOutputDirectory)$(AssemblyName).zip</ExtensionOutputPath>
     </PropertyGroup>
-        <ZipDirectory
-            Overwrite="true"
-            SourceDirectory="$(PublishDir)"
-            DestinationFile="$(ExtensionOutputPath)" />
-        <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputPath)" />
+    <ZipDirectory
+        Overwrite="true"
+        SourceDirectory="$(PublishDir)"
+        DestinationFile="$(ExtensionOutputPath)" />
+    <Message Importance="High" Text="Zipped Upgrade Assistant Extension: $(ExtensionOutputPath)"/>
   </Target>
+
 
   <!-- Remove host supplied assemblies -->
   <Target Name="RemoveUpgradeAssistantHostProvidedAssemblies"

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly</AssemblyName>
+    <RootNamespace>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
+    <ProjectReference Include="..\Client\Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ExtensionManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
+
+</Project>
+

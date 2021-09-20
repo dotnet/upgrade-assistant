@@ -96,3 +96,4 @@ PublishScripts/
 # Bundled dotnet tools
 .tools/
 tools/
+/src/extensions/looseassembly/LooseAssembly.NuGet/.data/
