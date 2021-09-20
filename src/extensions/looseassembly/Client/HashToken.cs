@@ -15,8 +15,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
     /// </summary>
     public readonly struct HashToken : IEquatable<HashToken>, IComparable<HashToken>
     {
-        private static readonly SHA256 Sha256 = SHA256.Create();
-
         /// <summary>
         /// The underlying bytes of the hash token
         /// NOTE: These are converted to local endianness, so they have appropriate values for comparisons.
@@ -55,7 +53,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         }
 
         public static HashToken FromStream(Stream stream)
-            => FromSha256Bytes(Sha256.ComputeHash(stream));
+        {
+            using var hasher = SHA256.Create();
+            var bytes = hasher.ComputeHash(stream);
+
+            return FromSha256Bytes(bytes);
+        }
 
         /// <summary>
         /// Creates a token from the byte representation.
