@@ -32,8 +32,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             Location = location;
             Configuration = configuration;
             Name = GetName(Configuration, location);
+            Version = GetVersion(logger);
 
-            Version = GetVersion();
             var serviceProviders = GetOptions<string[]>(ExtensionServiceProvidersSectionName);
 
             if (serviceProviders is not null)
@@ -45,9 +45,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         /// <summary>
         /// Version needs to fit into a <see cref="Version"/> at the moment. Versions may have a '+' or '-' in it per semantic versioning so we'll just take the first part.
         /// </summary>
-        private Version? GetVersion()
+        private Version? GetVersion(ILogger logger)
         {
-            // Currently needs to fit a version, so we'll just skip any '-' or '+'
+            // Currently needs to fit a version, so we'll just take the first part that will parse into a version
             var version = GetOptions<string>("Version");
 
             if (version is null)
@@ -55,23 +55,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 return null;
             }
 
-            var span = version.AsSpan();
+            var versionSpan = GetVersionPart(version);
 
-            var index = span.IndexOf('-');
-
-            if (index > 0)
+            if (versionSpan.Length == 0)
             {
-                span = span.Slice(0, index);
+                return null;
             }
 
-            index = span.IndexOf('+');
+            return Version.Parse(versionSpan);
 
-            if (index > 0)
+            static ReadOnlySpan<char> GetVersionPart(ReadOnlySpan<char> version)
             {
-                span = span.Slice(0, index);
-            }
+                for (var i = 0; i < version.Length; i++)
+                {
+                    var c = version[i];
 
-            return Version.Parse(span);
+                    if (c != '.' && !char.IsDigit(c))
+                    {
+                        return version.Slice(0, i);
+                    }
+                }
+
+                return version;
+            }
         }
 
         public string Name { get; }

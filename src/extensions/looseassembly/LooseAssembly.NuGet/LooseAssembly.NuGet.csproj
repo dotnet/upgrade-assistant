@@ -1,18 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.props" />
-
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <PackExtension>true</PackExtension>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Description>Provides data for loose assembly lookup based on NuGet.org</Description>
     <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.NuGet</AssemblyName>
     <DownloadLooseAssemblyIndex Condition=" '$(DownloadLooseAssemblyIndex)' == '' ">false</DownloadLooseAssemblyIndex>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="ExtensionManifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <AdditionalExtensionManifestLines Include='"LooseDependencies": { "Indexes": [ "nuget.index" ] }' />
   </ItemGroup>
 
   <Target Name="DownloadIndexFile" Condition=" '$(DownloadLooseAssemblyIndex)' " BeforeTargets="AssignTargetPaths">
@@ -33,8 +31,6 @@
       </None>
     </ItemGroup>
   </Target>
-
-  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
 
 </Project>
 
