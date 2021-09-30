@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.props" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <PackExtension>true</PackExtension>
+    <Description>Provides some services for the .NET Upgrade Assistant to identify loose dependencies based off of available NuGet feeds.</Description>
     <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly</AssemblyName>
     <RootNamespace>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly</RootNamespace>
   </PropertyGroup>
@@ -12,14 +12,6 @@
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
     <ProjectReference Include="..\Client\Client.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="ExtensionManifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <Import Project="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
 
 </Project>
 

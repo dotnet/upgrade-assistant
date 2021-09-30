@@ -100,11 +100,6 @@ stages:
             -prepareMachine
             $(_BuildArgs)
           displayName: Windows Build / Publish
-        - task: PowerShell@2
-          inputs:
-            filePath: .\build_extensions.ps1
-            arguments: -Configuration $(_BuildConfig)
-          displayName: Package extensions
 
 - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
   - template: eng\common\templates\post-build\post-build.yml

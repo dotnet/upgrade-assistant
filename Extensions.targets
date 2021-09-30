@@ -120,4 +120,6 @@
     <Message Text="Published extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
   </Target>
 
+  <Import Project="$(MSBuildThisFileDirectory)src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
+
 </Project>

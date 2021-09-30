@@ -1,0 +1,64 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)Extension.ExcludedFiles.targets" />
+
+  <PropertyGroup>
+    <_ExtensionIncludeBuildOutput>$(IncludeBuildOutput)</_ExtensionIncludeBuildOutput>
+    <_ExtensionIncludeBuildOutput Condition=" '$(_ExtensionIncludeBuildOutput)' == '' ">true</_ExtensionIncludeBuildOutput>
+  </PropertyGroup>
+
+  <Target Name="PublishUpgradeAssistant" AfterTargets="__PublishUpgradeAssistantExcludeIncludeBuildOutput;__PublishUpgradeAssistantInternalIncludeBuildOutput" />
+
+  <Target Name="__PublishUpgradeAssistantExcludeIncludeBuildOutput" Condition="!$(_ExtensionIncludeBuildOutput)" AfterTargets="Build">
+    <PropertyGroup>
+      <ExtensionOutputDirectory>$(OutDir)</ExtensionOutputDirectory>
+      <ExtensionManifestPath>$(ExtensionOutputDirectory)$(ExtensionFileName)</ExtensionManifestPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ExtensionFiles Include="$(ExtensionOutputDirectory)\*" />
+      <ExtensionFiles Remove="$(ExtensionOutputDirectory)\$(AssemblyName)*" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Ensure the extension is published on build -->
+  <Target Name="__PublishUpgradeAssistantInternalIncludeBuildOutput" Condition="$(_ExtensionIncludeBuildOutput)" AfterTargets="Build" DependsOnTargets="Publish">
+    <PropertyGroup>
+      <ExtensionOutputDirectory>$(PublishDir)</ExtensionOutputDirectory>
+      <ExtensionManifestPath>$(ExtensionOutputDirectory)ExtensionManifest.json</ExtensionManifestPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ExtensionFiles Include="$(ExtensionOutputDirectory)\*" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Zip extension if desired -->
+  <Target Name="ZipPublishUpgradeAssistant" Condition="$(ZipExtension)" AfterTargets="PublishUpgradeAssistant">
+    <PropertyGroup>
+      <ExtensionOutputPath>$(ExtensionOutputDirectory)$(AssemblyName).zip</ExtensionOutputPath>
+    </PropertyGroup>
+    <ZipDirectory
+        Overwrite="true"
+        SourceDirectory="$(PublishDir)"
+        DestinationFile="$(ExtensionOutputPath)" />
+    <Message Importance="High" Text="Zipped Upgrade Assistant Extension: $(ExtensionOutputPath)"/>
+  </Target>
+
+  <!-- Remove host supplied assemblies -->
+  <Target Name="RemoveUpgradeAssistantHostProvidedAssemblies"
+          AfterTargets="ComputeFilesToPublish">
+
+    <ItemGroup>
+      <_ExtensionArtifactsByRelativePath Include="%(ResolvedFileToPublish.RelativePath)">
+        <OriginalIdentity>%(Identity)</OriginalIdentity>
+      </_ExtensionArtifactsByRelativePath>
+      <_ExtensionArtifactsByRelativePath Remove="@(_UpgradeExtensionExclude)" />
+
+      <_ResolvedFileToPublish Include="%(_ExtensionArtifactsByRelativePath.OriginalIdentity)" />
+      <_ToRemove Include="@(ResolvedFileToPublish)" Exclude="@(_ResolvedFileToPublish)" />
+
+      <ResolvedFileToPublish Remove="@(_ToRemove)" />
+    </ItemGroup>
+  </Target>
+
+</Project>
