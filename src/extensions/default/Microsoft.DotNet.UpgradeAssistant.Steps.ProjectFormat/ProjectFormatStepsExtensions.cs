@@ -21,16 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.Services.AddUpgradeStep<SetTFMStep>();
             services.Services.AddUpgradeStep<TryConvertProjectConverterStep>();
-
-            if (FeatureFlags.IsRequested("TRY_CONVERT_EXE"))
-            {
-                services.AddExtensionOption<TryConvertOptions>("TryConvert");
-                services.Services.AddSingleton<ITryConvertTool, TryConvertTool>();
-            }
-            else
-            {
-                services.Services.AddTransient<ITryConvertTool, TryConvertInProcessTool>();
-            }
+            services.Services.AddTransient<ITryConvertTool, TryConvertInProcessTool>();
 
             return services.Services.AddOptions<TryConvertOptions>()
                 .PostConfigure(options =>
