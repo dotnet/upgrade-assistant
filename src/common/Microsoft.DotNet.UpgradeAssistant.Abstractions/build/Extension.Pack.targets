@@ -31,7 +31,7 @@
       <_ExtensionManifestContents Include='"MinRequiredVersion": "$(ExtensionMinRequiredVersion)"' />
       <_ExtensionManifestContents Include='"Description": "$(Description)"' />
       <_ExtensionManifestContents Include='"Authors": [ "$(Authors)" ]' />
-      <_ExtensionManifestContents Condition="!$(IncludeBuildOutput)" Include='"ExtensionServiceProviders": [ "$(AssemblyName).dll" ]' />
+      <_ExtensionManifestContents Condition="!$(_ExtensionIncludeBuildOutput)" Include='"ExtensionServiceProviders": [ "$(AssemblyName).dll" ]' />
       <_ExtensionManifestContents Include="@(AdditionalExtensionManifestLines)" />
     </ItemGroup>
 
