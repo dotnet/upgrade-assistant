@@ -9,8 +9,6 @@ Upgrade Assistant's extensibility provides the ability for users to extend it be
 
 Throughout this document, the term `workspace` will be used to refer to a solution or project that is being updated along with the state file Upgrade Assistant generates.
 
-> This feature is currently in a preview/testing phase. In order to enable it, you'll need to set the following environment variable: `UA_FEATURES=EXTENSION_MANAGEMENT`
-
 ## User Experience
 
 Extensions will now be something that are managed at a workspace level. This will allow users to have a consistent experience as well as be able to manage their extensions.
