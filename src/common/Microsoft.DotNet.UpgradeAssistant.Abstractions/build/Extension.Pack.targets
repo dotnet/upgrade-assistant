@@ -15,8 +15,8 @@
 
   <Target Name="PackExtensionManifestFiles">
     <ItemGroup>
-      <ExtensionFiles Update="@(ExtensionFiles)" Condition=" '%(ExtensionFiles.PackagePath)' == '' " PackagePath="/" />
-      <None Include="@(ExtensionFiles)" Pack="true" />
+      <ExtensionFile Update="@(ExtensionFile)" Condition=" '%(ExtensionFile.PackagePath)' == '' " PackagePath="/" />
+      <None Include="@(ExtensionFile)" Pack="true" />
     </ItemGroup>
   </Target>
 
@@ -53,7 +53,7 @@
     <WriteLinesToFile File="$(_TempExtensionManifestFilePath)" Lines="@(_CommaExtensionManifestContents)" Overwrite="true" WriteOnlyWhenDifferent="true" />
 
     <ItemGroup>
-      <ExtensionFiles Include="$(_TempExtensionManifestFilePath)" />
+      <ExtensionFile Include="$(_TempExtensionManifestFilePath)" />
     </ItemGroup>
 
     <Message Text="Created extension manifest file for $(ExtensionName)" Importance="High" />

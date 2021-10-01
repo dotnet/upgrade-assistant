@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="@(ExtensionFiles)">
+    <None Include="@(ExtensionFile)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

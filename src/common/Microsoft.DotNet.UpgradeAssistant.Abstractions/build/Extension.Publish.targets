@@ -10,8 +10,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ExtensionFiles Include="$(ExtensionOutputDirectory)\*" />
-      <ExtensionFiles Remove="$(ExtensionOutputDirectory)\$(AssemblyName)*" />
+      <ExtensionFile Include="$(ExtensionOutputDirectory)\*" />
+      <ExtensionFile Remove="$(ExtensionOutputDirectory)\$(AssemblyName)*" />
     </ItemGroup>
   </Target>
 
@@ -23,7 +23,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ExtensionFiles Include="$(ExtensionOutputDirectory)\*" />
+      <ExtensionFile Include="$(ExtensionOutputDirectory)\*" />
     </ItemGroup>
   </Target>
 
