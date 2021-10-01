@@ -13,6 +13,12 @@
     <_ExtensionIncludeBuildOutput Condition=" '$(_ExtensionIncludeBuildOutput)' == '' ">true</_ExtensionIncludeBuildOutput>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="@(ExtensionFile)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Import Condition="$(PublishExtension)" Project="$(MSBuildThisFileDirectory)Extension.Publish.targets" />
   <Import Condition="$(PackExtension)" Project="$(MSBuildThisFileDirectory)Extension.Pack.targets" />
 
