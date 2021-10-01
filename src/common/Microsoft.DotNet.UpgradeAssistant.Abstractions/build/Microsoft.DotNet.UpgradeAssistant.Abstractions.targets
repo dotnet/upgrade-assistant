@@ -7,6 +7,11 @@
     <PublishExtension Condition=" '$(PublishExtension)' == '' ">false</PublishExtension>
     <ExtensionFileName>ExtensionManifest.json</ExtensionFileName>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <_ExtensionIncludeBuildOutput>$(IncludeBuildOutput)</_ExtensionIncludeBuildOutput>
+    <_ExtensionIncludeBuildOutput Condition=" '$(_ExtensionIncludeBuildOutput)' == '' ">true</_ExtensionIncludeBuildOutput>
+  </PropertyGroup>
 
   <Import Condition="$(PublishExtension)" Project="$(MSBuildThisFileDirectory)Extension.Publish.targets" />
   <Import Condition="$(PackExtension)" Project="$(MSBuildThisFileDirectory)Extension.Pack.targets" />

@@ -1,11 +1,6 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)Extension.ExcludedFiles.targets" />
 
-  <PropertyGroup>
-    <_ExtensionIncludeBuildOutput>$(IncludeBuildOutput)</_ExtensionIncludeBuildOutput>
-    <_ExtensionIncludeBuildOutput Condition=" '$(_ExtensionIncludeBuildOutput)' == '' ">true</_ExtensionIncludeBuildOutput>
-  </PropertyGroup>
-
   <Target Name="PublishUpgradeAssistant" AfterTargets="__PublishUpgradeAssistantExcludeIncludeBuildOutput;__PublishUpgradeAssistantInternalIncludeBuildOutput" />
 
   <Target Name="__PublishUpgradeAssistantExcludeIncludeBuildOutput" Condition="!$(_ExtensionIncludeBuildOutput)" AfterTargets="Build">
