@@ -14,13 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="@(PackageMap)">
+    <None Include="@(ExtensionFiles)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="@(TemplateFile)">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Compile Remove="@(TemplateFile)" />
   </ItemGroup>
 
   <Import Condition="$(PublishExtension)" Project="$(MSBuildThisFileDirectory)Extension.Publish.targets" />
