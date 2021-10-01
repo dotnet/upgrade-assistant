@@ -3,6 +3,14 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Version
+### Added
+- Extensions can now be downloaded and installed into an upgrade context via a NuGet feed (see [docs](docs/design/Extension_Management.md) for details) (#873)[https://github.com/dotnet/upgrade-assistant/pull/855]
+- Added extension for identifying loose assemblies with data to identify loose assemblies from NuGet.org (see [docs](docs/design/Loose_binary_identification.md) for details) (#855)[https://github.com/dotnet/upgrade-assistant/pull/855]
+
+### Removed
+- Removed option to run `try-convert` as an exe and now will always be run in-process [#870](https://github.com/dotnet/upgrade-assistant/pull/870)
+
 ## Version 0.3.246501 - 2021-09-15 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.246501))
 ### Fixed
 - Fixed issue with Package Analyzer to not enumerate the same collection that is being modified. [#836](https://github.com/dotnet/upgrade-assistant/issues/836)
