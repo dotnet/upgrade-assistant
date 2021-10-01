@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
                 if (analyzerPackage is not null)
                 {
-                    _logger.LogInformation("Reference to .NET Upgrade Assistant analyzer package ({AnalyzerPackageName}, version {AnalyzerPackageVersion}) needs added", AnalyzerPackageName, analyzerPackage.Version);
+                    _logger.LogInformation("Reference to .NET Upgrade Assistant analyzer package ({AnalyzerPackageName}, version {AnalyzerPackageVersion}) needs to be added", AnalyzerPackageName, analyzerPackage.Version);
                     state.Packages.Add(analyzerPackage with { PrivateAssets = "all" }, new OperationDetails());
                 }
                 else

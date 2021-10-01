@@ -32,13 +32,51 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             Location = location;
             Configuration = configuration;
             Name = GetName(Configuration, location);
+            Version = GetVersion(logger);
 
-            Version = GetOptions<Version>("Version");
             var serviceProviders = GetOptions<string[]>(ExtensionServiceProvidersSectionName);
 
             if (serviceProviders is not null)
             {
                 _alc = new Lazy<AssemblyLoadContext>(() => new ExtensionAssemblyLoadContext(instanceKey, this, serviceProviders, logger));
+            }
+        }
+
+        /// <summary>
+        /// Version needs to fit into a <see cref="Version"/> at the moment. Versions may have a '+' or '-' in it per semantic versioning so we'll just take the first part.
+        /// </summary>
+        private Version? GetVersion(ILogger logger)
+        {
+            // Currently needs to fit a version, so we'll just take the first part that will parse into a version
+            var version = GetOptions<string>("Version");
+
+            if (version is null)
+            {
+                return null;
+            }
+
+            var versionSpan = GetVersionPart(version);
+
+            if (versionSpan.Length == 0)
+            {
+                return null;
+            }
+
+            return Version.Parse(versionSpan);
+
+            static ReadOnlySpan<char> GetVersionPart(ReadOnlySpan<char> version)
+            {
+                for (var i = 0; i < version.Length; i++)
+                {
+                    var c = version[i];
+
+                    if (c != '.' && !char.IsDigit(c))
+                    {
+                        return version.Slice(0, i);
+                    }
+                }
+
+                return version;
             }
         }
 

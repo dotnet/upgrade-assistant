@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 {
-    public class AspNetComponentIdentifierTests
+    public class WebComponentIdentifierTests
     {
         [InlineData(new[] { "" }, ProjectComponents.None)]
         [InlineData(new[] { "Microsoft.NET.Sdk.Web" }, ProjectComponents.AspNetCore)]
@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
-            var componentIdentifier = mock.Create<AspNetComponentIdentifier>();
+            var componentIdentifier = mock.Create<WebComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
-            var componentIdentifier = mock.Create<AspNetComponentIdentifier>();
+            var componentIdentifier = mock.Create<WebComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
-            var componentIdentifier = mock.Create<AspNetComponentIdentifier>();
+            var componentIdentifier = mock.Create<WebComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);
@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
 
-            var componentIdentifier = mock.Create<AspNetComponentIdentifier>();
+            var componentIdentifier = mock.Create<WebComponentIdentifier>();
 
             // Act
             var components = await componentIdentifier.GetComponentsAsync(project.Object, default).ConfigureAwait(false);

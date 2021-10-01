@@ -1,214 +1,25 @@
 ﻿<Project>
 
-  <!--
-    This is a list of all the host-supplied files that should not be contained within an extension.
-    
-    To create a new list, go to the output of the CLI and run the following sommand in PowerShell:
-    
-    Get-ChildItem *.dll -Recurse -Exclude extensions `
-      |% { $_.FullName.Replace("$pwd\", "") } `
-      |% { "<_UpgradeExtensionExclude Include=`"$_`" />" } `
-      | Set-Clipboard
-     
-    An updated list will now be on the clipboard and can be pasted below.
-  -->
+  <PropertyGroup>
+    <ZipExtension Condition=" '$(ZipExtension)' == '' ">false</ZipExtension>
+    <PackExtension Condition=" '$(PackExtension)' == '' ">false</PackExtension>
+    <PublishExtension Condition="$(PackExtension) OR $(ZipExtension)">true</PublishExtension>
+    <PublishExtension Condition=" '$(PublishExtension)' == '' ">false</PublishExtension>
+    <ExtensionFileName>ExtensionManifest.json</ExtensionFileName>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <_ExtensionIncludeBuildOutput>$(IncludeBuildOutput)</_ExtensionIncludeBuildOutput>
+    <_ExtensionIncludeBuildOutput Condition=" '$(_ExtensionIncludeBuildOutput)' == '' ">true</_ExtensionIncludeBuildOutput>
+  </PropertyGroup>
+
   <ItemGroup>
-    <_UpgradeExtensionExclude Include="cs\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="cs\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="cs\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="cs\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="cs\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="cs\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="cs\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="de\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="es\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="fr\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="it\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ja\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ko\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="pl\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="pt-BR\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="ru\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="runtimes\win\lib\netcoreapp2.0\System.Diagnostics.EventLog.dll" />
-    <_UpgradeExtensionExclude Include="tr\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="tr\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="tr\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="tr\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="tr\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="tr\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hans\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\Microsoft.CodeAnalysis.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\Microsoft.CodeAnalysis.VisualBasic.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\Microsoft.CodeAnalysis.VisualBasic.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll" />
-    <_UpgradeExtensionExclude Include="zh-Hant\System.CommandLine.resources.dll" />
-    <_UpgradeExtensionExclude Include="Autofac.dll" />
-    <_UpgradeExtensionExclude Include="Autofac.Extensions.DependencyInjection.dll" />
-    <_UpgradeExtensionExclude Include="AutoMapper.dll" />
-    <_UpgradeExtensionExclude Include="Humanizer.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Bcl.AsyncInterfaces.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Bcl.HashCode.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Build.Locator.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.CodeAnalysis.CSharp.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.CodeAnalysis.CSharp.Workspaces.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.CodeAnalysis.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.CodeAnalysis.VisualBasic.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.CodeAnalysis.Workspaces.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.CodeAnalysis.Workspaces.MSBuild.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.DotNet.UpgradeAssistant.Cli.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.DotNet.UpgradeAssistant.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.DotNet.UpgradeAssistant.Extensions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.DotNet.UpgradeAssistant.MSBuild.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.Abstractions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.Binder.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.CommandLine.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.FileExtensions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.Json.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Configuration.UserSecrets.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.DependencyInjection.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.FileProviders.Abstractions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.FileProviders.Physical.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.FileSystemGlobbing.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Hosting.Abstractions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Hosting.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Logging.Abstractions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Logging.Configuration.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Logging.Console.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Logging.Debug.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Logging.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Logging.EventLog.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Logging.EventSource.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Options.ConfigurationExtensions.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Options.DataAnnotations.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Options.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.Extensions.Primitives.dll" />
-    <_UpgradeExtensionExclude Include="Microsoft.VisualStudio.Setup.Configuration.Interop.dll" />
-    <_UpgradeExtensionExclude Include="Serilog.dll" />
-    <_UpgradeExtensionExclude Include="Serilog.Extensions.Hosting.dll" />
-    <_UpgradeExtensionExclude Include="Serilog.Extensions.Logging.dll" />
-    <_UpgradeExtensionExclude Include="Serilog.Sinks.Console.dll" />
-    <_UpgradeExtensionExclude Include="Serilog.Sinks.File.dll" />
-    <_UpgradeExtensionExclude Include="System.CommandLine.dll" />
-    <_UpgradeExtensionExclude Include="System.Composition.AttributedModel.dll" />
-    <_UpgradeExtensionExclude Include="System.Composition.Convention.dll" />
-    <_UpgradeExtensionExclude Include="System.Composition.Hosting.dll" />
-    <_UpgradeExtensionExclude Include="System.Composition.Runtime.dll" />
-    <_UpgradeExtensionExclude Include="System.Composition.TypedParts.dll" />
-    <_UpgradeExtensionExclude Include="System.Diagnostics.EventLog.dll" />
-    <_UpgradeExtensionExclude Include="System.IO.Pipelines.dll" />
-    <_UpgradeExtensionExclude Include="System.Linq.Async.dll" />
+    <None Include="@(ExtensionFile)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
-  <!-- Ensure the extension is published on build -->
-  <Target Name="PublishUpgradeAssistant" AfterTargets="Build" DependsOnTargets="Publish">
-    <PropertyGroup>
-      <ExtensionOutputDirectory Condition=" '$(ExtensionOutputDirectory)' == '' ">$(OutDir)</ExtensionOutputDirectory>
-      <ExtensionOutputPath>$(ExtensionOutputDirectory)$(AssemblyName).zip</ExtensionOutputPath>
-    </PropertyGroup>
-        <ZipDirectory
-            Overwrite="true"
-            SourceDirectory="$(PublishDir)"
-            DestinationFile="$(ExtensionOutputPath)" />
-        <Message Importance="High" Text="Created Upgrade Assistant Extension: $(ExtensionOutputPath)" />
-  </Target>
-
-  <!-- Remove host supplied assemblies -->
-  <Target Name="RemoveUpgradeAssistantHostProvidedAssemblies"
-          AfterTargets="ComputeFilesToPublish">
-
-    <ItemGroup>
-      <_ExtensionArtifactsByRelativePath Include="%(ResolvedFileToPublish.RelativePath)">
-        <OriginalIdentity>%(Identity)</OriginalIdentity>
-      </_ExtensionArtifactsByRelativePath>
-      <_ExtensionArtifactsByRelativePath Remove="@(_UpgradeExtensionExclude)" />
-
-      <_ResolvedFileToPublish Include="%(_ExtensionArtifactsByRelativePath.OriginalIdentity)" />
-      <_ToRemove Include="@(ResolvedFileToPublish)" Exclude="@(_ResolvedFileToPublish)" />
-
-      <ResolvedFileToPublish Remove="@(_ToRemove)" />
-    </ItemGroup>
-
-  </Target>
+  <Import Condition="$(PublishExtension)" Project="$(MSBuildThisFileDirectory)Extension.Publish.targets" />
+  <Import Condition="$(PackExtension)" Project="$(MSBuildThisFileDirectory)Extension.Pack.targets" />
 
 </Project>

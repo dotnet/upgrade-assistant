@@ -130,6 +130,18 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Templates</Name>
       <Project>{2e23fb6c-fad1-41b1-9187-1ecd7548fbcc}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\looseassembly\Client\Client.csproj">
+      <Name>Client</Name>
+      <Project>{cbe4039d-c56e-42a8-a610-2e93656e4bf1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\looseassembly\LooseAssembly.NuGet\LooseAssembly.NuGet.csproj">
+      <Name>LooseAssembly.NuGet</Name>
+      <Project>{e28e89ba-3569-4f92-a449-17ef31c97d4e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\looseassembly\LooseAssembly\LooseAssembly.csproj">
+      <Name>LooseAssembly</Name>
+      <Project>{6ff1bf91-58bc-4214-8c38-b87e45bc345d}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.Maui</Name>
       <Project>{a122dd5b-4b80-4558-8db2-8e9ebff12a1a}</Project>

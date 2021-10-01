@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
                 if (newtonsoftPackage is not null)
                 {
-                    _logger.LogInformation("Reference to Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs added", NewtonsoftPackageName, newtonsoftPackage.Version);
+                    _logger.LogInformation("Reference to Newtonsoft package ({NewtonsoftPackageName}, version {NewtonsoftPackageVersion}) needs to be added", NewtonsoftPackageName, newtonsoftPackage.Version);
                     state.Packages.Add(newtonsoftPackage, new OperationDetails());
                 }
                 else

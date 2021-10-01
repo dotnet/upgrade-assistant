@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="HashTokenTestFile.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HashTokenTestFile.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\extensions\looseassembly\Client\Client.csproj" />
+    <ProjectReference Include="..\..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
+  </ItemGroup>
+</Project>

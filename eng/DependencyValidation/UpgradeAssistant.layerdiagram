@@ -218,6 +218,27 @@
             </reference>
           </references>
         </layer>
+        <layer Id="c891186a-d60b-4838-b928-1f4f1bf5f5d8" name="looseassembly">
+          <references>
+            <reference Id="8c7b3a59-6b27-418e-9f50-80f4e5ca6899" name="looseassembly">
+              <ArtifactNode Label="looseassembly" Category="CodeSchema_Project" Id="(Assembly=../../src/extensions/looseassembly)">
+                <Category Ref="CodeMap_SolutionFolder" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.NuGet)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.NuGet.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">
