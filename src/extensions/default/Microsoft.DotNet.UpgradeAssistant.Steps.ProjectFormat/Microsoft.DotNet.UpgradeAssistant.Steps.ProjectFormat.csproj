@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <InstallTryConvert>true</InstallTryConvert>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Abstractions\MSBuild.Abstractions.csproj" />
