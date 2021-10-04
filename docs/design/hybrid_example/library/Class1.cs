@@ -1,6 +1,6 @@
 ﻿using System.Web;
 
-namespace hybrid_example
+namespace HybridExample
 {
     public class Class1
     {

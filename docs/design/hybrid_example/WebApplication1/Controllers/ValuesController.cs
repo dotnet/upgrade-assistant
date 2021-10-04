@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web;
 using System.Web.Http;
-using hybrid_example;
+using HybridExample;
 using WebApplication1;
 
 namespace WebApplication1.Controllers
