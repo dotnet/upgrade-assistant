@@ -64,27 +64,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         private async Task UpdateHighDPISetting(IProject project)
         {
             var programFile = project.FindFiles("Program.cs").FirstOrDefault();
-            var programFileContent = File.ReadAllLines(programFile);
-
-            if (!programFileContent.Contains("Application.SetHighDpiMode"))
+            if (programFile is not null && File.Exists(programFile))
             {
-                var hdpiValue = ProcessAppConfigFile(project);
-                try
-                {
-                    using var outputStream = File.Create(programFile, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
+                var programFileContent = File.ReadAllLines(programFile);
 
-                    await StreamHelpers.CopyStreamWithNewLineAdded(programFileContent, outputStream, "Application.EnableVisualStyles()", SR.Format("Application.SetHighDpiMode(HighDpiMode.{0});", hdpiValue)).ConfigureAwait(false);
-                }
-                catch (IOException exc)
+                if (!programFileContent.Contains("Application.SetHighDpiMode"))
                 {
-                    _logger.LogCritical(exc, "Error while editing Program.cs {Path}", programFile);
-                }
+                    var hdpiValue = ProcessAppConfigFile(project);
+                    try
+                    {
+                        using var outputStream = File.Create(programFile, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
 
-                _logger.LogInformation("Updated Program.cs file at {Path} with HighDPISetting set to {hdpi}", programFile, hdpiValue);
-            }
-            else
-            {
-                _logger.LogInformation("Program.cs file at {Path} already contains HighDPISetting, no need to edit.", programFile);
+                        await StreamHelpers.CopyStreamWithNewLineAdded(programFileContent, outputStream, "Application.EnableVisualStyles()", SR.Format("Application.SetHighDpiMode(HighDpiMode.{0});", hdpiValue)).ConfigureAwait(false);
+                    }
+                    catch (IOException exc)
+                    {
+                        _logger.LogCritical(exc, "Error while editing Program.cs {Path}", programFile);
+                    }
+
+                    _logger.LogInformation("Updated Program.cs file at {Path} with HighDPISetting set to {hdpi}", programFile, hdpiValue);
+                }
+                else
+                {
+                    _logger.LogInformation("Program.cs file at {Path} already contains HighDPISetting, no need to edit.", programFile);
+                }
             }
         }
 
