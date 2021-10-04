@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net45;net5.0</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <NoWarn>$(NoWarn);UA0014</NoWarn>
@@ -16,7 +16,7 @@
     <Compile Remove="HttpContextFactory.cs" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <Compile Include="AspNetHttpContext.cs" />
   </ItemGroup>
@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.0-dev" />
+    <Analyzer Include="E:\Work\migration\UpgradeAssistant\artifacts\bin\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Debug\netstandard2.0\*.dll" />
   </ItemGroup>
 
 </Project>

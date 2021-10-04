@@ -18,7 +18,6 @@ using HybridExample;
 namespace HybridExample
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    [Conditional("asdf")]
     internal sealed class AdapterDescriptor : Attribute
     {
         public AdapterDescriptor(Type interfaceType, Type original)
