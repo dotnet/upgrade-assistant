@@ -286,7 +286,7 @@ bool IsValid();
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(diagnostic, diagnosticFixed)
                 .WithFixed(withFix)
-                .WithExpectedDiagnosticsAfter(diagnostic, diagnosticFixed)
+                .WithExpectedDiagnosticsAfter(diagnostic)
                 .RunAsync();
         }
 
@@ -301,13 +301,13 @@ namespace RefactorTest
     {
         public void Run({|#0:SomeClass|} c)
         {
-            var isValid = {|#1:c.IsValid()|};
+            var isValid = {|#1:c.GetValid()|};
         }
     }
 
     public class SomeClass
     {
-       public bool IsValid() => true;
+       public {|#2:SomeClass|} GetValid() => this;
     }
 
     public interface ISome
@@ -322,28 +322,29 @@ namespace RefactorTest
     {
         public void Run({|#0:SomeClass|} c)
         {
-            var isValid = {|#1:c.IsValid()|};
+            var isValid = {|#1:c.GetValid()|};
         }
     }
 
     public class SomeClass
     {
-       public bool IsValid() => true;
+       public {|#2:SomeClass|} GetValid() => this;
     }
 
     public interface ISome
     {
-bool IsValid();
+ISome GetValid();
     }
 }";
 
             var diagnostic = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
-            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("IsValid", $"{refactor.Namespace}.{refactor.Destination}");
+            var diagnostic2 = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(2).WithArguments(refactor.Original, refactor.Destination);
+            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("GetValid", $"{refactor.Namespace}.{refactor.Destination}");
             await CreateTest(VerifyCSAddMember.Create(), refactor)
                 .WithSource(testFile)
-                .WithExpectedDiagnostics(diagnostic, diagnosticFixed)
+                .WithExpectedDiagnostics(diagnostic, diagnostic2, diagnosticFixed)
                 .WithFixed(withFix)
-                .WithExpectedDiagnosticsAfter(diagnostic, diagnosticFixed)
+                .WithExpectedDiagnosticsAfter(diagnostic, diagnostic2)
                 .RunAsync();
         }
 

@@ -51,7 +51,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     {
                         if (SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType, adapter.Original))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: adapter.PropertiesWithNewMember(operation.TargetMethod), operation.TargetMethod.Name, adapter.Destination));
+                            if (adapter.Destination.GetMembers(operation.TargetMethod.Name).Length == 0)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: adapter.PropertiesWithNewMember(operation.TargetMethod, adapters), operation.TargetMethod.Name, adapter.Destination));
+                            }
                         }
                     }
                 }, OperationKind.Invocation);

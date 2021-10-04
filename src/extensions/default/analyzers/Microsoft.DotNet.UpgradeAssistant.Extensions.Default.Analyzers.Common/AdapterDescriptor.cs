@@ -71,14 +71,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static SymbolDisplayFormat RoundtripMethodFormat { get; } =
             SymbolDisplayFormat.MinimallyQualifiedFormat.WithMemberOptions(
                 SymbolDisplayMemberOptions.IncludeParameters |
-                   SymbolDisplayMemberOptions.IncludeType |
+                   //SymbolDisplayMemberOptions.IncludeType |
                    SymbolDisplayMemberOptions.IncludeRef);
 
-        public ImmutableDictionary<string, string?> PropertiesWithNewMember(IMethodSymbol symbol)
+        public ImmutableDictionary<string, string?> PropertiesWithNewMember(IMethodSymbol symbol, ImmutableArray<AdapterDescriptor> descriptors)
         {
             var formatted = symbol.ToDisplayString(RoundtripMethodFormat);
+            var typeFormatted = GetTypeFromSymbol().ToDisplayString(RoundtripMethodFormat);
+            var final = $"{typeFormatted} {formatted}";
 
-            return Properties.Add(MethodKey, formatted);
+            return Properties.Add(MethodKey, final);
+
+            ITypeSymbol GetTypeFromSymbol()
+            {
+                foreach (var descriptor in descriptors)
+                {
+                    if (SymbolEqualityComparer.Default.Equals(descriptor.Original, symbol.ReturnType))
+                    {
+                        return descriptor.Destination;
+                    }
+                }
+
+                return symbol.ReturnType;
+            }
         }
 
         public static bool TryGetMethod(ImmutableDictionary<string, string?> dictionary, [MaybeNullWhen(false)] out string result)
