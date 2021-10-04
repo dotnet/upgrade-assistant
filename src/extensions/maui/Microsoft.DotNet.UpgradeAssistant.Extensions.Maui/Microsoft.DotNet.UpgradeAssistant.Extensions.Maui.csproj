@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackExtension>true</PackExtension>
+    <ExtensionName>Maui</ExtensionName>
+    <Description>Enhances .NET Upgrade Assistant to provide support for moving from Xamarin to .NET Maui.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,15 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ExtensionManifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Content Include="PackageMaps\*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <PackageMap Include="PackageMaps\*.json" />
+    <TemplateConfigFile Include="Templates\**\*.json" />
+    <ExtensionFiles Include="PackageMaps\*" PackagePath="PackageMaps/" />
+    <ExtensionFiles Include="Templates\**\*" PackagePath="Templates/"/>
     <Compile Remove="Templates\**\*.cs" />
   </ItemGroup>
 
@@ -44,5 +42,5 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  
+
 </Project>

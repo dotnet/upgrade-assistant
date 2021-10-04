@@ -80,6 +80,10 @@
       <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
     </MSBuild>
 
+    <ItemGroup>
+      <_NotHostProvidedAssembly Include="Newtonsoft.Json.dll" />
+    </ItemGroup>
+
     <!-- Create a list of all assemblies included by host and framework -->
     <ItemGroup>
       <_ExcludeFromExtension Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.dll" />
@@ -92,6 +96,7 @@
       <_ExcludeFromExtension Include="System.Threading.Tasks.Extensions.dll" />
       <_ExcludeFromExtension Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
       <_ExcludeFromExtension Include="%(RuntimeCopyLocalItems.DestinationSubPath)" />
+      <_ExcludeFromExtension Remove="@(_NotHostProvidedAssembly)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -119,5 +124,7 @@
 
     <Message Text="Published extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
   </Target>
+
+  <Import Project="$(MSBuildThisFileDirectory)src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
 
 </Project>

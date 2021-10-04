@@ -12,6 +12,8 @@ variables:
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: AzureDevOps-Artifact-Feeds-Pats
     - group: UpgradeAssistant_SDL_Settings
+  - name: DownloadLooseAssemblyIndex
+    value: true
 
 trigger:
   batch: true

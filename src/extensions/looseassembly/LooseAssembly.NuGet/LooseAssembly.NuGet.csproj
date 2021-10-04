@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackExtension>true</PackExtension>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Description>Provides data for loose assembly lookup based on NuGet.org</Description>
+    <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.NuGet</AssemblyName>
+    <DownloadLooseAssemblyIndex Condition=" '$(DownloadLooseAssemblyIndex)' == '' ">false</DownloadLooseAssemblyIndex>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalExtensionManifestLines Include='"LooseDependencies": { "Indexes": [ "nuget.index" ] }' />
+  </ItemGroup>
+
+  <Target Name="DownloadIndexFile" Condition=" '$(DownloadLooseAssemblyIndex)' " BeforeTargets="AssignTargetPaths">
+    <PropertyGroup>
+      <BlobBase>https://upgradeassistant.blob.core.windows.net/indexes/</BlobBase>
+      <IndexName>2021_09_17.index</IndexName>
+      <FullBlobPath>$(BlobBase)$(IndexName)</FullBlobPath>
+    </PropertyGroup>
+
+    <DownloadFile SourceUrl="$(FullBlobPath)" DestinationFolder=".data">
+      <Output TaskParameter="DownloadedFile" ItemName="TheFile" />
+    </DownloadFile>
+
+    <ItemGroup>
+      <None Include="@(TheFile)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <Link>nuget.index</Link>
+      </None>
+    </ItemGroup>
+  </Target>
+
+</Project>
+

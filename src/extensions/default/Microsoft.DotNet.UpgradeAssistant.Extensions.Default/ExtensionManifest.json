@@ -7,14 +7,6 @@
     ]
   },
 
-  "TryConvert": {
-    "ToolPath": "./try-convert/try-convert.dll",
-    "Arguments": [
-      "--no-backup",
-      "--keep-current-tfms"
-    ]
-  },
-
   "PackageUpdater": {
     "PackageMapPath": "PackageMaps"
   },

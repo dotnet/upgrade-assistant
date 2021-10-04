@@ -20,28 +20,23 @@ The main scenario this focuses on is one where a project has downloaded an assem
 
 In order to add this feature to your project, you will need to add the extension to the project:
 
-1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
-2. Install the extension for identifying loose assemblies:
+1. Install the extension for identifying loose assemblies:
    ```
    upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly
    ```
-3. Install the extension for the data to match against NuGet.org:
+2. Install the extension for the data to match against NuGet.org:
    ```
    upgrade-assistant extensions add Microsoft.DotNet.UpgradeAssistant.LooseAssembly.NuGet
    ```
 
 After these have been installed, users on a new machine must restore the packages:
 
-1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
-2. Restore the extensions installed
    ```
    upgrade-assistant extensions restore
    ```
 
 In order to update to the latest versions, the extensions may be updated:
 
-1. Set an environment variable for `UA_FEATURES=EXTENSION_MANAGEMENT`. Extension management is currently under preview, but is required to test this feature.
-2. Update the extensions installed
    ```
    upgrade-assistant extensions update
    ```
