@@ -1,8 +1,6 @@
 ﻿using System;
 using HybridExample;
 
-[assembly: AdapterDescriptor(false)]
-
 #if NETFRAMEWORK
 [assembly: AdapterDescriptor(typeof(IHttpContext), typeof(System.Web.HttpContext))]
 [assembly: AdapterDescriptor(typeof(IHttpContext), typeof(System.Web.HttpContextBase))]
@@ -21,9 +19,6 @@ namespace HybridExample
     internal sealed class AdapterDescriptor : Attribute
     {
         public AdapterDescriptor(Type interfaceType, Type original)
-        {
-        }
-        public AdapterDescriptor(bool isEnabled)
         {
         }
     }

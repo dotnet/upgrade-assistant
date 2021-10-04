@@ -71,7 +71,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static SymbolDisplayFormat RoundtripMethodFormat { get; } =
             SymbolDisplayFormat.MinimallyQualifiedFormat.WithMemberOptions(
                 SymbolDisplayMemberOptions.IncludeParameters |
-                   //SymbolDisplayMemberOptions.IncludeType |
                    SymbolDisplayMemberOptions.IncludeRef);
 
         public ImmutableDictionary<string, string?> PropertiesWithNewMember(IMethodSymbol symbol, ImmutableArray<AdapterDescriptor> descriptors)

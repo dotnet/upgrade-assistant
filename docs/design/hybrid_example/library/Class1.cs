@@ -11,6 +11,7 @@ namespace hybrid_example
 
         public string Method2(HttpRequest request)
         {
+            request.Abort();
             return request.Headers["headerName"];
         }
     }

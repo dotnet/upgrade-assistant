@@ -57,7 +57,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                     return;
                 }
 
-                var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+                var abstractionDocument = context.Document.Project.Solution.GetDocument(syntax.SourceTree);
+
+                if (abstractionDocument is null)
+                {
+                    return;
+                }
+
+                var root = await abstractionDocument.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
                 if (root is null)
                 {
@@ -76,16 +83,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         CodeFixResources.AdapterRefactorTitle,
-                        async cancellationToken =>
+                        createChangedSolution: async cancellationToken =>
                         {
-                            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
+                            var slnEditor = new SolutionEditor(context.Document.Project.Solution);
+                            var editor = await slnEditor.GetDocumentEditorAsync(abstractionDocument.Id);
 
                             var exp = methodDeclaration
                                 .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
                                 .WithAdditionalAnnotations(Simplifier.Annotation);
                             editor.AddMember(node, exp);
 
-                            return editor.GetChangedDocument();
+                            return slnEditor.GetChangedSolution();
                         },
                         nameof(CodeFixResources.UsingSystemWebTitle)),
                     context.Diagnostics);
