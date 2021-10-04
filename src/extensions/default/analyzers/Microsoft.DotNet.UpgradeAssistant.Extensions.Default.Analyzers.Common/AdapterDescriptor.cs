@@ -14,6 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     public record AdapterDescriptor(ITypeSymbol Destination, ITypeSymbol Original)
     {
         private const string ExpectedTypeKey = nameof(ExpectedTypeKey);
+        private const string MethodKey = nameof(MethodKey);
 
         private string? _originalMessage;
         private string? _destinationMessage;
@@ -66,6 +67,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return _properties!;
             }
         }
+
+        private static SymbolDisplayFormat RoundtripMethodFormat { get; } =
+            SymbolDisplayFormat.MinimallyQualifiedFormat.WithMemberOptions(
+                SymbolDisplayMemberOptions.IncludeParameters |
+                   SymbolDisplayMemberOptions.IncludeType |
+                   SymbolDisplayMemberOptions.IncludeRef);
+
+        public ImmutableDictionary<string, string?> PropertiesWithNewMember(IMethodSymbol symbol)
+        {
+            var formatted = symbol.ToDisplayString(RoundtripMethodFormat);
+
+            return Properties.Add(MethodKey, formatted);
+        }
+
+        public static bool TryGetMethod(ImmutableDictionary<string, string?> dictionary, [MaybeNullWhen(false)] out string result)
+            => dictionary.TryGetValue(MethodKey, out result) && result is not null;
 
         public static bool TryGetExpectedType(ImmutableDictionary<string, string?> dictionary, [MaybeNullWhen(false)] out string result)
             => dictionary.TryGetValue(ExpectedTypeKey, out result) && result is not null;

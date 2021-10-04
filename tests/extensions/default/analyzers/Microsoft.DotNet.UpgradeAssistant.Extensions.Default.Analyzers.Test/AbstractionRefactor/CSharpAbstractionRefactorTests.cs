@@ -8,6 +8,9 @@ using Xunit;
 using VerifyCS = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.CSharpCodeFixVerifier<
      Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.AdapterRefactorAnalyzer,
      Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.AdapterRefactorCodeFixer>;
+using VerifyCSAddMember = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.CSharpCodeFixVerifier<
+     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.AdapterRefactorAnalyzer,
+     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.AdapterAddMemberCodeFixer>;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
@@ -231,6 +234,120 @@ namespace RefactorTest
         }
 
         [Fact]
+        public async Task WithMemberAccess()
+        {
+            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var isValid = {|#1:c.IsValid()|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public bool IsValid() => true;
+    }
+
+    public interface ISome
+    {
+    }
+}";
+
+            const string withFix = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var isValid = {|#1:c.IsValid()|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public bool IsValid() => true;
+    }
+
+    public interface ISome
+    {
+bool IsValid();
+    }
+}";
+
+            var diagnostic = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("IsValid", $"{refactor.Namespace}.{refactor.Destination}");
+            await CreateTest(VerifyCSAddMember.Create(), refactor)
+                .WithSource(testFile)
+                .WithExpectedDiagnostics(diagnostic, diagnosticFixed)
+                .WithFixed(withFix)
+                .WithExpectedDiagnosticsAfter(diagnostic, diagnosticFixed)
+                .RunAsync();
+        }
+
+        [Fact]
+        public async Task WithMemberAccess2()
+        {
+            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var isValid = {|#1:c.IsValid()|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public bool IsValid() => true;
+    }
+
+    public interface ISome
+    {
+    }
+}";
+
+            const string withFix = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var isValid = {|#1:c.IsValid()|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public bool IsValid() => true;
+    }
+
+    public interface ISome
+    {
+bool IsValid();
+    }
+}";
+
+            var diagnostic = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("IsValid", $"{refactor.Namespace}.{refactor.Destination}");
+            await CreateTest(VerifyCSAddMember.Create(), refactor)
+                .WithSource(testFile)
+                .WithExpectedDiagnostics(diagnostic, diagnosticFixed)
+                .WithFixed(withFix)
+                .WithExpectedDiagnosticsAfter(diagnostic, diagnosticFixed)
+                .RunAsync();
+        }
+
+        [Fact]
         public async Task ChangeTwice()
         {
             var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
@@ -288,6 +405,9 @@ namespace RefactorTest
         }
 
         public ICodeFixTest CreateTest(AdapterDescriptor? attributeDescriptor = null, bool withFix = true)
+            => CreateTest(VerifyCS.Create(), attributeDescriptor, withFix);
+
+        public ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptor? attributeDescriptor = null, bool withFix = true)
         {
             const string Attribute = @"
 using System;
@@ -302,8 +422,7 @@ namespace Microsoft.CodeAnalysis
     }
 }";
 
-            var test = VerifyCS.Create()
-                .WithSource(Attribute);
+            test.WithSource(Attribute);
 
             if (withFix)
             {

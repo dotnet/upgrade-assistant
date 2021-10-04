@@ -15,3 +15,4 @@ UA0011 | Upgrade | Warning | SystemDeploymentAnalyzer
 UA0012 | Upgrade | Warning | BinaryFormatterUnsafeDeserializeAnalyzer
 UA0013 | Upgrade | Warning | ApiAlert
 UA0014 | Refactor | Warning | AdapterRefactorAnalyzer
+UA0014b | Refactor | Warning | AdapterRefactorAnalyzer

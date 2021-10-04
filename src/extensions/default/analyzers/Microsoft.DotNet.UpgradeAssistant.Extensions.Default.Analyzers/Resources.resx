@@ -124,7 +124,7 @@
     <value>Add member {0} to abstraction {1}</value>
   </data>
   <data name="AdapterAddMemberTitle" xml:space="preserve">
-    <value>Add member to abstraction.</value>
+    <value>Add member to abstraction</value>
   </data>
   <data name="AdapterRefactorDescription" xml:space="preserve">
     <value>Refactor usage to another type.</value>
