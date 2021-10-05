@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
         {
             // If available in the default, we want to ensure that is used.
             var inDefault = Default.Assemblies
-                .Where(a => !a.GetName().Name!.Contains("NuGet", StringComparison.OrdinalIgnoreCase))
+                .Where(a => IsHostProvided(a.GetName().Name))
                 .FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName.Name, StringComparison.Ordinal));
 
             if (inDefault is Assembly existing)
@@ -123,6 +123,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             ms.Position = 0;
             assemblyStream.Dispose();
             return ms;
+        }
+
+        private bool IsHostProvided(string? name)
+        {
+            if (name is null)
+            {
+                return false;
+            }
+
+            if (name.Contains("NuGet", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return name switch
+            {
+                "Newtonsoft.Json" => false,
+                _ => true,
+            };
         }
     }
 }
