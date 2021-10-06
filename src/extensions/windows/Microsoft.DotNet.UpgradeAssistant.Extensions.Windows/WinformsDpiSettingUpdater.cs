@@ -23,6 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private readonly WindowsUtilities _utilities = new();
         private readonly ILogger<WinformsDpiSettingUpdater> _logger;
+        private ProgramFileSpec _programFileSpec = new();
 
         public string Id => typeof(WinformsDpiSettingUpdater).FullName;
 
@@ -59,32 +60,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return hdpiValue;
         }
 
-        private async Task UpdateHighDPISetting(IProject project)
+        public async Task UpdateHighDPISetting(IProject project, string[] programFileContent, bool isDpiSettingSetInProgramFile, string programFilePath)
         {
-            var programFile = project.FindFiles("Program.cs").FirstOrDefault();
-            if (programFile is not null && File.Exists(programFile))
+            if (!programFileContent.Any())
             {
-                var programFileContent = File.ReadAllLines(programFile);
-
-                if (programFileContent.Where(x => x.Contains("Application.SetHighDpiMode")).FirstOrDefault() is null)
+                _logger.LogInformation("No Program.cs file found at {Path}.", programFilePath);
+            }
+            else
+            {
+                if (!isDpiSettingSetInProgramFile)
                 {
                     var hdpiValue = ProcessAppConfigFile(project);
                     try
                     {
-                        using var outputStream = File.Create(programFile, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
+                        using var outputStream = File.Create(programFilePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
 
                         await StreamHelpers.CopyStreamWithNewLineAdded(programFileContent, outputStream, Resources.EnableVisualStylesLine, SR.Format(Resources.HighDPISettingLine, hdpiValue)).ConfigureAwait(false);
 
-                        _logger.LogInformation("Updated Program.cs file at {Path} with HighDPISetting set to {hdpi}", programFile, hdpiValue);
+                        _logger.LogInformation("Updated Program.cs file at {Path} with HighDPISetting set to {hdpi}", programFilePath, hdpiValue);
                     }
                     catch (IOException exc)
                     {
-                        _logger.LogCritical(exc, "Error while editing Program.cs {Path}", programFile);
+                        _logger.LogCritical(exc, "Error while editing Program.cs {Path}", programFilePath);
                     }
                 }
                 else
                 {
-                    _logger.LogInformation("Program.cs file at {Path} already contains HighDPISetting, no need to edit.", programFile);
+                    _logger.LogInformation("Program.cs file at {Path} already contains HighDPISetting, no need to edit.", programFilePath);
                 }
             }
         }
@@ -102,13 +104,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 if (await _utilities.IsWinFormsProjectAsync(project, token))
                 {
-                    _logger.LogWarning(Resources.HighDPIMessage);
-                    fileLocations.Add(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name));
-                    await UpdateHighDPISetting(project);
+                    _programFileSpec = new(project.FindFiles("Program.cs").FirstOrDefault());
+                    if (!_programFileSpec.IsDpiSettingSet && _programFileSpec.FileContent.Any())
+                    {
+                        _logger.LogWarning(Resources.HighDPIMessage);
+                        fileLocations.Add(_programFileSpec.Path);
+                    }
+
+                    await UpdateHighDPISetting(project, _programFileSpec.FileContent, _programFileSpec.IsDpiSettingSet, _programFileSpec.Path);
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), Resources.DefFontMessage, fileLocations);
+            return new WinformsUpdaterResult(fileLocations.Any(), Resources.HighDPIMessage, fileLocations);
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
@@ -124,12 +131,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 if (await _utilities.IsWinFormsProjectAsync(project, token))
                 {
-                    _logger.LogWarning(Resources.HighDPIMessage);
-                    fileLocations.Add(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name));
+                    _programFileSpec = new(project.FindFiles("Program.cs").FirstOrDefault());
+                    if (!_programFileSpec.IsDpiSettingSet && _programFileSpec.FileContent.Any())
+                    {
+                        _logger.LogWarning(Resources.HighDPIMessage);
+                        fileLocations.Add(_programFileSpec.Path);
+                    }
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), Resources.DefFontMessage, fileLocations);
+            return new WinformsUpdaterResult(fileLocations.Any(), Resources.HighDPIMessage, fileLocations);
         }
     }
 }

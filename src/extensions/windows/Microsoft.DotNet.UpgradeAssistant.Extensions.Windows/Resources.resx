@@ -124,7 +124,7 @@
     <value>Application.EnableVisualStyles()</value>
   </data>
   <data name="HighDPIMessage" xml:space="preserve">
-    <value>Its recommended to set HighDpiMode to be SystemAware for better results in Main() - Application.SetHighDpiMode(HighDpiMode.SystemAware)</value>
+    <value>HighDpiMode needs to set in Main() instead of app.config or app.manifest - Application.SetHighDpiMode(HighDpiMode.&lt;setting&gt;). It is recommended to use SystemAware as the HighDpiMode option for better results.</value>
   </data>
   <data name="HighDPISettingLine" xml:space="preserve">
     <value>Application.SetHighDpiMode(HighDpiMode.{0});</value>

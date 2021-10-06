@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Its recommended to set HighDpiMode to be SystemAware for better results in Main() - Application.SetHighDpiMode(HighDpiMode.SystemAware).
+        ///   Looks up a localized string similar to HighDpiMode needs to set in Main() instead of app.config or app.manifest - Application.SetHighDpiMode(HighDpiMode.&lt;setting&gt;). It is recommended to use SystemAware as the HighDpiMode option for better results..
         /// </summary>
         internal static string HighDPIMessage {
             get {
