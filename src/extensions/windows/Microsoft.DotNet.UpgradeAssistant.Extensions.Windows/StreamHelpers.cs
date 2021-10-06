@@ -12,6 +12,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         private const int DefaultBufferSize = 1024;
 
+        /// <summary>
+        /// Write OutputStream with newLine that is added into the inputLines after any line containing existingLine.
+        /// </summary>
+        /// <param name="inputLines">lines from input source.</param>
+        /// <param name="outputStream">stream to write the inputLines into.</param>
+        /// <param name="existingLine">line that is already present in inputLines.</param>
+        /// <param name="newLine">new line that will get added after any line containing existingLine.</param>
+        /// <exception cref="ArgumentNullException">Throws a null exception if any of the params are null.</exception>
         public static async Task CopyStreamWithNewLineAdded(string[] inputLines, Stream outputStream, string existingLine, string newLine)
         {
             if (inputLines is null)
@@ -41,11 +49,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 if (i.Contains(existingLine))
                 {
                     line.AppendLine();
-                    line.Append(string.Concat("\t", newLine));
+                    line.Append(string.Concat(GetLeadingWhitespace(i), newLine));
                 }
 
                 await output.WriteLineAsync(line.ToString()).ConfigureAwait(false);
             }
+        }
+
+        private static string GetLeadingWhitespace(string str)
+        {
+            return str.Replace(str.TrimStart(), string.Empty);
         }
     }
 }

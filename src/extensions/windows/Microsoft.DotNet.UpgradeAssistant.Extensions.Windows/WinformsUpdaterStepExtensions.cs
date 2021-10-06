@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static IServiceCollection AddWinformsUpdaterStep(this IServiceCollection services) =>
             services
             .AddUpgradeStep<WinformsUpdateStep>()
-            .AddTransient<IUpdater<IProject>, WinformsDefaultFontUpdater>();
+            .AddTransient<IUpdater<IProject>, WinformsDefaultFontUpdater>()
+            .AddTransient<IUpdater<IProject>, WinformsDpiSettingUpdater>();
     }
 }
