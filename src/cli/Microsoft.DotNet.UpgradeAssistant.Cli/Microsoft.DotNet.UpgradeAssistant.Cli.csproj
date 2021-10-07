@@ -11,10 +11,7 @@
     <PackageId>upgrade-assistant</PackageId>
     <PackageReleaseNotes>A changelog is available at https://github.com/dotnet/upgrade-assistant/blob/main/CHANGELOG.md.</PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- Because the extensions are not referenced, VS ends up not correctly identifying if incremental builds should be rebuilt -->
-    <DisableFastUpToDateCheck Condition=" '$(BuildingInsideVisualStudio)' == 'true' ">true</DisableFastUpToDateCheck>
+    <IsExtensionHost>true</IsExtensionHost>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.Development.json">

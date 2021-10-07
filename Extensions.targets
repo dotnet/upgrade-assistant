@@ -1,9 +1,12 @@
 <Project>
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(IsExtensionHost)' == 'true'">
     <ExtensionDirectory>extensions\</ExtensionDirectory>
+
+    <!-- Because the extensions are not referenced, VS ends up not correctly identifying if incremental builds should be rebuilt -->
+    <DisableFastUpToDateCheck Condition=" '$(BuildingInsideVisualStudio)' == 'true' ">true</DisableFastUpToDateCheck>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(IsExtensionHost)' == 'true'">
     <ProjectReference Include="@(Extension)">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>_ExtensionProjectOutputItems</OutputItemType>
@@ -12,7 +15,11 @@
     </ProjectReference>
   </ItemGroup>
   
-  <Target Name="AssignExtensionProjectTargetPaths" BeforeTargets="AssignTargetPaths">
+  <Target Name="VerifyExtensionHostSetIfExtensionsSpecified" BeforeTargets="Build" Condition=" '$(IsExtensionHost)' != 'true' AND '@(Extension->Count())' != '0'">
+    <Error Text="If extensions are specified, the property `IsExtensionHost=true` must be set." />
+  </Target>
+
+  <Target Name="AssignExtensionProjectTargetPaths" Condition="'$(IsExtensionHost)' == 'true'" BeforeTargets="AssignTargetPaths">
     <ItemGroup>
       <_ExtensionProjectOutputItems Update="@(_ExtensionProjectOutputItems)">
         <TargetPath>$(ExtensionDirectory)%(_ExtensionProjectOutputItems.Name)\$([System.IO.Path]::GetFileName('%(Identity)'))</TargetPath>
