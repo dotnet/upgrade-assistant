@@ -65,7 +65,7 @@
       </Content>
     </ItemGroup>
 
-    <Message Text="Published extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
+    <Message Text="Published extension '%(Extension.Name)' into $(ProjectName) [$(TargetFramework)]" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
   </Target>
 
   <Target Name="GenerateHostProvidedAssemblies" BeforeTargets="AssignExtensionProjectTargetPaths">
