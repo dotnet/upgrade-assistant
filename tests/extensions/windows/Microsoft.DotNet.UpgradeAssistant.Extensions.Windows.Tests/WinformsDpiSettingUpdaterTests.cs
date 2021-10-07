@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
@@ -11,16 +12,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 {
     public class WinformsDpiSettingUpdaterTests
     {
-        [InlineData(new string[] { "Application.EnableVisualStyles();", "Application.SetCompatibleTextRenderingDefault(false);" }, false, true, new string[] { "Application.EnableVisualStyles();", "Application.SetHighDpiMode(HighDpiMode.SystemAware);", "Application.SetCompatibleTextRenderingDefault(false);" })] // Happy Path
-        [InlineData(new string[] { "Application.EnableVisualStyles();", "Application.SetHighDpiMode(HighDpiMode.SystemAware);", "Application.SetCompatibleTextRenderingDefault(false);" }, true, false, new string[] { })] // Do Nothing Scenario
-        [InlineData(new string[] { }, false, false, new string[] { })] // No Program.cs
-        [InlineData(new string[] { }, true, false, new string[] { })] // Negative Test
-        [InlineData(new string[] { "Application.SetCompatibleTextRenderingDefault(false);" }, false, true, new string[] { "Application.SetCompatibleTextRenderingDefault(false);" })] // No new line added since existing line does not exist
+        [InlineData("TestInputFiles/HighDpiHappyPathInput.txt", false, true, "TestExpectedFiles/HighDpiHappyPathExpected.txt")] // Happy Path
+        [InlineData("TestInputFiles/HighDpiNoUpdateInput.txt", true, false, "TestExpectedFiles/HighDpiEmptyExpected.txt")] // Do Nothing Scenario
+        [InlineData("TestInputFiles/HighDpiEmptyInput.txt", false, false, "TestExpectedFiles/HighDpiEmptyExpected.txt")] // No Program.cs
+        [InlineData("TestInputFiles/HighDpiEmptyInput.txt", true, false, "TestExpectedFiles/HighDpiEmptyExpected.txt")] // Negative Test
+        [InlineData("TestInputFiles/HighDpiNoNewLineAddedInput.txt", false, true, "TestExpectedFiles/HighDpiNoNewLineAddedExpected.txt")] // No new line added since existing line does not exist
         [Theory]
-        public async Task UpdateDpiSettingTests(string[] programFileContent, bool isDpiSettingSetInProgramFile, bool expectedProgramFile, string[] expectedFileContent)
+        public async Task UpdateDpiSettingTests(string inputFilePath, bool isDpiSettingSetInProgramFile, bool expectedOutputFile, string expectedFilePath)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
+            var random = new Random();
 
             var logger = mock.Mock<ILogger<WinformsDpiSettingUpdater>>();
             var updater = new WinformsDpiSettingUpdater(logger.Object);
@@ -35,22 +37,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
 
-            var programFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Program.cs");
-
-            // cleanup from previous test run
-            if (File.Exists(programFilePath))
-            {
-                File.Delete(programFilePath);
-            }
+            var programFilePath = Path.Combine(Path.GetTempPath(), string.Concat("TestFile", random.Next(), ".txt"));
+            var programFileContent = File.ReadAllLines(inputFilePath);
+            var expectedFileContent = File.ReadAllLines(expectedFilePath);
 
             // Act
             await updater.UpdateHighDPISetting(project.Object, programFileContent, isDpiSettingSetInProgramFile, programFilePath);
 
             // Assert
-            Assert.Equal(File.Exists(programFilePath), expectedProgramFile);
+            Assert.Equal(File.Exists(programFilePath), expectedOutputFile);
             if (File.Exists(programFilePath))
             {
                 Assert.Equal(File.ReadAllLines(programFilePath), expectedFileContent);
+                File.Delete(programFilePath);
             }
         }
     }

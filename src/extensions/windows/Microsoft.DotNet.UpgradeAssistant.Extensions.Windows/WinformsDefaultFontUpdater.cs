@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public string Title => "Default Font API Alert";
 
-        public string Description => Resources.DefFontMessage;
+        public string Description => Resources.DefaultFontMessage;
 
         public BuildBreakRisk Risk => BuildBreakRisk.Low;
 

@@ -19,7 +19,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public class WinformsDpiSettingUpdater : IUpdater<IProject>
     {
         private const int BufferSize = 65536;
-        private const string HighDPIConfiguration = "/configuration/System.Windows.Forms.ApplicationConfigurationSection";
 
         private readonly WindowsUtilities _utilities = new();
         private readonly ILogger<WinformsDpiSettingUpdater> _logger;
@@ -40,24 +39,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private string ProcessAppConfigFile(IProject project)
         {
-            var hdpiValue = "SystemAware";
             var appConfigFilePath = project.FindFiles("App.config").FirstOrDefault();
-            if (File.Exists(appConfigFilePath))
-            {
-                var appConfigFile = new ConfigFile(appConfigFilePath);
-                var highDPISetting = appConfigFile.Contents.XPathSelectElement(HighDPIConfiguration);
-                if (highDPISetting is not null)
-                {
-                    var hdpi = highDPISetting.Elements("add").Where(e => e.Attribute("key").Value == "DpiAwareness").FirstOrDefault();
-                    if (hdpi is not null)
-                    {
-                        hdpiValue = hdpi.Attribute("value").Value;
-                        _logger.LogDebug("Found DpiAwareness Setting with {value}", hdpiValue);
-                    }
-                }
-            }
-
-            return hdpiValue;
+            var hdpiValue = _utilities.GetElementFromAppConfig(appConfigFilePath, Resources.HighDPIConfiguration, Resources.HighDpiSettingKey);
+            return string.IsNullOrEmpty(hdpiValue) ? Resources.HighDpiDefaultSetting : hdpiValue;
         }
 
         public async Task UpdateHighDPISetting(IProject project, string[] programFileContent, bool isDpiSettingSetInProgramFile, string programFilePath)

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
-    public class ProgramFileSpec
+    public record ProgramFileSpec
     {
         public string Path { get; set; } = string.Empty;
 
