@@ -23,7 +23,7 @@
     <ItemGroup>
       <_ExtensionProjectOutputItems Update="@(_ExtensionProjectOutputItems)">
         <TargetPath>$(ExtensionDirectory)%(_ExtensionProjectOutputItems.Name)\$([System.IO.Path]::GetFileName('%(Identity)'))</TargetPath>
-        <RelativePath>$([System.IO.Path]::GetFileName('%(Identity)'))</RelativePath>
+        <OriginalRelativePath>$([System.IO.Path]::GetFileName('%(Identity)'))</OriginalRelativePath>
       </_ExtensionProjectOutputItems>
       <_ExtensionProjectReferenceExistent Include="@(_MSBuildProjectReferenceExistent)" Condition=" '%(_MSBuildProjectReferenceExistent.Name)' != '' " />
     </ItemGroup>
@@ -44,14 +44,14 @@
     <ItemGroup>
       <_AllExtensionProjectFilesContent Include="@(_ExtensionProjectOutput)">
         <TargetPath>$(ExtensionDirectory)%(_ExtensionProjectOutput.Name)\%(_ExtensionProjectOutput.TargetPath)</TargetPath>
-        <RelativePath>%(_ExtensionProjectOutput.TargetPath)</RelativePath>
+        <OriginalRelativePath>%(_ExtensionProjectOutput.TargetPath)</OriginalRelativePath>
       </_AllExtensionProjectFilesContent>
       <_AllExtensionProjectFilesContent Include="@(_ExtensionProjectOutputItems)" />
     </ItemGroup>
 
     <ItemGroup>
       <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
-      <_ExtensionArtifactsByRelativePath Include="%(_AllExtensionProjectFilesContent.RelativePath)">
+      <_ExtensionArtifactsByRelativePath Include="%(_AllExtensionProjectFilesContent.OriginalRelativePath)">
         <OriginalIdentity>%(Identity)</OriginalIdentity>
         <TargetPath>%(TargetPath)</TargetPath>
       </_ExtensionArtifactsByRelativePath>
