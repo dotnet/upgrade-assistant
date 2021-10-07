@@ -9,7 +9,6 @@
   <ItemGroup Condition="'$(IsExtensionHost)' == 'true'">
     <ProjectReference Include="@(Extension)">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>_ExtensionProjectOutputItems</OutputItemType>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <Private>false</Private>
     </ProjectReference>
@@ -21,10 +20,6 @@
 
   <Target Name="AssignExtensionProjectTargetPaths" Condition="'$(IsExtensionHost)' == 'true'" BeforeTargets="AssignTargetPaths">
     <ItemGroup>
-      <_ExtensionProjectOutputItems Update="@(_ExtensionProjectOutputItems)">
-        <TargetPath>$(ExtensionDirectory)%(_ExtensionProjectOutputItems.Name)\$([System.IO.Path]::GetFileName('%(Identity)'))</TargetPath>
-        <OriginalRelativePath>$([System.IO.Path]::GetFileName('%(Identity)'))</OriginalRelativePath>
-      </_ExtensionProjectOutputItems>
       <_ExtensionProjectReferenceExistent Include="@(_MSBuildProjectReferenceExistent)" Condition=" '%(_MSBuildProjectReferenceExistent.Name)' != '' " />
     </ItemGroup>
 
@@ -46,7 +41,6 @@
         <TargetPath>$(ExtensionDirectory)%(_ExtensionProjectOutput.Name)\%(_ExtensionProjectOutput.TargetPath)</TargetPath>
         <OriginalRelativePath>%(_ExtensionProjectOutput.TargetPath)</OriginalRelativePath>
       </_AllExtensionProjectFilesContent>
-      <_AllExtensionProjectFilesContent Include="@(_ExtensionProjectOutputItems)" />
     </ItemGroup>
 
     <ItemGroup>
