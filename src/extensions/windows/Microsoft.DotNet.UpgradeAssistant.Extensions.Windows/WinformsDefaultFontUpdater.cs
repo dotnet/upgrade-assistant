@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public string Title => "Default Font API Alert";
 
-        public string Description => "Default font in Windows Forms has been changed from Microsoft Sans Serif to Seg Segoe UI, in order to change the default font use the API - Application.SetDefaultFont(Font font). For more details see here - https://devblogs.microsoft.com/dotnet/whats-new-in-windows-forms-in-net-6-0-preview-5/#application-wide-default-font";
+        public string Description => Resources.DefaultFontMessage;
 
         public BuildBreakRisk Risk => BuildBreakRisk.Low;
 

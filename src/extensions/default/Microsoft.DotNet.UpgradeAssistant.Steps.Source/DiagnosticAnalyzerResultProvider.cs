@@ -63,11 +63,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
         }
 
-        private static HashSet<AnalyzeResult> ProcessDiagnostics(IEnumerable<Diagnostic> diagnostics)
+        private HashSet<AnalyzeResult> ProcessDiagnostics(IEnumerable<Diagnostic> diagnostics)
         {
             var results = new HashSet<AnalyzeResult>();
             foreach (var diag in diagnostics)
             {
+                _logger.LogInformation("Diagonstic {Id} with the message {message} generated", diag.Id, diag.Descriptor.Title.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 results.Add(new()
                 {
                     RuleId = diag.Id,
