@@ -1,12 +1,14 @@
 <Project>
-  <PropertyGroup Condition="'$(IsExtensionHost)' == 'true'">
+  <PropertyGroup>
     <ExtensionDirectory>extensions\</ExtensionDirectory>
+    <_IsExtensionHost>$(IsExtensionHost)</_IsExtensionHost>
+    <_IsExtensionHost Condition=" '$(_IsExtensionHost)' == '' ">false</_IsExtensionHost>
 
     <!-- Because the extensions are not referenced, VS ends up not correctly identifying if incremental builds should be rebuilt -->
-    <DisableFastUpToDateCheck Condition=" '$(BuildingInsideVisualStudio)' == 'true' ">true</DisableFastUpToDateCheck>
+    <DisableFastUpToDateCheck Condition=" $(_IsExtensionHost) AND '$(BuildingInsideVisualStudio)' == 'true' ">true</DisableFastUpToDateCheck>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(IsExtensionHost)' == 'true'">
+  <ItemGroup Condition="$(_IsExtensionHost)">
     <ProjectReference Include="@(Extension)">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -14,11 +16,44 @@
     </ProjectReference>
   </ItemGroup>
   
-  <Target Name="VerifyExtensionHostSetIfExtensionsSpecified" BeforeTargets="Build" Condition=" '$(IsExtensionHost)' != 'true' AND '@(Extension->Count())' != '0'">
+  <Target Name="_VerifyExtensionHostSetIfExtensionsSpecified" BeforeTargets="Build" Condition=" !$(_IsExtensionHost) AND '@(Extension->Count())' != '0'">
     <Error Text="If extensions are specified, the property `IsExtensionHost=true` must be set." />
   </Target>
 
-  <Target Name="AssignExtensionProjectTargetPaths" Condition="'$(IsExtensionHost)' == 'true'" BeforeTargets="AssignTargetPaths">
+  <Target Name="_VerifyExtensionHasName" BeforeTargets="VerifyExtensionHostSetIfExtensionsSpecified" Condition="$(_IsExtensionHost)">
+    <Error Text="Extension %(Extension.Identity) must define a name" Condition=" '%(Extension.Name)' == '' " />
+  </Target>
+
+  <Target Name="AssignExtensionProjectTargetPaths" Condition="$(_IsExtensionHost)" BeforeTargets="AssignTargetPaths">
+    <ItemGroup>
+      <Content Include="@(ExtensionFiles)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <Message Text="Published extension '%(Extension.Name)' into $(ProjectName) [$(TargetFramework)]" Importance="high" />
+  </Target>
+
+  <Target Name="_FilterExtensionProjectFiles" BeforeTargets="AssignExtensionProjectTargetPaths" Condition="$(_IsExtensionHost)">
+    <ItemGroup>
+      <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
+      <_ExtensionArtifactsByRelativePath Include="%(_AllExtensionProjectFilesContent.OriginalRelativePath)">
+        <OriginalIdentity>%(Identity)</OriginalIdentity>
+        <TargetPath>%(TargetPath)</TargetPath>
+      </_ExtensionArtifactsByRelativePath>
+
+      <!-- Remove the host supplied assemblies -->
+      <_FilteredExtensionArtifactsMinusExclusions Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_HostProvidedAssemblies)" />
+
+      <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
+      <ExtensionFiles Include="%(_FilteredExtensionArtifactsMinusExclusions.OriginalIdentity)">
+        <RelativePath>%(TargetPath)</RelativePath>
+        <TargetPath>%(TargetPath)</TargetPath>
+      </ExtensionFiles>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_GatherExtensionProjectFiles" BeforeTargets="_FilterExtensionProjectFiles" Condition="$(_IsExtensionHost)">
     <ItemGroup>
       <_ExtensionProjectReferenceExistent Include="@(_MSBuildProjectReferenceExistent)" Condition=" '%(_MSBuildProjectReferenceExistent.Name)' != '' " />
     </ItemGroup>
@@ -42,34 +77,9 @@
         <OriginalRelativePath>%(_ExtensionProjectOutput.TargetPath)</OriginalRelativePath>
       </_AllExtensionProjectFilesContent>
     </ItemGroup>
-
-    <ItemGroup>
-      <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
-      <_ExtensionArtifactsByRelativePath Include="%(_AllExtensionProjectFilesContent.OriginalRelativePath)">
-        <OriginalIdentity>%(Identity)</OriginalIdentity>
-        <TargetPath>%(TargetPath)</TargetPath>
-      </_ExtensionArtifactsByRelativePath>
-
-      <!-- Remove the host supplied assemblies -->
-      <_FilteredExtensionArtifactsMinusExclusions Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_HostProvidedAssemblies)" />
-
-      <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
-      <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsMinusExclusions.OriginalIdentity)">
-        <RelativePath>%(TargetPath)</RelativePath>
-        <TargetPath>%(TargetPath)</TargetPath>
-      </_FilteredExtensionArtifacts>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="@(_FilteredExtensionArtifacts)">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-
-    <Message Text="Published extension '%(Extension.Name)' into $(ProjectName) [$(TargetFramework)]" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
   </Target>
 
-  <Target Name="GenerateHostProvidedAssemblies" BeforeTargets="AssignExtensionProjectTargetPaths">
+  <Target Name="_GenerateHostProvidedAssemblies" BeforeTargets="_FilterExtensionProjectFiles">
     <ItemGroup>
       <_NotHostProvidedAssembly Include="Newtonsoft.Json.dll" />
     </ItemGroup>
