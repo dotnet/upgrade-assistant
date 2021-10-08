@@ -11,6 +11,7 @@
     <PackageId>upgrade-assistant</PackageId>
     <PackageReleaseNotes>A changelog is available at https://github.com/dotnet/upgrade-assistant/blob/main/CHANGELOG.md.</PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
+    <IsExtensionHost>true</IsExtensionHost>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.Development.json">

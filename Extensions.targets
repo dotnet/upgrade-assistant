@@ -1,128 +1,103 @@
 <Project>
-
   <PropertyGroup>
-    <IsCI>false</IsCI>
-    <IsCI Condition=" '$(BuildingInsideVisualStudio)' == '' ">true</IsCI>
+    <ExtensionDirectory>extensions\</ExtensionDirectory>
+    <_IsExtensionHost>$(IsExtensionHost)</_IsExtensionHost>
+    <_IsExtensionHost Condition=" '$(_IsExtensionHost)' == '' ">false</_IsExtensionHost>
+
+    <!-- Because the extensions are not referenced, VS ends up not correctly identifying if incremental builds should be rebuilt -->
+    <DisableFastUpToDateCheck Condition=" $(_IsExtensionHost) AND '$(BuildingInsideVisualStudio)' == 'true' ">true</DisableFastUpToDateCheck>
   </PropertyGroup>
 
-  <!-- If building an extension with a _ExtensionIntermediateOutputPath, we want to redirect bin and obj folders to reduce file lock conflicts -->
-  <PropertyGroup Condition=" '$(_ExtensionIntermediateOutputPath)' != '' ">
-    <_AssemblyIntermediatePath>$(_ExtensionIntermediateOutputPath)$(ExtensionDir)$(AssemblyName)\</_AssemblyIntermediatePath>
-    <OutDir>$(_AssemblyIntermediatePath)bin\</OutDir>
-    <IntermediateOutputPath>$(_AssemblyIntermediatePath)$(ExtensionDir)obj\</IntermediateOutputPath>
-  </PropertyGroup>
+  <ItemGroup Condition="$(_IsExtensionHost)">
+    <ProjectReference Include="@(Extension)">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+  
+  <Target Name="_VerifyExtensionHostSetIfExtensionsSpecified" BeforeTargets="Build" Condition=" !$(_IsExtensionHost) AND '@(Extension->Count())' != '0'">
+    <Error Text="If extensions are specified, the property `IsExtensionHost=true` must be set." />
+  </Target>
 
-  <!-- Publish the extension and collect its output -->
-  <Target Name="ComputePublishOutput"
-          DependsOnTargets="Build;ComputeFilesToPublish"
-          Returns="@(ExtensionFiles)">
+  <Target Name="_VerifyExtensionHasName" BeforeTargets="VerifyExtensionHostSetIfExtensionsSpecified" Condition="$(_IsExtensionHost)">
+    <Error Text="Extension %(Extension.Identity) must define a name" Condition=" '%(Extension.Name)' == '' " />
+  </Target>
+
+  <Target Name="AssignExtensionProjectTargetPaths" Condition="$(_IsExtensionHost)" BeforeTargets="AssignTargetPaths">
     <ItemGroup>
-      <ExtensionFiles Include="@(ResolvedFileToPublish)">
-        <Link>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</Link>
-        <TargetPath>$(ExtensionDir)/%(ResolvedFileToPublish.RelativePath)</TargetPath>
+      <Content Include="@(ExtensionFiles)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <Message Text="Published extension '%(Extension.Name)' into $(ProjectName) [$(TargetFramework)]" Importance="high" />
+  </Target>
+
+  <Target Name="_FilterExtensionProjectFiles" BeforeTargets="AssignExtensionProjectTargetPaths" Condition="$(_IsExtensionHost)">
+    <ItemGroup>
+      <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
+      <_ExtensionArtifactsByRelativePath Include="%(_AllExtensionProjectFilesContent.OriginalRelativePath)">
+        <OriginalIdentity>%(Identity)</OriginalIdentity>
+        <TargetPath>%(TargetPath)</TargetPath>
+      </_ExtensionArtifactsByRelativePath>
+
+      <!-- Remove the host supplied assemblies -->
+      <_FilteredExtensionArtifactsMinusExclusions Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_HostProvidedAssemblies)" />
+
+      <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
+      <ExtensionFiles Include="%(_FilteredExtensionArtifactsMinusExclusions.OriginalIdentity)">
+        <RelativePath>%(TargetPath)</RelativePath>
+        <TargetPath>%(TargetPath)</TargetPath>
       </ExtensionFiles>
     </ItemGroup>
   </Target>
 
-  <Target Name="_AddMetadataToExtensions"
-          BeforeTargets="RestoreExtensions;PublishUpgradeAssistantExtensions">
-    <!-- Add the relative directory the extension will be added to -->
+  <Target Name="_GatherExtensionProjectFiles" BeforeTargets="_FilterExtensionProjectFiles" Condition="$(_IsExtensionHost)">
     <ItemGroup>
-      <Extension Update="@(Extension)">
-        <Properties>Configuration=$(Configuration);ExtensionDir=extensions\%(Name)\</Properties>
-      </Extension>
+      <_ExtensionProjectReferenceExistent Include="@(_MSBuildProjectReferenceExistent)" Condition=" '%(_MSBuildProjectReferenceExistent.Name)' != '' " />
     </ItemGroup>
 
-    <!-- When compiling outside of VS, we want to set a new intermediate path to prevent race conditions of multiple writes to the output -->
-    <ItemGroup Condition="$(IsCI)">
-      <Extension Update="@(Extension)">
-        <Properties>%(Properties);_ExtensionIntermediateOutputPath=$(IntermediateOutputPath)</Properties>
-      </Extension>
-    </ItemGroup>
-  </Target>
+    <MSBuild
+        Projects="@(_ExtensionProjectReferenceExistent)"
+        Targets="PublishItemsOutputGroup"
+        BuildInParallel="$(BuildInParallel)"
+        Properties="%(_ExtensionProjectReferenceExistent.SetConfiguration); %(_ExtensionProjectReferenceExistent.SetPlatform); %(_ExtensionProjectReferenceExistent.SetTargetFramework)"
+        Condition="'%(_ExtensionProjectReferenceExistent.Name)' != '' "
+        ContinueOnError="$(ContinueOnError)"
+        SkipNonexistentTargets="true"
+        RemoveProperties="%(_ExtensionProjectReferenceExistent.GlobalPropertiesToRemove)$(_GlobalPropertiesToRemoveFromProjectReferences)">
 
-  <!--
-    Since we will be publishing extensions, we want to ensure they are restored. Must run before the following targets:
-
-    Restore: For clean builds
-    PrepareForBuild: For incremental builds in VS
-    PackDependsOn: For pack commands
-  -->
-  <Target Name="RestoreExtensions"
-          BeforeTargets="Restore;PrepareForBuild;$(PackDependsOn)">
-    <MSBuild Projects="%(Extension.Identity)"
-             Targets="Restore"
-             Properties="%(Properties)"
-             RemoveProperties="TargetFramework"
-             Condition=" '%(Name)' != '' " />
-  </Target>
-
-  <!-- Publish each extension into its own directory -->
-  <Target Name="PublishUpgradeAssistantExtensions"
-          DependsOnTargets="ResolveAssemblyReferences"
-          BeforeTargets="AssignTargetPaths"
-          Outputs="%(Extension.Identity)">
-
-    <Message Text="Publishing extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
-
-    <!--
-      Publish the extension and collect its extension.
-
-      - We also pass in some custom configuration so it'll know its an extension.
-      - We want to remove any TargetFramework that is set so that isn't flowed through to the next project.
-      -->
-    <MSBuild Projects="%(Extension.Identity)"
-             BuildInParallel="true"
-             Targets="ComputePublishOutput"
-             RemoveProperties="TargetFramework"
-             Properties="%(Properties)"
-             Condition=" '%(Name)' != '' ">
-      <Output TaskParameter="TargetOutputs" ItemName="_ExtensionArtifacts" />
+      <Output TaskParameter="TargetOutputs" ItemName="_ExtensionProjectOutput"/>
     </MSBuild>
 
+    <ItemGroup>
+      <_AllExtensionProjectFilesContent Include="@(_ExtensionProjectOutput)">
+        <TargetPath>$(ExtensionDirectory)%(_ExtensionProjectOutput.Name)\%(_ExtensionProjectOutput.TargetPath)</TargetPath>
+        <OriginalRelativePath>%(_ExtensionProjectOutput.TargetPath)</OriginalRelativePath>
+      </_AllExtensionProjectFilesContent>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_GenerateHostProvidedAssemblies" BeforeTargets="_FilterExtensionProjectFiles">
     <ItemGroup>
       <_NotHostProvidedAssembly Include="Newtonsoft.Json.dll" />
     </ItemGroup>
 
     <!-- Create a list of all assemblies included by host and framework -->
     <ItemGroup>
-      <_ExcludeFromExtension Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.dll" />
-      <_ExcludeFromExtension Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.dll" />
-      <_ExcludeFromExtension Include="System.ComponentModel.Annotations.dll" />
-      <_ExcludeFromExtension Include="System.Memory.dll" />
-      <_ExcludeFromExtension Include="System.Numerics.Vectors.dll" />
-      <_ExcludeFromExtension Include="System.Reflection.Emit.dll" />
-      <_ExcludeFromExtension Include="System.Text.Encodings.Web.dll" />
-      <_ExcludeFromExtension Include="System.Threading.Tasks.Extensions.dll" />
-      <_ExcludeFromExtension Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
-      <_ExcludeFromExtension Include="%(RuntimeCopyLocalItems.DestinationSubPath)" />
-      <_ExcludeFromExtension Remove="@(_NotHostProvidedAssembly)" />
+      <_HostProvidedAssemblies Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.dll" />
+      <_HostProvidedAssemblies Include="Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.dll" />
+      <_HostProvidedAssemblies Include="System.ComponentModel.Annotations.dll" />
+      <_HostProvidedAssemblies Include="System.Memory.dll" />
+      <_HostProvidedAssemblies Include="System.Numerics.Vectors.dll" />
+      <_HostProvidedAssemblies Include="System.Reflection.Emit.dll" />
+      <_HostProvidedAssemblies Include="System.Text.Encodings.Web.dll" />
+      <_HostProvidedAssemblies Include="System.Threading.Tasks.Extensions.dll" />
+      <_HostProvidedAssemblies Include="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+      <_HostProvidedAssemblies Include="%(RuntimeCopyLocalItems.DestinationSubPath)" />
+      <_HostProvidedAssemblies Remove="@(_NotHostProvidedAssembly)" />
     </ItemGroup>
-
-    <ItemGroup>
-      <!-- Create a collection of the extension files by their relative path while maintaining metadata -->
-      <_ExtensionArtifactsByRelativePath Include="%(_ExtensionArtifacts.RelativePath)">
-        <OriginalIdentity>%(Identity)</OriginalIdentity>
-        <TargetPath>%(TargetPath)</TargetPath>
-        <Link>%(Link)</Link>
-      </_ExtensionArtifactsByRelativePath>
-
-      <!-- Remove the host supplied assemblies -->
-      <_FilteredExtensionArtifactsMinusExclusions Include="@(_ExtensionArtifactsByRelativePath)" Exclude="@(_ExcludeFromExtension)" />
-
-      <!-- Transform the filtered list back to include the appropriate metadata to be added to -->
-      <_FilteredExtensionArtifacts Include="%(_FilteredExtensionArtifactsMinusExclusions.OriginalIdentity)">
-        <RelativePath>%(TargetPath)</RelativePath>
-        <TargetPath>%(TargetPath)</TargetPath>
-        <Link>%(Link)</Link>
-      </_FilteredExtensionArtifacts>
-
-      <None Include="@(_FilteredExtensionArtifacts)">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-    <Message Text="Published extension %(Extension.Name)" Importance="high" Condition=" '%(Extension.Name)' != '' "/>
   </Target>
 
   <Import Project="$(MSBuildThisFileDirectory)src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\build\Microsoft.DotNet.UpgradeAssistant.Abstractions.targets" />
