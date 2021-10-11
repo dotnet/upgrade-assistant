@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.VisualBasic.Testing;
 
 #pragma warning disable CA1000 // Do not declare static members on generic types
-#pragma warning disable CA1034 // Nested types should not be visible
 #pragma warning disable CA1724 // The type name Test conflicts
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
@@ -20,6 +19,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.Diagnostic(string)"/>
         public static DiagnosticResult Diagnostic(string diagnosticId)
             => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, XUnitVerifier>.Diagnostic(diagnosticId);
+
+        public static DiagnosticResult Diagnostic()
+            => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, XUnitVerifier>.Diagnostic();
+
+        public static Test Create() => new();
 
         public class Test : VisualBasicCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>, ICodeFixTest
         {

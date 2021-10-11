@@ -41,6 +41,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             context.RegisterCompilationStartAction(context =>
             {
+                if (!context.Compilation.TargetsAspNetCore())
+                {
+                    return;
+                }
+
                 // Load analyzer configuration defining the attribute types that should be mapped.
                 var mappings = TypeMapLoader.LoadMappings(context.Options.AdditionalFiles)
                     .Where(m => m.OldName.EndsWith(AttributeSuffix, StringComparison.Ordinal));

@@ -37,7 +37,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeUsingStatements, SyntaxKind.UsingDirective);
+            context.RegisterCompilationStartAction(context =>
+            {
+                if (!context.Compilation.TargetsAspNetCore())
+                {
+                    return;
+                }
+
+                context.RegisterSyntaxNodeAction(AnalyzeUsingStatements, SyntaxKind.UsingDirective);
+            });
         }
 
         private void AnalyzeUsingStatements(SyntaxNodeAnalysisContext context)
