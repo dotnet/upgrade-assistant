@@ -83,12 +83,14 @@ namespace Integration.Tests
             };
             var uknownPackageStr = JsonSerializer.Serialize(unknownPackages, options);
             var outputFile = Path.Combine(actualDirectory, "UnknownPackages.json");
+
             File.WriteAllText(outputFile, uknownPackageStr);
+
             Assert.False(true, $"Integration tests tried to access NuGet.{Environment.NewLine}The list of packages not yet \"pinned\" has been written to:{Environment.NewLine}{outputFile}");
         }
 
-        private static bool IsBuildArtifact(string path)
-            => path.StartsWith("obj", StringComparison.OrdinalIgnoreCase) || path.StartsWith("bin", StringComparison.OrdinalIgnoreCase);
+        private static bool IsBuildArtifact(PathString path)
+            => path.Contains("obj") || path.Contains("bin");
 
         private void AssertDirectoriesEqual(string expectedDir, string actualDir)
         {
