@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
 using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
+using Polly;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
@@ -82,7 +83,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 }
             }
 
-            var references = await GetReferenceAssemblies().ResolveAsync(language.ToLanguageName(), cancellationToken);
+            var references = await Policy.Handle<Exception>()
+                .RetryAsync(3)
+                .ExecuteAsync(cancellationToken => GetReferenceAssemblies().ResolveAsync(language.ToLanguageName(), cancellationToken), cancellationToken);
 
             project = project.WithMetadataReferences(references);
 
