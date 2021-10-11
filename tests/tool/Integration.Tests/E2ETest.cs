@@ -36,10 +36,7 @@ namespace Integration.Tests
         [InlineData("PCL", "SamplePCL.csproj", "")]
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-#if NET6_0
-        [InlineData("WpfSample/vb", "WpfApp1.sln", "", Skip = "Default imports are different in .NET 6")]
-        [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "", Skip = "Source code is not simplifying the same as .NET 5")]
-#else
+#if !NET6_0
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
 #endif
