@@ -20,7 +20,7 @@
       <FullBlobPath>$(BlobBase)$(IndexName)</FullBlobPath>
     </PropertyGroup>
 
-    <DownloadFile SourceUrl="$(FullBlobPath)" DestinationFolder=".data" Retries="5">
+    <DownloadFile SourceUrl="$(FullBlobPath)" DestinationFolder=".data" Retries="3">
       <Output TaskParameter="DownloadedFile" ItemName="TheFile" />
     </DownloadFile>
 
