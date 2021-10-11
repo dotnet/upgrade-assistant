@@ -42,17 +42,4 @@ namespace /*{{NAMESPACE}}*/
 #pragma warning restore UA0005 // Do not use HttpContext.Current
 #endif
     }
-
-    /// <summary>
-    /// This attribute can be used to map types that should be replaced with another. It will not be included in the compilation but will
-    /// be searched for by various analyzers to provide help in refactoring a codebase.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    [Conditional("ANALYZERS")]
-    internal sealed class AdapterDescriptor : Attribute
-    {
-        public AdapterDescriptor(Type interfaceType, Type original)
-        {
-        }
-    }
 }
