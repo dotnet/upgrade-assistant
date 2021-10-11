@@ -96,6 +96,8 @@ If you don't know what a pull request is read this article: https://help.github.
 
 Tests need to be provided for every bug/feature(except docs or samples) that is completed.
 
+Ad-hoc testing of the analyzer/codefixers can be done via `src/extensions/default/analyzers/Vsix/Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Vsix.csproj`. Set it as start-up and it will launch the experimental instance of Visual Studio with the analyzers/codefixers added as an extension.
+
 ### Feedback
 
 Your pull request will now go through extensive checks by the subject matter experts on our team. Please be patient while upgrade-assistant team gets through it. Update your pull request according to feedback until it is approved by one of the upgrade-assistant team members. Once the PR is approved, one of the upgrade-assistant team members will merge your PR into the repo.

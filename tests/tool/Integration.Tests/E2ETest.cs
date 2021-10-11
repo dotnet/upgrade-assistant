@@ -11,7 +11,6 @@ using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Integration.Tests
 {
