@@ -17,6 +17,7 @@ namespace Integration.Tests
 {
     public sealed class E2ETest
     {
+        private const string TempDirectoryName = "dotnet-upgrade-assistant-tests";
         private const string IntegrationTestAssetsPath = "IntegrationScenarios";
         private const string OriginalProjectSubDir = "Original";
         private const string UpgradedProjectSubDir = "Upgraded";
@@ -49,7 +50,7 @@ namespace Integration.Tests
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
             // Create a temporary working directory
-            var workingDir = Path.Combine(Path.GetTempPath(), "dotnet_ua_tests", Guid.NewGuid().ToString());
+            var workingDir = Path.Combine(Path.GetTempPath(), TempDirectoryName, Guid.NewGuid().ToString());
             var dir = Directory.CreateDirectory(workingDir);
             Assert.True(dir.Exists);
 
