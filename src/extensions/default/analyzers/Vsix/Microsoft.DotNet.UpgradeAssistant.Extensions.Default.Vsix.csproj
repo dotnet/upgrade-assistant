@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ExcludeCommonFiles>true</ExcludeCommonFiles>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -17,7 +18,7 @@
     <VSSDKTargetPlatformRegRootSuffix>Exp</VSSDKTargetPlatformRegRootSuffix>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(MSBuildRuntimeType)' != 'Core' ">
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232" PrivateAssets="all" />
   </ItemGroup>
 

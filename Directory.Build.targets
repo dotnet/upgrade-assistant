@@ -10,7 +10,7 @@
     </AdditionalFiles>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Language)'=='C#' AND $(IncludeBuildOutput)">
+  <ItemGroup Condition=" '$(Language)' == 'C#' AND '$(ExcludeCommonFiles)' != 'true' ">
     <Compile Include="$(MSBuildThisFileDirectory)/shared/**/*.cs" />
   </ItemGroup>
 
