@@ -29,6 +29,8 @@ namespace /*{{NAMESPACE}}*/
 #if NET || NETCOREAPP
 #if NET5_0_OR_GREATER
         [Obsolete(Message, error: false, DiagnosticId = "HttpContextCurrent", UrlFormat = "https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-context")]
+#else
+        [Obsolete(Message, error: false)]
 #endif
         public static HttpContext Current => HttpContextAccessor.HttpContext;
 
