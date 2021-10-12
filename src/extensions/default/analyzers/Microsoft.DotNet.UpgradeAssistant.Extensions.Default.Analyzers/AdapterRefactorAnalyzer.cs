@@ -36,9 +36,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             context.RegisterCompilationStartAction(context =>
             {
-                var adapters = AdapterDescriptor.Parse(context.Compilation);
+                var adapterContext = AdapterContext.Parse(context.Compilation);
 
-                if (adapters.Length == 0)
+                if (!adapterContext.IsAvailable)
                 {
                     return;
                 }
@@ -48,14 +48,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     var operation = (IInvocationOperation)context.Operation;
 
-                    foreach (var adapter in adapters)
+                    foreach (var adapter in adapterContext.Descriptors)
                     {
                         if (SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType, adapter.Original))
                         {
                             // TODO: this could be better by matching if it actually binds
                             if (adapter.Destination.GetMembers(operation.TargetMethod.Name).Length == 0)
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: adapter.PropertiesWithNewMember(operation.TargetMethod, adapters), operation.TargetMethod.Name, adapter.Destination));
+                                context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: adapter.PropertiesWithNewMember(operation.TargetMethod, adapterContext), operation.TargetMethod.Name, adapter.Destination));
                             }
                         }
                     }
@@ -69,16 +69,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     {
                         if (context.Node is CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax method)
                         {
-                            GeneralizedSyntaxNodeAction(context, adapters, method.ReturnType);
-                            GeneralizedParameterAction(context, adapters, method.ParameterList.Parameters, static n => n.Type);
+                            GeneralizedSyntaxNodeAction(context, adapterContext, method.ReturnType);
+                            GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.Type);
                         }
                         else if (context.Node is CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax field)
                         {
-                            GeneralizedSyntaxNodeAction(context, adapters, field.Declaration.Type);
+                            GeneralizedSyntaxNodeAction(context, adapterContext, field.Declaration.Type);
                         }
                         else if (context.Node is CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax property)
                         {
-                            GeneralizedSyntaxNodeAction(context, adapters, property.Type);
+                            GeneralizedSyntaxNodeAction(context, adapterContext, property.Type);
                         }
                     }, CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration, CodeAnalysis.CSharp.SyntaxKind.PropertyDeclaration, CodeAnalysis.CSharp.SyntaxKind.FieldDeclaration);
                 }
@@ -88,14 +88,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     {
                         if (context.Node is CodeAnalysis.VisualBasic.Syntax.MethodStatementSyntax method)
                         {
-                            GeneralizedSyntaxNodeAction(context, adapters, method.AsClause?.Type);
-                            GeneralizedParameterAction(context, adapters, method.ParameterList.Parameters, static n => n.AsClause?.Type);
+                            GeneralizedSyntaxNodeAction(context, adapterContext, method.AsClause?.Type);
+                            GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.AsClause?.Type);
                         }
                         else if (context.Node is CodeAnalysis.VisualBasic.Syntax.PropertyStatementSyntax property)
                         {
                             if (property.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
                             {
-                                GeneralizedSyntaxNodeAction(context, adapters, simple.Type);
+                                GeneralizedSyntaxNodeAction(context, adapterContext, simple.Type);
                             }
                         }
                         else if (context.Node is CodeAnalysis.VisualBasic.Syntax.FieldDeclarationSyntax field)
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                             {
                                 if (declarator.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
                                 {
-                                    GeneralizedSyntaxNodeAction(context, adapters, simple.Type);
+                                    GeneralizedSyntaxNodeAction(context, adapterContext, simple.Type);
                                 }
                             }
                         }
@@ -115,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private static void GeneralizedSyntaxNodeAction(
             SyntaxNodeAnalysisContext context,
-            ImmutableArray<AdapterDescriptor> adapters,
+            AdapterContext adapterContext,
             SyntaxNode? syntaxNode)
         {
             if (syntaxNode is null)
@@ -130,7 +130,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            foreach (var adapter in adapters)
+            foreach (var adapter in adapterContext.Descriptors)
             {
                 if (SymbolEqualityComparer.Default.Equals(adapter.Original, symbol))
                 {
@@ -141,7 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private static void GeneralizedParameterAction<TParameter>(
             SyntaxNodeAnalysisContext context,
-            ImmutableArray<AdapterDescriptor> adapters,
+            AdapterContext adapterContext,
             SeparatedSyntaxList<TParameter> parameters,
             Func<TParameter, SyntaxNode?> parameterToType)
             where TParameter : SyntaxNode
@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            foreach (var adapter in adapters)
+            foreach (var adapter in adapterContext.Descriptors)
             {
                 foreach (var p in parameters)
                 {

@@ -2,10 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 
@@ -73,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 SymbolDisplayMemberOptions.IncludeParameters |
                    SymbolDisplayMemberOptions.IncludeRef);
 
-        public ImmutableDictionary<string, string?> PropertiesWithNewMember(IMethodSymbol symbol, ImmutableArray<AdapterDescriptor> descriptors)
+        public ImmutableDictionary<string, string?> PropertiesWithNewMember(IMethodSymbol symbol, AdapterContext context)
         {
             var formatted = symbol.ToDisplayString(RoundtripMethodFormat);
             var typeFormatted = GetTypeFromSymbol().ToDisplayString(RoundtripMethodFormat);
@@ -83,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             ITypeSymbol GetTypeFromSymbol()
             {
-                foreach (var descriptor in descriptors)
+                foreach (var descriptor in context.Descriptors)
                 {
                     if (SymbolEqualityComparer.Default.Equals(descriptor.Original, symbol.ReturnType))
                     {
