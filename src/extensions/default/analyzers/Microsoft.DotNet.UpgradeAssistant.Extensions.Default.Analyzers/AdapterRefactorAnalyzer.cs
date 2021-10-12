@@ -43,6 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     return;
                 }
 
+                // Check to ensure abstractions have members used
                 context.RegisterOperationAction(context =>
                 {
                     var operation = (IInvocationOperation)context.Operation;
@@ -51,6 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     {
                         if (SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType, adapter.Original))
                         {
+                            // TODO: this could be better by matching if it actually binds
                             if (adapter.Destination.GetMembers(operation.TargetMethod.Name).Length == 0)
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: adapter.PropertiesWithNewMember(operation.TargetMethod, adapters), operation.TargetMethod.Name, adapter.Destination));
@@ -59,6 +61,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     }
                 }, OperationKind.Invocation);
 
+                // Check that you are using the abstraction
+                // TODO: Can we use a symbol/operation action? Need to be more exhaustive on search for types
                 if (context.Compilation.Language == LanguageNames.CSharp)
                 {
                     context.RegisterSyntaxNodeAction(context =>

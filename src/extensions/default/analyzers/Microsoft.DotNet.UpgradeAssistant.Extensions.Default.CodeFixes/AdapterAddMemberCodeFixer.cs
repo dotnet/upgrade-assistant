@@ -72,6 +72,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 }
 
                 var node = root.FindNode(syntax.SourceSpan);
+
+                // TODO: this should work for VB
                 var methodDeclaration = Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseMemberDeclaration(methodString);
 
                 if (methodDeclaration is null)
