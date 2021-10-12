@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task JustDefinitionsNothingElse()
         {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
 Namespace RefactorTest
     Public Class SomeClass
@@ -42,7 +42,7 @@ End Namespace";
         [Fact]
         public async Task SingleChange()
         {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
 Namespace RefactorTest
     Class Test
@@ -82,7 +82,7 @@ End Namespace";
         [Fact]
         public async Task MethodReturn()
         {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
 Namespace RefactorTest
     Class Test
@@ -124,7 +124,7 @@ End Namespace";
         [Fact]
         public async Task Field()
         {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
 Namespace RefactorTest
     Class Test
@@ -162,7 +162,7 @@ End Namespace";
         [Fact]
         public async Task Property()
         {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
 Namespace RefactorTest
     Class Test
@@ -197,7 +197,7 @@ End Namespace";
                 .RunAsync();
         }
 
-        public ICodeFixTest CreateTest(AdapterDescriptor? attributeDescriptor = null, bool withFix = true)
+        public ICodeFixTest CreateTest(AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
         {
             const string Attribute = @"
 Imports System

@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         [Fact]
         public async Task WithMemberAccess()
         {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
 namespace RefactorTest
 {
@@ -72,7 +72,7 @@ namespace RefactorTest
         [Fact(Skip = "Need to visit all parts of a member to map abstractions")]
         public async Task WithMemberAccessUsingConcreteTypeAsReturn()
         {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
 namespace RefactorTest
 {

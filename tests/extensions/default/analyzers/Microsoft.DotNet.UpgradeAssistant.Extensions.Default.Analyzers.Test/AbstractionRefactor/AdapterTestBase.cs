@@ -2,15 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Microsoft.CodeAnalysis;
-using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public abstract class AdapterTestBase
     {
-        protected ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptor? attributeDescriptor = null, bool withFix = true)
-        {
-            const string Attribute = @"
+        protected const string Attribute = @"
 using System;
 
 namespace Microsoft.CodeAnalysis
@@ -23,6 +20,8 @@ namespace Microsoft.CodeAnalysis
     }
 }";
 
+        protected ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
+        {
             test.WithSource(Attribute);
 
             if (withFix)
