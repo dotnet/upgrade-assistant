@@ -55,7 +55,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                             // TODO: this could be better by matching if it actually binds
                             if (adapter.Destination.GetMembers(operation.TargetMethod.Name).Length == 0)
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: adapter.PropertiesWithNewMember(operation.TargetMethod, adapterContext), operation.TargetMethod.Name, adapter.Destination));
+                                var properties = adapter.Properties
+                                    .WithMissingMethod(operation.TargetMethod);
+
+                                context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: properties, operation.TargetMethod.Name, adapter.Destination));
                             }
                         }
                     }

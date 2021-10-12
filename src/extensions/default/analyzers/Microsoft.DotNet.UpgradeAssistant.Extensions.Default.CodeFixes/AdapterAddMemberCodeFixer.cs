@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
@@ -29,22 +28,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         {
             var diagnostic = context.Diagnostics[0];
 
-            if (AdapterDescriptor.TryGetExpectedType(diagnostic.Properties, out var typeString) && AdapterDescriptor.TryGetMethod(diagnostic.Properties, out var methodString))
+            var semantic = await context.Document.GetSemanticModelAsync();
+
+            if (semantic is null)
             {
-                var semantic = await context.Document.GetSemanticModelAsync();
+                return;
+            }
 
-                if (semantic is null)
-                {
-                    return;
-                }
-
-                var type = semantic.Compilation.GetTypeByMetadataName(typeString);
-
-                if (type is null)
-                {
-                    return;
-                }
-
+            if (diagnostic.Properties.TryGetExpectedType(semantic, out var type) && diagnostic.Properties.TryGetMissingMethod(semantic, out var method))
+            {
                 var syntax = type.Locations.FirstOrDefault();
 
                 if (syntax is null)
@@ -73,14 +65,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                 var node = root.FindNode(syntax.SourceSpan);
 
-                // TODO: this should work for VB
-                var methodDeclaration = Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseMemberDeclaration(methodString);
-
-                if (methodDeclaration is null)
-                {
-                    return;
-                }
-
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(
                     CodeAction.Create(
@@ -88,7 +72,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                         createChangedSolution: async cancellationToken =>
                         {
                             var slnEditor = new SolutionEditor(context.Document.Project.Solution);
-                            var editor = await slnEditor.GetDocumentEditorAsync(abstractionDocument.Id);
+                            var editor = await slnEditor.GetDocumentEditorAsync(abstractionDocument.Id, cancellationToken);
+                            var methodDeclaration = editor.Generator.Declaration(method);
 
                             var exp = methodDeclaration
                                 .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)

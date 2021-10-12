@@ -2,19 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 using Xunit;
 
 using VerifyCS = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.CSharpCodeFixVerifier<
      Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.AdapterRefactorAnalyzer,
      Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.AdapterRefactorCodeFixer>;
-using VerifyCSAddMember = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.CSharpCodeFixVerifier<
-     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.AdapterRefactorAnalyzer,
-     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.AdapterAddMemberCodeFixer>;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
-    public class CSharpAbstractionRefactorTests
+    public class CSharpAbstractionRefactorTests : AdapterTestBase
     {
         [Fact]
         public async Task EmptyCode()
@@ -234,121 +230,6 @@ namespace RefactorTest
         }
 
         [Fact]
-        public async Task WithMemberAccess()
-        {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
-            var testFile = @"
-namespace RefactorTest
-{
-    public class Test
-    {
-        public void Run({|#0:SomeClass|} c)
-        {
-            var isValid = {|#1:c.IsValid()|};
-        }
-    }
-
-    public class SomeClass
-    {
-       public bool IsValid() => true;
-    }
-
-    public interface ISome
-    {
-    }
-}";
-
-            const string withFix = @"
-namespace RefactorTest
-{
-    public class Test
-    {
-        public void Run({|#0:SomeClass|} c)
-        {
-            var isValid = {|#1:c.IsValid()|};
-        }
-    }
-
-    public class SomeClass
-    {
-       public bool IsValid() => true;
-    }
-
-    public interface ISome
-    {
-bool IsValid();
-    }
-}";
-
-            var diagnostic = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
-            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("IsValid", $"{refactor.Namespace}.{refactor.Destination}");
-            await CreateTest(VerifyCSAddMember.Create(), refactor)
-                .WithSource(testFile)
-                .WithExpectedDiagnostics(diagnostic, diagnosticFixed)
-                .WithFixed(withFix)
-                .WithExpectedDiagnosticsAfter(diagnostic)
-                .RunAsync();
-        }
-
-        [Fact]
-        public async Task WithMemberAccess2()
-        {
-            var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
-            var testFile = @"
-namespace RefactorTest
-{
-    public class Test
-    {
-        public void Run({|#0:SomeClass|} c)
-        {
-            var isValid = {|#1:c.GetValid()|};
-        }
-    }
-
-    public class SomeClass
-    {
-       public {|#2:SomeClass|} GetValid() => this;
-    }
-
-    public interface ISome
-    {
-    }
-}";
-
-            const string withFix = @"
-namespace RefactorTest
-{
-    public class Test
-    {
-        public void Run({|#0:SomeClass|} c)
-        {
-            var isValid = {|#1:c.GetValid()|};
-        }
-    }
-
-    public class SomeClass
-    {
-       public {|#2:SomeClass|} GetValid() => this;
-    }
-
-    public interface ISome
-    {
-ISome GetValid();
-    }
-}";
-
-            var diagnostic = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
-            var diagnostic2 = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(2).WithArguments(refactor.Original, refactor.Destination);
-            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("GetValid", $"{refactor.Namespace}.{refactor.Destination}");
-            await CreateTest(VerifyCSAddMember.Create(), refactor)
-                .WithSource(testFile)
-                .WithExpectedDiagnostics(diagnostic, diagnostic2, diagnosticFixed)
-                .WithFixed(withFix)
-                .WithExpectedDiagnosticsAfter(diagnostic, diagnostic2)
-                .RunAsync();
-        }
-
-        [Fact]
         public async Task ChangeTwice()
         {
             var refactor = new AdapterDescriptor("RefactorTest", "ISome", "SomeClass");
@@ -407,42 +288,5 @@ namespace RefactorTest
 
         public ICodeFixTest CreateTest(AdapterDescriptor? attributeDescriptor = null, bool withFix = true)
             => CreateTest(VerifyCS.Create(), attributeDescriptor, withFix);
-
-        public ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptor? attributeDescriptor = null, bool withFix = true)
-        {
-            const string Attribute = @"
-using System;
-
-namespace Microsoft.CodeAnalysis
-{
-    public class AdapterDescriptor : Attribute
-    {
-        public AdapterDescriptor(Type interfaceType, Type original)
-        {
-        }
-    }
-}";
-
-            test.WithSource(Attribute);
-
-            if (withFix)
-            {
-                test.WithFixed(Attribute);
-            }
-
-            if (attributeDescriptor is not null)
-            {
-                var descriptor = attributeDescriptor.CreateAttributeString(LanguageNames.CSharp);
-
-                test.WithSource(descriptor);
-
-                if (withFix)
-                {
-                    test.WithFixed(descriptor);
-                }
-            }
-
-            return test;
-        }
     }
 }

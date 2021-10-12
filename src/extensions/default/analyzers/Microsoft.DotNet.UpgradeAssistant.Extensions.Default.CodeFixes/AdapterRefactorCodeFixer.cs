@@ -36,10 +36,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var diagnostic = context.Diagnostics[0];
 
-            if (AdapterDescriptor.TryGetExpectedType(diagnostic.Properties, out var result))
+            if (diagnostic.Properties.TryGetExpectedTypeString(out var result))
             {
-                var semantic = await context.Document.GetSemanticModelAsync();
-
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(
                     CodeAction.Create(

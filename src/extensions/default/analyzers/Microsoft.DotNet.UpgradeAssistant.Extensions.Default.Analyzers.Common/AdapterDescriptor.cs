@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 
@@ -12,7 +11,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     public record AdapterDescriptor(ITypeSymbol Destination, ITypeSymbol Original)
     {
         private const string ExpectedTypeKey = nameof(ExpectedTypeKey);
-        private const string MethodKey = nameof(MethodKey);
+        private const string MissingMethodTypeKey = nameof(MissingMethodTypeKey);
+        private const string MissingMethodKey = nameof(MissingMethodKey);
 
         private string? _originalMessage;
         private string? _destinationMessage;
@@ -50,54 +50,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 if (_properties is null)
                 {
-                    var value = Destination.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-
-                        // Remove global identifier for C#
-                        .Replace("global::", string.Empty)
-
-                        // Remove global identifier for VB
-                        .Replace("Global.", string.Empty);
-
                     Interlocked.Exchange(ref _properties, ImmutableDictionary.Create<string, string?>()
-                        .Add(ExpectedTypeKey, value));
+                        .WithMissingType(Destination));
                 }
 
                 return _properties!;
             }
         }
-
-        private static SymbolDisplayFormat RoundtripMethodFormat { get; } =
-            SymbolDisplayFormat.MinimallyQualifiedFormat.WithMemberOptions(
-                SymbolDisplayMemberOptions.IncludeParameters |
-                   SymbolDisplayMemberOptions.IncludeRef);
-
-        public ImmutableDictionary<string, string?> PropertiesWithNewMember(IMethodSymbol symbol, AdapterContext context)
-        {
-            var formatted = symbol.ToDisplayString(RoundtripMethodFormat);
-            var typeFormatted = GetTypeFromSymbol().ToDisplayString(RoundtripMethodFormat);
-            var final = $"{typeFormatted} {formatted}";
-
-            return Properties.Add(MethodKey, final);
-
-            ITypeSymbol GetTypeFromSymbol()
-            {
-                foreach (var descriptor in context.Descriptors)
-                {
-                    if (SymbolEqualityComparer.Default.Equals(descriptor.Original, symbol.ReturnType))
-                    {
-                        return descriptor.Destination;
-                    }
-                }
-
-                return symbol.ReturnType;
-            }
-        }
-
-        public static bool TryGetMethod(ImmutableDictionary<string, string?> dictionary, [MaybeNullWhen(false)] out string result)
-            => dictionary.TryGetValue(MethodKey, out result) && result is not null;
-
-        public static bool TryGetExpectedType(ImmutableDictionary<string, string?> dictionary, [MaybeNullWhen(false)] out string result)
-            => dictionary.TryGetValue(ExpectedTypeKey, out result) && result is not null;
 
         /// <summary>
         /// Searches for instances of an adapter descriptor. This is an attribute that has the following shape.
