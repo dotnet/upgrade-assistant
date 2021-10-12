@@ -239,7 +239,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0013_G", new TextSpan(1658, 25)),
                     new ExpectedDiagnostic("UA0013_G", new TextSpan(1658, 60)),
 
-                    new ExpectedDiagnostic("UA0013_H", new TextSpan(2023, 15)),
+                    new ExpectedDiagnostic("UA0013_H", new TextSpan(2057, 15)),
                     new ExpectedDiagnostic("UA0013_H", new TextSpan(2131, 29)),
                 }
             },
@@ -289,7 +289,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     .Select(e => e.Id)
                     .Distinct();
 
-                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, scenarioName, isFramework: true, expectedDiagnosticIds);
+                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, scenarioName, isFramework: false, expectedDiagnosticIds);
                 AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
             }
         }

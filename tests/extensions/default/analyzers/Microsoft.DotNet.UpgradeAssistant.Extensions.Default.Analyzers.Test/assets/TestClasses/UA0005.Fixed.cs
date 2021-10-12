@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web;
-using Microsoft.AspNetCore.Http;
+using HttpHelpers;
 
 namespace TestProject.TestClasses
 {

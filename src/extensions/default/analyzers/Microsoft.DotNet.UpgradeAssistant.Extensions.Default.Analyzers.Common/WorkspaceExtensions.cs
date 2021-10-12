@@ -1,13 +1,18 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static class WorkspaceExtensions
     {
+        public static bool TargetsAspNetCore(this Compilation compilation)
+            => compilation.ReferencedAssemblyNames.Any(n => n.Name.StartsWith("Microsoft.AspNetCore", StringComparison.OrdinalIgnoreCase));
+
         /// <summary>
         /// Tries to find a document given the <see cref="SyntaxTree"/> provided.
         /// </summary>

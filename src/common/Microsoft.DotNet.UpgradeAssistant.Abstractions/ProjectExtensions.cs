@@ -56,12 +56,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
             if (applicableComponentsAttr is not null)
             {
                 var applicableComponents = applicableComponentsAttr.ConstructorArguments.FirstOrDefault().Value as int?;
-                if (applicableComponents.HasValue)
+                if (applicableComponents.HasValue && applicableComponents.Value != 0)
                 {
-                    var projectComponents = (ProjectComponents)applicableComponents.Value;
-                    var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+                    var projectComponents = await project.GetComponentsAsync(token).ConfigureAwait(false);
+                    var result = applicableComponents & ((int)projectComponents);
 
-                    if (!components.HasFlag(projectComponents))
+                    if (((ProjectComponents)result) == ProjectComponents.None)
                     {
                         return false;
                     }

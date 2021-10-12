@@ -51,6 +51,51 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
             }
         }
 
+        [Theory]
+        [InlineData(ProjectComponents.AspNetCore, true)]
+        [InlineData(ProjectComponents.AspNet, true)]
+        [InlineData(ProjectComponents.AspNet | ProjectComponents.AspNetCore, true)]
+        [InlineData(ProjectComponents.AspNet | ProjectComponents.WinRT, true)]
+        [InlineData(ProjectComponents.None, false)]
+        [InlineData(ProjectComponents.WinRT, false)]
+        public async Task MultipleComponentTypes(ProjectComponents components, bool expected)
+        {
+            // Arrange
+            using var mock = AutoMock.GetLoose();
+            var testobj = new TestObjectMultipleComponents();
+            var project = mock.Mock<IProject>();
+            project.Setup(p => p.GetComponentsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(components);
+
+            // Act
+            var actual = await project.Object.IsApplicableAsync(testobj, default).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(ProjectComponents.AspNetCore, true)]
+        [InlineData(ProjectComponents.AspNet, true)]
+        [InlineData(ProjectComponents.AspNet | ProjectComponents.AspNetCore, true)]
+        [InlineData(ProjectComponents.None, true)]
+        [InlineData(ProjectComponents.WinRT, true)]
+        public async Task NoneMarkedOnItem(ProjectComponents components, bool expected)
+        {
+            // Arrange
+            using var mock = AutoMock.GetLoose();
+            var testobj = new TestObjectNone();
+            var project = mock.Mock<IProject>();
+            project.Setup(p => p.GetComponentsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(components);
+
+            // Act
+            var actual = await project.Object.IsApplicableAsync(testobj, default).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
         /// <summary>
         /// Checks to see if AppliesToProjectAsync will show an IConfigUpdater that appies to multiple languages.
         /// </summary>
@@ -84,6 +129,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Abstractions.Tests
             {
                 Assert.False(actual, "TestConfigUpdater only applies to C# and F# for ASP.NET Core");
             }
+        }
+
+        [ApplicableComponents(ProjectComponents.AspNetCore | ProjectComponents.AspNet)]
+        private class TestObjectMultipleComponents
+        {
+        }
+
+        [ApplicableComponents(ProjectComponents.None)]
+        private class TestObjectNone
+        {
         }
 
         [ApplicableComponents(ProjectComponents.AspNetCore)]

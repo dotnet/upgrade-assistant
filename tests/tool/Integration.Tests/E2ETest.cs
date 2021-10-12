@@ -11,12 +11,12 @@ using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Integration.Tests
 {
-    public sealed class E2ETest : IDisposable
+    public sealed class E2ETest
     {
+        private const string TempDirectoryName = "dotnet-upgrade-assistant-tests";
         private const string IntegrationTestAssetsPath = "IntegrationScenarios";
         private const string OriginalProjectSubDir = "Original";
         private const string UpgradedProjectSubDir = "Upgraded";
@@ -27,37 +27,37 @@ namespace Integration.Tests
         };
 
         private readonly ITestOutputHelper _output;
-        private readonly List<TemporaryDirectory> _temporaryDirectories;
 
         public E2ETest(ITestOutputHelper output)
         {
             _output = output;
-            _temporaryDirectories = new List<TemporaryDirectory>();
         }
 
         [InlineData("PCL", "SamplePCL.csproj", "")]
-        [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-#if NET6_0
-        [InlineData("WpfSample/vb", "WpfApp1.sln", "", Skip = "Default imports are different in .NET 6")]
-        [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "", Skip = "Source code is not simplifying the same as .NET 5")]
-#else
+
+        // Skip on theories has issues in XUnit: https://github.com/xunit/visualstudio.xunit/issues/266
+#if !NET6_0
+        // Using statements are different for some reason on .NET 5 and .NET 6 after Roslyn runs
+        [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
 #endif
+#if FALSE
         [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj", Skip = "Workload loading is broken")]
         [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj", Skip = "Workload loading is broken")]
+#endif
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
             // Create a temporary working directory
-            var workingDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            var workingDir = Path.Combine(Path.GetTempPath(), TempDirectoryName, Guid.NewGuid().ToString());
             var dir = Directory.CreateDirectory(workingDir);
             Assert.True(dir.Exists);
 
             // Copy the scenario files to the temporary directory
             var scenarioDir = Path.Combine(IntegrationTestAssetsPath, scenarioPath);
-            _temporaryDirectories.Add(await FileHelpers.CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false));
+            var temp = await FileHelpers.CopyDirectoryAsync(Path.Combine(scenarioDir, OriginalProjectSubDir), workingDir).ConfigureAwait(false);
             var upgradeRunner = new UpgradeRunner();
 
             // Run upgrade
@@ -65,10 +65,11 @@ namespace Integration.Tests
 
             Assert.Equal(ErrorCodes.Success, result);
 
-            FileHelpers.CleanupBuildArtifacts(workingDir);
-
             AssertOnlyKnownPackagesWereReferenced(upgradeRunner.UnknownPackages, workingDir);
             AssertDirectoriesEqual(Path.Combine(scenarioDir, UpgradedProjectSubDir), workingDir);
+
+            FileHelpers.CleanupBuildArtifacts(workingDir);
+            temp.Dispose();
         }
 
         private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
@@ -84,9 +85,14 @@ namespace Integration.Tests
             };
             var uknownPackageStr = JsonSerializer.Serialize(unknownPackages, options);
             var outputFile = Path.Combine(actualDirectory, "UnknownPackages.json");
+
             File.WriteAllText(outputFile, uknownPackageStr);
+
             Assert.False(true, $"Integration tests tried to access NuGet.{Environment.NewLine}The list of packages not yet \"pinned\" has been written to:{Environment.NewLine}{outputFile}");
         }
+
+        private static bool IsBuildArtifact(PathString path)
+            => path.Contains("obj") || path.Contains("bin");
 
         private void AssertDirectoriesEqual(string expectedDir, string actualDir)
         {
@@ -95,6 +101,7 @@ namespace Integration.Tests
                 .ToArray();
             var actualFiles = Directory.GetFiles(actualDir, "*", SearchOption.AllDirectories).Select(p => p[(actualDir.Length + 1)..])
                 .Where(t => !_ignoredFiles.Contains(Path.GetFileName(t)))
+                .Where(t => !IsBuildArtifact(t))
                 .OrderBy(fileName => fileName)
                 .ToArray();
 
@@ -138,14 +145,6 @@ namespace Integration.Tests
 
             static string ReadFile(string directory, string file)
                 => File.ReadAllText(Path.Combine(directory, file));
-        }
-
-        public void Dispose()
-        {
-            foreach (var dir in _temporaryDirectories)
-            {
-                dir?.Dispose();
-            }
         }
     }
 }
