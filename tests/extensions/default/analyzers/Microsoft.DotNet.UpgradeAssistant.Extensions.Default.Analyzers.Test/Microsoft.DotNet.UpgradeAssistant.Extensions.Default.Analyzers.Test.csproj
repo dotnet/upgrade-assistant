@@ -9,15 +9,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="assets\**" />
+    <Compile Remove="HttpContextRefactor\**" />
     <EmbeddedResource Remove="assets\**" />
+    <EmbeddedResource Remove="HttpContextRefactor\**" />
     <None Remove="assets\**" />
-    <Content Include="assets\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Compile Include="..\..\..\..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source\AdditionalFileText.cs" Link="AdditionalFileText.cs" />
-    <None Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package\build\WebTypeReplacements.typemap" Link="WebTypeReplacements.typemap">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Remove="HttpContextRefactor\**" />
+    <Compile Remove="AnalyzerTests.cs" />
+    <Compile Remove="ExpectedDiagnostic.cs" />
+    <Compile Remove="LanguageExtensions.cs" />
+    <Compile Remove="TestHelper.cs" />
+    <Compile Remove="TypeMapLoaderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis">
