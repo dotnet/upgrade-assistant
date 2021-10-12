@@ -69,7 +69,7 @@ namespace RefactorTest
                 .RunAsync();
         }
 
-        [Fact(Skip = "Need to visit all parts of a member to map abstractions")]
+        [Fact]
         public async Task WithMemberAccessUsingConcreteTypeAsReturn()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
@@ -113,6 +113,68 @@ namespace RefactorTest
     public interface ISome
     {
         ISome GetValid();
+    }
+}";
+
+            var diagnostic = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic2 = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(2).WithArguments(refactor.Original, refactor.Destination);
+            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("GetValid", $"{refactor.Namespace}.{refactor.Destination}");
+            await CreateTest(VerifyCSAddMember.Create(), refactor)
+                .WithSource(testFile)
+                .WithExpectedDiagnostics(diagnostic, diagnostic2, diagnosticFixed)
+                .WithFixed(withFix)
+                .WithExpectedDiagnosticsAfter(diagnostic, diagnostic2)
+                .RunAsync();
+        }
+
+        [Fact]
+        public async Task WithMemberAccessUsingConcreteTypeParameter()
+        {
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            {|#1:c.GetValid(c)|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public void GetValid({|#2:SomeClass|} some)
+       {
+       }
+    }
+
+    public interface ISome
+    {
+    }
+}";
+
+            const string withFix = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            {|#1:c.GetValid(c)|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public void GetValid({|#2:SomeClass|} some)
+       {
+       }
+    }
+
+    public interface ISome
+    {
+        void GetValid(ISome some);
     }
 }";
 

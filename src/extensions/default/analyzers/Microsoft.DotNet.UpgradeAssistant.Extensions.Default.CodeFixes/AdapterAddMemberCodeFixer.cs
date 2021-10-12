@@ -35,6 +35,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
+            var adapterContext = AdapterContext.Parse(semantic.Compilation);
+
             if (diagnostic.Properties.TryGetExpectedType(semantic, out var type) && diagnostic.Properties.TryGetMissingMethod(semantic, out var method))
             {
                 var syntax = type.Locations.FirstOrDefault();
@@ -73,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                         {
                             var slnEditor = new SolutionEditor(context.Document.Project.Solution);
                             var editor = await slnEditor.GetDocumentEditorAsync(abstractionDocument.Id, cancellationToken);
-                            var methodDeclaration = editor.Generator.Declaration(method);
+                            var methodDeclaration = editor.Generator.Declaration(method, adapterContext);
 
                             var exp = methodDeclaration
                                 .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
