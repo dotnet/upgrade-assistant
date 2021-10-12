@@ -108,7 +108,7 @@
     <Extension Include="..\..\extensions\windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows\Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.csproj">
       <Name>windows</Name>
     </Extension>
-    <Extension Include="..\..\extensions\NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.csproj">
+    <Extension Include="..\..\extensions\nuget\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.csproj">
       <Name>nuget</Name>
     </Extension>
   </ItemGroup>
