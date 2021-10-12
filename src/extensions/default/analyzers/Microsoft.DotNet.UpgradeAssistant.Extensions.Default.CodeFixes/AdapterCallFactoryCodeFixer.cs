@@ -14,7 +14,7 @@ using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic)]
-    public class AdapterAddMemberCodeFixer : CodeFixProvider
+    public class AdapterCallFactoryCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterRefactorAnalyzer.AddMemberDiagnosticId);
 

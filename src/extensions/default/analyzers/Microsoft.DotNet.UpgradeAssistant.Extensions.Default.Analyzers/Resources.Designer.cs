@@ -88,6 +88,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Call factory method..
+        /// </summary>
+        internal static string AdapterCallFactoryDescription {
+            get {
+                return ResourceManager.GetString("AdapterCallFactoryDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Call factory method to convert {0} to {1}.
+        /// </summary>
+        internal static string AdapterCallFactoryMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterCallFactoryMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Call factory method.
+        /// </summary>
+        internal static string AdapterCallFactoryTitle {
+            get {
+                return ResourceManager.GetString("AdapterCallFactoryTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refactor usage to another type..
         /// </summary>
         internal static string AdapterRefactorDescription {

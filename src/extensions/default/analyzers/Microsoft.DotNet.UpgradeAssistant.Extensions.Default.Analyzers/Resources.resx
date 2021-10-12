@@ -126,6 +126,15 @@
   <data name="AdapterAddMemberTitle" xml:space="preserve">
     <value>Add member to abstraction</value>
   </data>
+  <data name="AdapterCallFactoryDescription" xml:space="preserve">
+    <value>Call factory method.</value>
+  </data>
+  <data name="AdapterCallFactoryMessageFormat" xml:space="preserve">
+    <value>Call factory method to convert {0} to {1}</value>
+  </data>
+  <data name="AdapterCallFactoryTitle" xml:space="preserve">
+    <value>Call factory method</value>
+  </data>
   <data name="AdapterRefactorDescription" xml:space="preserve">
     <value>Refactor usage to another type.</value>
   </data>

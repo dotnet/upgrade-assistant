@@ -7,3 +7,4 @@ Rule ID | Category | Severity | Notes
 UA0005 | Upgrade | Warning | HttpContextCurrentAnalyzer
 UA0014 | Refactor | Warning | AdapterRefactorAnalyzer
 UA0014b | Refactor | Warning | AdapterRefactorAnalyzer
+UA0014c | Refactor | Warning | AdapterRefactorAnalyzer

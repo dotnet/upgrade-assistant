@@ -14,6 +14,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     {
         public const string RefactorDiagnosticId = "UA0014";
         public const string AddMemberDiagnosticId = "UA0014b";
+        public const string CallFactoryDiagnosticId = "UA0014c";
+
         private const string Category = "Refactor";
 
         private static readonly LocalizableString RefactorTitle = new LocalizableResourceString(nameof(Resources.AdapterRefactorTitle), Resources.ResourceManager, typeof(Resources));
@@ -24,10 +26,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString AddMemberMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterAddMemberMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString AddMemberDescription = new LocalizableResourceString(nameof(Resources.AdapterAddMemberDescription), Resources.ResourceManager, typeof(Resources));
 
+        private static readonly LocalizableString CallFactoryTitle = new LocalizableResourceString(nameof(Resources.AdapterCallFactoryTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString CallFactoryMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterCallFactoryMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString CallFactoryDescription = new LocalizableResourceString(nameof(Resources.AdapterCallFactoryDescription), Resources.ResourceManager, typeof(Resources));
+
         private static readonly DiagnosticDescriptor RefactorRule = new(RefactorDiagnosticId, RefactorTitle, RefactorMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: RefactorDescription);
         private static readonly DiagnosticDescriptor AddMemberRule = new(AddMemberDiagnosticId, AddMemberTitle, AddMemberMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AddMemberDescription);
+        private static readonly DiagnosticDescriptor CallFactoryRule = new(CallFactoryDiagnosticId, CallFactoryTitle, CallFactoryMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: CallFactoryDescription);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(RefactorRule, AddMemberRule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(RefactorRule, AddMemberRule, CallFactoryRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -36,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             context.RegisterCompilationStartAction(context =>
             {
-                var adapterContext = AdapterContext.Parse(context.Compilation);
+                var adapterContext = AdapterContext.Create().FromCompilation(context.Compilation);
 
                 if (!adapterContext.IsAvailable)
                 {
@@ -72,8 +79,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     {
                         if (context.Node is CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax method)
                         {
-                            GeneralizedSyntaxNodeAction(context, adapterContext, method.ReturnType);
-                            GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.Type);
+                            var symbol = context.SemanticModel.GetDeclaredSymbol(method);
+
+                            if (!adapterContext.Ignore(symbol))
+                            {
+                                GeneralizedSyntaxNodeAction(context, adapterContext, method.ReturnType);
+                                GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.Type);
+                            }
                         }
                         else if (context.Node is CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax field)
                         {

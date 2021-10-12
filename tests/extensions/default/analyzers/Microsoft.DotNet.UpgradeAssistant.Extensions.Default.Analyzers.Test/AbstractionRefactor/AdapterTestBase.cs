@@ -18,6 +18,13 @@ namespace Microsoft.CodeAnalysis
         {
         }
     }
+
+    public class FactoryDescriptor : Attribute
+    {
+        public FactoryDescriptor(Type factoryClass, string factoryMethod)
+        {
+        }
+    }
 }";
 
         protected ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)

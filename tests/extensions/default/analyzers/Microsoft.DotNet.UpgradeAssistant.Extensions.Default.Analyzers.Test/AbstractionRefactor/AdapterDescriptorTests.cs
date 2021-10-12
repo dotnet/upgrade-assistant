@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
 
             // Act
             var compilation = (await project.GetCompilationAsync())!;
-            var context = AdapterContext.Parse(compilation);
+            var context = AdapterContext.Create().FromCompilation(compilation);
 
             // Assert
             Assert.Empty(compilation.GetParseDiagnostics());
