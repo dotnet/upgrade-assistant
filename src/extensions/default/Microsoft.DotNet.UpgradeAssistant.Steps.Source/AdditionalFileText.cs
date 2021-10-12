@@ -4,15 +4,13 @@
 using System;
 using System.IO;
 using System.Threading;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
+namespace Microsoft.CodeAnalysis.Text
 {
     /// <summary>
     /// An AdditionalText implementation that reads a document from disk.
     /// </summary>
-    public class AdditionalFileText : AdditionalText
+    internal class AdditionalFileText : AdditionalText
     {
         /// <summary>
         /// Gets the path to read text file.

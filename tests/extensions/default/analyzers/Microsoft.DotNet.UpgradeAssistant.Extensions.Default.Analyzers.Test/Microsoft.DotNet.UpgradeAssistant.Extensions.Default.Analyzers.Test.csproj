@@ -14,6 +14,7 @@
     <Content Include="assets\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="..\..\..\..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source\AdditionalFileText.cs" Link="AdditionalFileText.cs" />
     <None Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package\build\WebTypeReplacements.typemap" Link="WebTypeReplacements.typemap">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -53,7 +54,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj" />
     <ProjectReference Include="..\..\..\..\..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.csproj" />
-    <ProjectReference Include="..\..\..\..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Source\Microsoft.DotNet.UpgradeAssistant.Steps.Source.csproj" />
     <ProjectReference Include="..\..\..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 </Project>
