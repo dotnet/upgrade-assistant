@@ -10,10 +10,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     public record AdapterDescriptor(ITypeSymbol Destination, ITypeSymbol Original)
     {
-        private const string ExpectedTypeKey = nameof(ExpectedTypeKey);
-        private const string MissingMethodTypeKey = nameof(MissingMethodTypeKey);
-        private const string MissingMethodKey = nameof(MissingMethodKey);
-
         private string? _originalMessage;
         private string? _destinationMessage;
         private ImmutableDictionary<string, string?>? _properties;
