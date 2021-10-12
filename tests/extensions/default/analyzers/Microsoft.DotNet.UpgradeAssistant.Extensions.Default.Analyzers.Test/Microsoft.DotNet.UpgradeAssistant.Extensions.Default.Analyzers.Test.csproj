@@ -38,16 +38,16 @@
       <Version>3.0.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.XUnit">
-      <Version>1.0.1-beta1.21265.1</Version>
+      <Version>1.1.1-beta1.21480.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit">
-      <Version>1.0.1-beta1.21265.1</Version>
+      <Version>1.1.1-beta1.21480.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Analyzer.Testing.XUnit">
-      <Version>1.0.1-beta1.21265.1</Version>
+      <Version>1.1.1-beta1.21480.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeFix.Testing.XUnit">
-      <Version>1.0.1-beta1.21265.1</Version>
+      <Version>1.1.1-beta1.21480.3</Version>
     </PackageReference>
     <PackageReference Include="Polly" Version="7.2.2" />
   </ItemGroup>

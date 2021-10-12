@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,6 +57,60 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add member to abstraction..
+        /// </summary>
+        internal static string AdapterAddMemberDescription {
+            get {
+                return ResourceManager.GetString("AdapterAddMemberDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add member {0} to abstraction {1}.
+        /// </summary>
+        internal static string AdapterAddMemberMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterAddMemberMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add member to abstraction.
+        /// </summary>
+        internal static string AdapterAddMemberTitle {
+            get {
+                return ResourceManager.GetString("AdapterAddMemberTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refactor usage to another type..
+        /// </summary>
+        internal static string AdapterRefactorDescription {
+            get {
+                return ResourceManager.GetString("AdapterRefactorDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refactor usage of type {0} to {1}.
+        /// </summary>
+        internal static string AdapterRefactorMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterRefactorMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refactor usage of type to another type.
+        /// </summary>
+        internal static string AdapterRefactorTitle {
+            get {
+                return ResourceManager.GetString("AdapterRefactorTitle", resourceCulture);
             }
         }
         
