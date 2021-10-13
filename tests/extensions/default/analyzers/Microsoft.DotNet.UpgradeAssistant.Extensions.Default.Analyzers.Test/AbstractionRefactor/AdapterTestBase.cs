@@ -27,7 +27,7 @@ namespace Microsoft.CodeAnalysis
     }
 }";
 
-        protected ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
+        protected static ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
         {
             test.WithSource(Attribute);
 

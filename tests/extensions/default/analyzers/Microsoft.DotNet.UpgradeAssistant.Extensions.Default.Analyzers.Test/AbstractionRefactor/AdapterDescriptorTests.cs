@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         public async Task SingleProject()
         {
             // Arrange
-            var ws = new AdhocWorkspace();
+            using var ws = new AdhocWorkspace();
             var (descriptor, project) = await AddDescriptorProject(ws);
 
             // Act

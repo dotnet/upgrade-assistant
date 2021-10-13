@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.VisualBasic.Testing;
 
 #pragma warning disable CA1000 // Do not declare static members on generic types
 #pragma warning disable CA1724 // The type name Test conflicts
+#pragma warning disable CA1034 // Nested types should not be visible
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {

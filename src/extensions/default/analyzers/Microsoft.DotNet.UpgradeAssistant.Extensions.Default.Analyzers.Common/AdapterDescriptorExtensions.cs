@@ -5,6 +5,8 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable CA1062 // Validate arguments of public methods
+
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     public static class AdapterDescriptorExtensions
@@ -51,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     foreach (var member in type.GetMembers(missingMethodName))
                     {
-                        if (string.Equals(missingMethod, member.ToDisplayString(RoundtripMethodFormat)))
+                        if (string.Equals(missingMethod, member.ToDisplayString(RoundtripMethodFormat), System.StringComparison.Ordinal))
                         {
                             method = member;
                             return true;

@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var diagnostic = context.Diagnostics[0];
 
-            var semantic = await context.Document.GetSemanticModelAsync(context.CancellationToken);
+            var semantic = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
 
             if (semantic is null)
             {

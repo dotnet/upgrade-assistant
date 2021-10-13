@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         {
             var diagnostic = context.Diagnostics[0];
 
-            var semantic = await context.Document.GetSemanticModelAsync();
+            var semantic = await context.Document.GetSemanticModelAsync().ConfigureAwait(false);
 
             if (semantic is null)
             {
@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                     return;
                 }
 
-                var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
+                var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
                 if (root is null)
                 {
@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                         CodeFixResources.AdapterCallFactoryTitle,
                         createChangedDocument: async cancellationToken =>
                         {
-                            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken);
+                            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
 
                             var memberAccess = editor.Generator.MemberAccessExpression(
                                 editor.Generator.NameExpression(factory.ContainingType),

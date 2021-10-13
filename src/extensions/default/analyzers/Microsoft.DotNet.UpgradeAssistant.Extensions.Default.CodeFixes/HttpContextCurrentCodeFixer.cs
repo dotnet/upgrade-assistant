@@ -70,8 +70,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
             {
                 using var sr = new StreamReader(typeof(HttpContextCurrentCodeFixer).Assembly.GetManifestResourceStream(HttpContextHelperResourceName));
                 var ns = project.DefaultNamespace ?? DefaultNamespace;
-                var contents = sr.ReadToEnd().Replace("/*{{NAMESPACE}}*/", ns);
-                project = document.Project.AddDocument($"{HttpContextHelperName}.cs", contents).Project;
+                var contents = await sr.ReadToEndAsync().ConfigureAwait(false);
+                var finalContents = contents.Replace("/*{{NAMESPACE}}*/", ns);
+                project = document.Project.AddDocument($"{HttpContextHelperName}.cs", finalContents).Project;
                 httpContextHelperClass = await GetHttpContextHelperClassAsync(project).ConfigureAwait(false);
             }
 

@@ -7,6 +7,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
+#pragma warning disable CA1062 // Validate arguments of public methods
+
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp, LanguageNames.VisualBasic)]

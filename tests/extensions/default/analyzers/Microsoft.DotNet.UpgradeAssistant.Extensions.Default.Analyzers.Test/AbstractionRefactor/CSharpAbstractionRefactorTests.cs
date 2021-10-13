@@ -286,7 +286,7 @@ namespace RefactorTest
                 .RunAsync();
         }
 
-        public ICodeFixTest CreateTest(AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
+        private static ICodeFixTest CreateTest(AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
             => CreateTest(VerifyCS.Create(), attributeDescriptor, withFix);
     }
 }

@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Microsoft.DotNet.UpgradeAssistant</RootNamespace>
     <IsPackable>true</IsPackable>
+    <NoWarn>$(NoWarn);CA1848</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Microsoft.DotNet.UpgradeAssistant.Abstractions</PackageId>

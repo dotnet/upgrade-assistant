@@ -197,7 +197,7 @@ End Namespace";
                 .RunAsync();
         }
 
-        public ICodeFixTest CreateTest(AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
+        public static ICodeFixTest CreateTest(AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
         {
             const string Attribute = @"
 Imports System

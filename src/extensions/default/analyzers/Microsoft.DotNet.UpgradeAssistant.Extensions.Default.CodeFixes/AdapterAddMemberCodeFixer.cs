@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         {
             var diagnostic = context.Diagnostics[0];
 
-            var semantic = await context.Document.GetSemanticModelAsync();
+            var semantic = await context.Document.GetSemanticModelAsync().ConfigureAwait(false);
 
             if (semantic is null)
             {
@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                         createChangedSolution: async cancellationToken =>
                         {
                             var slnEditor = new SolutionEditor(context.Document.Project.Solution);
-                            var editor = await slnEditor.GetDocumentEditorAsync(abstractionDocument.Id, cancellationToken);
+                            var editor = await slnEditor.GetDocumentEditorAsync(abstractionDocument.Id, cancellationToken).ConfigureAwait(false);
                             var methodDeclaration = editor.Generator.Declaration(member, adapterContext);
 
                             var exp = methodDeclaration
