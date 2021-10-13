@@ -160,6 +160,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
+            context.RegisterOperationBlockStartAction(context =>
+            {
+                if (context.OwningSymbol is IMethodSymbol enclosing &&
+                    !adapterContext.IsFactoryMethod(enclosing) &&
+                    adapterContext.GetDescriptorForDestination(enclosing.ReturnType) is AdapterDescriptor descriptor)
+                {
+                    context.RegisterOperationAction(context =>
+                    {
+                        var @return = (IReturnOperation)context.Operation;
+
+                        foreach (var child in @return.ReturnedValue.Children)
+                        {
+                            if (SymbolEqualityComparer.Default.Equals(child.Type, descriptor.Original))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(CallFactoryRule, child.Syntax.GetLocation(), properties: descriptor.Properties, descriptor.OriginalMessage, descriptor.DestinationMessage));
+                            }
+                        }
+                    }, OperationKind.Return);
+                }
+            });
+
             context.RegisterOperationAction(context =>
             {
                 var operation = (IInvalidOperation)context.Operation;

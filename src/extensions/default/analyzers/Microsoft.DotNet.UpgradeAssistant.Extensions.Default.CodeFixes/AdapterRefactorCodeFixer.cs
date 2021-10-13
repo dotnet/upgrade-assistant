@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                             return editor.GetChangedDocument();
                         },
-                        result.ToDisplayString()),
+                        nameof(AdapterRefactorCodeFixer)),
                     context.Diagnostics);
             }
         }

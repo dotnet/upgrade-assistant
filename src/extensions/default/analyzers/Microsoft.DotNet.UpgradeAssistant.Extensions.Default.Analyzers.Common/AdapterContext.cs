@@ -48,6 +48,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return null;
         }
 
+        public AdapterDescriptor? GetDescriptorForDestination(ITypeSymbol type)
+        {
+            foreach (var descriptor in Descriptors)
+            {
+                if (SymbolEqualityComparer.Default.Equals(descriptor.Destination, type))
+                {
+                    return descriptor;
+                }
+            }
+
+            return null;
+        }
+
         public bool Ignore(ISymbol? symbol)
         {
             if (symbol is null)

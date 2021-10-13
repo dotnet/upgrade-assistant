@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public class AdapterCallFactoryCodeFixer : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterRefactorAnalyzer.CallFactoryDiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(AdapterRefactorAnalyzer.CallFactoryDiagnosticId, "CS0266");
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                     return;
                 }
 
-                var node = root.FindNode(diagnostic.Location.SourceSpan);
+                var node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
 
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(
@@ -65,10 +65,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                             var memberAccess = editor.Generator.MemberAccessExpression(
                                 editor.Generator.NameExpression(factory.ContainingType),
                                 factory.Name);
-                            var invocation = editor.Generator.InvocationExpression(memberAccess, node);
-                            var arg = editor.Generator.Argument(invocation);
 
-                            editor.ReplaceNode(node, arg);
+                            var invocation = editor.Generator.InvocationExpression(memberAccess, node);
+
+                            editor.ReplaceNode(node, invocation);
 
                             return editor.GetChangedDocument();
                         },

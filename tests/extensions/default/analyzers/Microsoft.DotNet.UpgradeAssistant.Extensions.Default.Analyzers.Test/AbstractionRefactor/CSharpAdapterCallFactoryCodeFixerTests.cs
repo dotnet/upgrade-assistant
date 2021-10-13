@@ -192,5 +192,67 @@ namespace RefactorTest
                 .WithExpectedDiagnosticsAfter(diagnostic1)
                 .RunAsync();
         }
+
+        [Fact]
+        public async Task ReturnTypeChanges()
+        {
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+
+namespace RefactorTest
+{
+    public class Test
+    {
+        public ISome Run() => {|#0:new SomeClass()|};
+    }
+
+    public class SomeClass
+    {
+    }
+
+    public interface ISome
+    {
+    }
+
+    public static class TestFactory
+    {
+      public static ISome Create(SomeClass s) => null;
+    }
+}";
+
+            const string withFix = @"
+[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+
+namespace RefactorTest
+{
+    public class Test
+    {
+        public ISome Run() => TestFactory.Create(new SomeClass());
+    }
+
+    public class SomeClass
+    {
+    }
+
+    public interface ISome
+    {
+    }
+
+    public static class TestFactory
+    {
+      public static ISome Create(SomeClass s) => null;
+    }
+}";
+
+            var diagnostic1 = VerifyCS.Diagnostic(AdapterRefactorAnalyzer.CallFactoryDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic2 = DiagnosticResult.CompilerError("CS0266").WithLocation(0).WithArguments("RefactorTest.SomeClass", "RefactorTest.ISome");
+
+            await CreateTest(VerifyCS.Create(), refactor)
+                .WithExpectedDiagnostics(diagnostic1, diagnostic2)
+                .WithSource(testFile)
+                .WithFixed(withFix)
+                .RunAsync();
+        }
     }
 }
