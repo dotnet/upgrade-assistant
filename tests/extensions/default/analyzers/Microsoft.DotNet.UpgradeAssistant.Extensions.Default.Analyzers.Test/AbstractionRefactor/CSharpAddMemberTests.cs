@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
     public class CSharpAddMemberTests : AdapterTestBase
     {
         [Fact]
-        public async Task WithMemberAccess()
+        public async Task WithMethodAccess()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
@@ -56,6 +56,63 @@ namespace RefactorTest
     public interface ISome
     {
         bool IsValid();
+    }
+}";
+
+            var diagnostic = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnosticFixed = VerifyCSAddMember.Diagnostic(AdapterRefactorAnalyzer.AddMemberDiagnosticId).WithLocation(1).WithArguments("IsValid", $"{refactor.Namespace}.{refactor.Destination}");
+            await CreateTest(VerifyCSAddMember.Create(), refactor)
+                .WithSource(testFile)
+                .WithExpectedDiagnostics(diagnostic, diagnosticFixed)
+                .WithFixed(withFix)
+                .WithExpectedDiagnosticsAfter(diagnostic)
+                .RunAsync();
+        }
+
+        [Fact]
+        public async Task WithPropertyAccess()
+        {
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var isValid = {|#1:c.IsValid|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public bool IsValid { get; }
+    }
+
+    public interface ISome
+    {
+    }
+}";
+
+            const string withFix = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var isValid = {|#1:c.IsValid|};
+        }
+    }
+
+    public class SomeClass
+    {
+       public bool IsValid { get; }
+    }
+
+    public interface ISome
+    {
+        bool IsValid { get; }
     }
 }";
 

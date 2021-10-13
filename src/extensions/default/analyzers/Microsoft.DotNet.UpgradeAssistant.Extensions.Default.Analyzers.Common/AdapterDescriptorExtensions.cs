@@ -42,7 +42,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 .Add(MissingMethodKey, symbol.ToDisplayString(RoundtripMethodFormat))
                 .Add(MissingMethodTypeKey, symbol.ContainingType.ToDisplayString(RoundtripMethodFormat));
 
-        public static bool TryGetMissingMethod(this ImmutableDictionary<string, string?> dictionary, SemanticModel model, [MaybeNullWhen(false)] out IMethodSymbol method)
+        public static ImmutableDictionary<string, string?> WithMissing(this ImmutableDictionary<string, string?> properties, IPropertySymbol symbol)
+            => properties
+                .Add(MissingMethodKey, symbol.ToDisplayString(RoundtripMethodFormat))
+                .Add(MissingMethodTypeKey, symbol.ContainingType.ToDisplayString(RoundtripMethodFormat));
+
+        public static bool TryGetMissingMember(this ImmutableDictionary<string, string?> dictionary, SemanticModel model, [MaybeNullWhen(false)] out ISymbol method)
         {
             if (dictionary.TryGetValue(MissingMethodKey, out var missingMethodName) && missingMethodName is not null &&
                 dictionary.TryGetValue(MissingMethodTypeKey, out var missingMethodType) && missingMethodType is not null)
@@ -51,9 +56,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     foreach (var member in type.GetMembers())
                     {
-                        if (member is IMethodSymbol methodSymbol && string.Equals(missingMethodName, member.ToDisplayString(RoundtripMethodFormat)))
+                        if (string.Equals(missingMethodName, member.ToDisplayString(RoundtripMethodFormat)))
                         {
-                            method = methodSymbol;
+                            method = member;
                             return true;
                         }
                     }

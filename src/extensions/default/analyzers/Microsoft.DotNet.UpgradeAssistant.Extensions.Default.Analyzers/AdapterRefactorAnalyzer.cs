@@ -50,82 +50,109 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     return;
                 }
 
-                // Check to ensure abstractions have members used
-                context.RegisterOperationAction(context =>
+                RegisterAddMemberActions(adapterContext, context);
+                RegisterAdapterActions(adapterContext, context);
+            });
+        }
+
+        private static void RegisterAddMemberActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
+        {
+            context.RegisterOperationAction(context =>
+            {
+                var operation = (IInvocationOperation)context.Operation;
+
+                foreach (var adapter in adapterContext.Descriptors)
                 {
-                    var operation = (IInvocationOperation)context.Operation;
-
-                    foreach (var adapter in adapterContext.Descriptors)
+                    if (SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType, adapter.Original))
                     {
-                        if (SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType, adapter.Original))
+                        // TODO: this could be better by matching if it actually binds
+                        if (adapter.Destination.GetMembers(operation.TargetMethod.Name).Length == 0)
                         {
-                            // TODO: this could be better by matching if it actually binds
-                            if (adapter.Destination.GetMembers(operation.TargetMethod.Name).Length == 0)
-                            {
-                                var properties = adapter.Properties
-                                    .WithMissingMethod(operation.TargetMethod);
+                            var properties = adapter.Properties
+                                .WithMissingMethod(operation.TargetMethod);
 
-                                context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: properties, operation.TargetMethod.Name, adapter.Destination));
-                            }
+                            context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: properties, operation.TargetMethod.Name, adapter.Destination));
                         }
                     }
-                }, OperationKind.Invocation);
-
-                // Check that you are using the abstraction
-                // TODO: Can we use a symbol/operation action? Need to be more exhaustive on search for types
-                if (context.Compilation.Language == LanguageNames.CSharp)
-                {
-                    context.RegisterSyntaxNodeAction(context =>
-                    {
-                        if (context.Node is CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax method)
-                        {
-                            var symbol = context.SemanticModel.GetDeclaredSymbol(method);
-
-                            if (!adapterContext.Ignore(symbol))
-                            {
-                                GeneralizedSyntaxNodeAction(context, adapterContext, method.ReturnType);
-                                GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.Type);
-                            }
-                        }
-                        else if (context.Node is CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax field)
-                        {
-                            GeneralizedSyntaxNodeAction(context, adapterContext, field.Declaration.Type);
-                        }
-                        else if (context.Node is CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax property)
-                        {
-                            GeneralizedSyntaxNodeAction(context, adapterContext, property.Type);
-                        }
-                    }, CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration, CodeAnalysis.CSharp.SyntaxKind.PropertyDeclaration, CodeAnalysis.CSharp.SyntaxKind.FieldDeclaration);
                 }
-                else if (context.Compilation.Language == LanguageNames.VisualBasic)
+            }, OperationKind.Invocation);
+
+            context.RegisterOperationAction(context =>
+            {
+                var operation = (IPropertyReferenceOperation)context.Operation;
+
+                foreach (var adapter in adapterContext.Descriptors)
                 {
-                    context.RegisterSyntaxNodeAction(context =>
+                    if (SymbolEqualityComparer.Default.Equals(operation.Property.ContainingType, adapter.Original))
                     {
-                        if (context.Node is CodeAnalysis.VisualBasic.Syntax.MethodStatementSyntax method)
+                        // TODO: this could be better by matching if it actually binds
+                        if (adapter.Destination.GetMembers(operation.Property.Name).Length == 0)
                         {
-                            GeneralizedSyntaxNodeAction(context, adapterContext, method.AsClause?.Type);
-                            GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.AsClause?.Type);
+                            var properties = adapter.Properties
+                                .WithMissing(operation.Property);
+
+                            context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: properties, operation.Property.Name, adapter.Destination));
                         }
-                        else if (context.Node is CodeAnalysis.VisualBasic.Syntax.PropertyStatementSyntax property)
+                    }
+                }
+            }, OperationKind.PropertyReference);
+        }
+
+        private static void RegisterAdapterActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
+        {
+            // TODO: Can we use a symbol/operation action? Need to be more exhaustive on search for types
+            if (context.Compilation.Language == LanguageNames.CSharp)
+            {
+                context.RegisterSyntaxNodeAction(context =>
+                {
+                    if (context.Node is CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax method)
+                    {
+                        var symbol = context.SemanticModel.GetDeclaredSymbol(method);
+
+                        if (!adapterContext.Ignore(symbol))
                         {
-                            if (property.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
+                            GeneralizedSyntaxNodeAction(context, adapterContext, method.ReturnType);
+                            GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.Type);
+                        }
+                    }
+                    else if (context.Node is CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax field)
+                    {
+                        GeneralizedSyntaxNodeAction(context, adapterContext, field.Declaration.Type);
+                    }
+                    else if (context.Node is CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax property)
+                    {
+                        GeneralizedSyntaxNodeAction(context, adapterContext, property.Type);
+                    }
+                }, CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration, CodeAnalysis.CSharp.SyntaxKind.PropertyDeclaration, CodeAnalysis.CSharp.SyntaxKind.FieldDeclaration);
+            }
+            else if (context.Compilation.Language == LanguageNames.VisualBasic)
+            {
+                context.RegisterSyntaxNodeAction(context =>
+                {
+                    if (context.Node is CodeAnalysis.VisualBasic.Syntax.MethodStatementSyntax method)
+                    {
+                        GeneralizedSyntaxNodeAction(context, adapterContext, method.AsClause?.Type);
+                        GeneralizedParameterAction(context, adapterContext, method.ParameterList.Parameters, static n => n.AsClause?.Type);
+                    }
+                    else if (context.Node is CodeAnalysis.VisualBasic.Syntax.PropertyStatementSyntax property)
+                    {
+                        if (property.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
+                        {
+                            GeneralizedSyntaxNodeAction(context, adapterContext, simple.Type);
+                        }
+                    }
+                    else if (context.Node is CodeAnalysis.VisualBasic.Syntax.FieldDeclarationSyntax field)
+                    {
+                        foreach (var declarator in field.Declarators)
+                        {
+                            if (declarator.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
                             {
                                 GeneralizedSyntaxNodeAction(context, adapterContext, simple.Type);
                             }
                         }
-                        else if (context.Node is CodeAnalysis.VisualBasic.Syntax.FieldDeclarationSyntax field)
-                        {
-                            foreach (var declarator in field.Declarators)
-                            {
-                                if (declarator.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
-                                {
-                                    GeneralizedSyntaxNodeAction(context, adapterContext, simple.Type);
-                                }
-                            }
-                        }
-                    }, CodeAnalysis.VisualBasic.SyntaxKind.FunctionStatement, CodeAnalysis.VisualBasic.SyntaxKind.SubStatement, CodeAnalysis.VisualBasic.SyntaxKind.FieldDeclaration, CodeAnalysis.VisualBasic.SyntaxKind.PropertyStatement);
-                }
-            });
+                    }
+                }, CodeAnalysis.VisualBasic.SyntaxKind.FunctionStatement, CodeAnalysis.VisualBasic.SyntaxKind.SubStatement, CodeAnalysis.VisualBasic.SyntaxKind.FieldDeclaration, CodeAnalysis.VisualBasic.SyntaxKind.PropertyStatement);
+            }
         }
 
         private static void GeneralizedSyntaxNodeAction(
