@@ -169,4 +169,10 @@
   <data name="AdapterRefactorTitle" xml:space="preserve">
     <value>Refactor usage to alternate API</value>
   </data>
+  <data name="AdapterAddMemberTitle" xml:space="preserve">
+    <value>Add member to abstraction</value>
+  </data>
+  <data name="AdapterCallFactoryTitle" xml:space="preserve">
+    <value>Call factory method for abstraction</value>
+  </data>
 </root>

@@ -36,7 +36,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var diagnostic = context.Diagnostics[0];
 
-            if (diagnostic.Properties.TryGetExpectedTypeString(out var result))
+            var semantic = await context.Document.GetSemanticModelAsync(context.CancellationToken);
+
+            if (semantic is null)
+            {
+                return;
+            }
+
+            if (diagnostic.Properties.TryGetExpectedType(semantic, out var result))
             {
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(
@@ -45,8 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                         async cancellationToken =>
                         {
                             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
-                            var dotted = editor.Generator.DottedName(result);
-                            var exp = dotted
+                            var exp = editor.Generator.NameExpression(result)
                                 .WithTriviaFrom(node)
                                 .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
                                 .WithAdditionalAnnotations(Simplifier.Annotation);
@@ -54,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                             return editor.GetChangedDocument();
                         },
-                        nameof(CodeFixResources.UsingSystemWebTitle)),
+                        result.ToDisplayString()),
                     context.Diagnostics);
             }
         }

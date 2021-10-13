@@ -9,19 +9,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     public static class AdapterDescriptorExtensions
     {
-        private static SymbolDisplayFormat RoundtripMethodFormat { get; } = SymbolDisplayFormat.FullyQualifiedFormat
-            .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
-
         private const string ExpectedTypeKey = nameof(ExpectedTypeKey);
         private const string MissingMethodTypeKey = nameof(MissingMethodTypeKey);
         private const string MissingMethodKey = nameof(MissingMethodKey);
         private const string MissingMethodNameKey = nameof(MissingMethodNameKey);
 
+        private static readonly SymbolDisplayFormat RoundtripMethodFormat = SymbolDisplayFormat.FullyQualifiedFormat
+            .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
+
         public static ImmutableDictionary<string, string?> WithMissingType(this ImmutableDictionary<string, string?> properties, ITypeSymbol symbol)
             => properties.Add(ExpectedTypeKey, symbol.ToDisplayString(RoundtripMethodFormat));
-
-        public static bool TryGetExpectedTypeString(this ImmutableDictionary<string, string?> dictionary, [MaybeNullWhen(false)] out string result)
-            => dictionary.TryGetValue(ExpectedTypeKey, out result) && result is not null;
 
         public static bool TryGetExpectedType(this ImmutableDictionary<string, string?> dictionary, SemanticModel semantic, [MaybeNullWhen(false)] out INamedTypeSymbol namedType)
         {

@@ -61,6 +61,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add member to abstraction.
+        /// </summary>
+        internal static string AdapterAddMemberTitle {
+            get {
+                return ResourceManager.GetString("AdapterAddMemberTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Call factory method for abstraction.
+        /// </summary>
+        internal static string AdapterCallFactoryTitle {
+            get {
+                return ResourceManager.GetString("AdapterCallFactoryTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refactor usage to alternate API.
         /// </summary>
         internal static string AdapterRefactorTitle {

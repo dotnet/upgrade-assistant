@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        CodeFixResources.AdapterRefactorTitle,
+                        CodeFixResources.AdapterAddMemberTitle,
                         createChangedSolution: async cancellationToken =>
                         {
                             var slnEditor = new SolutionEditor(context.Document.Project.Solution);
@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                             return slnEditor.GetChangedSolution();
                         },
-                        nameof(CodeFixResources.UsingSystemWebTitle)),
+                        nameof(AdapterAddMemberCodeFixer)),
                     context.Diagnostics);
             }
         }

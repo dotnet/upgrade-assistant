@@ -22,4 +22,12 @@ namespace HybridExample
         {
         }
     }
+
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+    internal sealed class FactoryDescriptor : Attribute
+    {
+        public FactoryDescriptor(Type factoryType, string factoryMethod)
+        {
+        }
+    }
 }

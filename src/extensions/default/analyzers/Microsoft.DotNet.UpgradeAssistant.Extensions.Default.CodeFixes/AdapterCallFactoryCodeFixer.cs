@@ -2,13 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
@@ -16,13 +14,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public class AdapterCallFactoryCodeFixer : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterRefactorAnalyzer.AddMemberDiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterRefactorAnalyzer.CallFactoryDiagnosticId);
 
+        // TODO: Encounters an InvalidCastException if enabled
+#if FALSE
         public sealed override FixAllProvider GetFixAllProvider()
         {
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
             return WellKnownFixAllProviders.BatchFixer;
         }
+#endif
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
@@ -37,54 +38,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
             var adapterContext = AdapterContext.Create().FromCompilation(semantic.Compilation);
 
-            if (diagnostic.Properties.TryGetExpectedType(semantic, out var type) && diagnostic.Properties.TryGetMissingMember(semantic, out var method))
+            if (diagnostic.Properties.TryGetExpectedType(semantic, out var type))
             {
-                var syntax = type.Locations.FirstOrDefault();
+                var factory = adapterContext.GetFactory(type);
 
-                if (syntax is null)
+                if (factory is null)
                 {
                     return;
                 }
 
-                if (!syntax.IsInSource)
-                {
-                    return;
-                }
-
-                var abstractionDocument = context.Document.Project.Solution.GetDocument(syntax.SourceTree);
-
-                if (abstractionDocument is null)
-                {
-                    return;
-                }
-
-                var root = await abstractionDocument.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+                var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken);
 
                 if (root is null)
                 {
                     return;
                 }
 
-                var node = root.FindNode(syntax.SourceSpan);
+                var node = root.FindNode(diagnostic.Location.SourceSpan);
 
                 // Register a code action that will invoke the fix.
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        CodeFixResources.AdapterRefactorTitle,
-                        createChangedSolution: async cancellationToken =>
+                        CodeFixResources.AdapterCallFactoryTitle,
+                        createChangedDocument: async cancellationToken =>
                         {
-                            var slnEditor = new SolutionEditor(context.Document.Project.Solution);
-                            var editor = await slnEditor.GetDocumentEditorAsync(abstractionDocument.Id, cancellationToken);
-                            var methodDeclaration = editor.Generator.Declaration(method, adapterContext);
+                            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken);
 
-                            var exp = methodDeclaration
-                                .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
-                                .WithAdditionalAnnotations(Simplifier.Annotation);
-                            editor.AddMember(node, exp);
+                            var memberAccess = editor.Generator.MemberAccessExpression(
+                                editor.Generator.NameExpression(factory.ContainingType),
+                                factory.Name);
+                            var invocation = editor.Generator.InvocationExpression(memberAccess, node);
+                            var arg = editor.Generator.Argument(invocation);
 
-                            return slnEditor.GetChangedSolution();
+                            editor.ReplaceNode(node, arg);
+
+                            return editor.GetChangedDocument();
                         },
-                        nameof(CodeFixResources.UsingSystemWebTitle)),
+                        equivalenceKey: factory.ToDisplayString()),
                     context.Diagnostics);
             }
         }

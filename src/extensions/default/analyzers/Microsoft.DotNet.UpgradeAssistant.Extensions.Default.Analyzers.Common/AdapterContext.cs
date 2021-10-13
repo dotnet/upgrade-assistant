@@ -14,6 +14,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         public ImmutableArray<FactoryDescriptor> Factories { get; init; } = ImmutableArray.Create<FactoryDescriptor>();
 
+        public IMethodSymbol? GetFactory(ITypeSymbol type)
+        {
+            foreach (var factory in Factories)
+            {
+                foreach (var method in factory.Methods)
+                {
+                    if (SymbolEqualityComparer.Default.Equals(method.ReturnType, type))
+                    {
+                        return method;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public bool Ignore(ISymbol? symbol)
         {
             if (symbol is null)

@@ -11,10 +11,10 @@ using VerifyCS = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.AbstractionRefactor
 {
-    public class CSharpAdapterCallFactoryCodeFixer : AdapterTestBase
+    public class CSharpAdapterCallFactoryCodeFixerTests : AdapterTestBase
     {
-        [Fact(Skip = "Not implemented")]
-        public async Task WithMemberAccess()
+        [Fact]
+        public async Task ArgumentToMethod()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"

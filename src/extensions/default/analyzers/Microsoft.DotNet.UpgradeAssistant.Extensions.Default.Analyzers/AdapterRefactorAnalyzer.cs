@@ -52,6 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
                 RegisterAddMemberActions(adapterContext, context);
                 RegisterAdapterActions(adapterContext, context);
+                RegisterCallFactoryActions(adapterContext, context);
             });
         }
 
@@ -138,6 +139,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     }
                 }, CodeAnalysis.VisualBasic.SyntaxKind.FunctionStatement, CodeAnalysis.VisualBasic.SyntaxKind.SubStatement, CodeAnalysis.VisualBasic.SyntaxKind.FieldDeclaration, CodeAnalysis.VisualBasic.SyntaxKind.PropertyStatement);
             }
+        }
+
+        private static void RegisterCallFactoryActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
+        {
+            if (adapterContext.Factories.Length == 0)
+            {
+                return;
+            }
+
+            context.RegisterOperationAction(context =>
+            {
+                var operation = (IInvalidOperation)context.Operation;
+                var symbolInfo = context.Operation.SemanticModel.GetSymbolInfo(operation.Syntax);
+
+                foreach (var child in operation.Children)
+                {
+                    if (child is IParameterReferenceOperation parameter)
+                    {
+                        foreach (var descriptor in adapterContext.Descriptors)
+                        {
+                            if (SymbolEqualityComparer.Default.Equals(parameter.Type, descriptor.Original))
+                            {
+                                // TODO: should match arguments, but seems non-trivial
+                                foreach (var proposedMethod in symbolInfo.CandidateSymbols)
+                                {
+                                    context.ReportDiagnostic(Diagnostic.Create(CallFactoryRule, parameter.Syntax.GetLocation(), properties: descriptor.Properties, descriptor.OriginalMessage, descriptor.DestinationMessage));
+                                }
+                            }
+                        }
+                    }
+                }
+            }, OperationKind.Invalid);
         }
 
         private static void GeneralizedSyntaxNodeAction(

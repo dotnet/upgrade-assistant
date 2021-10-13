@@ -6,6 +6,7 @@ using System.Web;
 using Microsoft.AspNetCore.Http;
 #endif
 
+[assembly: HybridExample.FactoryDescriptor(typeof(HybridExample.HttpContextFactory), nameof(HybridExample.HttpContextFactory.Create))]
 namespace HybridExample
 {
     public static class HttpContextFactory
