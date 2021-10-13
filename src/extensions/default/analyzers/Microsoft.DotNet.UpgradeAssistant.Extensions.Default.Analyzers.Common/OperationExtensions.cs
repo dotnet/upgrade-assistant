@@ -19,6 +19,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         public static IOperation? GetEnclosingMethodOperation(this IOperation? operation)
             => operation.GetParentOperationWhere(static o => o.IsEnclosedMethodOperation());
 
+        public static IMethodSymbol? GetEnclosingMethod(this IOperation? operation)
+            => operation.GetEnclosingMethodOperation() is IOperation enclosed && enclosed.SemanticModel.GetDeclaredSymbol(enclosed.Syntax) is IMethodSymbol method
+                ? method
+                : null;
+
         public static bool IsEnclosedMethodOperation(this IOperation operation)
         {
             if (operation.IsVisualBasic())

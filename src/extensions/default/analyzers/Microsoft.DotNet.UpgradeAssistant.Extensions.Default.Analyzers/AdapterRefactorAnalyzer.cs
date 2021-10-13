@@ -62,6 +62,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         {
             context.RegisterOperationAction(context =>
             {
+                if (context.Operation.GetEnclosingMethod() is IMethodSymbol enclosing && adapterContext.IsFactoryMethod(enclosing))
+                {
+                    return;
+                }
+
                 var member = context.Operation switch
                 {
                     IInvocationOperation invocation => (ISymbol)invocation.TargetMethod,

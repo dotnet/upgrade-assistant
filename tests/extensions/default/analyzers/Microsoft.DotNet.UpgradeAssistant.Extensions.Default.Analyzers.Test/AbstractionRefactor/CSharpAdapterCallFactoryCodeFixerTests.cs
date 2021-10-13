@@ -33,6 +33,9 @@ namespace RefactorTest
 
     public class SomeClass
     {
+        public void SomeMethod()
+        {
+        }
     }
 
     public interface ISome
@@ -41,7 +44,11 @@ namespace RefactorTest
 
     public static class TestFactory
     {
-      public static ISome Create(SomeClass s) => null;
+      public static ISome Create(SomeClass s)
+      {
+        s.SomeMethod();
+        return null;
+      }
     }
 }";
 
@@ -61,6 +68,9 @@ namespace RefactorTest
 
     public class SomeClass
     {
+        public void SomeMethod()
+        {
+        }
     }
 
     public interface ISome
@@ -69,7 +79,11 @@ namespace RefactorTest
 
     public static class TestFactory
     {
-      public static ISome Create(SomeClass s) => null;
+      public static ISome Create(SomeClass s)
+      {
+        s.SomeMethod();
+        return null;
+      }
     }
 }";
 
