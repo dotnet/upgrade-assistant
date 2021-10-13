@@ -59,43 +59,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         {
             context.RegisterOperationAction(context =>
             {
-                var operation = (IInvocationOperation)context.Operation;
+                var member = context.Operation switch
+                {
+                    IInvocationOperation invocation => (ISymbol)invocation.TargetMethod,
+                    IPropertyReferenceOperation property => property.Property,
+                    _ => throw new NotImplementedException(),
+                };
 
                 foreach (var adapter in adapterContext.Descriptors)
                 {
-                    if (SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType, adapter.Original))
+                    if (SymbolEqualityComparer.Default.Equals(member.ContainingType, adapter.Original))
                     {
                         // TODO: this could be better by matching if it actually binds
-                        if (adapter.Destination.GetMembers(operation.TargetMethod.Name).Length == 0)
+                        if (adapter.Destination.GetMembers(member.Name).Length == 0)
                         {
                             var properties = adapter.Properties
-                                .WithMissingMethod(operation.TargetMethod);
+                                .WithMissingMember(member);
 
-                            context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: properties, operation.TargetMethod.Name, adapter.Destination));
+                            context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, context.Operation.Syntax.GetLocation(), properties: properties, member.Name, adapter.Destination));
                         }
                     }
                 }
-            }, OperationKind.Invocation);
-
-            context.RegisterOperationAction(context =>
-            {
-                var operation = (IPropertyReferenceOperation)context.Operation;
-
-                foreach (var adapter in adapterContext.Descriptors)
-                {
-                    if (SymbolEqualityComparer.Default.Equals(operation.Property.ContainingType, adapter.Original))
-                    {
-                        // TODO: this could be better by matching if it actually binds
-                        if (adapter.Destination.GetMembers(operation.Property.Name).Length == 0)
-                        {
-                            var properties = adapter.Properties
-                                .WithMissing(operation.Property);
-
-                            context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, operation.Syntax.GetLocation(), properties: properties, operation.Property.Name, adapter.Destination));
-                        }
-                    }
-                }
-            }, OperationKind.PropertyReference);
+            }, OperationKind.Invocation, OperationKind.PropertyReference);
         }
 
         private static void RegisterAdapterActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)

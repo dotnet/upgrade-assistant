@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private const string ExpectedTypeKey = nameof(ExpectedTypeKey);
         private const string MissingMethodTypeKey = nameof(MissingMethodTypeKey);
         private const string MissingMethodKey = nameof(MissingMethodKey);
+        private const string MissingMethodNameKey = nameof(MissingMethodNameKey);
 
         public static ImmutableDictionary<string, string?> WithMissingType(this ImmutableDictionary<string, string?> properties, ITypeSymbol symbol)
             => properties.Add(ExpectedTypeKey, symbol.ToDisplayString(RoundtripMethodFormat));
@@ -37,26 +38,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return false;
         }
 
-        public static ImmutableDictionary<string, string?> WithMissingMethod(this ImmutableDictionary<string, string?> properties, IMethodSymbol symbol)
+        public static ImmutableDictionary<string, string?> WithMissingMember(this ImmutableDictionary<string, string?> properties, ISymbol symbol)
             => properties
-                .Add(MissingMethodKey, symbol.ToDisplayString(RoundtripMethodFormat))
-                .Add(MissingMethodTypeKey, symbol.ContainingType.ToDisplayString(RoundtripMethodFormat));
-
-        public static ImmutableDictionary<string, string?> WithMissing(this ImmutableDictionary<string, string?> properties, IPropertySymbol symbol)
-            => properties
+                .Add(MissingMethodNameKey, symbol.Name)
                 .Add(MissingMethodKey, symbol.ToDisplayString(RoundtripMethodFormat))
                 .Add(MissingMethodTypeKey, symbol.ContainingType.ToDisplayString(RoundtripMethodFormat));
 
         public static bool TryGetMissingMember(this ImmutableDictionary<string, string?> dictionary, SemanticModel model, [MaybeNullWhen(false)] out ISymbol method)
         {
-            if (dictionary.TryGetValue(MissingMethodKey, out var missingMethodName) && missingMethodName is not null &&
-                dictionary.TryGetValue(MissingMethodTypeKey, out var missingMethodType) && missingMethodType is not null)
+            if (dictionary.TryGetValue(MissingMethodKey, out var missingMethod) && missingMethod is not null &&
+                dictionary.TryGetValue(MissingMethodTypeKey, out var missingMethodType) && missingMethodType is not null &&
+                dictionary.TryGetValue(MissingMethodNameKey, out var missingMethodName) && missingMethodName is not null)
             {
                 if (model.Compilation.GetTypeByMetadataName(missingMethodType) is INamedTypeSymbol type)
                 {
-                    foreach (var member in type.GetMembers())
+                    foreach (var member in type.GetMembers(missingMethodName))
                     {
-                        if (string.Equals(missingMethodName, member.ToDisplayString(RoundtripMethodFormat)))
+                        if (string.Equals(missingMethod, member.ToDisplayString(RoundtripMethodFormat)))
                         {
                             method = member;
                             return true;
