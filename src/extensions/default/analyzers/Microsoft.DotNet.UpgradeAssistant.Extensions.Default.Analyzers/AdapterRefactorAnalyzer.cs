@@ -162,17 +162,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
                 foreach (var child in operation.Children)
                 {
-                    if (child is IParameterReferenceOperation parameter)
+                    foreach (var descriptor in adapterContext.Descriptors)
                     {
-                        foreach (var descriptor in adapterContext.Descriptors)
+                        if (SymbolEqualityComparer.Default.Equals(child.Type, descriptor.Original))
                         {
-                            if (SymbolEqualityComparer.Default.Equals(parameter.Type, descriptor.Original))
+                            // TODO: should match arguments, but seems non-trivial
+                            foreach (var proposedMethod in symbolInfo.CandidateSymbols)
                             {
-                                // TODO: should match arguments, but seems non-trivial
-                                foreach (var proposedMethod in symbolInfo.CandidateSymbols)
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(CallFactoryRule, parameter.Syntax.GetLocation(), properties: descriptor.Properties, descriptor.OriginalMessage, descriptor.DestinationMessage));
-                                }
+                                context.ReportDiagnostic(Diagnostic.Create(CallFactoryRule, child.Syntax.GetLocation(), properties: descriptor.Properties, descriptor.OriginalMessage, descriptor.DestinationMessage));
                             }
                         }
                     }

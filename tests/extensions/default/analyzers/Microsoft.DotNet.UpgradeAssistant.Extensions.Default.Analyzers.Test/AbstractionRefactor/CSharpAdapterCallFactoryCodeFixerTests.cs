@@ -98,5 +98,99 @@ namespace RefactorTest
                 .WithExpectedDiagnosticsAfter(diagnostic1)
                 .RunAsync();
         }
+
+        [Fact]
+        public async Task LocalVariableCallFactory()
+        {
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var other = c;
+            Method({|#1:other|});
+        }
+
+        public void Method(ISome s)
+        {
+        }
+    }
+
+    public class SomeClass
+    {
+        public void SomeMethod()
+        {
+        }
+    }
+
+    public interface ISome
+    {
+    }
+
+    public static class TestFactory
+    {
+      public static ISome Create(SomeClass s)
+      {
+        s.SomeMethod();
+        return null;
+      }
+    }
+}";
+
+            const string withFix = @"
+[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run({|#0:SomeClass|} c)
+        {
+            var other = c;
+            Method(TestFactory.Create(other));
+        }
+
+        public void Method(ISome s)
+        {
+        }
+    }
+
+    public class SomeClass
+    {
+        public void SomeMethod()
+        {
+        }
+    }
+
+    public interface ISome
+    {
+    }
+
+    public static class TestFactory
+    {
+      public static ISome Create(SomeClass s)
+      {
+        s.SomeMethod();
+        return null;
+      }
+    }
+}";
+
+            var diagnostic1 = VerifyCS.Diagnostic(AdapterRefactorAnalyzer.RefactorDiagnosticId).WithLocation(0).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic2 = VerifyCS.Diagnostic(AdapterRefactorAnalyzer.CallFactoryDiagnosticId).WithLocation(1).WithArguments(refactor.Original, refactor.Destination);
+            var diagnostic3 = DiagnosticResult.CompilerError("CS1503").WithLocation(1).WithArguments("1", "RefactorTest.SomeClass", "RefactorTest.ISome");
+
+            await CreateTest(VerifyCS.Create(), refactor)
+                .WithSource(testFile)
+                .WithExpectedDiagnostics(diagnostic1, diagnostic2, diagnostic3)
+                .WithFixed(withFix)
+                .WithExpectedDiagnosticsAfter(diagnostic1)
+                .RunAsync();
+        }
     }
 }
