@@ -16,14 +16,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterRefactorAnalyzer.CallFactoryDiagnosticId);
 
-        // TODO: Encounters an InvalidCastException if enabled
-#if FALSE
         public sealed override FixAllProvider GetFixAllProvider()
         {
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
-            return WellKnownFixAllProviders.BatchFixer;
+            // TODO: Encounters an InvalidCastException if WellKnownFixAllProviders.BatchFixer is used
+            return null!;
         }
-#endif
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
