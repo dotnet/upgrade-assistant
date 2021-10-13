@@ -12,6 +12,10 @@ using System;
 
 namespace Microsoft.CodeAnalysis
 {
+    public class AdapterIgnore : Attribute
+    {
+    }
+
     public class AdapterDescriptor : Attribute
     {
         public AdapterDescriptor(Type interfaceType, Type original)

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
@@ -41,6 +42,39 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
             });
         }
 
+        [Fact]
+        public async Task DoubleProject()
+        {
+            // Arrange
+            using var ws = new AdhocWorkspace();
+            var (descriptor, project) = await AddDescriptorProject(ws);
+            var dependentProject = await AddProjectAsync(ws, "dependent");
+            var finalProject = dependentProject.AddProjectReference(new(project.Id));
+
+            // Act
+            var compilation = (await finalProject.GetCompilationAsync())!;
+            var context = AdapterContext.Create().FromCompilation(compilation);
+
+            // Assert
+            Assert.Empty(compilation.GetParseDiagnostics());
+            Assert.Empty(compilation.GetDiagnostics());
+
+            Assert.False(context.Ignore(compilation.Assembly));
+            Assert.True(context.Ignore(compilation.References.Select(compilation.GetAssemblyOrModuleSymbol).OfType<ISourceAssemblySymbol>().Single()));
+
+            var expectedOriginal = compilation.GetTypeByMetadataName(descriptor.FullOriginal);
+            var expectedDestination = compilation.GetTypeByMetadataName(descriptor.FullDestination);
+
+            Assert.NotNull(expectedOriginal);
+            Assert.NotNull(expectedDestination);
+
+            Assert.Collection(context.Descriptors, d =>
+            {
+                Assert.Equal(expectedOriginal, d.Original);
+                Assert.Equal(expectedDestination, d.Destination);
+            });
+        }
+
         private async Task<Project> AddProjectAsync(AdhocWorkspace ws, string name)
         {
             var referenceAssemblies = await References;
@@ -55,6 +89,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         {
             var descriptor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
+[assembly: Microsoft.CodeAnalysis.AdapterIgnore]
+
 namespace RefactorTest
 {
     public class SomeClass

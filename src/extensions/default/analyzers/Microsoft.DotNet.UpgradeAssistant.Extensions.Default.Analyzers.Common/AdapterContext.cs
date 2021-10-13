@@ -16,6 +16,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         public ImmutableArray<FactoryDescriptor> Factories { get; init; } = ImmutableArray.Create<FactoryDescriptor>();
 
+        public ImmutableHashSet<IAssemblySymbol> IgnoredAssemblies { get; init; } = ImmutableHashSet.Create<IAssemblySymbol>(SymbolEqualityComparer.Default);
+
         public bool IsFactoryMethod(IMethodSymbol method)
         {
             foreach (var factory in Factories)
@@ -68,13 +70,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return false;
             }
 
-            foreach (var factory in Factories)
+            if (symbol is IAssemblySymbol assembly && IgnoredAssemblies.Contains(assembly))
             {
-                foreach (var method in factory.Methods)
+                return true;
+            }
+
+            if (symbol is IMethodSymbol methodSymbol)
+            {
+                foreach (var factory in Factories)
                 {
-                    if (SymbolEqualityComparer.Default.Equals(method, symbol))
+                    foreach (var method in factory.Methods)
                     {
-                        return true;
+                        if (SymbolEqualityComparer.Default.Equals(method, methodSymbol))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -134,10 +144,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                         Factories = context.Factories.Add(factory)
                     };
                 }
+                else if (IsAssemblyIgnored(a))
+                {
+                    context = context with
+                    {
+                        IgnoredAssemblies = context.IgnoredAssemblies.Add(assembly)
+                    };
+                }
             }
 
             return context;
         }
+
+        private static bool IsAssemblyIgnored(AttributeData a)
+            => string.Equals(a.AttributeClass?.Name, "AdapterIgnore", StringComparison.OrdinalIgnoreCase);
 
         private static bool TryParseDescriptor(AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor descriptor)
         {
