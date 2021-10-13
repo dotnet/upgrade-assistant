@@ -70,6 +70,36 @@ namespace RefactorTest
         }
 
         [Fact]
+        public async Task IgnoreStaticMethods()
+        {
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var testFile = @"
+namespace RefactorTest
+{
+    public class Test
+    {
+        public void Run()
+        {
+            var isValid = SomeClass.IsValid();
+        }
+    }
+
+    public class SomeClass
+    {
+       public static bool IsValid() => true;
+    }
+
+    public interface ISome
+    {
+    }
+}";
+
+            await CreateTest(VerifyCSAddMember.Create(), refactor, withFix: false)
+                .WithSource(testFile)
+                .RunAsync();
+        }
+
+        [Fact]
         public async Task WithPropertyAccess()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");

@@ -74,6 +74,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     _ => throw new NotImplementedException(),
                 };
 
+                if (member.IsStatic)
+                {
+                    return;
+                }
+
                 foreach (var adapter in adapterContext.Descriptors)
                 {
                     if (SymbolEqualityComparer.Default.Equals(member.ContainingType, adapter.Original))
