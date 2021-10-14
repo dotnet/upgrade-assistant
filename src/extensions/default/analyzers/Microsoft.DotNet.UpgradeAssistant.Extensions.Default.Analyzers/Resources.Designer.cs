@@ -223,6 +223,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Adapter factory method must be static..
+        /// </summary>
+        internal static string AdapterFactoryMustBeStaticDescription {
+            get {
+                return ResourceManager.GetString("AdapterFactoryMustBeStaticDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter factory method {0} must be static.
+        /// </summary>
+        internal static string AdapterFactoryMustBeStaticMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterFactoryMustBeStaticMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter factory method must be static.
+        /// </summary>
+        internal static string AdapterFactoryMustBeStaticTitle {
+            get {
+                return ResourceManager.GetString("AdapterFactoryMustBeStaticTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specified adapter factory must exist..
         /// </summary>
         internal static string AdapterFactoryMustExistDescription {

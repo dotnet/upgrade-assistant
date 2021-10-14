@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 #pragma warning disable CA1062 // Validate arguments of public methods
@@ -198,6 +199,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     var methods = type.GetMembers(methodName)
                         .OfType<IMethodSymbol>()
+                        .Where(m => m.IsStatic)
                         .ToImmutableArray();
 
                     if (methods.Length > 0)

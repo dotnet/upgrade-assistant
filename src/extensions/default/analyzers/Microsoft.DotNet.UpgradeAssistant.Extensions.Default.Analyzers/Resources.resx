@@ -171,6 +171,15 @@
   <data name="AdapterDescriptorTypeParameterTitle" xml:space="preserve">
     <value>Adapter attributes must have correct constructor parameter</value>
   </data>
+  <data name="AdapterFactoryMustBeStaticDescription" xml:space="preserve">
+    <value>Adapter factory method must be static.</value>
+  </data>
+  <data name="AdapterFactoryMustBeStaticMessageFormat" xml:space="preserve">
+    <value>Adapter factory method {0} must be static</value>
+  </data>
+  <data name="AdapterFactoryMustBeStaticTitle" xml:space="preserve">
+    <value>Adapter factory method must be static</value>
+  </data>
   <data name="AdapterFactoryMustExistDescription" xml:space="preserve">
     <value>Specified adapter factory must exist.</value>
   </data>

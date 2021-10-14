@@ -81,5 +81,38 @@ namespace TestFactory
                 .WithExpectedDiagnostics(diagnostic)
                 .RunAsync();
         }
+
+        [Fact]
+        public async Task MustBeStatic()
+        {
+            var testFile = @"
+using System;
+
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(TestFactory.FactoryClass), {|#0:""Create""|})]
+
+namespace TestFactory
+{
+    public class FactoryClass
+    {
+        public IAbstraction Create(Concrete c) => null;
+    }
+
+    public interface IAbstraction
+    {
+    }
+
+    public class Concrete
+    {
+    }
+}";
+
+            var diagnostic = VerifyCS.Diagnostic(AdapterFactoryDescriptorUsageAnalyzer.MustBeStaticDiagnosticId).WithLocation(0).WithArguments("TestFactory.FactoryClass.Create(TestFactory.Concrete)");
+
+            await VerifyCS.Create()
+                .WithSource(Attribute)
+                .WithSource(testFile)
+                .WithExpectedDiagnostics(diagnostic)
+                .RunAsync();
+        }
     }
 }
