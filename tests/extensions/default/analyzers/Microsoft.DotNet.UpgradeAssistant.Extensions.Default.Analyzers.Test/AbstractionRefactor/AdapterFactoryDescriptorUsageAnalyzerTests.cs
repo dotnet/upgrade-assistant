@@ -82,14 +82,16 @@ namespace TestFactory
                 .RunAsync();
         }
 
-        [Fact]
-        public async Task MustBeStatic()
+        [InlineData("\"Create\"")]
+        [InlineData("nameof(TestFactory.FactoryClass.Create)")]
+        [Theory]
+        public async Task MustBeStatic(string create)
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(TestFactory.FactoryClass), {|#0:""Create""|})]
-
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(TestFactory.FactoryClass), {{|#0:{create}|}})]
+" + @"
 namespace TestFactory
 {
     public class FactoryClass

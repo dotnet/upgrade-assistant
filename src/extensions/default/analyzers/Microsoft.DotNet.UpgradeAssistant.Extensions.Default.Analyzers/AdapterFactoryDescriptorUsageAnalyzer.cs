@@ -57,20 +57,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 }
 
                 if (children[0] is ITypeOfOperation typeOf && typeOf.TypeOperand is INamedTypeSymbol type &&
-                    children[1] is ILiteralOperation literal && literal.ConstantValue.HasValue && literal.ConstantValue.Value is string methodName)
+                    children[1] is IOperation methodNode && methodNode.ConstantValue.HasValue && methodNode.ConstantValue.Value is string methodName)
                 {
                     var methods = type.GetMembers(methodName);
 
                     if (methods.Length == 0)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(MustExistRule, literal.Syntax.GetLocation(), methodName, type.ToDisplayString()));
+                        context.ReportDiagnostic(Diagnostic.Create(MustExistRule, methodNode.Syntax.GetLocation(), methodName, type.ToDisplayString()));
                     }
 
                     foreach (var method in methods)
                     {
                         if (!method.IsStatic)
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(MustBeStaticRule, literal.Syntax.GetLocation(), method.ToDisplayString()));
+                            context.ReportDiagnostic(Diagnostic.Create(MustBeStaticRule, methodNode.Syntax.GetLocation(), method.ToDisplayString()));
                         }
                     }
                 }
