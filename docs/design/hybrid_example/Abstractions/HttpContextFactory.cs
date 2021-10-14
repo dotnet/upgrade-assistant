@@ -6,7 +6,7 @@ using System.Web;
 using Microsoft.AspNetCore.Http;
 #endif
 
-[assembly: HybridExample.FactoryDescriptor(typeof(HybridExample.HttpContextFactory), nameof(HybridExample.HttpContextFactory.Create))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(HybridExample.HttpContextFactory), nameof(HybridExample.HttpContextFactory.Create))]
 
 namespace HybridExample
 {
@@ -14,7 +14,7 @@ namespace HybridExample
     {
         private const string Key = "HttpContextAdapter";
 
-        public static IHttpContext Create(HttpContext context)
+        public static IHttpContext Create(HttpContext context) 
         {
 #if NETFRAMEWORK
             if (context.Items.Contains(Key) && context.Items[Key] is IHttpContext icontext)
