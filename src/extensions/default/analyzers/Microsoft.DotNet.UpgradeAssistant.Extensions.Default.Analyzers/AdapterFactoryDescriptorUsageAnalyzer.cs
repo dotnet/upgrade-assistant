@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
                 var types = WellKnownTypes.From(symbol.Symbol);
 
-                if (types?.DescriptorFactory is null)
+                if (types.DescriptorFactory is null)
                 {
                     return;
                 }

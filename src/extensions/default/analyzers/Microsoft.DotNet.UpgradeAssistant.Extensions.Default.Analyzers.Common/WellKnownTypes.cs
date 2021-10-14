@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
-    public record WellKnownTypes
+    public readonly record struct WellKnownTypes
     {
         private const string AdapterDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute";
         private const string FactoryDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptorAttribute";
@@ -14,15 +14,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly SymbolDisplayFormat DisplayFormat = SymbolDisplayFormat.FullyQualifiedFormat
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
+        public bool IsEmpty => AdapterDescriptor is null && DescriptorFactory is null;
+
         public INamedTypeSymbol? AdapterDescriptor { get; init; }
 
         public INamedTypeSymbol? DescriptorFactory { get; init; }
 
-        public static WellKnownTypes? From(ISymbol? symbol)
+        public static WellKnownTypes From(ISymbol? symbol)
         {
             if (symbol is null)
             {
-                return null;
+                return default;
             }
 
             if (symbol is IMethodSymbol method)
@@ -32,14 +34,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             if (symbol is not INamedTypeSymbol namedType)
             {
-                return null;
+                return default;
             }
 
             return namedType.ToDisplayString(DisplayFormat) switch
             {
                 AdapterDescriptorFullyQualified => new() { AdapterDescriptor = namedType },
                 FactoryDescriptorFullyQualified => new() { DescriptorFactory = namedType },
-                _ => null,
+                _ => default,
             };
         }
 

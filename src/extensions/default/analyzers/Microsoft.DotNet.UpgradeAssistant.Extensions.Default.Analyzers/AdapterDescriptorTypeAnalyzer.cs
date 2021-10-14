@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 var types = WellKnownTypes.From(context.Symbol);
 
-                if (types is null)
+                if (types.IsEmpty)
                 {
                     return;
                 }

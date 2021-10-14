@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         public ImmutableArray<FactoryDescriptor> Factories { get; init; } = ImmutableArray.Create<FactoryDescriptor>();
 
-        public WellKnownTypes Types { get; init; } = new();
+        public WellKnownTypes Types { get; init; }
 
         public bool IsFactoryMethod(IMethodSymbol method)
         {
