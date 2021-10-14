@@ -13,8 +13,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     public class AdapterDescriptorTypeAnalyzerTests : AdapterTestBase
     {
         private const string SystemTypeName = "System.Type";
+        private const string StringName = "System.String";
         private const string AdapterDescriptorClassName = "AdapterDescriptorAttribute";
-        private const string AdapterDescriptorFullyQualifiedName = "Microsoft.CodeAnalysis.Refactoring." + AdapterDescriptorClassName;
+        private const string RefactoringNamespace = "Microsoft.CodeAnalysis.Refactoring.";
+        private const string FactoryDescriptorClassName = "AdapterFactoryDescriptorAttribute";
 
         [Fact]
         public async Task EmptyCode()
@@ -25,6 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         }
 
         [InlineData(AdapterDescriptorClassName, SystemTypeName)]
+        [InlineData(FactoryDescriptorClassName, StringName)]
         [Theory]
         public async Task CorrectlyFormed(string attributeName, string type2)
         {
@@ -47,6 +50,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
         }
 
         [InlineData(AdapterDescriptorClassName, SystemTypeName)]
+        [InlineData(FactoryDescriptorClassName, StringName)]
         [Theory]
         public async Task NotAnAttribute(string attributeName, string type2)
         {
@@ -65,7 +69,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
 
             var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.AttributeDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorFullyQualifiedName);
+                .WithArguments(RefactoringNamespace + attributeName);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
@@ -74,6 +78,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
         }
 
         [InlineData(AdapterDescriptorClassName)]
+        [InlineData(FactoryDescriptorClassName)]
         [Theory]
         public async Task SingleParameter(string attributeName)
         {
@@ -92,7 +97,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
 
             var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorFullyQualifiedName, 2);
+                .WithArguments(RefactoringNamespace + attributeName, 2);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
@@ -100,9 +105,10 @@ namespace Microsoft.CodeAnalysis.Refactoring
                 .RunAsync();
         }
 
-        [InlineData(AdapterDescriptorClassName)]
+        [InlineData(AdapterDescriptorClassName, SystemTypeName)]
+        [InlineData(FactoryDescriptorClassName, SystemTypeName)]
         [Theory]
-        public async Task SingleParameterNotAType(string attributeName)
+        public async Task SingleParameterNotAType(string attributeName, string typeName)
         {
             var testFile = @$"
 using System;
@@ -119,10 +125,10 @@ namespace Microsoft.CodeAnalysis.Refactoring
 
             var diagnostic1 = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorFullyQualifiedName, 2);
+                .WithArguments(RefactoringNamespace + attributeName, 2);
             var diagnostic2 = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterDiagnosticId)
                 .WithLocation(1)
-                .WithArguments(AdapterDescriptorFullyQualifiedName, SystemTypeName);
+                .WithArguments(RefactoringNamespace + attributeName, typeName);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic1, diagnostic2)
@@ -131,6 +137,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
         }
 
         [InlineData(AdapterDescriptorClassName)]
+        [InlineData(FactoryDescriptorClassName)]
         [Theory]
         public async Task DefaultConstructor(string attributeName)
         {
@@ -146,7 +153,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
 
             var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorFullyQualifiedName, 2);
+                .WithArguments(RefactoringNamespace + attributeName, 2);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)

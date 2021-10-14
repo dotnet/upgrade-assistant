@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -57,13 +58,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 }
 
                 var systemType = context.Compilation.GetTypeByMetadataName("System.Type");
+                var systemString = context.Compilation.GetTypeByMetadataName("System.String");
 
-                if (systemType is null)
+                if (systemType is null || systemString is null)
                 {
                     return;
                 }
 
-                ValidateDescriptor(context, systemType, types.AdapterDescriptor);
+                ValidateDescriptor(context, types.AdapterDescriptor, systemType, systemType);
+                ValidateDescriptor(context, types.DescriptorFactory, systemType, systemString);
             }, SymbolKind.NamedType);
         }
 
@@ -80,40 +83,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
         }
 
-        private static void ValidateDescriptor(SymbolAnalysisContext context, INamedTypeSymbol systemType, INamedTypeSymbol? adapterDescriptor)
+        private static void ValidateDescriptor(SymbolAnalysisContext context, INamedTypeSymbol? type, params INamedTypeSymbol[] parameterTypes)
         {
-            if (adapterDescriptor is null)
+            if (type is null)
             {
                 return;
             }
 
-            ValidateAttribute(context, adapterDescriptor);
+            ValidateAttribute(context, type);
 
-            if (adapterDescriptor.InstanceConstructors.Length > 1)
+            if (type.InstanceConstructors.Length > 1)
             {
-                foreach (var location in adapterDescriptor.Locations)
+                foreach (var location in type.Locations)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(ConstructorCountRule, location, adapterDescriptor.ToDisplayString(), 1));
+                    context.ReportDiagnostic(Diagnostic.Create(ConstructorCountRule, location, type.ToDisplayString(), 1));
                 }
             }
 
-            var constructor = adapterDescriptor.InstanceConstructors[0];
+            var constructor = type.InstanceConstructors[0];
 
-            if (constructor.Parameters.Length != 2)
+            if (constructor.Parameters.Length != parameterTypes.Length)
             {
                 foreach (var location in constructor.Locations)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(ParameterCountRule, location, adapterDescriptor.ToDisplayString(), 2));
+                    context.ReportDiagnostic(Diagnostic.Create(ParameterCountRule, location, type.ToDisplayString(), 2));
                 }
             }
 
-            foreach (var p in constructor.Parameters)
+            for (int i = 0; i < Math.Min(constructor.Parameters.Length, parameterTypes.Length); i++)
             {
-                if (!SymbolEqualityComparer.Default.Equals(systemType, p.Type))
+                var p = constructor.Parameters[i];
+                var expectedType = parameterTypes[i];
+
+                if (!SymbolEqualityComparer.Default.Equals(expectedType, p.Type))
                 {
                     foreach (var location in p.Locations)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(ParameterRule, location, adapterDescriptor.ToDisplayString(), systemType.ToDisplayString()));
+                        context.ReportDiagnostic(Diagnostic.Create(ParameterRule, location, type.ToDisplayString(), expectedType.ToDisplayString()));
                     }
                 }
             }
