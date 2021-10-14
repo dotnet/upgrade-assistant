@@ -115,65 +115,110 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adapter descriptor must provide original type and abstraction type..
+        ///   Looks up a localized string similar to Adapter types must be attributes..
         /// </summary>
-        internal static string AdapterDescriptorTypeDescription {
+        internal static string AdapterDescriptorTypeAttributeDescription {
             get {
-                return ResourceManager.GetString("AdapterDescriptorTypeDescription", resourceCulture);
+                return ResourceManager.GetString("AdapterDescriptorTypeAttributeDescription", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}.
+        ///   Looks up a localized string similar to Adapter type {0} must derive from attribute.
         /// </summary>
-        internal static string AdapterDescriptorTypeMessageFormat {
+        internal static string AdapterDescriptorTypeAttributeMessageFormat {
             get {
-                return ResourceManager.GetString("AdapterDescriptorTypeMessageFormat", resourceCulture);
+                return ResourceManager.GetString("AdapterDescriptorTypeAttributeMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adapter descriptor must be an attribute..
+        ///   Looks up a localized string similar to Adapter types must be attributes.
         /// </summary>
-        internal static string AdapterDescriptorTypeMustBeAttribute {
+        internal static string AdapterDescriptorTypeAttributeTitle {
             get {
-                return ResourceManager.GetString("AdapterDescriptorTypeMustBeAttribute", resourceCulture);
+                return ResourceManager.GetString("AdapterDescriptorTypeAttributeTitle", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Descriptor parameters must be a type..
+        ///   Looks up a localized string similar to Adapter types must have correct constructor count..
         /// </summary>
-        internal static string AdapterDescriptorTypeMustBeAType {
+        internal static string AdapterDescriptorTypeConstructorCountDescription {
             get {
-                return ResourceManager.GetString("AdapterDescriptorTypeMustBeAType", resourceCulture);
+                return ResourceManager.GetString("AdapterDescriptorTypeConstructorCountDescription", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must only contain a single constructor..
+        ///   Looks up a localized string similar to Adapter type {0} should only have {1} constructor(s).
         /// </summary>
-        internal static string AdapterDescriptorTypeOnlyOneConstructor {
+        internal static string AdapterDescriptorTypeConstructorCountMessageFormat {
             get {
-                return ResourceManager.GetString("AdapterDescriptorTypeOnlyOneConstructor", resourceCulture);
+                return ResourceManager.GetString("AdapterDescriptorTypeConstructorCountMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adapter descriptor must provide original type and abstraction type.
+        ///   Looks up a localized string similar to Adapter types must have correct constructor count.
         /// </summary>
-        internal static string AdapterDescriptorTypeTitle {
+        internal static string AdapterDescriptorTypeConstructorCountTitle {
             get {
-                return ResourceManager.GetString("AdapterDescriptorTypeTitle", resourceCulture);
+                return ResourceManager.GetString("AdapterDescriptorTypeConstructorCountTitle", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adapter descriptor constructor must have two parameters..
+        ///   Looks up a localized string similar to Adapter attribute constructors must have correct parameter count..
         /// </summary>
-        internal static string AdapterDescriptorTypeTwoParameters {
+        internal static string AdapterDescriptorTypeParameterCountDescription {
             get {
-                return ResourceManager.GetString("AdapterDescriptorTypeTwoParameters", resourceCulture);
+                return ResourceManager.GetString("AdapterDescriptorTypeParameterCountDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter attribute {0} constructor must have {1} parameter(s).
+        /// </summary>
+        internal static string AdapterDescriptorTypeParameterCountMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeParameterCountMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter attribute constructors must have correct parameter count.
+        /// </summary>
+        internal static string AdapterDescriptorTypeParameterCountTitle {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeParameterCountTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter attributes must have correct constructor parameter..
+        /// </summary>
+        internal static string AdapterDescriptorTypeParameterDescription {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeParameterDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter attribute {0} parameter should be of type {1}.
+        /// </summary>
+        internal static string AdapterDescriptorTypeParameterMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeParameterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter attributes must have correct constructor parameter.
+        /// </summary>
+        internal static string AdapterDescriptorTypeParameterTitle {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeParameterTitle", resourceCulture);
             }
         }
         

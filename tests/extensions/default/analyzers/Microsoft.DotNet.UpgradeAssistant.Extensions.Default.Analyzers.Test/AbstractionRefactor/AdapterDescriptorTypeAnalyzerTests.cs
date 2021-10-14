@@ -12,9 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public class AdapterDescriptorTypeAnalyzerTests : AdapterTestBase
     {
-        private const string TwoParameters = "Adapter descriptor constructor must have two parameters.";
-        private const string MustBeAType = "Descriptor parameters must be a type.";
-        private const string MustBeAnAttribute = "Adapter descriptor must be an attribute.";
+        private const string AdapterDescriptorName = "Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute";
+        private const string SystemTypeName = "System.Type";
 
         [Fact]
         public async Task EmptyCode()
@@ -61,7 +60,9 @@ namespace Microsoft.CodeAnalysis.Refactoring
     }
 }";
 
-            var diagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments(MustBeAnAttribute);
+            var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.AttributeDiagnosticId)
+                .WithLocation(0)
+                .WithArguments(AdapterDescriptorName);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
@@ -85,7 +86,9 @@ namespace Microsoft.CodeAnalysis.Refactoring
     }
 }";
 
-            var diagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments(TwoParameters);
+            var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
+                .WithLocation(0)
+                .WithArguments(AdapterDescriptorName, 2);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
@@ -109,8 +112,12 @@ namespace Microsoft.CodeAnalysis.Refactoring
     }
 }";
 
-            var diagnostic1 = VerifyCS.Diagnostic().WithLocation(0).WithArguments(TwoParameters);
-            var diagnostic2 = VerifyCS.Diagnostic().WithLocation(1).WithArguments(MustBeAType);
+            var diagnostic1 = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
+                .WithLocation(0)
+                .WithArguments(AdapterDescriptorName, 2);
+            var diagnostic2 = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterDiagnosticId)
+                .WithLocation(1)
+                .WithArguments(AdapterDescriptorName, SystemTypeName);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic1, diagnostic2)
@@ -131,7 +138,9 @@ namespace Microsoft.CodeAnalysis.Refactoring
     }
 }";
 
-            var diagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments(TwoParameters);
+            var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
+                .WithLocation(0)
+                .WithArguments(AdapterDescriptorName, 2);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
