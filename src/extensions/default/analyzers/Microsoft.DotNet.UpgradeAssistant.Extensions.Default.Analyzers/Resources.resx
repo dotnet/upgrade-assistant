@@ -135,6 +135,27 @@
   <data name="AdapterCallFactoryTitle" xml:space="preserve">
     <value>Call factory method</value>
   </data>
+  <data name="AdapterDescriptorTypeDescription" xml:space="preserve">
+    <value>Adapter descriptor must provide original type and abstraction type.</value>
+  </data>
+  <data name="AdapterDescriptorTypeMessageFormat" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="AdapterDescriptorTypeMustBeAttribute" xml:space="preserve">
+    <value>Adapter descriptor must be an attribute.</value>
+  </data>
+  <data name="AdapterDescriptorTypeMustBeAType" xml:space="preserve">
+    <value>Descriptor parameters must be a type.</value>
+  </data>
+  <data name="AdapterDescriptorTypeOnlyOneConstructor" xml:space="preserve">
+    <value>Must only contain a single constructor.</value>
+  </data>
+  <data name="AdapterDescriptorTypeTitle" xml:space="preserve">
+    <value>Adapter descriptor must provide original type and abstraction type</value>
+  </data>
+  <data name="AdapterDescriptorTypeTwoParameters" xml:space="preserve">
+    <value>Adapter descriptor constructor must have two parameters.</value>
+  </data>
   <data name="AdapterRefactorDescription" xml:space="preserve">
     <value>Refactor usage to another type.</value>
   </data>

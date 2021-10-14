@@ -115,6 +115,69 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Adapter descriptor must provide original type and abstraction type..
+        /// </summary>
+        internal static string AdapterDescriptorTypeDescription {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}.
+        /// </summary>
+        internal static string AdapterDescriptorTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter descriptor must be an attribute..
+        /// </summary>
+        internal static string AdapterDescriptorTypeMustBeAttribute {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeMustBeAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Descriptor parameters must be a type..
+        /// </summary>
+        internal static string AdapterDescriptorTypeMustBeAType {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeMustBeAType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must only contain a single constructor..
+        /// </summary>
+        internal static string AdapterDescriptorTypeOnlyOneConstructor {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeOnlyOneConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter descriptor must provide original type and abstraction type.
+        /// </summary>
+        internal static string AdapterDescriptorTypeTitle {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter descriptor constructor must have two parameters..
+        /// </summary>
+        internal static string AdapterDescriptorTypeTwoParameters {
+            get {
+                return ResourceManager.GetString("AdapterDescriptorTypeTwoParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refactor usage to another type..
         /// </summary>
         internal static string AdapterRefactorDescription {
