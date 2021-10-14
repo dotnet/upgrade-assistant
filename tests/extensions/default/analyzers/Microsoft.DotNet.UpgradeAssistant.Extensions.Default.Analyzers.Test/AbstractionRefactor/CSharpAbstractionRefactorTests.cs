@@ -41,12 +41,12 @@ namespace RefactorTest
                 .RunAsync();
         }
 
-        [Fact]
+        [Fact(Skip = "Not implemented")]
         public async Task IgnoreAttribute()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
-[assembly: Microsoft.CodeAnalysis.AdapterIgnore]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterIgnore]
 
 namespace RefactorTest
 {

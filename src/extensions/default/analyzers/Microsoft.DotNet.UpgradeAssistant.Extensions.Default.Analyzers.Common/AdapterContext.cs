@@ -18,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         public ImmutableHashSet<IAssemblySymbol> IgnoredAssemblies { get; init; } = ImmutableHashSet.Create<IAssemblySymbol>(SymbolEqualityComparer.Default);
 
+        public WellKnownTypes Types { get; init; } = new();
+
         public bool IsFactoryMethod(IMethodSymbol method)
         {
             foreach (var factory in Factories)
@@ -111,7 +113,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// <returns>A collection of adapter descriptors.</returns>
         public AdapterContext FromCompilation(Compilation compilation)
         {
-            var context = FromAssembly(compilation.Assembly);
+            var context = this with
+            {
+                Types = WellKnownTypes.From(compilation)
+            };
+
+            context = context.FromAssembly(compilation.Assembly);
 
             foreach (var reference in compilation.References)
             {
@@ -130,21 +137,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             foreach (var a in assembly.GetAttributes())
             {
-                if (TryParseDescriptor(a, out var descriptor))
+                if (TryParseDescriptor(context.Types, a, out var descriptor))
                 {
                     context = context with
                     {
                         Descriptors = context.Descriptors.Add(descriptor)
                     };
                 }
-                else if (TryParseFactory(a, out var factory))
+                else if (TryParseFactory(context.Types, a, out var factory))
                 {
                     context = context with
                     {
                         Factories = context.Factories.Add(factory)
                     };
                 }
-                else if (IsAssemblyIgnored(a))
+                else if (IsAssemblyIgnored(context.Types, a))
                 {
                     context = context with
                     {
@@ -156,33 +163,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return context;
         }
 
-        private static bool IsAssemblyIgnored(AttributeData a)
-            => string.Equals(a.AttributeClass?.Name, "AdapterIgnore", StringComparison.OrdinalIgnoreCase);
+        private static bool IsAssemblyIgnored(WellKnownTypes types, AttributeData a)
+            => SymbolEqualityComparer.Default.Equals(types.AdapterIgnore, a.AttributeClass);
 
-        private static bool TryParseDescriptor(AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor descriptor)
+        private static bool TryParseDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor descriptor)
         {
-            if (string.Equals(a.AttributeClass?.Name, "AdapterDescriptor", StringComparison.OrdinalIgnoreCase))
+            descriptor = default;
+
+            if (SymbolEqualityComparer.Default.Equals(types.AdapterDescriptor, a.AttributeClass))
             {
                 if (a.ConstructorArguments.Length == 2 &&
-                    a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
-                    a.ConstructorArguments[1].Kind == TypedConstantKind.Type &&
-                    a.ConstructorArguments[0].Value is ITypeSymbol destination &&
-                    a.ConstructorArguments[1].Value is ITypeSymbol concreteType)
+                   a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
+                   a.ConstructorArguments[1].Kind == TypedConstantKind.Type &&
+                   a.ConstructorArguments[0].Value is ITypeSymbol destination &&
+                   a.ConstructorArguments[1].Value is ITypeSymbol concreteType)
                 {
                     descriptor = new AdapterDescriptor(destination, concreteType);
                     return true;
                 }
-
-                // TODO: Raise a diagnostic for invalid cases
             }
 
-            descriptor = default;
             return false;
         }
 
-        private static bool TryParseFactory(AttributeData a, [MaybeNullWhen(false)] out FactoryDescriptor descriptor)
+        private static bool TryParseFactory(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out FactoryDescriptor descriptor)
         {
-            if (string.Equals(a.AttributeClass?.Name, "FactoryDescriptor", StringComparison.OrdinalIgnoreCase))
+            if (SymbolEqualityComparer.Default.Equals(types.DescriptorFactory, a.AttributeClass))
             {
                 if (a.ConstructorArguments.Length == 2 &&
                     a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
@@ -200,8 +206,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                         return true;
                     }
                 }
-
-                // TODO: Raise a diagnostic for invalid cases
             }
 
             descriptor = default;

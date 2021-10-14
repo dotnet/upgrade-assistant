@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
-[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
 namespace RefactorTest
 {
@@ -53,7 +53,7 @@ namespace RefactorTest
 }";
 
             const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
 namespace RefactorTest
 {
@@ -104,7 +104,7 @@ namespace RefactorTest
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
-[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
 namespace RefactorTest
 {
@@ -143,7 +143,7 @@ namespace RefactorTest
 }";
 
             const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
 namespace RefactorTest
 {
@@ -198,7 +198,7 @@ namespace RefactorTest
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
-[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
 namespace RefactorTest
 {
@@ -222,7 +222,7 @@ namespace RefactorTest
 }";
 
             const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.FactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
 namespace RefactorTest
 {

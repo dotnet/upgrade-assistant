@@ -1,8 +1,9 @@
 ﻿using System;
 using HybridExample;
+using Microsoft.CodeAnalysis.Refactoring;
 
 #if NETFRAMEWORK
-[assembly: AdapterDescriptor(typeof(IHttpContext), typeof(System.Web.HttpContext))]
+[assembly: AdapterDescriptor(typeof(IHttpContext))]
 [assembly: AdapterDescriptor(typeof(IHttpContext), typeof(System.Web.HttpContextBase))]
 [assembly: AdapterDescriptor(typeof(IRequest), typeof(System.Web.HttpRequest))]
 [assembly: AdapterDescriptor(typeof(IResponse), typeof(System.Web.HttpResponse))]
@@ -13,20 +14,24 @@ using HybridExample;
 #endif
 
 
-namespace HybridExample
+namespace Microsoft.CodeAnalysis.Refactoring
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    internal sealed class AdapterDescriptor : Attribute
+    internal sealed class AdapterDescriptorAttribute : Attribute
     {
-        public AdapterDescriptor(Type interfaceType, Type original)
+        public AdapterDescriptorAttribute(Type interfaceType)
+        {
+        }
+
+        public AdapterDescriptorAttribute(Type interfaceType, Type original)
         {
         }
     }
 
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    internal sealed class FactoryDescriptor : Attribute
+    internal sealed class FactoryDescriptorAttribute : Attribute
     {
-        public FactoryDescriptor(Type factoryType, string factoryMethod)
+        public FactoryDescriptorAttribute(Type factoryType, string factoryMethod)
         {
         }
     }

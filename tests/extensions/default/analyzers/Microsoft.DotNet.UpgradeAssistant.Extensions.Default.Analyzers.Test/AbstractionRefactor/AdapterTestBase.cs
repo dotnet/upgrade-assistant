@@ -10,22 +10,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         protected const string Attribute = @"
 using System;
 
-namespace Microsoft.CodeAnalysis
+namespace Microsoft.CodeAnalysis.Refactoring
 {
-    public class AdapterIgnore : Attribute
+    public class AdapterIgnoreAttribute : Attribute
     {
     }
 
-    public class AdapterDescriptor : Attribute
+    public class AdapterDescriptorAttribute : Attribute
     {
-        public AdapterDescriptor(Type interfaceType, Type original)
+        public AdapterDescriptorAttribute(Type interfaceType, Type original)
         {
         }
     }
 
-    public class FactoryDescriptor : Attribute
+    public class AdapterFactoryDescriptorAttribute : Attribute
     {
-        public FactoryDescriptor(Type factoryClass, string factoryMethod)
+        public AdapterFactoryDescriptorAttribute(Type factoryClass, string factoryMethod)
         {
         }
     }

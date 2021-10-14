@@ -15,8 +15,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         public string CreateAttributeString(string languageName)
             => languageName switch
             {
-                LanguageNames.VisualBasic => $"<Assembly: Microsoft.CodeAnalysis.AdapterDescriptor(GetType({FullDestination}), GetType({FullOriginal}))>",
-                LanguageNames.CSharp => $"[assembly: global::Microsoft.CodeAnalysis.AdapterDescriptor(typeof({FullDestination}), typeof({FullOriginal}))]",
+                LanguageNames.VisualBasic => $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullDestination}), GetType({FullOriginal}))>",
+                LanguageNames.CSharp => $"[assembly: global::Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof({FullDestination}), typeof({FullOriginal}))]",
                 _ => throw new NotSupportedException(),
             };
     }

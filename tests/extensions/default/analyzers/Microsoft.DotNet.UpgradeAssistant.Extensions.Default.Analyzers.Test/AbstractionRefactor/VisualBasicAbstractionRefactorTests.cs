@@ -202,8 +202,8 @@ End Namespace";
             const string Attribute = @"
 Imports System
 
-Namespace Microsoft.CodeAnalysis
-    Public Class AdapterDescriptor
+Namespace Microsoft.CodeAnalysis.Refactoring
+    Public Class AdapterDescriptorAttribute
         Inherits Attribute
 
         Public Sub New(interfaceType As Type, original As Type)
