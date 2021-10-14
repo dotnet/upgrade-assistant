@@ -12,8 +12,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public class AdapterDescriptorTypeAnalyzerTests : AdapterTestBase
     {
-        private const string AdapterDescriptorName = "Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute";
         private const string SystemTypeName = "System.Type";
+        private const string AdapterDescriptorClassName = "AdapterDescriptorAttribute";
+        private const string AdapterDescriptorFullyQualifiedName = "Microsoft.CodeAnalysis.Refactoring." + AdapterDescriptorClassName;
 
         [Fact]
         public async Task EmptyCode()
@@ -23,46 +24,48 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             await VerifyCS.Create().WithSource(testFile).RunAsync();
         }
 
-        [Fact]
-        public async Task CorrectlyFormed()
+        [InlineData(AdapterDescriptorClassName, SystemTypeName)]
+        [Theory]
+        public async Task CorrectlyFormed(string attributeName, string type2)
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
 namespace Microsoft.CodeAnalysis.Refactoring
-{
-    public class AdapterDescriptorAttribute : Attribute
-    {
-        public AdapterDescriptorAttribute(Type destination, Type original)
-        {
-        }
-    }
-}";
+{{
+    public class {attributeName} : Attribute
+    {{
+        public {attributeName}(Type destination, {type2} original)
+        {{
+        }}
+    }}
+}}";
 
             await VerifyCS.Create()
                 .WithSource(testFile)
                 .RunAsync();
         }
 
-        [Fact]
-        public async Task NotAnAttribute()
+        [InlineData(AdapterDescriptorClassName, SystemTypeName)]
+        [Theory]
+        public async Task NotAnAttribute(string attributeName, string type2)
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
 namespace Microsoft.CodeAnalysis.Refactoring
-{
-    public class {|#0:AdapterDescriptorAttribute|}
-    {
-        public AdapterDescriptorAttribute(Type destination, Type original)
-        {
-        }
-    }
-}";
+{{
+    public class {{|#0:{attributeName}|}}
+    {{
+        public {attributeName}(Type destination, {type2} original)
+        {{
+        }}
+    }}
+}}";
 
             var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.AttributeDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorName);
+                .WithArguments(AdapterDescriptorFullyQualifiedName);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
@@ -70,25 +73,26 @@ namespace Microsoft.CodeAnalysis.Refactoring
                 .RunAsync();
         }
 
-        [Fact]
-        public async Task SingleParameter()
+        [InlineData(AdapterDescriptorClassName)]
+        [Theory]
+        public async Task SingleParameter(string attributeName)
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
 namespace Microsoft.CodeAnalysis.Refactoring
-{
-    public class AdapterDescriptorAttribute : Attribute
-    {
-        public {|#0:AdapterDescriptorAttribute|}(Type type)
-        {
-        }
-    }
-}";
+{{
+    public class {attributeName} : Attribute
+    {{
+        public {{|#0:{attributeName}|}}(Type destination)
+        {{
+        }}
+    }}
+}}";
 
             var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorName, 2);
+                .WithArguments(AdapterDescriptorFullyQualifiedName, 2);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
@@ -96,28 +100,29 @@ namespace Microsoft.CodeAnalysis.Refactoring
                 .RunAsync();
         }
 
-        [Fact]
-        public async Task SingleParameterNotAType()
+        [InlineData(AdapterDescriptorClassName)]
+        [Theory]
+        public async Task SingleParameterNotAType(string attributeName)
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
 namespace Microsoft.CodeAnalysis.Refactoring
-{
-    public class AdapterDescriptorAttribute : Attribute
-    {
-        public {|#0:AdapterDescriptorAttribute|}(string {|#1:type|})
-        {
-        }
-    }
-}";
+{{
+    public class {attributeName} : Attribute
+    {{
+        public {{|#0:{attributeName}|}}(string {{|#1:destination|}})
+        {{
+        }}
+    }}
+}}";
 
             var diagnostic1 = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorName, 2);
+                .WithArguments(AdapterDescriptorFullyQualifiedName, 2);
             var diagnostic2 = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterDiagnosticId)
                 .WithLocation(1)
-                .WithArguments(AdapterDescriptorName, SystemTypeName);
+                .WithArguments(AdapterDescriptorFullyQualifiedName, SystemTypeName);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic1, diagnostic2)
@@ -125,22 +130,23 @@ namespace Microsoft.CodeAnalysis.Refactoring
                 .RunAsync();
         }
 
-        [Fact]
-        public async Task DefaultConstructor()
+        [InlineData(AdapterDescriptorClassName)]
+        [Theory]
+        public async Task DefaultConstructor(string attributeName)
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
 namespace Microsoft.CodeAnalysis.Refactoring
-{
-    public class {|#0:AdapterDescriptorAttribute|} : Attribute
-    {
-    }
-}";
+{{
+    public class {{|#0:{attributeName}|}} : Attribute
+    {{
+    }}
+}}";
 
             var diagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.ParameterCountDiagnosticId)
                 .WithLocation(0)
-                .WithArguments(AdapterDescriptorName, 2);
+                .WithArguments(AdapterDescriptorFullyQualifiedName, 2);
 
             await VerifyCS.Create()
                 .WithExpectedDiagnostics(diagnostic)
