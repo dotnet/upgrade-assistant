@@ -71,14 +71,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             ValidateAttribute(context, adapterDescriptor);
 
-            if (adapterDescriptor.InstanceConstructors.Length != 1)
+            if (adapterDescriptor.InstanceConstructors.Length > 1)
             {
                 foreach (var location in adapterDescriptor.Locations)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(AdapterDescriptorRule, location, Resources.AdapterDescriptorTypeOnlyOneConstructor));
                 }
-
-                return;
             }
 
             var constructor = adapterDescriptor.InstanceConstructors[0];
