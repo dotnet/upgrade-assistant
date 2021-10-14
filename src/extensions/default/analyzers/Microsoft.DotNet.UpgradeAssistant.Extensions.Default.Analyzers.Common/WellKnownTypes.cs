@@ -21,9 +21,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         public INamedTypeSymbol? AdapterIgnore { get; init; }
 
-        public static WellKnownTypes? From(ISymbol? type)
+        public static WellKnownTypes? From(ISymbol? symbol)
         {
-            if (type is not INamedTypeSymbol namedType)
+            if (symbol is null)
+            {
+                return null;
+            }
+
+            if (symbol is IMethodSymbol method)
+            {
+                symbol = method.ContainingType;
+            }
+
+            if (symbol is not INamedTypeSymbol namedType)
             {
                 return null;
             }

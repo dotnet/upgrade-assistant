@@ -223,6 +223,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specified adapter factory must exist..
+        /// </summary>
+        internal static string AdapterFactoryMustExistDescription {
+            get {
+                return ResourceManager.GetString("AdapterFactoryMustExistDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified adapter factory method {0} on type {1} does not exist.
+        /// </summary>
+        internal static string AdapterFactoryMustExistMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterFactoryMustExistMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified adapter factory must exist.
+        /// </summary>
+        internal static string AdapterFactoryMustExistTitle {
+            get {
+                return ResourceManager.GetString("AdapterFactoryMustExistTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refactor usage to another type..
         /// </summary>
         internal static string AdapterRefactorDescription {

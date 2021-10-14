@@ -12,3 +12,4 @@ UA0014d | Refactor | Warning | AdapterDescriptorTypeAnalyzer
 UA0014e | Refactor | Warning | AdapterDescriptorTypeAnalyzer
 UA0014f | Refactor | Warning | AdapterDescriptorTypeAnalyzer
 UA0014g | Refactor | Warning | AdapterDescriptorTypeAnalyzer
+UA0014h | Refactor | Warning | AdapterFactoryDescriptorUsageAnalyzer
