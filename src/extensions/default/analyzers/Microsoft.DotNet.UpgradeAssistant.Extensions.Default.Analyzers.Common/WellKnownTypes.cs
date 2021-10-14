@@ -8,11 +8,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     public record WellKnownTypes
     {
+        private const string AdapterDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute";
+        private const string FactoryDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptorAttribute";
+        private const string IgnoreFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterIgnoreAttribute";
+
+        private static readonly SymbolDisplayFormat DisplayFormat = SymbolDisplayFormat.FullyQualifiedFormat
+            .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
+
         public INamedTypeSymbol? AdapterDescriptor { get; init; }
 
         public INamedTypeSymbol? DescriptorFactory { get; init; }
 
         public INamedTypeSymbol? AdapterIgnore { get; init; }
+
+        public static WellKnownTypes? From(ISymbol? type)
+        {
+            if (type is not INamedTypeSymbol namedType)
+            {
+                return null;
+            }
+
+            return namedType.ToDisplayString(DisplayFormat) switch
+            {
+                AdapterDescriptorFullyQualified => new() { AdapterDescriptor = namedType },
+                FactoryDescriptorFullyQualified => new() { DescriptorFactory = namedType },
+                IgnoreFullyQualified => new() { AdapterIgnore = namedType },
+                _ => null,
+            };
+        }
 
         public static WellKnownTypes From(Compilation compilation)
         {
@@ -23,9 +46,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             return new()
             {
-                AdapterDescriptor = compilation.GetTypeByMetadataName("Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute"),
-                DescriptorFactory = compilation.GetTypeByMetadataName("Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptorAttribute"),
-                AdapterIgnore = compilation.GetTypeByMetadataName("Microsoft.CodeAnalysis.Refactoring.AdapterIgnoreAttribute"),
+                AdapterDescriptor = compilation.GetTypeByMetadataName(AdapterDescriptorFullyQualified),
+                DescriptorFactory = compilation.GetTypeByMetadataName(FactoryDescriptorFullyQualified),
+                AdapterIgnore = compilation.GetTypeByMetadataName(IgnoreFullyQualified),
             };
         }
     }

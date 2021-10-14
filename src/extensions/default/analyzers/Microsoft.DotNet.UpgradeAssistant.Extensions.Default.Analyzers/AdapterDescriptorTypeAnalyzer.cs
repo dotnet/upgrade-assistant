@@ -29,9 +29,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterCompilationAction(context =>
+            context.RegisterSymbolAction(context =>
             {
-                var types = WellKnownTypes.From(context.Compilation);
+                var types = WellKnownTypes.From(context.Symbol);
+
+                if (types is null)
+                {
+                    return;
+                }
 
                 var systemType = context.Compilation.GetTypeByMetadataName("System.Type");
 
@@ -41,10 +46,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 }
 
                 ValidateDescriptor(context, systemType, types.AdapterDescriptor);
-            });
+            }, SymbolKind.NamedType);
         }
 
-        private static void ValidateAttribute(CompilationAnalysisContext context, INamedTypeSymbol adapterDescriptor)
+        private static void ValidateAttribute(SymbolAnalysisContext context, INamedTypeSymbol adapterDescriptor)
         {
             var attribute = context.Compilation.GetTypeByMetadataName("System.Attribute");
 
@@ -57,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
         }
 
-        private static void ValidateDescriptor(CompilationAnalysisContext context, INamedTypeSymbol systemType, INamedTypeSymbol? adapterDescriptor)
+        private static void ValidateDescriptor(SymbolAnalysisContext context, INamedTypeSymbol systemType, INamedTypeSymbol? adapterDescriptor)
         {
             if (adapterDescriptor is null)
             {
