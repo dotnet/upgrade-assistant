@@ -17,8 +17,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         public ImmutableArray<FactoryDescriptor> Factories { get; init; } = ImmutableArray.Create<FactoryDescriptor>();
 
-        public ImmutableHashSet<IAssemblySymbol> IgnoredAssemblies { get; init; } = ImmutableHashSet.Create<IAssemblySymbol>(SymbolEqualityComparer.Default);
-
         public WellKnownTypes Types { get; init; } = new();
 
         public bool IsFactoryMethod(IMethodSymbol method)
@@ -71,11 +69,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             if (symbol is null)
             {
                 return false;
-            }
-
-            if (symbol is IAssemblySymbol assembly && IgnoredAssemblies.Contains(assembly))
-            {
-                return true;
             }
 
             if (symbol is IMethodSymbol methodSymbol)
@@ -152,20 +145,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                         Factories = context.Factories.Add(factory)
                     };
                 }
-                else if (IsAssemblyIgnored(context.Types, a))
-                {
-                    context = context with
-                    {
-                        IgnoredAssemblies = context.IgnoredAssemblies.Add(assembly)
-                    };
-                }
             }
 
             return context;
         }
-
-        private static bool IsAssemblyIgnored(WellKnownTypes types, AttributeData a)
-            => SymbolEqualityComparer.Default.Equals(types.AdapterIgnore, a.AttributeClass);
 
         private static bool TryParseDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor descriptor)
         {

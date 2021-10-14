@@ -12,10 +12,6 @@ using System;
 
 namespace Microsoft.CodeAnalysis.Refactoring
 {
-    public class AdapterIgnoreAttribute : Attribute
-    {
-    }
-
     public class AdapterDescriptorAttribute : Attribute
     {
         public AdapterDescriptorAttribute(Type interfaceType, Type original)

@@ -41,36 +41,6 @@ namespace RefactorTest
                 .RunAsync();
         }
 
-        [Fact(Skip = "Not implemented")]
-        public async Task IgnoreAttribute()
-        {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
-            var testFile = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterIgnore]
-
-namespace RefactorTest
-{
-    public static class Test
-    {
-        public static void Helper(SomeClass c)
-        {
-        }
-    }
-
-    public class SomeClass
-    {
-    }
-
-    public interface ISome
-    {
-    }
-}";
-
-            await CreateTest(refactor, withFix: false)
-                .WithSource(testFile)
-                .RunAsync();
-        }
-
         [Fact]
         public async Task SingleChange()
         {

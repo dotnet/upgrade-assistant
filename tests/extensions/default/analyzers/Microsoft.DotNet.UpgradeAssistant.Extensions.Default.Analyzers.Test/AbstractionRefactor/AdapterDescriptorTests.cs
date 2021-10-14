@@ -59,9 +59,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
             Assert.Empty(compilation.GetParseDiagnostics());
             Assert.Empty(compilation.GetDiagnostics());
 
-            Assert.False(context.Ignore(compilation.Assembly));
-            Assert.True(context.Ignore(compilation.References.Select(compilation.GetAssemblyOrModuleSymbol).OfType<ISourceAssemblySymbol>().Single()));
-
             var expectedOriginal = compilation.GetTypeByMetadataName(descriptor.FullOriginal);
             var expectedDestination = compilation.GetTypeByMetadataName(descriptor.FullDestination);
 
@@ -89,8 +86,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         {
             var descriptor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
             var testFile = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterIgnore]
-
 namespace RefactorTest
 {
     public class SomeClass

@@ -10,7 +10,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     {
         private const string AdapterDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute";
         private const string FactoryDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptorAttribute";
-        private const string IgnoreFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterIgnoreAttribute";
 
         private static readonly SymbolDisplayFormat DisplayFormat = SymbolDisplayFormat.FullyQualifiedFormat
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
@@ -18,8 +17,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         public INamedTypeSymbol? AdapterDescriptor { get; init; }
 
         public INamedTypeSymbol? DescriptorFactory { get; init; }
-
-        public INamedTypeSymbol? AdapterIgnore { get; init; }
 
         public static WellKnownTypes? From(ISymbol? symbol)
         {
@@ -42,7 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 AdapterDescriptorFullyQualified => new() { AdapterDescriptor = namedType },
                 FactoryDescriptorFullyQualified => new() { DescriptorFactory = namedType },
-                IgnoreFullyQualified => new() { AdapterIgnore = namedType },
                 _ => null,
             };
         }
@@ -58,7 +54,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 AdapterDescriptor = compilation.GetTypeByMetadataName(AdapterDescriptorFullyQualified),
                 DescriptorFactory = compilation.GetTypeByMetadataName(FactoryDescriptorFullyQualified),
-                AdapterIgnore = compilation.GetTypeByMetadataName(IgnoreFullyQualified),
             };
         }
     }
