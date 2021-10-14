@@ -113,6 +113,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("AdapterCallFactoryTitle", resourceCulture);
             }
         }
+    
+        /// <summary>
+        ///   Looks up a localized string similar to Refactor usage to another type..
+        /// </summary>
+        internal static string AdapterDefinitionDescription {
+            get {
+                return ResourceManager.GetString("AdapterDefinitionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refactor usage of type {0} to {1}.
+        /// </summary>
+        internal static string AdapterDefinitionMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterDefinitionMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refactor usage of type to another type.
+        /// </summary>
+        internal static string AdapterDefinitionTitle {
+            get {
+                return ResourceManager.GetString("AdapterDefinitionTitle", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Adapter types must be attributes..

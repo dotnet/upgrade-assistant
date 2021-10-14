@@ -22,10 +22,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return test;
         }
 
-        public static TTest WithFixed<TTest>(this TTest test, string fixedCode)
+        public static TTest WithFixed<TTest>(this TTest test, string fixedCode, string? name = null)
             where TTest : ICodeFixTest
         {
-            test.FixedState.Sources.Add(fixedCode);
+            if (name is not null)
+            {
+                test.FixedState.Sources.Add((name, fixedCode));
+            }
+            else
+            {
+                test.FixedState.Sources.Add(fixedCode);
+            }
+
             return test;
         }
 

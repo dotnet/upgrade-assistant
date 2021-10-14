@@ -17,6 +17,10 @@ namespace Microsoft.CodeAnalysis.Refactoring
         public AdapterDescriptorAttribute(Type interfaceType, Type original)
         {
         }
+
+        public AdapterDescriptorAttribute(Type original)
+        {
+        }
     }
 
     public class AdapterFactoryDescriptorAttribute : Attribute

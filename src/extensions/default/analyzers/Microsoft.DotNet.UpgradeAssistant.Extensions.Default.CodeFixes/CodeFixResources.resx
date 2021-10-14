@@ -175,4 +175,7 @@
   <data name="AdapterCallFactoryTitle" xml:space="preserve">
     <value>Call factory method for abstraction</value>
   </data>
+  <data name="AdapterDefinitionTitle" xml:space="preserve">
+    <value>Create abstraction for definition</value>
+  </data>
 </root>
