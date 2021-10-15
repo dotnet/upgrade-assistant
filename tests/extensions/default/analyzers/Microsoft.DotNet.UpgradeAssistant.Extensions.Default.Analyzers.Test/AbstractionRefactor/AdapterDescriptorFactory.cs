@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
-    public record AdapterDescriptorFactory(string Namespace, string Original, string? Destination)
+    public record AdapterDescriptorFactory(string Namespace, string Original, string Destination)
     {
         public string FullDestination => $"{Namespace}.{Destination}";
 
