@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 _ => throw new NotSupportedException(),
             };
 
-        private string CreateVBAttributeString() => Destination is null 
+        private string CreateVBAttributeString() => Destination is null
             ? $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullOriginal}))>"
             : $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullOriginal}), GetType({FullDestination}))>";
 

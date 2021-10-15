@@ -17,12 +17,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         public const string RefactorDiagnosticId = "UA0014";
         public const string AddMemberDiagnosticId = "UA0014b";
         public const string CallFactoryDiagnosticId = "UA0014c";
+        public const string StaticMemberDiagnosticId = "UA0014k";
 
         private const string Category = "Refactor";
 
         private static readonly LocalizableString RefactorTitle = new LocalizableResourceString(nameof(Resources.AdapterRefactorTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString RefactorMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterRefactorMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString RefactorDescription = new LocalizableResourceString(nameof(Resources.AdapterRefactorDescription), Resources.ResourceManager, typeof(Resources));
+
+        private static readonly LocalizableString StaticMemberTitle = new LocalizableResourceString(nameof(Resources.AdapterStaticMemberTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString StaticMemberMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterStaticMemberMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString StaticMemberDescription = new LocalizableResourceString(nameof(Resources.AdapterStaticMemberDescription), Resources.ResourceManager, typeof(Resources));
 
         private static readonly LocalizableString AddMemberTitle = new LocalizableResourceString(nameof(Resources.AdapterAddMemberTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString AddMemberMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterAddMemberMessageFormat), Resources.ResourceManager, typeof(Resources));
@@ -33,10 +38,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString CallFactoryDescription = new LocalizableResourceString(nameof(Resources.AdapterCallFactoryDescription), Resources.ResourceManager, typeof(Resources));
 
         private static readonly DiagnosticDescriptor RefactorRule = new(RefactorDiagnosticId, RefactorTitle, RefactorMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: RefactorDescription);
+        private static readonly DiagnosticDescriptor StaticMemberRule = new(StaticMemberDiagnosticId, StaticMemberTitle, StaticMemberMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: StaticMemberDescription);
         private static readonly DiagnosticDescriptor AddMemberRule = new(AddMemberDiagnosticId, AddMemberTitle, AddMemberMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AddMemberDescription);
         private static readonly DiagnosticDescriptor CallFactoryRule = new(CallFactoryDiagnosticId, CallFactoryTitle, CallFactoryMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: CallFactoryDescription);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(RefactorRule, AddMemberRule, CallFactoryRule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(RefactorRule, AddMemberRule, CallFactoryRule, StaticMemberRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -55,11 +61,41 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 RegisterAddMemberActions(adapterContext, context);
                 RegisterAdapterActions(adapterContext, context);
                 RegisterCallFactoryActions(adapterContext, context);
+                RegisterStaticMemberActions(adapterContext, context);
             });
+        }
+
+        private static void RegisterStaticMemberActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
+        {
+            if (adapterContext.StaticMemberDescriptors.IsEmpty)
+            {
+                return;
+            }
+
+            context.RegisterOperationAction(context =>
+            {
+                if (context.Operation.Parent.Kind == OperationKind.NameOf)
+                {
+                    return;
+                }
+
+                var operation = (IPropertyReferenceOperation)context.Operation;
+                var descriptor = adapterContext.GetStaticMemberDescriptor(operation.Property);
+
+                if (descriptor is not null)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(StaticMemberRule, context.Operation.Syntax.GetLocation(), properties: descriptor.Properties, descriptor.Original.ToDisplayString(), descriptor.Destination.ToDisplayString()));
+                }
+            }, OperationKind.PropertyReference);
         }
 
         private static void RegisterAddMemberActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
         {
+            if (adapterContext.TypeDescriptors.IsEmpty)
+            {
+                return;
+            }
+
             context.RegisterOperationAction(context =>
             {
                 if (context.Operation.GetEnclosingMethod() is IMethodSymbol enclosing && adapterContext.IsFactoryMethod(enclosing))
@@ -87,7 +123,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                         if (adapter.Destination.GetMembers(member.Name).Length == 0)
                         {
                             var properties = adapter.Properties
-                                .WithMissingMember(member);
+                                .WithSymbol(member);
 
                             context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, context.Operation.Syntax.GetLocation(), properties: properties, member.Name, adapter.Destination));
                         }

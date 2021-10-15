@@ -178,4 +178,7 @@
   <data name="AdapterDefinitionTitle" xml:space="preserve">
     <value>Create abstraction for definition</value>
   </data>
+  <data name="AdapterStaticMemberTitle" xml:space="preserve">
+    <value>Redirect static member access to alternate member</value>
+  </data>
 </root>

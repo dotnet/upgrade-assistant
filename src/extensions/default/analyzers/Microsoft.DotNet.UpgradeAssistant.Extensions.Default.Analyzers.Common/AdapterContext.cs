@@ -36,6 +36,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return false;
         }
 
+        public AdapterDescriptor<ISymbol>? GetStaticMemberDescriptor(ISymbol symbol)
+        {
+            foreach (var descriptor in StaticMemberDescriptors)
+            {
+                if (SymbolEqualityComparer.Default.Equals(descriptor.Original, symbol))
+                {
+                    return descriptor;
+                }
+            }
+
+            return null;
+        }
+
         public IMethodSymbol? GetFactory(ITypeSymbol type)
         {
             foreach (var factory in Factories)
@@ -89,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return false;
         }
 
-        public bool IsAvailable => TypeDescriptors.Length > 0;
+        public bool IsAvailable => TypeDescriptors.Length > 0 || StaticMemberDescriptors.Length > 0;
 
         public static AdapterContext Create() => new();
 
@@ -169,15 +182,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                    a.ConstructorArguments[1].Kind == TypedConstantKind.Primitive &&
                    a.ConstructorArguments[2].Kind == TypedConstantKind.Type &&
                    a.ConstructorArguments[3].Kind == TypedConstantKind.Primitive &&
-                   a.ConstructorArguments[0].Value is ITypeSymbol destinationType &&
-                   a.ConstructorArguments[1].Value is string destinationMember &&
-                   a.ConstructorArguments[2].Value is ITypeSymbol concreteType &&
-                   a.ConstructorArguments[1].Value is string concreteMember)
+                   a.ConstructorArguments[0].Value is ITypeSymbol concreteType &&
+                   a.ConstructorArguments[1].Value is string concreteMember &&
+                   a.ConstructorArguments[2].Value is ITypeSymbol destinationType &&
+                   a.ConstructorArguments[3].Value is string destinationMember)
                 {
                     if (destinationType.GetMembers(destinationMember).FirstOrDefault() is ISymbol destinationSymbol &&
                         concreteType.GetMembers(concreteMember).FirstOrDefault() is ISymbol concreteSymbol)
                     {
-                        descriptor = new(destinationSymbol, concreteSymbol);
+                        descriptor = new(concreteSymbol, destinationSymbol);
                         return true;
                     }
                 }

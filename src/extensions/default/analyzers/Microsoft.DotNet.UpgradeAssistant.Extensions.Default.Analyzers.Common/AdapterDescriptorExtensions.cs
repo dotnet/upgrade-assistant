@@ -12,15 +12,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     public static class AdapterDescriptorExtensions
     {
         private const string ExpectedTypeKey = nameof(ExpectedTypeKey);
-        private const string MissingMethodTypeKey = nameof(MissingMethodTypeKey);
-        private const string MissingMethodKey = nameof(MissingMethodKey);
-        private const string MissingMethodNameKey = nameof(MissingMethodNameKey);
+        private const string MemberTypeKey = nameof(MemberTypeKey);
+        private const string MemberKey = nameof(MemberKey);
+        private const string MemberNameKey = nameof(MemberNameKey);
 
         private static readonly SymbolDisplayFormat RoundtripMethodFormat = SymbolDisplayFormat.FullyQualifiedFormat
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
-        public static ImmutableDictionary<string, string?> WithMissingType(this ImmutableDictionary<string, string?> properties, ISymbol symbol)
-            => properties.Add(ExpectedTypeKey, symbol.ToDisplayString(RoundtripMethodFormat));
+        public static ImmutableDictionary<string, string?> WithSymbol(this ImmutableDictionary<string, string?> properties, ISymbol symbol)
+        {
+            if (symbol is INamedTypeSymbol namedType)
+            {
+                return properties.Add(ExpectedTypeKey, namedType.ToDisplayString(RoundtripMethodFormat));
+            }
+            else if (symbol is IPropertySymbol || symbol is IMethodSymbol)
+            {
+                return properties
+                    .Add(MemberNameKey, symbol.Name)
+                    .Add(MemberKey, symbol.ToDisplayString(RoundtripMethodFormat))
+                    .Add(MemberTypeKey, symbol.ContainingType.ToDisplayString(RoundtripMethodFormat));
+            }
+
+            return properties;
+        }
 
         public static bool TryGetExpectedType(this ImmutableDictionary<string, string?> dictionary, SemanticModel semantic, [MaybeNullWhen(false)] out INamedTypeSymbol namedType)
         {
@@ -37,17 +51,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return false;
         }
 
-        public static ImmutableDictionary<string, string?> WithMissingMember(this ImmutableDictionary<string, string?> properties, ISymbol symbol)
-            => properties
-                .Add(MissingMethodNameKey, symbol.Name)
-                .Add(MissingMethodKey, symbol.ToDisplayString(RoundtripMethodFormat))
-                .Add(MissingMethodTypeKey, symbol.ContainingType.ToDisplayString(RoundtripMethodFormat));
-
         public static bool TryGetMissingMember(this ImmutableDictionary<string, string?> dictionary, SemanticModel model, [MaybeNullWhen(false)] out ISymbol method)
         {
-            if (dictionary.TryGetValue(MissingMethodKey, out var missingMethod) && missingMethod is not null &&
-                dictionary.TryGetValue(MissingMethodTypeKey, out var missingMethodType) && missingMethodType is not null &&
-                dictionary.TryGetValue(MissingMethodNameKey, out var missingMethodName) && missingMethodName is not null)
+            if (dictionary.TryGetValue(MemberKey, out var missingMethod) && missingMethod is not null &&
+                dictionary.TryGetValue(MemberTypeKey, out var missingMethodType) && missingMethodType is not null &&
+                dictionary.TryGetValue(MemberNameKey, out var missingMethodName) && missingMethodName is not null)
             {
                 if (model.Compilation.GetTypeByMetadataName(missingMethodType) is INamedTypeSymbol type)
                 {

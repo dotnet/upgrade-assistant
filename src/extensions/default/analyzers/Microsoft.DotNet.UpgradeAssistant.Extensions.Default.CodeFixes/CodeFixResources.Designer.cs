@@ -77,9 +77,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
                 return ResourceManager.GetString("AdapterCallFactoryTitle", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Call factory method for abstraction.
+        ///   Looks up a localized string similar to Create abstraction for definition.
         /// </summary>
         internal static string AdapterDefinitionTitle {
             get {
@@ -93,6 +93,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         internal static string AdapterRefactorTitle {
             get {
                 return ResourceManager.GetString("AdapterRefactorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redirect static member access to alternate member.
+        /// </summary>
+        internal static string AdapterStaticMemberTitle {
+            get {
+                return ResourceManager.GetString("AdapterStaticMemberTitle", resourceCulture);
             }
         }
         

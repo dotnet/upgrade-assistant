@@ -113,9 +113,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("AdapterCallFactoryTitle", resourceCulture);
             }
         }
-    
+        
         /// <summary>
-        ///   Looks up a localized string similar to Refactor usage to another type..
+        ///   Looks up a localized string similar to Adapter definition..
         /// </summary>
         internal static string AdapterDefinitionDescription {
             get {
@@ -124,7 +124,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Refactor usage of type {0} to {1}.
+        ///   Looks up a localized string similar to Adapter definition for {0}.
         /// </summary>
         internal static string AdapterDefinitionMessageFormat {
             get {
@@ -133,7 +133,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Refactor usage of type to another type.
+        ///   Looks up a localized string similar to Adapter definition.
         /// </summary>
         internal static string AdapterDefinitionTitle {
             get {
@@ -327,6 +327,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         internal static string AdapterRefactorTitle {
             get {
                 return ResourceManager.GetString("AdapterRefactorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redirect static member access to alternate member..
+        /// </summary>
+        internal static string AdapterStaticMemberDescription {
+            get {
+                return ResourceManager.GetString("AdapterStaticMemberDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change call from {0} to {1}.
+        /// </summary>
+        internal static string AdapterStaticMemberMessageFormat {
+            get {
+                return ResourceManager.GetString("AdapterStaticMemberMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Redirect static member access to alternate member.
+        /// </summary>
+        internal static string AdapterStaticMemberTitle {
+            get {
+                return ResourceManager.GetString("AdapterStaticMemberTitle", resourceCulture);
             }
         }
         

@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 if (_properties is null)
                 {
                     Interlocked.Exchange(ref _properties, ImmutableDictionary.Create<string, string?>()
-                        .WithMissingType(Destination));
+                        .WithSymbol(Destination));
                 }
 
                 return _properties!;
