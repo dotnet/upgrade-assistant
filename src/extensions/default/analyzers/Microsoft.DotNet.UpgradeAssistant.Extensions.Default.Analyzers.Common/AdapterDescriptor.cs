@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
-    public record AdapterDescriptor<TSymbol>(TSymbol Destination, TSymbol Original)
+    public record AdapterDescriptor<TSymbol>(TSymbol Original, TSymbol Destination)
         where TSymbol : ISymbol
     {
         private string? _originalMessage;

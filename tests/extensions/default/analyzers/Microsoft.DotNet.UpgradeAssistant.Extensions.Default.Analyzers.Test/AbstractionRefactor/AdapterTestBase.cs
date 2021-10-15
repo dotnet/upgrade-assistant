@@ -21,11 +21,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
 
     public class AdapterDescriptorAttribute : Attribute
     {
-        public AdapterDescriptorAttribute(Type interfaceType, Type original)
-        {
-        }
-
-        public AdapterDescriptorAttribute(Type original)
+        public AdapterDescriptorAttribute(Type original, Type interfaceType = null)
         {
         }
     }

@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         [Fact]
         public async Task ArgumentToMethod()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 [assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
@@ -102,7 +102,7 @@ namespace RefactorTest
         [Fact]
         public async Task LocalVariableCallFactory()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 [assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 
@@ -196,7 +196,7 @@ namespace RefactorTest
         [Fact]
         public async Task ReturnTypeChanges()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 [assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
 

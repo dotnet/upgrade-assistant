@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
 
         private async Task<(AdapterDescriptorFactory Factory, Project Project)> AddDescriptorProject(AdhocWorkspace ws)
         {
-            var descriptor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var descriptor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 namespace RefactorTest
 {

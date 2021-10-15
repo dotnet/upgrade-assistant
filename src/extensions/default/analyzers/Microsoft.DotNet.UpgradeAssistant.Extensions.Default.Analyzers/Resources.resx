@@ -132,7 +132,7 @@
   <data name="AdapterCallFactoryMessageFormat" xml:space="preserve">
     <value>Call factory method to convert {0} to {1}</value>
   </data>
-  <data name="AdapterCallFactoryTitle" xml:space="preserve">
+  <data name="AdapterDefinitionTitle" xml:space="preserve">
     <value>Adapter definition</value>
   </data>
   <data name="AdapterDefinitionDescription" xml:space="preserve">

@@ -99,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         /// <![CDATA[
         /// public class AdapterDescriptor : Attribute
         /// {
-        ///     public AdapterDescriptor(Type interfaceType, Type concreteType)
+        ///     public AdapterDescriptor(Type concreteType, Type? interfaceType)
         ///     {
         ///     }
         /// } ]]>
@@ -195,10 +195,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 if (a.ConstructorArguments.Length == 2 &&
                    a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
                    a.ConstructorArguments[1].Kind == TypedConstantKind.Type &&
-                   a.ConstructorArguments[0].Value is ITypeSymbol destination &&
-                   a.ConstructorArguments[1].Value is ITypeSymbol concreteType)
+                   a.ConstructorArguments[0].Value is ITypeSymbol concreteType &&
+                   a.ConstructorArguments[1].Value is ITypeSymbol destination)
                 {
-                    descriptor = new(destination, concreteType);
+                    descriptor = new(concreteType, destination);
                     return true;
                 }
             }

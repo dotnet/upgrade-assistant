@@ -57,20 +57,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                             // Update attribute
                             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
                             var interfaceName = $"I{typeToReplace.Name}";
-                            var fullyQualifiedInterfaceName = typeToReplace
-                                .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted))
-                                .Replace(typeToReplace.Name, interfaceName);
+                            var project = context.Document.Project;
+                            var defaultNamespace = project.DefaultNamespace ?? project.Name;
+                            var fullyQualifiedInterfaceName = $"{defaultNamespace}.{interfaceName}";
 
                             var newArg = editor.Generator.AttributeArgument(
                                 editor.Generator.TypeOfExpression(
                                     editor.Generator.QualifiedName(
-                                        editor.Generator.NameExpression(typeToReplace.ContainingNamespace),
+                                        editor.Generator.IdentifierName(defaultNamespace),
                                         editor.Generator.IdentifierName(interfaceName))));
 
-                            var newNode = editor.Generator.InsertAttributeArguments(node, 0, new[] { newArg });
+                            var newNode = editor.Generator.InsertAttributeArguments(node, 1, new[] { newArg });
                             editor.ReplaceNode(node, newNode);
 
-                            var project = editor.GetChangedDocument().Project;
+                            project = editor.GetChangedDocument().Project;
 
                             if (semantic.Compilation.GetTypeByMetadataName(fullyQualifiedInterfaceName) is not null)
                             {
@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
 
                             var interfaceDeclaration = editor.Generator.InterfaceDeclaration(interfaceName, accessibility: Accessibility.Public);
                             var namespaceDeclaration = editor.Generator.NamespaceDeclaration(
-                                editor.Generator.NameExpression(typeToReplace.ContainingNamespace),
+                                editor.Generator.IdentifierName(defaultNamespace),
                                 interfaceDeclaration);
 
                             // Add the interface declaration to the abstractions project

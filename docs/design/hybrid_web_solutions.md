@@ -18,7 +18,7 @@ The adapter pattern is ideal for this situation, in that we can create an adapte
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 internal sealed class AdapterDescriptor : Attribute
 {
-    public AdapterDescriptor(Type interfaceType, Type original)
+    public AdapterDescriptor(Type original, Type? interfaceType)
     {
     }
 }
@@ -27,9 +27,9 @@ internal sealed class AdapterDescriptor : Attribute
 This can then be used to register what expected adapters should be. Assuming the following interfaces are defined (see the example below for how this may be set up), the adapters may be registered as follows:
 
 ```csharp
-[assembly: AdapterDescriptor(typeof(IHttpContext), typeof(System.Web.HttpContext))]
-[assembly: AdapterDescriptor(typeof(IHttpContext), typeof(System.Web.HttpContextBase))]
-[assembly: AdapterDescriptor(typeof(IRequest), typeof(System.Web.HttpRequest))]
+[assembly: AdapterDescriptor(typeof(System.Web.HttpContext), typeof(IHttpContext))]
+[assembly: AdapterDescriptor(typeof(System.Web.HttpContextBase), typeof(IHttpContext))]
+[assembly: AdapterDescriptor(typeof(System.Web.HttpRequest), typeof(IRequest))]
 ```
 
 Now, the analyze `UA0014` will start flaggin any usage of the types on the right hand side and will offer to replace them with the abstraction desired. This can be applied at the scope of document/project/solution level.
@@ -97,10 +97,10 @@ This process should be applied to a project *before* attempting to migrate to .N
 4. Annotate the assembly with the `HttpContextHelper` type with `AdapterDescriptor` attributes:
 
     ```csharp
-    [assembly: AdapterDescriptor(typeof(IHttpContext)), typeof(System.Web.HttpContext))]
-    [assembly: AdapterDescriptor(typeof(IHttpContext)), typeof(System.Web.HttpContextBase))]
-    [assembly: AdapterDescriptor(typeof(IHttpRequest)), typeof(System.Web.HttpRequest))]
-    [assembly: AdapterDescriptor(typeof(IHttpResponse)), typeof(System.Web.HttpResponse))]
+    [assembly: AdapterDescriptor(typeof(System.Web.HttpContext), typeof(IHttpContext))]
+    [assembly: AdapterDescriptor(typeof(System.Web.HttpContextBase), typeof(IHttpContext))]
+    [assembly: AdapterDescriptor(typeof(System.Web.HttpRequest), typeof(IHttpRequest))]
+    [assembly: AdapterDescriptor(typeof(System.Web.HttpResponse), typeof(IHttpResponse))]
     ```
 
 5. Run UA0014 that will replace all parameters, return types, fields, and properties with the appropriate interface

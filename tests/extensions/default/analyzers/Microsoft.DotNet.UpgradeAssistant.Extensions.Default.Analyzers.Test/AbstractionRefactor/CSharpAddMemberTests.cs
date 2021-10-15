@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         [Fact]
         public async Task WithMethodAccess()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 namespace RefactorTest
 {
@@ -72,7 +72,7 @@ namespace RefactorTest
         [Fact]
         public async Task IgnoreStaticMethods()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 namespace RefactorTest
 {
@@ -102,7 +102,7 @@ namespace RefactorTest
         [Fact]
         public async Task WithPropertyAccess()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 namespace RefactorTest
 {
@@ -159,7 +159,7 @@ namespace RefactorTest
         [Fact]
         public async Task WithMemberAccessUsingConcreteTypeAsReturn()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 namespace RefactorTest
 {
@@ -217,7 +217,7 @@ namespace RefactorTest
         [Fact]
         public async Task WithMemberAccessUsingConcreteTypeParameter()
         {
-            var refactor = new AdapterDescriptorFactory("RefactorTest", "ISome", "SomeClass");
+            var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
             var testFile = @"
 namespace RefactorTest
 {

@@ -17,9 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
         public async Task CanGenerateInterfaceStub()
         {
             var testFile = @"
-[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(RefactorTest.SomeClass))|}]
+[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass))|}]
 
-namespace RefactorTest
+namespace TestProject
 {
     public class Test
     {
@@ -36,9 +36,9 @@ namespace RefactorTest
 }";
 
             const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(RefactorTest.ISomeClass), typeof(RefactorTest.SomeClass))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass), typeof(TestProject.ISomeClass))]
 
-namespace RefactorTest
+namespace TestProject
 {
     public class Test
     {
@@ -54,14 +54,14 @@ namespace RefactorTest
     }
 }";
 
-            const string interfaceDefinition = @"namespace RefactorTest
+            const string interfaceDefinition = @"namespace TestProject
 {
     public interface ISomeClass
     {
     }
 }";
 
-            var diagnostic = VerifyCS.Diagnostic(AdapterDefinitionAnalyzer.DefinitionDiagnosticId).WithLocation(0).WithArguments("RefactorTest.SomeClass");
+            var diagnostic = VerifyCS.Diagnostic(AdapterDefinitionAnalyzer.DefinitionDiagnosticId).WithLocation(0).WithArguments("TestProject.SomeClass");
             await CreateTest(VerifyCS.Create(), null)
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(diagnostic)
@@ -74,9 +74,9 @@ namespace RefactorTest
         public async Task DoesNothingIfInterfaceStubExists()
         {
             var testFile = @"
-[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(RefactorTest.SomeClass))|}]
+[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass))|}]
 
-namespace RefactorTest
+namespace TestProject
 {
     public class Test
     {
@@ -97,9 +97,9 @@ namespace RefactorTest
 }";
 
             const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(RefactorTest.ISomeClass), typeof(RefactorTest.SomeClass))]
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass), typeof(TestProject.ISomeClass))]
 
-namespace RefactorTest
+namespace TestProject
 {
     public class Test
     {
@@ -119,11 +119,77 @@ namespace RefactorTest
     }
 }";
 
-            var diagnostic = VerifyCS.Diagnostic(AdapterDefinitionAnalyzer.DefinitionDiagnosticId).WithLocation(0).WithArguments("RefactorTest.SomeClass");
+            var diagnostic = VerifyCS.Diagnostic(AdapterDefinitionAnalyzer.DefinitionDiagnosticId).WithLocation(0).WithArguments("TestProject.SomeClass");
             await CreateTest(VerifyCS.Create(), null)
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(diagnostic)
                 .WithFixed(withFix)
+                .RunAsync();
+        }
+
+        [Fact]
+        public async Task CanGenerateInterfaceStubWithCorrectNamespace()
+        {
+            // while (!System.Diagnostics.Debugger.IsAttached)
+            // {
+            //     System.Console.WriteLine($"Waiting to attach on {System.Diagnostics.Process.GetCurrentProcess().Id}");
+            //     System.Threading.Thread.Sleep(1000);
+            // }
+            var testFile = @"
+using ClassLib;
+
+[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(ClassLib.SomeClass))|}]
+
+namespace TestProject
+{
+    public class Test
+    {
+        public void Run(SomeClass c)
+        {
+            var isValid = c.IsValid();
+        }
+    }
+}";
+            var concreteFile = @"
+namespace ClassLib
+{
+    public class SomeClass
+    {
+        public bool IsValid() => true;
+    }
+}";
+
+            const string withFix = @"
+using ClassLib;
+
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(ClassLib.SomeClass), typeof(TestProject.ISomeClass))]
+
+namespace TestProject
+{
+    public class Test
+    {
+        public void Run(SomeClass c)
+        {
+            var isValid = c.IsValid();
+        }
+    }
+}";
+
+            const string interfaceDefinition = @"namespace TestProject
+{
+    public interface ISomeClass
+    {
+    }
+}";
+
+            var diagnostic = VerifyCS.Diagnostic(AdapterDefinitionAnalyzer.DefinitionDiagnosticId).WithLocation(0).WithArguments("ClassLib.SomeClass");
+            await CreateTest(VerifyCS.Create(), null)
+                .WithSource(testFile)
+                .WithSource(concreteFile)
+                .WithExpectedDiagnostics(diagnostic)
+                .WithFixed(withFix)
+                .WithFixed(concreteFile)
+                .WithFixed(interfaceDefinition, "ISomeClass.cs")
                 .RunAsync();
         }
     }

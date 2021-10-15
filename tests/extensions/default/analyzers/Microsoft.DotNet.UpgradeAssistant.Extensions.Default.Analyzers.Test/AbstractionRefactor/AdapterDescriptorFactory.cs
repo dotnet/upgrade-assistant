@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
-    public record AdapterDescriptorFactory(string Namespace, string Destination, string Original)
+    public record AdapterDescriptorFactory(string Namespace, string Original, string? Destination)
     {
         public string FullDestination => $"{Namespace}.{Destination}";
 
@@ -15,9 +15,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         public string CreateAttributeString(string languageName)
             => languageName switch
             {
-                LanguageNames.VisualBasic => $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullDestination}), GetType({FullOriginal}))>",
-                LanguageNames.CSharp => $"[assembly: global::Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof({FullDestination}), typeof({FullOriginal}))]",
+                LanguageNames.VisualBasic => CreateVBAttributeString(),
+                LanguageNames.CSharp => CreateCSharpAttributeString(),
                 _ => throw new NotSupportedException(),
             };
+
+        private string CreateVBAttributeString() => Destination is null 
+            ? $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullOriginal}))>"
+            : $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullOriginal}), GetType({FullDestination}))>";
+
+        private string CreateCSharpAttributeString() => Destination is null
+            ? $"[assembly: global::Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof({FullOriginal}))]"
+            : $"[assembly: global::Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof({FullOriginal}), typeof({FullDestination}))]";
     }
 }
