@@ -57,8 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                             // Update attribute
                             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
                             var interfaceName = $"I{typeToReplace.Name}";
-                            var project = context.Document.Project;
-                            var defaultNamespace = project.DefaultNamespace ?? project.Name;
+                            var defaultNamespace = context.Document.Project.DefaultNamespace ?? context.Document.Project.Name;
                             var fullyQualifiedInterfaceName = $"{defaultNamespace}.{interfaceName}";
 
                             var newArg = editor.Generator.AttributeArgument(
@@ -67,10 +66,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                                         editor.Generator.IdentifierName(defaultNamespace),
                                         editor.Generator.IdentifierName(interfaceName))));
 
-                            var newNode = editor.Generator.InsertAttributeArguments(node, 1, new[] { newArg });
-                            editor.ReplaceNode(node, newNode);
+                            editor.AddAttributeArgument(node, newArg);
 
-                            project = editor.GetChangedDocument().Project;
+                            var project = editor.GetChangedDocument().Project;
 
                             if (semantic.Compilation.GetTypeByMetadataName(fullyQualifiedInterfaceName) is not null)
                             {
