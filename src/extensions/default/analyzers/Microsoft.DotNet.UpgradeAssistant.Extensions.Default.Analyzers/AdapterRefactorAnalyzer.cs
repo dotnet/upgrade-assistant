@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     return;
                 }
 
-                foreach (var adapter in adapterContext.Descriptors)
+                foreach (var adapter in adapterContext.TypeDescriptors)
                 {
                     if (SymbolEqualityComparer.Default.Equals(member.ContainingType, adapter.Original))
                     {
@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             {
                 if (context.OwningSymbol is IMethodSymbol enclosing &&
                     !adapterContext.IsFactoryMethod(enclosing) &&
-                    adapterContext.GetDescriptorForDestination(enclosing.ReturnType) is AdapterDescriptor descriptor)
+                    adapterContext.GetDescriptorForDestination(enclosing.ReturnType) is AdapterDescriptor<ITypeSymbol> descriptor)
                 {
                     context.RegisterOperationAction(context =>
                     {
@@ -188,7 +188,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
                 foreach (var child in operation.Children)
                 {
-                    foreach (var descriptor in adapterContext.Descriptors)
+                    foreach (var descriptor in adapterContext.TypeDescriptors)
                     {
                         if (SymbolEqualityComparer.Default.Equals(child.Type, descriptor.Original))
                         {
@@ -220,7 +220,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            foreach (var adapter in adapterContext.Descriptors)
+            foreach (var adapter in adapterContext.TypeDescriptors)
             {
                 if (SymbolEqualityComparer.Default.Equals(adapter.Original, symbol))
                 {
@@ -243,7 +243,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            foreach (var adapter in adapterContext.Descriptors)
+            foreach (var adapter in adapterContext.TypeDescriptors)
             {
                 foreach (var p in parameters)
                 {

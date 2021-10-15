@@ -12,7 +12,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     public record AdapterContext
     {
-        public ImmutableArray<AdapterDescriptor> Descriptors { get; init; } = ImmutableArray.Create<AdapterDescriptor>();
+        public ImmutableArray<AdapterDescriptor<ITypeSymbol>> TypeDescriptors { get; init; } = ImmutableArray.Create<AdapterDescriptor<ITypeSymbol>>();
+
+        public ImmutableArray<AdapterDescriptor<ISymbol>> StaticMemberDescriptors { get; init; } = ImmutableArray.Create<AdapterDescriptor<ISymbol>>();
 
         public ImmutableArray<FactoryDescriptor> Factories { get; init; } = ImmutableArray.Create<FactoryDescriptor>();
 
@@ -50,9 +52,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return null;
         }
 
-        public AdapterDescriptor? GetDescriptorForDestination(ITypeSymbol type)
+        public AdapterDescriptor<ITypeSymbol>? GetDescriptorForDestination(ITypeSymbol type)
         {
-            foreach (var descriptor in Descriptors)
+            foreach (var descriptor in TypeDescriptors)
             {
                 if (SymbolEqualityComparer.Default.Equals(descriptor.Destination, type))
                 {
@@ -87,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return false;
         }
 
-        public bool IsAvailable => Descriptors.Length > 0;
+        public bool IsAvailable => TypeDescriptors.Length > 0;
 
         public static AdapterContext Create() => new();
 
@@ -134,7 +136,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     context = context with
                     {
-                        Descriptors = context.Descriptors.Add(descriptor)
+                        TypeDescriptors = context.TypeDescriptors.Add(descriptor)
+                    };
+                }
+                else if (TryParseStaticDescriptor(context.Types, a, out var staticDescriptor))
+                {
+                    context = context with
+                    {
+                        StaticMemberDescriptors = context.StaticMemberDescriptors.Add(staticDescriptor)
                     };
                 }
                 else if (TryParseFactory(context.Types, a, out var factory))
@@ -149,7 +158,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return context;
         }
 
-        private static bool TryParseDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor descriptor)
+        private static bool TryParseStaticDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor<ISymbol> descriptor)
+        {
+            descriptor = default;
+
+            if (SymbolEqualityComparer.Default.Equals(types.AdapterStaticDescriptor, a.AttributeClass))
+            {
+                if (a.ConstructorArguments.Length == 4 &&
+                   a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
+                   a.ConstructorArguments[1].Kind == TypedConstantKind.Primitive &&
+                   a.ConstructorArguments[2].Kind == TypedConstantKind.Type &&
+                   a.ConstructorArguments[3].Kind == TypedConstantKind.Primitive &&
+                   a.ConstructorArguments[0].Value is ITypeSymbol destinationType &&
+                   a.ConstructorArguments[1].Value is string destinationMember &&
+                   a.ConstructorArguments[2].Value is ITypeSymbol concreteType &&
+                   a.ConstructorArguments[1].Value is string concreteMember)
+                {
+                    if (destinationType.GetMembers(destinationMember).FirstOrDefault() is ISymbol destinationSymbol &&
+                        concreteType.GetMembers(concreteMember).FirstOrDefault() is ISymbol concreteSymbol)
+                    {
+                        descriptor = new(destinationSymbol, concreteSymbol);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryParseDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor<ITypeSymbol> descriptor)
         {
             descriptor = default;
 
@@ -161,7 +198,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                    a.ConstructorArguments[0].Value is ITypeSymbol destination &&
                    a.ConstructorArguments[1].Value is ITypeSymbol concreteType)
                 {
-                    descriptor = new AdapterDescriptor(destination, concreteType);
+                    descriptor = new(destination, concreteType);
                     return true;
                 }
             }

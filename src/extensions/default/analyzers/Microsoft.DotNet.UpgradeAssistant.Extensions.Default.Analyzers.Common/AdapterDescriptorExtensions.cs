@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly SymbolDisplayFormat RoundtripMethodFormat = SymbolDisplayFormat.FullyQualifiedFormat
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
-        public static ImmutableDictionary<string, string?> WithMissingType(this ImmutableDictionary<string, string?> properties, ITypeSymbol symbol)
+        public static ImmutableDictionary<string, string?> WithMissingType(this ImmutableDictionary<string, string?> properties, ISymbol symbol)
             => properties.Add(ExpectedTypeKey, symbol.ToDisplayString(RoundtripMethodFormat));
 
         public static bool TryGetExpectedType(this ImmutableDictionary<string, string?> dictionary, SemanticModel semantic, [MaybeNullWhen(false)] out INamedTypeSymbol namedType)

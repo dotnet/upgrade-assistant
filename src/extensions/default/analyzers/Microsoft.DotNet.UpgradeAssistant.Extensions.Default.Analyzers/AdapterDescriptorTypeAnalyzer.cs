@@ -67,6 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
                 ValidateDescriptor(context, types.AdapterDescriptor, systemType, systemType);
                 ValidateDescriptor(context, types.DescriptorFactory, systemType, systemString);
+                ValidateDescriptor(context, types.AdapterStaticDescriptor, systemType, systemString, systemType, systemString);
             }, SymbolKind.NamedType);
         }
 

@@ -12,6 +12,13 @@ using System;
 
 namespace Microsoft.CodeAnalysis.Refactoring
 {
+    public class AdapterStaticDescriptorAttribute : Attribute
+    {
+        public AdapterStaticDescriptorAttribute(Type originalType, string originalString, Type destinationType, string destinationString)
+        {
+        }
+    }
+
     public class AdapterDescriptorAttribute : Attribute
     {
         public AdapterDescriptorAttribute(Type interfaceType, Type original)

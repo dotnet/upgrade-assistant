@@ -9,14 +9,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     public readonly record struct WellKnownTypes
     {
         private const string AdapterDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute";
+        private const string AdapterStaticDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterStaticDescriptorAttribute";
         private const string FactoryDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptorAttribute";
 
         private static readonly SymbolDisplayFormat DisplayFormat = SymbolDisplayFormat.FullyQualifiedFormat
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
-        public bool IsEmpty => AdapterDescriptor is null && DescriptorFactory is null;
+        public bool IsEmpty => AdapterDescriptor is null && DescriptorFactory is null && AdapterStaticDescriptor is null;
 
         public INamedTypeSymbol? AdapterDescriptor { get; init; }
+
+        public INamedTypeSymbol? AdapterStaticDescriptor { get; init; }
 
         public INamedTypeSymbol? DescriptorFactory { get; init; }
 
@@ -40,6 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return namedType.ToDisplayString(DisplayFormat) switch
             {
                 AdapterDescriptorFullyQualified => new() { AdapterDescriptor = namedType },
+                AdapterStaticDescriptorFullyQualified => new() { AdapterStaticDescriptor = namedType },
                 FactoryDescriptorFullyQualified => new() { DescriptorFactory = namedType },
                 _ => default,
             };
@@ -55,6 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return new()
             {
                 AdapterDescriptor = compilation.GetTypeByMetadataName(AdapterDescriptorFullyQualified),
+                AdapterStaticDescriptor = compilation.GetTypeByMetadataName(AdapterStaticDescriptorFullyQualified),
                 DescriptorFactory = compilation.GetTypeByMetadataName(FactoryDescriptorFullyQualified),
             };
         }

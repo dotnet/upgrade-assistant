@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     {
         public static ITypeSymbol MapType(this AdapterContext context, ITypeSymbol type)
         {
-            foreach (var descriptor in context.Descriptors)
+            foreach (var descriptor in context.TypeDescriptors)
             {
                 if (SymbolEqualityComparer.Default.Equals(descriptor.Original, type))
                 {

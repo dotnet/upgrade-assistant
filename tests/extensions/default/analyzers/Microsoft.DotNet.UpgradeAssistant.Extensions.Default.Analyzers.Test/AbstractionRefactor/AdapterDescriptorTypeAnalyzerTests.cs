@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -14,8 +16,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     {
         private const string SystemTypeName = "System.Type";
         private const string StringName = "System.String";
-        private const string AdapterDescriptorClassName = "AdapterDescriptorAttribute";
         private const string RefactoringNamespace = "Microsoft.CodeAnalysis.Refactoring.";
+        private const string AdapterDescriptorClassName = "AdapterDescriptorAttribute";
+        private const string AdapterStaticDescriptorClassName = "AdapterStaticDescriptorAttribute";
         private const string FactoryDescriptorClassName = "AdapterFactoryDescriptorAttribute";
 
         [Fact]
@@ -26,10 +29,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             await VerifyCS.Create().WithSource(testFile).RunAsync();
         }
 
-        [InlineData(AdapterDescriptorClassName, SystemTypeName)]
-        [InlineData(FactoryDescriptorClassName, StringName)]
+        [InlineData(AdapterDescriptorClassName, new[] { SystemTypeName, SystemTypeName })]
+        [InlineData(AdapterStaticDescriptorClassName, new[] { SystemTypeName, StringName, SystemTypeName, StringName })]
+        [InlineData(FactoryDescriptorClassName, new[] { SystemTypeName, StringName })]
         [Theory]
-        public async Task CorrectlyFormed(string attributeName, string type2)
+        public async Task CorrectlyFormed(string attributeName, string[] types)
         {
             var testFile = @$"
 using System;
@@ -38,7 +42,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
 {{
     public class {attributeName} : Attribute
     {{
-        public {attributeName}(Type destination, {type2} original)
+        public {attributeName}({JoinTypes(types)})
         {{
         }}
     }}
@@ -49,10 +53,11 @@ namespace Microsoft.CodeAnalysis.Refactoring
                 .RunAsync();
         }
 
-        [InlineData(AdapterDescriptorClassName, SystemTypeName)]
-        [InlineData(FactoryDescriptorClassName, StringName)]
+        [InlineData(AdapterDescriptorClassName, new[] { SystemTypeName, SystemTypeName })]
+        [InlineData(AdapterStaticDescriptorClassName, new[] { SystemTypeName, StringName, SystemTypeName, StringName })]
+        [InlineData(FactoryDescriptorClassName, new[] { SystemTypeName, StringName })]
         [Theory]
-        public async Task NotAnAttribute(string attributeName, string type2)
+        public async Task NotAnAttribute(string attributeName, string[] types)
         {
             var testFile = @$"
 using System;
@@ -61,7 +66,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
 {{
     public class {{|#0:{attributeName}|}}
     {{
-        public {attributeName}(Type destination, {type2} original)
+        public {attributeName}({JoinTypes(types)})
         {{
         }}
     }}
@@ -78,6 +83,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
         }
 
         [InlineData(AdapterDescriptorClassName)]
+        [InlineData(AdapterStaticDescriptorClassName)]
         [InlineData(FactoryDescriptorClassName)]
         [Theory]
         public async Task SingleParameter(string attributeName)
@@ -106,6 +112,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
         }
 
         [InlineData(AdapterDescriptorClassName, SystemTypeName)]
+        [InlineData(AdapterStaticDescriptorClassName, SystemTypeName)]
         [InlineData(FactoryDescriptorClassName, SystemTypeName)]
         [Theory]
         public async Task SingleParameterNotAType(string attributeName, string typeName)
@@ -137,6 +144,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
         }
 
         [InlineData(AdapterDescriptorClassName)]
+        [InlineData(AdapterStaticDescriptorClassName)]
         [InlineData(FactoryDescriptorClassName)]
         [Theory]
         public async Task DefaultConstructor(string attributeName)
@@ -160,5 +168,8 @@ namespace Microsoft.CodeAnalysis.Refactoring
                 .WithSource(testFile)
                 .RunAsync();
         }
+
+        private static string JoinTypes(string[] types)
+            => string.Join(", ", types.Select(t => $"{t} _{Guid.NewGuid():N}"));
     }
 }

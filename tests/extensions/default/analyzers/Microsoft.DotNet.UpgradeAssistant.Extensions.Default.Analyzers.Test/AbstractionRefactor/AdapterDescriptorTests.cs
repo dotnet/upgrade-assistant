@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
             Assert.NotNull(expectedOriginal);
             Assert.NotNull(expectedDestination);
 
-            Assert.Collection(context.Descriptors, d =>
+            Assert.Collection(context.TypeDescriptors, d =>
             {
                 Assert.Equal(expectedOriginal, d.Original);
                 Assert.Equal(expectedDestination, d.Destination);
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.Ab
             Assert.NotNull(expectedOriginal);
             Assert.NotNull(expectedDestination);
 
-            Assert.Collection(context.Descriptors, d =>
+            Assert.Collection(context.TypeDescriptors, d =>
             {
                 Assert.Equal(expectedOriginal, d.Original);
                 Assert.Equal(expectedDestination, d.Destination);
