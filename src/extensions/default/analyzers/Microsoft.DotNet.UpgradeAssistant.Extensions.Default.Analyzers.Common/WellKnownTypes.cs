@@ -24,7 +24,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         public INamedTypeSymbol? DescriptorFactory { get; init; }
 
         public static WellKnownTypes From(IOperation operation)
-            => From(operation.SemanticModel.GetSymbolInfo(operation.Syntax).Symbol);
+        {
+            if (operation is null)
+            {
+                throw new ArgumentNullException(nameof(operation));
+            }
+
+            return From(operation.SemanticModel.GetSymbolInfo(operation.Syntax).Symbol);
+        }
 
         public static WellKnownTypes From(ISymbol? symbol)
         {

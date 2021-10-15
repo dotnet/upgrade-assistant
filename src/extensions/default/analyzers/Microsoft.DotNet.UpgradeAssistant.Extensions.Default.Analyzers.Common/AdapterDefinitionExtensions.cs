@@ -15,10 +15,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
         public static ImmutableDictionary<string, string?> WithTypeToReplace(this ImmutableDictionary<string, string?> properties, ITypeSymbol symbol)
-            => properties.Add(TypeToReplaceKey, symbol.ToDisplayString(RoundtripMethodFormat));
+        {
+            if (properties is null)
+            {
+                throw new System.ArgumentNullException(nameof(properties));
+            }
+
+            if (symbol is null)
+            {
+                throw new System.ArgumentNullException(nameof(symbol));
+            }
+
+            return properties.Add(TypeToReplaceKey, symbol.ToDisplayString(RoundtripMethodFormat));
+        }
 
         public static bool TryGetTypeToReplace(this ImmutableDictionary<string, string?> dictionary, SemanticModel semantic, [MaybeNullWhen(false)] out INamedTypeSymbol namedType)
         {
+            if (dictionary is null)
+            {
+                throw new System.ArgumentNullException(nameof(dictionary));
+            }
+
+            if (semantic is null)
+            {
+                throw new System.ArgumentNullException(nameof(semantic));
+            }
+
             if (dictionary.TryGetValue(TypeToReplaceKey, out var result) && result is not null)
             {
                 if (semantic.Compilation.GetTypeByMetadataName(result) is INamedTypeSymbol symbol)
