@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Immutable;
@@ -33,20 +33,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             context.RegisterOperationAction(context =>
             {
-                if (context.Operation.Syntax is CodeAnalysis.CSharp.Syntax.AttributeSyntax)
+                if (WellKnownTypes.From(context.Operation).AdapterDescriptor is not null)
                 {
-                   if (context.Operation.Children.Count() == 1 &&
-                    context.Operation.Children.First() is ITypeOfOperation typeOf &&
-                    typeOf.TypeOperand is ITypeSymbol typeToReplace)
-                   {
-                       var definition = new AdapterDefinition(typeToReplace);
-                       context.ReportDiagnostic(
-                           Diagnostic.Create(
-                               DefinitionRule,
-                               context.Operation.Syntax.GetLocation(),
-                               properties: definition.Properties,
-                               definition.TypeToReplace));
-                   }
+                    if (context.Operation.Children.Count() == 1 &&
+                     context.Operation.Children.First() is ITypeOfOperation typeOf &&
+                     typeOf.TypeOperand is ITypeSymbol typeToReplace)
+                    {
+                        var definition = new AdapterDefinition(typeToReplace);
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                DefinitionRule,
+                                context.Operation.Syntax.GetLocation(),
+                                properties: definition.Properties,
+                                definition.TypeToReplace));
+                    }
                 }
             }, OperationKind.None);
         }

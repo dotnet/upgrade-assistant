@@ -40,11 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             context.RegisterOperationAction(context =>
             {
-                var symbol = context.Operation.SemanticModel.GetSymbolInfo(context.Operation.Syntax);
-
-                var types = WellKnownTypes.From(symbol.Symbol);
-
-                if (types.DescriptorFactory is null)
+                if (WellKnownTypes.From(context.Operation).DescriptorFactory is null)
                 {
                     return;
                 }
