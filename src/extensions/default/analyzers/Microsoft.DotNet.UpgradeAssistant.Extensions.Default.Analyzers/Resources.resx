@@ -222,6 +222,15 @@
   <data name="ApiAlertGenericMessageFormat" xml:space="preserve">
     <value>{0}</value>
   </data>
+  <data name="AddAdapterDescriptorTitle" xml:space="preserve">
+    <value>Add an adapter descriptor class</value>
+  </data>
+  <data name="AddAdapterDescriptorDescription" xml:space="preserve">
+    <value>Create an adapter descriptor class to facilitate migrations away from this deprecated type.</value>
+  </data>
+  <data name="AddAdapterDescriptorMessageFormat" xml:space="preserve">
+    <value>Create an adapter descriptor class with assembly attribute '{0}'</value>
+  </data>
   <data name="ApiAlertGenericTitle" xml:space="preserve">
     <value>Replace unsupported API</value>
   </data>
@@ -328,7 +337,7 @@
     <value>System.Deployment is not supported on .NET Core</value>
   </data>
   <data name="UsingSystemDeploymentDescription" xml:space="preserve">
-    <value>System.Deployment is not supported on .NET Core.</value>
+    <value>System.Deployment is not supported on .NET Core</value>
   </data>
   <data name="UsingSystemWebDescription" xml:space="preserve">
     <value>ASP.NET Core projects should not reference System.Web or OWIN namespaces.</value>

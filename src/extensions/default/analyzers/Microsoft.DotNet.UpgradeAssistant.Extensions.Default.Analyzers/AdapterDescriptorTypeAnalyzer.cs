@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -17,6 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         public const string ConstructorCountDiagnosticId = "UA0014e";
         public const string ParameterDiagnosticId = "UA0014f";
         public const string ParameterCountDiagnosticId = "UA0014g";
+        public const string AddAdapterDescriptorDiagnosticId = "UA0014l";
 
         private const string Category = "Refactor";
 
@@ -36,12 +38,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString AdapterDescriptorTypeParameterCountMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterDescriptorTypeParameterCountMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString AdapterDescriptorTypeParameterCountDescription = new LocalizableResourceString(nameof(Resources.AdapterDescriptorTypeParameterCountDescription), Resources.ResourceManager, typeof(Resources));
 
+        private static readonly LocalizableString AddAdapterDescriptorTitle = new LocalizableResourceString(nameof(Resources.AddAdapterDescriptorTitle), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString AddAdapterDescriptorMessageFormat = new LocalizableResourceString(nameof(Resources.AddAdapterDescriptorMessageFormat), Resources.ResourceManager, typeof(Resources));
+        private static readonly LocalizableString AddAdapterDescriptorDescription = new LocalizableResourceString(nameof(Resources.AddAdapterDescriptorDescription), Resources.ResourceManager, typeof(Resources));
+
         private static readonly DiagnosticDescriptor AttributeRule = new(AttributeDiagnosticId, AdapterDescriptorTypeAttributeTitle, AdapterDescriptorTypeAttributeMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AdapterDescriptorTypeAttributeDescription);
         private static readonly DiagnosticDescriptor ConstructorCountRule = new(ConstructorCountDiagnosticId, AdapterDescriptorTypeConstructorCountTitle, AdapterDescriptorTypeConstructorCountMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AdapterDescriptorTypeConstructorCountDescription);
         private static readonly DiagnosticDescriptor ParameterRule = new(ParameterDiagnosticId, AdapterDescriptorTypeParameterTitle, AdapterDescriptorTypeParameterMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AdapterDescriptorTypeParameterDescription);
         private static readonly DiagnosticDescriptor ParameterCountRule = new(ParameterCountDiagnosticId, AdapterDescriptorTypeParameterCountTitle, AdapterDescriptorTypeParameterCountMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AdapterDescriptorTypeParameterCountDescription);
+        private static readonly DiagnosticDescriptor AddAdapterDescriptorRule = new(AddAdapterDescriptorDiagnosticId, AddAdapterDescriptorTitle, AddAdapterDescriptorMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AddAdapterDescriptorDescription);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(AttributeRule, ConstructorCountRule, ParameterRule, ParameterCountRule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(AttributeRule, ConstructorCountRule, ParameterRule, ParameterCountRule, AddAdapterDescriptorRule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -69,6 +76,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 ValidateDescriptor(context, types.DescriptorFactory, systemType, systemString);
                 ValidateDescriptor(context, types.AdapterStaticDescriptor, systemType, systemString, systemType, systemString);
             }, SymbolKind.NamedType);
+
+            context.RegisterCompilationStartAction(context =>
+            {
+                var adapterContext = AdapterContext.Create().FromCompilation(context.Compilation);
+
+                if (adapterContext.Types.AdapterDescriptor is null)
+                {
+                    RegisterAddAdapterDescriptorActions(context);
+                    return;
+                }
+            });
         }
 
         private static void ValidateAttribute(SymbolAnalysisContext context, INamedTypeSymbol type)
@@ -93,11 +111,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             ValidateAttribute(context, type);
 
-            if (type.InstanceConstructors.Length > 1)
+            if (type.InstanceConstructors.Length > 2)
             {
                 foreach (var location in type.Locations)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(ConstructorCountRule, location, type.ToDisplayString(), 1));
+                    context.ReportDiagnostic(Diagnostic.Create(ConstructorCountRule, location, type.ToDisplayString(), 2));
                 }
             }
 
@@ -111,7 +129,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 }
             }
 
-            for (int i = 0; i < Math.Min(constructor.Parameters.Length, parameterTypes.Length); i++)
+            for (var i = 0; i < Math.Min(constructor.Parameters.Length, parameterTypes.Length); i++)
             {
                 var p = constructor.Parameters[i];
                 var expectedType = parameterTypes[i];
@@ -121,6 +139,109 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     foreach (var location in p.Locations)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(ParameterRule, location, type.ToDisplayString(), expectedType.ToDisplayString()));
+                    }
+                }
+            }
+        }
+
+        private static void RegisterAddAdapterDescriptorActions(CompilationStartAnalysisContext context)
+        {
+            if (context.Compilation.Language != LanguageNames.CSharp)
+            {
+                return;
+            }
+
+            var deprecatedTypeSymbols = InitializeDeprecatedTypeSymbols(context.Compilation);
+
+            context.RegisterSyntaxNodeAction(context =>
+            {
+                if (context.Node is CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax method)
+                {
+                    var symbol = context.SemanticModel.GetDeclaredSymbol(method);
+                    GeneralizedSyntaxNodeAction(context, deprecatedTypeSymbols, method.ReturnType);
+                    GeneralizedParameterAction(context, deprecatedTypeSymbols, method.ParameterList.Parameters, static n => n.Type);
+                }
+                else if (context.Node is CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax field)
+                {
+                    GeneralizedSyntaxNodeAction(context, deprecatedTypeSymbols, field.Declaration.Type);
+                }
+                else if (context.Node is CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax property)
+                {
+                    GeneralizedSyntaxNodeAction(context, deprecatedTypeSymbols, property.Type);
+                }
+            }, CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration, CodeAnalysis.CSharp.SyntaxKind.PropertyDeclaration, CodeAnalysis.CSharp.SyntaxKind.FieldDeclaration);
+        }
+
+        private static HashSet<ISymbol> InitializeDeprecatedTypeSymbols(Compilation compilation)
+        {
+            var deprecatedTypeNames = new[]
+            {
+                "System.Web.HttpContext",
+                "System.Web.HttpContextBase",
+                "Microsoft.AspNetCore.Http.HttpRequest",
+                "Microsoft.AspNetCore.Http.HttpResponse",
+            };
+
+#pragma warning disable RS1024 // Compare symbols correctly (Known false positive: https://github.com/dotnet/roslyn-analyzers/issues/4568)
+            var deprecatedTypeSymbols = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
+#pragma warning restore RS1024 // Compare symbols correctly
+
+            foreach (var name in deprecatedTypeNames)
+            {
+                var typeSymbol = compilation.GetTypeByMetadataName(name);
+                if (typeSymbol is not null)
+                {
+                    deprecatedTypeSymbols.Add(typeSymbol);
+                }
+            }
+
+            return deprecatedTypeSymbols;
+        }
+
+        private static void GeneralizedSyntaxNodeAction(
+            SyntaxNodeAnalysisContext context,
+            HashSet<ISymbol> deprecatedTypeSymbols,
+            SyntaxNode? syntaxNode)
+        {
+            if (syntaxNode is null)
+            {
+                return;
+            }
+
+            var symbol = context.SemanticModel.GetSymbolInfo(syntaxNode).Symbol;
+
+            if (symbol is null)
+            {
+                return;
+            }
+
+            if (deprecatedTypeSymbols.Contains(symbol))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(AddAdapterDescriptorRule, syntaxNode.GetLocation(), syntaxNode.ToFullString().Trim()));
+            }
+        }
+
+        private static void GeneralizedParameterAction<TParameter>(
+            SyntaxNodeAnalysisContext context,
+            HashSet<ISymbol> deprecatedTypeSymbols,
+            SeparatedSyntaxList<TParameter> parameters,
+            Func<TParameter, SyntaxNode?> parameterToType)
+            where TParameter : SyntaxNode
+        {
+            var method = context.SemanticModel.GetDeclaredSymbol(context.Node);
+
+            if (method is null)
+            {
+                return;
+            }
+
+            foreach (var p in parameters)
+            {
+                if (parameterToType(p) is SyntaxNode type && context.SemanticModel.GetSymbolInfo(type) is SymbolInfo info && info.Symbol is ISymbol parameterSymbol)
+                {
+                    if (deprecatedTypeSymbols.Contains(parameterSymbol))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(AddAdapterDescriptorRule, type.GetLocation(), parameterSymbol.Name));
                     }
                 }
             }

@@ -376,6 +376,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add an adapter descriptor class.
+        /// </summary>
+        internal static string AddAdapterDescriptorTitle {
+            get {
+                return ResourceManager.GetString("AddAdapterDescriptorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Create an adapter descriptor class to facilitate migrations away from this deprecated type.
+        /// </summary>
+        internal static string AddAdapterDescriptorDescription {
+            get {
+                return ResourceManager.GetString("AddAdapterDescriptorDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   An adapter descriptor class with assembly attribute '{0}' will be created.
+        /// </summary>
+        internal static string AddAdapterDescriptorMessageFormat {
+            get {
+                return ResourceManager.GetString("AddAdapterDescriptorMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace unsupported API.
         /// </summary>
         internal static string ApiAlertGenericTitle {
@@ -691,7 +718,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to System.Deployment is not supported on .NET Core..
+        ///   Looks up a localized string similar to System.Deployment is not supported on .NET Core.
         /// </summary>
         internal static string UsingSystemDeploymentDescription {
             get {
