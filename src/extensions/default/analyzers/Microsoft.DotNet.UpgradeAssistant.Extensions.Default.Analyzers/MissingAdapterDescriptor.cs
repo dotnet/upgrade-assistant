@@ -34,23 +34,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.RegisterCompilationStartAction(context =>
             {
                 var adapterContext = AdapterContext.Create().FromCompilation(context.Compilation);
+                var deprecatedTypeSymbols = InitializeDeprecatedTypeSymbols(context.Compilation);
 
                 if (adapterContext.Types.AdapterDescriptor is null)
                 {
-                    RegisterAddAdapterDescriptorActions(context);
-                    return;
+                    RegisterAddAdapterDescriptorActions(context, deprecatedTypeSymbols);
                 }
             });
         }
 
-        private static void RegisterAddAdapterDescriptorActions(CompilationStartAnalysisContext context)
+        private static void RegisterAddAdapterDescriptorActions(CompilationStartAnalysisContext context, HashSet<ISymbol> deprecatedTypeSymbols)
         {
             if (context.Compilation.Language != LanguageNames.CSharp)
             {
                 return;
             }
-
-            var deprecatedTypeSymbols = InitializeDeprecatedTypeSymbols(context.Compilation);
 
             context.RegisterSyntaxNodeAction(context =>
             {

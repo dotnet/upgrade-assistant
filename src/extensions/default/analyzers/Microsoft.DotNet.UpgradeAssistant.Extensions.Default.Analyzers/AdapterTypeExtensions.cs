@@ -9,7 +9,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     internal static class AdapterTypeExtensions
     {
-        public static void RegisterTypeAdapterActions(this CompilationStartAnalysisContext context, DiagnosticDescriptor diagnosticDescriptor, AdapterContext adapterContext)
+        public readonly record struct SyntaxTypeContext(SyntaxNodeAnalysisContext context, ISymbol symbol, SyntaxNode node)
+        {
+            public void ReportDiagnostic(Diagnostic diagnostic) => context.ReportDiagnostic(diagnostic);
+        }
+
+        public static void RegisterTypeAdapterActions(this CompilationStartAnalysisContext context, AdapterContext adapterContext, Action<SyntaxTypeContext> action)
         {
             // TODO: Can we use a symbol/operation action? Need to be more exhaustive on search for types
             if (context.Compilation.Language == LanguageNames.CSharp)
@@ -22,17 +27,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
                         if (!adapterContext.Ignore(symbol))
                         {
-                            GeneralizedSyntaxNodeAction(context, diagnosticDescriptor, adapterContext, method.ReturnType);
-                            GeneralizedParameterAction(context, diagnosticDescriptor, adapterContext, method.ParameterList.Parameters, static n => n.Type);
+                            GeneralizedSyntaxNodeAction(context, action, method.ReturnType);
+                            GeneralizedParameterAction(context, action, method.ParameterList.Parameters, static n => n.Type);
                         }
                     }
                     else if (context.Node is CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax field)
                     {
-                        GeneralizedSyntaxNodeAction(context, diagnosticDescriptor, adapterContext, field.Declaration.Type);
+                        GeneralizedSyntaxNodeAction(context, action, field.Declaration.Type);
                     }
                     else if (context.Node is CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax property)
                     {
-                        GeneralizedSyntaxNodeAction(context, diagnosticDescriptor, adapterContext, property.Type);
+                        GeneralizedSyntaxNodeAction(context, action, property.Type);
                     }
                 }, CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration, CodeAnalysis.CSharp.SyntaxKind.PropertyDeclaration, CodeAnalysis.CSharp.SyntaxKind.FieldDeclaration);
             }
@@ -42,14 +47,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     if (context.Node is CodeAnalysis.VisualBasic.Syntax.MethodStatementSyntax method)
                     {
-                        GeneralizedSyntaxNodeAction(context, diagnosticDescriptor, adapterContext, method.AsClause?.Type);
-                        GeneralizedParameterAction(context, diagnosticDescriptor, adapterContext, method.ParameterList.Parameters, static n => n.AsClause?.Type);
+                        GeneralizedSyntaxNodeAction(context, action, method.AsClause?.Type);
+                        GeneralizedParameterAction(context, action, method.ParameterList.Parameters, static n => n.AsClause?.Type);
                     }
                     else if (context.Node is CodeAnalysis.VisualBasic.Syntax.PropertyStatementSyntax property)
                     {
                         if (property.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
                         {
-                            GeneralizedSyntaxNodeAction(context, diagnosticDescriptor, adapterContext, simple.Type);
+                            GeneralizedSyntaxNodeAction(context, action, simple.Type);
                         }
                     }
                     else if (context.Node is CodeAnalysis.VisualBasic.Syntax.FieldDeclarationSyntax field)
@@ -58,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                         {
                             if (declarator.AsClause is CodeAnalysis.VisualBasic.Syntax.SimpleAsClauseSyntax simple)
                             {
-                                GeneralizedSyntaxNodeAction(context, diagnosticDescriptor, adapterContext, simple.Type);
+                                GeneralizedSyntaxNodeAction(context, action, simple.Type);
                             }
                         }
                     }
@@ -68,8 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
         private static void GeneralizedSyntaxNodeAction(
             SyntaxNodeAnalysisContext context,
-            DiagnosticDescriptor diagnosticDescriptor,
-            AdapterContext adapterContext,
+            Action<SyntaxTypeContext> action,
             SyntaxNode? syntaxNode)
         {
             if (syntaxNode is null)
@@ -84,19 +88,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            foreach (var adapter in adapterContext.TypeDescriptors)
-            {
-                if (SymbolEqualityComparer.Default.Equals(adapter.Original, symbol))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, syntaxNode.GetLocation(), properties: adapter.Properties, adapter.OriginalMessage, adapter.DestinationMessage));
-                }
-            }
+            action(new(context, symbol, syntaxNode));
         }
 
         private static void GeneralizedParameterAction<TParameter>(
             SyntaxNodeAnalysisContext context,
-            DiagnosticDescriptor diagnosticDescriptor,
-            AdapterContext adapterContext,
+            Action<SyntaxTypeContext> action,
             SeparatedSyntaxList<TParameter> parameters,
             Func<TParameter, SyntaxNode?> parameterToType)
             where TParameter : SyntaxNode
@@ -108,17 +105,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            foreach (var adapter in adapterContext.TypeDescriptors)
+            foreach (var p in parameters)
             {
-                foreach (var p in parameters)
+                if (parameterToType(p) is SyntaxNode type && context.SemanticModel.GetSymbolInfo(type).Symbol is ISymbol parameterSymbol)
                 {
-                    if (parameterToType(p) is SyntaxNode type && context.SemanticModel.GetSymbolInfo(type) is SymbolInfo info && info.Symbol is ISymbol parameterSymbol)
-                    {
-                        if (SymbolEqualityComparer.Default.Equals(adapter.Original, parameterSymbol))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, type.GetLocation(), properties: adapter.Properties, adapter.OriginalMessage, adapter.DestinationMessage));
-                        }
-                    }
+                    action(new(context, parameterSymbol, type));
                 }
             }
         }

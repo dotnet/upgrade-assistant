@@ -59,9 +59,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 }
 
                 RegisterAddMemberActions(adapterContext, context);
-                context.RegisterTypeAdapterActions(RefactorRule, adapterContext);
+                RegisterTypeAction(adapterContext, context);
                 RegisterCallFactoryActions(adapterContext, context);
                 RegisterStaticMemberActions(adapterContext, context);
+            });
+        }
+
+        private static void RegisterTypeAction(AdapterContext adapterContext, CompilationStartAnalysisContext context)
+        {
+            if (adapterContext.TypeDescriptors.IsEmpty)
+            {
+                return;
+            }
+
+            context.RegisterTypeAdapterActions(adapterContext, context =>
+            {
+                foreach (var adapter in adapterContext.TypeDescriptors)
+                {
+                    if (SymbolEqualityComparer.Default.Equals(adapter.Original, context.symbol))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(RefactorRule, context.node.GetLocation(), properties: adapter.Properties, adapter.OriginalMessage, adapter.DestinationMessage));
+                    }
+                }
             });
         }
 
