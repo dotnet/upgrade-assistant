@@ -1,0 +1,4 @@
+﻿System.Web.HttpContext
+System.Web.HttpContextBase
+Microsoft.AspNetCore.Http.HttpRequest
+Microsoft.AspNetCore.Http.HttpResponse

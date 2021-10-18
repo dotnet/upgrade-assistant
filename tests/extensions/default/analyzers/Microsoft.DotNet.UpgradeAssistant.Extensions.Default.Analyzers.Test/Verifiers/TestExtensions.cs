@@ -8,6 +8,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public static class TestExtensions
     {
+        public static TTest WithAdditionalFile<TTest>(this TTest test, string fileName, string fileContents)
+            where TTest : IAnalyzerTest
+        {
+            test.TestState.AdditionalFiles.Add((fileName, fileContents));
+            return test;
+        }
+
         public static TTest WithSource<TTest>(this TTest test, string source)
             where TTest : IAnalyzerTest
         {

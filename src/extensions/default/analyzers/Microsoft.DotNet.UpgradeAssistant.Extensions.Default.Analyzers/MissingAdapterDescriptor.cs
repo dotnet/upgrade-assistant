@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -33,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             context.RegisterCompilationStartAction(context =>
             {
                 var adapterContext = AdapterContext.Create().FromCompilation(context.Compilation);
-                var deprecatedTypeSymbols = InitializeDeprecatedTypeSymbols(context.Compilation);
+                var deprecatedTypeSymbols = RefactoredTypesCollection.Create(context.Compilation, context.Options.AdditionalFiles);
 
                 if (adapterContext.Types.AdapterDescriptor is null)
                 {
@@ -46,32 +45,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     });
                 }
             });
-        }
-
-        private static HashSet<ISymbol> InitializeDeprecatedTypeSymbols(Compilation compilation)
-        {
-            var deprecatedTypeNames = new[]
-            {
-                "System.Web.HttpContext",
-                "System.Web.HttpContextBase",
-                "Microsoft.AspNetCore.Http.HttpRequest",
-                "Microsoft.AspNetCore.Http.HttpResponse",
-            };
-
-#pragma warning disable RS1024 // Compare symbols correctly (Known false positive: https://github.com/dotnet/roslyn-analyzers/issues/4568)
-            var deprecatedTypeSymbols = new HashSet<ISymbol>(SymbolEqualityComparer.Default);
-#pragma warning restore RS1024 // Compare symbols correctly
-
-            foreach (var name in deprecatedTypeNames)
-            {
-                var typeSymbol = compilation.GetTypeByMetadataName(name);
-                if (typeSymbol is not null)
-                {
-                    deprecatedTypeSymbols.Add(typeSymbol);
-                }
-            }
-
-            return deprecatedTypeSymbols;
         }
     }
 }

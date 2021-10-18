@@ -12,6 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public class CSharpAddAdapterDescriptorTests : AdapterTestBase
     {
+        private const string AdditionalFileContext = "System.Web.HttpContext";
         private const string HttpContextAttributeDescriptorClass = @"using System;
 using Microsoft.CodeAnalysis.Refactoring;
 #if NET || NETCOREAPP
@@ -78,6 +79,7 @@ namespace RefactorTest
             var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments("HttpContext");
             await VerifyCS.Create()
                 .WithSource(testFile)
+                .WithAdditionalFile("web.refactoring.txt", AdditionalFileContext)
                 .WithExpectedDiagnostics(addAttributeDescriptorClassDiagnostic)
                 .WithFixed(testFile)
                 .WithFixed(HttpContextAttributeDescriptorClass, "AdapterDescriptor.cs")
@@ -106,6 +108,7 @@ namespace RefactorTest
             await VerifyCS.Create()
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(addAttributeDescriptorClassDiagnostic)
+                .WithAdditionalFile("web.refactoring.txt", AdditionalFileContext)
                 .WithFixed(testFile)
                 .WithFixed(HttpContextAttributeDescriptorClass, "AdapterDescriptor.cs")
                 .WithSystemWeb()
