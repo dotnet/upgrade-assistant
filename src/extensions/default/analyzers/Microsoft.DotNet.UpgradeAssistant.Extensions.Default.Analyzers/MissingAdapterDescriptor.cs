@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
@@ -38,35 +37,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
                 if (adapterContext.Types.AdapterDescriptor is null)
                 {
-                    RegisterAddAdapterDescriptorActions(context, deprecatedTypeSymbols);
+                    context.RegisterTypeAdapterActions(adapterContext, context =>
+                    {
+                        if (deprecatedTypeSymbols.Contains(context.symbol))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(AddAdapterDescriptorRule, context.node.GetLocation(), context.node.ToFullString().Trim()));
+                        }
+                    });
                 }
             });
-        }
-
-        private static void RegisterAddAdapterDescriptorActions(CompilationStartAnalysisContext context, HashSet<ISymbol> deprecatedTypeSymbols)
-        {
-            if (context.Compilation.Language != LanguageNames.CSharp)
-            {
-                return;
-            }
-
-            context.RegisterSyntaxNodeAction(context =>
-            {
-                if (context.Node is CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax method)
-                {
-                    var symbol = context.SemanticModel.GetDeclaredSymbol(method);
-                    GeneralizedSyntaxNodeAction(context, deprecatedTypeSymbols, method.ReturnType);
-                    GeneralizedParameterAction(context, deprecatedTypeSymbols, method.ParameterList.Parameters, static n => n.Type);
-                }
-                else if (context.Node is CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax field)
-                {
-                    GeneralizedSyntaxNodeAction(context, deprecatedTypeSymbols, field.Declaration.Type);
-                }
-                else if (context.Node is CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax property)
-                {
-                    GeneralizedSyntaxNodeAction(context, deprecatedTypeSymbols, property.Type);
-                }
-            }, CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration, CodeAnalysis.CSharp.SyntaxKind.PropertyDeclaration, CodeAnalysis.CSharp.SyntaxKind.FieldDeclaration);
         }
 
         private static HashSet<ISymbol> InitializeDeprecatedTypeSymbols(Compilation compilation)
@@ -93,55 +72,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
 
             return deprecatedTypeSymbols;
-        }
-
-        private static void GeneralizedSyntaxNodeAction(
-            SyntaxNodeAnalysisContext context,
-            HashSet<ISymbol> deprecatedTypeSymbols,
-            SyntaxNode? syntaxNode)
-        {
-            if (syntaxNode is null)
-            {
-                return;
-            }
-
-            var symbol = context.SemanticModel.GetSymbolInfo(syntaxNode).Symbol;
-
-            if (symbol is null)
-            {
-                return;
-            }
-
-            if (deprecatedTypeSymbols.Contains(symbol))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(AddAdapterDescriptorRule, syntaxNode.GetLocation(), syntaxNode.ToFullString().Trim()));
-            }
-        }
-
-        private static void GeneralizedParameterAction<TParameter>(
-            SyntaxNodeAnalysisContext context,
-            HashSet<ISymbol> deprecatedTypeSymbols,
-            SeparatedSyntaxList<TParameter> parameters,
-            Func<TParameter, SyntaxNode?> parameterToType)
-            where TParameter : SyntaxNode
-        {
-            var method = context.SemanticModel.GetDeclaredSymbol(context.Node);
-
-            if (method is null)
-            {
-                return;
-            }
-
-            foreach (var p in parameters)
-            {
-                if (parameterToType(p) is SyntaxNode type && context.SemanticModel.GetSymbolInfo(type) is SymbolInfo info && info.Symbol is ISymbol parameterSymbol)
-                {
-                    if (deprecatedTypeSymbols.Contains(parameterSymbol))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(AddAdapterDescriptorRule, type.GetLocation(), parameterSymbol.Name));
-                    }
-                }
-            }
         }
     }
 }
