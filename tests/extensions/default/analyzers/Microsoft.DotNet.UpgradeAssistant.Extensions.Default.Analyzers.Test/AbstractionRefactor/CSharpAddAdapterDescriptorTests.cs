@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 
 using VerifyCS = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.CSharpCodeFixVerifier<
-     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.AdapterDescriptorTypeAnalyzer,
+     Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.MissingAdapterDescriptor,
      Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.AddAdapterDescriptorCodeFixer>;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
@@ -75,7 +75,7 @@ namespace RefactorTest
     }
 }";
 
-            var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.AddAdapterDescriptorDiagnosticId).WithLocation(0).WithArguments("HttpContext");
+            var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments("HttpContext");
             await VerifyCS.Create()
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(addAttributeDescriptorClassDiagnostic)
@@ -102,7 +102,7 @@ namespace RefactorTest
     }
 }";
 
-            var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic(AdapterDescriptorTypeAnalyzer.AddAdapterDescriptorDiagnosticId).WithLocation(0).WithArguments("HttpContext");
+            var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments("HttpContext");
             await VerifyCS.Create()
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(addAttributeDescriptorClassDiagnostic)

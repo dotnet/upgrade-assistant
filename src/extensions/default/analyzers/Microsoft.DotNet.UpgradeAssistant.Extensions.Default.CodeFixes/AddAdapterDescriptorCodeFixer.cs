@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     {
         private const string AdapterDescriptorResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.Templates.AdapterDescriptor.cs";
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AdapterDescriptorTypeAnalyzer.AddAdapterDescriptorDiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(MissingAdapterDescriptor.AddAdapterDescriptorDiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
