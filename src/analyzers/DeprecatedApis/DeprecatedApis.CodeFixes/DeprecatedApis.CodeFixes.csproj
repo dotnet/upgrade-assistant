@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NoWarn>$(NoWarn);DV2002</NoWarn>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes</AssemblyName>
+    <RootNamespace>$(AssemblyName.Replace(" ", "_"))</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="CodeFixResources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="CodeFixResources.resx" />
+    <Compile Remove="AttributeUpgradeCodeFixer.cs" />
+    <Compile Remove="BinaryFormatterUnsafeDeserializeCodeFixer.cs" />
+    <Compile Remove="HtmlHelperCodeFixer.cs" />
+    <Compile Remove="HttpContextIsDebuggingEnabledCodeFixer.cs" />
+    <Compile Remove="HttpContextRefactorCodeFixProvider.cs" />
+    <Compile Remove="IdentifierUpgradeCodeFixer.cs" />
+    <Compile Remove="MethodInjectionExtensions.cs" />
+    <Compile Remove="TypeUpgradeCodeFixer.cs" />
+    <Compile Remove="UrlHelperCodeFixer.cs" />
+    <Compile Remove="UsingSystemWebCodeFixer.cs" />
+    <ProjectReference Include="..\DeprecatedApis.Common\DeprecatedApis.Common.csproj" />
+    <ProjectReference Include="..\DeprecatedApis\DeprecatedApis.csproj" />
+    <EmbeddedResource Update="CodeFixResources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="CodeFixResources.Designer.cs" />
+  </ItemGroup>
+</Project>

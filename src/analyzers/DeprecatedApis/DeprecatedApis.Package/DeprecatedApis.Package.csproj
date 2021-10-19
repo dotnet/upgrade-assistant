@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsPackable>true</IsPackable>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer</PackageId>
+    <Authors>Microsoft</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/dotnet/upgrade-assistant</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnet/upgrade-assistant</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Analyzers for Microsoft .NET Upgrade Assistant</Description>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <PackageTags>Upgrade, analyzers</PackageTags>
+    <Description>A set of analyzers to assist developers in migrating away from deprecated APIs.</Description>
+    <PackageIcon>icon.png</PackageIcon>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeprecatedApis.CodeFixes\DeprecatedApis.CodeFixes.csproj" />
+    <ProjectReference Include="..\DeprecatedApis\DeprecatedApis.csproj" />
+    <ProjectReference Include="..\DeprecatedApis.Common\DeprecatedApis.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
+    <None Update="build\*" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <Target Name="_AddAnalyzersToOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutputPath)\*DeprecatedApis*.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\*DeprecatedApis*.dll" PackagePath="analyzers/dotnet/vb" />
+    </ItemGroup>
+  </Target>
+</Project>

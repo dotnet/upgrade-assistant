@@ -50,6 +50,26 @@
       <Name>UpgradeStepSample</Name>
       <Project>{43cf805f-4fa3-4453-b99a-2bb0aa0b9875}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\analyzers\DeprecatedApis\DeprecatedApis.CodeFixes\DeprecatedApis.CodeFixes.csproj">
+      <Name>DeprecatedApis.CodeFixes</Name>
+      <Project>{779e952e-9a47-44e8-af3f-327761f3a2a1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\analyzers\DeprecatedApis\DeprecatedApis.Common\DeprecatedApis.Common.csproj">
+      <Name>DeprecatedApis.Common</Name>
+      <Project>{776eb0a8-5ad7-4951-b898-d4c41ec18dc1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\analyzers\DeprecatedApis\DeprecatedApis.Package\DeprecatedApis.Package.csproj">
+      <Name>DeprecatedApis.Package</Name>
+      <Project>{88fcb5d3-87b3-4d0a-8f8c-eaddfd84249b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\analyzers\DeprecatedApis\DeprecatedApis\DeprecatedApis.csproj">
+      <Name>DeprecatedApis</Name>
+      <Project>{6075b3ec-1f6d-4fec-84c2-63f058f2c4a3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\analyzers\DeprecatedApis\Vsix\DeprecatedApis.Vsix.csproj">
+      <Name>DeprecatedApis.Vsix</Name>
+      <Project>{73cdae33-91c9-4823-803f-595a0f9e9fdd}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\cli\Microsoft.DotNet.UpgradeAssistant.Cli\Microsoft.DotNet.UpgradeAssistant.Cli.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Cli</Name>
       <Project>{647d258a-4fe1-4dfa-8d02-0e5dbe3b40f7}</Project>

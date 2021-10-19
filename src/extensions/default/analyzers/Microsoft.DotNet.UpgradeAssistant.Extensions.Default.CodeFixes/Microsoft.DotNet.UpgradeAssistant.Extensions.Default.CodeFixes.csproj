@@ -17,16 +17,6 @@
     <Compile Remove="Templates\*.cs" />
     <Compile Update="CodeFixResources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="CodeFixResources.resx" />
     <EmbeddedResource Include="Templates\*.*" />
-    <Compile Remove="AttributeUpgradeCodeFixer.cs" />
-    <Compile Remove="BinaryFormatterUnsafeDeserializeCodeFixer.cs" />
-    <Compile Remove="HtmlHelperCodeFixer.cs" />
-    <Compile Remove="HttpContextIsDebuggingEnabledCodeFixer.cs" />
-    <Compile Remove="HttpContextRefactorCodeFixProvider.cs" />
-    <Compile Remove="IdentifierUpgradeCodeFixer.cs" />
-    <Compile Remove="MethodInjectionExtensions.cs" />
-    <Compile Remove="TypeUpgradeCodeFixer.cs" />
-    <Compile Remove="UrlHelperCodeFixer.cs" />
-    <Compile Remove="UsingSystemWebCodeFixer.cs" />
     <EmbeddedResource Update="CodeFixResources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="CodeFixResources.Designer.cs" />
   </ItemGroup>
 </Project>

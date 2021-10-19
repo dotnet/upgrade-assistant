@@ -6,7 +6,6 @@
     <TargetFramework>net472</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ExcludeCommonFiles>true</ExcludeCommonFiles>
-    <NoWarn>$(NoWarn);CA1014</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

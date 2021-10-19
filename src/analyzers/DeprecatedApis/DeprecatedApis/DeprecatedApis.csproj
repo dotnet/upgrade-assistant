@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer</AssemblyName>
+    <RootNamespace>$(AssemblyName.Replace(" ", "_"))</RootNamespace>
+    <!-- Avoid ID conflicts with the package project. -->
+    <PackageId>*$(AssemblyName)*</PackageId>
+  </PropertyGroup>
+   <ItemGroup>
+    <None Remove="DefaultApiAlerts.apitargets" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
+      <Version>3.3.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeprecatedApis.Common\DeprecatedApis.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="Resources.resx" />
+    <EmbeddedResource Update="Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
+  </ItemGroup>
+</Project>

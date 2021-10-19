@@ -166,22 +166,4 @@
   <data name="AttributeRemoveTitle" xml:space="preserve">
     <value>Remove attribute</value>
   </data>
-  <data name="AdapterRefactorTitle" xml:space="preserve">
-    <value>Refactor usage to alternate API</value>
-  </data>
-  <data name="AdapterAddMemberTitle" xml:space="preserve">
-    <value>Add member to abstraction</value>
-  </data>
-  <data name="AdapterCallFactoryTitle" xml:space="preserve">
-    <value>Call factory method for abstraction</value>
-  </data>
-  <data name="AdapterDefinitionTitle" xml:space="preserve">
-    <value>Create abstraction for definition</value>
-  </data>
-  <data name="AddAdapterDescriptorTitle" xml:space="preserve">
-    <value>Add an adapter descriptor</value>
-  </data>
-  <data name="AdapterStaticMemberTitle" xml:space="preserve">
-    <value>Redirect static member access to alternate member</value>
-  </data>
 </root>

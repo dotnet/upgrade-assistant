@@ -6,8 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-#pragma warning disable CA1062 // Validate arguments of public methods
-
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public static class WorkspaceExtensions

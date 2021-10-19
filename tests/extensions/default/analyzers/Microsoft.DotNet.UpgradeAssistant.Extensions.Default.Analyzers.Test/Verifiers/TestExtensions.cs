@@ -8,20 +8,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 {
     public static class TestExtensions
     {
-        public static TTest WithAdditionalFile<TTest>(this TTest test, string fileName, string fileContents)
-            where TTest : IAnalyzerTest
-        {
-            test.TestState.AdditionalFiles.Add((fileName, fileContents));
-            return test;
-        }
-
-        public static TTest WithAdditionalFileFixed<TTest>(this TTest test, string fileName, string fileContents)
-            where TTest : ICodeFixTest
-        {
-            test.FixedState.AdditionalFiles.Add((fileName, fileContents));
-            return test;
-        }
-
         public static TTest WithSource<TTest>(this TTest test, string source)
             where TTest : IAnalyzerTest
         {
@@ -36,18 +22,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return test;
         }
 
-        public static TTest WithFixed<TTest>(this TTest test, string fixedCode, string? name = null)
+        public static TTest WithFixed<TTest>(this TTest test, string fixedCode)
             where TTest : ICodeFixTest
         {
-            if (name is not null)
-            {
-                test.FixedState.Sources.Add((name, fixedCode));
-            }
-            else
-            {
-                test.FixedState.Sources.Add(fixedCode);
-            }
-
+            test.FixedState.Sources.Add(fixedCode);
             return test;
         }
 

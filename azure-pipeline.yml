@@ -20,7 +20,6 @@ trigger:
   branches:
     include:
       - main
-      - hackathon2021
 pr:
   branches:
     include:

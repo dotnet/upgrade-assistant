@@ -3,29 +3,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <!-- Avoid ID conflicts with the package project. -->
-    <PackageId>Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Internal</PackageId>
+    <PackageId>*$(MSBuildProjectFullPath)*</PackageId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="ApiAlertAnalyzer.cs" />
-    <Compile Remove="AttributeUpgradeAnalyzer.cs" />
-    <Compile Remove="BinaryFormatterUnsafeDeserializeAnalyzer.cs" />
-    <Compile Remove="DiagnosticAnalyzerExtensions.cs" />
-    <Compile Remove="HtmlHelperAnalyzer.cs" />
-    <Compile Remove="HttpContextIsDebuggingEnabledAnalyzer.cs" />
-    <Compile Remove="NameMatcher.cs" />
-    <Compile Remove="SystemDeploymentAnalyzer.cs" />
-    <Compile Remove="TargetSyntax.cs" />
-    <Compile Remove="TargetSyntaxMessage.cs" />
-    <Compile Remove="TargetSyntaxMessageLoader.cs" />
-    <Compile Remove="TargetSyntaxType.cs" />
-    <Compile Remove="TypeMapLoader.cs" />
-    <Compile Remove="TypeMapping.cs" />
-    <Compile Remove="TypeUpgradeAnalyzer.cs" />
-    <Compile Remove="UrlHelperAnalyzer.cs" />
-    <Compile Remove="UsingSystemWebAnalyzer.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="DefaultApiAlerts.apitargets" />
+    <EmbeddedResource Include="DefaultApiAlerts.apitargets" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">

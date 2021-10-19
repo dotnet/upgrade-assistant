@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <IsTestProject>true</IsTestProject>
+    <!-- Ignore the .ConfigureAwait(false) warning -->
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="assets\**" />
+    <Compile Remove="HttpContextRefactor\**" />
+    <EmbeddedResource Remove="assets\**" />
+    <EmbeddedResource Remove="HttpContextRefactor\**" />
+    <None Remove="assets\**" />
+    <None Remove="HttpContextRefactor\**" />
+    <Compile Remove="AnalyzerTests.cs" />
+    <Compile Remove="ExpectedDiagnostic.cs" />
+    <Compile Remove="LanguageExtensions.cs" />
+    <Compile Remove="TestHelper.cs" />
+    <Compile Remove="TypeMapLoaderTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces">
+      <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+      <Version>3.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.XUnit">
+      <Version>1.1.1-beta1.21480.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.XUnit">
+      <Version>1.1.1-beta1.21480.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Analyzer.Testing.XUnit">
+      <Version>1.1.1-beta1.21480.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeFix.Testing.XUnit">
+      <Version>1.1.1-beta1.21480.3</Version>
+    </PackageReference>
+    <PackageReference Include="Polly" Version="7.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\analyzers\DeprecatedApis\DeprecatedApis.CodeFixes\DeprecatedApis.CodeFixes.csproj" />
+    <ProjectReference Include="..\..\..\src\analyzers\DeprecatedApis\DeprecatedApis\DeprecatedApis.csproj" />
+  </ItemGroup>
+</Project>

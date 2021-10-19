@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+    <ItemGroup>
+      <AdditionalFiles Include="$(MSBuildThisFileDirectory)\*.refactoring.txt">
+        <Visible>false</Visible>
+      </AdditionalFiles>
+    </ItemGroup>
+</Project>

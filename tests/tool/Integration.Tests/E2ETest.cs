@@ -33,7 +33,6 @@ namespace Integration.Tests
             _output = output;
         }
 
-#if FALSE
         [InlineData("PCL", "SamplePCL.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
 
@@ -49,7 +48,6 @@ namespace Integration.Tests
         [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj", Skip = "Workload loading is broken")]
 #endif
         [Theory]
-#endif
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
             // Create a temporary working directory

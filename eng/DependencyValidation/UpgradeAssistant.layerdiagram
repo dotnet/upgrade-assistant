@@ -324,5 +324,30 @@
         </reference>
       </references>
     </layer>
+    <layer Id="79fb50a6-4932-42c4-8ca7-8045366a3550" name="analyzers">
+      <references>
+        <reference Id="91e008e3-9dca-4f41-8d56-b8aeafe96748" name="analyzers">
+          <ArtifactNode Label="analyzers" Category="CodeSchema_Project" Id="(Assembly=../../src/analyzers)">
+            <Category Ref="CodeMap_SolutionFolder" />
+          </ArtifactNode>
+          <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Common)" Label="Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Common.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+          <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer)" Label="Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+          <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes)" Label="Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+          <ExpandedNode Id="(Assembly=DeprecatedApis.Package)" Label="DeprecatedApis.Package.dll" Category="CodeSchema_Assembly">
+            <Category Ref="FileSystem.Category.FileOfType.dll" />
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+          <ExpandedNode Id="(Assembly=DeprecatedApisVsix)" Label="DeprecatedApisVsix.dll" Category="CodeSchema_Assembly">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+        </reference>
+      </references>
+    </layer>
   </layers>
 </layerModel>

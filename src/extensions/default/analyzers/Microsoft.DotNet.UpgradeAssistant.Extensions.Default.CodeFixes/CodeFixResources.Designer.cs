@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class CodeFixResources {
@@ -57,60 +57,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add member to abstraction.
-        /// </summary>
-        internal static string AdapterAddMemberTitle {
-            get {
-                return ResourceManager.GetString("AdapterAddMemberTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Call factory method for abstraction.
-        /// </summary>
-        internal static string AdapterCallFactoryTitle {
-            get {
-                return ResourceManager.GetString("AdapterCallFactoryTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Create abstraction for definition.
-        /// </summary>
-        internal static string AdapterDefinitionTitle {
-            get {
-                return ResourceManager.GetString("AdapterDefinitionTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Refactor usage to alternate API.
-        /// </summary>
-        internal static string AdapterRefactorTitle {
-            get {
-                return ResourceManager.GetString("AdapterRefactorTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Redirect static member access to alternate member.
-        /// </summary>
-        internal static string AdapterStaticMemberTitle {
-            get {
-                return ResourceManager.GetString("AdapterStaticMemberTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Add an adapter descriptor.
-        /// </summary>
-        internal static string AddAdapterDescriptorTitle {
-            get {
-                return ResourceManager.GetString("AddAdapterDescriptorTitle", resourceCulture);
             }
         }
         
