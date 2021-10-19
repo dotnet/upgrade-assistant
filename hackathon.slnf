@@ -2,14 +2,12 @@
   "solution": {
     "path": "Microsoft.DotNet.UpgradeAssistant.sln",
     "projects": [
-      "src\\common\\Microsoft.DotNet.UpgradeAssistant.Abstractions\\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj",
-      "src\\extensions\\default\\analyzers\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Common.csproj",
-      "src\\extensions\\default\\analyzers\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Package.csproj",
-      "src\\extensions\\default\\analyzers\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.csproj",
-      "src\\extensions\\default\\analyzers\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.csproj",
-      "src\\extensions\\default\\analyzers\\Vsix\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Vsix.csproj",
-      "tests\\Microsoft.DotNet.UpgradeAssistant.TestHelpers\\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj",
-      "tests\\extensions\\default\\analyzers\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test\\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.csproj"
+      "src\\analyzers\\DeprecatedApis\\DeprecatedApis.CodeFixes\\DeprecatedApis.CodeFixes.csproj",
+      "src\\analyzers\\DeprecatedApis\\DeprecatedApis.Common\\DeprecatedApis.Common.csproj",
+      "src\\analyzers\\DeprecatedApis\\DeprecatedApis.Package\\DeprecatedApis.Package.csproj",
+      "src\\analyzers\\DeprecatedApis\\DeprecatedApis\\DeprecatedApis.csproj",
+      "src\\analyzers\\DeprecatedApis\\Vsix\\DeprecatedApis.Vsix.csproj",
+      "tests\\analyzers\\DeprecatedApis.Tests\\DeprecatedApis.Tests.csproj"
     ]
   }
 }
