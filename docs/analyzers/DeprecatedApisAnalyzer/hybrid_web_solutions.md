@@ -12,7 +12,7 @@ The adapter pattern is ideal for this situation, in that we can create an adapte
 
 > Note: The behavior of the two `HttpContext` types are quite different in many ways which this document does not attempt to address. The focus of this document is to provide a pattern as to how developers may begin to address pervasive usage of this type.
 
-`UA0014` is an analyzer that allows a project to specify what adapters should be used for a given type and provides codefixers to automate that change. This can be defined by first defining an attribute of the following shape:
+`UA0100` is an analyzer that allows a project to specify what adapters should be used for a given type and provides codefixers to automate that change. This can be defined by first defining an attribute of the following shape:
 
 ```csharp
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
@@ -32,7 +32,7 @@ This can then be used to register what expected adapters should be. Assuming the
 [assembly: AdapterDescriptor(typeof(System.Web.HttpRequest), typeof(IRequest))]
 ```
 
-Now, the analyze `UA0014` will start flaggin any usage of the types on the right hand side and will offer to replace them with the abstraction desired. This can be applied at the scope of document/project/solution level.
+Now, the analyze `UA0100` will start flagging any usage of the types on the right hand side and will offer to replace them with the abstraction desired. This can be applied at the scope of document/project/solution level.
 
 In order to apply it beyond the current project, the abstractions should be moved to a separate project. In that project, the adapters may be registered and will apply to any project that references it.
 
