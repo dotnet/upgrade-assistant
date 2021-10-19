@@ -34,16 +34,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 var adapterContext = AdapterContext.Create().FromCompilation(context.Compilation);
                 var deprecatedTypeSymbols = RefactoredTypesCollection.Create(context.Compilation, context.Options.AdditionalFiles);
 
-                if (adapterContext.Types.AdapterDescriptor is null)
+                context.RegisterTypeAdapterActions(adapterContext, context =>
                 {
-                    context.RegisterTypeAdapterActions(adapterContext, context =>
+                    if (deprecatedTypeSymbols.Contains(context.symbol) && !adapterContext.IsTypeMarkedForRefactoring(context.symbol))
                     {
-                        if (deprecatedTypeSymbols.Contains(context.symbol))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(AddAdapterDescriptorRule, context.node.GetLocation(), context.node.ToFullString().Trim()));
-                        }
-                    });
-                }
+                        context.ReportDiagnostic(Diagnostic.Create(AddAdapterDescriptorRule, context.node.GetLocation(), context.node.ToFullString().Trim()));
+                    }
+                });
             });
         }
     }

@@ -6,8 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-#pragma warning disable CA1062 // Validate arguments of public methods
-
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
     public record AdapterContext
@@ -17,6 +15,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         public ImmutableArray<AdapterDescriptor<ISymbol>> StaticMemberDescriptors { get; init; } = ImmutableArray.Create<AdapterDescriptor<ISymbol>>();
 
         public ImmutableArray<FactoryDescriptor> Factories { get; init; } = ImmutableArray.Create<FactoryDescriptor>();
+
+        public ImmutableArray<AdapterDefinition> Definitions { get; init; } = ImmutableArray.Create<AdapterDefinition>();
 
         public WellKnownTypes Types { get; init; }
 
@@ -63,6 +63,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
 
             return null;
+        }
+
+        public bool IsTypeMarkedForRefactoring(ISymbol type)
+        {
+            foreach (var definition in Definitions)
+            {
+                if (SymbolEqualityComparer.Default.Equals(definition.TypeToReplace, type))
+                {
+                    return true;
+                }
+            }
+
+            foreach (var descriptor in TypeDescriptors)
+            {
+                if (SymbolEqualityComparer.Default.Equals(descriptor.Original, type))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public AdapterDescriptor<ITypeSymbol>? GetDescriptorForDestination(ITypeSymbol type)
@@ -145,12 +166,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             foreach (var a in assembly.GetAttributes())
             {
-                if (TryParseDescriptor(context.Types, a, out var descriptor))
+                if (TryParseDescriptor(context.Types, a, ref context))
                 {
-                    context = context with
-                    {
-                        TypeDescriptors = context.TypeDescriptors.Add(descriptor)
-                    };
                 }
                 else if (TryParseStaticDescriptor(context.Types, a, out var staticDescriptor))
                 {
@@ -199,19 +216,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return false;
         }
 
-        private static bool TryParseDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor<ITypeSymbol> descriptor)
+        private static bool TryParseDescriptor(WellKnownTypes types, AttributeData a, ref AdapterContext context)
         {
-            descriptor = default;
-
             if (SymbolEqualityComparer.Default.Equals(types.AdapterDescriptor, a.AttributeClass))
             {
                 if (a.ConstructorArguments.Length == 2 &&
                    a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
                    a.ConstructorArguments[1].Kind == TypedConstantKind.Type &&
-                   a.ConstructorArguments[0].Value is ITypeSymbol concreteType &&
-                   a.ConstructorArguments[1].Value is ITypeSymbol destination)
+                   a.ConstructorArguments[0].Value is ITypeSymbol concreteType)
                 {
-                    descriptor = new(concreteType, destination);
+                    if (a.ConstructorArguments[1].Value is ITypeSymbol destination)
+                    {
+                        var descriptor = new AdapterDescriptor<ITypeSymbol>(concreteType, destination);
+                        context = context with { TypeDescriptors = context.TypeDescriptors.Add(descriptor) };
+                    }
+                    else
+                    {
+                        var definition = new AdapterDefinition(concreteType);
+                        context = context with { Definitions = context.Definitions.Add(definition) };
+                    }
+
                     return true;
                 }
             }

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
@@ -13,6 +14,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         {
             var result = ImmutableHashSet.CreateBuilder<ISymbol>(SymbolEqualityComparer.Default);
 
+            foreach (var line in GetNames(additionalTexts))
+            {
+                if (compilation.GetTypeByMetadataName(line) is ISymbol symbol)
+                {
+                    result.Add(symbol);
+                }
+            }
+
+            return result.ToImmutable();
+        }
+
+        private static IEnumerable<string> GetNames(ImmutableArray<AdditionalText> additionalTexts)
+        {
             foreach (var additional in additionalTexts)
             {
                 if (additional.Path.EndsWith(".refactoring.txt", StringComparison.OrdinalIgnoreCase))
@@ -25,16 +39,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                         {
                             var trimmed = TrimLine(line.ToString());
 
-                            if (trimmed.Length > 0 && compilation.GetTypeByMetadataName(trimmed) is ISymbol symbol)
+                            if (!string.IsNullOrEmpty(trimmed))
                             {
-                                result.Add(symbol);
+                                yield return trimmed;
                             }
                         }
                     }
                 }
             }
 
-            return result.ToImmutable();
+#if DEBUG
+            yield return "System.Web.HttpContext";
+            yield return "System.Web.HttpContextBase";
+#endif
         }
 
         private static string TrimLine(string input)

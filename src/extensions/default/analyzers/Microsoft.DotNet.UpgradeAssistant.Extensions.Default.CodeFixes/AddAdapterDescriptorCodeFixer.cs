@@ -2,12 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Immutable;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Simplification;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
@@ -15,7 +15,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
     [ExportCodeFixProvider(LanguageNames.CSharp)]
     public class AddAdapterDescriptorCodeFixer : CodeFixProvider
     {
-        private const string AdapterDescriptorResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes.Templates.AdapterDescriptor.cs";
+        private const string NamespaceName = "Microsoft.CodeAnalysis.Refactoring";
+        private const string AttributeName = "AdapterDescriptorAttribute";
+        private const string FullAttributeName = NamespaceName + "." + AttributeName;
+        private const string SystemType = "System.Type";
+        private const string SystemAttribute = "System.Attribute";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(MissingAdapterDescriptor.AddAdapterDescriptorDiagnosticId);
 
@@ -35,7 +39,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                 return;
             }
 
+            var semantic = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
+
+            if (semantic is null)
+            {
+                return;
+            }
+
             var node = root.FindNode(context.Span);
+
+            if (semantic.GetSymbolInfo(node, context.CancellationToken).Symbol is not ITypeSymbol type)
+            {
+                return;
+            }
 
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
@@ -43,21 +59,68 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
                     CodeFixResources.AddAdapterDescriptorTitle,
                     async cancellationToken =>
                     {
+                        var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
                         var project = context.Document.Project;
 
-                        using var sr = new StreamReader(typeof(AddAdapterDescriptorCodeFixer).Assembly.GetManifestResourceStream(AdapterDescriptorResourceName));
-                        var contents = await sr.ReadToEndAsync().ConfigureAwait(false);
-                        contents = contents.Replace("/*{{DEPRECATED_TYPE}}*/", node.ToFullString().Trim());
+                        if (semantic.Compilation.GetTypeByMetadataName(FullAttributeName) is null)
+                        {
+                            project = project.AddDocument($"{AttributeName}.cs", CreateDescriptorAttribute(editor.Generator))
+                                .Project;
+                        }
 
-                        var adapterDescriptorAttributeClass = project.AddDocument("AdapterDescriptor.cs", contents);
-                        project = adapterDescriptorAttributeClass.Project;
-                        var slnEditor = new SolutionEditor(project.Solution);
+                        project = project.AddDocument("Descriptors.cs", CreateAttributeInstance(editor.Generator, type))
+                            .Project;
 
-                        return slnEditor.GetChangedSolution()
-                            .WithDocumentText(adapterDescriptorAttributeClass.Id, await adapterDescriptorAttributeClass.GetTextAsync(cancellationToken).ConfigureAwait(false));
+                        return project.Solution;
                     },
                     nameof(AddAdapterDescriptorCodeFixer)),
                 context.Diagnostics);
+        }
+
+        private static SyntaxNode CreateAttributeInstance(SyntaxGenerator generator, ITypeSymbol type) =>
+            generator.AddAttributes(
+                generator.CompilationUnit(),
+                generator.Attribute(
+                    generator.DottedName(FullAttributeName),
+                    new[] { generator.TypeOfExpression(generator.NameExpression(type)) }))
+                .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
+                .WithAdditionalAnnotations(Simplifier.Annotation);
+
+        private static SyntaxNode CreateDescriptorAttribute(SyntaxGenerator generator)
+        {
+            var constructor = generator.ConstructorDeclaration(
+                parameters: new[]
+                {
+                    generator.ParameterDeclaration("original", generator.DottedName(SystemType)),
+                    generator.ParameterDeclaration("interfaceType", generator.DottedName(SystemType), initializer: generator.NullLiteralExpression()),
+                },
+                accessibility: Accessibility.Public);
+            var type = generator.ClassDeclaration(
+                AttributeName,
+                modifiers: DeclarationModifiers.Sealed,
+                accessibility: Accessibility.Internal,
+                baseType: generator.DottedName(SystemAttribute),
+                members: new[] { constructor });
+
+            var target = generator.MemberAccessExpression(
+                generator.MemberAccessExpression(
+                    generator.IdentifierName("System"),
+                    "AttributeTargets"),
+                "Assembly");
+
+            var typeWithUsage = generator.AddAttributes(
+                type,
+                generator.Attribute("System.AttributeUsageAttribute",
+                    generator.Argument(target),
+                    generator.AttributeArgument("AllowMultiple",
+                        generator.TrueLiteralExpression())))
+                .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
+                .WithAdditionalAnnotations(Simplifier.Annotation);
+
+            return generator.CompilationUnit(
+                generator.AddMembers(
+                    generator.NamespaceDeclaration(NamespaceName),
+                    typeWithUsage));
         }
     }
 }

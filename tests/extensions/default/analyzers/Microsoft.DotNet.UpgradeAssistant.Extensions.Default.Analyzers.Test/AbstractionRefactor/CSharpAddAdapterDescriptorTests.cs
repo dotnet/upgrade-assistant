@@ -13,46 +13,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     public class CSharpAddAdapterDescriptorTests : AdapterTestBase
     {
         private const string AdditionalFileContext = "System.Web.HttpContext";
-        private const string HttpContextAttributeDescriptorClass = @"using System;
-using Microsoft.CodeAnalysis.Refactoring;
-#if NET || NETCOREAPP
-using Microsoft.AspNetCore.Http;
-#else
-using System.Web;
-#endif
+        private const string AddedHttpContextDescriptor = @"using System.Web;
 
-[assembly: AdapterDescriptor(typeof(HttpContext))]
-
-namespace Microsoft.CodeAnalysis.Refactoring
-{
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    internal sealed class AdapterDescriptorAttribute : Attribute
-    {
-        public AdapterDescriptorAttribute(Type original, Type interfaceType)
-        {
-        }
-        public AdapterDescriptorAttribute(Type original)
-        {
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    internal sealed class AdapterFactoryDescriptorAttribute : Attribute
-    {
-        public AdapterFactoryDescriptorAttribute(Type factoryType, string factoryMethod)
-        {
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    internal class AdapterStaticDescriptorAttribute : Attribute
-    {
-        public AdapterStaticDescriptorAttribute(Type originalType, string originalString, Type destinationType, string destinationString)
-        {
-        }
-    }
-}
+[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(HttpContext))]
 ";
+
+        private const string AddedDescriptorAttributeFile = @"namespace Microsoft.CodeAnalysis.Refactoring
+{
+    [System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true)]
+    internal sealed class AdapterDescriptorAttribute : System.Attribute
+    {
+        public AdapterDescriptorAttribute(System.Type original, System.Type interfaceType = null)
+        {
+        }
+    }
+}";
+
+        private const string AdapterDescriptorAttributeFileName = "AdapterDescriptorAttribute.cs";
+        private const string DescriptorsFileName = "Descriptors.cs";
+        private const string WebRefactoringTxtFileName = "web.refactoring.txt";
 
         [Fact]
         public async Task EmptyCode()
@@ -76,13 +55,62 @@ namespace RefactorTest
     }
 }";
 
+            var fixedFile = @"
+using System.Web;
+
+namespace RefactorTest
+{
+    public class SomeClass
+    {
+        private readonly HttpContext _context;
+    }
+}";
+
             var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments("HttpContext");
             await VerifyCS.Create()
                 .WithSource(testFile)
-                .WithAdditionalFile("web.refactoring.txt", AdditionalFileContext)
+                .WithAdditionalFile(WebRefactoringTxtFileName, AdditionalFileContext)
+                .WithExpectedDiagnostics(addAttributeDescriptorClassDiagnostic)
+                .WithFixed(fixedFile)
+                .WithFixed(AddedDescriptorAttributeFile, AdapterDescriptorAttributeFileName)
+                .WithFixed(AddedHttpContextDescriptor, DescriptorsFileName)
+                .WithSystemWeb()
+                .RunAsync();
+        }
+
+        [Fact]
+        public async Task SingleChangeFieldAttributeExistings()
+        {
+            var testFile = @"
+using System;
+using System.Web;
+
+namespace RefactorTest
+{
+    public class SomeClass
+    {
+        private readonly {|#0:HttpContext|} _context;
+    }
+}
+
+namespace Microsoft.CodeAnalysis.Refactoring
+{
+    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+    internal sealed class AdapterDescriptorAttribute : Attribute
+    {
+        public AdapterDescriptorAttribute(Type original, Type interfaceType = null)
+        {
+        }
+    }
+}";
+
+            var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments("HttpContext");
+            await VerifyCS.Create()
+                .WithSource(testFile)
+                .WithAdditionalFile(WebRefactoringTxtFileName, AdditionalFileContext)
                 .WithExpectedDiagnostics(addAttributeDescriptorClassDiagnostic)
                 .WithFixed(testFile)
-                .WithFixed(HttpContextAttributeDescriptorClass, "AdapterDescriptor.cs")
+                .WithFixed(AddedHttpContextDescriptor, DescriptorsFileName)
                 .WithSystemWeb()
                 .RunAsync();
         }
@@ -108,9 +136,10 @@ namespace RefactorTest
             await VerifyCS.Create()
                 .WithSource(testFile)
                 .WithExpectedDiagnostics(addAttributeDescriptorClassDiagnostic)
-                .WithAdditionalFile("web.refactoring.txt", AdditionalFileContext)
+                .WithAdditionalFile(WebRefactoringTxtFileName, AdditionalFileContext)
                 .WithFixed(testFile)
-                .WithFixed(HttpContextAttributeDescriptorClass, "AdapterDescriptor.cs")
+                .WithFixed(AddedDescriptorAttributeFile, AdapterDescriptorAttributeFileName)
+                .WithFixed(AddedHttpContextDescriptor, DescriptorsFileName)
                 .WithSystemWeb()
                 .RunAsync();
         }

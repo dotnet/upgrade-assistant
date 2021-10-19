@@ -97,20 +97,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add an adapter descriptor class.
-        /// </summary>
-        internal static string AddAdapterDescriptorTitle {
-            get {
-                return ResourceManager.GetString("AddAdapterDescriptorTitle", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Redirect static member access to alternate member.
         /// </summary>
         internal static string AdapterStaticMemberTitle {
             get {
                 return ResourceManager.GetString("AdapterStaticMemberTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add an adapter descriptor.
+        /// </summary>
+        internal static string AddAdapterDescriptorTitle {
+            get {
+                return ResourceManager.GetString("AddAdapterDescriptorTitle", resourceCulture);
             }
         }
         

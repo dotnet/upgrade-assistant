@@ -15,6 +15,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return test;
         }
 
+        public static TTest WithAdditionalFileFixed<TTest>(this TTest test, string fileName, string fileContents)
+            where TTest : ICodeFixTest
+        {
+            test.FixedState.AdditionalFiles.Add((fileName, fileContents));
+            return test;
+        }
+
         public static TTest WithSource<TTest>(this TTest test, string source)
             where TTest : IAnalyzerTest
         {
