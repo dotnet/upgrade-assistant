@@ -20,7 +20,7 @@ namespace Microsoft.CodeAnalysis.Refactoring
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     internal sealed class AdapterDescriptorAttribute : Attribute
     {
-        public AdapterDescriptorAttribute(Type original, Type? interfaceType)
+        public AdapterDescriptorAttribute(Type original, Type? interfaceType = null)
         {
         }
     }

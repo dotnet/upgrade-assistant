@@ -3,6 +3,7 @@
     <_RootDirectory>$(MSBuildThisFileDirectory)..\..\..\..\</_RootDirectory>
   </PropertyGroup>
   <ItemGroup>
-    <!--<Analyzer Include="$(_RootDirectory)artifacts\bin\DeprecatedApis.CodeFixes\Debug\netstandard2.0\*.dll"/>-->
+    <Analyzer Include="$(_RootDirectory)artifacts\bin\DeprecatedApis.CodeFixes\Debug\netstandard2.0\*.dll"/>
   </ItemGroup>
+  <Import Project="$(_RootDirectory)src\analyzers\DeprecatedApis\DeprecatedApis.Package\build\Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.props"/>
 </Project>
