@@ -37,10 +37,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         private static readonly LocalizableString CallFactoryMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterCallFactoryMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString CallFactoryDescription = new LocalizableResourceString(nameof(Resources.AdapterCallFactoryDescription), Resources.ResourceManager, typeof(Resources));
 
-        private static readonly DiagnosticDescriptor RefactorRule = new(RefactorDiagnosticId, RefactorTitle, RefactorMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: RefactorDescription);
-        private static readonly DiagnosticDescriptor StaticMemberRule = new(StaticMemberDiagnosticId, StaticMemberTitle, StaticMemberMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: StaticMemberDescription);
-        private static readonly DiagnosticDescriptor AddMemberRule = new(AddMemberDiagnosticId, AddMemberTitle, AddMemberMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AddMemberDescription);
-        private static readonly DiagnosticDescriptor CallFactoryRule = new(CallFactoryDiagnosticId, CallFactoryTitle, CallFactoryMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: CallFactoryDescription);
+        private static readonly DiagnosticDescriptor RefactorRule = new(RefactorDiagnosticId, RefactorTitle, RefactorMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: RefactorDescription, helpLinkUri: HelpLink.Create(RefactorDiagnosticId));
+        private static readonly DiagnosticDescriptor StaticMemberRule = new(StaticMemberDiagnosticId, StaticMemberTitle, StaticMemberMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: StaticMemberDescription, helpLinkUri: HelpLink.Create(StaticMemberDiagnosticId));
+        private static readonly DiagnosticDescriptor AddMemberRule = new(AddMemberDiagnosticId, AddMemberTitle, AddMemberMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AddMemberDescription, helpLinkUri: HelpLink.Create(AddMemberDiagnosticId));
+        private static readonly DiagnosticDescriptor CallFactoryRule = new(CallFactoryDiagnosticId, CallFactoryTitle, CallFactoryMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: CallFactoryDescription, helpLinkUri: HelpLink.Create(CallFactoryDiagnosticId));
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(RefactorRule, AddMemberRule, CallFactoryRule, StaticMemberRule);
 

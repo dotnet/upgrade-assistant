@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         private static readonly LocalizableString AddAdapterDescriptorMessageFormat = new LocalizableResourceString(nameof(Resources.AddAdapterDescriptorMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString AddAdapterDescriptorDescription = new LocalizableResourceString(nameof(Resources.AddAdapterDescriptorDescription), Resources.ResourceManager, typeof(Resources));
 
-        private static readonly DiagnosticDescriptor AddAdapterDescriptorRule = new(AddAdapterDescriptorDiagnosticId, AddAdapterDescriptorTitle, AddAdapterDescriptorMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AddAdapterDescriptorDescription);
+        private static readonly DiagnosticDescriptor AddAdapterDescriptorRule = new(AddAdapterDescriptorDiagnosticId, AddAdapterDescriptorTitle, AddAdapterDescriptorMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: AddAdapterDescriptorDescription, helpLinkUri: HelpLink.Create(AddAdapterDescriptorDiagnosticId));
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(AddAdapterDescriptorRule);
 

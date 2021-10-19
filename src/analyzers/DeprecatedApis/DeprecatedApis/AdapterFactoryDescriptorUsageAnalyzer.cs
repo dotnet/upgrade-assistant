@@ -28,8 +28,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         private static readonly LocalizableString MustBeStaticMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterFactoryMustBeStaticMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MustBeStaticDescription = new LocalizableResourceString(nameof(Resources.AdapterFactoryMustBeStaticDescription), Resources.ResourceManager, typeof(Resources));
 
-        private static readonly DiagnosticDescriptor MustExistRule = new(MustExistDiagnosticId, MustExistTitle, MustExistMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: MustExistDescription);
-        private static readonly DiagnosticDescriptor MustBeStaticRule = new(MustBeStaticDiagnosticId, MustBeStaticTitle, MustBeStaticMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: MustBeStaticDescription);
+        private static readonly DiagnosticDescriptor MustExistRule = new(MustExistDiagnosticId, MustExistTitle, MustExistMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: MustExistDescription, helpLinkUri: HelpLink.Create(MustExistDiagnosticId));
+        private static readonly DiagnosticDescriptor MustBeStaticRule = new(MustBeStaticDiagnosticId, MustBeStaticTitle, MustBeStaticMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: MustBeStaticDescription, helpLinkUri: HelpLink.Create(MustBeStaticDiagnosticId));
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(MustExistRule, MustBeStaticRule);
 

@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         private static readonly LocalizableString DefinitionMessageFormat = new LocalizableResourceString(nameof(Resources.AdapterDefinitionMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString DefinitionDescription = new LocalizableResourceString(nameof(Resources.AdapterDefinitionDescription), Resources.ResourceManager, typeof(Resources));
 
-        private static readonly DiagnosticDescriptor DefinitionRule = new(DefinitionDiagnosticId, DefinitionTitle, DefinitionMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: DefinitionDescription);
+        private static readonly DiagnosticDescriptor DefinitionRule = new(DefinitionDiagnosticId, DefinitionTitle, DefinitionMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: DefinitionDescription, helpLinkUri: HelpLink.Create(DefinitionDiagnosticId));
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(DefinitionRule);
 
