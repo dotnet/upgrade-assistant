@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -12,26 +13,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test
 {
     public class CSharpAddAdapterDescriptorTests : AdapterTestBase
     {
-        private const string AdditionalFileContext = "System.Web.HttpContext";
-        private const string AddedHttpContextDescriptor = @"using System.Web;
-
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(HttpContext))]
-";
-
-        private const string AddedDescriptorAttributeFile = @"namespace Microsoft.CodeAnalysis.Refactoring
-{
-    [System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true)]
-    internal sealed class AdapterDescriptorAttribute : System.Attribute
-    {
-        public AdapterDescriptorAttribute(System.Type original, System.Type interfaceType = null)
-        {
-        }
-    }
-}";
-
         private const string AdapterDescriptorAttributeFileName = "AdapterDescriptorAttribute.cs";
         private const string DescriptorsFileName = "Descriptors.cs";
         private const string WebRefactoringTxtFileName = "web.refactoring.txt";
+        private const string AdditionalFileContext = "System.Web.HttpContext";
+
+        private const string AddedDescriptorAttributeFile = @$"namespace {WellKnownTypeNames.AttributeNamespace}
+{{
+    [System.AttributeUsage(System.AttributeTargets.Assembly, AllowMultiple = true)]
+    internal sealed class {WellKnownTypeNames.AdapterDescriptor} : System.Attribute
+    {{
+        public {WellKnownTypeNames.AdapterDescriptor}(System.Type original, System.Type interfaceType = null)
+        {{
+        }}
+    }}
+}}";
+
+        private static readonly string AttributeWithoutSuffix = WellKnownTypeNames.AdapterDescriptorFullyQualified.AsSpan()[..^"Attribute".Length].ToString();
+        private static readonly string AddedHttpContextDescriptor = @$"using System.Web;
+
+[assembly: {AttributeWithoutSuffix}(typeof(HttpContext))]
+";
 
         [Fact]
         public async Task EmptyCode()
@@ -93,16 +95,7 @@ namespace RefactorTest
     }
 }
 
-namespace Microsoft.CodeAnalysis.Refactoring
-{
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    internal sealed class AdapterDescriptorAttribute : Attribute
-    {
-        public AdapterDescriptorAttribute(Type original, Type interfaceType = null)
-        {
-        }
-    }
-}";
+" + AddedDescriptorAttributeFile;
 
             var addAttributeDescriptorClassDiagnostic = VerifyCS.Diagnostic().WithLocation(0).WithArguments("HttpContext");
             await VerifyCS.Create()

@@ -15,9 +15,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test
         [Fact]
         public async Task SingleChange()
         {
-            var testFile = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterStaticDescriptor(typeof(RefactorTest.SomeClass), nameof(RefactorTest.SomeClass.Prop1), typeof(RefactorTest.OtherClass), nameof(RefactorTest.OtherClass.Prop2))]
-
+            var testFile = @$"
+[assembly: {WellKnownTypeNames.AdapterStaticDescriptorFullyQualified}(typeof(RefactorTest.SomeClass), nameof(RefactorTest.SomeClass.Prop1), typeof(RefactorTest.OtherClass), nameof(RefactorTest.OtherClass.Prop2))]
+" + @"
 namespace RefactorTest
 {
     public static class Test
@@ -36,9 +36,9 @@ namespace RefactorTest
     }
 }";
 
-            const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterStaticDescriptor(typeof(RefactorTest.SomeClass), nameof(RefactorTest.SomeClass.Prop1), typeof(RefactorTest.OtherClass), nameof(RefactorTest.OtherClass.Prop2))]
-
+            const string withFix = @$"
+[assembly: {WellKnownTypeNames.AdapterStaticDescriptorFullyQualified}(typeof(RefactorTest.SomeClass), nameof(RefactorTest.SomeClass.Prop1), typeof(RefactorTest.OtherClass), nameof(RefactorTest.OtherClass.Prop2))]
+" + @"
 namespace RefactorTest
 {
     public static class Test

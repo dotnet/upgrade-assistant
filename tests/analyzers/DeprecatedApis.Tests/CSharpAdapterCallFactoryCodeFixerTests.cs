@@ -17,9 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test.Abstract
         public async Task ArgumentToMethod()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
-            var testFile = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
-
+            var testFile = @$"
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+" + @"
 namespace RefactorTest
 {
     public class Test
@@ -52,9 +52,9 @@ namespace RefactorTest
     }
 }";
 
-            const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
-
+            const string withFix = @$"
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+" + @"
 namespace RefactorTest
 {
     public class Test
@@ -103,9 +103,9 @@ namespace RefactorTest
         public async Task LocalVariableCallFactory()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
-            var testFile = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
-
+            var testFile = @$"
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+" + @"
 namespace RefactorTest
 {
     public class Test
@@ -142,9 +142,9 @@ namespace RefactorTest
     }
 }";
 
-            const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
-
+            const string withFix = @$"
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+" + @"
 namespace RefactorTest
 {
     public class Test
@@ -197,9 +197,9 @@ namespace RefactorTest
         public async Task ReturnTypeChanges()
         {
             var refactor = new AdapterDescriptorFactory("RefactorTest", "SomeClass", "ISome");
-            var testFile = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
-
+            var testFile = @$"
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+" + @"
 namespace RefactorTest
 {
     public class Test
@@ -221,9 +221,9 @@ namespace RefactorTest
     }
 }";
 
-            const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
-
+            const string withFix = @$"
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(RefactorTest.TestFactory), nameof(RefactorTest.TestFactory.Create))]
+" + @"
 namespace RefactorTest
 {
     public class Test

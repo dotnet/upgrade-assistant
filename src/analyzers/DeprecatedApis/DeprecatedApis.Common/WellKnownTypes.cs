@@ -8,10 +8,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 {
     public readonly record struct WellKnownTypes
     {
-        private const string AdapterDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterDescriptorAttribute";
-        private const string AdapterStaticDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterStaticDescriptorAttribute";
-        private const string FactoryDescriptorFullyQualified = "Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptorAttribute";
-
         private static readonly SymbolDisplayFormat DisplayFormat = SymbolDisplayFormat.FullyQualifiedFormat
             .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted);
 
@@ -52,9 +48,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
             return namedType.ToDisplayString(DisplayFormat) switch
             {
-                AdapterDescriptorFullyQualified => new() { AdapterDescriptor = namedType },
-                AdapterStaticDescriptorFullyQualified => new() { AdapterStaticDescriptor = namedType },
-                FactoryDescriptorFullyQualified => new() { DescriptorFactory = namedType },
+                WellKnownTypeNames.AdapterDescriptorFullyQualified => new() { AdapterDescriptor = namedType },
+                WellKnownTypeNames.AdapterStaticDescriptorFullyQualified => new() { AdapterStaticDescriptor = namedType },
+                WellKnownTypeNames.FactoryDescriptorFullyQualified => new() { DescriptorFactory = namedType },
                 _ => default,
             };
         }
@@ -68,9 +64,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
             return new()
             {
-                AdapterDescriptor = compilation.GetTypeByMetadataName(AdapterDescriptorFullyQualified),
-                AdapterStaticDescriptor = compilation.GetTypeByMetadataName(AdapterStaticDescriptorFullyQualified),
-                DescriptorFactory = compilation.GetTypeByMetadataName(FactoryDescriptorFullyQualified),
+                AdapterDescriptor = compilation.GetTypeByMetadataName(WellKnownTypeNames.AdapterDescriptorFullyQualified),
+                AdapterStaticDescriptor = compilation.GetTypeByMetadataName(WellKnownTypeNames.AdapterStaticDescriptorFullyQualified),
+                DescriptorFactory = compilation.GetTypeByMetadataName(WellKnownTypeNames.FactoryDescriptorFullyQualified),
             };
         }
     }

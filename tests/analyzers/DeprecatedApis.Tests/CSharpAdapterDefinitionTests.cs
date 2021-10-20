@@ -16,9 +16,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test.Abstract
         [Fact]
         public async Task CanGenerateInterfaceStub()
         {
-            var testFile = @"
-[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass))|}]
-
+            var testFile = @$"
+[assembly: {{|#0:{WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof(TestProject.SomeClass))|}}]
+" + @"
 namespace TestProject
 {
     public class Test
@@ -35,9 +35,9 @@ namespace TestProject
     }
 }";
 
-            const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass), typeof(TestProject.ISomeClass))]
-
+            const string withFix = @$"
+[assembly: {{|#0:{WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof(TestProject.SomeClass), typeof(TestProject.ISomeClass))|}}]
+" + @"
 namespace TestProject
 {
     public class Test
@@ -73,9 +73,9 @@ namespace TestProject
         [Fact]
         public async Task DoesNothingIfInterfaceStubExists()
         {
-            var testFile = @"
-[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass))|}]
-
+            var testFile = @$"
+[assembly: {{|#0:{WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof(TestProject.SomeClass))|}}]
+" + @"
 namespace TestProject
 {
     public class Test
@@ -96,9 +96,9 @@ namespace TestProject
     }
 }";
 
-            const string withFix = @"
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(TestProject.SomeClass), typeof(TestProject.ISomeClass))]
-
+            const string withFix = @$"
+[assembly: {{|#0:{WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof(TestProject.SomeClass), typeof(TestProject.ISomeClass))|}}]
+" + @"
 namespace TestProject
 {
     public class Test
@@ -130,16 +130,11 @@ namespace TestProject
         [Fact]
         public async Task CanGenerateInterfaceStubWithCorrectNamespace()
         {
-            // while (!System.Diagnostics.Debugger.IsAttached)
-            // {
-            //     System.Console.WriteLine($"Waiting to attach on {System.Diagnostics.Process.GetCurrentProcess().Id}");
-            //     System.Threading.Thread.Sleep(1000);
-            // }
-            var testFile = @"
+            var testFile = @$"
 using ClassLib;
 
-[assembly: {|#0:Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(ClassLib.SomeClass))|}]
-
+[assembly: {{|#0:{WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof(ClassLib.SomeClass))|}}]
+" + @"
 namespace TestProject
 {
     public class Test
@@ -159,11 +154,11 @@ namespace ClassLib
     }
 }";
 
-            const string withFix = @"
+            const string withFix = @$"
 using ClassLib;
 
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof(ClassLib.SomeClass), typeof(TestProject.ISomeClass))]
-
+[assembly: {{|#0:{WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof(ClassLib.SomeClass), typeof(TestProject.ISomeClass))|}}]
+" + @"
 namespace TestProject
 {
     public class Test

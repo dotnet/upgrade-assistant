@@ -199,11 +199,11 @@ End Namespace";
 
         public static ICodeFixTest CreateTest(AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
         {
-            const string Attribute = @"
+            const string Attribute = @$"
 Imports System
 
-Namespace Microsoft.CodeAnalysis.Refactoring
-    Public Class AdapterDescriptorAttribute
+Namespace {WellKnownTypeNames.AttributeNamespace}
+    Public Class {WellKnownTypeNames.AdapterDescriptor}
         Inherits Attribute
 
         Public Sub New(interfaceType As Type, original As Type)

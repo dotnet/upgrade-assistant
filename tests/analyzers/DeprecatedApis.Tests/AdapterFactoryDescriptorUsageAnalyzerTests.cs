@@ -23,11 +23,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test
         [Fact]
         public async Task CorrectlyFormed()
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(TestFactory.FactoryClass), nameof(TestFactory.FactoryClass.Create))]
-
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(TestFactory.FactoryClass), nameof(TestFactory.FactoryClass.Create))]
+" + @"
 namespace TestFactory
 {
     public static class FactoryClass
@@ -52,11 +52,11 @@ namespace TestFactory
         [Fact]
         public async Task MethodNotFound()
         {
-            var testFile = @"
+            var testFile = @$"
 using System;
 
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(TestFactory.FactoryClass), {|#0:""notreal""|})]
-
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(TestFactory.FactoryClass), {{|#0:""notreal""|}})]
+" + @"
 namespace TestFactory
 {
     public static class FactoryClass
@@ -90,7 +90,7 @@ namespace TestFactory
             var testFile = @$"
 using System;
 
-[assembly: Microsoft.CodeAnalysis.Refactoring.AdapterFactoryDescriptor(typeof(TestFactory.FactoryClass), {{|#0:{create}|}})]
+[assembly: {WellKnownTypeNames.FactoryDescriptorFullyQualified}(typeof(TestFactory.FactoryClass), {{|#0:{create}|}})]
 " + @"
 namespace TestFactory
 {

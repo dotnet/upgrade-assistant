@@ -7,32 +7,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test
 {
     public abstract class AdapterTestBase
     {
-        protected const string Attribute = @"
+        protected const string Attribute = @$"
 using System;
 
-namespace Microsoft.CodeAnalysis.Refactoring
-{
-    public class AdapterStaticDescriptorAttribute : Attribute
-    {
-        public AdapterStaticDescriptorAttribute(Type originalType, string originalString, Type destinationType, string destinationString)
-        {
-        }
-    }
+namespace {WellKnownTypeNames.AttributeNamespace}
+{{
+    public class {WellKnownTypeNames.AdapterStaticDescriptor} : Attribute
+    {{
+        public {WellKnownTypeNames.AdapterStaticDescriptor}(Type originalType, string originalString, Type destinationType, string destinationString)
+        {{
+        }}
+    }}
 
-    public class AdapterDescriptorAttribute : Attribute
-    {
-        public AdapterDescriptorAttribute(Type original, Type interfaceType = null)
-        {
-        }
-    }
+    public class {WellKnownTypeNames.AdapterDescriptor} : Attribute
+    {{
+        public {WellKnownTypeNames.AdapterDescriptor}(Type original, Type interfaceType = null)
+        {{
+        }}
+    }}
 
-    public class AdapterFactoryDescriptorAttribute : Attribute
-    {
-        public AdapterFactoryDescriptorAttribute(Type factoryClass, string factoryMethod)
-        {
-        }
-    }
-}";
+    public class {WellKnownTypeNames.FactoryDescriptor} : Attribute
+    {{
+        public {WellKnownTypeNames.FactoryDescriptor}(Type factoryClass, string factoryMethod)
+        {{
+        }}
+    }}
+}}";
 
         protected static ICodeFixTest CreateTest(ICodeFixTest test, AdapterDescriptorFactory? attributeDescriptor = null, bool withFix = true)
         {

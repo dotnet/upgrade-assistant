@@ -11,12 +11,9 @@ using Microsoft.CodeAnalysis.Simplification;
 
 namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp)]
+    [ExportCodeFixProvider(LanguageNames.CSharp, LanguageNames.VisualBasic)]
     public class AddAdapterDescriptorCodeFixer : CodeFixProvider
     {
-        private const string NamespaceName = "Microsoft.CodeAnalysis.Refactoring";
-        private const string AttributeName = "AdapterDescriptorAttribute";
-        private const string FullAttributeName = NamespaceName + "." + AttributeName;
         private const string SystemType = "System.Type";
         private const string SystemAttribute = "System.Attribute";
 
@@ -61,9 +58,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes
                         var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
                         var project = context.Document.Project;
 
-                        if (semantic.Compilation.GetTypeByMetadataName(FullAttributeName) is null)
+                        if (semantic.Compilation.GetTypeByMetadataName(WellKnownTypeNames.AdapterDescriptorFullyQualified) is null)
                         {
-                            project = project.AddDocument($"{AttributeName}.cs", CreateDescriptorAttribute(editor.Generator))
+                            project = project.AddDocument($"{WellKnownTypeNames.AdapterDescriptor}.cs", CreateDescriptorAttribute(editor.Generator))
                                 .Project;
                         }
 
@@ -80,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes
             generator.AddAttributes(
                 generator.CompilationUnit(),
                 generator.Attribute(
-                    generator.DottedName(FullAttributeName),
+                    generator.DottedName(WellKnownTypeNames.AdapterDescriptorFullyQualified),
                     new[] { generator.TypeOfExpression(generator.NameExpression(type)) }))
                 .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation)
                 .WithAdditionalAnnotations(Simplifier.Annotation);
@@ -95,7 +92,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes
                 },
                 accessibility: Accessibility.Public);
             var type = generator.ClassDeclaration(
-                AttributeName,
+                WellKnownTypeNames.AdapterDescriptor,
                 modifiers: DeclarationModifiers.Sealed,
                 accessibility: Accessibility.Internal,
                 baseType: generator.DottedName(SystemAttribute),
@@ -118,7 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes
 
             return generator.CompilationUnit(
                 generator.AddMembers(
-                    generator.NamespaceDeclaration(NamespaceName),
+                    generator.NamespaceDeclaration(WellKnownTypeNames.AttributeNamespace),
                     typeWithUsage));
         }
     }

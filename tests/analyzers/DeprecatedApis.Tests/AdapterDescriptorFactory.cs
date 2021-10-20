@@ -21,11 +21,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test
             };
 
         private string CreateVBAttributeString() => Destination is null
-            ? $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullOriginal}))>"
-            : $"<Assembly: Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(GetType({FullOriginal}), GetType({FullDestination}))>";
+            ? $"<Assembly: {WellKnownTypeNames.AdapterDescriptorFullyQualified}(GetType({FullOriginal}))>"
+            : $"<Assembly: {WellKnownTypeNames.AdapterDescriptorFullyQualified}(GetType({FullOriginal}), GetType({FullDestination}))>";
 
         private string CreateCSharpAttributeString() => Destination is null
-            ? $"[assembly: global::Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof({FullOriginal}))]"
-            : $"[assembly: global::Microsoft.CodeAnalysis.Refactoring.AdapterDescriptor(typeof({FullOriginal}), typeof({FullDestination}))]";
+            ? $"[assembly: {WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof({FullOriginal}))]"
+            : $"[assembly: {WellKnownTypeNames.AdapterDescriptorFullyQualified}(typeof({FullOriginal}), typeof({FullDestination}))]";
     }
 }
