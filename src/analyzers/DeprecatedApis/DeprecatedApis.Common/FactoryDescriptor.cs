@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 {
-    public record FactoryDescriptor(ImmutableArray<IMethodSymbol> Methods)
+    public record FactoryDescriptor(IMethodSymbol Method)
     {
     }
 }

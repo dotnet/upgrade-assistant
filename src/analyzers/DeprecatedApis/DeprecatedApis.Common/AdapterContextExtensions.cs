@@ -68,11 +68,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                         StaticMembers = context.StaticMembers.Add(staticDescriptor)
                     };
                 }
-                else if (TryParseFactory(context.KnownTypes, a, out var factory))
+                else if (TryParseFactories(context.KnownTypes, a, out var factories))
                 {
                     context = context with
                     {
-                        Factories = context.Factories.Add(factory)
+                        Factories = context.Factories.AddRange(factories)
                     };
                 }
             }
@@ -135,7 +135,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
             return false;
         }
 
-        private static bool TryParseFactory(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out FactoryDescriptor descriptor)
+        private static bool TryParseFactories(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out ImmutableArray<FactoryDescriptor> descriptor)
         {
             if (SymbolEqualityComparer.Default.Equals(types.DescriptorFactory, a.AttributeClass))
             {
@@ -148,11 +148,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                     var methods = type.GetMembers(methodName)
                         .OfType<IMethodSymbol>()
                         .Where(m => m.IsStatic)
+                        .Select(m => new FactoryDescriptor(m))
                         .ToImmutableArray();
 
                     if (methods.Length > 0)
                     {
-                        descriptor = new FactoryDescriptor(methods);
+                        descriptor = methods;
                         return true;
                     }
                 }

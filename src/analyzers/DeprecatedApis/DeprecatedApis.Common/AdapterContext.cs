@@ -22,12 +22,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         {
             foreach (var factory in Factories)
             {
-                foreach (var factoryMethod in factory.Methods)
+                if (SymbolEqualityComparer.Default.Equals(method, factory.Method))
                 {
-                    if (SymbolEqualityComparer.Default.Equals(method, factoryMethod))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -51,12 +48,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         {
             foreach (var factory in Factories)
             {
-                foreach (var method in factory.Methods)
+                if (SymbolEqualityComparer.Default.Equals(factory.Method.ReturnType, type))
                 {
-                    if (SymbolEqualityComparer.Default.Equals(method.ReturnType, type))
-                    {
-                        return method;
-                    }
+                    return factory.Method;
                 }
             }
 
@@ -106,16 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
             if (symbol is IMethodSymbol methodSymbol)
             {
-                foreach (var factory in Factories)
-                {
-                    foreach (var method in factory.Methods)
-                    {
-                        if (SymbolEqualityComparer.Default.Equals(method, methodSymbol))
-                        {
-                            return true;
-                        }
-                    }
-                }
+                return IsFactoryMethod(methodSymbol);
             }
 
             return false;
