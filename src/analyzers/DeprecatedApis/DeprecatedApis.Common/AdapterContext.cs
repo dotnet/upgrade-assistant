@@ -8,15 +8,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 {
     public record AdapterContext
     {
-        public ImmutableArray<AdapterDescriptor<ITypeSymbol>> TypeDescriptors { get; init; } = ImmutableArray.Create<AdapterDescriptor<ITypeSymbol>>();
+        public ImmutableArray<ReplacementDescriptor<ITypeSymbol>> Types { get; init; } = ImmutableArray.Create<ReplacementDescriptor<ITypeSymbol>>();
 
-        public ImmutableArray<AdapterDescriptor<ISymbol>> StaticMemberDescriptors { get; init; } = ImmutableArray.Create<AdapterDescriptor<ISymbol>>();
+        public ImmutableArray<ReplacementDescriptor<ISymbol>> StaticMembers { get; init; } = ImmutableArray.Create<ReplacementDescriptor<ISymbol>>();
 
         public ImmutableArray<FactoryDescriptor> Factories { get; init; } = ImmutableArray.Create<FactoryDescriptor>();
 
-        public ImmutableArray<AdapterDefinition> Definitions { get; init; } = ImmutableArray.Create<AdapterDefinition>();
+        public ImmutableArray<ApiDescriptor> Apis { get; init; } = ImmutableArray.Create<ApiDescriptor>();
 
-        public WellKnownTypes Types { get; init; }
+        public WellKnownTypes KnownTypes { get; init; }
 
         public bool IsFactoryMethod(IMethodSymbol method)
         {
@@ -34,9 +34,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
             return false;
         }
 
-        public AdapterDescriptor<ISymbol>? GetStaticMemberDescriptor(ISymbol symbol)
+        public ReplacementDescriptor<ISymbol>? GetStaticMemberDescriptor(ISymbol symbol)
         {
-            foreach (var descriptor in StaticMemberDescriptors)
+            foreach (var descriptor in StaticMembers)
             {
                 if (SymbolEqualityComparer.Default.Equals(descriptor.Original, symbol))
                 {
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
         public bool IsTypeMarkedForRefactoring(ISymbol type)
         {
-            foreach (var definition in Definitions)
+            foreach (var definition in Apis)
             {
                 if (SymbolEqualityComparer.Default.Equals(definition.TypeToReplace, type))
                 {
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                 }
             }
 
-            foreach (var descriptor in TypeDescriptors)
+            foreach (var descriptor in Types)
             {
                 if (SymbolEqualityComparer.Default.Equals(descriptor.Original, type))
                 {
@@ -84,9 +84,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
             return false;
         }
 
-        public AdapterDescriptor<ITypeSymbol>? GetDescriptorForDestination(ITypeSymbol type)
+        public ReplacementDescriptor<ITypeSymbol>? GetDescriptorForDestination(ITypeSymbol type)
         {
-            foreach (var descriptor in TypeDescriptors)
+            foreach (var descriptor in Types)
             {
                 if (SymbolEqualityComparer.Default.Equals(descriptor.Destination, type))
                 {

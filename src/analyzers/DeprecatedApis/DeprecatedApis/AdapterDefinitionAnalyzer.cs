@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                      context.Operation.Children.First() is ITypeOfOperation typeOf &&
                      typeOf.TypeOperand is ITypeSymbol typeToReplace)
                     {
-                        var definition = new AdapterDefinition(typeToReplace);
+                        var definition = new ApiDescriptor(typeToReplace);
                         context.ReportDiagnostic(
                             Diagnostic.Create(
                                 DefinitionRule,

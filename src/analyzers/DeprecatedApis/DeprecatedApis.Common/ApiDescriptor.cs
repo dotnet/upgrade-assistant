@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 {
-    public record AdapterDefinition(ITypeSymbol TypeToReplace)
+    public record ApiDescriptor(ITypeSymbol TypeToReplace)
     {
         private ImmutableDictionary<string, string?>? _properties;
 

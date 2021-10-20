@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test.Abstract
             Assert.NotNull(expectedOriginal);
             Assert.NotNull(expectedDestination);
 
-            Assert.Collection(context.TypeDescriptors, d =>
+            Assert.Collection(context.Types, d =>
             {
                 Assert.Equal(expectedOriginal, d.Original);
                 Assert.Equal(expectedDestination, d.Destination);
@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test.Abstract
             Assert.NotNull(expectedOriginal);
             Assert.NotNull(expectedDestination);
 
-            Assert.Collection(context.TypeDescriptors, d =>
+            Assert.Collection(context.Types, d =>
             {
                 Assert.Equal(expectedOriginal, d.Original);
                 Assert.Equal(expectedDestination, d.Destination);

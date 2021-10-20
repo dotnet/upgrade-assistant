@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.CodeFixes
     {
         public static ITypeSymbol MapType(this AdapterContext context, ITypeSymbol type)
         {
-            foreach (var descriptor in context.TypeDescriptors)
+            foreach (var descriptor in context.Types)
             {
                 if (SymbolEqualityComparer.Default.Equals(descriptor.Original, type))
                 {

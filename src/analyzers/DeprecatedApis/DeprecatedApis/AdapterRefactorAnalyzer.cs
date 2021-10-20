@@ -62,14 +62,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
         private static void RegisterTypeAction(AdapterContext adapterContext, CompilationStartAnalysisContext context)
         {
-            if (adapterContext.TypeDescriptors.IsEmpty)
+            if (adapterContext.Types.IsEmpty)
             {
                 return;
             }
 
             context.RegisterTypeAdapterActions(adapterContext, context =>
             {
-                foreach (var adapter in adapterContext.TypeDescriptors)
+                foreach (var adapter in adapterContext.Types)
                 {
                     if (SymbolEqualityComparer.Default.Equals(adapter.Original, context.symbol))
                     {
@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
         private static void RegisterStaticMemberActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
         {
-            if (adapterContext.StaticMemberDescriptors.IsEmpty)
+            if (adapterContext.StaticMembers.IsEmpty)
             {
                 return;
             }
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
         private static void RegisterAddMemberActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
         {
-            if (adapterContext.TypeDescriptors.IsEmpty)
+            if (adapterContext.Types.IsEmpty)
             {
                 return;
             }
@@ -129,7 +129,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                     return;
                 }
 
-                foreach (var adapter in adapterContext.TypeDescriptors)
+                foreach (var adapter in adapterContext.Types)
                 {
                     if (SymbolEqualityComparer.Default.Equals(member.ContainingType, adapter.Original))
                     {
@@ -157,7 +157,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
             {
                 if (context.OwningSymbol is IMethodSymbol enclosing &&
                     !adapterContext.IsFactoryMethod(enclosing) &&
-                    adapterContext.GetDescriptorForDestination(enclosing.ReturnType) is AdapterDescriptor<ITypeSymbol> descriptor)
+                    adapterContext.GetDescriptorForDestination(enclosing.ReturnType) is ReplacementDescriptor<ITypeSymbol> descriptor)
                 {
                     context.RegisterOperationAction(context =>
                     {
@@ -181,7 +181,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
                 foreach (var child in operation.Children)
                 {
-                    foreach (var descriptor in adapterContext.TypeDescriptors)
+                    foreach (var descriptor in adapterContext.Types)
                     {
                         if (SymbolEqualityComparer.Default.Equals(child.Type, descriptor.Original))
                         {

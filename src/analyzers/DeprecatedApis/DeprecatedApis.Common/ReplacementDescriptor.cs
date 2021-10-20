@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 {
-    public record AdapterDescriptor<TSymbol>(TSymbol Original, TSymbol Destination)
+    public record ReplacementDescriptor<TSymbol>(TSymbol Original, TSymbol Destination)
         where TSymbol : ISymbol
     {
         private string? _originalMessage;

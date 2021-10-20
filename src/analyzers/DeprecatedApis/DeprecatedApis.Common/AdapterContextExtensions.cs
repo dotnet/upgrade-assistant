@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 
             context = context with
             {
-                Types = WellKnownTypes.From(compilation)
+                KnownTypes = WellKnownTypes.From(compilation)
             };
 
             context = context.FromAssembly(compilation.Assembly);
@@ -58,17 +58,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         {
             foreach (var a in assembly.GetAttributes())
             {
-                if (TryParseDescriptor(context.Types, a, ref context))
+                if (TryParseDescriptor(context.KnownTypes, a, ref context))
                 {
                 }
-                else if (TryParseStaticDescriptor(context.Types, a, out var staticDescriptor))
+                else if (TryParseStaticDescriptor(context.KnownTypes, a, out var staticDescriptor))
                 {
                     context = context with
                     {
-                        StaticMemberDescriptors = context.StaticMemberDescriptors.Add(staticDescriptor)
+                        StaticMembers = context.StaticMembers.Add(staticDescriptor)
                     };
                 }
-                else if (TryParseFactory(context.Types, a, out var factory))
+                else if (TryParseFactory(context.KnownTypes, a, out var factory))
                 {
                     context = context with
                     {
@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
             return context;
         }
 
-        private static bool TryParseStaticDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out AdapterDescriptor<ISymbol> descriptor)
+        private static bool TryParseStaticDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out ReplacementDescriptor<ISymbol> descriptor)
         {
             descriptor = default;
 
@@ -119,13 +119,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                 {
                     if (a.ConstructorArguments[1].Value is ITypeSymbol destination)
                     {
-                        var descriptor = new AdapterDescriptor<ITypeSymbol>(concreteType, destination);
-                        context = context with { TypeDescriptors = context.TypeDescriptors.Add(descriptor) };
+                        var descriptor = new ReplacementDescriptor<ITypeSymbol>(concreteType, destination);
+                        context = context with { Types = context.Types.Add(descriptor) };
                     }
                     else
                     {
-                        var definition = new AdapterDefinition(concreteType);
-                        context = context with { Definitions = context.Definitions.Add(definition) };
+                        var definition = new ApiDescriptor(concreteType);
+                        context = context with { Apis = context.Apis.Add(definition) };
                     }
 
                     return true;
