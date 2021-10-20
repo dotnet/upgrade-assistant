@@ -121,8 +121,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
             return false;
         }
 
-        public bool IsAvailable => TypeDescriptors.Length > 0 || StaticMemberDescriptors.Length > 0;
-
         public static AdapterContext Create() => new();
     }
 }

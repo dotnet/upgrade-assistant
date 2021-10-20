@@ -53,11 +53,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
             {
                 var adapterContext = AdapterContext.Create().FromCompilation(context.Compilation);
 
-                if (!adapterContext.IsAvailable)
-                {
-                    return;
-                }
-
                 RegisterAddMemberActions(adapterContext, context);
                 RegisterTypeAction(adapterContext, context);
                 RegisterCallFactoryActions(adapterContext, context);
