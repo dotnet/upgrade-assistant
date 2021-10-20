@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -17,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         /// <![CDATA[
         /// public class AdapterDescriptor : Attribute
         /// {
-        ///     public AdapterDescriptor(Type concreteType, Type? interfaceType)
+        ///     public AdapterDescriptor(Type concreteType, Type? interfaceType = null)
         ///     {
         ///     }
         /// } ]]>
@@ -58,33 +56,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
         {
             foreach (var a in assembly.GetAttributes())
             {
-                if (TryParseDescriptor(context.KnownTypes, a, ref context))
-                {
-                }
-                else if (TryParseStaticDescriptor(context.KnownTypes, a, out var staticDescriptor))
-                {
-                    context = context with
-                    {
-                        StaticMembers = context.StaticMembers.Add(staticDescriptor)
-                    };
-                }
-                else if (TryParseFactories(context.KnownTypes, a, out var factories))
-                {
-                    context = context with
-                    {
-                        Factories = context.Factories.AddRange(factories)
-                    };
-                }
+                ParseDescriptor(a, ref context);
+                ParseStaticDescriptor(a, ref context);
+                ParseFactories(a, ref context);
             }
 
             return context;
         }
 
-        private static bool TryParseStaticDescriptor(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out ReplacementDescriptor<ISymbol> descriptor)
+        private static void ParseStaticDescriptor(AttributeData a, ref AdapterContext context)
         {
-            descriptor = default;
-
-            if (SymbolEqualityComparer.Default.Equals(types.AdapterStaticDescriptor, a.AttributeClass))
+            if (SymbolEqualityComparer.Default.Equals(context.KnownTypes.AdapterStaticDescriptor, a.AttributeClass))
             {
                 if (a.ConstructorArguments.Length == 4 &&
                    a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
@@ -99,18 +81,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                     if (destinationType.GetMembers(destinationMember).FirstOrDefault() is ISymbol destinationSymbol &&
                         concreteType.GetMembers(concreteMember).FirstOrDefault() is ISymbol concreteSymbol)
                     {
-                        descriptor = new(concreteSymbol, destinationSymbol);
-                        return true;
+                        context = context with { StaticMembers = context.StaticMembers.Add(new(concreteSymbol, destinationSymbol)) };
                     }
                 }
             }
-
-            return false;
         }
 
-        private static bool TryParseDescriptor(WellKnownTypes types, AttributeData a, ref AdapterContext context)
+        private static void ParseDescriptor(AttributeData a, ref AdapterContext context)
         {
-            if (SymbolEqualityComparer.Default.Equals(types.AdapterDescriptor, a.AttributeClass))
+            if (SymbolEqualityComparer.Default.Equals(context.KnownTypes.AdapterDescriptor, a.AttributeClass))
             {
                 if (a.ConstructorArguments.Length == 2 &&
                    a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
@@ -127,17 +106,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                         var definition = new ApiDescriptor(concreteType);
                         context = context with { Apis = context.Apis.Add(definition) };
                     }
-
-                    return true;
                 }
             }
-
-            return false;
         }
 
-        private static bool TryParseFactories(WellKnownTypes types, AttributeData a, [MaybeNullWhen(false)] out ImmutableArray<FactoryDescriptor> descriptor)
+        private static void ParseFactories(AttributeData a, ref AdapterContext context)
         {
-            if (SymbolEqualityComparer.Default.Equals(types.DescriptorFactory, a.AttributeClass))
+            if (SymbolEqualityComparer.Default.Equals(context.KnownTypes.DescriptorFactory, a.AttributeClass))
             {
                 if (a.ConstructorArguments.Length == 2 &&
                     a.ConstructorArguments[0].Kind == TypedConstantKind.Type &&
@@ -145,22 +120,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                     a.ConstructorArguments[0].Value is ITypeSymbol type &&
                     a.ConstructorArguments[1].Value is string methodName)
                 {
-                    var methods = type.GetMembers(methodName)
-                        .OfType<IMethodSymbol>()
-                        .Where(m => m.IsStatic)
-                        .Select(m => new FactoryDescriptor(m))
-                        .ToImmutableArray();
+                    var members = type.GetMembers(methodName);
 
-                    if (methods.Length > 0)
+                    if (members.Length > 0)
                     {
-                        descriptor = methods;
-                        return true;
+                        var builder = context.Factories.ToBuilder();
+
+                        foreach (var member in members)
+                        {
+                            if (member is IMethodSymbol method && method.IsStatic)
+                            {
+                                builder.Add(new(method));
+                            }
+                        }
+
+                        context = context with { Factories = builder.ToImmutable() };
                     }
                 }
             }
-
-            descriptor = default;
-            return false;
         }
     }
 }
