@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer.Test
 {
     public class CSharpAddAdapterDescriptorTests : AdapterTestBase
     {
-        private const string AdapterDescriptorAttributeFileName = "AdapterDescriptorAttribute.cs";
+        private const string AdapterDescriptorAttributeFileName = $"{WellKnownTypeNames.AdapterDescriptor}.cs";
         private const string DescriptorsFileName = "Descriptors.cs";
         private const string WebRefactoringTxtFileName = "web.refactoring.txt";
         private const string AdditionalFileContext = "System.Web.HttpContext";
