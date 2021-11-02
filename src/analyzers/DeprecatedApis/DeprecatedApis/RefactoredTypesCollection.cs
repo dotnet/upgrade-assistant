@@ -51,6 +51,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
 #if DEBUG
             yield return "System.Web.HttpContext";
             yield return "System.Web.HttpContextBase";
+            yield return "System.Web.HttpRequest";
+            yield return "System.Web.HttpResponse";
 #endif
         }
 
