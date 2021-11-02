@@ -1,7 +1,4 @@
-﻿using System.Web;
-using System.Web.Optimization;
-
-namespace TemplateMvc
+﻿namespace TemplateMvc
 {
     public class BundleConfig
     {
