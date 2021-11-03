@@ -49,6 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             test.ExpectedDiagnostics.AddRange(expected);
             return test;
         }
+
         public static CodeFixTest<TVerifier> WithExpectedDiagnostics<TVerifier>(this CodeFixTest<TVerifier> test, params DiagnosticResult[] expected)
             where TVerifier : IVerifier, new()
         {
