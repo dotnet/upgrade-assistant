@@ -1,4 +1,5 @@
-﻿namespace TemplateMvc
+﻿
+namespace TemplateMvc
 {
     public class BundleConfig
     {
