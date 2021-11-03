@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Xunit;
 
 using VerifyVB = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.VisualBasicCodeFixVerifier<
@@ -435,7 +436,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        private static VerifyVB.Test CreateTest() => new VerifyVB.Test()
+        private static CodeFixTest<XUnitVerifier> CreateTest() => new VerifyVB.Test()
             .WithSystemWeb()
             .With(CodeFixTestBehaviors.FixOne);
     }
