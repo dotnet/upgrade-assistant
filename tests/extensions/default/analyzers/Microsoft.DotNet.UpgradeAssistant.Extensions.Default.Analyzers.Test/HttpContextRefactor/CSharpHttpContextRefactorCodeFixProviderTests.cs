@@ -58,8 +58,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
 
-            var test = CreateTest();
-
             await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
