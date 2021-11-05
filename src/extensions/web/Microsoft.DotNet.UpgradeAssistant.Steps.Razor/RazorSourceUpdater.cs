@@ -128,6 +128,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             var diagnosticsCount = diagnostics.Count();
             while (fixableDiagnostics.Any())
             {
+                // Finding and fixing the diagnostics can be a bit slow; provide an update once per loop iteration
+                // so that users can see progress.
+                _logger.LogInformation("{DiagnosticCount} diagnostics remaining to be fixed", diagnosticsCount);
+
                 // Iterate through the first fixable diagnostic from each document
                 foreach (var diagnostic in fixableDiagnostics.GroupBy(d => d.Location.SourceTree?.FilePath).Select(g => g.First()))
                 {
@@ -163,6 +167,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // These are applied after finding all of them so that they can be applied in reverse line order
             _logger.LogDebug("Applying {ReplacementCount} updates to Razor documents based on changes made by code fix providers", textReplacements.Count());
             _textReplacer.ApplyTextReplacements(textReplacements);
+
+            // Update the solution/project in case a code fix updated files outside of the views
+            project = GetProjectWithoutGeneratedCode(project, inputs);
+            context.UpdateSolution(project.Solution);
             await FixUpProjectFileAsync(context, token).ConfigureAwait(false);
 
             if (diagnosticsCount > 0)
@@ -207,6 +215,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
         private static async Task FixUpProjectFileAsync(IUpgradeContext context, CancellationToken token)
         {
+            // Reload the workspace in case code fixes modified the project file
+            await context.ReloadWorkspaceAsync(token).ConfigureAwait(false);
             var file = context.CurrentProject.Required().GetFile();
             file.Simplify();
             await file.SaveAsync(token).ConfigureAwait(false);
@@ -253,6 +263,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             return projectWithGeneratedCode;
+        }
+
+        private static Project GetProjectWithoutGeneratedCode(Project project, IEnumerable<RazorCodeDocument> documents)
+        {
+            var filePaths = documents.Select(GetGeneratedFilePath);
+            var documentsToRemove = project.Documents.Where(d => filePaths.Contains(d.FilePath, StringComparer.OrdinalIgnoreCase)).Select(d => d.Id);
+            return project.RemoveDocuments(ImmutableArray.CreateRange(documentsToRemove));
         }
 
         private async Task<Project> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document)
