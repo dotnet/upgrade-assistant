@@ -161,7 +161,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Identify changed code sections
             var textReplacements = await GetReplacements(originalProject, project.Documents.Where(d => generatedFilePaths.Contains(d.FilePath)), token).ConfigureAwait(false);
-            var z = project.Documents.Where(d => generatedFilePaths.Contains(d.FilePath)).Select(d => d.GetTextAsync().Result.ToString()).ToArray();
 
             // Update cshtml based on changes made to generated source code
             // These are applied after finding all of them so that they can be applied in reverse line order
