@@ -70,14 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     var originalText = replacement.OriginalText.ToString().TrimStart();
                     var updatedText = replacement.NewText.ToString().TrimStart();
 
-                    // Generally, it's not necessary to minimize replacements since the text should be the same in both documents
-                    // However, in the specific case of text being added before the first #line pragma in a Razor doc, it's possible
-                    // that C# unrelated to the original document will show up with the replaced text, so minimize replacements only
-                    // in the case that text is being inserted before the original first line.
-                    if (replacement.StartingLine == 0)
-                    {
-                        MinimizeReplacement(ref originalText, ref updatedText);
-                    }
+                    MinimizeReplacement(ref originalText, ref updatedText);
 
                     // If the changed text ends with a semi-colon, trim it since the semi-colon won't appear in implicit Razor expressions
                     if (originalText.Trim().EndsWith(";", StringComparison.Ordinal) && updatedText.Trim().EndsWith(";", StringComparison.Ordinal))
@@ -89,6 +82,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     // If new text is being added, insert it with correct Razor transition syntax
                     if (string.IsNullOrWhiteSpace(originalText))
                     {
+                        // If the original and updated text trimmed to the same text, then bail out.
+                        if (string.IsNullOrWhiteSpace(updatedText))
+                        {
+                            continue;
+                        }
+
                         // Using statements are inserted with special implicit Razor expression syntax
                         if (UsingBlockRegex.IsMatch(updatedText))
                         {
@@ -121,6 +120,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                             endOffset = Math.Min(endOffset, documentText.Length);
                         }
 
+                        // Replace the text
                         documentText.Replace(originalText, updatedText, startOffset, endOffset - startOffset);
                     }
                 }
@@ -162,20 +162,61 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 return;
             }
 
+            // Work at the "word" or token level so that "Hello userA!" -> "Hello userB!" doesn't minimize to replacing all 'A's with 'B's
+            var originalTokens = Tokenize(original).ToArray();
+            var updatedTokens = Tokenize(updated).ToArray();
+
             var index = 0;
-            while (index < original.Length && index < updated.Length && original[index] == updated[index])
+            while (index < originalTokens.Length && index < updatedTokens.Length && originalTokens[index].Equals(updatedTokens[index], StringComparison.Ordinal))
             {
                 index++;
             }
 
             var endIndex = 0;
-            while (endIndex > -original.Length && endIndex > -updated.Length && original[original.Length - 1 + endIndex] == updated[updated.Length - 1 + endIndex])
+            while (endIndex > -originalTokens.Length && endIndex > -updatedTokens.Length && originalTokens[originalTokens.Length - 1 + endIndex].Equals(updatedTokens[updatedTokens.Length - 1 + endIndex], StringComparison.Ordinal))
             {
                 endIndex--;
             }
 
-            original = original.Substring(index, Math.Max(0, original.Length + endIndex - index));
-            updated = updated.Substring(index, Math.Max(0, updated.Length + endIndex - index));
+            original = string.Concat(originalTokens.Skip(index).Take(Math.Max(0, originalTokens.Length + endIndex - index)));
+            updated = string.Concat(updatedTokens.Skip(index).Take(Math.Max(0, updatedTokens.Length + endIndex - index)));
+        }
+
+        /// <summary>
+        /// Splits a string into 'words' where a word is any string of letters and numbers or a single character that isn't a letter or number.
+        /// </summary>
+        /// <param name="str">The string to divide into words.</param>
+        /// <returns>An enumerable of words and all intervening characters comprising the input string.</returns>
+        private static IEnumerable<string> Tokenize(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                yield break;
+            }
+
+            var nextToken = new StringBuilder();
+            foreach (var c in str)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    nextToken.Append(c);
+                }
+                else
+                {
+                    if (nextToken.Length > 0)
+                    {
+                        yield return nextToken.ToString();
+                        nextToken = new StringBuilder();
+                    }
+
+                    yield return c.ToString();
+                }
+            }
+
+            if (nextToken.Length > 0)
+            {
+                yield return nextToken.ToString();
+            }
         }
     }
 }
