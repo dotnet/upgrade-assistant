@@ -107,11 +107,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 LogDetails("Framework references to be added: {FrameworkReference}", _analysisState.FrameworkReferences.Additions);
                 LogDetails("Framework references to be removed: {FrameworkReference}", _analysisState.FrameworkReferences.Deletions);
 
-                void LogDetails<T>(string name, IReadOnlyCollection<T> collection)
+                void LogDetails<T>(string name, IReadOnlyCollection<Operation<T>> collection)
                 {
                     if (collection.Count > 0)
                     {
-                        Logger.LogInformation(name, string.Join(Environment.NewLine, collection));
+                        Logger.LogInformation(name, string.Join(Environment.NewLine, collection.Select(o => o.Item)));
                     }
                 }
 
