@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             var results = new HashSet<AnalyzeResult>();
             foreach (var diag in diagnostics)
             {
-                _logger.LogInformation("Diagonstic {Id} with the message {message} generated", diag.Id, diag.Descriptor.Title.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                _logger.LogInformation("Diagnostic {Id} with the message {message} generated", diag.Id, diag.Descriptor.Description.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 results.Add(new()
                 {
                     RuleId = diag.Id,
