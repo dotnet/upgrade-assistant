@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         public static Test Create() => new Test();
 
-        public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>, ICodeFixTest
+        public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, XUnitVerifier>
         {
             public Test()
             {

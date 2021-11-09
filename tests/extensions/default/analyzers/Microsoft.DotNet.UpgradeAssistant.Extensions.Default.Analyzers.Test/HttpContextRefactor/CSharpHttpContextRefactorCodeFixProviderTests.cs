@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Xunit;
 
 using VerifyCS = Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test.CSharpCodeFixVerifier<
@@ -56,6 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
     }";
 
             var expected = VerifyCS.Diagnostic(DiagnosticId).WithLocation(0).WithArguments(HttpContextName, HttpContextCurrentName);
+
             await CreateTest().WithSource(testFile).WithFixed(fixedFile).WithExpectedDiagnostics(expected).RunAsync();
         }
 
@@ -516,7 +518,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        private static VerifyCS.Test CreateTest()
+        private static CodeFixTest<XUnitVerifier> CreateTest()
             => VerifyCS.Create()
                 .WithSystemWeb()
                 .With(CodeFixTestBehaviors.FixOne);
