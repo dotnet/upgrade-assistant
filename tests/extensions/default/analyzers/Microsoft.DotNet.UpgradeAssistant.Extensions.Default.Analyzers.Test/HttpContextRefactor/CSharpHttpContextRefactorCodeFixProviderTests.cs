@@ -518,7 +518,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 .RunAsync();
         }
 
-        private static CodeFixTest<XUnitVerifier>  CreateTest()
+        private static CodeFixTest<XUnitVerifier> CreateTest()
             => VerifyCS.Create()
                 .WithSystemWeb()
                 .With(CodeFixTestBehaviors.FixOne);
