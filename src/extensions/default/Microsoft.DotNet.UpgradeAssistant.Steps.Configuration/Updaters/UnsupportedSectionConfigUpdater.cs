@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 
                 if (section is not null)
                 {
-                    _logger.LogInformation("{SectionName} is not supported in .NET 5. See {IssueLink} for details. For now, it will be disabled.", name, issue);
+                    _logger.LogInformation("{SectionName} is not supported in .NET 6. See {IssueLink} for details. For now, it will be disabled.", name, issue);
                     yield return (section, issue);
                 }
             }
