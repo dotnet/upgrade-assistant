@@ -8,10 +8,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Sarif;
-using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
 {
     public class AnalyzeResultWriterTests
     {
