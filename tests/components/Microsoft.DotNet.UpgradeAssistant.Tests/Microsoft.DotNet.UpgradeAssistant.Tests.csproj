@@ -3,7 +3,6 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\components\Microsoft.DotNet.UpgradeAssistant.Analysis\Microsoft.DotNet.UpgradeAssistant.Analysis.csproj" />
     <ProjectReference Include="..\..\..\src\components\Microsoft.DotNet.UpgradeAssistant\Microsoft.DotNet.UpgradeAssistant.csproj" />
     <ProjectReference Include="..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
