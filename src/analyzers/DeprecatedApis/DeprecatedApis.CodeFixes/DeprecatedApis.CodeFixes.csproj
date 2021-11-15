@@ -26,7 +26,6 @@
     <Compile Remove="TypeUpgradeCodeFixer.cs" />
     <Compile Remove="UrlHelperCodeFixer.cs" />
     <Compile Remove="UsingSystemWebCodeFixer.cs" />
-    <ProjectReference Include="..\DeprecatedApis.Common\DeprecatedApis.Common.csproj" />
     <ProjectReference Include="..\DeprecatedApis\DeprecatedApis.csproj" />
     <EmbeddedResource Update="CodeFixResources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="CodeFixResources.Designer.cs" />
   </ItemGroup>

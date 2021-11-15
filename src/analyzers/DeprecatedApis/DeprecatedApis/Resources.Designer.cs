@@ -383,5 +383,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer {
                 return ResourceManager.GetString("AddAdapterDescriptorTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown language.
+        /// </summary>
+        internal static string UnknownLanguage {
+            get {
+                return ResourceManager.GetString("UnknownLanguage", resourceCulture);
+            }
+        }
     }
 }

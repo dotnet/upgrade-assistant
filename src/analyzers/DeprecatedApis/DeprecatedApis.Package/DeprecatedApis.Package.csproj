@@ -23,7 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DeprecatedApis.CodeFixes\DeprecatedApis.CodeFixes.csproj" />
     <ProjectReference Include="..\DeprecatedApis\DeprecatedApis.csproj" />
-    <ProjectReference Include="..\DeprecatedApis.Common\DeprecatedApis.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
