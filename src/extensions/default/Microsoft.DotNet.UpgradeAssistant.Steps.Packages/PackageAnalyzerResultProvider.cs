@@ -16,14 +16,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageAnalyzerResultProvider : IAnalyzeResultProvider
     {
-        private const string Id = "UA101";
+        private const string RuleId = "UA101";
+        private const string RuleName = "SomeRuleName";
+        private const string FullDescription = "Some full description";
+        private readonly Uri _helpUri = new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
         private IDependencyAnalysisState? _analysisState;
 
         private ILogger Logger { get; }
 
-        public string Name => "Dependency Analysis";
+        public string ToolName => "DependencyAnalysis";
 
         public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
@@ -37,9 +40,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _analysisState = null;
         }
 
-        public async Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
+        public Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
         {
-            return await Task.FromResult(true);
+            return Task.FromResult(true);
         }
 
         public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
@@ -86,24 +89,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             var results = new HashSet<AnalyzeResult>();
 
-            if (analysisState is null || !analysisState.AreChangesRecommended)
+            if (analysisState is not null && analysisState.AreChangesRecommended)
             {
-                results.Add(new()
-                {
-                    RuleId = Id,
-                    RuleName = this.Name,
-                    FileLocation = fileLocation,
-                    ResultMessage = "No package updates needed",
-                });
-            }
-            else
-            {
-                GetResults("Reference to ", " needs to be deleted ", analysisState.References.Deletions);
-                GetResults("Reference to ", " needs to be added ", analysisState.References.Additions);
-                GetResults("Package ", " needs to be deleted ", analysisState.Packages.Deletions);
-                GetResults("Package ", " needs to be added ", analysisState.Packages.Additions);
-                GetResults("Framework Reference to ", " needs to be deleted ", analysisState.FrameworkReferences.Deletions);
-                GetResults("Framework Reference to ", " needs to be added ", analysisState.FrameworkReferences.Additions);
+                GetResults("Reference to ", " needs to be deleted.", analysisState.References.Deletions);
+                GetResults("Reference to ", " needs to be added.", analysisState.References.Additions);
+                GetResults("Package ", " needs to be deleted.", analysisState.Packages.Deletions);
+                GetResults("Package ", " needs to be added.", analysisState.Packages.Additions);
+                GetResults("Framework Reference to ", " needs to be deleted.", analysisState.FrameworkReferences.Deletions);
+                GetResults("Framework Reference to ", " needs to be added.", analysisState.FrameworkReferences.Additions);
 
                 void GetResults<T>(string name, string action, IReadOnlyCollection<Operation<T>> collection)
                 {
@@ -115,8 +108,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                             {
                                 results.UnionWith(s.OperationDetails.Details.Select(s => new AnalyzeResult()
                                 {
-                                    RuleId = Id,
-                                    RuleName = this.Name,
+                                    RuleId = RuleId,
+                                    RuleName = RuleName,
+                                    FullDescription = FullDescription,
+                                    HelpUri = _helpUri,
                                     FileLocation = fileLocation,
                                     ResultMessage = s,
                                 }));
@@ -125,8 +120,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                             {
                                 results.Add(new()
                                 {
-                                    RuleId = Id,
-                                    RuleName = this.Name,
+                                    RuleId = RuleId,
+                                    RuleName = RuleName,
+                                    FullDescription = FullDescription,
+                                    HelpUri = _helpUri,
                                     FileLocation = fileLocation,
                                     ResultMessage = string.Concat(name, s.Item, action),
                                 });

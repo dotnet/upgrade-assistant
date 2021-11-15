@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
         private readonly IRoslynDiagnosticProvider _diagnosticAnalysisRunner;
         private readonly ILogger _logger;
 
-        public string Name => "API Upgradability";
+        public string ToolName => "API Upgradability";
 
         public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 

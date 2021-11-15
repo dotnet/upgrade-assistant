@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         private readonly IUpdater<IProject> _updater;
         private readonly string _id = "UA102";
 
-        public string Name => "Component Analysis";
+        public string ToolName => "Component Analysis";
 
         public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     yield return new()
                     {
                         RuleId = this._id,
-                        RuleName = this.Name,
+                        RuleName = this.ToolName,
                         FileLocation = s,
                         ResultMessage = updaterResult.Message,
                     };

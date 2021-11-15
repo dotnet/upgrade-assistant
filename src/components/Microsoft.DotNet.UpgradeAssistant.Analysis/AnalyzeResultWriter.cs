@@ -49,11 +49,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                         {
                             Name = ar.Name,
                             SemanticVersion = ar.Version,
-                            InformationUri = ar.InformationURI,
+                            InformationUri = ar.InformationUri,
                             Rules = analyzeResults.GroupBy(x => x.RuleId).Select(a => new ReportingDescriptor()
                             {
                                 Id = a.Key,
-                                FullDescription = new() { Text = a.First().RuleName, },
+                                Name = a.First().RuleName,
+                                FullDescription = new() { Text = a.First().FullDescription, },
+                                HelpUri = a.First().HelpUri,
                             }).ToList(),
                         },
                     },

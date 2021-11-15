@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 {
                     Name = "some-name",
                     Version = "1.0.0",
-                    InformationURI = new Uri("https://github.com/dotnet/upgrade-assistant"),
+                    InformationUri = new Uri("https://github.com/dotnet/upgrade-assistant"),
                     AnalysisResults = analyzeResults.ToAsyncEnumerable()
                 }
             };
