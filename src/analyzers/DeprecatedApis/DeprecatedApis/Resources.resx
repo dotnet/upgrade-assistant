@@ -225,7 +225,4 @@
   <data name="AddAdapterDescriptorMessageFormat" xml:space="preserve">
     <value>Create an adapter descriptor for '{0}'</value>
   </data>
-  <data name="UnknownLanguage" xml:space="preserve">
-    <value>Unknown language</value>
-  </data>
 </root>

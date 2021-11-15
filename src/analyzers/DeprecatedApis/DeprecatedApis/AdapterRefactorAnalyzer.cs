@@ -110,40 +110,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.DeprecatedApisAnalyzer
                 return;
             }
 
-            context.RegisterOperationAction(context =>
+            context.RegisterOperationBlockStartAction(context =>
             {
-                if (context.Operation.GetEnclosingMethod() is IMethodSymbol enclosing && adapterContext.IsFactoryMethod(enclosing))
+                if (context.OwningSymbol is IMethodSymbol enclosing && adapterContext.IsFactoryMethod(enclosing))
                 {
                     return;
                 }
 
-                var member = context.Operation switch
+                context.RegisterOperationAction(context =>
                 {
-                    IInvocationOperation invocation => (ISymbol)invocation.TargetMethod,
-                    IPropertyReferenceOperation property => property.Property,
-                    _ => throw new NotImplementedException(),
-                };
-
-                if (member.IsStatic)
-                {
-                    return;
-                }
-
-                foreach (var adapter in adapterContext.Types)
-                {
-                    if (SymbolEqualityComparer.Default.Equals(member.ContainingType, adapter.Original))
+                    var member = context.Operation switch
                     {
-                        // TODO: this could be better by matching if it actually binds
-                        if (adapter.Destination.GetMembers(member.Name).Length == 0)
-                        {
-                            var properties = adapter.Properties
-                                .WithSymbol(member);
+                        IInvocationOperation invocation => (ISymbol)invocation.TargetMethod,
+                        IPropertyReferenceOperation property => property.Property,
+                        _ => throw new NotImplementedException(),
+                    };
 
-                            context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, context.Operation.Syntax.GetLocation(), properties: properties, member.Name, adapter.Destination));
+                    if (member.IsStatic)
+                    {
+                        return;
+                    }
+
+                    foreach (var adapter in adapterContext.Types)
+                    {
+                        if (SymbolEqualityComparer.Default.Equals(member.ContainingType, adapter.Original))
+                        {
+                            // TODO: this could be better by matching if it actually binds
+                            if (adapter.Destination.GetMembers(member.Name).Length == 0)
+                            {
+                                var properties = adapter.Properties
+                                    .WithSymbol(member);
+
+                                context.ReportDiagnostic(Diagnostic.Create(AddMemberRule, context.Operation.Syntax.GetLocation(), properties: properties, member.Name, adapter.Destination));
+                            }
                         }
                     }
-                }
-            }, OperationKind.Invocation, OperationKind.PropertyReference);
+                }, OperationKind.Invocation, OperationKind.PropertyReference);
+            });
         }
 
         private static void RegisterCallFactoryActions(AdapterContext adapterContext, CompilationStartAnalysisContext context)
