@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
     {
         string ToolName { get; }
 
-        Uri InformationURI { get; }
+        Uri InformationUri { get; }
 
         Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token);
 

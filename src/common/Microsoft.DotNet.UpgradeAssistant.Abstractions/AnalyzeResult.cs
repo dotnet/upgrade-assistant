@@ -12,12 +12,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         public string RuleName { get; init; } = string.Empty;
 
         /// <summary>
-        /// Gets the description of the analysis.
+        /// Gets the full description of the analysis.
         /// </summary>
         public string FullDescription { get; init; } = string.Empty;
 
         /// <summary>
-        /// Gets the direct link to the documentation.
+        /// Gets the link to the documentation.
         /// </summary>
         public Uri HelpUri { get; init; } = new("about:blank");
 

@@ -16,14 +16,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     public class WinformsResultProvider : IAnalyzeResultProvider
     {
-        private ILogger Logger { get; }
+        private const string RuleId = "UA102";
+        private const string RuleName = "SomeRuleName";
+        private const string FullDescription = "Some full description";
 
+        private readonly Uri _helpUri = new("about:blank");
         private readonly IUpdater<IProject> _updater;
-        private readonly string _id = "UA102";
+
+        private ILogger Logger { get; }
 
         public string ToolName => "Component Analysis";
 
-        public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
+        public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
         public WinformsResultProvider(IUpdater<IProject> updater,
            ILogger<WinformsResultProvider> logger)
@@ -78,8 +82,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 {
                     yield return new()
                     {
-                        RuleId = this._id,
-                        RuleName = this.ToolName,
+                        RuleId = RuleId,
+                        RuleName = RuleName,
+                        HelpUri = _helpUri,
+                        FullDescription = FullDescription,
                         FileLocation = s,
                         ResultMessage = updaterResult.Message,
                     };

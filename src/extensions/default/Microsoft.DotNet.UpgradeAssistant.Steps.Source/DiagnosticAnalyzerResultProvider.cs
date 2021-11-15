@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public string ToolName => "API Upgradability";
 
-        public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
+        public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
         public DiagnosticAnalyzerResultProvider(IRoslynDiagnosticProvider diagnosticAnalysisRunner, ILogger<DiagnosticAnalyzerResultProvider> logger)
         {

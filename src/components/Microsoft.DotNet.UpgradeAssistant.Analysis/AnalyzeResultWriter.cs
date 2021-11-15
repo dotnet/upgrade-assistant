@@ -50,18 +50,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                             Name = ar.Name,
                             SemanticVersion = ar.Version,
                             InformationUri = ar.InformationUri,
-                            Rules = analyzeResults.GroupBy(x => x.RuleId).Select(a => new ReportingDescriptor()
-                            {
-                                Id = a.Key,
-                                Name = a.First().RuleName,
-                                FullDescription = new() { Text = a.First().FullDescription, },
-                                HelpUri = a.First().HelpUri,
-                            }).ToList(),
+                            Rules = analyzeResults.GroupBy(x => x.RuleId).Select(ExtractRule).ToList(),
                         },
                     },
                     Results = ExtractResults(analyzeResults),
                 };
             }
+        }
+
+        private static ReportingDescriptor ExtractRule(IGrouping<string, AnalyzeResult> analyzeResults)
+        {
+            var analyzeResult = analyzeResults.First();
+
+            var rule = new ReportingDescriptor
+            {
+                Id = analyzeResult.RuleId,
+                HelpUri = analyzeResult.HelpUri
+            };
+
+            if (string.IsNullOrWhiteSpace(analyzeResult.FullDescription))
+            {
+                rule.FullDescription = new() { Text = analyzeResult.RuleName };
+            }
+            else
+            {
+                rule.Name = analyzeResult.RuleName;
+                rule.FullDescription = new() { Text = analyzeResult.FullDescription };
+            }
+
+            return rule;
         }
 
         private static IList<Result> ExtractResults(IList<AnalyzeResult> analyzeResults)

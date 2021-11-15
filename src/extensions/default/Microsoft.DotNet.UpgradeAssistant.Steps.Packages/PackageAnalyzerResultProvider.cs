@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private const string RuleId = "UA101";
         private const string RuleName = "SomeRuleName";
         private const string FullDescription = "Some full description";
-        private readonly Uri _helpUri = new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
+        private readonly Uri _helpUri = new("about:blank");
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
         private IDependencyAnalysisState? _analysisState;
@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public string ToolName => "DependencyAnalysis";
 
-        public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
+        public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
         public PackageAnalyzerResultProvider(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
@@ -89,7 +89,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
             var results = new HashSet<AnalyzeResult>();
 
-            if (analysisState is not null && analysisState.AreChangesRecommended)
+            if (analysisState is null || !analysisState.AreChangesRecommended)
+            {
+                results.Add(new()
+                {
+                    RuleId = RuleId,
+                    RuleName = RuleName,
+                    HelpUri = _helpUri,
+                    FullDescription = FullDescription,
+                    FileLocation = fileLocation,
+                    ResultMessage = "No package updates needed.",
+                });
+            }
+            else
             {
                 GetResults("Reference to ", " needs to be deleted.", analysisState.References.Deletions);
                 GetResults("Reference to ", " needs to be added.", analysisState.References.Additions);
