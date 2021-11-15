@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters.Tests
 </configuration>";
             var after = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
-    <!-- system.diagnostics section is not supported on .NET 5 (see https://github.com/dotnet/runtime/issues/23937)-->
+    <!-- system.diagnostics section is not supported on .NET 6 (see https://github.com/dotnet/runtime/issues/23937)-->
     <!--<system.diagnostics />-->
 </configuration>";
 
@@ -105,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters.Tests
 </configuration>";
             var after = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <configuration>
-    <!-- system.diagnostics section is not supported on .NET 5 (see https://github.com/dotnet/runtime/issues/23937)-->
+    <!-- system.diagnostics section is not supported on .NET 6 (see https://github.com/dotnet/runtime/issues/23937)-->
     <!--<system.diagnostics>
   <child />
 </system.diagnostics>-->

@@ -37,7 +37,7 @@ namespace Integration.Tests
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
 
         // Skip on theories has issues in XUnit: https://github.com/xunit/visualstudio.xunit/issues/266
-#if !NET6_0
+#if !NET5_0
         // Using statements are different for some reason on .NET 5 and .NET 6 after Roslyn runs
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]

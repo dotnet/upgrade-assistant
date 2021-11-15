@@ -3,10 +3,22 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
-## Version
+## Version 0.3.255803 - 2021-11-09 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.255803))
+### Added
+- In lieu of .NET 6 GA, Current, LTS and Preview now point to .NET 6 in upgrade-assistant (#907)[https://github.com/dotnet/upgrade-assistant/pull/907]
+
+### Fixed
+- Razor source updater bug fixes (#919)[https://github.com/dotnet/upgrade-assistant/pull/919]. Issues addressed
+  - (#856)[https://github.com/dotnet/upgrade-assistant/issues/856]
+  - (#914)[https://github.com/dotnet/upgrade-assistant/issues/914]
+  - (#915)[https://github.com/dotnet/upgrade-assistant/issues/915]
+
+## Version 0.3.252501 - 2021-11-01 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.252501))
 ### Added
 - Extensions can now be downloaded and installed into an upgrade context via a NuGet feed (see [docs](docs/design/Extension_Management.md) for details) (#873)[https://github.com/dotnet/upgrade-assistant/pull/855]
 - Added extension for identifying loose assemblies with data to identify loose assemblies from NuGet.org (see [docs](docs/design/Loose_binary_identification.md) for details) (#855)[https://github.com/dotnet/upgrade-assistant/pull/855]
+- Source updater for handling HighDpiMode setting in Winforms (#877)[https://github.com/dotnet/upgrade-assistant/pull/877]
+- More verbose logging for Diagnostic Analysis in Analyze Command (#877)[https://github.com/dotnet/upgrade-assistant/pull/877]
 
 ### Removed
 - Removed option to run `try-convert` as an exe and now will always be run in-process [#870](https://github.com/dotnet/upgrade-assistant/pull/870)
