@@ -10,7 +10,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public interface IAnalyzeResultProvider
     {
-        string ToolName { get; }
+        string Name { get; }
 
         Uri InformationUri { get; }
 

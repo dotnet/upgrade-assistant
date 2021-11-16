@@ -68,14 +68,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 HelpUri = analyzeResult.HelpUri
             };
 
-            if (string.IsNullOrWhiteSpace(analyzeResult.FullDescription))
+            rule.FullDescription = new()
             {
-                rule.FullDescription = new() { Text = analyzeResult.RuleName };
-            }
-            else
+                Text = !string.IsNullOrWhiteSpace(analyzeResult.FullDescription) ? analyzeResult.FullDescription : analyzeResult.RuleName
+            };
+
+            if (!string.IsNullOrWhiteSpace(analyzeResult.FullDescription))
             {
                 rule.Name = analyzeResult.RuleName;
-                rule.FullDescription = new() { Text = analyzeResult.FullDescription };
             }
 
             return rule;

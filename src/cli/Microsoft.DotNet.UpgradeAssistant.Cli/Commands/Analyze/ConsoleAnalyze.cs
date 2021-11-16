@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 analyzeResultMap.Add(new()
                 {
                     Version = GetProviderVersion(provider),
-                    Name = provider.ToolName,
+                    Name = provider.Name,
                     InformationUri = provider.InformationUri,
                     AnalysisResults = provider.AnalyzeAsync(analzyerContext, token),
                 });

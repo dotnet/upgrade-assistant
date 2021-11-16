@@ -17,16 +17,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     public class PackageAnalyzerResultProvider : IAnalyzeResultProvider
     {
         private const string RuleId = "UA101";
-        private const string RuleName = "SomeRuleName";
-        private const string FullDescription = "Some full description";
-        private readonly Uri _helpUri = new("about:blank");
+        private const string RuleName = "Dependency Analysis";
+        private const string FullDescription = "Dependency Analysis";
+        private readonly Uri _helpUri = new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
         private IDependencyAnalysisState? _analysisState;
 
         private ILogger Logger { get; }
 
-        public string ToolName => "DependencyAnalysis";
+        public string ToolName => "Dependency Analysis";
 
         public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
@@ -40,9 +40,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             _analysisState = null;
         }
 
-        public Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
+        public async Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
         {
-            return Task.FromResult(true);
+            return await Task.FromResult(true);
         }
 
         public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)

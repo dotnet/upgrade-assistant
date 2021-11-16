@@ -97,6 +97,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                     RuleId = "RULE0001",
                     RuleName = "RuleName0001",
                     HelpUri = new Uri("https://github.com/dotnet/upgrade-assistant")
+                },
+                new AnalyzeResult
+                {
+                    FileLocation = "some-file-path-2",
+                    LineNumber = 1,
+                    ResultMessage = "some result message",
+                    RuleId = "RULE0002",
+                    RuleName = "RuleName0002",
+                    HelpUri = new Uri("https://github.com/dotnet/upgrade-assistant")
                 }
             };
 
@@ -123,11 +132,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             Assert.Equal("https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json", sarifLog.SchemaUri.OriginalString);
             Assert.Equal(SarifVersion.Current, sarifLog.Version);
 
-            var analyzeResult = analyzeResults.First();
-            var rule = sarifLog.Runs[0].Tool.Driver.Rules.First();
-            Assert.Equal(analyzeResult.RuleId, rule.Id);
-            Assert.Equal(analyzeResult.RuleName, rule.FullDescription.Text);
-            Assert.Equal(analyzeResult.HelpUri, rule.HelpUri);
+            Assert.Equal(analyzeResults.Count, sarifLog.Runs[0].Tool.Driver.Rules.Count);
+
+            var firstAnalyzeResult = analyzeResults.First();
+            var firstRule = sarifLog.Runs[0].Tool.Driver.Rules.First();
+            Assert.Equal(firstAnalyzeResult.RuleId, firstRule.Id);
+            Assert.Equal(firstAnalyzeResult.RuleName, firstRule.FullDescription.Text);
+            Assert.Equal(firstAnalyzeResult.HelpUri, firstRule.HelpUri);
+
+            var lastAnalyzeResult = analyzeResults.Last();
+            var lastRule = sarifLog.Runs[0].Tool.Driver.Rules.Last();
+            Assert.Equal(lastAnalyzeResult.RuleId, lastRule.Id);
+            Assert.Equal(lastAnalyzeResult.RuleName, lastRule.FullDescription.Text);
+            Assert.Equal(lastAnalyzeResult.HelpUri, lastRule.HelpUri);
         }
     }
 }

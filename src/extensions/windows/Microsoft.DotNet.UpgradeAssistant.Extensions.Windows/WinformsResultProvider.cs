@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
@@ -17,15 +15,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public class WinformsResultProvider : IAnalyzeResultProvider
     {
         private const string RuleId = "UA102";
-        private const string RuleName = "SomeRuleName";
-        private const string FullDescription = "Some full description";
+        private const string RuleName = "Component Analysis";
+        private const string FullDescription = "Component Analysis";
 
-        private readonly Uri _helpUri = new("about:blank");
+        private readonly Uri _helpUri = new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
         private readonly IUpdater<IProject> _updater;
 
         private ILogger Logger { get; }
 
-        public string ToolName => "Component Analysis";
+        public string Name => "Component Analysis";
 
         public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
