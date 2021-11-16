@@ -15,10 +15,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public class WinformsResultProvider : IAnalyzeResultProvider
     {
         private const string RuleId = "UA102";
-        private const string RuleName = "Component Analysis";
-        private const string FullDescription = "Component Analysis";
-
-        private readonly Uri _helpUri = new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
         private readonly IUpdater<IProject> _updater;
 
         private ILogger Logger { get; }
@@ -81,9 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     yield return new()
                     {
                         RuleId = RuleId,
-                        RuleName = RuleName,
-                        HelpUri = _helpUri,
-                        FullDescription = FullDescription,
+                        RuleName = this.Name,
                         FileLocation = s,
                         ResultMessage = updaterResult.Message,
                     };
