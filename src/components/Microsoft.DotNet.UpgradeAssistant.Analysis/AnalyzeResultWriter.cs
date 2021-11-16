@@ -73,6 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 Text = !string.IsNullOrWhiteSpace(analyzeResult.FullDescription) ? analyzeResult.FullDescription : analyzeResult.RuleName
             };
 
+            // TODO: once we update all the other types of rules, we will be able to remove this condition.
             if (!string.IsNullOrWhiteSpace(analyzeResult.FullDescription))
             {
                 rule.Name = analyzeResult.RuleName;
