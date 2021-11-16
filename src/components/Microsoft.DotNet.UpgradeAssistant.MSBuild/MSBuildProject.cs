@@ -19,7 +19,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private readonly ILogger _logger;
         private readonly IEnumerable<IComponentIdentifier> _componentIdentifiers;
-        private readonly IPackageRestorer _restorer;
         private readonly Factories _factories;
 
         public MSBuildWorkspaceUpgradeContext Context { get; }
@@ -30,8 +29,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             MSBuildWorkspaceUpgradeContext context,
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             Factories factories,
-            IPackageRestorer restorer,
-            ITargetFrameworkMonikerComparer comparer,
             FileInfo file,
             ILogger logger)
         {
@@ -40,7 +37,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _factories = factories ?? throw new ArgumentNullException(nameof(factories));
             _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
-            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

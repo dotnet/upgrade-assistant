@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, path, _logger);
+            var project = new MSBuildProject(this, _componentIdentifiers, _factories, path, _logger);
 
             _projectCache.Add(path.FullName, project);
 
