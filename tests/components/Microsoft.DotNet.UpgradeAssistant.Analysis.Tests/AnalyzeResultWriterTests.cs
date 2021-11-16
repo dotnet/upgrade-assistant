@@ -23,7 +23,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
 
             _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 await writer.WriteAsync(null, source.Token).ConfigureAwait(false);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             }).ConfigureAwait(false);
         }
 

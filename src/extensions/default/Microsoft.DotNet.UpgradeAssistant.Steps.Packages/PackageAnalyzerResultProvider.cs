@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private ILogger Logger { get; }
 
-        public string ToolName => "Dependency Analysis";
+        public string Name => "Dependency Analysis";
 
         public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
