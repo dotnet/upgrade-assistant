@@ -103,14 +103,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
             else
             {
-                GetResults("Reference to ", " needs to be deleted.", analysisState.References.Deletions);
-                GetResults("Reference to ", " needs to be added.", analysisState.References.Additions);
-                GetResults("Package ", " needs to be deleted.", analysisState.Packages.Deletions);
-                GetResults("Package ", " needs to be added.", analysisState.Packages.Additions);
-                GetResults("Framework Reference to ", " needs to be deleted.", analysisState.FrameworkReferences.Deletions);
-                GetResults("Framework Reference to ", " needs to be added.", analysisState.FrameworkReferences.Additions);
+                GetResults("UA103", "ReferenceShouldBeDeleted", "Reference to ", " needs to be deleted.", analysisState.References.Deletions);
+                GetResults("UA104", "ReferenceShouldBeAdded", "Reference to ", " needs to be added.", analysisState.References.Additions);
+                GetResults("UA105", "PackageShouldBeDeleted", "Package ", " needs to be deleted.", analysisState.Packages.Deletions);
+                GetResults("UA106", "PackageShouldBeAdded", "Package ", " needs to be added.", analysisState.Packages.Additions);
+                GetResults("UA107", "FrameworkShouldBeDeleted", "Framework Reference to ", " needs to be deleted.", analysisState.FrameworkReferences.Deletions);
+                GetResults("UA108", "FrameworkShouldBeAdded", "Framework Reference to ", " needs to be added.", analysisState.FrameworkReferences.Additions);
 
-                void GetResults<T>(string name, string action, IReadOnlyCollection<Operation<T>> collection)
+                void GetResults<T>(string ruleId, string ruleName, string name, string action, IReadOnlyCollection<Operation<T>> collection)
                 {
                     if (collection.Any())
                     {
@@ -120,8 +120,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                             {
                                 results.UnionWith(s.OperationDetails.Details.Select(s => new AnalyzeResult()
                                 {
-                                    RuleId = RuleId,
-                                    RuleName = RuleName,
+                                    RuleId = ruleId,
+                                    RuleName = ruleName,
                                     FullDescription = FullDescription,
                                     HelpUri = _helpUri,
                                     FileLocation = fileLocation,
@@ -132,8 +132,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                             {
                                 results.Add(new()
                                 {
-                                    RuleId = RuleId,
-                                    RuleName = RuleName,
+                                    RuleId = ruleId,
+                                    RuleName = ruleName,
                                     FullDescription = FullDescription,
                                     HelpUri = _helpUri,
                                     FileLocation = fileLocation,
