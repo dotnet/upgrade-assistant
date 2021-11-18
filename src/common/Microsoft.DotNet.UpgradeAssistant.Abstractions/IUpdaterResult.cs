@@ -5,6 +5,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IUpdaterResult
     {
+        string RuleId { get; }
+
+        string RuleName { get; }
+
+        string FullDescription { get; }
+
         bool Result { get; }
     }
 }

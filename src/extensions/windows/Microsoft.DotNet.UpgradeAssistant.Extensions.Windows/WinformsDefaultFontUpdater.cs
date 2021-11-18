@@ -55,7 +55,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), this.Description, fileLocations);
+            return new WinformsUpdaterResult(
+                RuleId: "SomeRuleId",
+                RuleName: Id,
+                FullDescription: Title,
+                Result: fileLocations.Any(),
+                Message: this.Description,
+                FileLocations: fileLocations);
         }
     }
 }
