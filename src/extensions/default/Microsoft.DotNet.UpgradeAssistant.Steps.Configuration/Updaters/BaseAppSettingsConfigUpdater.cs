@@ -78,7 +78,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
                 await file.SaveAsync(token).ConfigureAwait(false);
             }
 
-            return new DefaultUpdaterResult(true);
+            return new DefaultUpdaterResult(
+                RuleId: "Id",
+                RuleName: string.Empty,
+                FullDescription: string.Empty,
+                true);
         }
 
         public static IList<AppSettingsFile> FindExistingAppSettingsFiles(IUpgradeContext context)

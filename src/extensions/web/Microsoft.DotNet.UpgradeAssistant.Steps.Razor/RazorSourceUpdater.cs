@@ -99,7 +99,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 _logger.LogInformation("  {DiagnosticsCount} diagnostics need fixed in {FilePath}", diagnosticsGroup.Count(), diagnosticsGroup.Key);
             }
 
-            return new FileUpdaterResult(mappedDiagnostics.Any(), diagnosticsByFile.Select(g => g.Key));
+            return new FileUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                mappedDiagnostics.Any(),
+                diagnosticsByFile.Select(g => g.Key));
         }
 
         /// <summary>

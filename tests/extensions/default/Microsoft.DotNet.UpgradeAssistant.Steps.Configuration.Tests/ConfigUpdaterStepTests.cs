@@ -216,7 +216,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
                     mock.Setup(c => c.Id).Returns($"ConfigUpdater #{i}");
                     mock.Setup(c => c.IsApplicableAsync(It.IsAny<IUpgradeContext>(),
                                                         It.IsAny<ImmutableArray<ConfigFile>>(),
-                                                        It.IsAny<CancellationToken>())).Returns(Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(i >= completeCount)));
+                                                        It.IsAny<CancellationToken>())).Returns(Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                                                            string.Empty, string.Empty, string.Empty, i >= completeCount)));
                     mock.Setup(c => c.Risk).Returns(BuildBreakRisk.Medium);
                     builder.RegisterMock(mock);
                 }

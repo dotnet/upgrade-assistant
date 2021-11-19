@@ -115,7 +115,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 
             var result = _appSettings.Count > 0;
 
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(result));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                result));
         }
     }
 }

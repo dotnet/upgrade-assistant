@@ -14,7 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     public class WinformsResultProvider : IAnalyzeResultProvider
     {
-        private const string RuleId = "UA102";
         private readonly IUpdater<IProject> _updater;
 
         private ILogger Logger { get; }

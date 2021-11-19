@@ -99,7 +99,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), Resources.HighDPIMessage, fileLocations);
+            return new WinformsUpdaterResult(
+                RuleId: "SomeRuleId",
+                RuleName: Id,
+                FullDescription: Title,
+                fileLocations.Any(),
+                Resources.HighDPIMessage,
+                fileLocations);
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
@@ -124,7 +130,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), Resources.HighDPIMessage, fileLocations);
+            return new WinformsUpdaterResult(
+                RuleId: "SomeRuleId",
+                RuleName: Id,
+                FullDescription: Title,
+                fileLocations.Any(),
+                Resources.HighDPIMessage,
+                fileLocations);
         }
     }
 }

@@ -85,7 +85,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Log how many Razor documents had @helpers and return a corresponding FileUpdaterResult
             _logger.LogInformation("Found @helper functions in {Count} documents", inputsWithHelpers.Count);
-            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(inputsWithHelpers.Any(), inputsWithHelpers));
+            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                inputsWithHelpers.Any(), inputsWithHelpers));
         }
 
         /// <summary>
@@ -146,7 +150,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
             }
 
-            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(true, updatedDocuments));
+            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                true,
+                updatedDocuments));
         }
 
         private static bool HasMvcRazorUsing(RazorCodeDocument document)
