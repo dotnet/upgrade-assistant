@@ -311,7 +311,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         /// </summary>
         /// <remarks>
         /// Checking the symbol in the semantic model is preferred and this method
-        /// should only be used when not symbol information is available.
+        /// should only be used when no symbol information is available.
         /// </remarks>
         /// <param name="node">The syntax node to investigate.</param>
         /// <returns>True if it appears the syntax node is used in a context where a type
