@@ -303,5 +303,120 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
                 LanguageNames.VisualBasic => StringComparer.OrdinalIgnoreCase,
                 _ => throw new NotImplementedException(Resources.UnknownLanguage),
             };
+
+        /// <summary>
+        /// Attempts to determine if a given syntax node corresponds to a type symbol
+        /// based on the node's usage by its parent. This is a best guess in cases where
+        /// semantic information is not available.
+        /// </summary>
+        /// <remarks>
+        /// Checking the symbol in the semantic model is preferred and this method
+        /// should only be used when not symbol information is available.
+        /// </remarks>
+        /// <param name="node">The syntax node to investigate.</param>
+        /// <returns>True if it appears the syntax node is used in a context where a type
+        /// symbol would usually make sense.</returns>
+        public static bool IsTypeSyntax(this SyntaxNode? node)
+        {
+            var parentNode = node?.Parent;
+
+            if (parentNode is null)
+            {
+                return false;
+            }
+
+            // Object creation
+            if (parentNode.IsKind(CS.SyntaxKind.ObjectCreationExpression) || parentNode.IsKind(VB.SyntaxKind.ObjectCreationExpression))
+            {
+                return true;
+            }
+
+            // Static member access
+            if ((parentNode is CSSyntax.MemberAccessExpressionSyntax csMAE && csMAE.Expression.IsEquivalentTo(node))
+                || (parentNode is VBSyntax.MemberAccessExpressionSyntax vbMAE && vbMAE.Expression.IsEquivalentTo(node)))
+            {
+                return true;
+            }
+
+            // Base type
+            if (parentNode.IsBaseTypeSyntax())
+            {
+                return true;
+            }
+
+            // Generic parameter
+            if (parentNode.IsKind(CS.SyntaxKind.TypeArgumentList) || parentNode.IsKind(VB.SyntaxKind.TypeArgumentList))
+            {
+                return true;
+            }
+
+            // Attribute
+            if (parentNode.IsKind(CS.SyntaxKind.Attribute) || parentNode.IsKind(VB.SyntaxKind.Attribute))
+            {
+                return true;
+            }
+
+            // Array
+            if (parentNode.IsKind(CS.SyntaxKind.ArrayType) || parentNode.IsKind(VB.SyntaxKind.ArrayType))
+            {
+                return true;
+            }
+
+            // Variable type
+            if ((parentNode is CSSyntax.VariableDeclarationSyntax csDecl && csDecl.Type.IsEquivalentTo(node))
+                || (parentNode is VBSyntax.SimpleAsClauseSyntax vbDecl && vbDecl.Type.IsEquivalentTo(node)))
+            {
+                return true;
+            }
+
+            // Parameter type
+            if (parentNode.IsKind(CS.SyntaxKind.Parameter) || parentNode.IsKind(VB.SyntaxKind.Parameter))
+            {
+                return true;
+            }
+
+            // Property type
+            if (parentNode.IsKind(CS.SyntaxKind.PropertyDeclaration) || parentNode.IsKind(VB.SyntaxKind.PropertyStatement))
+            {
+                return true;
+            }
+
+            // Method return type (VB method return types are already covered by SimpleAsClause
+            if (parentNode.IsKind(CS.SyntaxKind.MethodDeclaration))
+            {
+                return true;
+            }
+
+            // C# As expression
+            if (parentNode is CSSyntax.BinaryExpressionSyntax binaryExpression
+                && binaryExpression.IsKind(CS.SyntaxKind.AsExpression)
+                && binaryExpression.Right.IsEquivalentTo(node))
+            {
+                return true;
+            }
+
+            // VB CType expression
+            if (parentNode is VBSyntax.CTypeExpressionSyntax cType
+                && cType.Type.IsEquivalentTo(node))
+            {
+                return true;
+            }
+
+            // C# cast expression
+            if (parentNode is CSSyntax.CastExpressionSyntax csCastExpression
+                && csCastExpression.Type.IsEquivalentTo(node))
+            {
+                return true;
+            }
+
+            // VB cast expression
+            if (parentNode is VBSyntax.CastExpressionSyntax vbCastExpression
+                && vbCastExpression.Type.IsEquivalentTo(node))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

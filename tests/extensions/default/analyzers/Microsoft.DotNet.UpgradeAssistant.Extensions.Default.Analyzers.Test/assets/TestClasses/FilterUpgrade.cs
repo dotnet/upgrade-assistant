@@ -22,6 +22,7 @@ namespace TestProject.TestClasses
         {
             Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext a = null;
             var x = this as IActionFilter;
+            var y = (IActionFilter)this;
         }
 
         public override void OnActionExecuted(ActionExecutedContext filterContext) => throw new NotImplementedException();
