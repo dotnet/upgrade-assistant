@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
@@ -16,14 +14,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     public class WinformsResultProvider : IAnalyzeResultProvider
     {
-        private ILogger Logger { get; }
-
+        private const string RuleId = "UA102";
         private readonly IUpdater<IProject> _updater;
-        private readonly string _id = "UA102";
+
+        private ILogger Logger { get; }
 
         public string Name => "Component Analysis";
 
-        public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
+        public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
         public WinformsResultProvider(IUpdater<IProject> updater,
            ILogger<WinformsResultProvider> logger)
@@ -78,7 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 {
                     yield return new()
                     {
-                        RuleId = this._id,
+                        RuleId = RuleId,
                         RuleName = this.Name,
                         FileLocation = s,
                         ResultMessage = updaterResult.Message,

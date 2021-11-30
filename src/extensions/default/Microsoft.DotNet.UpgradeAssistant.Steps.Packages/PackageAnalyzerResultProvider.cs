@@ -16,7 +16,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class PackageAnalyzerResultProvider : IAnalyzeResultProvider
     {
-        private const string Id = "UA101";
+        private const string RuleId = "UA101";
+        private const string RuleName = "Dependency Analysis";
+        private const string FullDescription = "Dependency Analysis";
+        private readonly Uri _helpUri = new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
         private IDependencyAnalysisState? _analysisState;
@@ -25,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public string Name => "Dependency Analysis";
 
-        public Uri InformationURI => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
+        public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
         public PackageAnalyzerResultProvider(IDependencyAnalyzerRunner packageAnalyzer,
             ITargetFrameworkSelector tfmSelector,
@@ -90,23 +93,59 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             {
                 results.Add(new()
                 {
-                    RuleId = Id,
-                    RuleName = this.Name,
+                    RuleId = RuleId,
+                    RuleName = RuleName,
+                    HelpUri = _helpUri,
+                    FullDescription = FullDescription,
                     FileLocation = fileLocation,
-                    ResultMessage = "No package updates needed",
+                    ResultMessage = "No package updates needed.",
                 });
             }
             else
             {
-                GetResults("Reference to ", " needs to be deleted ", analysisState.References.Deletions);
-                GetResults("Reference to ", " needs to be added ", analysisState.References.Additions);
-                GetResults("Package ", " needs to be deleted ", analysisState.Packages.Deletions);
-                GetResults("Package ", " needs to be added ", analysisState.Packages.Additions);
-                GetResults("Framework Reference to ", " needs to be deleted ", analysisState.FrameworkReferences.Deletions);
-                GetResults("Framework Reference to ", " needs to be added ", analysisState.FrameworkReferences.Additions);
+                GetResults("UA103", "Reference to ", " needs to be deleted.", analysisState.References.Deletions);
+                GetResults("UA104", "Reference to ", " needs to be added.", analysisState.References.Additions);
+                GetResults("UA105", "Package ", " needs to be deleted.", analysisState.Packages.Deletions);
+                GetResults("UA106", "Package ", " needs to be added.", analysisState.Packages.Additions);
+                GetResults("UA107", "Framework Reference to ", " needs to be deleted.", analysisState.FrameworkReferences.Deletions);
+                GetResults("UA108", "Framework Reference to ", " needs to be added.", analysisState.FrameworkReferences.Additions);
 
-                void GetResults<T>(string name, string action, IReadOnlyCollection<Operation<T>> collection)
+                void GetResults<T>(string ruleId, string name, string action, IReadOnlyCollection<Operation<T>> collection)
                 {
+                    string ruleName = string.Empty, fullDescription = string.Empty;
+                    switch (ruleId)
+                    {
+                        case "UA103":
+                            ruleName = "ReferenceToBeDeleted";
+                            fullDescription = "References that need to be deleted in order to upgrade the project to chosen TFM";
+                            break;
+
+                        case "UA104":
+                            ruleName = "ReferenceToBeAdded";
+                            fullDescription = "References that need to be added in order to upgrade the project to chosen TFM";
+                            break;
+
+                        case "UA105":
+                            ruleName = "PackageToBeDeleted";
+                            fullDescription = "Packages that need to be deleted in order to upgrade the project to chosen TFM";
+                            break;
+
+                        case "UA106":
+                            ruleName = "PackageToBeAdded";
+                            fullDescription = "Packages that need to be added in order to upgrade the project to chosen TFM";
+                            break;
+
+                        case "UA107":
+                            ruleName = "FrameworkReferenceToBeDeleted";
+                            fullDescription = "Framework Reference that need to be deleted in order to upgrade the project to chosen TFM";
+                            break;
+
+                        case "UA108":
+                            ruleName = "FrameworkReferenceToBeAdded";
+                            fullDescription = "Framework Reference that need to be added in order to upgrade the project to chosen TFM";
+                            break;
+                    }
+
                     if (collection.Any())
                     {
                         foreach (var s in collection)
@@ -115,8 +154,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                             {
                                 results.UnionWith(s.OperationDetails.Details.Select(s => new AnalyzeResult()
                                 {
-                                    RuleId = Id,
-                                    RuleName = this.Name,
+                                    RuleId = ruleId,
+                                    RuleName = ruleName,
+                                    FullDescription = fullDescription,
+                                    HelpUri = _helpUri,
                                     FileLocation = fileLocation,
                                     ResultMessage = s,
                                 }));
@@ -125,8 +166,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                             {
                                 results.Add(new()
                                 {
-                                    RuleId = Id,
-                                    RuleName = this.Name,
+                                    RuleId = ruleId,
+                                    RuleName = ruleName,
+                                    FullDescription = fullDescription,
+                                    HelpUri = _helpUri,
                                     FileLocation = fileLocation,
                                     ResultMessage = string.Concat(name, s.Item, action),
                                 });
