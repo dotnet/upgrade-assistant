@@ -196,9 +196,9 @@
     <value>Microsoft .NET Upgrade Assistant v{0}</value>
   </data>
   <data name="UpgradeAssistantHeaderDetails" xml:space="preserve">
-    <value>Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.
+    <value>Makes a best-effort attempt to upgrade .NET Framework projects to current, preview, or LTS versions of .NET.
  
-This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.
+This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade.
 
 This tool's purpose is to automate some of the 'routine' upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to the project will highlight the remaining changes needed after the tool runs.</value>
   </data>
