@@ -1,7 +1,7 @@
 # Upgrade Assistant
 
 ## Share your feedback on the .NET Upgrade Assistant!
-We're interested to hearing how your experience with the .NET Upgrade Assistant has been going as you upgrade your project(s) from .NET Framework to .NET 5 and beyond.
+We're interested to hearing how your experience with the .NET Upgrade Assistant has been going as you upgrade your project(s) from .NET Framework to the latest version of .NET (current, LTS, or preview).
 
 [Share your feedback here](https://www.surveymonkey.com/r/2LBPCXH)!
 
@@ -15,7 +15,7 @@ We're interested to hearing how your experience with the .NET Upgrade Assistant 
 
 ## Overview
 
-This project enables automation of common tasks related to upgrading .NET Framework projects to .NET 5 and beyond. Note that this is not a complete upgrade tool and work *will* be required after using the tooling to upgrade a project.
+This project enables automation of common tasks related to upgrading .NET Framework projects to the latest versions of .NET (current, LTS, or Preview). See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for more details for what these mean.Note that this is not a complete upgrade tool and work *will* be required after using the tooling to upgrade a project.
 
 ### Upgrade Solution
 
@@ -24,9 +24,9 @@ When run on a solution in order to upgrade, the tool will:
 - Determine which projects need upgraded and recommend the order the projects should be upgraded in
 - Update the project file to be an SDK-style project
 - Remove transitive NuGet package dependencies that may have been present in packages.config
-- Re-target project to .NET 5.0
-- Update NuGet package dependencies to versions that are compatible with .NET 5.0
-- Make simple updates in C# source code to replace patterns that worked in .NET Framework with .NET 5.0 equivalents
+- Re-target project to .NET current, LTS, or preview
+- Update NuGet package dependencies to versions that are compatible with .NET current, LTS, or preview
+- Make simple updates in C# source code to replace patterns that worked in .NET Framework with current, LTS, or preview equivalents
 - For some app models (like ASP.NET apps), add common template files (like startup.cs) and make simple updates based on recognized web.config or app.config values
 - For projects targeting Windows, add a reference to the Microsoft.Windows.Compatibility package
 - Add references to analyzers that help with upgrade, such as the Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers package
@@ -36,19 +36,19 @@ After running this tool on a solution to upgrade, the solution will likely not b
 ### Analyze Solution prior to Upgrade
 
 When run on a solution in order to analyze dependencies prior to upgrade, the tool will provide an analysis report for each of the projects in the solution containing details on:
-- Package dependencies that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
-- References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
-- Framework References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (.NET 5.0 and beyond)
+- Package dependencies that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
+- References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
+- Framework References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
 - Call out if there is a package upgrade across major versions that could lead towards having breaking changes.
-- Unsupported API for the chosen TFM (.NET 5.0 and beyond) used in the projects with pointers to recommended path forward if one is available.
+- Unsupported API for the chosen TFM (current, LTS, or preview) used in the projects with pointers to recommended path forward if one is available.
 
 ### Solution wide extension management
 
-Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md)
+Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md).
 
 ### Optional Features
 
-Some features within Upgrade Assistant may be enabled by adding extensions.
+Some features within Upgrade Assistant may be enabled by adding extensions. Available extensions can be viewed on [here](https://www.nuget.org/packages?packagetype=UpgradeAssistantExtension&sortby=relevance&q=&prerel=True).
 
 **Loose Assembly Identification**
 
@@ -56,11 +56,11 @@ Some projects incorporate what we call "loose assemblies" where assemblies are a
 
 ## Upgrade documentation
 
-As you upgrade projects from .NET Framework to .NET 5, it will be very useful to be familiar with relevant [porting documentation](https://docs.microsoft.com/dotnet/core/porting/).
+As you upgrade projects from .NET Framework to .NET (current, LTS, or preview), it will be very useful to be familiar with relevant [porting documentation](https://docs.microsoft.com/dotnet/core/porting/).
 
 Web scenarios can be especially challenging, so it you are upgrading an ASP.NET app, be sure to read [ASP.NET Core migration documentation](https://docs.microsoft.com/aspnet/core/migration/proper-to-2x). If you are unfamiliar with ASP.NET Core, you should also read [ASP.NET Core fundamentals documentation](https://docs.microsoft.com/aspnet/core/fundamentals) to learn about important ASP.NET Core concepts (hosting, middleware, routing, etc.).
 
-The following tutorials will give you a sense of how to upgrade ASP.NET, Windows Forms, and WPF applications to .NET 5 using the Upgrade Assistant:
+The following tutorials will give you a sense of how to upgrade ASP.NET, Windows Forms, and WPF applications to .NET (current, LTS, or preview) using the Upgrade Assistant:
 - [Upgrade an ASP.NET MVC App to .NET 5 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-aspnetmvc)
 - [Upgrade a Windows Forms App to .NET 5 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-winforms-framework)
 - [Upgrade a WPF App to .NET 5 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-wpf-framework)
@@ -185,9 +185,9 @@ The output of the analyze command is a report in SARIF format. SARIF is based on
 Sample of the report in VS SARIF Viewer : ![Analysis Report](/docs/images/AnalysisReport.PNG)
 ### Determining upgrade feasibility
 
-Note that this tool does not (yet) advise on the feasibility or estimated cost of upgrading projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to .NET 5.0.
+Note that this tool does not (yet) advise on the feasibility or estimated cost of upgrading projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to the latest version of .NET (current, LTS, or preview).
 
-If you're just starting to look at .NET 5.0 and would like to understand more about potential challenges in upgrading any particular project, you should begin by looking at .NET Framework dependencies the project has and third-party libraries or NuGet packages it depends on and understand whether those dependencies are likely to work on .NET 5.0. Resources that can help with that analysis include:
+If you're just starting to look at the latest versions of .NET (current, LTS, or preview) and would like to understand more about potential challenges in upgrading any particular project, you should begin by looking at .NET Framework dependencies the project has and third-party libraries or NuGet packages it depends on and understand whether those dependencies are likely to work on the latest version of .NET (current, LTS, or preview). Resources that can help with that analysis include:
 
 1. [The .NET Portability Analyzer tool](https://github.com/microsoft/dotnet-apiport)
 2. [.NET Core porting documentation](https://docs.microsoft.com/dotnet/core/porting/)
@@ -232,14 +232,14 @@ Concepts referred to in this repository which may have unclear meaning are expla
 The project outputs a log file by default in the working directory called `upgrade-assistant.clef` that can be viewed with tools such as [Compact Log Format Viewer](https://github.com/warrenbuckley/Compact-Log-Format-Viewer) available via the [Windows Store](https://www.microsoft.com/store/apps/9N8RV8LKTXRJ?cid=storebadge&ocid=badge).
 
 ## Roadmap
-Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to .NET 5 and beyond in the [roadmap](docs/roadmap.md).
+Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to the latets version of .NET (current, LTS, or preview) and beyond in the [roadmap](docs/roadmap.md).
 
 ## Engage, Contribute and Give Feedback
-Some of the best ways to contribute are to use the tool to upgrade your apps to .NET 5, file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
+Some of the best ways to contribute are to use the tool to upgrade your apps to the latest version of .NET (current, LTS, or preview), file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
 
 Check out the [contributing](/CONTRIBUTING.md) page for more details on the best places to log issues, start discussions, PR process etc.
 
-Happy upgrading to .NET 5!
+Happy upgrading to the latest version of .NET (current, LTS, or preview)!
 
 ## Data Collection
 The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft's privacy statement. Our privacy statement is located [here](https://go.microsoft.com/fwlink/?LinkID=824704). You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.

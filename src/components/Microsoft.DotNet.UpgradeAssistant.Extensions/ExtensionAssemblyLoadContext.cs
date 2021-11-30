@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.FileProviders;
@@ -63,17 +62,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         protected override Assembly? Load(AssemblyName assemblyName)
         {
-            // If available in the default, we want to ensure that is used.
-            var inDefault = Default.Assemblies
-                .Where(a => IsHostProvided(a.GetName().Name))
-                .FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName.Name, StringComparison.Ordinal));
-
-            if (inDefault is Assembly existing)
-            {
-                _logger.LogDebug("Loaded {Name} from default context instead of {Extension}", assemblyName, Name);
-                return existing;
-            }
-
             var dll = $"{assemblyName.Name}.dll";
             var dllFile = _extension.FileProvider.GetFileInfo(dll);
 
@@ -123,25 +111,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             ms.Position = 0;
             assemblyStream.Dispose();
             return ms;
-        }
-
-        private bool IsHostProvided(string? name)
-        {
-            if (name is null)
-            {
-                return false;
-            }
-
-            if (name.Contains("NuGet", StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            return name switch
-            {
-                "Newtonsoft.Json" => false,
-                _ => true,
-            };
         }
     }
 }

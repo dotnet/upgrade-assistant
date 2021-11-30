@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
                 foreach (var (section, issue) in GetUnsupportedSections(configFile))
                 {
                     section.ReplaceWith(
-                        new XComment($" {section.Name} section is not supported on .NET 5 (see {issue})"),
+                        new XComment($" {section.Name} section is not supported on .NET 6 (see {issue})"),
                         new XComment(section.ToString()));
                     updated = true;
                 }
@@ -98,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 
                 if (section is not null)
                 {
-                    _logger.LogInformation("{SectionName} is not supported in .NET 5. See {IssueLink} for details. For now, it will be disabled.", name, issue);
+                    _logger.LogInformation("{SectionName} is not supported in .NET 6. See {IssueLink} for details. For now, it will be disabled.", name, issue);
                     yield return (section, issue);
                 }
             }

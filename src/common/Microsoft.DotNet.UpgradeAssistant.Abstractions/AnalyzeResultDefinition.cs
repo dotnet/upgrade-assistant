@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         /// <summary>
         /// Gets link to information for the analysis tool.
         /// </summary>
-        public Uri InformationURI { get; init; } = new("about:blank");
+        public Uri InformationUri { get; init; } = new("about:blank");
 
         /// <summary>
         /// Gets results of the analysis type defined above.
