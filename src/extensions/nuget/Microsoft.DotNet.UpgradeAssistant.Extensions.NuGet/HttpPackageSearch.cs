@@ -40,6 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 packageType = string.Empty;
             }
 
+            // This is the URL for searching NuGet.org via REST: https://docs.microsoft.com/en-us/nuget/api/search-query-service-resource
             var url = new Uri($"https://azuresearch-usnc.nuget.org/query?q={name}&skip=0&take={SearchTake}&prerelease=true&packageType={packageType}&semVerLevel=2.0.0");
 
             var result = await _client.GetByteArrayAsync(url, token).ConfigureAwait(false);
