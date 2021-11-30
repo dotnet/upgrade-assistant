@@ -4,7 +4,9 @@ namespace HybridExample
 {
     internal class AspNetHttpContext : IHttpContext, IRequest, IResponse
     {
+#pragma warning disable UA0100 // Refactor usage of type to another type
         private readonly HttpContext _context;
+#pragma warning restore UA0100 // Refactor usage of type to another type
 
         public AspNetHttpContext(HttpContext context)
         {
