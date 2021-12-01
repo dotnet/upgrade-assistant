@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             // If the identifier is part of a fully qualified name and the qualified name does not match
             // the old name, then bail out because it is not referring to that type
-            if ((fullyQualifiedNameNode is CSSyntax.QualifiedNameSyntax || fullyQualifiedNameNode is VBSyntax.QualifiedNameSyntax)
+            if (fullyQualifiedNameNode.IsQualifiedName()
                 && !mapping.OldName.EndsWith(fullyQualifiedNameNode.ToString(), StringComparison.Ordinal))
             {
                 return;
@@ -145,19 +145,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 
             var symbolInfo = context.SemanticModel.GetSymbolInfo(context.Node);
 
-            // If the identifier resolves to a symbol that isn't a type symbol (property symbol, for example),
-            // then bail out because this analyzer should only flag type usage.
-            if (symbolInfo.Symbol is ISymbol && symbolInfo.Symbol is not INamedTypeSymbol)
+            // If symbol information is available, then attempt to use that to determine
+            // whether the syntax node corresponds to a type that needs flagged.
+            if (symbolInfo.Symbol is ISymbol symbol)
             {
-                return;
-            }
-
-            // Bail out if the node corresponds to a symbol that isn't the old type.
-            if (symbolInfo.Symbol is INamedTypeSymbol symbol
-                && symbol is not IErrorTypeSymbol
-                && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldName, StringComparison.Ordinal))
-            {
-                return;
+                if (symbol is INamedTypeSymbol typeSymbol)
+                {
+                    // Bail out if the node corresponds to a type symbol that isn't the old type.
+                    if (typeSymbol is not IErrorTypeSymbol
+                    && !typeSymbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldName, StringComparison.Ordinal))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        // This case is intentionally not handled.
+                        // A type symbol that is either an error type symbol or that correctly matches the old type name
+                        // may warrant reporting a diagnostic.
+                    }
+                }
+                else
+                {
+                    // If the identifier resolves to a symbol that isn't a type symbol (property symbol, for example),
+                    // then bail out because this analyzer should only flag type usage.
+                    return;
+                }
             }
 
             // Bail out if the symbol might correspond to a symbol that is the new type.
