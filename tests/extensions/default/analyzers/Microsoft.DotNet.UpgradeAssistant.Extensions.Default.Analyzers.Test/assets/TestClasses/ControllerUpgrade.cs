@@ -81,7 +81,16 @@ namespace Foo
 {
     public class ApiController
     {
-        object Controller { get; set; }
+        object Controller
+        {
+            get;
+
+            set
+            {
+                var ApiController = string.Empty;
+                var x = ApiController.Substring(0, 0);
+            }
+        }
     }
 
     public class Controller
