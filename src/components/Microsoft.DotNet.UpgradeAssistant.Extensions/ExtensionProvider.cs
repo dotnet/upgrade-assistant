@@ -145,7 +145,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 .AddInMemoryCollection(collection)
                 .Build();
 
+#pragma warning disable CA2000 // Dispose objects before losing scope
             return _factory.Create(new PhysicalFileProvider(Environment.CurrentDirectory), Environment.CurrentDirectory, config);
+#pragma warning restore CA2000 // Dispose objects before losing scope
         }
 
         public IExtensionInstance? OpenExtension(string path)
@@ -154,6 +156,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             foreach (var loader in _loaders)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     if (loader.LoadExtension(path) is ExtensionInstance instance)
@@ -173,6 +176,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 catch (Exception e)
                 {
                     _logger.LogError(e, "There was an error loading an extension from {Path}", path);
+                    throw;
                 }
             }
 

@@ -8,7 +8,7 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
 
-    <!-- 
+    <!--
       Use version 3.8.0 of CodeAnalysis assemblies to preserve compatibility
       with Visual Studio 2019 16.8
     -->
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DotNetBuildFromSource)' == 'true'">
-    <!--    
+    <!--
       When building using source-build the process is:
       - Newtonsoft.Json versions 9.0.1 and 12.0.2 are built by source-build
       - Version 12.0.2 is written to Version.props
@@ -42,6 +42,9 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <Nullable>enable</Nullable>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\rules.ruleset</CodeAnalysisRuleSet>
+
+    <!-- Ignore CA2254 The logging message template should not vary between calls. EditorConfig doesn't seem to honored for this -->
+    <NoWarn>$(NoWarn);CA2254</NoWarn>
   </PropertyGroup>
 
   <!-- Treat warnings as errors in release builds, so that all warnings

@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes
         /// <returns>An updated document with the given node replaced with the new identifier.</returns>
         private static async Task<Document> UpdateIdentifierTypeAsync(Document document, SyntaxNode node, string newIdentifier, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
+            var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
 
             // Create new identifier
             var updatedNode = GetUpdatedNode(node, editor.Generator, newIdentifier)

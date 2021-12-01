@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -249,11 +248,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task NegativeTest()
         {
+            using var workspace = new AdhocWorkspace();
             var analyzers = TestHelper.AllAnalyzers
                 .SelectMany(a => a.SupportedDiagnostics)
                 .Select(d => d.Id)
                 .ToArray();
-            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", analyzers, isFramework: true).ConfigureAwait(false);
+            var diagnostics = await workspace.GetDiagnosticsAsync("Startup.cs", analyzers, isFramework: true).ConfigureAwait(false);
 
             Assert.Empty(diagnostics);
         }
@@ -289,7 +289,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     .Select(e => e.Id)
                     .Distinct();
 
-                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, scenarioName, isFramework: false, expectedDiagnosticIds);
+                using var workspace = new AdhocWorkspace();
+                var diagnostics = await workspace.GetDiagnosticsAsync(language, scenarioName, isFramework: false, expectedDiagnosticIds);
                 AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
             }
         }
@@ -319,7 +320,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     continue;
                 }
 
-                var fixedText = await TestHelper.FixSourceAsync(language, scenarioName, expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
+                using var workspace = new AdhocWorkspace();
+                var fixedText = await workspace.FixSourceAsync(language, scenarioName, expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
                 var expectedText = TestHelper.GetSource(language, $"{scenarioName}.Fixed");
 
                 _output.WriteLine("Expected:");

@@ -60,6 +60,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 lock (_sync)
                 {
+                    // This *may be* null due to multi-threading
+#pragma warning disable CA1508 // Avoid dead conditional code
                     if (_version is null)
                     {
                         var instance = MSBuildLocator.QueryVisualStudioInstances()
@@ -98,6 +100,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                             return null;
                         }
                     }
+#pragma warning restore CA1508 // Avoid dead conditional code
                 }
             }
 

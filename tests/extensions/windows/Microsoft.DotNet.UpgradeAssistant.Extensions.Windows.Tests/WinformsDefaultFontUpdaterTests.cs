@@ -35,13 +35,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.FileInfo).Returns(new FileInfo("./test"));
-            project.Setup(p => p.GetComponentsAsync(CancellationToken.None)).Returns(ValueTask.FromResult(component));
+            project.Setup(p => p.GetComponentsAsync(CancellationToken.None)).ReturnsAsync(component);
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
 
             // Act
-            var updaterResult = await updater.IsApplicableAsync(context.Object, ImmutableArray<IProject>.Empty.Add(project.Object), CancellationToken.None);
+            var updaterResult = await updater.IsApplicableAsync(context.Object, ImmutableArray<IProject>.Empty.Add(project.Object), CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, updaterResult.Result);
@@ -69,18 +69,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             var project1 = new Mock<IProject>();
             project1.Setup(p => p.GetFile()).Returns(projectFile1.Object);
             project1.Setup(p => p.FileInfo).Returns(new FileInfo("./test1"));
-            project1.Setup(p => p.GetComponentsAsync(CancellationToken.None)).Returns(ValueTask.FromResult(component1));
+            project1.Setup(p => p.GetComponentsAsync(CancellationToken.None)).ReturnsAsync(component1);
 
             var project2 = new Mock<IProject>();
             project2.Setup(p => p.GetFile()).Returns(projectFile2.Object);
             project2.Setup(p => p.FileInfo).Returns(new FileInfo("./test2"));
-            project2.Setup(p => p.GetComponentsAsync(CancellationToken.None)).Returns(ValueTask.FromResult(component2));
+            project2.Setup(p => p.GetComponentsAsync(CancellationToken.None)).ReturnsAsync(component2);
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project1.Object, project2.Object });
 
             // Act
-            var updaterResult = (WinformsUpdaterResult)await updater.IsApplicableAsync(context.Object, context.Object.Projects.ToImmutableArray(), CancellationToken.None);
+            var updaterResult = (WinformsUpdaterResult)await updater.IsApplicableAsync(context.Object, context.Object.Projects.ToImmutableArray(), CancellationToken.None).ConfigureAwait(false);
             var fileLocations = updaterResult.FileLocations.Select(i => Path.GetFileNameWithoutExtension(i));
 
             // Assert

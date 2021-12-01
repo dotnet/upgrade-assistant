@@ -1,7 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using Microsoft.DotNet.UpgradeAssistant.MSBuild;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using NuGet.Configuration;
 
@@ -10,7 +10,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
     public class NuGetExtensionBuilder : IExtensionServiceProvider
     {
         public void AddServices(IExtensionServiceCollection services)
-            => AddNuGet(services.Services);
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            AddNuGet(services.Services);
+        }
 
         private static void AddNuGet(IServiceCollection services)
         {

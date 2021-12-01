@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,6 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
                         catch (Exception e)
                         {
                             logger.LogError(e, "Could not load loose assembly index {Path}", path);
+                            throw;
                         }
                     }
                 }
@@ -84,9 +84,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
                 var result = (ownerPackageId, containingPackage) switch
                 {
                     { containingPackage: { Id: var id }, } when string.Equals(id, ownerPackageId, StringComparison.OrdinalIgnoreCase) => GetNuGetReference(containingPackage),
-                    { containingPackage: { Id: var id }, ownerPackageId: not null } when !string.Equals(id, ownerPackageId, StringComparison.OrdinalIgnoreCase) => await GetLatestReferenceAsync(ownerPackageId, containingPackage),
+                    { containingPackage: { Id: var id }, ownerPackageId: not null } when !string.Equals(id, ownerPackageId, StringComparison.OrdinalIgnoreCase) => await GetLatestReferenceAsync(ownerPackageId, containingPackage).ConfigureAwait(false),
                     { containingPackage: not null, ownerPackageId: null } => GetNuGetReference(containingPackage),
-                    { containingPackage: null, ownerPackageId: not null } => await GetLatestReferenceAsync(ownerPackageId, containingPackage!),
+                    { containingPackage: null, ownerPackageId: not null } => await GetLatestReferenceAsync(ownerPackageId, containingPackage!).ConfigureAwait(false),
                     _ => null,
                 };
 
@@ -99,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
             async Task<NuGetReference> GetLatestReferenceAsync(string packageId, NuGetPackageVersion nuget)
             {
                 _logger.LogDebug("Searching for the latest version of {PackageId} for {TFMs}", packageId, tfms);
-                var latest = await _packages.GetLatestVersionAsync(packageId, tfms, new() { Prerelease = true, Unlisted = true }, token);
+                var latest = await _packages.GetLatestVersionAsync(packageId, tfms, new() { Prerelease = true, Unlisted = true }, token).ConfigureAwait(false);
 
                 if (latest is not null)
                 {

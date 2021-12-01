@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         {
             token.ThrowIfCancellationRequested();
 
-            _io.Output.WriteLine();
+            await _io.Output.WriteLineAsync();
 
             var commands = _commandProvider.GetCommands(step, context);
             var command = await _input.ChooseAsync("Choose a command:", commands, token);
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             if (!await ExecuteAndTimeCommand(context, step, command, token))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                _io.Output.WriteLine($"Command ({command.CommandText}) did not succeed");
+                await _io.Output.WriteAsync($"Command ({command.CommandText}) did not succeed");
                 Console.ResetColor();
             }
             else if (!await _input.WaitToProceedAsync(token))
@@ -132,27 +132,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             if (offset == 0)
             {
-                _io.Output.WriteLine();
-                _io.Output.WriteLine("Upgrade Steps");
-                _io.Output.WriteLine();
+                await _io.Output.WriteLineAsync();
+                await _io.Output.WriteLineAsync("Upgrade Steps");
+                await _io.Output.WriteLineAsync();
 
                 var displayedProjectInfo = false;
 
                 foreach (var entrypoint in context.EntryPoints)
                 {
-                    _io.Output.WriteLine($"Entrypoint: {entrypoint.FileInfo}");
+                    await _io.Output.WriteLineAsync($"Entrypoint: {entrypoint.FileInfo}");
                     displayedProjectInfo = true;
                 }
 
                 if (context.CurrentProject is not null)
                 {
-                    _io.Output.WriteLine($"Current Project: {context.CurrentProject.FileInfo}");
+                    await _io.Output.WriteLineAsync($"Current Project: {context.CurrentProject.FileInfo}");
                     displayedProjectInfo = true;
                 }
 
                 if (displayedProjectInfo)
                 {
-                    _io.Output.WriteLine();
+                    await _io.Output.WriteLineAsync();
                 }
             }
 
@@ -162,12 +162,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 var indexStr = offset % 2 == 0
                     ? $"{count++}. "
                     : $"{(char)('a' + (count++ - 1))}. ";
-                _io.Output.Write($"{new string(' ', offset * 4)}{indexStr}");
+                await _io.Output.WriteAsync($"{new string(' ', offset * 4)}{indexStr}");
 
                 // Write the step title and make a note of whether the step is incomplete
                 // (since that would mean future steps shouldn't show "[Next step]")
                 WriteStepStatus(step, step == currentStep);
-                _io.Output.WriteLine(step.Title);
+                await _io.Output.WriteLineAsync(step.Title);
                 nextStepFound = nextStepFound || step.Status != UpgradeStepStatus.Complete;
 
                 await ShowUpgradeStepsAsync(step.SubSteps, context, token, currentStep, offset + 1);

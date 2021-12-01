@@ -30,7 +30,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
         public async Task<bool> RunAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
-            var tfm = await _targetFrameworkSelector.SelectTargetFrameworkAsync(project, token);
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            var tfm = await _targetFrameworkSelector.SelectTargetFrameworkAsync(project, token).ConfigureAwait(false);
 
             // try-convert has no overloads to pass in properties
             SetEnvironmentVariables(context);

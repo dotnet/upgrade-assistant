@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using Autofac;
 using Autofac.Extras.Moq;
-using Microsoft.DotNet.UpgradeAssistant.MSBuild;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
-    public class MSBuildRegistrationFixture : IDisposable
+    public sealed class MSBuildRegistrationFixture : IDisposable
     {
         private readonly List<string> _messages = new();
 

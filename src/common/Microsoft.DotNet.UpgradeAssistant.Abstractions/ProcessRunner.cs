@@ -69,8 +69,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             if (process.ExitCode != args.SuccessCode)
             {
-                var message = "[{Tool}] Error: Exited with non-success code: {ExitCode}";
-                _logger.Log(args.GetMessageLogLevel(true, message), message, args.DisplayName, process.ExitCode);
+                const string Message = "[{Tool}] Error: Exited with non-success code: {ExitCode}";
+                _logger.Log(args.GetMessageLogLevel(true, Message), Message, args.DisplayName, process.ExitCode);
 
                 return false;
             }

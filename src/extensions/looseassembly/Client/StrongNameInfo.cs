@@ -75,9 +75,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         }
 
         public override string ToString() => $"{Name}, PublicKeyToken={PublicKeyToken}";
-
-        public static bool operator ==(StrongNameInfo first, StrongNameInfo second) => first.Equals(second);
-
-        public static bool operator !=(StrongNameInfo first, StrongNameInfo second) => !first.Equals(second);
     }
 }
