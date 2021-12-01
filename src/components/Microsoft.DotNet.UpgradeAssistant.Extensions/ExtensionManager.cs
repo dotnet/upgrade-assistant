@@ -3,21 +3,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public sealed class ExtensionManager : IExtensionManager
     {
+        internal const string PackageType = "UpgradeAssistantExtension";
+
         private readonly Lazy<IExtensionDownloader> _extensionDownloader;
+        private readonly Lazy<IPackageSearch> _searcher;
         private readonly ILogger<ExtensionManager> _logger;
         private readonly IExtensionProvider _extensionProvider;
         private readonly IUpgradeAssistantConfigurationLoader _configurationLoader;
@@ -26,11 +25,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             IExtensionProvider extensionProvider,
             IUpgradeAssistantConfigurationLoader configurationLoader,
             Lazy<IExtensionDownloader> extensionDownloader,
+            Lazy<IPackageSearch> searcher,
             ILogger<ExtensionManager> logger)
         {
             _extensionProvider = extensionProvider ?? throw new ArgumentNullException(nameof(extensionProvider));
             _configurationLoader = configurationLoader ?? throw new ArgumentNullException(nameof(configurationLoader));
             _extensionDownloader = extensionDownloader ?? throw new ArgumentNullException(nameof(extensionDownloader));
+            _searcher = searcher;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -146,6 +147,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
 
             return success;
+        }
+
+        public async IAsyncEnumerable<ExtensionSource> SearchAsync(string query, string source, [EnumeratorCancellation] CancellationToken token)
+        {
+            await foreach (var result in _searcher.Value.SearchAsync(query, source, PackageType, token))
+            {
+                yield return new(result.Name)
+                {
+                    Source = source,
+                    Version = result.Version,
+                };
+            }
         }
     }
 }

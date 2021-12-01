@@ -9,11 +9,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     public class NuGetExtensionPackageCreator : IExtensionCreator
     {
-        private readonly Lazy<IPackageDownloader> _packageDownloader;
+        private readonly Lazy<IPackageCreator> _packageCreator;
 
-        public NuGetExtensionPackageCreator(Lazy<IPackageDownloader> packageDownloader)
+        public NuGetExtensionPackageCreator(Lazy<IPackageCreator> packageCreator)
         {
-            _packageDownloader = packageDownloader ?? throw new ArgumentNullException(nameof(packageDownloader));
+            _packageCreator = packageCreator ?? throw new ArgumentNullException(nameof(packageCreator));
         }
 
         public bool TryCreateExtensionFromDirectory(IExtensionInstance extension, Stream stream)
@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            if (!_packageDownloader.Value.CreateArchive(extension, stream))
+            if (!_packageCreator.Value.CreateArchive(extension, ExtensionManager.PackageType, stream))
             {
                 return false;
             }
