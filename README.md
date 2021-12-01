@@ -44,11 +44,11 @@ When run on a solution in order to analyze dependencies prior to upgrade, the to
 
 ### Solution wide extension management
 
-Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md)
+Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md).
 
 ### Optional Features
 
-Some features within Upgrade Assistant may be enabled by adding extensions.
+Some features within Upgrade Assistant may be enabled by adding extensions. Available extensions can be viewed on [here](https://www.nuget.org/packages?packagetype=UpgradeAssistantExtension&sortby=relevance&q=&prerel=True).
 
 **Loose Assembly Identification**
 

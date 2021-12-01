@@ -49,17 +49,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                         {
                             Name = ar.Name,
                             SemanticVersion = ar.Version,
-                            InformationUri = ar.InformationURI,
-                            Rules = analyzeResults.GroupBy(x => x.RuleId).Select(a => new ReportingDescriptor()
-                            {
-                                Id = a.Key,
-                                FullDescription = new() { Text = a.First().RuleName, },
-                            }).ToList(),
+                            InformationUri = ar.InformationUri,
+                            Rules = analyzeResults.GroupBy(x => x.RuleId).Select(ExtractRule).ToList(),
                         },
                     },
                     Results = ExtractResults(analyzeResults),
                 };
             }
+        }
+
+        private static ReportingDescriptor ExtractRule(IGrouping<string, AnalyzeResult> analyzeResults)
+        {
+            var analyzeResult = analyzeResults.First();
+
+            var rule = new ReportingDescriptor
+            {
+                Id = analyzeResult.RuleId,
+                HelpUri = analyzeResult.HelpUri
+            };
+
+            rule.FullDescription = new()
+            {
+                Text = !string.IsNullOrWhiteSpace(analyzeResult.FullDescription) ? analyzeResult.FullDescription : analyzeResult.RuleName
+            };
+
+            // TODO: once we update all the other types of rules, we will be able to remove this condition.
+            if (!string.IsNullOrWhiteSpace(analyzeResult.FullDescription))
+            {
+                rule.Name = analyzeResult.RuleName;
+            }
+
+            return rule;
         }
 
         private static IList<Result> ExtractResults(IList<AnalyzeResult> analyzeResults)

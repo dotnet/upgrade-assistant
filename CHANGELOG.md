@@ -3,6 +3,14 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Version 0.3.256001 - 2021-11-17 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.256001))
+
+### Added
+- Pushed extensions for loose assembly lookup and Maui (preview) conversions to NuGet.org
+
+### Changed
+- Updated SARIF output for analyze to newer version (#927)[https://github.com/dotnet/upgrade-assistant/pull/927]
+
 ## Version 0.3.255803 - 2021-11-09 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.255803))
 ### Added
 - In lieu of .NET 6 GA, Current, LTS and Preview now point to .NET 6 in upgrade-assistant (#907)[https://github.com/dotnet/upgrade-assistant/pull/907]
