@@ -320,7 +320,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         {
             var parentNode = node?.Parent;
 
-            if (parentNode is null)
+            // Checking that node is null shouldn't be necessary here since if node is null, parentNode is also null,
+            // but adding this check makes Roslyn happy (otherwise we get warnings using node that it hasn't been null checked)
+            if (node is null || parentNode is null)
             {
                 return false;
             }
