@@ -12,7 +12,7 @@ namespace TestProject.TestClasses
 
         public void OnResultExecuting(ResultExecutingContext filterContext)
         {
-            ResultExecutingContext x = (ResultExecutingContext)new TestProject.MyNamespace.ResultExecutingContext();
+            Foo.ResultExecutingContext x = (Foo.ResultExecutingContext)new TestProject.MyNamespace.ResultExecutingContext();
             throw new NotImplementedException();
         }
     }
@@ -23,6 +23,7 @@ namespace TestProject.TestClasses
         {
             Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext a = null;
             var x = this as IActionFilter;
+            var y = (IActionFilter)this;
         }
 
         public override void OnActionExecuted(ActionExecutedContext filterContext) => throw new NotImplementedException();

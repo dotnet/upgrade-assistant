@@ -9,7 +9,7 @@ namespace TestProject.TestClasses
         {
             Func<string, HelperResult> x = a => new HelperResult(writer => writer.Write(a));
 
-            return (HelperResult)r;
+            return (Foo.HelperResult)r;
         }
     }
 }
