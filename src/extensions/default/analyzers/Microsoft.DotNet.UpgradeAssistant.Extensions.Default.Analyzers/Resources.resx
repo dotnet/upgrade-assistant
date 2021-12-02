@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ApiAlertGenericDescription" xml:space="preserve">
-    <value>This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent.</value>
+    <value>This type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent.</value>
   </data>
   <data name="ApiAlertGenericMessageFormat" xml:space="preserve">
     <value>{0}</value>
@@ -127,7 +127,7 @@
     <value>Replace unsupported API</value>
   </data>
   <data name="AttributeUpgradeDescription" xml:space="preserve">
-    <value>This attribute type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent.</value>
+    <value>This attribute type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent.</value>
   </data>
   <data name="AttributeUpgradeMessageFormat" xml:space="preserve">
     <value>Attribute type '{0}' should be replaced with '{1}'</value>
@@ -208,7 +208,7 @@
     <value>ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace</value>
   </data>
   <data name="TypeUpgradeDescription" xml:space="preserve">
-    <value>This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent.</value>
+    <value>This type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent.</value>
   </data>
   <data name="TypeUpgradeMessageFormat" xml:space="preserve">
     <value>Type '{0}' should be replaced with '{1}'</value>

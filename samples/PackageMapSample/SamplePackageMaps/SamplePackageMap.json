@@ -7,10 +7,10 @@
 
     // This boolean indicates whether the package map replacements work
     // while targeting .NET Framework or if the project must be upgraded
-    // to .NET 5/.NET Standard before the package maps should be applied.
+    // to .NET 6/.NET Standard before the package maps should be applied.
     //
     // If false, the package map will only be applied after the project
-    // targets .NET Core/.NET 5/.NET Standard. If true, the package map
+    // targets .NET Core/.NET 6/.NET Standard. If true, the package map
     // will be appplied regardless of the project's TFM.
     "NetCorePackagesWorkOnNetFx": true,
 
@@ -23,7 +23,7 @@
         // A version of "*" means to remove references to any versions of the package.
         // A version other than "*" means to only remove references if their version
         // is less than or equal to that version (useful in cases where new versions
-        // work on .NET 5 but older versions don't).
+        // work on .NET 6 but older versions don't).
         "Version": "*"
       }
     ],

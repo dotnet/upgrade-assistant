@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
+        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent..
         /// </summary>
         internal static string ApiAlertGenericDescription {
             get {
@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This attribute type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
+        ///   Looks up a localized string similar to This attribute type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent..
         /// </summary>
         internal static string AttributeUpgradeDescription {
             get {
@@ -331,7 +331,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
+        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent..
         /// </summary>
         internal static string TypeUpgradeDescription {
             get {

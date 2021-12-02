@@ -1,5 +1,5 @@
 # Roadmap
-This tool is just one piece of a bigger journey we’re on to streamline the journey to upgrade your apps from .NET Framework to .NET 5 and beyond.
+This tool is just one piece of a bigger journey we’re on to streamline the journey to upgrade your apps from .NET Framework to .NET 6 and beyond.
 This list is not an exhaustive list of all features and support coming – but rather the ones most requested and/or prioritized to keep your upgrades on track. If there’s anything missing from this list that you expect to see or you’re having difficulty with in your upgrade, please let us know via an [issues](https://github.com/dotnet/upgrade-assistant/issues).
 
 The priority or state for an issue can change at any time.
@@ -10,14 +10,14 @@ Take a look at the design doc for [design details](https://github.com/dotnet/upg
 
 - **Committed**
   - [Loose assemblies analysis](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#loose-assembly-analysis)
-  -	More visibility into [NuGet dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#nuget-package-dependecy-analysis) (e.g. newer versions, do they support .NET 5+?), transitive dependencies, and [inter-project dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#inter-project-dependencies)
+  -	More visibility into [NuGet dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#nuget-package-dependecy-analysis) (e.g. newer versions, do they support .NET 6+?), transitive dependencies, and [inter-project dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#inter-project-dependencies)
 - **On Deck**
-  -	[Up front checks for technologies that might not be supported in .NET 5+](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#surface-unsupported-api-categories) or could make the upgrade effort large in cost (links to docs, options available, best practices, etc.).
+  -	[Up front checks for technologies that might not be supported in 6+](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#surface-unsupported-api-categories) or could make the upgrade effort large in cost (links to docs, options available, best practices, etc.).
 
 **2. Upgrade**
 
 - **Committed**
-  - [Choose between LTS (long-term servicing), Current (.NET 5) or Preview (.NET 6 Preview) for the target .NET version](https://github.com/dotnet/upgrade-assistant/issues/41)
+  - [Choose between Current LTS (long-term servicing) .NET 6, Current (.NET 7) or Preview (.NET 7 Preview) for the target .NET version](https://github.com/dotnet/upgrade-assistant/issues/41)
   - [Add more ASP.NET app analyzers for code fixes](https://github.com/dotnet/upgrade-assistant/issues/55)
   - Update non-C# source:
     - [VB](https://github.com/dotnet/upgrade-assistant/issues/270)
