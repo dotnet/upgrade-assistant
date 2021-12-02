@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LocalizedStrings {
@@ -210,6 +210,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         internal static string UpgradeAssistantCommandExtension {
             get {
                 return ResourceManager.GetString("UpgradeAssistantCommandExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specify format of analyze result. If not provided, a sarif file will be produced..
+        /// </summary>
+        internal static string UpgradeAssistantCommandFormat {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandFormat", resourceCulture);
             }
         }
         

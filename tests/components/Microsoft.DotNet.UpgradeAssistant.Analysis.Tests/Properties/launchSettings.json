@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Microsoft.DotNet.UpgradeAssistant.Analysis.Tests": {
+      "commandName": "Project",
+      "commandLineArgs": "analyze \"C:\\Users\\bleaphart\\source\\repos\\DailySweepstakesCalculator\\DailySweepstakesCalculator.sln\""
+    }
+  }
+}

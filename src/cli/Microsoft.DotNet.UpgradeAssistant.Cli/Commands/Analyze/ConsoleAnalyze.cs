@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -18,25 +19,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly IEnumerable<IAnalyzeResultProvider> _providers;
         private readonly IAnalyzeResultWriter _writer;
         private readonly IExtensionProvider _extensionProvider;
+        private readonly IOptions<AnalysisOptions> _options;
 
         public ConsoleAnalyze(
             IEnumerable<IAnalyzeResultProvider> analysisProviders,
             IUpgradeContextFactory contextFactory,
             IUpgradeStateManager stateManager,
             IAnalyzeResultWriter writer,
-            IExtensionProvider extensionProvider)
+            IExtensionProvider extensionProvider, IOptions<AnalysisOptions> options)
         {
             _providers = analysisProviders ?? throw new ArgumentNullException(nameof(analysisProviders));
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));
             _extensionProvider = extensionProvider ?? throw new ArgumentNullException(nameof(extensionProvider));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
+
+           // _contextFactory.CreateContext
         }
 
         public async Task RunAsync(CancellationToken token)
         {
             using var context = await _contextFactory.CreateContext(token);
-
+            
             await _stateManager.LoadStateAsync(context, token);
             var analzyerContext = new AnalyzeContext(context);
             var analyzeResultMap = new List<AnalyzeResultDefinition>();
@@ -52,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 });
             }
 
-            await _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), token).ConfigureAwait(false);
+            await _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), _options.Value.Format, token).ConfigureAwait(false);
         }
 
         private string GetProviderVersion(IAnalyzeResultProvider provider)

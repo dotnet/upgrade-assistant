@@ -50,5 +50,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<ITargetFrameworkSelectorFilter, DependencyMinimumTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, ExecutableTargetFrameworkSelectorFilter>();
         }
+
     }
 }

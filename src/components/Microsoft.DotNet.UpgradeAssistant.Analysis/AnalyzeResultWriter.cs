@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             this._serializer = serializer;
         }
 
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, string? format, CancellationToken token)
         {
             if (results is null)
             {
@@ -32,9 +33,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
-
-            _serializer.Write(_sarifLogPath, sarifLog);
+            if (format != null && format.ToLower(CultureInfo.CurrentCulture) == "html")
+            {
+                WriteHTML(sarifLog);
+            }
+            else
+            {
+                _serializer.Write(_sarifLogPath, sarifLog);
+            }
         }
+
+        private void WriteHTML(SarifLog sarifLog)
+        {
+            var template = File.ReadAllText("../../../../../HTMLTemplate.html");
+            var sarifString = _serializer.Serialize(sarifLog);
+            var ss = sarifString.Replace("\r\n", string.Empty).Replace(@"\", string.Empty).Replace("file:///C:/", string.Empty);
+            var finishedTemplate = template.Replace("%SARIF_LOG%", ss);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html"), finishedTemplate);
+        }
+
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)
         {

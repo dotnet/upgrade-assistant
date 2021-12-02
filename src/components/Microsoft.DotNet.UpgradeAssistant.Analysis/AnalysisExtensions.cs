@@ -9,7 +9,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class AnalysisExtensions
     {
-        public static void AddAnalysis(this IServiceCollection services)
+        public static void AddAnalysis(this IServiceCollection services, Action<AnalysisOptions> configure)
         {
             if (services is null)
             {
@@ -18,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IAnalyzeResultWriter, AnalyzeResultWriter>();
+            services.AddOptions<AnalysisOptions>()
+                .Configure(configure);
         }
     }
 }

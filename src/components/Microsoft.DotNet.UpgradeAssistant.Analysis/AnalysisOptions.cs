@@ -4,13 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public interface IAnalyzeResultWriter
+    public class AnalysisOptions
     {
-        Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, string? format, CancellationToken token);
+        public string? Format { get; set; }
     }
 }
