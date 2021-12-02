@@ -15,7 +15,7 @@ Type, System.ServiceModel.ServiceHostBase, true
 C: Script and style bundling works differently in ASP.NET Core. BundleCollection should be replaced by alternative bundling technologies. https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 Type, System.Web.Optimization.BundleCollection, true
 
-D: Although ClickOnce is supported on .NET 6+, apps do not have access to the System.Deployment.Application namespace. For more details see https://github.com/dotnet/deployment-tools/issues/27 and https://github.com/dotnet/deployment-tools/issues/53
+D: Although ClickOnce is supported on .NET 5+, apps do not have access to the System.Deployment.Application namespace. For more details see https://github.com/dotnet/deployment-tools/issues/27 and https://github.com/dotnet/deployment-tools/issues/53
 Namespace, System.Deployment.Application, false
 
 E: Child actions should be replaced with view components. For more details, see https://docs.microsoft.com/aspnet/core/mvc/views/view-components and https://www.davepaquette.com/archive/2016/01/02/goodbye-child-actions-hello-view-components.aspx

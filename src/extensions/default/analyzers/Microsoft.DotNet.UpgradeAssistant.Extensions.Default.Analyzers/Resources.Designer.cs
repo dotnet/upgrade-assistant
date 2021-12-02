@@ -10,8 +10,8 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,16 +59,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent..
+        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
         /// </summary>
         internal static string ApiAlertGenericDescription {
             get {
                 return ResourceManager.GetString("ApiAlertGenericDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to {0}.
         /// </summary>
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("ApiAlertGenericMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Replace unsupported API.
         /// </summary>
@@ -86,16 +86,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("ApiAlertGenericTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to This attribute type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent..
+        ///   Looks up a localized string similar to This attribute type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
         /// </summary>
         internal static string AttributeUpgradeDescription {
             get {
                 return ResourceManager.GetString("AttributeUpgradeDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Attribute type &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
@@ -104,7 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("AttributeUpgradeMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Attributes should be upgraded.
         /// </summary>
@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("AttributeUpgradeTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; should be replaced with &apos;Deserialize()&apos;..
         /// </summary>
@@ -122,7 +122,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("BinaryFormatterUnsafeDeserializeDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; should be replaced with &apos;Deserialize()&apos;.
         /// </summary>
@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("BinaryFormatterUnsafeDeserializeMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &apos;UnsafeDeserialize()&apos; does not exist.
         /// </summary>
@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("BinaryFormatterUnsafeDeserializeTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Filter-related types should come from the Microsoft.AspNetCore.Mvc.Filters namespace in ASP.NET Core..
         /// </summary>
@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("FilterDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
@@ -158,7 +158,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("FilterMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Filter types should be used from the Microsoft.AspNetCore.Mvc.Filters namespace.
         /// </summary>
@@ -167,7 +167,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("FilterTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult..
         /// </summary>
@@ -176,7 +176,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HelperResultDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
@@ -185,7 +185,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HelperResultMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HelperResult should be replaced with Microsoft.AspNetCore.Mvc.Razor.HelperResult.
         /// </summary>
@@ -194,7 +194,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HelperResultTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HtmlHelper should be replaced with Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelper or Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper..
         /// </summary>
@@ -203,7 +203,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HtmlHelperDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
@@ -212,7 +212,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HtmlHelperMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HtmlHelper should be replaced with IHtmlHelper.
         /// </summary>
@@ -221,7 +221,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HtmlHelperTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HtmlString, IHtmlString, and MvcHtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString..
         /// </summary>
@@ -230,7 +230,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HtmlStringDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with Microsoft.AspNetCore.Html.HtmlString.
         /// </summary>
@@ -239,7 +239,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HtmlStringMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HtmlString types should be replaced with Microsoft.AspNetCore.Html.HtmlString.
         /// </summary>
@@ -248,7 +248,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HtmlStringTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead..
         /// </summary>
@@ -257,7 +257,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HttpContextCurrentDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HttpContext does not have a Current property; get the context from a controller or use HttpContextAccessor instead.
         /// </summary>
@@ -266,7 +266,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HttpContextCurrentMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Do not use HttpContext.Current.
         /// </summary>
@@ -275,7 +275,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HttpContextCurrentTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HttpContext.DebuggerEnabled does not exist in ASP.NET Core and should be replaced with System.Diagnostics.Debugger.IsAttached..
         /// </summary>
@@ -284,7 +284,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HttpContextDebuggingEnabledDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached.
         /// </summary>
@@ -293,7 +293,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HttpContextDebuggingEnabledMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to HttpContext.DebuggerEnabled should be replaced with System.Diagnostics.Debugger.IsAttached.
         /// </summary>
@@ -302,7 +302,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("HttpContextDebuggingEnabledTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace in ASP.NET Core..
         /// </summary>
@@ -311,7 +311,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("ResultTypeDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
@@ -320,7 +320,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("ResultTypeMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to ActionResult types should come from the Microsoft.AspNetCore.Mvc namespace.
         /// </summary>
@@ -329,16 +329,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("ResultTypeTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 6+ and should be replaced with a modern equivalent..
+        ///   Looks up a localized string similar to This type is not supported on .NET Core/.NET 5+ and should be replaced with a modern equivalent..
         /// </summary>
         internal static string TypeUpgradeDescription {
             get {
                 return ResourceManager.GetString("TypeUpgradeDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Type &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
@@ -347,7 +347,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("TypeUpgradeMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Types should be upgraded.
         /// </summary>
@@ -356,7 +356,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("TypeUpgradeTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to UrlHelper should be replaced with Microsoft.AspNetCore.Mvc.IUrlHelper or Microsoft.AspNetCore.Mvc.Routing.UrlHelper..
         /// </summary>
@@ -365,7 +365,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("UrlHelperDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Identifier &apos;{0}&apos; should be replaced with &apos;{1}&apos;.
         /// </summary>
@@ -374,7 +374,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("UrlHelperMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to UrlHelper should be replaced with IUrlHelper.
         /// </summary>
@@ -383,7 +383,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("UrlHelperTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to System.Deployment is not supported on .NET Core.
         /// </summary>
@@ -392,7 +392,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("UsingSystemDeployment", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to System.Deployment is not supported on .NET Core..
         /// </summary>
@@ -401,7 +401,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("UsingSystemDeploymentDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to ASP.NET Core projects should not reference System.Web or OWIN namespaces..
         /// </summary>
@@ -410,7 +410,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("UsingSystemWebDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Namespace &apos;{0}&apos; should not be referenced in ASP.NET Core projects.
         /// </summary>
@@ -419,7 +419,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers {
                 return ResourceManager.GetString("UsingSystemWebMessageFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to ASP.NET Core projects should not reference ASP.NET namespaces.
         /// </summary>
