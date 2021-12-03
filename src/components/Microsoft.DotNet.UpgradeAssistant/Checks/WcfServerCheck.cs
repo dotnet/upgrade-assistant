@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
     {
         private const string UPGRADE_LINK = "https://aka.ms/migrate-wcf-to-grpc";
         private const string CATEGORY = "WCF Server-side Services";
-        private const string WCF_MESSAGE = "Support for {0} is limited to .NET Full Framework. To learn more please read: {1}";
+        private const string WCF_MESSAGE = $"Support for {CATEGORY} is limited to .NET Full Framework. To learn more please read: {UPGRADE_LINK}";
         private readonly ILogger<WcfServerCheck> _logger;
 
         public WcfServerCheck(ILogger<WcfServerCheck> logger)
@@ -32,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
         /// </summary>
         public string Id => nameof(WcfServerCheck);
 
-        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, WCF_MESSAGE, CATEGORY, UPGRADE_LINK);
+        public string UpgradeMessage => WCF_MESSAGE;
 
         public Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
@@ -54,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             // are there any svc.cs files in this project?
             if (project.FindFiles($".svc{GetExtensionForLanguage(project)}").Any())
             {
-                _logger.LogError(WCF_MESSAGE, CATEGORY, UPGRADE_LINK);
+                _logger.LogError(WCF_MESSAGE);
                 return Task.FromResult(UpgradeReadiness.Unsupported);
             }
 

@@ -11,7 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 {
     public class CanLoadProjectFile : IUpgradeReadyCheck
     {
-        private const string MESSAGE_TEMPLATE = "Project {0} cannot be loaded: {1}";
         private const string GUIDANCE = "Use Visual Studio to confirm that this project can be loaded.";
 
         private readonly ILogger<CanLoadProjectFile> _logger;
@@ -23,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
 
         public string Id => nameof(CanLoadProjectFile);
 
-        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, MESSAGE_TEMPLATE, "{Project}", GUIDANCE);
+        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, "Project {0} cannot be loaded: {1}", "{Project}", GUIDANCE);
 
         public Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
@@ -42,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                _logger.LogError(MESSAGE_TEMPLATE, project.FileInfo, e.Message);
+                _logger.LogError("Project {File} cannot be loaded: {Message}", project.FileInfo, e.Message);
                 return Task.FromResult(UpgradeReadiness.NotReady);
             }
         }

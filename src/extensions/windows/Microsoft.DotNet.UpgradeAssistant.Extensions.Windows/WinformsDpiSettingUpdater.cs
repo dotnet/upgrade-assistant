@@ -6,11 +6,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
@@ -20,7 +17,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         private const int BufferSize = 65536;
 
-        private readonly WindowsUtilities _utilities = new();
         private readonly ILogger<WinformsDpiSettingUpdater> _logger;
         private ProgramFileSpec _programFileSpec = new();
 
@@ -37,15 +33,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private string ProcessAppConfigFile(IProject project)
+        private static string ProcessAppConfigFile(IProject project)
         {
             var appConfigFilePath = project.FindFiles("App.config").FirstOrDefault();
-            var hdpiValue = _utilities.GetElementFromAppConfig(appConfigFilePath, Resources.HighDPIConfiguration, Resources.HighDpiSettingKey);
+            var hdpiValue = WindowsUtilities.GetElementFromAppConfig(appConfigFilePath, Resources.HighDPIConfiguration, Resources.HighDpiSettingKey);
             return string.IsNullOrEmpty(hdpiValue) ? Resources.HighDpiDefaultSetting : hdpiValue;
         }
 
         public async Task UpdateHighDPISetting(IProject project, string[] programFileContent, bool isDpiSettingSetInProgramFile, string programFilePath)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
             if (!programFileContent.Any())
             {
                 _logger.LogInformation("No Program.cs file found at {Path}.", programFilePath);
@@ -61,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
                         await StreamHelpers.CopyStreamWithNewLineAdded(programFileContent, outputStream, Resources.EnableVisualStylesLine, SR.Format(Resources.HighDPISettingLine, hdpiValue)).ConfigureAwait(false);
 
-                        _logger.LogInformation("Updated Program.cs file at {Path} with HighDPISetting set to {hdpi}", programFilePath, hdpiValue);
+                        _logger.LogInformation("Updated Program.cs file at {Path} with HighDPISetting set to {HighDpi}", programFilePath, hdpiValue);
                     }
                     catch (IOException exc)
                     {
@@ -86,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             foreach (var project in inputs)
             {
-                if (await _utilities.IsWinFormsProjectAsync(project, token))
+                if (await project.IsWinFormsProjectAsync(token).ConfigureAwait(false))
                 {
                     _programFileSpec = new(project.FindFiles("Program.cs").FirstOrDefault());
                     if (!_programFileSpec.IsDpiSettingSet && _programFileSpec.FileContent.Any())
@@ -95,7 +96,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         fileLocations.Add(_programFileSpec.Path);
                     }
 
-                    await UpdateHighDPISetting(project, _programFileSpec.FileContent, _programFileSpec.IsDpiSettingSet, _programFileSpec.Path);
+                    await UpdateHighDPISetting(project, _programFileSpec.FileContent, _programFileSpec.IsDpiSettingSet, _programFileSpec.Path).ConfigureAwait(false);
                 }
             }
 
@@ -113,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             foreach (var project in inputs)
             {
-                if (await _utilities.IsWinFormsProjectAsync(project, token))
+                if (await project.IsWinFormsProjectAsync(token).ConfigureAwait(false))
                 {
                     _programFileSpec = new(project.FindFiles("Program.cs").FirstOrDefault());
                     if (!_programFileSpec.IsDpiSettingSet && _programFileSpec.FileContent.Any())

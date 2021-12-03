@@ -427,8 +427,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
 
             public string? ExtensionPath { get; set; }
 
-            public string? Path => null;
-
             public bool IgnoreUnsupportedFeatures { get; set; }
 
             public UpgradeTarget TargetTfmSupport { get; set; }

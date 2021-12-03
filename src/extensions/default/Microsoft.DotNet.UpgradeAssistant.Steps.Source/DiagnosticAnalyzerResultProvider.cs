@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public async Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
         {
-            return await Task.FromResult(true);
+            return await Task.FromResult(true).ConfigureAwait(false);
         }
 
         public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             var results = new HashSet<AnalyzeResult>();
             foreach (var diag in diagnostics)
             {
-                _logger.LogInformation("Diagnostic {Id} with the message {message} generated", diag.Id, diag.Descriptor.Description.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                _logger.LogInformation("Diagnostic {Id} with the message {Message} generated", diag.Id, diag.Descriptor.Description.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 results.Add(new()
                 {
                     RuleId = diag.Id,

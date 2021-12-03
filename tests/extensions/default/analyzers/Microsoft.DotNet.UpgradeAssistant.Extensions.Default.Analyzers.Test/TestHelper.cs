@@ -50,15 +50,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
         private static ImmutableArray<AdditionalText> AdditionalTexts => ImmutableArray.Create<AdditionalText>(new AdditionalFileText(Path.Combine(AppContext.BaseDirectory, TypeMapPath)));
 
-        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(string documentPath, IEnumerable<string> diagnosticIds, bool isFramework)
+        public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(this AdhocWorkspace workspace, string documentPath, IEnumerable<string> diagnosticIds, bool isFramework)
         {
-            return GetDiagnosticsAsync(Language.CSharp, documentPath, isFramework, diagnosticIds);
+            return workspace.GetDiagnosticsAsync(Language.CSharp, documentPath, isFramework, diagnosticIds);
         }
 
-        public static async Task<Project> CreateProjectAsync(Language language, bool isFramework, CancellationToken cancellationToken = default)
+        public static async Task<Project> CreateProjectAsync(this AdhocWorkspace workspace, Language language, bool isFramework, CancellationToken cancellationToken = default)
         {
-            var workspace = new AdhocWorkspace();
-
             var project = workspace.AddProject("testProject", language.ToLanguageName());
 
             ReferenceAssemblies GetReferenceAssemblies()
@@ -91,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
 
             foreach (var file in Directory.EnumerateFiles("assets", $"*.{language.GetFileExtension()}", SearchOption.AllDirectories))
             {
-                if (!file.Contains(".Fixed."))
+                if (!file.Contains(".Fixed.", StringComparison.Ordinal))
                 {
                     project = project.AddDocument(Path.GetFileName(file), File.ReadAllText(file))
                         .Project;
@@ -101,14 +99,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return project;
         }
 
-        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(Language lang, string documentPath, bool isFramework, IEnumerable<string> diagnosticIds)
+        public static async Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(this AdhocWorkspace workspace, Language lang, string documentPath, bool isFramework, IEnumerable<string> diagnosticIds)
         {
             if (documentPath is null)
             {
                 throw new ArgumentNullException(nameof(documentPath));
             }
 
-            var project = await CreateProjectAsync(lang, isFramework);
+            var project = await workspace.CreateProjectAsync(lang, isFramework);
 
             return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
@@ -145,14 +143,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
             return File.ReadAllText(path);
         }
 
-        public static async Task<string> FixSourceAsync(Language lang, string documentPath, IEnumerable<string> diagnosticIds)
+        public static async Task<string> FixSourceAsync(this AdhocWorkspace workspace, Language lang, string documentPath, IEnumerable<string> diagnosticIds)
         {
             if (documentPath is null)
             {
                 throw new ArgumentNullException(nameof(documentPath));
             }
 
-            var project = await CreateProjectAsync(lang, isFramework: false);
+            var project = await workspace.CreateProjectAsync(lang, isFramework: false);
             var projectId = project.Id;
 
             var diagnosticFixed = false;

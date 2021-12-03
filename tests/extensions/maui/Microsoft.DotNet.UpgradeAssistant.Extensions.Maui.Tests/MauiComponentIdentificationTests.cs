@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.Tests
             project.Setup(p => p.NuGetReferences).Returns(new Mock<INuGetReferences>().Object);
 
             // Act
-            var components = await mock.Create<MauiComponentIdentifier>().GetComponentsAsync(project.Object, default);
+            var components = await mock.Create<MauiComponentIdentifier>().GetComponentsAsync(project.Object, default).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expectedComponents, components);

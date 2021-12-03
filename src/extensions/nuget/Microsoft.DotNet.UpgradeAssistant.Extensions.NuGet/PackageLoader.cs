@@ -343,7 +343,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 return new PackageArchiveReader(ms, false);
             }
 
-            ms.Dispose();
+            await ms.DisposeAsync().ConfigureAwait(false);
             return null;
         }
 

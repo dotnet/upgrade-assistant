@@ -37,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 _ => Microsoft.Extensions.Logging.LogLevel.Debug
             };
 
-            _logger.Log(logLevel, $"[NuGet] {message.Message}");
+            _logger.Log(logLevel, "[NuGet] {NuGetMessage}", message.Message);
         }
 
         public void Log(LogLevel level, string data) => Log(new LogMessage(level, data));

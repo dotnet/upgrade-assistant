@@ -93,10 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// Indicates the position across the keyspace that the hash is located.
         /// This is helpful in selecting a starting probe of an ordered index.
         /// </summary>
-        public double GetKeySpaceLocation()
-        {
-            return _highBytes / (double)ulong.MaxValue;
-        }
+        public double KeySpaceLocation => _highBytes / (double)ulong.MaxValue;
 
         /// <summary>
         /// Compares to another token.
@@ -164,5 +161,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 
             return builder.ToString();
         }
+
+        public static bool operator ==(HashToken left, HashToken right) => left.Equals(right);
+
+        public static bool operator !=(HashToken left, HashToken right) => !(left == right);
+
+        public static bool operator <(HashToken left, HashToken right) => left.CompareTo(right) < 0;
+
+        public static bool operator <=(HashToken left, HashToken right) => left.CompareTo(right) <= 0;
+
+        public static bool operator >(HashToken left, HashToken right) => left.CompareTo(right) > 0;
+
+        public static bool operator >=(HashToken left, HashToken right) => left.CompareTo(right) >= 0;
     }
 }

@@ -21,6 +21,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void Configure(WorkspaceOptions options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             if (options.MSBuildPath is null)
             {
                 options.MSBuildPath = FindMSBuildPath();

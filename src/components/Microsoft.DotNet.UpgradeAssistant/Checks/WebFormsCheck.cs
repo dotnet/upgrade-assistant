@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
     {
         private const string CATEGORY = "Web Forms";
         private const string UPGRADE_LINK = "https://aka.ms/migrate-web-forms";
-        private const string WEB_FORMS_MESSAGE = "Support for {0} is limited to .NET Full Framework. To learn more please read: {1}";
+        private const string WEB_FORMS_MESSAGE = $"Support for {CATEGORY} is limited to .NET Full Framework. To learn more please read: {UPGRADE_LINK}";
 
         private readonly ILogger<WebFormsCheck> _logger;
 
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
         // NOTE: Intentionally does not detect user controls. https://docs.microsoft.com/en-us/previous-versions/aspnet/fb3w5b53(v=vs.100)
         // NOTE: Intentionally does not detect custom controls. A custom control is a class that you write that derives from Control or WebControl.
         // NOTE: Intentionally does not detect master pages. The assumption is that a project will also contain ASPX Web Forms if it contains master pages, user controls, or custom controls.
-        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, WEB_FORMS_MESSAGE, CATEGORY, UPGRADE_LINK);
+        public string UpgradeMessage => WEB_FORMS_MESSAGE;
 
         public async Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
             // This ReadyCheck should highlight the technology in the "head" project.
             if (DoesProjectContainWebFormsFiles(project))
             {
-                _logger.LogError(WEB_FORMS_MESSAGE, CATEGORY, UPGRADE_LINK);
+                _logger.LogError(WEB_FORMS_MESSAGE);
                 return UpgradeReadiness.Unsupported;
             }
 
