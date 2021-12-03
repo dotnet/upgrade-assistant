@@ -12,7 +12,7 @@ Take a look at the design doc for [design details](https://github.com/dotnet/upg
   - [Loose assemblies analysis](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#loose-assembly-analysis)
   -	More visibility into [NuGet dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#nuget-package-dependecy-analysis) (e.g. newer versions, do they support .NET 6+?), transitive dependencies, and [inter-project dependencies](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#inter-project-dependencies)
 - **On Deck**
-  -	[Up front checks for technologies that might not be supported in 6+](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#surface-unsupported-api-categories) or could make the upgrade effort large in cost (links to docs, options available, best practices, etc.).
+  -	[Up front checks for technologies that might not be supported in .NET 6+](https://github.com/dotnet/upgrade-assistant/blob/main/docs/design/Pre-UpgradeAnalysis.md#surface-unsupported-api-categories) or could make the upgrade effort large in cost (links to docs, options available, best practices, etc.).
 
 **2. Upgrade**
 
