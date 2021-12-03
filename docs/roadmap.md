@@ -17,7 +17,7 @@ Take a look at the design doc for [design details](https://github.com/dotnet/upg
 **2. Upgrade**
 
 - **Committed**
-  - [Choose between LTS (long-term servicing) version (.NET 6), Latest Current (.NET 7) or Latest Preview (.NET 7 Preview) for the target .NET version](https://github.com/dotnet/upgrade-assistant/issues/41)
+  - [Choose between LTS (long-term servicing) version (.NET 6), Latest Current (.NET 6) or Latest Preview (.NET 6) for the target .NET version](https://github.com/dotnet/upgrade-assistant/issues/41)
   - [Add more ASP.NET app analyzers for code fixes](https://github.com/dotnet/upgrade-assistant/issues/55)
   - Update non-C# source:
     - [VB](https://github.com/dotnet/upgrade-assistant/issues/270)
