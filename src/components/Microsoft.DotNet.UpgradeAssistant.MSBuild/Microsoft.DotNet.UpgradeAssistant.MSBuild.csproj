@@ -5,7 +5,7 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime">
-      <Version>17.0.0-preview-21426-01</Version>
+      <Version>17.0.0</Version>
     </PackageReference>
   </ItemGroup>
 

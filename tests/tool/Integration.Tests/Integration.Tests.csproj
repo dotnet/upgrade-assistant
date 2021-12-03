@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
-    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'net6.0' ">6.0.0-preview.7.21377.19</RuntimeFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="IntegrationScenarios\**" />
@@ -14,7 +13,7 @@
   <ItemGroup>
     <!-- The test framework brings in an old NuGet.Frameworks that ends up getting used rather than what MSBuild wants. -->
     <!-- Workaround solution, VSTest issue to remove the dependendency for long term solution - https://github.com/microsoft/vstest/issues/3154 -->
-    <PackageReference Include="NuGet.Frameworks" Version="6.0.0-rc.258" Condition=" '$(TargetFramework)' == 'net6.0' "/>
+    <PackageReference Include="NuGet.Frameworks" Version="6.0.0" Condition=" '$(TargetFramework)' == 'net6.0' "/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\cli\Microsoft.DotNet.UpgradeAssistant.Cli\Microsoft.DotNet.UpgradeAssistant.Cli.csproj" />
