@@ -127,7 +127,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0002", new TextSpan(136, 32)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(209, 32)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(256, 12)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(320, 16)),
                 }
             },
             {
@@ -147,7 +146,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 new[]
                 {
                     new ExpectedDiagnostic("UA0002", new TextSpan(240, 25)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(342, 18)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(382, 14)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(423, 12)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(477, 27)),
@@ -163,12 +161,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0002", new TextSpan(88, 28)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(162, 36)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(327, 37)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(404, 26)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(436, 26)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(615, 36)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(707, 37)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(872, 13)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(947, 21))
+                    new ExpectedDiagnostic("UA0002", new TextSpan(909, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(989, 21))
                 }
             },
             {
@@ -177,11 +174,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 {
                     new ExpectedDiagnostic("UA0002", new TextSpan(187, 13)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(615, 29)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(954, 14)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1030, 25)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1079, 10)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1102, 13)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1160, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1702, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1802, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1873, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1902, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(2013, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(2074, 13)),
 
                     new ExpectedDiagnostic("UA0002", new TextSpan(177, 13), Language.VisualBasic),
                     new ExpectedDiagnostic("UA0002", new TextSpan(463, 29), Language.VisualBasic),

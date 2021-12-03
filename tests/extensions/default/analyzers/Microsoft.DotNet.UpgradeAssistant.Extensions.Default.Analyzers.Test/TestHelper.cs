@@ -13,8 +13,8 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Default.CodeFixes;
-using Microsoft.DotNet.UpgradeAssistant.Steps.Source;
 using Polly;
 using Xunit;
 

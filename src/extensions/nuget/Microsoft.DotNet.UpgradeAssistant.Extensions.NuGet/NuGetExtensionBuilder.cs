@@ -26,6 +26,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             services.AddSingleton<PackageLoader>();
             services.AddTransient<IPackageLoader>(ctx => ctx.GetRequiredService<PackageLoader>());
             services.AddTransient<IPackageDownloader>(ctx => ctx.GetRequiredService<PackageLoader>());
+            services.AddTransient<IPackageCreator>(ctx => ctx.GetRequiredService<PackageLoader>());
+            services.AddTransient<IPackageSearch, HttpPackageSearch>();
             services.AddSingleton<IVersionComparer, NuGetVersionComparer>();
             services.AddTransient<ITargetFrameworkMonikerComparer, NuGetTargetFrameworkMonikerComparer>();
             services.AddSingleton<IUpgradeStartup, NuGetCredentialsStartup>();

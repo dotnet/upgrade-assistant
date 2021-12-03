@@ -133,17 +133,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            // If the identifier resolves to an actual symbol that isn't the old identifier, bail out
-            // Also refrain from adding a diagnostic if the symbol is ambiguous but a candidate symbol matches the
-            // new type. This is useful in cases where the type is referenced as a simple name and the new namespace
-            // has been added but the old namespace hasn't been removed yet.
-            var symbolInfo = context.SemanticModel.GetSymbolInfo(context.Node);
+            var fullyQualifiedNameNode = context.Node.GetQualifiedName();
 
-            // Bail out if the node corresponds to a symbol that isn't the old type.
-            if (symbolInfo.Symbol is INamedTypeSymbol symbol
-                && !symbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldName, StringComparison.Ordinal))
+            // If the identifier is part of a fully qualified name and the qualified name does not match
+            // the old name, then bail out because it is not referring to that type
+            if (fullyQualifiedNameNode.IsQualifiedName()
+                && !mapping.OldName.EndsWith(fullyQualifiedNameNode.ToString(), StringComparison.Ordinal))
             {
                 return;
+            }
+
+            var symbolInfo = context.SemanticModel.GetSymbolInfo(context.Node);
+
+            // If symbol information is available, then attempt to use that to determine
+            // whether the syntax node corresponds to a type that needs flagged.
+            if (symbolInfo.Symbol is ISymbol symbol)
+            {
+                if (symbol is INamedTypeSymbol typeSymbol)
+                {
+                    // Bail out if the node corresponds to a type symbol that isn't the old type.
+                    if (typeSymbol is not IErrorTypeSymbol
+                    && !typeSymbol.ToDisplayString(NullableFlowState.NotNull).Equals(mapping.OldName, StringComparison.Ordinal))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        // This case is intentionally not handled.
+                        // A type symbol that is either an error type symbol or that correctly matches the old type name
+                        // may warrant reporting a diagnostic.
+                    }
+                }
+                else
+                {
+                    // If the identifier resolves to a symbol that isn't a type symbol (property symbol, for example),
+                    // then bail out because this analyzer should only flag type usage.
+                    return;
+                }
             }
 
             // Bail out if the symbol might correspond to a symbol that is the new type.
@@ -152,10 +178,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 return;
             }
 
-            // If the identifier is part of a fully qualified name and the qualified name exactly matches the new full name,
-            // then bail out because the code is likely fine and the symbol is just unavailable because of missing references.
-            var fullyQualifiedNameNode = context.Node.GetQualifiedName();
-            if (fullyQualifiedNameNode.ToString().Equals(mapping.NewName, StringComparison.Ordinal))
+            // If the symbol cannot be determined, bail out if the syntax is not used in
+            // a way that a type symbol would typically be used. This avoids incorrectly
+            // reporting diagnostics in cases where an interesting simple name is used
+            // for a property name that doesn't resolve to a symbol, for example.
+            if (!fullyQualifiedNameNode.IsTypeSyntax())
             {
                 return;
             }
