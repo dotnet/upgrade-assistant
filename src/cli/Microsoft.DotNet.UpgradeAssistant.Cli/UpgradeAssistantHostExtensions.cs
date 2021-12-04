@@ -68,17 +68,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddHostedService<ConsoleRunner>();
                     services.AddStepManagement();
                     services.AddStateFactory(upgradeOptions);
-
-                    /*services.AddOptions(options =>
-                    {
-                        options.Format = upgradeOptions.Format;
-                    });*/
                     services.AddExtensions()
                         .AddDefaultExtensions(context.Configuration)
                         .AddFromEnvironmentVariables(context.Configuration)
                         .Configure(options =>
                         {
-                            // options.Format = upgradeOptions.Format;
                             options.AdditionalOptions = upgradeOptions.AdditionalOptions;
                             options.CheckMinimumVersion = !UpgradeVersion.Current.IsDevelopment;
                             options.CurrentVersion = UpgradeVersion.Current.Version;
@@ -179,8 +173,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             Program.ShowHeader();
 
             const string LogFilePath = "upgrade-assistant.clef";
-
-            Console.WriteLine(options);
 
             var logSettings = new LogSettings(options.IsVerbose);
 

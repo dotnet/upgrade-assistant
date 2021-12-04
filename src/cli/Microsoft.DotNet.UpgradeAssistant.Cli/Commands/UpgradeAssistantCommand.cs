@@ -23,7 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             AddOption(new Option<bool>(new[] { "--ignore-unsupported-features" }, LocalizedStrings.UpgradeAssistantCommandIgnoreUnsupported));
             AddOption(new Option<DirectoryInfo>(new[] { "--vs-path" }, LocalizedStrings.UpgradeAssistantCommandVS));
             AddOption(new Option<DirectoryInfo>(new[] { "--msbuild-path" }, LocalizedStrings.UpgradeAssistantCommandMsbuild));
-           /* AddOption(new Option<string>(new[] { "--format", "--f" }, LocalizedStrings.UpgradeAssistantCommandFormat));*/
         }
 
         protected class CommandOptions : IUpgradeAssistantOptions
