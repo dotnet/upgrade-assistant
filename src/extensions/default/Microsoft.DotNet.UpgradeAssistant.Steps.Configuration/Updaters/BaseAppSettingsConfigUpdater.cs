@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public abstract class BaseAppSettingsConfigUpdater
     {
+        private const string RuleId = "UA201";
         private const string AppSettingsJsonFileName = "appsettings.json";
 
         private static readonly Regex AppSettingsFileRegex = new("^appsettings(\\..+)?\\.json$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -79,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
             }
 
             return new DefaultUpdaterResult(
-                RuleId: "Id",
+                RuleId,
                 RuleName: string.Empty,
                 FullDescription: string.Empty,
                 true);

@@ -6,11 +6,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
@@ -18,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinForms)]
     public class WinformsDpiSettingUpdater : IUpdater<IProject>
     {
+        private const string RuleId = "UA202";
         private const int BufferSize = 65536;
 
         private readonly WindowsUtilities _utilities = new();
@@ -100,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             return new WinformsUpdaterResult(
-                RuleId: "SomeRuleId",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 fileLocations.Any(),
@@ -131,7 +129,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             return new WinformsUpdaterResult(
-                RuleId: "SomeRuleId",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 fileLocations.Any(),

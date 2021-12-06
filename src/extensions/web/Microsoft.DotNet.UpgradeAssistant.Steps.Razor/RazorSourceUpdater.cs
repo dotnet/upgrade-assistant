@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     /// </summary>
     public class RazorSourceUpdater : IUpdater<RazorCodeDocument>
     {
+        private const string RuleId = "UA208";
         private readonly IEnumerable<DiagnosticAnalyzer> _analyzers;
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
@@ -100,7 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             return new FileUpdaterResult(
-                RuleId: "Id",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 mappedDiagnostics.Any(),
@@ -187,7 +188,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             return new FileUpdaterResult(
-                RuleId: "Id",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 Result: true,

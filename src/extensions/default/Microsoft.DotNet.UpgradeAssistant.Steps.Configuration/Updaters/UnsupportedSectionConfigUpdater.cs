@@ -14,6 +14,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class UnsupportedSectionConfigUpdater : IUpdater<ConfigFile>
     {
+        private const string RuleId = "UA205";
+
         private static (string Name, string Issue)[] _names = new (string, string)[]
         {
             ("system.diagnostics", "https://github.com/dotnet/runtime/issues/23937"),
@@ -68,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
             }
 
             return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
-                RuleId: "Id",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 applied));
@@ -81,7 +83,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
                 if (GetUnsupportedSections(configFile).Any())
                 {
                     return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
-                        RuleId: "Id",
+                        RuleId,
                         RuleName: Id,
                         FullDescription: Title,
                         true));
@@ -89,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
             }
 
             return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
-                RuleId: "Id",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 false));

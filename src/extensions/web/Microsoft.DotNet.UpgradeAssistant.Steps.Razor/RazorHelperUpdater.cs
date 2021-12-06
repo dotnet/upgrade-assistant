@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     /// </summary>
     public class RazorHelperUpdater : IUpdater<RazorCodeDocument>
     {
+        private const string RuleId = "UA207";
         private const string HelperResultNamespace = "Microsoft.AspNetCore.Mvc.Razor";
         private readonly IHelperMatcher _helperMatcher;
         private readonly ILogger<RazorHelperUpdater> _logger;
@@ -86,10 +87,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             // Log how many Razor documents had @helpers and return a corresponding FileUpdaterResult
             _logger.LogInformation("Found @helper functions in {Count} documents", inputsWithHelpers.Count);
             return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(
-                RuleId: "Id",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
-                inputsWithHelpers.Any(), inputsWithHelpers));
+                inputsWithHelpers.Any(),
+                inputsWithHelpers));
         }
 
         /// <summary>
@@ -151,7 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
             }
 
             return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(
-                RuleId: "Id",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 true,

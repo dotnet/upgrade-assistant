@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -16,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinForms)]
     public class WinformsDefaultFontUpdater : IUpdater<IProject>
     {
+        private const string RuleId = "UA209";
         private readonly WindowsUtilities _utilities = new();
         private readonly ILogger<WinformsDefaultFontUpdater> _logger;
 
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             return new WinformsUpdaterResult(
-                RuleId: "SomeRuleId",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 Result: fileLocations.Any(),
