@@ -186,7 +186,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
             }
 
-            return new FileUpdaterResult(true, textReplacements.Select(r => r.FilePath).Distinct());
+            return new FileUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                Result: true,
+                textReplacements.Select(r => r.FilePath).Distinct());
         }
 
         private async Task<IEnumerable<MappedTextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)

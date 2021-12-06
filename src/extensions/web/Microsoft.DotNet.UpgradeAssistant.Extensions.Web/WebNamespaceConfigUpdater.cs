@@ -77,12 +77,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
                 File.WriteAllLines(path, viewImportsContents);
                 _logger.LogInformation("View imports written to {ViewImportsPath}", path);
 
-                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(true));
+                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                    RuleId: "Id",
+                    RuleName: Id,
+                    FullDescription: Title,
+                    Result: true));
             }
             catch (IOException exc)
             {
                 _logger.LogError(exc, "Unexpected exception accessing _ViewImports");
-                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(false));
+                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                    RuleId: "Id",
+                    RuleName: Id,
+                    FullDescription: Title,
+                    Result: false));
             }
         }
 
@@ -147,7 +155,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
             _namespacesToUpgrade = namespaces.Distinct().Where(ns => !alreadyImportedNamespaces.Contains(ns));
             _logger.LogInformation("{NamespaceCount} web page namespace imports need upgraded: {Namespaces}", _namespacesToUpgrade.Count(), string.Join(", ", _namespacesToUpgrade));
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(_namespacesToUpgrade.Any()));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                Result: _namespacesToUpgrade.Any()));
         }
     }
 }

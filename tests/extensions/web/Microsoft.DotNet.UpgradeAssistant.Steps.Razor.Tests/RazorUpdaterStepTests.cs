@@ -280,7 +280,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         mock.Setup(c => c.Id).Returns($"RazorUpdater #{i}");
                         mock.Setup(c => c.IsApplicableAsync(It.IsAny<IUpgradeContext>(),
                                                             It.IsAny<ImmutableArray<RazorCodeDocument>>(),
-                                                            It.IsAny<CancellationToken>())).Returns(Task.FromResult<IUpdaterResult>(new FileUpdaterResult(i >= completeUpdaterCount, Enumerable.Empty<string>())));
+                                                            It.IsAny<CancellationToken>())).Returns(Task.FromResult<IUpdaterResult>(new FileUpdaterResult("RULE0001", "RuleName", "Full Description", i >= completeUpdaterCount, Enumerable.Empty<string>())));
                         mock.Setup(c => c.Risk).Returns(BuildBreakRisk.Medium);
                         cfg.RegisterMock(mock);
                     }
