@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public class WinformsDefaultFontUpdater : IUpdater<IProject>
     {
         private const string RuleId = "UA209";
-        private readonly WindowsUtilities _utilities = new();
+
         private readonly ILogger<WinformsDefaultFontUpdater> _logger;
 
         public string Id => typeof(WinformsDefaultFontUpdater).FullName;
