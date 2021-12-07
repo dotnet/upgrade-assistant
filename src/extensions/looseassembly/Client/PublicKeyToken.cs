@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -17,7 +18,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// <summary>
         /// We need SHA1 to make PKTs from public keys.
         /// </summary>
+#pragma warning disable CA5350 // Do Not Use Weak Cryptographic Algorithms
         private static readonly SHA1 Sha1 = SHA1.Create();
+#pragma warning restore CA5350 // Do Not Use Weak Cryptographic Algorithms
 
         /// <summary>
         /// The underlying token stored as a ulong.
@@ -55,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
             var builder = new StringBuilder(16);
             foreach (var b in Bytes)
             {
-                builder.AppendFormat("{0:x2}", b);
+                builder.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
             }
 
             return builder.ToString();
@@ -70,6 +73,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// </summary>
         public static PublicKeyToken FromPktString(string pkt)
         {
+            if (pkt is null)
+            {
+                throw new ArgumentNullException(nameof(pkt));
+            }
+
             if (pkt.Length != 16)
             {
                 throw new InvalidOperationException("The key length is not even");
@@ -91,6 +99,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// </summary>
         public static PublicKeyToken FromPublicKeyString(string publicKey)
         {
+            if (publicKey is null)
+            {
+                throw new ArgumentNullException(nameof(publicKey));
+            }
+
             if (publicKey.Length % 2 != 0)
             {
                 throw new InvalidOperationException("The key length is not even");

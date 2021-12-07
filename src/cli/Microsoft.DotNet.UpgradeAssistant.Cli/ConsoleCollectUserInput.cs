@@ -23,15 +23,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public bool IsInteractive => true;
 
-        public Task<string?> AskUserAsync(string prompt)
+        public async Task<string?> AskUserAsync(string prompt)
         {
-            _io.Output.WriteLine(prompt);
-            _io.Output.Write(Prompt);
+            await _io.Output.WriteLineAsync(prompt);
+            await _io.Output.WriteAsync(Prompt);
 
-            return Task.FromResult(_io.Input.ReadLine());
+            return await _io.Input.ReadLineAsync();
         }
 
-        public Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
+        public async Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
             where T : UpgradeCommand
         {
             if (commands is null)
@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 throw new ArgumentNullException(nameof(commands));
             }
 
-            _io.Output.WriteLine(message);
+            await _io.Output.WriteLineAsync(message);
 
             var possible = new Dictionary<int, T>();
 
@@ -48,12 +48,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 if (command.IsEnabled)
                 {
                     var index = possible.Count + 1;
-                    _io.Output.WriteLine($" {index,3}. {command.CommandText}");
+                    await _io.Output.WriteLineAsync($" {index,3}. {command.CommandText}");
                     possible.Add(index, command);
                 }
                 else
                 {
-                    _io.Output.WriteLine($"   {command.CommandText}");
+                    await _io.Output.WriteLineAsync($"   {command.CommandText}");
                 }
             }
 
@@ -61,29 +61,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 token.ThrowIfCancellationRequested();
 
-                _io.Output.Write(Prompt);
+                await _io.Output.WriteAsync(Prompt);
 
-                var result = _io.Input.ReadLine();
+                var result = await _io.Input.ReadLineAsync();
 
                 if (result is null)
                 {
                     throw new OperationCanceledException();
                 }
 
-                var selectedCommandText = result.AsSpan().Trim(" .\t");
+                var selectedCommandText = result.Trim(" .\t".ToCharArray());
 
-                if (selectedCommandText.IsEmpty)
+                if (string.IsNullOrEmpty(selectedCommandText))
                 {
                     if (possible.TryGetValue(1, out var defaultSelected))
                     {
-                        return Task.FromResult(defaultSelected);
+                        return defaultSelected;
                     }
                 }
                 else if (int.TryParse(selectedCommandText, out var selectedCommandIndex))
                 {
                     if (possible.TryGetValue(selectedCommandIndex, out var selected))
                     {
-                        return Task.FromResult(selected);
+                        return selected;
                     }
                 }
 

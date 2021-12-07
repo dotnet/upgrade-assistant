@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
     {
         private const string CATEGORY = "the VB Razor engine";
         private const string UPGRADE_LINK = "https://aka.ms/vb-angular-and-web-api";
-        private const string VBHTML_MESSAGE = "Support for {0} is limited to .NET Full Framework. To learn more please read: {1}";
+        private const string VBHTML_MESSAGE = $"Support for {CATEGORY} is limited to .NET Full Framework. To learn more please read: {UPGRADE_LINK}";
 
         private readonly ILogger<VisualBasicRazorTemplateCheck> _logger;
 
@@ -33,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
         /// </summary>
         public string Id => nameof(VisualBasicRazorTemplateCheck);
 
-        public string UpgradeMessage => string.Format(CultureInfo.InvariantCulture, VBHTML_MESSAGE, CATEGORY, UPGRADE_LINK);
+        public string UpgradeMessage => VBHTML_MESSAGE;
 
         public async Task<UpgradeReadiness> IsReadyAsync(IProject project, UpgradeReadinessOptions options, CancellationToken token)
         {
@@ -62,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 
             if (DoesProjectContainRazorFiles(project))
             {
-                _logger.LogError(VBHTML_MESSAGE, CATEGORY, UPGRADE_LINK);
+                _logger.LogError(VBHTML_MESSAGE);
                 return UpgradeReadiness.Unsupported;
             }
 

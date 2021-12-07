@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             foreach (var project in inputs)
             {
-                if (await _utilities.IsWinFormsProjectAsync(project, token))
+                if (await project.IsWinFormsProjectAsync(token).ConfigureAwait(false))
                 {
                     _logger.LogWarning(this.Description);
                     fileLocations.Add(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name));

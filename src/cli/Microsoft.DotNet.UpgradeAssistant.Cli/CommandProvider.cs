@@ -64,31 +64,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             return commands;
         }
 
-        private Task ShowStepStatus(UpgradeStep step)
+        private async Task ShowStepStatus(UpgradeStep step)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            _io.Output.WriteLine(new string('-', step.Title.Length));
-            _io.Output.WriteLine($"{step.Title}");
-            _io.Output.WriteLine(new string('-', step.Title.Length));
+            await _io.Output.WriteLineAsync(new string('-', step.Title.Length));
+            await _io.Output.WriteLineAsync($"{step.Title}");
+            await _io.Output.WriteLineAsync(new string('-', step.Title.Length));
             Console.ResetColor();
-            _io.Output.WriteLine(ConsoleHelpers.WrapString(step.Description, Console.WindowWidth));
-            WriteWithColor("  Status              ", ConsoleColor.DarkYellow);
-            _io.Output.Write(": ");
-            _io.Output.WriteLine($"{step.Status}");
-            WriteWithColor("  Risk to break build ", ConsoleColor.DarkYellow);
-            _io.Output.Write(": ");
-            _io.Output.WriteLine($"{step.Risk}");
-            WriteWithColor("  Details             ", ConsoleColor.DarkYellow);
-            _io.Output.Write(": ");
-            _io.Output.WriteLine(ConsoleHelpers.WrapString($"{step.StatusDetails}", Console.WindowWidth, "  Details             : ".Length));
-
-            return Task.CompletedTask;
+            await _io.Output.WriteLineAsync(ConsoleHelpers.WrapString(step.Description, Console.WindowWidth));
+            await WriteWithColorAsync("  Status              ", ConsoleColor.DarkYellow);
+            await _io.Output.WriteAsync(": ");
+            await _io.Output.WriteLineAsync($"{step.Status}");
+            await WriteWithColorAsync("  Risk to break build ", ConsoleColor.DarkYellow);
+            await _io.Output.WriteAsync(": ");
+            await _io.Output.WriteLineAsync($"{step.Risk}");
+            await WriteWithColorAsync("  Details             ", ConsoleColor.DarkYellow);
+            await _io.Output.WriteAsync(": ");
+            await _io.Output.WriteLineAsync(ConsoleHelpers.WrapString($"{step.StatusDetails}", Console.WindowWidth, "  Details             : ".Length));
         }
 
-        private void WriteWithColor(string msg, ConsoleColor color)
+        private async ValueTask WriteWithColorAsync(string msg, ConsoleColor color)
         {
             Console.ForegroundColor = color;
-            _io.Output.Write(msg);
+            await _io.Output.WriteAsync(msg);
             Console.ResetColor();
         }
     }

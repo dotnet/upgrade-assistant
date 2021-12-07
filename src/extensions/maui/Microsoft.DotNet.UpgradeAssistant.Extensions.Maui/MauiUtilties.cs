@@ -4,19 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
-    public class MauiUtilties
+    internal static class MauiUtilties
     {
-        public MauiUtilties()
-        {
-        }
-
-        public async Task<MauiProjectType> IsMauiProject(IProject project, CancellationToken token)
+        public static async Task<MauiProjectType> IsMauiProject(IProject project, CancellationToken token)
         {
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             if (components.HasFlag(ProjectComponents.MauiiOS))
@@ -31,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             return MauiProjectType.Maui;
         }
 
-        public void RuntimePropertyMapper(IProjectPropertyElements projectproperties, IProjectFile file, string oldRumtimePropertyName)
+        public static void RuntimePropertyMapper(IProjectPropertyElements projectproperties, IProjectFile file, string oldRumtimePropertyName)
         {
             // following conversion mapping here : https://github.com/xamarin/xamarin-macios/wiki/Project-file-properties-dotnet-migration
             var runtimeMapping = new Dictionary<string, string>()
@@ -62,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
         }
 
-        public void TransformProperty(IProjectPropertyElements projectproperties, IProjectFile file, string oldpropertyName, string newPropertyName, string oldPropertyValue = "", string newPropertyValue = "")
+        public static void TransformProperty(IProjectPropertyElements projectproperties, IProjectFile file, string oldpropertyName, string newPropertyName, string oldPropertyValue = "", string newPropertyValue = "")
         {
             var currentPropertyValue = projectproperties.GetProjectPropertyValue(oldpropertyName).FirstOrDefault();
             if (!string.IsNullOrEmpty(currentPropertyValue))

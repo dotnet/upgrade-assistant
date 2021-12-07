@@ -6,6 +6,9 @@
     <TargetFramework>net472</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <ExcludeCommonFiles>true</ExcludeCommonFiles>
+
+    <!-- CA1014: Mark assemblies with CLSCompliant falsely is raise on this project. We are not using any output, so it's not necessary -->
+    <NoWarn>$(NoWarn);CA1014</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

@@ -11,7 +11,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
     public static class WorkspaceExtensions
     {
         public static bool TargetsAspNetCore(this Compilation compilation)
-            => compilation.ReferencedAssemblyNames.Any(n => n.Name.StartsWith("Microsoft.AspNetCore", StringComparison.OrdinalIgnoreCase));
+        {
+            if (compilation is null)
+            {
+                throw new ArgumentNullException(nameof(compilation));
+            }
+
+            return compilation.ReferencedAssemblyNames.Any(n => n.Name.StartsWith("Microsoft.AspNetCore", StringComparison.OrdinalIgnoreCase));
+        }
 
         /// <summary>
         /// Tries to find a document given the <see cref="SyntaxTree"/> provided.

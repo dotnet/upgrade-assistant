@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -15,8 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         public override string Title => "Add Project Properties for .NET MAUI Project";
 
         public override string Description => "Adds the Project Properties per platform for .NET MAUI Projects";
-
-        private MauiUtilties MauiUtilties => new MauiUtilties();
 
         public MauiAddProjectPropertiesStep(ILogger<MauiAddProjectPropertiesStep> logger)
             : base(logger)
@@ -79,7 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added Project Properties for {projectType.ToString()} to .NET MAUI project ");
         }
 
-        private void UpgradeMauiAndroid(IProjectPropertyElements projectproperties, IProjectFile file)
+        private static void UpgradeMauiAndroid(IProjectPropertyElements projectproperties, IProjectFile file)
         {
             // confirm final mappings https://github.com/xamarin/xamarin-android/blob/main/Documentation/guides/OneDotNet.md#changes-to-msbuild-properties
             // remove uneeded properties
@@ -111,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
         }
 
-        private void UpgradeMauiiOS(IProjectPropertyElements projectproperties, IProjectFile file)
+        private static void UpgradeMauiiOS(IProjectPropertyElements projectproperties, IProjectFile file)
         {
             MauiUtilties.RuntimePropertyMapper(projectproperties, file, "MtouchArch");
             MauiUtilties.TransformProperty(projectproperties, file, "MtouchEnableSGenConc", "EnableSGenConc");
@@ -120,7 +117,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             projectproperties.RemoveProjectProperty("IPhoneResourcePrefix");
         }
 
-        private void UpgradeMaui(IProjectPropertyElements projectproperties, IProjectFile file)
+        private static void UpgradeMaui(IProjectPropertyElements projectproperties, IProjectFile file)
         {
             // remove unneeded Properties
             projectproperties.RemoveProjectProperty("DebugType");

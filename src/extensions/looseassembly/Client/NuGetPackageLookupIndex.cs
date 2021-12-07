@@ -42,6 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// The manager for the packages section of the file.
         /// </summary>
         private readonly ReadOnlyMemoryMappedManager _packages;
+        private bool _disposedValue;
 
         /// <summary>
         /// Gets the number of hash entries in the file.
@@ -65,7 +66,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
             // Since it will create a file stream anyway, let's do it early to get precise size information
             // for sizing the sections.
             // otherwise, the last "page" will make it look like the file is larger than it is.
+            // NOTE: The memory mapped file will handle disposing the stream
+#pragma warning disable CA2000 // Dispose objects before losing scope
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+#pragma warning restore CA2000 // Dispose objects before losing scope
             var size = stream.Length;
 
             // we need to know the size of the header and the magic numbers to compare, so make one and marshal it
@@ -385,7 +389,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
             probes = 0;
 
             // calculate where we should be in the keyspace
-            var keyspaceLocation = hashToken.GetKeySpaceLocation();
+            var keyspaceLocation = hashToken.KeySpaceLocation;
 
             // calculate a likely index based on that
             var index = (int)(HashCount * keyspaceLocation);
@@ -519,11 +523,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
             }
         }
 
-        public virtual void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
-            _hashLookup.Dispose();
-            _packages.Dispose();
-            _index.Dispose();
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _hashLookup.Dispose();
+                    _packages.Dispose();
+                    _index.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

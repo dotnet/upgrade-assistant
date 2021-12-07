@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     // Razor syntax.
                     if (!HasMvcRazorUsing(document))
                     {
-                        _logger.LogInformation("Adding an import statement for the '{namespace}' namespace to {FilePath}", HelperResultNamespace, path);
+                        _logger.LogInformation("Adding an import statement for the '{Namespace}' namespace to {FilePath}", HelperResultNamespace, path);
                         newText.Insert(0, $"@using {HelperResultNamespace}{Environment.NewLine}");
                     }
 

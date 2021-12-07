@@ -4,6 +4,12 @@ about: Create a report about something that is not working
 ---
 
 <!--
+FAQ:
+
+- If you are getting a failed source while attempting to install or upgrade, please run with the `--ignore-failed-sources` option. An open issue is available here to track adding this as the default behavior: https://github.com/dotnet/sdk/issues/18402
+-->
+
+<!--
 Please keep in mind that the GitHub issue tracker is not intended as a general support forum, but for reporting **non-security** bugs and feature requests.
 -->
 

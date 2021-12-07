@@ -14,7 +14,7 @@ namespace TestProject.TestClasses
             return View();
         }
 
-        public RedirectResult AnotherPage() => new RedirectResult("foo");
+        public Foo.RedirectResult AnotherPage() => new RedirectResult("foo");
 
         public ActionResult YetAnotherPage()
         {
