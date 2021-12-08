@@ -16,6 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class AppSettingsConfigUpdater : BaseAppSettingsConfigUpdater, IUpdater<ConfigFile>
     {
+        private const string RuleId = "UA203";
         private const string AppSettingsPath = "/configuration/appSettings";
         private const string AddSettingElementName = "add";
         private const string KeyAttributeName = "key";
@@ -115,7 +116,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 
             var result = _appSettings.Count > 0;
 
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(result));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                result));
         }
     }
 }

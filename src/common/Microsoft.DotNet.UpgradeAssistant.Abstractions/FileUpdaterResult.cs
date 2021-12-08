@@ -5,5 +5,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public record FileUpdaterResult(bool Result, IEnumerable<string> FilePaths) : IUpdaterResult { }
+    public record FileUpdaterResult(
+        string RuleId,
+        string RuleName,
+        string FullDescription,
+        bool Result,
+        IEnumerable<string> FilePaths) : IUpdaterResult { }
 }

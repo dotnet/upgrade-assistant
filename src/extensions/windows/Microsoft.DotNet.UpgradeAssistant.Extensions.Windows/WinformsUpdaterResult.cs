@@ -5,7 +5,13 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
-    public record WinformsUpdaterResult(bool Result, string Message, IList<string> FileLocations) : IUpdaterResult
+    public record WinformsUpdaterResult(
+        string RuleId,
+        string RuleName,
+        string FullDescription,
+        bool Result,
+        string Message,
+        IList<string> FileLocations) : IUpdaterResult
     {
     }
 }

@@ -15,6 +15,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinForms)]
     public class WinformsDefaultFontUpdater : IUpdater<IProject>
     {
+        private const string RuleId = "UA209";
+
         private readonly ILogger<WinformsDefaultFontUpdater> _logger;
 
         public string Id => typeof(WinformsDefaultFontUpdater).FullName;
@@ -53,7 +55,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), this.Description, fileLocations);
+            return new WinformsUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                Result: fileLocations.Any(),
+                Message: this.Description,
+                FileLocations: fileLocations);
         }
     }
 }

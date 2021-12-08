@@ -119,22 +119,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "RazorHelperUpdaterViews/OneHelper/Test.csproj",
-                    new FileUpdaterResult(true, new[] { @"\MyView.cshtml" })
+                    new FileUpdaterResult("RULE0001", "RuleName", "Full Description", true, new[] { @"\MyView.cshtml" })
                 },
                 new object[]
                 {
                     "RazorHelperUpdaterViews/HelperInSubDir/Test.csproj",
-                    new FileUpdaterResult(true, new[] { @"\OneHelper\MyView.cshtml", @"\OneHelper\AnotherHelper\MyView.cshtml" })
+                    new FileUpdaterResult("RULE0001", "RuleName", "Full Description", true, new[] { @"\OneHelper\MyView.cshtml", @"\OneHelper\AnotherHelper\MyView.cshtml" })
                 },
                 new object[]
                 {
                     "RazorHelperUpdaterViews/MultipleHelpers/Test.csproj",
-                    new FileUpdaterResult(true, new[] { @"\MultiHelpers.cshtml", @"\MyView.cshtml" })
+                    new FileUpdaterResult("RULE0001", "RuleName", "Full Description", true, new[] { @"\MultiHelpers.cshtml", @"\MyView.cshtml" })
                 },
                 new object[]
                 {
                     "RazorHelperUpdaterViews/NoHelpers/Test.csproj",
-                    new FileUpdaterResult(false, Array.Empty<string>())
+                    new FileUpdaterResult("RULE0001", "RuleName", "Full Description", false, Array.Empty<string>())
                 }
             };
 

@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinForms)]
     public class WinformsDpiSettingUpdater : IUpdater<IProject>
     {
+        private const string RuleId = "UA202";
         private const int BufferSize = 65536;
 
         private readonly ILogger<WinformsDpiSettingUpdater> _logger;
@@ -100,7 +101,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), Resources.HighDPIMessage, fileLocations);
+            return new WinformsUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                fileLocations.Any(),
+                Resources.HighDPIMessage,
+                fileLocations);
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
@@ -125,7 +132,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(fileLocations.Any(), Resources.HighDPIMessage, fileLocations);
+            return new WinformsUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                fileLocations.Any(),
+                Resources.HighDPIMessage,
+                fileLocations);
         }
     }
 }

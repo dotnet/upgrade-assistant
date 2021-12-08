@@ -14,6 +14,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class UnsupportedSectionConfigUpdater : IUpdater<ConfigFile>
     {
+        private const string RuleId = "UA205";
+
         private static (string Name, string Issue)[] _names = new (string, string)[]
         {
             ("system.diagnostics", "https://github.com/dotnet/runtime/issues/23937"),
@@ -67,7 +69,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
                 }
             }
 
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(applied));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                applied));
         }
 
         public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
@@ -76,11 +82,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
             {
                 if (GetUnsupportedSections(configFile).Any())
                 {
-                    return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(true));
+                    return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                        RuleId,
+                        RuleName: Id,
+                        FullDescription: Title,
+                        true));
                 }
             }
 
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(false));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                false));
         }
 
         private IEnumerable<(XElement Section, string Issue)> GetUnsupportedSections(ConfigFile file)
