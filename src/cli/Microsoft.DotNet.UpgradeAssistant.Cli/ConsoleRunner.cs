@@ -56,6 +56,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         builder.Populate(services);
                     }
                 });
+
+                await RunStartupAsync(scope.Resolve<IEnumerable<IUpgradeStartup>>(), token);
                 await scope.Resolve<IAppCommand>().RunAsync(token);
 
                 _errorCode.ErrorCode = ErrorCodes.Success;

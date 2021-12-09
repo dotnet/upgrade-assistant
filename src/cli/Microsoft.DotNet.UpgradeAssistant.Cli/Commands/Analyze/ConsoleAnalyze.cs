@@ -34,14 +34,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
-
-           // _contextFactory.CreateContext
         }
 
         public async Task RunAsync(CancellationToken token)
         {
             using var context = await _contextFactory.CreateContext(token);
-            
+
             await _stateManager.LoadStateAsync(context, token);
             var analzyerContext = new AnalyzeContext(context);
             var analyzeResultMap = new List<AnalyzeResultDefinition>();
