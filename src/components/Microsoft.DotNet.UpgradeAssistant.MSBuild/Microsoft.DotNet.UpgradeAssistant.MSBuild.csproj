@@ -5,7 +5,7 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime">
-      <Version>17.0.0-preview-21426-01</Version>
+      <Version>17.0.0</Version>
     </PackageReference>
   </ItemGroup>
 
@@ -50,7 +50,7 @@
       <Version>$(MicrosoftCodeAnalysisVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" PrivateAssets="runtime">
-      <!-- This package is mostly COM definitions which can be loaded in .NET 5 runtime just fine -->
+      <!-- This package is mostly COM definitions which can be loaded in .NET 6 runtime just fine -->
       <NoWarn>NU1701</NoWarn>
       <Version>2.3.2262-g94fae01e</Version>
     </PackageReference>

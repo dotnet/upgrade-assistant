@@ -60,8 +60,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         // Run `dotnet restore` using quiet mode since some warnings and errors are
         // expected. As long as a lock file is produced (which is checked elsewhere),
         // the tool was successful enough.
-        public Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token) =>
-            _runner.RunProcessAsync(new ProcessInfo
+        public Task<bool> RunRestoreAsync(IUpgradeContext context, string path, CancellationToken token)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            return _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = "dotnet",
                 Arguments = _userInput.IsInteractive ? Invariant($"restore --interactive \"{path}\"") : Invariant($"restore \"{path}\""),
@@ -72,5 +78,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 // necessary to enable interactive auth is to make sure that necessary messages are displayed to users.
                 GetMessageLogLevel = (_, message) => MessagesToDisplay.Any(m => message.Contains(m, StringComparison.Ordinal)) ? LogLevel.Information : LogLevel.Debug,
             }, token);
+        }
     }
 }

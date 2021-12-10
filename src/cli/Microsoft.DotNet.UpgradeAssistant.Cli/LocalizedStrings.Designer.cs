@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LocalizedStrings {
@@ -93,6 +93,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         internal static string ExtensionManagementName {
             get {
                 return ResourceManager.GetString("ExtensionManagementName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No query provided for search..
+        /// </summary>
+        internal static string ExtensionManagementNoQuery {
+            get {
+                return ResourceManager.GetString("ExtensionManagementNoQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {Name} v{Version}.
+        /// </summary>
+        internal static string ExtensionManagementSearch {
+            get {
+                return ResourceManager.GetString("ExtensionManagementSearch", resourceCulture);
             }
         }
         
@@ -279,7 +297,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         /// <summary>
         ///   Looks up a localized string similar to Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.
         /// 
-        ///This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 5.
+        ///This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 6.
         ///
         ///This tool&apos;s purpose is to automate some of the &apos;routine&apos; upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers a [rest of string was truncated]&quot;;.
         /// </summary>

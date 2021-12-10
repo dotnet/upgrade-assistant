@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
     [ApplicableLanguage(Language.CSharp)]
     public class WebNamespaceConfigUpdater : IUpdater<ConfigFile>
     {
+        private const string RuleId = "UA206";
         private const string NamespacesPath = "/configuration/system.web.webPages.razor/pages/namespaces";
         private const string AddElementName = "add";
         private const string NamespaceAttributeName = "namespace";
@@ -77,12 +78,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
                 File.WriteAllLines(path, viewImportsContents);
                 _logger.LogInformation("View imports written to {ViewImportsPath}", path);
 
-                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(true));
+                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                    RuleId,
+                    RuleName: Id,
+                    FullDescription: Title,
+                    Result: true));
             }
             catch (IOException exc)
             {
                 _logger.LogError(exc, "Unexpected exception accessing _ViewImports");
-                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(false));
+                return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                    RuleId,
+                    RuleName: Id,
+                    FullDescription: Title,
+                    Result: false));
             }
         }
 
@@ -147,7 +156,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
 
             _namespacesToUpgrade = namespaces.Distinct().Where(ns => !alreadyImportedNamespaces.Contains(ns));
             _logger.LogInformation("{NamespaceCount} web page namespace imports need upgraded: {Namespaces}", _namespacesToUpgrade.Count(), string.Join(", ", _namespacesToUpgrade));
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(_namespacesToUpgrade.Any()));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                Result: _namespacesToUpgrade.Any()));
         }
     }
 }

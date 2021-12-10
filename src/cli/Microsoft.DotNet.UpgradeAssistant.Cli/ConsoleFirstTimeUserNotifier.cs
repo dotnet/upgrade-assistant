@@ -20,20 +20,20 @@ namespace Microsoft.DotNet.UpgradeAssistant
             _io = io ?? throw new ArgumentNullException(nameof(io));
         }
 
-        public Task<bool> StartupAsync(CancellationToken token)
+        public async Task<bool> StartupAsync(CancellationToken token)
         {
             if (!_sentinel.Exists())
             {
-                _io.Output.WriteLine();
-                _io.Output.WriteLine(_sentinel.Title);
-                _io.Output.WriteLine(new string('-', 10));
-                _io.Output.WriteLine(_sentinel.DisclosureText);
-                _io.Output.WriteLine();
+                await _io.Output.WriteLineAsync();
+                await _io.Output.WriteLineAsync(_sentinel.Title);
+                await _io.Output.WriteLineAsync(new string('-', 10));
+                await _io.Output.WriteLineAsync(_sentinel.DisclosureText);
+                await _io.Output.WriteLineAsync();
 
                 _sentinel.CreateIfNotExists();
             }
 
-            return Task.FromResult(true);
+            return true;
         }
     }
 }

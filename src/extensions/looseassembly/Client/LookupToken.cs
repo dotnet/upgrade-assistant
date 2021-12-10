@@ -5,7 +5,9 @@ using System.IO;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
 {
+#pragma warning disable CA1815 // Override equals and operator equals on value types
     public readonly struct LookupToken
+#pragma warning restore CA1815 // Override equals and operator equals on value types
     {
         public LookupToken(StrongNameInfo strongName, HashToken token)
         {

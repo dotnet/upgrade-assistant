@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Configuration;
+using Serilog.Events;
 using Serilog.Formatting.Compact;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
@@ -57,6 +59,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureServices((context, services) =>
                 {
+                    services.AddHttpClient();
+
                     // Register this first so the first startup step is to check for telemetry opt-out
                     services.AddTransient<IUpgradeStartup, ConsoleFirstTimeUserNotifier>();
                     services.AddTelemetry(options =>
@@ -183,11 +187,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddSingleton(parseResult);
                     services.AddTransient<IUpgradeStartup, UsedCommandTelemetry>();
                 })
-                .UseSerilog((_, __, loggerConfiguration) => loggerConfiguration
+                .UseSerilog((context, __, loggerConfiguration) => loggerConfiguration
                     .Enrich.FromLogContext()
-                    .MinimumLevel.Is(Serilog.Events.LogEventLevel.Verbose)
+                    .MinimumLevelFromConfiguration(context.Configuration.GetSection("Logging:Loglevel"))
+                    .MinimumLevel.Override("System", LogEventLevel.Warning)
+                    .MinimumLevel.Is(LogEventLevel.Verbose)
                     .WriteTo.Console(levelSwitch: logSettings.Console)
                     .WriteTo.File(new CompactJsonFormatter(), LogFilePath, levelSwitch: logSettings.File));
+        }
+
+        private static LoggerConfiguration MinimumLevelFromConfiguration(this LoggerConfiguration builder, IConfiguration config)
+        {
+            foreach (var (key, value) in config.AsEnumerable())
+            {
+                var idx = key.LastIndexOf(':');
+                var eventName = key[(idx + 1)..];
+
+                if (Enum.TryParse<LogEventLevel>(value, out var level))
+                {
+                    builder.MinimumLevel.Override(eventName, level);
+                }
+            }
+
+            return builder;
         }
 
         public static async Task<int> RunUpgradeAssistantAsync(this IHostBuilder hostBuilder, CancellationToken token)

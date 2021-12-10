@@ -23,7 +23,7 @@ using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
-    public sealed class PackageLoader : IPackageLoader, IPackageDownloader, IDisposable
+    public sealed class PackageLoader : IPackageLoader, IPackageDownloader, IDisposable, IPackageCreator
     {
         private const int MaxRetries = 3;
 
@@ -343,7 +343,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 return new PackageArchiveReader(ms, false);
             }
 
-            ms.Dispose();
+            await ms.DisposeAsync().ConfigureAwait(false);
             return null;
         }
 
@@ -420,7 +420,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             return false;
         }
 
-        public bool CreateArchive(IExtensionInstance extension, Stream stream)
+        public bool CreateArchive(IExtensionInstance extension, string? packageType, Stream stream)
         {
             if (extension is null)
             {
@@ -455,9 +455,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             {
                 Id = extension.Name,
                 Version = NuGetVersion.Parse(extension.Version.ToString()),
-                Description = extension.Description,
-                PackageTypes = new[] { new PackageType("UpgradeAssistantExtension", new Version(1, 0, 0)) }
+                Description = extension.Description
             };
+
+            if (packageType is not null)
+            {
+                builder.PackageTypes = new[] { new PackageType(packageType, new Version(1, 0, 0)) };
+            }
 
             builder.Authors.AddRange(extension.Authors);
             builder.Files.Add(new EmptyFile(Path.Combine("content", "_.txt")));

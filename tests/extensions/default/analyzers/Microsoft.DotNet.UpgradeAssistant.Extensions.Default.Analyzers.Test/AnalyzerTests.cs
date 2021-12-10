@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -128,7 +127,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0002", new TextSpan(136, 32)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(209, 32)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(256, 12)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(320, 16)),
                 }
             },
             {
@@ -148,7 +146,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 new[]
                 {
                     new ExpectedDiagnostic("UA0002", new TextSpan(240, 25)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(342, 18)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(382, 14)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(423, 12)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(477, 27)),
@@ -164,12 +161,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     new ExpectedDiagnostic("UA0002", new TextSpan(88, 28)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(162, 36)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(327, 37)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(404, 26)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(436, 26)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(615, 36)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(707, 37)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(872, 13)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(947, 21))
+                    new ExpectedDiagnostic("UA0002", new TextSpan(909, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(989, 21))
                 }
             },
             {
@@ -178,11 +174,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                 {
                     new ExpectedDiagnostic("UA0002", new TextSpan(187, 13)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(615, 29)),
-                    new ExpectedDiagnostic("UA0002", new TextSpan(954, 14)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1030, 25)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1079, 10)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1102, 13)),
                     new ExpectedDiagnostic("UA0002", new TextSpan(1160, 25)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1702, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1802, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1873, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(1902, 13)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(2013, 10)),
+                    new ExpectedDiagnostic("UA0002", new TextSpan(2074, 13)),
 
                     new ExpectedDiagnostic("UA0002", new TextSpan(177, 13), Language.VisualBasic),
                     new ExpectedDiagnostic("UA0002", new TextSpan(463, 29), Language.VisualBasic),
@@ -249,11 +250,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
         [Fact]
         public async Task NegativeTest()
         {
+            using var workspace = new AdhocWorkspace();
             var analyzers = TestHelper.AllAnalyzers
                 .SelectMany(a => a.SupportedDiagnostics)
                 .Select(d => d.Id)
                 .ToArray();
-            var diagnostics = await TestHelper.GetDiagnosticsAsync("Startup.cs", analyzers, isFramework: true).ConfigureAwait(false);
+            var diagnostics = await workspace.GetDiagnosticsAsync("Startup.cs", analyzers, isFramework: true).ConfigureAwait(false);
 
             Assert.Empty(diagnostics);
         }
@@ -289,7 +291,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     .Select(e => e.Id)
                     .Distinct();
 
-                var diagnostics = await TestHelper.GetDiagnosticsAsync(language, scenarioName, isFramework: false, expectedDiagnosticIds);
+                using var workspace = new AdhocWorkspace();
+                var diagnostics = await workspace.GetDiagnosticsAsync(language, scenarioName, isFramework: false, expectedDiagnosticIds);
                 AssertDiagnosticsCorrect(diagnostics, expectedDiagnostics);
             }
         }
@@ -319,7 +322,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.Test
                     continue;
                 }
 
-                var fixedText = await TestHelper.FixSourceAsync(language, scenarioName, expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
+                using var workspace = new AdhocWorkspace();
+                var fixedText = await workspace.FixSourceAsync(language, scenarioName, expectedDiagnostics.Select(d => d.Id).Distinct()).ConfigureAwait(false);
                 var expectedText = TestHelper.GetSource(language, $"{scenarioName}.Fixed");
 
                 _output.WriteLine("Expected:");

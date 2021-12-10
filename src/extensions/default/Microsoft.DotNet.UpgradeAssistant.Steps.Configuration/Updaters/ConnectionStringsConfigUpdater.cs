@@ -16,6 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public class ConnectionStringsConfigUpdater : BaseAppSettingsConfigUpdater, IUpdater<ConfigFile>
     {
+        private const string RuleId = "UA204";
         private const string ConnectionStringsPath = "/configuration/connectionStrings";
         private const string AddConnectionStringElementName = "add";
         private const string NameAttributeName = "name";
@@ -106,7 +107,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 
             var result = _connectionStrings.Count > 0;
 
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(result));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                result));
         }
     }
 }

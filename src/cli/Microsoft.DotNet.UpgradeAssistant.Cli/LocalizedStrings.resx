@@ -129,6 +129,12 @@
   <data name="ExtensionManagementName" xml:space="preserve">
     <value>Name of extension</value>
   </data>
+  <data name="ExtensionManagementNoQuery" xml:space="preserve">
+    <value>No query provided for search.</value>
+  </data>
+  <data name="ExtensionManagementSearch" xml:space="preserve">
+    <value>{Name} v{Version}</value>
+  </data>
   <data name="ExtensionManagementSource" xml:space="preserve">
     <value>Source of extension</value>
   </data>

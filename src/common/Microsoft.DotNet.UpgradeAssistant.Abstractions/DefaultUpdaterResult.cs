@@ -3,5 +3,9 @@
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public record DefaultUpdaterResult(bool Result) : IUpdaterResult { }
+    public record DefaultUpdaterResult(
+        string RuleId,
+        string RuleName,
+        string FullDescription,
+        bool Result) : IUpdaterResult { }
 }

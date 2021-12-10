@@ -8,6 +8,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
@@ -29,6 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             AddCommand(new RestoreExtensionCommand());
             AddCommand(new UpdateExtensionCommand());
             AddCommand(new CreateExtensionCommand());
+            AddCommand(new SearchExtensionCommand());
         }
 
         private class ExtensionCommandBase : Command
@@ -56,29 +58,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                                     .Configure<IOptions<ExtensionOptions>>((options, extensionOptions) =>
                                     {
                                         options.Path = opts.ExtensionPath;
+                                        options.Source = NormalizeSource(opts.Source, extensionOptions.Value.DefaultSource);
 
                                         if (opts.Name is not null)
                                         {
-                                            var source = opts.Source;
-
-                                            if (source is not null && source.StartsWith('.'))
-                                            {
-                                                source = Path.GetFullPath(source, Environment.CurrentDirectory);
-                                            }
-
-                                            if (source is null)
-                                            {
-                                                source = extensionOptions.Value.DefaultSource;
-                                            }
-
                                             foreach (var name in opts.Name)
                                             {
-                                                options.Extensions.Add(new(name) { Source = source, Version = opts.Version });
+                                                options.Extensions.Add(new(name) { Source = options.Source, Version = opts.Version });
+                                            }
+
+                                            if (opts.Name.Count == 1)
+                                            {
+                                                options.Name = opts.Name.First();
                                             }
                                         }
                                     });
                               })
                               .RunConsoleAsync(token));
+
+            private static string NormalizeSource(string? source, string defaultSource)
+            {
+                if (source is null)
+                {
+                    return defaultSource;
+                }
+
+                if (source.StartsWith('.'))
+                {
+                    source = Path.GetFullPath(source, Environment.CurrentDirectory);
+                }
+
+                return source;
+            }
         }
 
         private class AddExtensionCommand : ExtensionCommandBase
@@ -347,11 +358,57 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             }
         }
 
+        private class SearchExtensionCommand : ExtensionCommandBase
+        {
+            public SearchExtensionCommand()
+                : base("search")
+            {
+                AddHandler<SearchExtensionAppCommand>();
+                AddArgument(new Argument<string>("name", LocalizedStrings.ExtensionManagementName) { Arity = ArgumentArity.ZeroOrOne });
+            }
+
+            private class SearchExtensionAppCommand : IAppCommand
+            {
+                private readonly IOptions<ExtensionNameOptions> _options;
+                private readonly IExtensionManager _extensionManager;
+                private readonly ILogger<SearchExtensionAppCommand> _logger;
+
+                public SearchExtensionAppCommand(IOptions<ExtensionNameOptions> options, IExtensionManager extensionManager, ILogger<SearchExtensionAppCommand> logger)
+                {
+                    _options = options ?? throw new ArgumentNullException(nameof(options));
+                    _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
+                    _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+                }
+
+                public async Task RunAsync(CancellationToken token)
+                {
+                    if (_options.Value.Source is string source)
+                    {
+                        var name = _options.Value.Name ?? string.Empty;
+
+                        await foreach (var result in _extensionManager.SearchAsync(name, source, token).WithCancellation(token))
+                        {
+                            _logger.LogInformation(LocalizedStrings.ExtensionManagementSearch, result.Name, result.Version);
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning(LocalizedStrings.ExtensionManagementNoQuery);
+                    }
+                }
+            }
+        }
+
         private class ExtensionNameOptions
         {
             public ICollection<ExtensionSource> Extensions { get; } = new List<ExtensionSource>();
 
             public string? Path { get; set; }
+
+            // Only populated when a single name has been provided
+            public string? Name { get; set; }
+
+            public string Source { get; set; } = null!;
         }
 
         private class ExtensionUpgradeAssistantOptions : IUpgradeAssistantOptions
@@ -369,8 +426,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public string? Version { get; set; }
 
             public string? ExtensionPath { get; set; }
-
-            public string? Path => null;
 
             public bool IgnoreUnsupportedFeatures { get; set; }
 

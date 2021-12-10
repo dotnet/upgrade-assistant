@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     /// </summary>
     public class RazorSourceUpdater : IUpdater<RazorCodeDocument>
     {
+        private const string RuleId = "UA208";
         private readonly IEnumerable<DiagnosticAnalyzer> _analyzers;
         private readonly IEnumerable<CodeFixProvider> _codeFixProviders;
         private readonly ImmutableArray<AdditionalText> _additionalTexts;
@@ -99,7 +100,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 _logger.LogInformation("  {DiagnosticsCount} diagnostics need fixed in {FilePath}", diagnosticsGroup.Count(), diagnosticsGroup.Key);
             }
 
-            return new FileUpdaterResult(mappedDiagnostics.Any(), diagnosticsByFile.Select(g => g.Key));
+            return new FileUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                mappedDiagnostics.Any(),
+                diagnosticsByFile.Select(g => g.Key));
         }
 
         /// <summary>
@@ -181,7 +187,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
             }
 
-            return new FileUpdaterResult(true, textReplacements.Select(r => r.FilePath).Distinct());
+            return new FileUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                Result: true,
+                textReplacements.Select(r => r.FilePath).Distinct());
         }
 
         private async Task<IEnumerable<MappedTextReplacement>> GetReplacements(Project originalProject, IEnumerable<Document> updatedDocuments, CancellationToken token)

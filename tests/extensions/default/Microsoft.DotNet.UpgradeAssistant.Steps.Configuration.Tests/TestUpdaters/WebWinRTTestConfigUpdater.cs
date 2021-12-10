@@ -31,12 +31,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Tests
         public Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
             ApplyCount++;
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(_isApplicable));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                _isApplicable));
         }
 
         public Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<ConfigFile> inputs, CancellationToken token)
         {
-            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(_isApplicable));
+            return Task.FromResult<IUpdaterResult>(new DefaultUpdaterResult(
+                RuleId: "Id",
+                RuleName: Id,
+                FullDescription: Title,
+                _isApplicable));
         }
     }
 }

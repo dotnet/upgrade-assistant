@@ -2,13 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public record FileUpdaterResult(
-        string RuleId,
-        string RuleName,
-        string FullDescription,
-        bool Result,
-        IEnumerable<string> FilePaths) : IUpdaterResult { }
+    public interface IPackageSearch
+    {
+        IAsyncEnumerable<NuGetReference> SearchAsync(string name, string source, string? packageType, CancellationToken token);
+    }
 }

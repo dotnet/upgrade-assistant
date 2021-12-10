@@ -74,12 +74,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         }
 
         public IAsyncEnumerable<NuGetReference> GetTransitivePackageReferencesAsync(TargetFrameworkMoniker tfm, CancellationToken token)
-            => PackageReferenceFormat switch
+        {
+            if (tfm is null)
+            {
+                throw new ArgumentNullException(nameof(tfm));
+            }
+
+            return PackageReferenceFormat switch
             {
                 NugetPackageFormat.PackageConfig => PackageReferences.ToAsyncEnumerable(),
                 NugetPackageFormat.PackageReference => GetAllPackageReferenceDependenciesAsync(tfm, token).Select(l => new NuGetReference(l.Name, l.Version.ToNormalizedString())),
                 _ => AsyncEnumerable.Empty<NuGetReference>()
             };
+        }
 
         public async ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token)
             => PackageReferences.Any(p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase))

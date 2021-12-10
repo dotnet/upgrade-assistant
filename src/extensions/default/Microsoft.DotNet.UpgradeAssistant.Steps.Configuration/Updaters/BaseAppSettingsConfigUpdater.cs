@@ -15,6 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 {
     public abstract class BaseAppSettingsConfigUpdater
     {
+        private const string RuleId = "UA201";
         private const string AppSettingsJsonFileName = "appsettings.json";
 
         private static readonly Regex AppSettingsFileRegex = new("^appsettings(\\..+)?\\.json$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -78,7 +79,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
                 await file.SaveAsync(token).ConfigureAwait(false);
             }
 
-            return new DefaultUpdaterResult(true);
+            return new DefaultUpdaterResult(
+                RuleId,
+                RuleName: string.Empty,
+                FullDescription: string.Empty,
+                true);
         }
 
         public static IList<AppSettingsFile> FindExistingAppSettingsFiles(IUpgradeContext context)

@@ -22,9 +22,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
             _path = path;
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            base.Dispose();
+            base.Dispose(disposing);
             File.Delete(_path);
         }
 

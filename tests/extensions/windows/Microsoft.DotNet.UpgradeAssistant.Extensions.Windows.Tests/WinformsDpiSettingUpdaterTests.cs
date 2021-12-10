@@ -37,12 +37,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
 
-            var programFilePath = Path.Combine(Path.GetTempPath(), string.Concat("TestFile", random.Next(), ".txt"));
+            var programFilePath = Path.Combine(Path.GetTempPath(), $"TestFile{Guid.NewGuid()}.txt");
             var programFileContent = File.ReadAllLines(inputFilePath);
             var expectedFileContent = File.ReadAllLines(expectedFilePath);
 
             // Act
-            await updater.UpdateHighDPISetting(project.Object, programFileContent, isDpiSettingSetInProgramFile, programFilePath);
+            await updater.UpdateHighDPISetting(project.Object, programFileContent, isDpiSettingSetInProgramFile, programFilePath).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(File.Exists(programFilePath), expectedOutputFile);

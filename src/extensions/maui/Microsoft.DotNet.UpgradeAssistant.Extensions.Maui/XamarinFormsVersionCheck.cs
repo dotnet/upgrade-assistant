@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     {
         private const string CATEGORY = ".NET MAUI Upgrade";
         private const string UPGRADE_LINK = "https://aka.ms/upgradeassistant/maui/requirements";
-        private const string XAMARIN_FORMS_MESSAGE = "Support for upgrading to {0} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {1}";
+        private const string XAMARIN_FORMS_MESSAGE = "Support for upgrading to {Category} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {Link}";
         private const string MINIMUM_XAMARIN_VERSION = "4.8";
 
         private readonly ILogger<XamarinFormsVersionCheck> _logger;

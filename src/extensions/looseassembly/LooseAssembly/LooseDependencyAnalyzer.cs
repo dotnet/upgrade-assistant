@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,13 +27,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
 
         public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
+            if (project is null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            if (state is null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
             foreach (var reference in state.References)
             {
                 if (project.TryResolveHintPath(reference, out var path))
                 {
                     _logger.LogDebug("Found hint path for {Reference} at {Path}", reference.Name, path);
 
-                    var found = await _lookup.SearchAsync(path, project.TargetFrameworks, token).ToListAsync(token);
+                    var found = await _lookup.SearchAsync(path, project.TargetFrameworks, token).ToListAsync(token).ConfigureAwait(false);
 
                     if (found.Count == 0)
                     {

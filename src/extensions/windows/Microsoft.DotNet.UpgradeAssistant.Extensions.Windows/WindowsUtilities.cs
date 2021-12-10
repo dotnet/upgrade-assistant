@@ -9,15 +9,15 @@ using System.Xml.XPath;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
-    public class WindowsUtilities
+    internal static class WindowsUtilities
     {
-        public async Task<bool> IsWinFormsProjectAsync(IProject project, CancellationToken token)
+        public static async ValueTask<bool> IsWinFormsProjectAsync(this IProject project, CancellationToken token)
         {
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             return components.HasFlag(ProjectComponents.WinForms);
         }
 
-        public string GetElementFromAppConfig(string configPath, string configuration, string key)
+        public static string GetElementFromAppConfig(string configPath, string configuration, string key)
         {
             if (File.Exists(configPath))
             {

@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     ///     Code derived from sample: https://code.msdn.microsoft.com/Visual-Studio-Setup-0cedd331.
     /// </summary>
     /// <remarks>
-    /// The package is not supported on .NET 5, so we copied the COM declarations to use instead.
+    /// The package is not supported on .NET 6, so we copied the COM declarations to use instead.
     /// </remarks>
     internal class VisualStudioFinder : IConfigureOptions<WorkspaceOptions>
     {

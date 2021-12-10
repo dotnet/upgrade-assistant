@@ -2,10 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -13,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         public string Path { get; set; } = string.Empty;
 
-        public bool IsDpiSettingSet { get; set; } = false;
+        public bool IsDpiSettingSet { get; set; }
 
         public string[] FileContent { get; set; } = Array.Empty<string>();
 

@@ -19,6 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
     /// </summary>
     public class RazorHelperUpdater : IUpdater<RazorCodeDocument>
     {
+        private const string RuleId = "UA207";
         private const string HelperResultNamespace = "Microsoft.AspNetCore.Mvc.Razor";
         private readonly IHelperMatcher _helperMatcher;
         private readonly ILogger<RazorHelperUpdater> _logger;
@@ -85,7 +86,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
 
             // Log how many Razor documents had @helpers and return a corresponding FileUpdaterResult
             _logger.LogInformation("Found @helper functions in {Count} documents", inputsWithHelpers.Count);
-            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(inputsWithHelpers.Any(), inputsWithHelpers));
+            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                inputsWithHelpers.Any(),
+                inputsWithHelpers));
         }
 
         /// <summary>
@@ -133,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                     // Razor syntax.
                     if (!HasMvcRazorUsing(document))
                     {
-                        _logger.LogInformation("Adding an import statement for the '{namespace}' namespace to {FilePath}", HelperResultNamespace, path);
+                        _logger.LogInformation("Adding an import statement for the '{Namespace}' namespace to {FilePath}", HelperResultNamespace, path);
                         newText.Insert(0, $"@using {HelperResultNamespace}{Environment.NewLine}");
                     }
 
@@ -146,7 +152,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 }
             }
 
-            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(true, updatedDocuments));
+            return Task.FromResult<IUpdaterResult>(new FileUpdaterResult(
+                RuleId,
+                RuleName: Id,
+                FullDescription: Title,
+                true,
+                updatedDocuments));
         }
 
         private static bool HasMvcRazorUsing(RazorCodeDocument document)
