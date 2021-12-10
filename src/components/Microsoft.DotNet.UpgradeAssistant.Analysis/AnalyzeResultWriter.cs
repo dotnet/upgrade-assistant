@@ -17,7 +17,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
     {
         private readonly string _sarifLogPath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
         private readonly ISerializer _serializer;
-        //private const string templatePath = "Microsoft.DotNet.UpgradeAssistant.Cli.Properties.HTMLTemplate.html";
 
         public AnalyzeResultWriter(ISerializer serializer)
         {
@@ -35,7 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
-            if (format is not null && format.ToLower(CultureInfo.CurrentCulture) == "html")
+            if (format is not null && string.Equals(format, "html", StringComparison.OrdinalIgnoreCase))
             {
                 WriteHTML(sarifLog);
             }
