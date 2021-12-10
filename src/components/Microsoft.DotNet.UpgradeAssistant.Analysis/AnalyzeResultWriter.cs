@@ -52,15 +52,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             var names = Assembly.GetExecutingAssembly();
             var templatePath = names.GetManifestResourceNames();
 
-            using (var assembly = Assembly.GetExecutingAssembly().GetManifestResourceStream(templatePath[0]))
-            {
-              using (var templateString = new StreamReader(assembly))
-                {
-                    var template = templateString.ReadToEnd();
-                    var finishedTemplate = template.Replace("%SARIF_LOG%", ss);
-                    File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html"), finishedTemplate);
-                }
-            }
+            using var assembly = Assembly.GetExecutingAssembly().GetManifestResourceStream(templatePath[0]);
+            using var templateString = new StreamReader(assembly);
+            var template = templateString.ReadToEnd();
+            var finishedTemplate = template.Replace("%SARIF_LOG%", ss);
+            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html"), finishedTemplate);
         }
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)
