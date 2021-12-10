@@ -44,7 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), source.Token).ConfigureAwait(false);
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, source.Token).ConfigureAwait(false);
 
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
             if (!File.Exists(filePath))
