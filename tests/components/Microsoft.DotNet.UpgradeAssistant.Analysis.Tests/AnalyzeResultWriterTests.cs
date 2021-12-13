@@ -18,7 +18,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
         public async Task ValidateSarifVersion()
         {
             var serializer = new JsonSerializer();
-            using var source = new CancellationTokenSource();
             var writer = new AnalyzeResultWriter(serializer);
 
             var analyzeResults = new List<AnalyzeResult>
@@ -44,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, source.Token).ConfigureAwait(false);
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, CancellationToken.None).ConfigureAwait(false);
 
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
             if (!File.Exists(filePath))
