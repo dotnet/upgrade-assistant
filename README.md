@@ -67,7 +67,7 @@ The following tutorials will give you a sense of how to upgrade ASP.NET, Windows
 
 Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook)
 
-[![Porting existing ASP.NET apps to .NET Core by Steve "ardalis" Smith](https://user-images.githubusercontent.com/782127/108890126-2c82f680-75db-11eb-9358-dc0a5d877b6d.png)](https://aka.ms/aspnet-porting-ebook)
+[![Porting existing ASP.NET apps to .NET Core by Steve "ardalis" Smith](https://user-images.githubusercontent.com/782127/145730776-4f05fecf-01c3-4587-9e68-b45b42d83e92.png)
 
 ## Installation
 
