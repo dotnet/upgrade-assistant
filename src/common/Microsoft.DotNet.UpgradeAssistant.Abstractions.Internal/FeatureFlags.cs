@@ -24,6 +24,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static bool IsRequested(string name) => _features.Contains(name);
 
-        public static bool AnalyzeFormat() => _features.Contains("FORMAT");
+        public static bool IsAnalyzeFormatEnabled() => _features.Contains("FORMAT");
     }
 }
