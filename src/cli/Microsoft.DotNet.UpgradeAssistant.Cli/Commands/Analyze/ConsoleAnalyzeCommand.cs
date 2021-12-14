@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Threading;
@@ -17,6 +18,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Host.CreateDefaultBuilder()
                     .UseConsoleUpgradeAssistant<ConsoleAnalyze>(options, result)
                     .RunUpgradeAssistantAsync(token));
+
+            if (FeatureFlags.AnalyzeFormat())
+            {
+                AddOption(new Option<string>(new[] { "--format", "--f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
+            }
         }
     }
 }

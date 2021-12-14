@@ -232,6 +232,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specify format of analyze result. If not provided, a sarif file will be produced..
+        /// </summary>
+        internal static string UpgradeAssistantCommandFormat {
+            get {
+                return ResourceManager.GetString("UpgradeAssistantCommandFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Acknowledges that upgrade-assistant will not be able to completely upgrade a project. This indicates that the solution must be redesigned (e.g. consider Blazor to replace Web Forms)..
         /// </summary>
         internal static string UpgradeAssistantCommandIgnoreUnsupported {

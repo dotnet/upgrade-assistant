@@ -84,6 +84,8 @@ namespace Integration.Tests
             public DirectoryInfo? VSPath { get; }
 
             public DirectoryInfo? MSBuildPath { get; }
+
+            public string? Format { get; }
         }
     }
 }
