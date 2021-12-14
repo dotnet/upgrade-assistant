@@ -55,5 +55,43 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             Assert.Equal("https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json", sarifLog.SchemaUri.OriginalString);
             Assert.Equal(SarifVersion.Current, sarifLog.Version);
         }
+
+        [Fact]
+        public async Task ValidateHTML()
+        {
+            var serializer = new JsonSerializer();
+            var writer = new AnalyzeResultWriter(serializer);
+
+            var analyzeResults = new List<AnalyzeResult>
+            {
+                new AnalyzeResult
+                {
+                    FileLocation = "some-file-path",
+                    LineNumber = 1,
+                    ResultMessage = "some result message",
+                    RuleId = "RULE0001",
+                    RuleName = "RuleName0001"
+                }
+            };
+
+            var analyzeResultMap = new List<AnalyzeResultDefinition>
+            {
+                new AnalyzeResultDefinition
+                {
+                    Name = "some-name",
+                    Version = "1.0.0",
+                    InformationURI = new Uri("https://github.com/dotnet/upgrade-assistant"),
+                    AnalysisResults = analyzeResults.ToAsyncEnumerable()
+                }
+            };
+
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), "html", CancellationToken.None).ConfigureAwait(false);
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html");
+            if (!File.Exists(filePath))
+            {
+                Assert.True(false, "File wasn't exported successfully.");
+            }
+        }
     }
 }

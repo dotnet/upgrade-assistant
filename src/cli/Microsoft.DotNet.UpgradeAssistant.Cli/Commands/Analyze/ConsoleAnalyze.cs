@@ -26,7 +26,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             IUpgradeContextFactory contextFactory,
             IUpgradeStateManager stateManager,
             IAnalyzeResultWriter writer,
-            IExtensionProvider extensionProvider, IOptions<AnalysisOptions> options)
+            IExtensionProvider extensionProvider,
+            IOptions<AnalysisOptions> options)
         {
             _providers = analysisProviders ?? throw new ArgumentNullException(nameof(analysisProviders));
             _writer = writer ?? throw new ArgumentNullException(nameof(writer));

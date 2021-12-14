@@ -3,9 +3,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="HTMLTemplate.html" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="HTMLTemplate.html" />
   </ItemGroup>
   <ItemGroup>
