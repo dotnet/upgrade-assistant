@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                await writer.WriteAsync(null, source.Token).ConfigureAwait(false);
+                await writer.WriteAsync(null, null, source.Token).ConfigureAwait(false);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             }).ConfigureAwait(false);
         }
@@ -121,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), source.Token).ConfigureAwait(false);
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, source.Token).ConfigureAwait(false);
 
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
             if (!File.Exists(filePath))
@@ -172,7 +172,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 {
                     Name = "some-name",
                     Version = "1.0.0",
-                    InformationURI = new Uri("https://github.com/dotnet/upgrade-assistant"),
+                    InformationUri = new Uri("https://github.com/dotnet/upgrade-assistant"),
                     AnalysisResults = analyzeResults.ToAsyncEnumerable()
                 }
             };
