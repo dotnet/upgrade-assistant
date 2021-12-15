@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## Version
 
 ### Added
-- Analysis Reports are now available in html format by specifying the format flag and type html
-- Support has been added for developing other types of formatting options for the Analysis Report
+- Added support for analysis report to be generated in HTML format
+(#966)[https://github.com/dotnet/upgrade-assistant/pull/966]
 
 ## Version 0.3.256001 - 2021-11-17 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.256001))
 
