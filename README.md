@@ -98,7 +98,7 @@ dotnet tool install -g upgrade-assistant --ignore-failed-sources
 
 Upgrade-assistant is installed as a NuGet package, so invalid or authenticated sources in [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) can cause installation problems.
 
-To try the latest (and likely less stable) versions of the tool, CI builds are available on the dotnet-tools NuGet feed and can be installed with 
+To try the latest (and likely less stable) versions of the tool, CI builds are available on the dotnet-tools NuGet feed and can be installed with
 
 ```
 dotnet tool install -g upgrade-assistant --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
@@ -174,12 +174,13 @@ Options:
                                                  Preview TFM. See
                                                  https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
                                                  details for what these mean.
+                                                                    --format                                        Specify what format desired. Currently supports html and sarif. 
   --version                                      Show version information
   -?, -h, --help                                 Show help and usage information
 ```
 The output of the analyze command is a report in SARIF format. SARIF is based on JSON and can be viewed using the following viewers:
 
-- Any text editor. 
+- Any text editor.
 - [VS extension for SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=WDGIS.MicrosoftSarifViewer) for a richer experience.
 
 Sample of the report in VS SARIF Viewer : ![Analysis Report](/docs/images/AnalysisReport.PNG)
@@ -235,7 +236,7 @@ The project outputs a log file by default in the working directory called `upgra
 Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to the latets version of .NET (current, LTS, or preview) and beyond in the [roadmap](docs/roadmap.md).
 
 ## Engage, Contribute and Give Feedback
-Some of the best ways to contribute are to use the tool to upgrade your apps to the latest version of .NET (current, LTS, or preview), file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
+Some of the best ways to contribute are to use the tool to upgrade your apps to the latest version of .NET (current, LTS, or preview), file issues for feature-requests or bugs, join in design conversations, and make pull-requests.
 
 Check out the [contributing](/CONTRIBUTING.md) page for more details on the best places to log issues, start discussions, PR process etc.
 

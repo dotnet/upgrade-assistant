@@ -3,6 +3,12 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Version
+
+### Added
+- Analysis Reports are now available in html format by specifying the format flag and type html
+- Support has been added for developing other types of formatting options for the Analysis Report
+
 ## Version 0.3.256001 - 2021-11-17 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.256001))
 
 ### Added
@@ -55,7 +61,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added .NET MAUI extension steps to add TFMs for .NET MAUI [#790](https://github.com/dotnet/upgrade-assistant/pull/790)
     - Adds templates files per project
     - Manages project property transforms as per migration requirements
-    - Makes C# source code updates for new .NET MAUI APIs. 
+    - Makes C# source code updates for new .NET MAUI APIs.
 
 ## Version 0.2.237901 - 2021-07-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.237901))
 
@@ -75,7 +81,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Fixed regression where `--skip-backup` and `--entrypoint` options were not being passed through [#695](https://github.com/dotnet/upgrade-assistant/pull/695)
- 
+
 ## Version 0.2.233001 - 2021-06-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.233001))
 
 ### Added
@@ -130,7 +136,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Multiple entrypoints can now be added by using globbing and multiple instances of the `--entry-point` argument [#425](https://github.com/dotnet/upgrade-assistant/pull/425)
-- NuGet credential providers will now be used, if present (may require running in interactive mode) [#448](https://github.com/dotnet/upgrade-assistant/pull/448) 
+- NuGet credential providers will now be used, if present (may require running in interactive mode) [#448](https://github.com/dotnet/upgrade-assistant/pull/448)
 - Source analyzers and code fix providers are now applied to source embedded in Razor documents [#455](https://github.com/dotnet/upgrade-assistant/pull/455)
 - Persist Backup path in .upgrade-assistant state file [#447](https://github.com/dotnet/upgrade-assistant/pull/447) Thanks for the PR, [@oteione](https://github.com/oteinone)!
 
@@ -139,7 +145,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Do not add _ViewImports.cshtml to VB projects [#378](https://github.com/dotnet/upgrade-assistant/issues/378)
 
 ### Breaking change
-- The commandline argument `-e` is now shorthand for `--entry-point` rather than `--extension` [#425](https://github.com/dotnet/upgrade-assistant/pull/425) 
+- The commandline argument `-e` is now shorthand for `--entry-point` rather than `--extension` [#425](https://github.com/dotnet/upgrade-assistant/pull/425)
 
 ## Version 0.2.220602 - 2021-04-06 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.220602))
 ### Added
