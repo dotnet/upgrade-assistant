@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Telemetry
 
         public string CurrentSessionId { get; set; } = string.Empty;
 
-        internal string TelemetryOptout => $"DOTNET_{ToolName.ToUpperInvariant()}_TELEMTRY_OPTOUT";
+        internal string TelemetryOptout => $"DOTNET_{ToolName.ToUpperInvariant()}_TELEMETRY_OPTOUT";
 
         internal string ProducerNamespace => $"dotnet/{ToolName}";
 
