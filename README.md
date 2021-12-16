@@ -236,7 +236,7 @@ The project outputs a log file by default in the working directory called `upgra
 Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to the latets version of .NET (current, LTS, or preview) and beyond in the [roadmap](docs/roadmap.md).
 
 ## Engage, Contribute and Give Feedback
-Some of the best ways to contribute are to use the tool to upgrade your apps to the latest version of .NET (current, LTS, or preview), file issues for feature-requests or bugs, join in design conversations, and make pull-requests.
+Some of the best ways to contribute are to use the tool to upgrade your apps to the latest version of .NET (current, LTS, or preview), file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
 
 Check out the [contributing](/CONTRIBUTING.md) page for more details on the best places to log issues, start discussions, PR process etc.
 
