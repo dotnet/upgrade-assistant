@@ -174,7 +174,7 @@ Options:
                                                  Preview TFM. See
                                                  https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
                                                  details for what these mean.
-  --format                                       Specify what format desired. Currently supports html and sarif. 
+  --format  <HTML>                                     Specify the format in which the analysis report will be generated. Currently supports html other than the default SARIF format. 
   --version                                      Show version information
   -?, -h, --help                                 Show help and usage information
 ```
