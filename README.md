@@ -180,7 +180,7 @@ Options:
 ```
 The output of the analyze command is a report in SARIF format. SARIF is based on JSON and can be viewed using the following viewers:
 
-- Any text editor.
+- Any text editor. 
 - [VS extension for SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=WDGIS.MicrosoftSarifViewer) for a richer experience.
 
 Sample of the report in VS SARIF Viewer : ![Analysis Report](/docs/images/AnalysisReport.PNG)
