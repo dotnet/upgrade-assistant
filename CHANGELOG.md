@@ -61,7 +61,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added .NET MAUI extension steps to add TFMs for .NET MAUI [#790](https://github.com/dotnet/upgrade-assistant/pull/790)
     - Adds templates files per project
     - Manages project property transforms as per migration requirements
-    - Makes C# source code updates for new .NET MAUI APIs.
+    - Makes C# source code updates for new .NET MAUI APIs. 
 
 ## Version 0.2.237901 - 2021-07-30 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.2.237901))
 
