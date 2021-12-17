@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                await writer.WriteAsync(null, source.Token).ConfigureAwait(false);
+                await writer.WriteAsync(null, null, source.Token).ConfigureAwait(false);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             }).ConfigureAwait(false);
         }
@@ -33,7 +33,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
         public async Task ValidateSarifMetadata()
         {
             var serializer = new JsonSerializer();
-            using var source = new CancellationTokenSource();
             var writer = new AnalyzeResultWriter(serializer);
 
             var analyzeResults = new List<AnalyzeResult>
@@ -61,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), source.Token).ConfigureAwait(false);
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, CancellationToken.None).ConfigureAwait(false);
 
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
             if (!File.Exists(filePath))
@@ -122,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), source.Token).ConfigureAwait(false);
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, source.Token).ConfigureAwait(false);
 
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
             if (!File.Exists(filePath))
@@ -147,6 +146,44 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             Assert.Equal(lastAnalyzeResult.RuleId, lastRule.Id);
             Assert.Equal(lastAnalyzeResult.RuleName, lastRule.FullDescription.Text);
             Assert.Equal(lastAnalyzeResult.HelpUri, lastRule.HelpUri);
+        }
+
+        [Fact]
+        public async Task ValidateHTML()
+        {
+            var serializer = new JsonSerializer();
+            var writer = new AnalyzeResultWriter(serializer);
+
+            var analyzeResults = new List<AnalyzeResult>
+            {
+                new AnalyzeResult
+                {
+                    FileLocation = "some-file-path",
+                    LineNumber = 1,
+                    ResultMessage = "some result message",
+                    RuleId = "RULE0001",
+                    RuleName = "RuleName0001"
+                }
+            };
+
+            var analyzeResultMap = new List<AnalyzeResultDefinition>
+            {
+                new AnalyzeResultDefinition
+                {
+                    Name = "some-name",
+                    Version = "1.0.0",
+                    InformationUri = new Uri("https://github.com/dotnet/upgrade-assistant"),
+                    AnalysisResults = analyzeResults.ToAsyncEnumerable()
+                }
+            };
+
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), "html", CancellationToken.None).ConfigureAwait(false);
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html");
+            if (!File.Exists(filePath))
+            {
+                Assert.True(false, "File wasn't exported successfully.");
+            }
         }
     }
 }

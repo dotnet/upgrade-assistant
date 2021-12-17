@@ -438,6 +438,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public DirectoryInfo? VSPath { get; set; }
 
             public DirectoryInfo? MSBuildPath { get; set; }
+
+            public string? Format { get; set; }
         }
     }
 }

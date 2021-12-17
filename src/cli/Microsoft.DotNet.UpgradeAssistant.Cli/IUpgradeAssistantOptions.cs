@@ -24,5 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         DirectoryInfo? VSPath { get; }
 
         DirectoryInfo? MSBuildPath { get; }
+
+        string? Format { get; }
     }
 }

@@ -72,7 +72,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     services.AddHostedService<ConsoleRunner>();
                     services.AddStepManagement();
                     services.AddStateFactory(upgradeOptions);
-
                     services.AddExtensions()
                         .AddDefaultExtensions(context.Configuration)
                         .AddFromEnvironmentVariables(context.Configuration)
@@ -107,7 +106,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     });
 
                     services.AddUserInput();
-                    services.AddAnalysis();
+                    services.AddAnalysis(options =>
+                    {
+                        options.Format = upgradeOptions.Format;
+                    });
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();
