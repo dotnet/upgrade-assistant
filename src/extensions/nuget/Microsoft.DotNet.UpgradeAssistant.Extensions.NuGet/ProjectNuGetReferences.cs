@@ -173,7 +173,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             if (target is null)
             {
                 _logger.LogError("NuGet target in project.assets.json is still unavailable after restore. Please verify that the project has been restored.");
-                throw new UpgradeException("Restore has not restored the expected TFMs. Please review any warnings from dotnet-restore.");
+                throw new UpgradeException("Restore has not restored the expected TFMs. Please review any warnings from dotnet restore.");
             }
 
             foreach (var library in target.Libraries)
