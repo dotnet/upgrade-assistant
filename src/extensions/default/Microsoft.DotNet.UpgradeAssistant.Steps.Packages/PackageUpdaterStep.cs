@@ -23,8 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     /// </summary>
     public class PackageUpdaterStep : UpgradeStep
     {
-        private const int MaxAnalysisIterations = 3;
-
         private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
@@ -130,51 +128,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             var project = context.CurrentProject.Required();
 
-            try
+            var projectFile = project.GetFile();
+
+            if (_analysisState is not null)
             {
-                var projectFile = project.GetFile();
+                projectFile.RemoveReferences(_analysisState.References.Deletions.Select(i => i.Item));
 
-                var count = 0;
-                do
-                {
-                    if (count >= MaxAnalysisIterations)
-                    {
-                        Logger.LogError("Maximum package analysis and update iterations reached. Review NuGet dependencies manually");
-                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Maximum package analysis and update iterations reached");
-                    }
+                projectFile.RemovePackages(_analysisState.Packages.Deletions.Select(i => i.Item));
+                projectFile.AddPackages(_analysisState.Packages.Additions.Select(i => i.Item));
 
-                    if (_analysisState is not null)
-                    {
-                        projectFile.RemoveReferences(_analysisState.References.Deletions.Select(i => i.Item));
+                projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferences.Deletions.Select(i => i.Item));
+                projectFile.AddFrameworkReferences(_analysisState.FrameworkReferences.Additions.Select(i => i.Item));
 
-                        projectFile.RemovePackages(_analysisState.Packages.Deletions.Select(i => i.Item));
-                        projectFile.AddPackages(_analysisState.Packages.Additions.Select(i => i.Item));
-
-                        projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferences.Deletions.Select(i => i.Item));
-                        projectFile.AddFrameworkReferences(_analysisState.FrameworkReferences.Additions.Select(i => i.Item));
-
-                        await projectFile.SaveAsync(token).ConfigureAwait(false);
-                        count++;
-
-                        Logger.LogDebug("Re-running analysis to check whether additional changes are needed");
-                        _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, project.TargetFrameworks, token).ConfigureAwait(false);
-                        if (!_analysisState.IsValid)
-                        {
-                            return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Package analysis failed");
-                        }
-                    }
-                }
-                while (_analysisState is not null && _analysisState.AreChangesRecommended);
-
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
+                await projectFile.SaveAsync(token).ConfigureAwait(false);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception exc)
-#pragma warning restore CA1031 // Do not catch general exception types
-            {
-                Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}");
-            }
+
+            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
         }
     }
 }
