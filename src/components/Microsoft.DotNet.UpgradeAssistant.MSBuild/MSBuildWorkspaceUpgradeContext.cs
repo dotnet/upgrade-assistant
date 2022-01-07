@@ -88,14 +88,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IProject GetProject(string path)
         {
-            if (_projectCache.TryGetValue(path, out var cached))
+            // Normalize to ensure we're always getting the same path
+            var normalizedPath = Path.GetFullPath(path);
+
+            if (_projectCache.TryGetValue(normalizedPath, out var cached))
             {
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, new FileInfo(path), _logger);
+            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, new FileInfo(normalizedPath), _logger);
 
-            _projectCache.Add(path, project);
+            _projectCache.Add(normalizedPath, project);
 
             return project;
         }
