@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         IEnumerable<IProject> EntryPoints { get; set; }
 
         /// <summary>
-        /// This property is intended for query operations only and will be updated by UpgraderManager. Changing this property will not change the control flow.
+        /// Gets or sets the current step. This property is intended for query operations only and will be updated by UpgraderManager. Changing this property will not change the control flow.
         /// </summary>
         UpgradeStep? CurrentStep { get; set; }
 
@@ -29,6 +29,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         void SetCurrentProject(IProject? project);
 
         IEnumerable<IProject> Projects { get; }
+
+        IProject GetProject(string path);
 
         bool InputIsSolution { get; }
 

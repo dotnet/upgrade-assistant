@@ -6,9 +6,12 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
+    /// <summary>
+    /// A system to track experimental features. Please keep in sync with the README section 'Experimental features'.
+    /// </summary>
     public static class FeatureFlags
     {
-        private static ICollection<string> _features = CreateFeatures();
+        private static readonly ICollection<string> _features = CreateFeatures();
 
         private static ICollection<string> CreateFeatures()
         {
@@ -22,8 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return new HashSet<string>(features.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
         }
 
-        public static bool IsRequested(string name) => _features.Contains(name);
+        public static bool IsAnalyzeFormatEnabled => _features.Contains("ANALYZE_OUTPUT_FORMAT");
 
-        public static bool IsAnalyzeFormatEnabled() => _features.Contains("FORMAT");
+        public static bool IsSolutionWideSdkConversionEnabled => _features.Contains("SOLUTION_WIDE_SDK_CONVERSION");
     }
 }
