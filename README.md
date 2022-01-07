@@ -46,6 +46,15 @@ When run on a solution in order to analyze dependencies prior to upgrade, the to
 
 Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md).
 
+### Experimental features
+
+Feature flags can be used to turn some experimental features on or off. Functionality behind feature flags may or may not be made public and are considered a way to test features that may be unstable. In order to enable a feature, set an environment variable to a semi-colon delimited list of feature names. For example: `$env:UA_FEATURES="FEATURE1;FEATURE2"`.
+
+Current features that are available to try out include:
+
+- `ANALYZE_OUTPUT_FORMAT`: Enables a `--format` flag for the `analyze` command that can take other options. Currently restricted to `sarif` and `html`
+- `SOLUTION_WIDE_SDK_CONVERSION`: Switches project format conversion from old style project files to SDK style to be solution wide first before any other changes to the project files.
+
 ### Optional Features
 
 Some features within Upgrade Assistant may be enabled by adding extensions. Available extensions can be viewed on [here](https://www.nuget.org/packages?packagetype=UpgradeAssistantExtension&sortby=relevance&q=&prerel=True).

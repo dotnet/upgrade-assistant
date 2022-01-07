@@ -86,16 +86,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ProjectCollection.Dispose();
         }
 
-        public IProject GetOrAddProject(FileInfo path)
+        public IProject GetProject(string path)
         {
-            if (_projectCache.TryGetValue(path.FullName, out var cached))
+            // Normalize to ensure we're always getting the same path
+            var normalizedPath = Path.GetFullPath(path);
+
+            if (_projectCache.TryGetValue(normalizedPath, out var cached))
             {
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, path, _logger);
+            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, new FileInfo(normalizedPath), _logger);
 
-            _projectCache.Add(path.FullName, project);
+            _projectCache.Add(normalizedPath, project);
 
             return project;
         }
@@ -111,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 foreach (var path in _entryPointPaths)
                 {
-                    yield return GetOrAddProject(path);
+                    yield return GetProject(path.FullName);
                 }
             }
 
@@ -138,7 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     }
                     else
                     {
-                        yield return GetOrAddProject(new FileInfo(project.FilePath));
+                        yield return GetProject(project.FilePath);
                     }
                 }
             }
@@ -223,7 +226,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     return null;
                 }
 
-                return GetOrAddProject(_projectPath);
+                return GetProject(_projectPath.FullName);
             }
         }
 

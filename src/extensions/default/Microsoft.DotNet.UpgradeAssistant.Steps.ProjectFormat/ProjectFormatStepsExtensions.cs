@@ -20,8 +20,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             services.Services.AddUpgradeStep<SetTFMStep>();
-            services.Services.AddUpgradeStep<TryConvertProjectConverterStep>();
+
+            if (FeatureFlags.IsSolutionWideSdkConversionEnabled)
+            {
+                services.Services.AddUpgradeStep<SdkStyleConversionSolutionWideStep>();
+            }
+            else
+            {
+                services.Services.AddUpgradeStep<TryConvertProjectConverterStep>();
+            }
+
             services.Services.AddTransient<ITryConvertTool, TryConvertInProcessTool>();
+            services.Services.AddTransient<TryConvertRunner>();
 
             return services.Services.AddOptions<TryConvertOptions>()
                 .PostConfigure(options =>
