@@ -11,13 +11,4 @@
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.csproj" />
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="W:\migration\UpgradeAssistant\shared\Common\SR.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="W:\migration\UpgradeAssistant\shared\Common\NullableAttributes.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="W:\migration\UpgradeAssistant\shared\Common\IsExternalInit.cs" />
-  </ItemGroup>
 </Project>
