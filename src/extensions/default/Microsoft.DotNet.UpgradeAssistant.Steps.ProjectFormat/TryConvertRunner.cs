@@ -64,32 +64,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             var projectFile = project.GetFile();
 
-            try
+            // SDK-style projects should reference the Microsoft.NET.Sdk SDK
+            if (!projectFile.IsSdk)
             {
-                // SDK-style projects should reference the Microsoft.NET.Sdk SDK
-                if (!projectFile.IsSdk)
-                {
-                    _logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
+                _logger.LogDebug("Project {ProjectPath} not yet converted", projectFile.FilePath);
 
-                    var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+                var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
 
-                    return new UpgradeStepInitializeResult(
-                        UpgradeStepStatus.Incomplete,
-                        $"Project {projectFile.FilePath} is not an SDK project. Applying this step will convert the project to SDK style.",
-                        components.HasFlag(ProjectComponents.AspNetCore) ? BuildBreakRisk.High : BuildBreakRisk.Medium);
-                }
-                else
-                {
-                    _logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.Sdk);
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
-                }
+                return new UpgradeStepInitializeResult(
+                    UpgradeStepStatus.Incomplete,
+                    $"Project {projectFile.FilePath} is not an SDK project. Applying this step will convert the project to SDK style.",
+                    components.HasFlag(ProjectComponents.AspNetCore) ? BuildBreakRisk.High : BuildBreakRisk.Medium);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception exc)
-#pragma warning restore CA1031 // Do not catch general exception types
+            else
             {
-                _logger.LogError(exc, "Failed to open project {ProjectPath}", projectFile.FilePath);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Failed to open project {projectFile.FilePath}", BuildBreakRisk.Unknown);
+                _logger.LogDebug("Project {ProjectPath} already targets SDK {SDK}", projectFile.FilePath, projectFile.Sdk);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project already targets {projectFile.Sdk} SDK", BuildBreakRisk.None);
             }
         }
 
