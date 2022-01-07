@@ -41,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
         }
 
-        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(true);
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is null);
 
         public override IEnumerable<UpgradeStep> SubSteps => _substeps ?? Enumerable.Empty<UpgradeStep>();
 
@@ -54,11 +54,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 
             if (_substeps is null)
             {
-                _substeps = context.EntryPoints.PostOrderTraversal(t => t.ProjectReferences)
-                    .Select(p => new ProjectSdkConversionStep(_runner, p.FileInfo, Logger))
+                var all = context.EntryPoints.PostOrderTraversal(t => t.ProjectReferences)
+                    .Select(p => (new ProjectSdkConversionStep(_runner, p.FileInfo, Logger), p.GetFile().IsSdk))
                     .ToList();
 
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Some projects may need to be converted to SDK style.", BuildBreakRisk.High));
+                _substeps = all.Select(a => a.Item1);
+
+                if (all.All(a => a.IsSdk))
+                {
+                    return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "ALl projects are already SDK style.", BuildBreakRisk.None));
+                }
+                else
+                {
+                    return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "Some projects need to be converted to SDK style.", BuildBreakRisk.High));
+                }
             }
             else
             {
