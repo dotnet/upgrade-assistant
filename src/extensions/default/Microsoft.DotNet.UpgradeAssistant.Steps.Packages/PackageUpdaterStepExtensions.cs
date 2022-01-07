@@ -23,7 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.Services.AddUpgradeStep<PackageUpdaterPreTFMStep>();
             services.Services.AddUpgradeStep<PackageUpdaterStep>();
-            services.Services.AddUpgradeStep<TransitiveReferenceUpgradeStep>();
             services.Services.AddTransient<IDependencyAnalyzerRunner, DependencyAnalyzerRunner>();
             services.Services.AddTransient<IAnalyzeResultProvider, PackageAnalyzerResultProvider>();
 

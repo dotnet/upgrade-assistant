@@ -9,7 +9,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public const string ConfigUpdaterStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.ConfigUpdaterStep";
         public const string PackageUpdaterPreTFMStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterPreTFMStep";
         public const string PackageUpdaterStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep";
-        public const string TransitivePackagesReducerStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.TransitiveReferenceUpgradeStep";
         public const string TryConvertProjectConverterStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep";
         public const string SetTFMStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep";
         public const string CurrentProjectSelectionStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Solution.CurrentProjectSelectionStep";

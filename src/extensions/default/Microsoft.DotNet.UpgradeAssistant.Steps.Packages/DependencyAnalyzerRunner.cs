@@ -13,17 +13,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     public class DependencyAnalyzerRunner : IDependencyAnalyzerRunner
     {
         private readonly IPackageRestorer _packageRestorer;
+        private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
         private readonly ILogger<DependencyAnalyzerRunner> _logger;
 
         public DependencyAnalyzerRunner(
             IPackageRestorer packageRestorer,
+            IEnumerable<IDependencyAnalyzer> packageAnalyzers,
             ILogger<DependencyAnalyzerRunner> logger)
         {
+            if (packageAnalyzers is null)
+            {
+                throw new ArgumentNullException(nameof(packageAnalyzers));
+            }
+
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
+            _packageAnalyzers = packageAnalyzers.OrderyByPrecedence();
             _logger = logger;
         }
 
-        public async Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, IEnumerable<IDependencyAnalyzer> analyzers, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, CancellationToken token)
+        public async Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, CancellationToken token)
         {
             if (projectRoot is null)
             {
@@ -31,16 +39,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new ArgumentNullException(nameof(projectRoot));
             }
 
-            if (analyzers is null)
-            {
-                throw new ArgumentNullException(nameof(analyzers));
-            }
-
             await _packageRestorer.RestorePackagesAsync(context, projectRoot, token).ConfigureAwait(false);
             var analysisState = new DependencyAnalysisState(projectRoot, projectRoot.NuGetReferences, targetframeworks);
 
             // Iterate through all package references in the project file
-            foreach (var analyzer in analyzers)
+            foreach (var analyzer in _packageAnalyzers)
             {
                 _logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
                 try

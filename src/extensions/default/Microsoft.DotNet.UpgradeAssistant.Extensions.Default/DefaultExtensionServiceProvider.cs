@@ -74,6 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
         {
             // Add package analyzers (note that the order matters as the analyzers are run in the order registered)
             services.AddTransient<IDependencyAnalyzer, DuplicateReferenceAnalyzer>();
+            services.AddTransient<IDependencyAnalyzer, TransitiveReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, PackageMapReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, TargetCompatibilityReferenceAnalyzer>();
             services.AddTransient<IDependencyAnalyzer, UpgradeAssistantReferenceAnalyzer>();
