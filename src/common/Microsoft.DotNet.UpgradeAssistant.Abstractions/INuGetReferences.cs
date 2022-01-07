@@ -44,5 +44,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <param name="token">A cancellation token.</param>
         /// <returns>Returns whether the package is transitively referenced.</returns>
         ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token);
+
+        /// <summary>
+        /// Checks if a particular version of a package is transitively referenced via other packages or projects.
+        /// This does not check whether the package is directly referenced or not and will always return false
+        /// for projects not using PackageReference package references.
+        /// </summary>
+        /// <param name="nugetReference">The package identity.</param>
+        /// <param name="projectReferences">Collection of project references that are to be included.</param>
+        /// <param name="token">A cancellation token.</param>
+        /// <returns>Returns whether the package is transitively referenced.</returns>
+        ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, IEnumerable<NuGetReference> projectReferences, CancellationToken token);
     }
 }

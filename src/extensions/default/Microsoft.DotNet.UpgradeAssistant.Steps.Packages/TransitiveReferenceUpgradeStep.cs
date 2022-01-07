@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
@@ -17,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         {
         }
 
-        public override string Id => typeof(TransitiveReferenceUpgradeStep).FullName;
+        public override string Id => WellKnownStepIds.TransitivePackagesReducerStepId;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
@@ -31,6 +32,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private class TransitiveReferenceAnalyzer : IDependencyAnalyzer
         {
+            private const int MAX_ITERATIONS = 5;
+
             private readonly ILogger _logger;
 
             public string Name => "Transitive reference analyzer";
@@ -52,15 +55,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     throw new ArgumentNullException(nameof(state));
                 }
 
-                // If the package is referenced transitively, mark for removal
-                foreach (var packageReference in state.Packages)
+                bool completed;
+                var count = 0;
+
+                do
                 {
-                    if (await project.NuGetReferences.IsTransitiveDependencyAsync(packageReference, token).ConfigureAwait(false))
+                    if (count++ < MAX_ITERATIONS)
                     {
-                        _logger.LogInformation("Marking package {PackageName} for removal because it appears to be a transitive dependency", packageReference.Name);
-                        state.Packages.Remove(packageReference, new OperationDetails());
+                        _logger.LogError("Maximum iterations ({MaxIterations}) was hit attempting to reduce transitive dependencies", MAX_ITERATIONS);
+                        return;
+                    }
+
+                    completed = true;
+                    var currentSet = state.Packages.Except(state.Packages.Deletions.Select(d => d.Item)).ToList();
+
+                    // If the package is referenced transitively, mark for removal
+                    foreach (var packageReference in currentSet)
+                    {
+                        if (await project.NuGetReferences.IsTransitiveDependencyAsync(packageReference, currentSet, token).ConfigureAwait(false))
+                        {
+                            state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
+                            completed = false;
+                        }
                     }
                 }
+                while (!completed);
             }
         }
     }

@@ -92,8 +92,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             => PackageReferences.Any(p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase))
             || (PackageReferenceFormat == NugetPackageFormat.PackageReference && await _project.TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => string.Equals(packageName, d.Id, StringComparison.OrdinalIgnoreCase), token), cancellationToken: token).ConfigureAwait(false));
 
-        public async ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token)
-            => PackageReferenceFormat == NugetPackageFormat.PackageReference && await _project.TargetFrameworks.ToAsyncEnumerable().AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => ReferenceSatisfiesDependency(d, nugetReference, true), token), token).ConfigureAwait(false);
+        public ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token)
+            => IsTransitiveDependencyAsync(nugetReference, PackageReferences, token);
+
+        public async ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, IEnumerable<NuGetReference> projectReferences, CancellationToken token)
+        {
+            if (PackageReferenceFormat != NugetPackageFormat.PackageReference)
+            {
+                return false;
+            }
+
+            var set = new HashSet<string>(projectReferences.Select(p => p.Name));
+
+            return await _project.TargetFrameworks
+                .ToAsyncEnumerable()
+                .AnyAwaitAsync(tfm => ContainsPackageDependencyAsync(tfm, d => set.Contains(d.Id) && ReferenceSatisfiesDependency(d, nugetReference, true), token), token)
+                .ConfigureAwait(false);
+        }
 
         private static bool ReferenceSatisfiesDependency(PackageDependency dependency, NuGetReference packageReference, bool minVersionMatchOnly)
         {
