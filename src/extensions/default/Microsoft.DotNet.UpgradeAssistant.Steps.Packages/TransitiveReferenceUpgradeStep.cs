@@ -32,8 +32,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         private class TransitiveReferenceAnalyzer : IDependencyAnalyzer
         {
-            private const int MAX_ITERATIONS = 5;
-
             private readonly ILogger _logger;
 
             public string Name => "Transitive reference analyzer";
@@ -58,11 +56,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 bool completed;
                 var count = 0;
 
+                // The maximum iterations should be the number of packages. This is the worst case when all the packages are brought in by referencing a single package.
+                var maxIterations = state.Packages.Count();
+
                 do
                 {
-                    if (count++ < MAX_ITERATIONS)
+                    if (count++ > maxIterations)
                     {
-                        _logger.LogError("Maximum iterations ({MaxIterations}) was hit attempting to reduce transitive dependencies", MAX_ITERATIONS);
+                        _logger.LogError("Maximum iterations ({MaxIterations}) was hit attempting to reduce transitive dependencies", maxIterations);
                         return;
                     }
 

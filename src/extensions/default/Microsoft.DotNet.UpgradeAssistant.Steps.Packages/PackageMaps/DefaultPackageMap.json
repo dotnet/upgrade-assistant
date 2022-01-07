@@ -9,6 +9,23 @@
     ]
   },
   {
+    "PackageSetName": "Microsoft.Bcl",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.Bcl",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Bcl.Build",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Bcl.Async",
+        "Version": "*"
+      }
+    ]
+  },
+  {
     "PackageSetName": "PowerShell",
     "NetCorePackagesWorkOnNetFx": true,
     "NetFrameworkPackages": [

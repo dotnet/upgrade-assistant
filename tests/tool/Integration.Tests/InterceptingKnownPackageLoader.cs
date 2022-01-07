@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,11 @@ namespace Integration.Tests
 
         public async Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
         {
+            if (packageName == "ControlzEx")
+            {
+                Debugger.Break();
+            }
+
             if (_packages.TryGetValue(packageName, out var known))
             {
                 return known;
@@ -51,6 +57,11 @@ namespace Integration.Tests
 
         public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
         {
+            if (reference.Name == "ControlzEx")
+            {
+                Debugger.Break();
+            }
+
             if (_packages.TryGetValue(reference.Name, out var known))
             {
                 return new NuGetReference[] { known };
