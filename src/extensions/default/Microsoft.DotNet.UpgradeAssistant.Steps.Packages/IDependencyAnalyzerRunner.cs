@@ -10,6 +10,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public interface IDependencyAnalyzerRunner
     {
-        Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, CancellationToken token);
+        Task<IDependencyAnalysisState> AnalyzeAsync(IUpgradeContext context, IProject? projectRoot, IEnumerable<IDependencyAnalyzer> analyzers, IReadOnlyCollection<TargetFrameworkMoniker> targetframeworks, CancellationToken token);
     }
 }

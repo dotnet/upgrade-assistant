@@ -23,7 +23,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     /// </summary>
     public class PackageUpdaterStep : UpgradeStep
     {
-        private readonly IPackageRestorer _packageRestorer;
         private readonly IEnumerable<IDependencyAnalyzer> _packageAnalyzers;
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
 
@@ -53,13 +52,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         };
 
         public PackageUpdaterStep(
-            IPackageRestorer packageRestorer,
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
             IDependencyAnalyzerRunner packageAnalyzer,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
-            _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
             _packageAnalyzers = packageAnalyzers ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
@@ -77,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             try
             {
                 var currentProject = context.CurrentProject.Required();
-                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, currentProject, currentProject.TargetFrameworks, token).ConfigureAwait(false);
+                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, currentProject, _packageAnalyzers, currentProject.TargetFrameworks, token).ConfigureAwait(false);
                 if (!_analysisState.IsValid)
                 {
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);

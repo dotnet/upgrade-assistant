@@ -22,6 +22,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private readonly Uri _helpUri = new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
         private readonly ITargetFrameworkSelector _tfmSelector;
+        private readonly IEnumerable<IDependencyAnalyzer> _dependencyAnalyzers;
+
         private IDependencyAnalysisState? _analysisState;
 
         private ILogger Logger { get; }
@@ -30,12 +32,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
-        public PackageAnalyzerResultProvider(IDependencyAnalyzerRunner packageAnalyzer,
+        public PackageAnalyzerResultProvider(
+            IDependencyAnalyzerRunner packageAnalyzer,
+            IEnumerable<IDependencyAnalyzer> analyzers,
             ITargetFrameworkSelector tfmSelector,
             ILogger<PackageAnalyzerResultProvider> logger)
         {
             Logger = logger;
             _tfmSelector = tfmSelector;
+            _dependencyAnalyzers = analyzers;
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
             _analysisState = null;
         }
@@ -65,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 try
                 {
-                    _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, targetframeworks, token).ConfigureAwait(false);
+                    _analysisState = await _packageAnalyzer.AnalyzeAsync(context, project, _dependencyAnalyzers, targetframeworks, token).ConfigureAwait(false);
                     if (!_analysisState.IsValid)
                     {
                         Logger.LogError($"Package analysis failed");

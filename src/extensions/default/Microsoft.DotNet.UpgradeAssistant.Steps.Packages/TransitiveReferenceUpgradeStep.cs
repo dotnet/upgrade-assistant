@@ -12,11 +12,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
     public class TransitiveReferenceUpgradeStep : PackageUpdaterStep
     {
-        public TransitiveReferenceUpgradeStep(
-            IPackageRestorer packageRestorer,
-            IDependencyAnalyzerRunner runner,
-            ILogger<TransitiveReferenceUpgradeStep> logger)
-            : base(packageRestorer, new[] { new TransitiveReferenceAnalyzer(logger) }, runner, logger)
+        public TransitiveReferenceUpgradeStep(IDependencyAnalyzerRunner runner, ILogger<TransitiveReferenceUpgradeStep> logger)
+            : base(new[] { new TransitiveReferenceAnalyzer(logger) }, runner, logger)
         {
         }
 
