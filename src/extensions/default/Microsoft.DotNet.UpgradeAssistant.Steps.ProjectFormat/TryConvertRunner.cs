@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -11,20 +10,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
 {
     public class TryConvertRunner
     {
-        private readonly ITryConvertTool _runner;
+        private readonly ITryConvertTool _tool;
         private readonly IPackageRestorer _restorer;
         private readonly ILogger _logger;
 
-        public TryConvertRunner(ITryConvertTool runner, IPackageRestorer restorer, ILogger<TryConvertRunner> logger)
+        public TryConvertRunner(ITryConvertTool tool, IPackageRestorer restorer, ILogger<TryConvertRunner> logger)
         {
-            _runner = runner;
+            _tool = tool;
             _restorer = restorer;
             _logger = logger;
         }
 
-        public string VersionString => _runner?.Version is null ? string.Empty : $", version {_runner.Version}";
+        public string VersionString => _tool?.Version is null ? string.Empty : $", version {_tool.Version}";
 
-        public string Path => _runner.Path;
+        public string Path => _tool.Path;
 
         public async Task<UpgradeStepApplyResult> ApplyAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
@@ -58,9 +57,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
                 throw new ArgumentNullException(nameof(project));
             }
 
-            if (!_runner.IsAvailable)
+            if (!_tool.IsAvailable)
             {
-                throw new UpgradeException($"try-convert not found: {_runner.Path}");
+                throw new UpgradeException($"try-convert not found: {_tool.Path}");
             }
 
             var projectFile = project.GetFile();
@@ -98,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
         {
             _logger.LogInformation($"Converting project file format with try-convert{VersionString}");
 
-            var result = await _runner.RunAsync(context, project, token).ConfigureAwait(false);
+            var result = await _tool.RunAsync(context, project, token).ConfigureAwait(false);
 
             // Reload the workspace since an external process worked on and
             // may have changed the workspace's project.
