@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             // If the package is referenced transitively, mark for removal
             foreach (var packageReference in state.Packages)
             {
-                if (await project.NuGetReferences.IsTransitiveDependencyAsync(packageReference, state.Packages, token).ConfigureAwait(false))
+                if (await project.NuGetReferences.IsTransitiveDependencyAsync(packageReference, token).ConfigureAwait(false))
                 {
                     state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
                 }
