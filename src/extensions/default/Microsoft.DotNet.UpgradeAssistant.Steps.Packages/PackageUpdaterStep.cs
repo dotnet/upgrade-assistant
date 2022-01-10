@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
     {
         private readonly IDependencyAnalyzerRunner _packageAnalyzer;
 
-        private IDependencyAnalysisState? _analysisState;
+        private IEnumerable<UpgradeStep>? _subSteps;
 
         public override string Description => "Update package references to versions compatible with the target framework";
 
@@ -56,10 +56,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             : base(logger)
         {
             _packageAnalyzer = packageAnalyzer ?? throw new ArgumentNullException(nameof(packageAnalyzer));
-            _analysisState = null;
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
+
+        public override IEnumerable<UpgradeStep> SubSteps => _subSteps ?? Enumerable.Empty<UpgradeStep>();
+
+        private async ValueTask<IDependencyAnalysisState?> GetAnalysisState(IUpgradeContext context, CancellationToken token)
+        {
+            try
+            {
+                var currentProject = context.CurrentProject.Required();
+                return await _packageAnalyzer.AnalyzeAsync(context, currentProject, currentProject.TargetFrameworks, token).ConfigureAwait(false);
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception exc)
+#pragma warning restore CA1031 // Do not catch general exception types
+            {
+                Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
+                return null;
+            }
+        }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -68,49 +85,40 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new ArgumentNullException(nameof(context));
             }
 
-            try
+            var analysis = await GetAnalysisState(context, token).ConfigureAwait(false);
+
+            if (analysis is null || !analysis.IsValid)
             {
-                var currentProject = context.CurrentProject.Required();
-                _analysisState = await _packageAnalyzer.AnalyzeAsync(context, currentProject, currentProject.TargetFrameworks, token).ConfigureAwait(false);
-                if (!_analysisState.IsValid)
-                {
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Package analysis failed", BuildBreakRisk.Unknown);
-                }
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception exc)
-#pragma warning restore CA1031 // Do not catch general exception types
-            {
-                Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception analyzing package references for: {context.CurrentProject.Required().FileInfo}", BuildBreakRisk.Unknown);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Package analysis failed", BuildBreakRisk.Unknown);
             }
 
-            if (_analysisState is null || !_analysisState.AreChangesRecommended)
+            if (!analysis.AreChangesRecommended)
             {
                 Logger.LogInformation("No package updates needed");
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
             }
-            else
+
+            var steps = new List<UpgradeStep>();
+
+            AddSubsteps(analysis.References.Deletions, "Remove reference '{0}'", static t => t.Name, static (file, op) => file.RemoveReferences(new[] { op.Item }));
+            AddSubsteps(analysis.Packages.Deletions, "Remove package '{0}'", static t => t.Name, static (file, op) => file.RemovePackages(new[] { op.Item }));
+            AddSubsteps(analysis.Packages.Additions, "Add package '{0}'", static t => t.Name, static (file, op) => file.AddPackages(new[] { op.Item }));
+            AddSubsteps(analysis.FrameworkReferences.Deletions, "Remove framework reference '{0}'", static t => t.Name, static (file, op) => file.RemoveFrameworkReferences(new[] { op.Item }));
+            AddSubsteps(analysis.FrameworkReferences.Additions, "Add framework reference '{0}'", static t => t.Name, static (file, op) => file.AddFrameworkReferences(new[] { op.Item }));
+
+            void AddSubsteps<T>(IEnumerable<Operation<T>> items, string messageFormat, Func<T, string> textFactory, Action<IProjectFile, Operation<T>> action)
             {
-                LogDetails("References to be removed: {References}", _analysisState.References.Deletions);
-                LogDetails("References to be added: {References}", _analysisState.References.Additions);
-                LogDetails("Packages to be removed: {Packages}", _analysisState.Packages.Deletions);
-                LogDetails("Packages to be added: {Packages}", _analysisState.Packages.Additions);
-                LogDetails("Framework references to be added: {FrameworkReference}", _analysisState.FrameworkReferences.Additions);
-                LogDetails("Framework references to be removed: {FrameworkReference}", _analysisState.FrameworkReferences.Deletions);
-
-                void LogDetails<T>(string name, IReadOnlyCollection<Operation<T>> collection)
+                foreach (var item in items)
                 {
-                    if (collection.Count > 0)
-                    {
-                        Logger.LogInformation(name, string.Join(Environment.NewLine, collection.Select(o => o.Item)));
-                    }
+                    steps.Add(new PackageManipulationStep<T>(item, SR.Format(messageFormat, textFactory(item.Item)), action, Logger));
                 }
-
-                return new UpgradeStepInitializeResult(
-                    UpgradeStepStatus.Incomplete,
-                    $"{_analysisState.References.Deletions.Count} references need removed, {_analysisState.Packages.Deletions.Count} packages need removed, and {_analysisState.Packages.Additions.Count} packages need added", Risk: _analysisState.Risk);
             }
+
+            _subSteps = steps;
+
+            return new UpgradeStepInitializeResult(
+                UpgradeStepStatus.Incomplete,
+                $"{analysis.References.Deletions.Count} references need removed, {analysis.Packages.Deletions.Count} packages need removed, and {analysis.Packages.Additions.Count} packages need added", Risk: analysis.Risk);
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
@@ -120,24 +128,44 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var project = context.CurrentProject.Required();
+            var projectFile = context.CurrentProject.Required().GetFile();
 
-            var projectFile = project.GetFile();
-
-            if (_analysisState is not null)
-            {
-                projectFile.RemoveReferences(_analysisState.References.Deletions.Select(i => i.Item));
-
-                projectFile.RemovePackages(_analysisState.Packages.Deletions.Select(i => i.Item));
-                projectFile.AddPackages(_analysisState.Packages.Additions.Select(i => i.Item));
-
-                projectFile.RemoveFrameworkReferences(_analysisState.FrameworkReferences.Deletions.Select(i => i.Item));
-                projectFile.AddFrameworkReferences(_analysisState.FrameworkReferences.Additions.Select(i => i.Item));
-
-                await projectFile.SaveAsync(token).ConfigureAwait(false);
-            }
+            await projectFile.SaveAsync(token).ConfigureAwait(false);
 
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Packages updated");
+        }
+
+        private class PackageManipulationStep<T> : UpgradeStep
+        {
+            private readonly Operation<T> _operation;
+            private readonly Action<IProjectFile, Operation<T>> _action;
+
+            public PackageManipulationStep(Operation<T> operation, string title, Action<IProjectFile, Operation<T>> action, ILogger logger)
+                : base(logger)
+            {
+                _operation = operation;
+                _action = action;
+
+                Title = title;
+            }
+
+            public override string Title { get; }
+
+            public override string Description => string.Join(";", _operation.OperationDetails.Details);
+
+            protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
+            {
+                var file = context.CurrentProject.Required().GetFile();
+
+                _action(file, _operation);
+
+                return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, Title));
+            }
+
+            protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
+                => Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, Title, _operation.OperationDetails.Risk));
+
+            protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(true);
         }
     }
 }
