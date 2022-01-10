@@ -46,6 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             foreach (var analyzer in _packageAnalyzers)
             {
                 _logger.LogDebug("Analyzing packages with {AnalyzerName}", analyzer.Name);
+
                 try
                 {
                     await analyzer.AnalyzeAsync(projectRoot, analysisState, token).ConfigureAwait(false);
