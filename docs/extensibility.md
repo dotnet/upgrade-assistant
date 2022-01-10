@@ -210,8 +210,8 @@ Roslyn analyzers and code fix providers. Upgrade Assistant's source updater step
 
 Upgrade Assistant follows this naming pattern for DiagnosticID for Analyzers added: `UAXXX`. Below is a list of default analyzers and extension analyzers currently implemented. When adding a new Analyzer, pick the next value for ID and update the section below with the newly added Analyzer information.
 
-- [Default Analyzers List](..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers/AnalyzerReleases.Unshipped.md)
-- [.NET MAUI Extension Analyzers List](..\src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\AnalyzerReleases.Unshipped.md)
+- [Default Analyzers List](../src/extensions/default/analyzers/Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers/AnalyzerReleases.Unshipped.md)
+- [.NET MAUI Extension Analyzers List](../src/extensions/maui/Microsoft.DotNet.UpgradeAssistant.Extensions.Maui/AnalyzerReleases.Unshipped.md)
 
 ## Updaters
 Various services may request an implementation of `IUpdater<TUpdater>` which provides a way to update an object of type `TUpdater`. An example is a `IUpdater<ConfigFile>` that will provide updates for configuration files (`app.config`, `web.config`).
