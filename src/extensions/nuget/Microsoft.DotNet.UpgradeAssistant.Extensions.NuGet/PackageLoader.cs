@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Configuration;
@@ -32,10 +33,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         private readonly ILogger<PackageLoader> _logger;
         private readonly global::NuGet.Common.ILogger _nugetLogger;
         private readonly Dictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
+        private readonly ITargetFrameworkMonikerComparer _comparer;
         private readonly NuGetDownloaderOptions _options;
 
         public PackageLoader(
             INuGetPackageSourceFactory sourceFactory,
+            ITargetFrameworkMonikerComparer comparer,
             ILogger<PackageLoader> logger,
             IOptions<NuGetDownloaderOptions> options)
         {
@@ -55,6 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             _options = options.Value;
             _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(_options.PackageSourcePath));
             _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
+            _comparer = comparer;
         }
 
         public async Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
@@ -376,9 +380,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             return new NuGetPackageMetadata
             {
-                Owners = nuspec.GetOwners()
+                Owners = nuspec.GetOwners(),
+                Dependencies = BuildDependencyList(nuspec.GetDependencyGroups()),
             };
         }
+
+        private ImmutableArray<NuGetDependencyInformation> BuildDependencyList(IEnumerable<PackageDependencyGroup> groups)
+            => groups.Select(t =>
+            {
+                if (_comparer.TryParse(t.TargetFramework.ToString(), out var tfm))
+                {
+                    var packages = t.Packages.Select(p => new NuGetReference(p.Id, p.VersionRange.ToString())).ToImmutableArray();
+                    return new NuGetDependencyInformation(tfm, packages);
+                }
+                else
+                {
+                    _logger.LogWarning("Could not parse TFM {Moniker}", t.TargetFramework);
+                    return null;
+                }
+            }).Where(t => t is not null).ToImmutableArray()!;
 
         public async Task<bool> DownloadPackageToDirectoryAsync(string path, NuGetReference nugetReference, string source, CancellationToken token)
         {
