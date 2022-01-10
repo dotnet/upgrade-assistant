@@ -21,13 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             IEnumerable<IDependencyAnalyzer> packageAnalyzers,
             ILogger<DependencyAnalyzerRunner> logger)
         {
-            if (packageAnalyzers is null)
-            {
-                throw new ArgumentNullException(nameof(packageAnalyzers));
-            }
-
             _packageRestorer = packageRestorer ?? throw new ArgumentNullException(nameof(packageRestorer));
-            _packageAnalyzers = packageAnalyzers.OrderyByPrecedence();
+            _packageAnalyzers = packageAnalyzers?.OrderyByPrecedence() ?? throw new ArgumentNullException(nameof(packageAnalyzers));
             _logger = logger;
         }
 
