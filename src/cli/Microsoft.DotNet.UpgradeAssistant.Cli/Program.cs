@@ -34,6 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             root.AddCommand(new ConsoleAnalyzeCommand());
             root.AddCommand(new ConsoleUpgradeCommand());
             root.AddCommand(new ExtensionManagementCommand());
+            root.AddCommand(new FeatureFlagCommand());
 
             return new CommandLineBuilder(root)
                 .UseDefaults()
