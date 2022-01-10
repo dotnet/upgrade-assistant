@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new InvalidOperationException("Could not find project path for reference");
             }
 
-            return Context.GetOrAddProject(new FileInfo(project.FilePath));
+            return Context.GetProject(project.FilePath);
         });
 
         public Language Language => ParseLanguageByProjectFileExtension(FileInfo.Extension);
