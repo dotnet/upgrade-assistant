@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
-    public abstract class AutoApplyStep : UpgradeStep
+    public abstract class AutoApplySubStep : UpgradeStep
     {
         private readonly UpgradeStep _parentStep;
 
-        protected AutoApplyStep(UpgradeStep parentStep, ILogger logger)
+        protected AutoApplySubStep(UpgradeStep parentStep, ILogger logger)
             : base(logger)
         {
             _parentStep = parentStep;

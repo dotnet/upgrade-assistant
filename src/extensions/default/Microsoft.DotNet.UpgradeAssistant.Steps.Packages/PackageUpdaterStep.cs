@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
         public override IEnumerable<UpgradeStep> SubSteps => _subSteps;
 
-        private class DependencyAnalyzerStep : AutoApplyStep
+        private class DependencyAnalyzerStep : AutoApplySubStep
         {
             private readonly IDependencyAnalyzer _analyzer;
             private readonly IPackageRestorer _restorer;
@@ -195,7 +195,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(true);
         }
 
-        private class PackageManipulationStep<T> : AutoApplyStep
+        private class PackageManipulationStep<T> : AutoApplySubStep
         {
             private readonly Operation<T> _operation;
             private readonly Action<IProjectFile, Operation<T>> _action;
