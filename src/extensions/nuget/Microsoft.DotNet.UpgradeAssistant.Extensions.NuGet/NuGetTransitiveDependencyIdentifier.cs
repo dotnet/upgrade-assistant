@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
         private async Task<RestoreTargetGraph?> RestoreProjectAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfm, CancellationToken token)
         {
-            var tfmInfo = tfm.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToString()) }).ToList();
+            var tfmInfo = tfm.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToFullString()) }).ToList();
 
             // Create a project in a unique and temporary directory
             var path = Path.Combine(Path.GetTempPath(), "dotnet-ua", "restores", Guid.NewGuid().ToString(), "project.txt");

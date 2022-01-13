@@ -138,16 +138,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     return null;
                 }
 
-                if (NormalizeVersion(_platformVersion) is Version normalized)
-                {
-                    return normalized;
-                }
-
-                return Platform switch
-                {
-                    Platforms.Windows => DefaultVersions.Windows,
-                    _ => null,
-                };
+                return NormalizeVersion(_platformVersion);
             }
 
             init => _platformVersion = value;
@@ -180,7 +171,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return hashcode.ToHashCode();
         }
 
-        public override string ToString()
+        public override string ToString() => ToString(false);
+
+        public string ToFullString() => ToString(true);
+
+        private string ToString(bool includeDefaultPlatformVersion)
         {
             var sb = new StringBuilder();
 
@@ -199,6 +194,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 if (PlatformVersion is Version platformVersion)
                 {
                     sb.Append(platformVersion);
+                }
+                else if (includeDefaultPlatformVersion)
+                {
+                    var defaultVersion = platform switch
+                    {
+                        Platforms.Windows => DefaultVersions.Windows,
+                        _ => null,
+                    };
+
+                    sb.Append(defaultVersion);
                 }
             }
 
