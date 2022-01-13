@@ -8,7 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -17,24 +19,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly IUpgradeContextFactory _contextFactory;
         private readonly IUpgradeStateManager _stateManager;
         private readonly IEnumerable<IAnalyzeResultProvider> _providers;
-        private readonly IAnalyzeResultWriter _writer;
         private readonly IExtensionProvider _extensionProvider;
         private readonly IOptions<AnalysisOptions> _options;
+        private readonly IAnalyzeResultWriterProvider _writerProvider;
+        private readonly ILogger<ConsoleAnalyze> _logger;
 
         public ConsoleAnalyze(
             IEnumerable<IAnalyzeResultProvider> analysisProviders,
             IUpgradeContextFactory contextFactory,
             IUpgradeStateManager stateManager,
-            IAnalyzeResultWriter writer,
             IExtensionProvider extensionProvider,
-            IOptions<AnalysisOptions> options)
+            IOptions<AnalysisOptions> options,
+            IAnalyzeResultWriterProvider writerProvider,
+            ILogger<ConsoleAnalyze> logger)
         {
             _providers = analysisProviders ?? throw new ArgumentNullException(nameof(analysisProviders));
-            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
             _extensionProvider = extensionProvider ?? throw new ArgumentNullException(nameof(extensionProvider));
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            _writerProvider = writerProvider ?? throw new ArgumentNullException(nameof(writerProvider));
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task RunAsync(CancellationToken token)
@@ -56,7 +61,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 });
             }
 
-            await _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), _options.Value.Format, token).ConfigureAwait(false);
+            if (_writerProvider.TryGetWriter(_options.Value.Format, out var writer))
+            {
+                _logger.LogInformation("Writing to output format {Format}", _options.Value.Format);
+                await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), _options.Value.Format, token).ConfigureAwait(false);
+            } else
+            {
+                _logger.LogError("Requested format '{Format}' is unavailable", _options.Value.Format);
+            }
+
+           // await _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), _options.Value.Format, token).ConfigureAwait(false);
         }
 
         private string GetProviderVersion(IAnalyzeResultProvider provider)
