@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Moq;
 using Xunit;
 
@@ -158,14 +159,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 
             using var mock = AutoMock.GetLoose();
 
-            var projectFile = mock.Mock<IProjectFile>();
+            var projectFile = new Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(false);
 
-            var nugetPackages = mock.Mock<INuGetReferences>();
-            nugetPackages.Setup(p => p.IsTransitivelyAvailableAsync(name, default)).ReturnsAsync(true);
+            var transitive = mock.Mock<ITransitiveDependencyIdentifier>();
+            transitive.Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default)).ReturnsAsync(new[] { new NuGetReference(name, string.Empty) });
 
-            var project = mock.Mock<IProject>();
+            var nugetPackages = new Mock<INuGetReferences>();
+            nugetPackages.Setup(n => n.PackageReferences).Returns(Enumerable.Empty<NuGetReference>());
+
+            var project = new Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(nugetPackages.Object);
 
             var componentIdentifier = mock.Create<WindowsComponentIdentifier>();

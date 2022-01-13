@@ -2,17 +2,22 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     [Order(int.MaxValue)]
     public class TransitiveReferenceAnalyzer : IDependencyAnalyzer
     {
+        private readonly ITransitiveDependencyIdentifier _transitiveChecker;
+
+        public TransitiveReferenceAnalyzer(ITransitiveDependencyIdentifier transitiveChecker)
+        {
+            _transitiveChecker = transitiveChecker ?? throw new ArgumentNullException(nameof(transitiveChecker));
+        }
+
         public string Name => "Transitive reference analyzer";
 
         public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
@@ -27,13 +32,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            // If the package is referenced transitively, mark for removal
-            foreach (var packageReference in state.Packages)
+            foreach (var packageReference in await _transitiveChecker.RemoveTransitiveDependenciesAsync(state.Packages, state.TargetFrameworks, token).ConfigureAwait(false))
             {
-                if (await project.NuGetReferences.IsTransitiveDependencyAsync(packageReference, token).ConfigureAwait(false))
-                {
-                    state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
-                }
+                state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
             }
         }
     }

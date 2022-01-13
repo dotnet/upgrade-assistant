@@ -20,14 +20,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<NewtonsoftReferenceAnalyzer> _logger;
         private readonly ITargetFrameworkMonikerComparer _tfmComparer;
+        private readonly ITransitiveDependencyIdentifier _transitiveIdentifier;
 
         public string Name => "Newtonsoft.Json reference analyzer";
 
-        public NewtonsoftReferenceAnalyzer(IPackageLoader packageLoader, ILogger<NewtonsoftReferenceAnalyzer> logger, ITargetFrameworkMonikerComparer tfmComparer)
+        public NewtonsoftReferenceAnalyzer(
+            IPackageLoader packageLoader,
+            ITargetFrameworkMonikerComparer tfmComparer,
+            ITransitiveDependencyIdentifier transitiveIdentifier,
+            ILogger<NewtonsoftReferenceAnalyzer> logger)
         {
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tfmComparer = tfmComparer ?? throw new ArgumentNullException(nameof(tfmComparer));
+            _transitiveIdentifier = transitiveIdentifier ?? throw new ArgumentNullException(nameof(transitiveIdentifier));
         }
 
         public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
@@ -52,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
                 return;
             }
 
-            if (await project.NuGetReferences.IsTransitivelyAvailableAsync(NewtonsoftPackageName, token).ConfigureAwait(false))
+            if (await _transitiveIdentifier.IsTransitiveDependencyAsync(NewtonsoftPackageName, project, token).ConfigureAwait(false))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", NewtonsoftPackageName);
                 return;

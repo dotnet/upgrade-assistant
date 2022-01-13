@@ -49,12 +49,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         };
 
         public PackageUpdaterStep(
-            IPackageRestorer restorer,
             IEnumerable<IDependencyAnalyzer> dependencyAnalyzers,
             ILogger<PackageUpdaterStep> logger)
             : base(logger)
         {
-            _subSteps = dependencyAnalyzers.OrderyByPrecedence().Select(d => new DependencyAnalyzerStep(this, restorer, d, logger)).ToList();
+            _subSteps = dependencyAnalyzers.OrderyByPrecedence().Select(d => new DependencyAnalyzerStep(this, d, logger)).ToList();
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
@@ -77,14 +76,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         private class DependencyAnalyzerStep : AutoApplySubStep
         {
             private readonly IDependencyAnalyzer _analyzer;
-            private readonly IPackageRestorer _restorer;
 
             private IEnumerable<UpgradeStep>? _subSteps;
             private BuildBreakRisk _risk;
 
             public DependencyAnalyzerStep(
                 PackageUpdaterStep parentStep,
-                IPackageRestorer restorer,
                 IDependencyAnalyzer analyzer,
                 ILogger logger)
                 : base(parentStep, logger)
@@ -94,7 +91,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     throw new ArgumentNullException(nameof(logger));
                 }
 
-                _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
                 _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
             }
 
@@ -172,7 +168,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             {
                 var projectRoot = context.CurrentProject.Required();
 
-                await _restorer.RestorePackagesAsync(context, projectRoot, token).ConfigureAwait(false);
                 var analysisState = new DependencyAnalysisState(projectRoot, projectRoot.NuGetReferences, projectRoot.TargetFrameworks);
 
                 Logger.LogDebug("Analyzing packages with {AnalyzerName}", _analyzer.Name);

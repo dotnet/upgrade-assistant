@@ -18,13 +18,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
     {
         private const string SystemConfigurationPackageName = "System.Configuration.ConfigurationManager";
 
+        private readonly ITransitiveDependencyIdentifier _transitiveIdentifier;
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger<MyDotAnalyzer> _logger;
 
         public string Name => nameof(MyDotAnalyzer) + " reference analyzer";
 
-        public MyDotAnalyzer(IPackageLoader packageLoader, ILogger<MyDotAnalyzer> logger)
+        public MyDotAnalyzer(ITransitiveDependencyIdentifier transitiveIdentifier, IPackageLoader packageLoader, ILogger<MyDotAnalyzer> logger)
         {
+            _transitiveIdentifier = transitiveIdentifier ?? throw new ArgumentNullException(nameof(transitiveIdentifier));
             _packageLoader = packageLoader ?? throw new ArgumentNullException(nameof(packageLoader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -53,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
                 return;
             }
 
-            if (await project.NuGetReferences.IsTransitivelyAvailableAsync(SystemConfigurationPackageName, token).ConfigureAwait(false))
+            if (await _transitiveIdentifier.IsTransitiveDependencyAsync(SystemConfigurationPackageName, project.NuGetReferences.PackageReferences, project.TargetFrameworks, token).ConfigureAwait(false))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", SystemConfigurationPackageName);
                 return;

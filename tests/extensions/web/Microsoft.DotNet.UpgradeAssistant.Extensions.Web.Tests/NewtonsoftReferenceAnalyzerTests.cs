@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -138,12 +139,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
 
         private static Mock<IProject> CreateProjectForWhichAnalyzerIsApplicable(AutoMock mock)
         {
-            var project = mock.Mock<IProject>();
-            var nugetReferences = mock.Mock<INuGetReferences>();
-            nugetReferences.Setup(n => n.IsTransitivelyAvailableAsync(It.IsAny<string>(), default))
-                .Returns(new ValueTask<bool>(false));
+            var tfms = new[] { TargetFrameworkMoniker.Net50 };
 
-            project.Setup(p => p.TargetFrameworks).Returns(new[] { TargetFrameworkMoniker.Net50 });
+            var nugetReferences = new Mock<INuGetReferences>();
+            nugetReferences.Setup(n => n.PackageReferences).Returns(Enumerable.Empty<NuGetReference>());
+
+            var transitiveDependencies = mock.Mock<ITransitiveDependencyIdentifier>();
+            transitiveDependencies
+                .Setup(n => n.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), tfms, default))
+                .ReturnsAsync(Array.Empty<NuGetReference>());
+
+            var project = new Mock<IProject>();
+            project.Setup(p => p.TargetFrameworks).Returns(tfms);
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(ProjectComponents.AspNetCore));
             project.Setup(p => p.OutputType).Returns(ProjectOutputType.Exe);
             project.Setup(p => p.NuGetReferences).Returns(nugetReferences.Object);
