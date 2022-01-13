@@ -58,9 +58,8 @@ namespace Integration.Tests
 
             var latest = await _other.GetNewerVersionsAsync(reference, tfms, options, token).ConfigureAwait(false);
 
-            if (latest is not null)
+            if (latest is not null && latest.LastOrDefault() is NuGetReference latestReference)
             {
-                var latestReference = latest.Last();
                 _unknownPackages[latestReference.Name] = latestReference.Version;
                 _logger.LogError("Unexpected check for newer version: {Name}, {Version}", reference.Name, reference.Version);
             }

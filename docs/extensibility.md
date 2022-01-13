@@ -3,6 +3,8 @@
 The Upgrade Assistant has an extension system that make it easy for users to customize many of the upgrade steps (or add new upgrade steps) without having to rebuild the tool. There are both code and non-code ways of extending the tool.
 
 - [Create Extension](#create-extension)
+- [Custom assemblies](#custom-assemblies)
+- [Publishing to NuGet.org](#publishing-to-nugetorg)
 - [Extension Service Providers](#extension-service-providers)
   - [Registering Services Configuration](#registering-services-configuration)
   - [Accessing extension files](#accessing-extension-files)
@@ -14,6 +16,7 @@ The Upgrade Assistant has an extension system that make it easy for users to cus
 - [Templates](#templates)
 
 ## Create Extension
+
 To create an Upgrade Assistant extension, you will need to start with a manifest file called `ExtensionManifest.json`. The manifest file contains pointers to the paths (relative to the manifest file) where the different extension items can be found. The extension manifest is required, but all of its elements are optional and it is only necessary to include the ones that are useful for the extension the manifest is describing. An outline of possible extension manifest elements is:
 
 ```json
@@ -36,14 +39,18 @@ To create an Upgrade Assistant extension, you will need to start with a manifest
 
 An extension can be available as:
 
+- NuGet package on NuGet.org (see [below](#publishing-to-nugetorg) for details)
 - Just the `ExtensionManifest.json`
 - A directory containing `ExtensionManifest.json`
 - A zip file containing a `ExtensionManifest.json`
 
 To use an extension at runtime, you may either:
 
+- Add an extension to a project via `upgrade-assistant extensions add [name]` if it's available on a NuGet feed
 - Use the `--extension` argument on the commandline
 - Set the environment variable `UpgradeAssistantExtensionPaths` to a semicolon-delimited list of paths to probe for extensions.
+
+## Custom assemblies
 
 The `ExtensionServiceProviders` element of the extension manifest contains an array of assemblies that the Upgrade Assistant should look in for implementations of `Microsoft.DotNet.UpgradeAssistant.Extensions.IExtensionServiceProvider`. At runtime, Upgrade Assistant will load any assemblies listed in the ExtensionServiceProviders array (paths are relative to the extension manifest's location) and instantiate an public implementations of `IExtensionServiceProvider` found in those assemblies. The `IExtensionServiceProvider` instances will then be used to register services in Upgrade Assistant's dependency injection container. Common services that an extension might register include will be detailed below.
 
@@ -54,6 +61,13 @@ When building a project, you can reference the Upgrade Assistants abstractions v
 ```
 
 This will also augment the build process so that the project will publish on builds. That publish directory is what should be used when adding an extension to Upgrade Assistant.
+
+## Publishing to NuGet.org
+
+Extensions for Upgrade Assistant can be published to NuGet.org and will be available to search and add to projects. In order to publish, you can run the `dotnet pack` command on the project (if it is a .NET project) or you can use `upgrade-assistant extensions create [path]` if it is simply a manifest file and config files.
+
+Available Upgrade Assistant extensions available on NuGet can be viewed [here](https://www.nuget.org/packages?packagetype=UpgradeAssistantExtension&sortby=relevance&q=&prerel=True). You may use your own feed as well, but search is only available on NuGet.org. 
+
 
 ## Extension Service Providers
 Any other services that might be needed by Upgrade Assistant steps (either the default steps or those added by extensions) can be registered. Extensions can register services that their own upgrade steps will need or services that will be used by other upgrade steps and Upgrade Assistant will make sure any services registered in an `IExtensionServiceProvider` implementation will be made available at runtime:
@@ -210,8 +224,8 @@ Roslyn analyzers and code fix providers. Upgrade Assistant's source updater step
 
 Upgrade Assistant follows this naming pattern for DiagnosticID for Analyzers added: `UAXXX`. Below is a list of default analyzers and extension analyzers currently implemented. When adding a new Analyzer, pick the next value for ID and update the section below with the newly added Analyzer information.
 
-- [Default Analyzers List](..\src\extensions\default\analyzers\Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers/AnalyzerReleases.Unshipped.md)
-- [.NET MAUI Extension Analyzers List](..\src\extensions\maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\AnalyzerReleases.Unshipped.md)
+- [Default Analyzers List](../src/extensions/default/analyzers/Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers/AnalyzerReleases.Unshipped.md)
+- [.NET MAUI Extension Analyzers List](../src/extensions/maui/Microsoft.DotNet.UpgradeAssistant.Extensions.Maui/AnalyzerReleases.Unshipped.md)
 
 ## Updaters
 Various services may request an implementation of `IUpdater<TUpdater>` which provides a way to update an object of type `TUpdater`. An example is a `IUpdater<ConfigFile>` that will provide updates for configuration files (`app.config`, `web.config`).

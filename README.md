@@ -46,6 +46,15 @@ When run on a solution in order to analyze dependencies prior to upgrade, the to
 
 Extensions may be managed centrally for a project as described [here](docs/design/Extension_Management.md).
 
+### Experimental features
+
+Feature flags can be used to turn some experimental features on or off. Functionality behind feature flags may or may not be made public and are considered a way to test features that may be unstable. In order to enable a feature, set an environment variable to a semi-colon delimited list of feature names. For example: `$env:UA_FEATURES="FEATURE1;FEATURE2"`.
+
+Current features that are available to try out include:
+
+- `ANALYZE_OUTPUT_FORMAT`: Enables a `--format` flag for the `analyze` command that can take other options. Currently restricted to `sarif` and `html`
+- `SOLUTION_WIDE_SDK_CONVERSION`: Switches project format conversion from old style project files to SDK style to be solution wide first before any other changes to the project files.
+
 ### Optional Features
 
 Some features within Upgrade Assistant may be enabled by adding extensions. Available extensions can be viewed on [here](https://www.nuget.org/packages?packagetype=UpgradeAssistantExtension&sortby=relevance&q=&prerel=True).
@@ -174,6 +183,7 @@ Options:
                                                  Preview TFM. See
                                                  https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
                                                  details for what these mean.
+  --format  <HTML>                               Specify the format in which the analysis report will be generated. Currently supports html other than the default SARIF format.
   --version                                      Show version information
   -?, -h, --help                                 Show help and usage information
 ```
@@ -183,6 +193,7 @@ The output of the analyze command is a report in SARIF format. SARIF is based on
 - [VS extension for SARIF Viewer](https://marketplace.visualstudio.com/items?itemName=WDGIS.MicrosoftSarifViewer) for a richer experience.
 
 Sample of the report in VS SARIF Viewer : ![Analysis Report](/docs/images/AnalysisReport.PNG)
+Sample of the report in HTML format : ![Analysis Report (HTML)](/docs/images/AnalysisReportHTML.png)
 ### Determining upgrade feasibility
 
 Note that this tool does not (yet) advise on the feasibility or estimated cost of upgrading projects. It assumes that projects it runs on have already been reviewed and a decision taken to upgrade them to the latest version of .NET (current, LTS, or preview).

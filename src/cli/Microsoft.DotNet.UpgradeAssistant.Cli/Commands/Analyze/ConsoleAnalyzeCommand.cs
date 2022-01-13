@@ -18,8 +18,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Host.CreateDefaultBuilder()
                     .UseConsoleUpgradeAssistant<ConsoleAnalyze>(options, result)
                     .RunUpgradeAssistantAsync(token));
-
-            AddOption(new Option<string>(new[] { "--format", "-f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
+            if (FeatureFlags.IsAnalyzeFormatEnabled)
+            {
+                AddOption(new Option<string>(new[] { "--format", "--f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
+            }
         }
     }
 }
