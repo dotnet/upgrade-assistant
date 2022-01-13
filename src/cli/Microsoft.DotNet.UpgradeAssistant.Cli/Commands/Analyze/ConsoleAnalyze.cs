@@ -65,12 +65,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 _logger.LogInformation("Writing to output format {Format}", _options.Value.Format);
                 await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), _options.Value.Format, token).ConfigureAwait(false);
-            } else
+            }
+            else
             {
                 _logger.LogError("Requested format '{Format}' is unavailable", _options.Value.Format);
             }
-
-           // await _writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), _options.Value.Format, token).ConfigureAwait(false);
         }
 
         private string GetProviderVersion(IAnalyzeResultProvider provider)

@@ -11,12 +11,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IAnalyzeResultWriterProvider
     {
-        bool TryGetWriter(string format,[MaybeNullWhen(false)] out IAnalyzeResultWriter writer);
+        bool TryGetWriter(string format, [MaybeNullWhen(false)] out IAnalyzeResultWriter writer);
     }
 
     public class AnalyzerResultProviderWriter : IAnalyzeResultWriterProvider
     {
-
     private readonly IEnumerable<IAnalyzeResultWriter> _writers;
 
     public AnalyzerResultProviderWriter(IEnumerable<IAnalyzeResultWriter> writers)
@@ -26,10 +25,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
     public bool TryGetWriter(string format, [MaybeNullWhen(false)] out IAnalyzeResultWriter writer)
     {
-
             foreach (var writ in _writers)
             {
-                if (string.Equals(writ.GetFormat(), format, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(writ.Format, format, StringComparison.OrdinalIgnoreCase))
                 {
                     writer = writ;
                     return true;

@@ -18,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         private readonly string _sarifLogPath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
         private readonly ISerializer _serializer;
 
+        public string Format => "sarif";
+
         public SarifAnalyzeResultWriter(ISerializer serializer)
         {
             this._serializer = serializer;
@@ -35,11 +37,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
             _serializer.Write(_sarifLogPath, sarifLog);
-        }
-
-        public string GetFormat()
-        {
-            return "sarif";
         }
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)

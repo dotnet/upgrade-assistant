@@ -11,6 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
     {
         Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, string? format, CancellationToken token);
 
-        string GetFormat();
+        string Format { get; }
     }
 }

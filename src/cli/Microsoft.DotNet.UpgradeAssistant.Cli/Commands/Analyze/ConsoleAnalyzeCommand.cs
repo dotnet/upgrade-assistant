@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     .UseConsoleUpgradeAssistant<ConsoleAnalyze>(options, result)
                     .RunUpgradeAssistantAsync(token));
 
-                AddOption(new Option<string>(new[] { "--format", "-f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
+            AddOption(new Option<string>(new[] { "--format", "-f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
         }
     }
 }

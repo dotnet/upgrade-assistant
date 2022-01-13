@@ -118,7 +118,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddSingleton<IProcessRunner, ProcessRunner>();
                     services.AddSingleton<ErrorCodeAccessor>();
-                    services.AddSingleton<AnalyzerResultProviderWriter>();
 
                     services.AddTargetFrameworkSelectors(options =>
                     {

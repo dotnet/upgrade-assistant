@@ -13,11 +13,13 @@ using Microsoft.CodeAnalysis.Sarif;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public class HTMLAnalyzeResultWriter : IAnalyzeResultWriter
+    public class HtmlAnalyzeResultWriter : IAnalyzeResultWriter
     {
         private readonly ISerializer _serializer;
 
-        public HTMLAnalyzeResultWriter(ISerializer serializer)
+        public string Format => "html";
+
+        public HtmlAnalyzeResultWriter(ISerializer serializer)
         {
             this._serializer = serializer;
         }
@@ -34,11 +36,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
             WriteHTML(sarifLog);
-        }
-
-        public string GetFormat()
-        {
-            return "html";
         }
 
         private void WriteHTML(SarifLog sarifLog)
