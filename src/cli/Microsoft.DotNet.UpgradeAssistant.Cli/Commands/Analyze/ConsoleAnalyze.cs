@@ -10,7 +10,6 @@ using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
