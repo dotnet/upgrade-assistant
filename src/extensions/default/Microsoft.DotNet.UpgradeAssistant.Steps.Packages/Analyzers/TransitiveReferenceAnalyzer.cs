@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
@@ -32,7 +33,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            foreach (var packageReference in await _transitiveChecker.RemoveTransitiveDependenciesAsync(state.Packages, state.TargetFrameworks, token).ConfigureAwait(false))
+            var closure = await _transitiveChecker.GetTransitiveDependenciesAsync(state.Packages, state.TargetFrameworks, token).ConfigureAwait(false);
+            var set = state.Packages
+                .SelectMany(p => closure.GetDependencies(p))
+                .Select(p => p.Name)
+                .ToHashSet();
+            var toRemove = state.Packages
+                .Where(p => set.Contains(p.Name))
+                .ToList();
+
+            foreach (var packageReference in toRemove)
             {
                 state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
             }

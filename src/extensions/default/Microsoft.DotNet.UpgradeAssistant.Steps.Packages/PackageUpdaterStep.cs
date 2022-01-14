@@ -150,6 +150,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analyzer.Name} has identified some recommended changes", Risk: _risk);
             }
 
+            public override UpgradeStepInitializeResult Reset()
+            {
+                _subSteps = default;
+                _risk = default;
+
+                return base.Reset();
+            }
+
             protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
             {
                 if (context is null)

@@ -2,7 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -40,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<IReadOnlyCollection<NuGetReference>> GetTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
+        public async Task<TransitiveClosureCollection> GetTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
         {
             if (packages is null)
             {
@@ -56,39 +58,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             if (graph is null)
             {
-                return Array.Empty<NuGetReference>();
+                return TransitiveClosureCollection.Empty;
             }
 
-            return new GraphItemCollection(graph.Flattened);
-        }
-
-        public async Task<IEnumerable<NuGetReference>> RemoveTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
-        {
-            if (packages is null)
-            {
-                throw new ArgumentNullException(nameof(packages));
-            }
-
-            if (tfms is null)
-            {
-                throw new ArgumentNullException(nameof(tfms));
-            }
-
-            var graph = await RestoreProjectAsync(packages, tfms, token).ConfigureAwait(false);
-
-            if (graph is null)
-            {
-                return packages;
-            }
-
-            IEnumerable<LibraryDependency> GetPackageDependencies(NuGetReference package) => graph.Flattened.First(p => p.Key.Name.Equals(package.Name, StringComparison.OrdinalIgnoreCase)).Data.Dependencies;
-
-            bool IsPackageInDependencySet(NuGetReference packageReference, IEnumerable<LibraryDependency> dependencies) => dependencies.Any(d => d.Name.Equals(packageReference.Name, StringComparison.OrdinalIgnoreCase));
-
-            return packages.Where(package =>
-            {
-                return packages.Select(GetPackageDependencies).Any(dependencies => IsPackageInDependencySet(package, dependencies));
-            });
+            return new(new TargetGraphLookup(graph));
         }
 
         private async Task<RestoreTargetGraph?> RestoreProjectAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfm, CancellationToken token)
@@ -149,20 +122,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             return result[0].Result.RestoreGraphs.FirstOrDefault();
         }
 
-        private class GraphItemCollection : IReadOnlyCollection<NuGetReference>
+        private class TargetGraphLookup : ILookup<NuGetReference, NuGetReference>
         {
-            private readonly ISet<GraphItem<RemoteResolveResult>> _flattened;
+            private readonly RestoreTargetGraph _graph;
 
-            public GraphItemCollection(ISet<GraphItem<RemoteResolveResult>> flattened)
+            public TargetGraphLookup(RestoreTargetGraph graph)
             {
-                _flattened = flattened;
+                _graph = graph;
             }
 
-            public int Count => _flattened.Count;
+            public IEnumerable<NuGetReference> this[NuGetReference key] => TryFind(key, out var result) ? result : Enumerable.Empty<NuGetReference>();
+
+            public int Count => _graph.Flattened.Count;
+
+            public bool Contains(NuGetReference key) => TryFind(key, out _);
 
             public IEnumerator<NuGetReference> GetEnumerator()
             {
-                foreach (var item in _flattened)
+                foreach (var item in _graph.Flattened)
                 {
                     var library = item.Data.Match.Library;
 
@@ -170,7 +147,53 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 }
             }
 
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            IEnumerator<IGrouping<NuGetReference, NuGetReference>> IEnumerable<IGrouping<NuGetReference, NuGetReference>>.GetEnumerator()
+            {
+                foreach (var item in _graph.Flattened)
+                {
+                    yield return new ResolveResultGrouping(item.Data);
+                }
+            }
+
+            private bool TryFind(NuGetReference package, [MaybeNullWhen(false)] out ResolveResultGrouping result)
+            {
+                foreach (var item in _graph.Flattened)
+                {
+                    if (string.Equals(item.Data.Match.Library.Name, package.Name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result = new(item.Data);
+                        return true;
+                    }
+                }
+
+                result = default;
+                return false;
+            }
+
+            private class ResolveResultGrouping : IGrouping<NuGetReference, NuGetReference>
+            {
+                private readonly RemoteResolveResult _result;
+
+                public ResolveResultGrouping(RemoteResolveResult result)
+                {
+                    _result = result;
+                    Key = new(_result.Match.Library.Name, _result.Match.Library.Version.ToString());
+                }
+
+                public NuGetReference Key { get; }
+
+                public IEnumerator<NuGetReference> GetEnumerator()
+                {
+                    foreach (var dependency in _result.Dependencies)
+                    {
+                        yield return new(dependency.Name, dependency.LibraryRange.VersionRange.ToString());
+                    }
+                }
+
+                IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            }
         }
     }
 }

@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             var transitiveDependencies = mock.Mock<ITransitiveDependencyIdentifier>();
             transitiveDependencies
                 .Setup(n => n.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), tfms, default))
-                .ReturnsAsync(Array.Empty<NuGetReference>());
+                .ReturnsAsync(TransitiveClosureCollection.Empty);
 
             var project = new Mock<IProject>();
             project.Setup(p => p.TargetFrameworks).Returns(tfms);

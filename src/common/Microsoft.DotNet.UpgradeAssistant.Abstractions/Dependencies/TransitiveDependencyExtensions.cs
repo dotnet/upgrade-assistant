@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 
             var result = await identifier.GetTransitiveDependenciesAsync(packages, tfms, token).ConfigureAwait(false);
 
-            foreach (var item in result)
+            foreach (var item in result.References)
             {
                 if (item.Equals(package))
                 {
@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 
             var result = await identifier.GetTransitiveDependenciesAsync(packages, tfms, token).ConfigureAwait(false);
 
-            foreach (var item in result)
+            foreach (var item in result.References)
             {
                 if (string.Equals(item.Name, packageName, StringComparison.OrdinalIgnoreCase))
                 {

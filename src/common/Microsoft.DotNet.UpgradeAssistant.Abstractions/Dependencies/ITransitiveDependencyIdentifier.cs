@@ -9,8 +9,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 {
     public interface ITransitiveDependencyIdentifier
     {
-        Task<IReadOnlyCollection<NuGetReference>> GetTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token);
-
-        Task<IEnumerable<NuGetReference>> RemoveTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token);
+        Task<TransitiveClosureCollection> GetTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token);
     }
 }

@@ -163,7 +163,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             projectFile.Setup(f => f.IsSdk).Returns(false);
 
             var transitive = mock.Mock<ITransitiveDependencyIdentifier>();
-            transitive.Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default)).ReturnsAsync(new[] { new NuGetReference(name, string.Empty) });
+            var result = new TransitiveClosureCollection(new[] { new NuGetReference(name, string.Empty) }.ToLookup(t => t));
+            transitive
+                .Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default))
+                .ReturnsAsync(result);
 
             var nugetPackages = new Mock<INuGetReferences>();
             nugetPackages.Setup(n => n.PackageReferences).Returns(Enumerable.Empty<NuGetReference>());
