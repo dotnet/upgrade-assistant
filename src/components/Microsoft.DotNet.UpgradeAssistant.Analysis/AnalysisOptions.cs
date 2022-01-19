@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class AnalysisOptions
     {
-        public string? Format { get; set; }
+        [Required]
+        public string Format { get; set; } = null!;
     }
 }
