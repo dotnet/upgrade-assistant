@@ -30,7 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             Factories factories,
             FileInfo file,
-            ILogger logger)
+            ILogger<MSBuildProject> logger)
         {
             FileInfo = file ?? throw new ArgumentNullException(nameof(file));
             Context = context ?? throw new ArgumentNullException(nameof(context));
