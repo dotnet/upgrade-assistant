@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         {
             _packageSources = packageSources ?? throw new ArgumentNullException(nameof(packageSources));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -64,9 +64,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             return new(new TargetGraphLookup(graph));
         }
 
-        private async Task<RestoreTargetGraph?> RestoreProjectAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfm, CancellationToken token)
+        private async Task<RestoreTargetGraph?> RestoreProjectAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
         {
-            var tfmInfo = tfm.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToFullString()) }).ToList();
+            var tfmInfo = tfms.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToFullString()) }).ToList();
 
             // Create a project in a unique and temporary directory
             var path = Path.Combine(Path.GetTempPath(), "dotnet-ua", "restores", Guid.NewGuid().ToString(), "project.txt");
@@ -84,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                     ProjectStyle = ProjectStyle.PackageReference,
                     ProjectUniqueName = path,
                     OutputPath = Path.GetTempPath(),
-                    OriginalTargetFrameworks = new[] { tfm.ToString() },
+                    OriginalTargetFrameworks = tfms.Select(tfm => tfm.ToFullString()).ToArray(),
                     ConfigFilePaths = _settings.GetConfigFilePaths(),
                     PackagesPath = SettingsUtility.GetGlobalPackagesFolder(_settings),
                     Sources = _packageSources.ToList(),

@@ -33,8 +33,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var closure = await _transitiveChecker.GetTransitiveDependenciesAsync(state.Packages, state.TargetFrameworks, token).ConfigureAwait(false);
-            var set = state.Packages
+            var allPackages = state.Packages.Concat(project.PackageReferences).ToHashSet();
+            var closure = await _transitiveChecker.GetTransitiveDependenciesAsync(allPackages, state.TargetFrameworks, token).ConfigureAwait(false);
+            var set = allPackages
                 .SelectMany(p => closure.GetDependencies(p))
                 .Select(p => p.Name)
                 .ToHashSet();
