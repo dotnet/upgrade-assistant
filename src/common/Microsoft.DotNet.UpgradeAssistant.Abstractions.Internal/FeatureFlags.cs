@@ -13,11 +13,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         private const string Output_Format = "ANALYZE_OUTPUT_FORMAT";
         private const string SolutionWideSdkConversion = "SOLUTION_WIDE_SDK_CONVERSION";
+        private const string EnableCrossPlatform = "ENABLE_CROSS_PLATFORM";
 
-        public static readonly ICollection<string> RegisteredFeatures = new[]
+        public static readonly IReadOnlyCollection<string> RegisteredFeatures = new[]
         {
             Output_Format,
-            SolutionWideSdkConversion
+            SolutionWideSdkConversion,
+            EnableCrossPlatform,
         };
 
         private static readonly ICollection<string> _features = CreateFeatures();
@@ -35,6 +37,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
 
         public static bool IsRegistered(string name) => _features.Contains(name);
+
+        public static bool IsWindowsCheckEnabled => !_features.Contains(EnableCrossPlatform);
 
         public static bool IsAnalyzeFormatEnabled => _features.Contains(Output_Format);
 
