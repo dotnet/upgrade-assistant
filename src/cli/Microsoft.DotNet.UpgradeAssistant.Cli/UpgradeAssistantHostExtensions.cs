@@ -106,9 +106,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     });
 
                     services.AddUserInput();
+
                     services.AddAnalysis(options =>
                     {
-                        options.Format = upgradeOptions.Format;
+                        options.Format = upgradeOptions.Format ?? context.Configuration["Analysis:DefaultFormat"];
                     });
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
