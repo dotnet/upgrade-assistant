@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
 {
     public class TransitiveClosureCollection
     {
-        public static TransitiveClosureCollection Empty => new(Enumerable.Empty<NuGetReference>().ToLookup(static t => t));
+        public static TransitiveClosureCollection Empty { get; } = new(Enumerable.Empty<NuGetReference>().ToLookup(static t => t));
 
         private readonly ILookup<NuGetReference, NuGetReference> _dependencies;
 
