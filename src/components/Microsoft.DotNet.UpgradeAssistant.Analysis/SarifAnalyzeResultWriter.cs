@@ -13,12 +13,14 @@ using Microsoft.CodeAnalysis.Sarif;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public class AnalyzeResultWriter : IAnalyzeResultWriter
+    public class SarifAnalyzeResultWriter : IAnalyzeResultWriter
     {
         private readonly string _sarifLogPath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
         private readonly ISerializer _serializer;
 
-        public AnalyzeResultWriter(ISerializer serializer)
+        public string Format => "sarif";
+
+        public SarifAnalyzeResultWriter(ISerializer serializer)
         {
             this._serializer = serializer;
         }
@@ -34,29 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
-            if (format is not null && string.Equals(format, "html", StringComparison.OrdinalIgnoreCase))
-            {
-                WriteHTML(sarifLog);
-            }
-            else
-            {
-                _serializer.Write(_sarifLogPath, sarifLog);
-            }
-        }
-
-        private void WriteHTML(SarifLog sarifLog)
-        {
-            var sarifString = _serializer.Serialize(sarifLog);
-            var ss = sarifString.Replace("\r\n", string.Empty).Replace(@"\", string.Empty).Replace("file:///C:/", string.Empty);
-
-            var names = Assembly.GetExecutingAssembly();
-            var templatePath = names.GetManifestResourceNames();
-
-            using var assembly = Assembly.GetExecutingAssembly().GetManifestResourceStream(templatePath[0]);
-            using var templateString = new StreamReader(assembly);
-            var template = templateString.ReadToEnd();
-            var finishedTemplate = template.Replace("%SARIF_LOG%", ss);
-            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html"), finishedTemplate);
+            _serializer.Write(_sarifLogPath, sarifLog);
         }
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)

@@ -62,14 +62,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
                     return list;
                 }
 
-                foreach (var path in opts.ExtensionPaths)
-                {
-                    LoadPath(path, isDefault: false);
-                }
-
                 foreach (var path in opts.DefaultExtensions)
                 {
                     LoadPath(path, isDefault: true);
+                }
+
+                foreach (var path in opts.ExtensionPaths)
+                {
+                    LoadPath(path, isDefault: false);
                 }
 
                 foreach (var path in Registered.Select(extensionLocator.GetInstallPath))

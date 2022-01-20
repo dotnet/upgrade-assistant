@@ -17,9 +17,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             services.AddTransient<ISerializer, JsonSerializer>();
-            services.AddTransient<IAnalyzeResultWriter, AnalyzeResultWriter>();
             services.AddOptions<AnalysisOptions>()
-                .Configure(configure);
+                .Configure(configure)
+                .ValidateDataAnnotations();
+            services.AddTransient<IAnalyzeResultWriterProvider, AnalyzerResultProviderWriter>();
+            services.AddTransient<IAnalyzeResultWriter, HtmlAnalyzeResultWriter>();
+            services.AddTransient<IAnalyzeResultWriter, SarifAnalyzeResultWriter>();
         }
     }
 }
