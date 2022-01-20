@@ -25,6 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return new HashSet<string>(features.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
         }
 
+        public static bool IsWindowsCheckEnabled => !_features.Contains("ENABLE_CROSS_PLATFORM");
+
         public static bool IsAnalyzeFormatEnabled => _features.Contains("ANALYZE_OUTPUT_FORMAT");
 
         public static bool IsSolutionWideSdkConversionEnabled => _features.Contains("SOLUTION_WIDE_SDK_CONVERSION");
