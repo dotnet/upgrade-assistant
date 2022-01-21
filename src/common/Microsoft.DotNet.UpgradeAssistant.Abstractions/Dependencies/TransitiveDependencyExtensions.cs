@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
             do
             {
                 var current = projects.Dequeue();
-                set.UnionWith(current.NuGetReferences.PackageReferences);
+                set.UnionWith(current.PackageReferences);
 
                 foreach (var child in current.ProjectReferences)
                 {

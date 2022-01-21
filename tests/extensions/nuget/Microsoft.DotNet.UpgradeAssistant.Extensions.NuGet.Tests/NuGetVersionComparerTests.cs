@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Autofac.Extras.Moq;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
@@ -16,10 +17,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
         public void StringCompareTests(string x, string y, int expected)
         {
             // Arrange
-            var comparer = new NuGetVersionComparer();
+            using var mock = AutoMock.GetLoose();
 
             // Act
-            var result = comparer.Compare(x, y);
+            var result = mock.Create<NuGetVersionComparer>().Compare(x, y);
 
             // Assert
             Assert.Equal(expected, result);
@@ -37,10 +38,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests
         public void IsMajorVersionChange(string x, string y, bool expected)
         {
             // Arrange
-            var comparer = new NuGetVersionComparer();
+            using var mock = AutoMock.GetLoose();
 
             // Act
-            var result = comparer.IsMajorChange(x, y);
+            var result = mock.Create<NuGetVersionComparer>().IsMajorChange(x, y);
 
             // Assert
             Assert.Equal(expected, result);

@@ -13,10 +13,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     public class TransitiveReferenceAnalyzer : IDependencyAnalyzer
     {
         private readonly ITransitiveDependencyIdentifier _transitiveChecker;
+        private readonly IVersionComparer _comparer;
 
-        public TransitiveReferenceAnalyzer(ITransitiveDependencyIdentifier transitiveChecker)
+        public TransitiveReferenceAnalyzer(ITransitiveDependencyIdentifier transitiveChecker, IVersionComparer comparer)
         {
             _transitiveChecker = transitiveChecker ?? throw new ArgumentNullException(nameof(transitiveChecker));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         }
 
         public string Name => "Transitive reference analyzer";
@@ -35,12 +37,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             var allPackages = state.Packages.Concat(project.PackageReferences).ToHashSet();
             var closure = await _transitiveChecker.GetTransitiveDependenciesAsync(allPackages, state.TargetFrameworks, token).ConfigureAwait(false);
-            var set = allPackages
+            var dependencyLookup = allPackages
                 .SelectMany(p => closure.GetDependencies(p))
-                .Select(p => p.Name)
-                .ToHashSet();
+                .ToLookup(p => p.Name);
+
             var toRemove = state.Packages
-                .Where(p => set.Contains(p.Name))
+                .Where(p =>
+                {
+                    // Only remove a package iff it is transitively brought in with a higher or equal version
+                    var versions = dependencyLookup[p.Name].Select(static d => d.Version);
+
+                    if (_comparer.TryFindBestVersion(versions, out var best))
+                    {
+                        return _comparer.Compare(p.Version, best) <= 0;
+                    }
+
+                    return false;
+                })
                 .ToList();
 
             foreach (var packageReference in toRemove)
