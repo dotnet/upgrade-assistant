@@ -13,19 +13,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
     public class WindowsCompatReferenceAnalyzer : IDependencyAnalyzer
     {
         private const string PackageName = "Microsoft.Windows.Compatibility";
-
+        private readonly ITransitiveDependencyIdentifier _transitiveIdentifier;
         private readonly IPackageLoader _loader;
         private readonly IVersionComparer _comparer;
         private readonly ILogger<WindowsCompatReferenceAnalyzer> _logger;
 
         public WindowsCompatReferenceAnalyzer(
+            ITransitiveDependencyIdentifier transitiveIdentifier,
             IPackageLoader loader,
             IVersionComparer comparer,
             ILogger<WindowsCompatReferenceAnalyzer> logger)
         {
-            _logger = logger;
-            _loader = loader;
-            _comparer = comparer;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _transitiveIdentifier = transitiveIdentifier ?? throw new ArgumentNullException(nameof(transitiveIdentifier));
+            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         }
 
         public string Name => "Windows Compatibility Pack Analyzer";
@@ -47,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 return;
             }
 
-            if (await project.NuGetReferences.IsTransitivelyAvailableAsync(PackageName, token).ConfigureAwait(false))
+            if (await _transitiveIdentifier.IsTransitiveDependencyAsync(PackageName, project, token).ConfigureAwait(false))
             {
                 _logger.LogDebug("{PackageName} already referenced transitively", PackageName);
                 return;

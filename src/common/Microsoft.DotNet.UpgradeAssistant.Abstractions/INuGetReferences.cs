@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <param name="tfm">The target framework to get the dependencies for.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns>A collection of transitive dependencies.</returns>
+        [Obsolete("Please use ITransitiveDependencyIdentifier")]
         IAsyncEnumerable<NuGetReference> GetTransitivePackageReferencesAsync(TargetFrameworkMoniker tfm, CancellationToken token);
 
         /// <summary>
@@ -33,6 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <param name="packageName">The name of a package.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns>Returns whether the package is transitively referenced.</returns>
+        [Obsolete("Please use ITransitiveDependencyIdentifier")]
         ValueTask<bool> IsTransitivelyAvailableAsync(string packageName, CancellationToken token);
 
         /// <summary>
@@ -43,6 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <param name="nugetReference">The package identity.</param>
         /// <param name="token">A cancellation token.</param>
         /// <returns>Returns whether the package is transitively referenced.</returns>
+        [Obsolete("Please use ITransitiveDependencyIdentifier")]
         ValueTask<bool> IsTransitiveDependencyAsync(NuGetReference nugetReference, CancellationToken token);
     }
 }

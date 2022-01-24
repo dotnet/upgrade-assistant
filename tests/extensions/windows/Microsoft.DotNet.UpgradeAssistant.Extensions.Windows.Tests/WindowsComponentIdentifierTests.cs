@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Moq;
 using Xunit;
 
@@ -26,13 +27,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             // Arrange
             using var mock = AutoMock.GetLoose();
 
-            var projectFile = mock.Mock<IProjectFile>();
+            mock.Mock<ITransitiveDependencyIdentifier>()
+                .Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default))
+                .ReturnsAsync(TransitiveClosureCollection.Empty);
+
+            var projectFile = new Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);
             projectFile.Setup(f => f.Sdk).Returns(Array.Empty<string>());
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
             projectFile.Setup(f => f.GetPropertyValue(propertyName)).Returns(value);
 
-            var project = mock.Mock<IProject>();
+            var project = new Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
@@ -55,12 +60,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             // Arrange
             using var mock = AutoMock.GetLoose();
 
-            var projectFile = mock.Mock<IProjectFile>();
+            mock.Mock<ITransitiveDependencyIdentifier>()
+                .Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default))
+                .ReturnsAsync(TransitiveClosureCollection.Empty);
+
+            var projectFile = new Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);
             projectFile.Setup(f => f.Sdk).Returns(new HashSet<string>(sdk, StringComparer.OrdinalIgnoreCase));
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
 
-            var project = mock.Mock<IProject>();
+            var project = new Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(mock.Mock<INuGetReferences>().Object);
@@ -94,12 +103,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 
             using var mock = AutoMock.GetLoose();
 
-            var projectFile = mock.Mock<IProjectFile>();
+            mock.Mock<ITransitiveDependencyIdentifier>()
+                .Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default))
+                .ReturnsAsync(TransitiveClosureCollection.Empty);
+
+            var projectFile = new Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);
             projectFile.Setup(f => f.Sdk).Returns(Array.Empty<string>());
             projectFile.Setup(f => f.GetPropertyValue(It.IsAny<string>())).Returns(string.Empty);
 
-            var project = mock.Mock<IProject>();
+            var project = new Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.FrameworkReferences).Returns(frameworkReferences);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
@@ -131,9 +144,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 
             using var mock = AutoMock.GetLoose();
 
-            var projectFile = mock.Mock<IProjectFile>();
+            mock.Mock<ITransitiveDependencyIdentifier>()
+                .Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default))
+                .ReturnsAsync(TransitiveClosureCollection.Empty);
 
-            var project = mock.Mock<IProject>();
+            var projectFile = new Mock<IProjectFile>();
+            var project = new Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.References).Returns(references);
             project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
@@ -158,14 +174,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 
             using var mock = AutoMock.GetLoose();
 
-            var projectFile = mock.Mock<IProjectFile>();
+            var projectFile = new Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(false);
 
-            var nugetPackages = mock.Mock<INuGetReferences>();
-            nugetPackages.Setup(p => p.IsTransitivelyAvailableAsync(name, default)).ReturnsAsync(true);
+            var transitive = mock.Mock<ITransitiveDependencyIdentifier>();
+            var result = new TransitiveClosureCollection(new[] { new NuGetReference(name, string.Empty) }.ToLookup(t => t));
+            transitive
+                .Setup(p => p.GetTransitiveDependenciesAsync(It.IsAny<IEnumerable<NuGetReference>>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), default))
+                .ReturnsAsync(result);
 
-            var project = mock.Mock<IProject>();
+            var nugetPackages = new Mock<INuGetReferences>();
+            nugetPackages.Setup(n => n.PackageReferences).Returns(Enumerable.Empty<NuGetReference>());
+
+            var project = new Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.TargetFrameworks).Returns(Array.Empty<TargetFrameworkMoniker>());
             project.Setup(p => p.NuGetReferences).Returns(nugetPackages.Object);
 
             var componentIdentifier = mock.Create<WindowsComponentIdentifier>();

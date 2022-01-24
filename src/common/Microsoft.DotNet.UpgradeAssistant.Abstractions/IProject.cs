@@ -26,6 +26,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
         INuGetReferences NuGetReferences { get; }
 
         /// <summary>
+        /// Gets all the PackageReference items in the project including evaluated items.
+        /// </summary>
+        IEnumerable<NuGetReference> PackageReferences { get; }
+
+        /// <summary>
         /// Gets Evaluated Project Properties.
         /// </summary>
         IEnumerable<string> ProjectTypes { get; }

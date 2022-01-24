@@ -6,13 +6,21 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 {
     [Order(int.MaxValue)]
     public class TransitiveReferenceAnalyzer : IDependencyAnalyzer
     {
+        private readonly ITransitiveDependencyIdentifier _transitiveChecker;
+        private readonly IVersionComparer _comparer;
+
+        public TransitiveReferenceAnalyzer(ITransitiveDependencyIdentifier transitiveChecker, IVersionComparer comparer)
+        {
+            _transitiveChecker = transitiveChecker ?? throw new ArgumentNullException(nameof(transitiveChecker));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+        }
+
         public string Name => "Transitive reference analyzer";
 
         public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
@@ -27,13 +35,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            // If the package is referenced transitively, mark for removal
-            foreach (var packageReference in state.Packages)
-            {
-                if (await project.NuGetReferences.IsTransitiveDependencyAsync(packageReference, token).ConfigureAwait(false))
+            var allPackages = state.Packages.Concat(project.PackageReferences).ToHashSet();
+            var closure = await _transitiveChecker.GetTransitiveDependenciesAsync(allPackages, state.TargetFrameworks, token).ConfigureAwait(false);
+            var dependencyLookup = allPackages
+                .SelectMany(p => closure.GetDependencies(p))
+                .ToLookup(p => p.Name);
+
+            var toRemove = state.Packages
+                .Where(p =>
                 {
-                    state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
-                }
+                    // Only remove a package iff it is transitively brought in with a higher or equal version
+                    var versions = dependencyLookup[p.Name].Select(static d => d.Version);
+
+                    if (_comparer.TryFindBestVersion(versions, out var best))
+                    {
+                        return _comparer.Compare(p.Version, best) <= 0;
+                    }
+
+                    return false;
+                })
+                .ToList();
+
+            foreach (var packageReference in toRemove)
+            {
+                state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
             }
         }
     }

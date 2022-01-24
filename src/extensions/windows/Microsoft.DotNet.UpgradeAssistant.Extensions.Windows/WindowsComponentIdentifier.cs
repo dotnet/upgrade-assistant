@@ -6,12 +6,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     public class WindowsComponentIdentifier : IComponentIdentifier
     {
         private const string DesktopSdk = "Microsoft.NET.Sdk.Desktop";
+        private const string WinRTPackage = "Microsoft.Windows.SDK.Contracts";
 
         private readonly string[] _desktopFrameworkReferences = new[]
         {
@@ -33,10 +35,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             "WindowsBase"
         };
 
-        private readonly string[] _winRTPackages = new[]
+        private readonly ITransitiveDependencyIdentifier _identifier;
+
+        public WindowsComponentIdentifier(ITransitiveDependencyIdentifier identifier)
         {
-            "Microsoft.Windows.SDK.Contracts"
-        };
+            _identifier = identifier;
+        }
 
         public async ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token)
         {
@@ -107,9 +111,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return components;
         }
 
-        private ValueTask<bool> IsWinRt(IProject project, CancellationToken token) =>
-            _winRTPackages
-                .ToAsyncEnumerable()
-                .AnyAwaitAsync(package => project.NuGetReferences.IsTransitivelyAvailableAsync(package, token), cancellationToken: token);
+        private async ValueTask<bool> IsWinRt(IProject project, CancellationToken token)
+        {
+            return await _identifier.IsTransitiveDependencyAsync(WinRTPackage, project, token).ConfigureAwait(false);
+        }
     }
 }

@@ -485,7 +485,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly.Client
         /// <summary>
         /// Implements the search for a given hash token.
         /// </summary>
-        private bool TryBinarySearchForHashToken(ReadOnlySpan<byte> indexSegment, HashToken hashToken, out ReadOnlySpan<byte> entry, out ushort probes)
+        private static bool TryBinarySearchForHashToken(ReadOnlySpan<byte> indexSegment, HashToken hashToken, out ReadOnlySpan<byte> entry, out ushort probes)
         {
             probes = 0;
             if (indexSegment.Length % PERHASH_SIZE != 0)

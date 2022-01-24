@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Build.Construction;
 
+using MBuild = Microsoft.Build.Evaluation;
+
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal static class MSBuildExtensions
@@ -15,6 +17,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var packageName = item.Include;
             var packageVersion = (item.Children.FirstOrDefault(c => c.ElementName.Equals(MSBuildConstants.VersionElementName, StringComparison.OrdinalIgnoreCase)) as ProjectMetadataElement)?.Value
                 ?? "0.0.0"; // Package references without versions will resolve to the lowest stable version
+
+            return new NuGetReference(packageName, packageVersion);
+        }
+
+        public static NuGetReference AsNuGetReference(this MBuild.ProjectItem item)
+        {
+            var packageName = item.EvaluatedInclude;
+            var packageVersion = item.GetMetadataValue(MSBuildConstants.VersionElementName) ?? "0.0.0"; // Package references without versions will resolve to the lowest stable version
 
             return new NuGetReference(packageName, packageVersion);
         }
