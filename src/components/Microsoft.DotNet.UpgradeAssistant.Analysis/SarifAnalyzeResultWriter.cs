@@ -3,10 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Sarif;
@@ -15,7 +14,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class SarifAnalyzeResultWriter : IAnalyzeResultWriter
     {
-        private readonly string _sarifLogPath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
         private readonly ISerializer _serializer;
 
         public string Format => "sarif";
@@ -25,18 +23,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             this._serializer = serializer;
         }
 
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, string? format, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, Stream stream, CancellationToken token)
         {
             if (results is null)
             {
                 throw new ArgumentNullException(nameof(results));
             }
 
+            if (stream is null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
+
             var sarifLog = new SarifLog()
             {
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
-            _serializer.Write(_sarifLogPath, sarifLog);
+
+            using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true);
+
+            _serializer.Write(writer, sarifLog);
         }
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)

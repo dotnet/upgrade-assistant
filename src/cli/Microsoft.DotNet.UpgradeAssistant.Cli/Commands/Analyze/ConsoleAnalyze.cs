@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,8 +63,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             if (_writerProvider.TryGetWriter(_options.Value.Format, out var writer))
             {
-                _logger.LogInformation("Writing to output format {Format}", _options.Value.Format);
-                await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), _options.Value.Format, token).ConfigureAwait(false);
+                var output = Path.Combine(Directory.GetCurrentDirectory(), $"AnalysisReport.{_options.Value.Format}");
+
+                _logger.LogInformation("Writing output to {File}", output);
+
+                using var stream = File.OpenWrite(output);
+                await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), stream, token).ConfigureAwait(false);
             }
             else
             {

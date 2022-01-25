@@ -23,9 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
 
             _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                await writer.WriteAsync(null, null, source.Token).ConfigureAwait(false);
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+                await writer.WriteAsync(null!, null!, source.Token).ConfigureAwait(false);
             }).ConfigureAwait(false);
         }
 
@@ -60,15 +58,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, CancellationToken.None).ConfigureAwait(false);
+            using var ms = new MemoryStream();
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), ms, CancellationToken.None).ConfigureAwait(false);
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
-            if (!File.Exists(filePath))
-            {
-                Assert.True(false, "File wasn't exported successfully.");
-            }
+            ms.Position = 0;
 
-            var sarifLog = SarifLog.Load(filePath);
+            var sarifLog = SarifLog.Load(ms);
             Assert.Equal("https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json", sarifLog.SchemaUri.OriginalString);
             Assert.Equal(SarifVersion.Current, sarifLog.Version);
 
@@ -121,15 +116,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), null, source.Token).ConfigureAwait(false);
+            using var ms = new MemoryStream();
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), ms, source.Token).ConfigureAwait(false);
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
-            if (!File.Exists(filePath))
-            {
-                Assert.True(false, "File wasn't exported successfully.");
-            }
+            ms.Position = 0;
 
-            var sarifLog = SarifLog.Load(filePath);
+            var sarifLog = SarifLog.Load(ms);
             Assert.Equal("https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json", sarifLog.SchemaUri.OriginalString);
             Assert.Equal(SarifVersion.Current, sarifLog.Version);
 

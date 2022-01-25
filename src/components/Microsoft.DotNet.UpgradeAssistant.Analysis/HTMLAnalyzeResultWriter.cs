@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Sarif;
@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             this._serializer = serializer;
         }
 
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, string? format, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, Stream stream, CancellationToken token)
         {
             if (results is null)
             {
@@ -35,22 +35,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             {
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
-            WriteHTML(sarifLog);
+
+            WriteHTML(sarifLog, stream);
         }
 
-        private void WriteHTML(SarifLog sarifLog)
+        private void WriteHTML(SarifLog sarifLog, Stream stream)
         {
-            var sarifString = _serializer.Serialize(sarifLog);
+            var sarifString = GetSarifString(sarifLog);
             var ss = sarifString.Replace("\r\n", string.Empty).Replace(@"\", string.Empty).Replace("file:///C:/", string.Empty);
 
-            var names = Assembly.GetExecutingAssembly();
-            var templatePath = names.GetManifestResourceNames();
-
-            using var assembly = Assembly.GetExecutingAssembly().GetManifestResourceStream(templatePath[0]);
+            using var assembly = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(HtmlAnalyzeResultWriter), "HTMLTemplate.html");
             using var templateString = new StreamReader(assembly);
             var template = templateString.ReadToEnd();
             var finishedTemplate = template.Replace("%SARIF_LOG%", ss);
-            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html"), finishedTemplate);
+
+            using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true);
+            writer.Write(finishedTemplate);
         }
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)
@@ -129,6 +129,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             }
 
             return results;
+        }
+
+        private string GetSarifString(SarifLog sarifLog)
+        {
+            using var stringWriter = new StringWriter();
+
+            _serializer.Write(stringWriter, sarifLog);
+
+            return stringWriter.ToString();
         }
     }
 }

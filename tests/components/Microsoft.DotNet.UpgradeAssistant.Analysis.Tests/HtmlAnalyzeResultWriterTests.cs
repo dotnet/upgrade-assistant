@@ -43,13 +43,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                 }
             };
 
-            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), "html", CancellationToken.None).ConfigureAwait(false);
+            using var ms = new MemoryStream();
+            await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), ms, CancellationToken.None).ConfigureAwait(false);
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html");
-            if (!File.Exists(filePath))
-            {
-                Assert.True(false, "File wasn't exported successfully.");
-            }
+            // Attempt to move position to ensure stream is still open
+            ms.Position = 0;
+
+            Assert.NotEmpty(ms.ToArray());
         }
     }
 }
