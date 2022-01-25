@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var allPackages = state.Packages.Concat(project.PackageReferences).ToHashSet();
+            var allPackages = new HashSet<NuGetReference>(state.Packages.Concat(project.PackageReferences));
             var closure = await _transitiveChecker.GetTransitiveDependenciesAsync(allPackages, state.TargetFrameworks, token).ConfigureAwait(false);
             var dependencyLookup = allPackages
                 .SelectMany(p => closure.GetDependencies(p))

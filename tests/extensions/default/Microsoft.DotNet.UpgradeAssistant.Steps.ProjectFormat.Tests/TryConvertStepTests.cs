@@ -7,7 +7,7 @@ using AutoFixture;
 using Moq;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.Tests
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert.Tests
 {
     public class TryConvertStepTests
     {

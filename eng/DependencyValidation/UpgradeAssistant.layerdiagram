@@ -239,6 +239,38 @@
             </reference>
           </references>
         </layer>
+        <layer Id="b335a2f7-d736-4f71-817e-4100ec46b7e2" name="try-convert">
+          <references>
+            <reference Id="e84055f5-9b64-4240-b123-3e3bb18597dc" name="try-convert">
+              <ArtifactNode Label="try-convert" Category="CodeSchema_Project" Id="(Assembly=../../src/extensions/try-convert)">
+                <Category Ref="CodeMap_SolutionFolder" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=MSBuild.Conversion.Facts)" Label="MSBuild.Conversion.Facts.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=MSBuild.Conversion.Package)" Label="MSBuild.Conversion.Package.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=MSBuild.Conversion.Project)" Label="MSBuild.Conversion.Project.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=MSBuild.Conversion.SDK)" Label="MSBuild.Conversion.SDK.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=MSBuild.Abstractions)" Label="MSBuild.Abstractions.dll" Category="CodeSchema_Assembly">
+                <Category Ref="FileSystem.Category.FileOfType.dll" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+              <ExpandedNode Id="(Assembly=Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert)" Label="Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">

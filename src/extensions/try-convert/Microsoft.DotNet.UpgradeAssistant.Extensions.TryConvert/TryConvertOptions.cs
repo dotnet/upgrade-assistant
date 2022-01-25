@@ -4,7 +4,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 {
     public class TryConvertOptions
     {

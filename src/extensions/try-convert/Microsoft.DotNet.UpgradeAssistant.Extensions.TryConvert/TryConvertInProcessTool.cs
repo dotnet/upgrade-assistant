@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using MSBuild.Abstractions;
 using MSBuild.Conversion.Project;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 {
     public class TryConvertInProcessTool : ITryConvertTool
     {

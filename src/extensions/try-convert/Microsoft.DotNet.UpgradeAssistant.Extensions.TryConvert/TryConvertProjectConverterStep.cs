@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 {
     public class TryConvertProjectConverterStep : UpgradeStep
     {

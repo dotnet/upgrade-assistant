@@ -4,7 +4,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 {
     public interface ITryConvertTool
     {
