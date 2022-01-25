@@ -19,7 +19,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
     {
         private readonly ILogger _logger;
         private readonly IEnumerable<IComponentIdentifier> _componentIdentifiers;
-        private readonly IPackageRestorer _restorer;
         private readonly Factories _factories;
 
         public MSBuildWorkspaceUpgradeContext Context { get; }
@@ -30,17 +29,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             MSBuildWorkspaceUpgradeContext context,
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             Factories factories,
-            IPackageRestorer restorer,
-            ITargetFrameworkMonikerComparer comparer,
             FileInfo file,
-            ILogger logger)
+            ILogger<MSBuildProject> logger)
         {
             FileInfo = file ?? throw new ArgumentNullException(nameof(file));
             Context = context ?? throw new ArgumentNullException(nameof(context));
 
             _factories = factories ?? throw new ArgumentNullException(nameof(factories));
             _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
-            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -55,10 +51,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 throw new InvalidOperationException("Could not find project path for reference");
             }
 
-            return Context.GetOrAddProject(new FileInfo(project.FilePath));
+            return Context.GetProject(project.FilePath);
         });
 
         public Language Language => ParseLanguageByProjectFileExtension(FileInfo.Extension);
+
+        IEnumerable<NuGetReference> IProject.PackageReferences
+        {
+            get
+            {
+                var items = Project.GetItems(MSBuildConstants.PackageReferenceType);
+
+                if (items is null)
+                {
+                    return Enumerable.Empty<NuGetReference>();
+                }
+
+                return items.Select(i => i.AsNuGetReference());
+            }
+        }
 
         public INuGetReferences NuGetReferences => _factories.CreateNuGetReferences(Context, this);
 

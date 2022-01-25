@@ -23,38 +23,30 @@ using NuGet.Versioning;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
-    public sealed class PackageLoader : IPackageLoader, IPackageDownloader, IDisposable, IPackageCreator
+    public sealed class PackageLoader : IPackageLoader, IPackageDownloader, IPackageCreator
     {
         private const int MaxRetries = 3;
 
-        private readonly SourceCacheContext _cache;
-        private readonly Lazy<IEnumerable<PackageSource>> _packageSources;
-        private readonly ILogger<PackageLoader> _logger;
-        private readonly global::NuGet.Common.ILogger _nugetLogger;
         private readonly Dictionary<PackageSource, SourceRepository> _sourceRepositoryCache;
-        private readonly NuGetDownloaderOptions _options;
+        private readonly NuGetLogger _nugetLogger;
+        private readonly SourceCacheContext _context;
+        private readonly IEnumerable<PackageSource> _packageSource;
+        private readonly IOptions<NuGetDownloaderOptions> _options;
+        private readonly ILogger<PackageLoader> _logger;
 
         public PackageLoader(
-            INuGetPackageSourceFactory sourceFactory,
-            ILogger<PackageLoader> logger,
-            IOptions<NuGetDownloaderOptions> options)
+            SourceCacheContext context,
+            IEnumerable<PackageSource> packageSource,
+            IOptions<NuGetDownloaderOptions> options,
+            ILogger<PackageLoader> logger)
         {
-            if (sourceFactory is null)
-            {
-                throw new ArgumentNullException(nameof(sourceFactory));
-            }
-
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _nugetLogger = new NuGetLogger(logger);
-            _cache = new SourceCacheContext { NoCache = true };
-            _options = options.Value;
-            _packageSources = new Lazy<IEnumerable<PackageSource>>(() => sourceFactory.GetPackageSources(_options.PackageSourcePath));
+            _context = context;
+            _packageSource = packageSource;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _sourceRepositoryCache = new Dictionary<PackageSource, SourceRepository>();
+
+            _nugetLogger = new NuGetLogger(logger);
         }
 
         public async Task<bool> DoesPackageSupportTargetFrameworksAsync(NuGetReference packageReference, IEnumerable<TargetFrameworkMoniker> targetFrameworks, CancellationToken token)
@@ -83,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return SearchByNameAsync(reference.Name, tfms, options, currentVersion: reference.GetNuGetVersion(), _packageSources.Value, token: token);
+            return SearchByNameAsync(reference.Name, tfms, options, currentVersion: reference.GetNuGetVersion(), _packageSource, token: token);
         }
 
         public Task<NuGetReference?> GetLatestVersionAsync(string packageName, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
@@ -107,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             if (sources is null)
             {
-                sources = _packageSources.Value;
+                sources = _packageSource;
             }
 
             foreach (var source in sources)
@@ -115,7 +107,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 try
                 {
                     var metadata = await GetSourceRepository(source).GetResourceAsync<PackageMetadataResource>(token).ConfigureAwait(false);
-                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(name, includePrerelease: options.Prerelease, includeUnlisted: options.Unlisted, _cache, _nugetLogger, token)).ConfigureAwait(false);
+                    var searchResults = await CallWithRetryAsync(() => metadata.GetMetadataAsync(name, includePrerelease: options.Prerelease, includeUnlisted: options.Unlisted, _context, _nugetLogger, token)).ConfigureAwait(false);
 
                     results.AddRange(searchResults);
                 }
@@ -254,7 +246,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         private Stream? GetCachedPackage(NuGetReference packageReference)
         {
             // First look in the local NuGet cache for the archive
-            if (_options.CachePath is string cachePath)
+            if (_options.Value.CachePath is string cachePath)
             {
                 var archivePath = Path.Combine(cachePath, packageReference.Name, packageReference.Version, $"{packageReference.Name}.{packageReference.Version}.nupkg");
                 if (File.Exists(archivePath))
@@ -287,7 +279,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         {
             // Attempt to download the package from the sources
             var packageVersion = packageReference.GetNuGetVersion();
-            var packageSources = sources ?? _packageSources.Value;
+            var packageSources = sources ?? _packageSource;
 
             foreach (var source in packageSources)
             {
@@ -295,9 +287,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 try
                 {
                     var packageFinder = await repo.GetResourceAsync<FindPackageByIdResource>(token).ConfigureAwait(false);
-                    if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _cache, _nugetLogger, token).ConfigureAwait(false))
+                    if (await packageFinder.DoesPackageExistAsync(packageReference.Name, packageVersion, _context, (NuGetLogger?)_nugetLogger, token).ConfigureAwait(false))
                     {
-                        if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, stream, _cache, _nugetLogger, token).ConfigureAwait(false))
+                        if (await packageFinder.CopyNupkgToStreamAsync(packageReference.Name, packageVersion, stream, _context, (NuGetLogger?)_nugetLogger, token).ConfigureAwait(false))
                         {
                             _logger.LogDebug("Package {NuGetPackage} downloaded from feed {NuGetFeed}", packageReference, source.Source);
                             return true;
@@ -345,11 +337,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             await ms.DisposeAsync().ConfigureAwait(false);
             return null;
-        }
-
-        public void Dispose()
-        {
-            _cache?.Dispose();
         }
 
         private SourceRepository GetSourceRepository(PackageSource source)

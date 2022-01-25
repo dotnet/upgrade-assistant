@@ -4,15 +4,25 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
+namespace Microsoft.DotNet.UpgradeAssistant
 {
-    internal static class GraphTraversalExtensions
+    public static class GraphTraversalExtensions
     {
         public static IEnumerable<T> PostOrderTraversal<T>(this T initial, Func<T, IEnumerable<T>> selector, IEqualityComparer<T>? comparer = null)
             => new[] { initial }.PostOrderTraversal(selector, comparer);
 
         public static IEnumerable<T> PostOrderTraversal<T>(this IEnumerable<T> initial, Func<T, IEnumerable<T>> selector, IEqualityComparer<T>? comparer = null)
         {
+            if (initial is null)
+            {
+                throw new ArgumentNullException(nameof(initial));
+            }
+
+            if (selector is null)
+            {
+                throw new ArgumentNullException(nameof(selector));
+            }
+
             var result = new List<T>();
             var visited = new HashSet<T>(comparer);
 

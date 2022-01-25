@@ -30,11 +30,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
         };
 
         public PackageUpdaterPreTFMStep(
-            IPackageRestorer packageRestorer,
-            IEnumerable<IDependencyAnalyzer> packageAnalyzers,
-            IDependencyAnalyzerRunner dependencyAnalyzerRunner,
+            IEnumerable<IDependencyAnalyzer> analyzers,
             ILogger<PackageUpdaterPreTFMStep> logger)
-            : base(packageRestorer, packageAnalyzers, dependencyAnalyzerRunner, logger)
+            : base(analyzers, logger)
         {
         }
     }

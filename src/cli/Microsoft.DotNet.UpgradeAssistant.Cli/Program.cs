@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         public static Task<int> Main(string[] args)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (FeatureFlags.IsWindowsCheckEnabled && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 Console.WriteLine(LocalizedStrings.NonWindowsWarning);
                 return Task.FromResult(ErrorCodes.PlatformNotSupported);
@@ -34,6 +34,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             root.AddCommand(new ConsoleAnalyzeCommand());
             root.AddCommand(new ConsoleUpgradeCommand());
             root.AddCommand(new ExtensionManagementCommand());
+            root.AddCommand(new FeatureFlagCommand());
 
             return new CommandLineBuilder(root)
                 .UseDefaults()

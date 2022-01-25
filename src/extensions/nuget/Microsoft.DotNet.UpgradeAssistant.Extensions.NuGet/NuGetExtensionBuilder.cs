@@ -2,8 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NuGet.Configuration;
+using NuGet.Protocol.Core.Types;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
@@ -21,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
         private static void AddNuGet(IServiceCollection services)
         {
+            services.AddTransient<ITransitiveDependencyIdentifier, NuGetTransitiveDependencyIdentifier>();
             services.AddTransient<ITargetFrameworkCollection, TargetFrameworkMonikerCollection>();
             services.AddTransient<INuGetReferences, ProjectNuGetReferences>();
             services.AddSingleton<PackageLoader>();
@@ -32,10 +36,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             services.AddTransient<ITargetFrameworkMonikerComparer, NuGetTargetFrameworkMonikerComparer>();
             services.AddSingleton<IUpgradeStartup, NuGetCredentialsStartup>();
             services.AddSingleton<INuGetPackageSourceFactory, NuGetPackageSourceFactory>();
+            services.AddSingleton(_ => Settings.LoadDefaultSettings(null));
+            services.AddSingleton(_ => new SourceCacheContext { NoCache = true });
+            services.AddSingleton(ctx => ctx.GetRequiredService<INuGetPackageSourceFactory>().GetPackageSources(ctx.GetRequiredService<IOptions<NuGetDownloaderOptions>>().Value.PackageSourcePath));
             services.AddOptions<NuGetDownloaderOptions>()
-                .Configure(options =>
+                .Configure<ISettings>((options, settings) =>
                 {
-                    var settings = Settings.LoadDefaultSettings(null);
                     options.CachePath = SettingsUtility.GetGlobalPackagesFolder(settings);
                 });
         }

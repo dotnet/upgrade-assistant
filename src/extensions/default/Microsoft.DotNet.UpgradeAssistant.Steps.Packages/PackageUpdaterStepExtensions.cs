@@ -27,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.Services.AddTransient<IAnalyzeResultProvider, PackageAnalyzerResultProvider>();
 
             services.AddExtensionOption<PackageUpdaterOptions>(PackageUpdaterOptionsSectionName)
-                .MapFiles<NuGetPackageMap[]>(t => Path.Combine(t.PackageMapPath, PackageMapExtension));
+                .MapFiles<NuGetPackageMap[]>(t => Path.Combine(t.PackageMapPath!, PackageMapExtension));
         }
     }
 }

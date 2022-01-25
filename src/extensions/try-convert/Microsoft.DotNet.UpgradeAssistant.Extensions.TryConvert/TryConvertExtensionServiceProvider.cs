@@ -4,15 +4,16 @@
 using System;
 using System.IO;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
-using Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
-namespace Microsoft.DotNet.UpgradeAssistant
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 {
-    public static class ProjectFormatStepsExtensions
+    public class TryConvertExtensionServiceProvider : IExtensionServiceProvider
     {
-        public static OptionsBuilder<TryConvertOptions> AddProjectFormatSteps(this IExtensionServiceCollection services)
+        private const string TryConvertProjectConverterStepOptionsSection = "TryConvert";
+
+        public void AddServices(IExtensionServiceCollection services)
         {
             if (services is null)
             {
@@ -20,10 +21,21 @@ namespace Microsoft.DotNet.UpgradeAssistant
             }
 
             services.Services.AddUpgradeStep<SetTFMStep>();
-            services.Services.AddUpgradeStep<TryConvertProjectConverterStep>();
-            services.Services.AddTransient<ITryConvertTool, TryConvertInProcessTool>();
 
-            return services.Services.AddOptions<TryConvertOptions>()
+            if (FeatureFlags.IsSolutionWideSdkConversionEnabled)
+            {
+                services.Services.AddUpgradeStep<SdkStyleConversionSolutionWideStep>();
+            }
+            else
+            {
+                services.Services.AddUpgradeStep<TryConvertProjectConverterStep>();
+            }
+
+            services.Services.AddTransient<ITryConvertTool, TryConvertInProcessTool>();
+            services.Services.AddTransient<TryConvertRunner>();
+
+            services.Services.AddOptions<TryConvertOptions>()
+                .Bind(services.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection))
                 .PostConfigure(options =>
                 {
                     var path = Environment.ExpandEnvironmentVariables(options.ToolPath);

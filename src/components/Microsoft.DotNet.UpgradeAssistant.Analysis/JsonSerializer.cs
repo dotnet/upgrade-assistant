@@ -3,52 +3,34 @@
 
 using System.Globalization;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class JsonSerializer : ISerializer
     {
-        private readonly Encoding _fileEncoding = new UTF8Encoding(false);
-
-        private readonly JsonSerializerSettings _settings = new()
+        private readonly Newtonsoft.Json.JsonSerializer _serializer = Newtonsoft.Json.JsonSerializer.Create(new()
         {
             Formatting = Formatting.Indented,
             Culture = CultureInfo.InvariantCulture,
             TypeNameHandling = TypeNameHandling.None,
             NullValueHandling = NullValueHandling.Ignore,
-        };
-
-        public JsonSerializer()
-        {
-        }
-
-        public virtual T Deserialize<T>(string content)
-        {
-            return JsonConvert.DeserializeObject<T>(content);
-        }
+        });
 
         public virtual string Serialize<T>(T obj)
         {
-            return JsonConvert.SerializeObject(obj, typeof(T), _settings);
+            using var stringWriter = new StringWriter();
+
+            Write<T>(stringWriter, obj);
+
+            return stringWriter.ToString();
         }
 
-        public virtual T Read<T>(string filePath)
+        public void Write<T>(TextWriter writer, T obj)
         {
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException(filePath);
-            }
+            using var jsonWriter = new JsonTextWriter(writer);
 
-            string contents = File.ReadAllText(filePath, _fileEncoding);
-            return Deserialize<T>(contents);
-        }
-
-        public virtual void Write<T>(string filePath, T obj)
-        {
-            string contents = Serialize<T>(obj);
-            File.WriteAllText(filePath, contents, _fileEncoding);
+            _serializer.Serialize(jsonWriter, obj, typeof(T));
         }
     }
 }

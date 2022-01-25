@@ -51,6 +51,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
             public const string Android = "android";
             public const string IOS = "ios";
         }
+
+        private static class DefaultVersions
+        {
+            public static readonly Version Windows = new(7, 0, 0, 0);
+        }
+
 #pragma warning restore CA1034 // Nested types should not be visible
 
         private readonly string? _platform;
@@ -165,7 +171,11 @@ namespace Microsoft.DotNet.UpgradeAssistant
             return hashcode.ToHashCode();
         }
 
-        public override string ToString()
+        public override string ToString() => ToString(false);
+
+        public string ToFullString() => ToString(true);
+
+        private string ToString(bool includeDefaultPlatformVersion)
         {
             var sb = new StringBuilder();
 
@@ -184,6 +194,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 if (PlatformVersion is Version platformVersion)
                 {
                     sb.Append(platformVersion);
+                }
+                else if (includeDefaultPlatformVersion)
+                {
+                    var defaultVersion = platform switch
+                    {
+                        Platforms.Windows => DefaultVersions.Windows,
+                        _ => null,
+                    };
+
+                    sb.Append(defaultVersion);
                 }
             }
 

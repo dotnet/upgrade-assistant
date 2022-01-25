@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     Logger.LogCritical(exc, "Unexpected exception analyzing package references for: {ProjectPath}", context.CurrentProject.Required().FileInfo);
                 }
 
-                foreach (var r in this.ExtractAnalysisResult(Path.Combine(project.FileInfo.DirectoryName, project.FileInfo.Name), _analysisState))
+                foreach (var r in this.ExtractAnalysisResult(Path.Combine(project.FileInfo.DirectoryName!, project.FileInfo.Name), _analysisState))
                 {
                     yield return r;
                 }

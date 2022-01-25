@@ -15,8 +15,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
 {
     public class DefaultExtensionServiceProvider : IExtensionServiceProvider
     {
-        private const string TryConvertProjectConverterStepOptionsSection = "TryConvert";
-
         public void AddServices(IExtensionServiceCollection services)
         {
             if (services is null)
@@ -34,8 +32,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             services.AddBackupStep();
             services.AddConfigUpdaterStep();
             services.AddPackageUpdaterStep();
-            services.AddProjectFormatSteps()
-                .Bind(services.Configuration.GetSection(TryConvertProjectConverterStepOptionsSection));
             services.AddSolutionSteps();
             services.AddSourceUpdaterStep();
             services.AddTemplateInserterStep();

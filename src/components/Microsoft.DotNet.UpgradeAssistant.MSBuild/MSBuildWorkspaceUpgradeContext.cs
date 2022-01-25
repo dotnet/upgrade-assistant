@@ -17,14 +17,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
-        private readonly IPackageRestorer _restorer;
-        private readonly ITargetFrameworkMonikerComparer _comparer;
-        private readonly IEnumerable<IComponentIdentifier> _componentIdentifiers;
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly Dictionary<string, IProject> _projectCache;
         private readonly IOptions<WorkspaceOptions> _options;
-        private readonly Factories _factories;
-
+        private readonly Func<MSBuildWorkspaceUpgradeContext, FileInfo, MSBuildProject> _projectFactory;
         private List<FileInfo>? _entryPointPaths;
         private FileInfo? _projectPath;
 
@@ -57,19 +53,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public MSBuildWorkspaceUpgradeContext(
             IOptions<WorkspaceOptions> options,
-            IPackageRestorer restorer,
             Factories factories,
-            ITargetFrameworkMonikerComparer comparer,
-            IEnumerable<IComponentIdentifier> componentIdentifiers,
+            Func<MSBuildWorkspaceUpgradeContext, FileInfo, MSBuildProject> projectFactory,
             ILogger<MSBuildWorkspaceUpgradeContext> logger)
         {
-            _factories = factories ?? throw new ArgumentNullException(nameof(factories));
-            _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
+            _projectFactory = projectFactory ?? throw new ArgumentNullException(nameof(projectFactory));
             _options = options ?? throw new ArgumentNullException(nameof(options));
-            _restorer = restorer ?? throw new ArgumentNullException(nameof(restorer));
-            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
-            _componentIdentifiers = componentIdentifiers ?? throw new ArgumentNullException(nameof(componentIdentifiers));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
 
             Properties = new UpgradeContextProperties();
             SolutionInfo = factories.CreateSolutionInfo(InputPath);
@@ -86,16 +78,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             ProjectCollection.Dispose();
         }
 
-        public IProject GetOrAddProject(FileInfo path)
+        public IProject GetProject(string path)
         {
-            if (_projectCache.TryGetValue(path.FullName, out var cached))
+            // Normalize to ensure we're always getting the same path
+            var normalizedPath = Path.GetFullPath(path);
+
+            if (_projectCache.TryGetValue(normalizedPath, out var cached))
             {
                 return cached;
             }
 
-            var project = new MSBuildProject(this, _componentIdentifiers, _factories, _restorer, _comparer, path, _logger);
+            var project = _projectFactory(this, new FileInfo(normalizedPath));
 
-            _projectCache.Add(path.FullName, project);
+            _projectCache.Add(normalizedPath, project);
 
             return project;
         }
@@ -111,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                 foreach (var path in _entryPointPaths)
                 {
-                    yield return GetOrAddProject(path);
+                    yield return GetProject(path.FullName);
                 }
             }
 
@@ -138,7 +133,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     }
                     else
                     {
-                        yield return GetOrAddProject(new FileInfo(project.FilePath));
+                        yield return GetProject(project.FilePath);
                     }
                 }
             }
@@ -223,7 +218,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     return null;
                 }
 
-                return GetOrAddProject(_projectPath);
+                return GetProject(_projectPath.FullName);
             }
         }
 

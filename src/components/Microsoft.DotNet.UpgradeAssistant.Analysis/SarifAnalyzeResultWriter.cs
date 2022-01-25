@@ -3,60 +3,46 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Sarif;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public class AnalyzeResultWriter : IAnalyzeResultWriter
+    public class SarifAnalyzeResultWriter : IAnalyzeResultWriter
     {
-        private readonly string _sarifLogPath = Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.sarif");
         private readonly ISerializer _serializer;
 
-        public AnalyzeResultWriter(ISerializer serializer)
+        public string Format => "sarif";
+
+        public SarifAnalyzeResultWriter(ISerializer serializer)
         {
             this._serializer = serializer;
         }
 
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, string? format, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, Stream stream, CancellationToken token)
         {
             if (results is null)
             {
                 throw new ArgumentNullException(nameof(results));
             }
 
+            if (stream is null)
+            {
+                throw new ArgumentNullException(nameof(stream));
+            }
+
             var sarifLog = new SarifLog()
             {
                 Runs = await ExtractRunsAsync(results).ToListAsync(token).ConfigureAwait(false),
             };
-            if (format is not null && string.Equals(format, "html", StringComparison.OrdinalIgnoreCase))
-            {
-                WriteHTML(sarifLog);
-            }
-            else
-            {
-                _serializer.Write(_sarifLogPath, sarifLog);
-            }
-        }
 
-        private void WriteHTML(SarifLog sarifLog)
-        {
-            var sarifString = _serializer.Serialize(sarifLog);
-            var ss = sarifString.Replace("\r\n", string.Empty).Replace(@"\", string.Empty).Replace("file:///C:/", string.Empty);
+            using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true);
 
-            var names = Assembly.GetExecutingAssembly();
-            var templatePath = names.GetManifestResourceNames();
-
-            using var assembly = Assembly.GetExecutingAssembly().GetManifestResourceStream(templatePath[0]);
-            using var templateString = new StreamReader(assembly);
-            var template = templateString.ReadToEnd();
-            var finishedTemplate = template.Replace("%SARIF_LOG%", ss);
-            File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "AnalysisReport.html"), finishedTemplate);
+            _serializer.Write(writer, sarifLog);
         }
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)
