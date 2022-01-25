@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     .RunUpgradeAssistantAsync(token));
             if (FeatureFlags.IsAnalyzeFormatEnabled)
             {
-                AddOption(new Option<string>(new[] { "--format", "--f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
+                AddOption(new Option<string>(new[] { "--format", "-f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
             }
         }
     }
