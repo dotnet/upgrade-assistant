@@ -34,6 +34,26 @@
     </Validate>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\modules\try-convert\src\MSBuild.Abstractions\MSBuild.Abstractions.csproj">
+      <Name>MSBuild.Abstractions</Name>
+      <Project>{9f711060-ca6e-464e-a1bb-a89dafebabd8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\modules\try-convert\src\MSBuild.Conversion.Facts\MSBuild.Conversion.Facts.csproj">
+      <Name>MSBuild.Conversion.Facts</Name>
+      <Project>{409c813e-290d-4da2-9ff0-3c1d1e5860da}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\modules\try-convert\src\MSBuild.Conversion.Package\MSBuild.Conversion.Package.csproj">
+      <Name>MSBuild.Conversion.Package</Name>
+      <Project>{c94b874a-6cf6-4dbe-85d6-97ac803c8f4c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\modules\try-convert\src\MSBuild.Conversion.Project\MSBuild.Conversion.Project.csproj">
+      <Name>MSBuild.Conversion.Project</Name>
+      <Project>{3a029c76-ae6d-488f-84b9-51e4c963e2fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\modules\try-convert\src\MSBuild.Conversion.SDK\MSBuild.Conversion.SDK.csproj">
+      <Name>MSBuild.Conversion.SDK</Name>
+      <Project>{410e4be0-f259-4844-8774-a7ee47f1ad14}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\samples\FindReplaceStepSample\FindReplaceStepSample.csproj">
       <Name>FindReplaceStepSample</Name>
       <Project>{5b8e8267-e90e-4e78-a219-a62aedce81ce}</Project>
@@ -114,10 +134,6 @@
       <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Packages</Name>
       <Project>{18c0711f-2b26-49d8-89ab-f68499a0eb9b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat\Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.csproj">
-      <Name>Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat</Name>
-      <Project>{9d38a783-b8ee-44c9-825a-dccca972ff0b}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\extensions\default\Microsoft.DotNet.UpgradeAssistant.Steps.Solution\Microsoft.DotNet.UpgradeAssistant.Steps.Solution.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Steps.Solution</Name>
       <Project>{b6c71468-2074-44df-89e1-1b97e4a3dfde}</Project>
@@ -149,6 +165,10 @@
     <ProjectReference Include="..\..\src\extensions\nuget\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet\Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet</Name>
       <Project>{e18a3cb0-bfdb-4672-ad53-7eaaf26c52ab}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\extensions\try-convert\Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert\Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert.csproj">
+      <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert</Name>
+      <Project>{2d223074-2202-4aa0-83e4-dd6e7079c92d}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\extensions\vb\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.csproj">
       <Name>Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic</Name>
