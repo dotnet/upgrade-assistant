@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup Label="Test">
+    <PackageReference Update="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+</Project>
