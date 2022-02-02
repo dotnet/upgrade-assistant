@@ -16,34 +16,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     [Collection(MSBuildStepTestCollection.Name)]
     public class MSBuildProjectTests
     {
-        [InlineData(@"TestProject\TestProject.csproj")]
-        [Theory]
-        public void LoadProjectNotNullTest(string path)
+        private readonly string _folderName = "MSBuildTestProject";
+
+        [Fact]
+        public void LoadProjectNotNullTest()
         {
             // Act
-            var project = LoadProject(path);
+            var path = MSBuildTestHelper.CreateProject(_folderName);
+            var project = MSBuildTestHelper.LoadProject(path);
 
             // Assert
             Assert.NotNull(project);
+
+            // Cleanup
+            MSBuildTestHelper.CleanupProject(_folderName);
         }
 
-        [InlineData(@"TestProject\TestProject.csproj", "Newtonsoft.Json", "9.0.1")]
+        [InlineData("Newtonsoft.Json", "9.0.1")]
         [Theory]
-        public void PackageReferenceVersionTest(string path, string packageName, string expectedVersion)
+        public void PackageReferenceVersionTest(string packageName, string expectedVersion)
         {
             // Act
-            var project = LoadProject(path);
+            var path = MSBuildTestHelper.CreateProject(_folderName);
+            var project = MSBuildTestHelper.LoadProject(path);
             var packageReference = project.GetItems("PackageReference").FirstOrDefault();
 
             // Assert
             Assert.Equal(packageName, packageReference?.EvaluatedInclude);
             Assert.Equal(expectedVersion, packageReference?.GetMetadataValue("Version"));
-        }
 
-        public static Microsoft.Build.Evaluation.Project LoadProject(string path)
-        {
-            ProjectCollection collection = ProjectCollection.GlobalProjectCollection;
-            return collection.LoadProject(path);
+            // Cleanup
+            MSBuildTestHelper.CleanupProject(_folderName);
         }
     }
 }
