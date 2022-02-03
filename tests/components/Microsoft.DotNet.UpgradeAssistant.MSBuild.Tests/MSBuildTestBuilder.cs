@@ -11,27 +11,23 @@ using Microsoft.Build.Evaluation;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 {
-    public sealed class MSBuildTestBuild : IDisposable
+    public sealed class MSBuildTestBuilder : IDisposable
     {
-        public string TestFolderPath { get; }
+        private string TestFolderPath { get; }
 
-        public MSBuildTestBuild(string path)
+        public MSBuildTestBuilder()
         {
-            TestFolderPath = path;
-            if (!Directory.Exists(path))
+            TestFolderPath = Path.Combine(Path.GetTempPath(), "MSBuildTestProject");
+            if (!Directory.Exists(TestFolderPath))
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(TestFolderPath);
             }
         }
 
         public string Add(string fileName, string fileContents)
         {
             string file = Path.Combine(TestFolderPath, fileName);
-            using (var sw = new StreamWriter(file))
-            {
-                sw.WriteLine(fileContents);
-            }
-
+            File.WriteAllText(file, fileContents);
             return file;
         }
 
