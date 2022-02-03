@@ -16,29 +16,71 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     [Collection(MSBuildStepTestCollection.Name)]
     public class MSBuildProjectTests
     {
-        private readonly string _folderName = "MSBuildTestProject";
-
         [Fact]
         public void LoadProjectNotNullTest()
         {
+            // Arrange
+            var msBuildTestBuild = new MSBuildTestBuild("MSBuildTestProject");
+            var csprojPath = CreateProjectContent(msBuildTestBuild, "TestProject.csproj", @"<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework> net472 </TargetFramework>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include = ""Newtonsoft.Json"" />
+    </ItemGroup>
+ </Project> ");
+
+            CreateProjectContent(msBuildTestBuild, "Packages.props", @"<Project>
+  <ItemGroup Label=""Test"">
+    <PackageReference Update = ""Newtonsoft.Json"" Version = ""9.0.1"" />  
+  </ItemGroup>
+</Project> ");
+
+            CreateProjectContent(msBuildTestBuild, "Directory.Build.targets", @"<Project>
+  <Sdk Name=""Microsoft.Build.CentralPackageVersions"" Version=""2.0.1"" />
+</Project> ");
+
             // Act
-            var path = MSBuildTestHelper.CreateProject(_folderName);
-            var project = MSBuildTestHelper.LoadProject(path);
+            var project = MSBuildTestBuild.Build(csprojPath);
 
             // Assert
             Assert.NotNull(project);
 
             // Cleanup
-            MSBuildTestHelper.CleanupProject(_folderName);
+            msBuildTestBuild.Dispose();
         }
 
         [InlineData("Newtonsoft.Json", "9.0.1")]
         [Theory]
         public void PackageReferenceVersionTest(string packageName, string expectedVersion)
         {
+            // Arrange
+            var msBuildTestBuild = new MSBuildTestBuild("MSBuildTestProject");
+            var csprojPath = CreateProjectContent(msBuildTestBuild, "TestProject.csproj", @"<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework> net472 </TargetFramework>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include = ""Newtonsoft.Json"" />
+    </ItemGroup>
+ </Project> ");
+
+            CreateProjectContent(msBuildTestBuild, "Packages.props", @"<Project>
+  <ItemGroup Label=""Test"">
+    <PackageReference Update = ""Newtonsoft.Json"" Version = ""9.0.1"" />  
+  </ItemGroup>
+</Project> ");
+
+            CreateProjectContent(msBuildTestBuild, "Directory.Build.targets", @"<Project>
+  <Sdk Name=""Microsoft.Build.CentralPackageVersions"" Version=""2.0.1"" />
+</Project> ");
+
             // Act
-            var path = MSBuildTestHelper.CreateProject(_folderName);
-            var project = MSBuildTestHelper.LoadProject(path);
+            var project = MSBuildTestBuild.Build(csprojPath);
             var packageReference = project.GetItems("PackageReference").FirstOrDefault();
 
             // Assert
@@ -46,7 +88,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             Assert.Equal(expectedVersion, packageReference?.GetMetadataValue("Version"));
 
             // Cleanup
-            MSBuildTestHelper.CleanupProject(_folderName);
+            msBuildTestBuild.Dispose();
+        }
+
+        public static string CreateProjectContent(MSBuildTestBuild build, string fileName, string fileContent)
+        {
+            return build.Add(fileName, fileContent);
         }
     }
 }
