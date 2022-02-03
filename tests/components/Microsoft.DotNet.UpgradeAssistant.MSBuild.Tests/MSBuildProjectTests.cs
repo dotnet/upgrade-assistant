@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 </Project> ");
 
             // Act
-            var project = MSBuildTestBuilder.Build(csprojPath);
+            var project = msBuildTestBuild.Build(csprojPath);
 
             // Assert
             Assert.NotNull(project);
@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 </Project> ");
 
             // Act
-            var project = MSBuildTestBuilder.Build(csprojPath);
+            var project = msBuildTestBuild.Build(csprojPath);
             var packageReference = project.GetItems("PackageReference").FirstOrDefault();
 
             // Assert
