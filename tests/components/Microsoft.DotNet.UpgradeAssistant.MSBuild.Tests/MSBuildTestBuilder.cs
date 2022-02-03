@@ -15,6 +15,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     {
         private string TestFolderPath { get; }
 
+        private ProjectCollection TestProjectCollection { get; }
+
         public MSBuildTestBuilder()
         {
             TestFolderPath = Path.Combine(Path.GetTempPath(), "MSBuildTestProject");
@@ -22,6 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             {
                 Directory.CreateDirectory(TestFolderPath);
             }
+
+            TestProjectCollection = new ProjectCollection();
         }
 
         public string Add(string fileName, string fileContents)
@@ -31,10 +35,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
             return file;
         }
 
-        public static Microsoft.Build.Evaluation.Project Build(string path)
+        public Microsoft.Build.Evaluation.Project Build(string path)
         {
-            using var collection = new ProjectCollection();
-            return collection.LoadProject(path);
+            return TestProjectCollection.LoadProject(path);
         }
 
         public void Dispose()
