@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Exceptions;
+using Moq;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
@@ -77,12 +79,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 </Project> ");
 
             // Act
-            var project = msBuildTestBuild.Build(csprojPath);
-            var packageReference = project.GetItems("PackageReference").FirstOrDefault();
+            var msbuildEvaluatedProject = msBuildTestBuild.Build(csprojPath);
+            var packageReferences = msbuildEvaluatedProject.GetItems("PackageReference").Select(i => new NuGetReference(i.EvaluatedInclude, i.GetMetadataValue("Version")));
+
+            var projectFile = new Mock<IProjectFile>();
+            projectFile.Setup(f => f.FilePath).Returns(csprojPath);
+
+            var project = new Mock<IProject>();
+            project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.FileInfo).Returns(new FileInfo(csprojPath));
+            project.Setup(p => p.PackageReferences).Returns(packageReferences);
+
+            var packageReference = project.Object.PackageReferences.FirstOrDefault();
 
             // Assert
-            Assert.Equal(packageName, packageReference?.EvaluatedInclude);
-            Assert.Equal(expectedVersion, packageReference?.GetMetadataValue("Version"));
+            Assert.Equal(packageName, packageReference?.Name);
+            Assert.Equal(expectedVersion, packageReference?.Version);
         }
     }
 }
