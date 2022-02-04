@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 {
                     return NugetPackageFormat.PackageConfig;
                 }
-                else if (_project.GetFile().PackageReferences.Any())
+                else if (_project.PackageReferences.Any())
                 {
                     return NugetPackageFormat.PackageReference;
                 }
@@ -64,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
                 if (packagesConfig is null)
                 {
-                    return _project.GetFile().PackageReferences;
+                    return _project.PackageReferences;
                 }
                 else
                 {
