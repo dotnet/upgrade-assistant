@@ -28,7 +28,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     <OutputType>Exe</OutputType>
     <TargetFramework> net472 </TargetFramework>
   </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include = ""Newtonsoft.Json"" />
     </ItemGroup>
@@ -45,12 +44,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 </Project> ");
 
             // Act
+            var project = msBuildTestBuild.Build(csprojPath);
 
             // Assert
             Assert.NotNull(project);
         }
 
+        [InlineData("Newtonsoft.Json", "9.0.1")]
         [Theory]
+        public void PackageReferenceVersionTest(string packageName, string expectedVersion)
         {
             // Arrange
             using var msBuildTestBuild = new MSBuildTestBuilder();
@@ -59,7 +61,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     <OutputType>Exe</OutputType>
     <TargetFramework> net472 </TargetFramework>
   </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include = ""Newtonsoft.Json"" />
     </ItemGroup>
@@ -76,8 +77,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
 </Project> ");
 
             // Act
+            var msbuildEvaluatedProject = msBuildTestBuild.Build(csprojPath);
+            var packageReferences = msbuildEvaluatedProject.GetItems("PackageReference").Select(i => new NuGetReference(i.EvaluatedInclude, i.GetMetadataValue("Version")));
+
+            var projectFile = new Mock<IProjectFile>();
+            projectFile.Setup(f => f.FilePath).Returns(csprojPath);
+
+            var project = new Mock<IProject>();
+            project.Setup(p => p.GetFile()).Returns(projectFile.Object);
+            project.Setup(p => p.FileInfo).Returns(new FileInfo(csprojPath));
+            project.Setup(p => p.PackageReferences).Returns(packageReferences);
+
+            var packageReference = project.Object.PackageReferences.FirstOrDefault();
 
             // Assert
+            Assert.Equal(packageName, packageReference?.Name);
+            Assert.Equal(expectedVersion, packageReference?.Version);
         }
     }
 }
