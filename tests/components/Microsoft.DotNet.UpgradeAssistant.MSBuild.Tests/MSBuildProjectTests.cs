@@ -28,6 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     <OutputType>Exe</OutputType>
     <TargetFramework> net472 </TargetFramework>
   </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include = ""Newtonsoft.Json"" />
     </ItemGroup>
@@ -61,6 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild.Tests
     <OutputType>Exe</OutputType>
     <TargetFramework> net472 </TargetFramework>
   </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include = ""Newtonsoft.Json"" />
     </ItemGroup>
