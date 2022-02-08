@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="PackageMaps\UwpPackageMap.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PackageMaps\UwpPackageMap.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PackageMaps\WinFormsPackageMap.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

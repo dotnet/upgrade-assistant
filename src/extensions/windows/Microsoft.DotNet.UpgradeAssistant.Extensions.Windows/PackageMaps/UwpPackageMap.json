@@ -1,0 +1,30 @@
+﻿[
+  {
+    "PackageSetName": "UWP",
+    "NetCorePackagesWorkOnNetFx": false,
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.NETCore.UniversalWindowsPlatform",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.UI.Xaml",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.Toolkit.Uwp.UI.Animations",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "Microsoft.WindowsAppSDK",
+        "Version": "1.0.0"
+      },
+      {
+        "Name": "Microsoft.Windows.SDK.BuildTools",
+        "Version": "10.0.22000.194"
+      }
+    ]
+  }
+]
