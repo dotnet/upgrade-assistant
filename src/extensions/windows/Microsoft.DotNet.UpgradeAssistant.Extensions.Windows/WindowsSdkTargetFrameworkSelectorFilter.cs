@@ -44,12 +44,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             // Projects with Windows Desktop components or a WinExe output type should use a -windows suffix
             if (updater.Components.HasFlag(ProjectComponents.WindowsDesktop) || updater.Project.OutputType == ProjectOutputType.WinExe)
             {
-                tfm = current with { Platform = TargetFrameworkMoniker.Platforms.Windows };
-
-                if (updater.Components.HasFlag(ProjectComponents.WinRT))
+                var projFile = updater.Project.GetFile();
+                var currentTF = projFile.GetPropertyValue("TargetFramework");
+                if (!currentTF.Contains("-windows"))
                 {
-                    // TODO: Default to this version to ensure everything is supported.
-                    tfm = tfm with { PlatformVersion = TargetFrameworkMoniker.Net50_Windows_10_0_19041_0.PlatformVersion };
+                    tfm = current with { Platform = TargetFrameworkMoniker.Platforms.Windows };
+
+                    if (updater.Components.HasFlag(ProjectComponents.WinRT))
+                    {
+                        // TODO: Default to this version to ensure everything is supported.
+                        tfm = tfm with { PlatformVersion = TargetFrameworkMoniker.Net50_Windows_10_0_19041_0.PlatformVersion };
+                    }
+                }
+                else
+                {
+                    var version = Version.Parse(currentTF.Substring(currentTF.IndexOf("-windows", StringComparison.OrdinalIgnoreCase) + "_windows".Length));
+                    tfm = current with { Platform = TargetFrameworkMoniker.Platforms.Windows, PlatformVersion = version };
                 }
 
                 return true;
