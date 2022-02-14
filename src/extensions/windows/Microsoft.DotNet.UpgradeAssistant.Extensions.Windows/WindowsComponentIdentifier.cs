@@ -90,6 +90,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     components |= ProjectComponents.WindowsDesktop;
                 }
 
+                if (file.GetPropertyValue("UseWinUI").Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    components |= ProjectComponents.WinUI;
+                    components |= ProjectComponents.WindowsDesktop;
+                }
+
                 var frameworkReferenceNames = project.FrameworkReferences.Select(r => r.Name);
 
                 if (frameworkReferenceNames.Any(f => _desktopFrameworkReferences.Contains(f, StringComparer.OrdinalIgnoreCase)))

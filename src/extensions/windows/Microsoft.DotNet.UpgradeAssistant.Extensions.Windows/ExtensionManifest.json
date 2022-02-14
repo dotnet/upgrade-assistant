@@ -5,6 +5,12 @@
     "PackageMapPath": "PackageMaps"
   },
 
+  "TemplateInserter": {
+    "TemplateConfigFiles": [
+      "Templates\\WinAppSDKTemplates\\WinAppSDKTemplates.json"
+    ]
+  },
+
   "ExtensionServiceProviders": [
     "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.dll"
   ]
