@@ -6,6 +6,12 @@
 
   <ItemGroup>
     <None Remove="PackageMaps\UwpPackageMap.json" />
+    <None Remove="Templates\WinAppSDKTemplates\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Templates\WinAppSDKTemplates\App.xaml.cs" />
+    <Compile Remove="Templates\WinAppSDKTemplates\MainWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -13,6 +19,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PackageMaps\WinFormsPackageMap.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\WinAppSDKTemplates\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -20,6 +20,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services
             .AddUpgradeStep<WinformsUpdateStep>()
             .AddTransient<IUpdater<IProject>, WinformsDefaultFontUpdater>()
-            .AddTransient<IUpdater<IProject>, WinformsDpiSettingUpdater>();
+            .AddTransient<IUpdater<IProject>, WinformsDpiSettingUpdater>()
+            .AddTransient<IUpdater<IProject>, WinUINamespaceUpdater>()
+            .AddTransient<IUpdater<IProject>, WinUIPropertiesUpdater>()
+            .AddTransient<IUpdater<IProject>, WinUIPackageAppxmanifestUpdater>()
+            .AddTransient<IUpdater<IProject>, WinUIUnnecessaryFilesUpdater>();
     }
 }

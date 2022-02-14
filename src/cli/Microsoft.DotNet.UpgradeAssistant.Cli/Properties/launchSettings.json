@@ -2,7 +2,7 @@
   "profiles": {
     "Microsoft.DotNet.UpgradeAssistant.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade D:\\repos\\Windows-appsample-photo-lab\\photolab\\PhotoLab.csproj",
+      "commandLineArgs": "upgrade E:\\source\\samples\\UWPMigrationSample2\\UWPMigrationSample2.csproj",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
