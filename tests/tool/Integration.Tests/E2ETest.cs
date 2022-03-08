@@ -43,7 +43,7 @@ namespace Integration.Tests
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
 #endif
-#if FALSE
+#if TRUE
         [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj", Skip = "Workload loading is broken")]
         [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj", Skip = "Workload loading is broken")]
 #endif

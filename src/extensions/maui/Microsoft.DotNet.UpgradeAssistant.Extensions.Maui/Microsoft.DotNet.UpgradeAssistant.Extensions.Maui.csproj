@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ExtensionManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <PackageMap Include="PackageMaps\*.json" />
     <TemplateConfigFile Include="Templates\**\*.json" />
     <ExtensionFiles Include="PackageMaps\*" PackagePath="PackageMaps/" />
