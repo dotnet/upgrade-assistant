@@ -45,6 +45,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var toRemove = state.Packages
                 .Where(p =>
                 {
+                    if (p.Name == "Microsoft.WindowsAppSDK")
+                    {
+                        return false;
+                    }
                     // Only remove a package iff it is transitively brought in with a higher or equal version
                     var versions = dependencyLookup[p.Name].Select(static d => d.Version);
 

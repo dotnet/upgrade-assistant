@@ -22,8 +22,12 @@
         "Version": "1.0.0"
       },
       {
-        "Name": "Microsoft.Windows.SDK.BuildTools",
-        "Version": "10.0.22000.194"
+        "Name": "CommunityToolkit.WinUI.UI.Animations",
+        "Version": "7.1.2"
+      },
+      {
+        "Name": "Microsoft.Graphics.Win2D",
+        "Version":  "1.0.0.30",
       }
     ]
   }

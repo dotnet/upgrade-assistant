@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
@@ -37,7 +38,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 foreach (var itemPath in project.FindFiles(".cs", ProjectItemType.Compile))
                 {
                     var contents = File.ReadAllText(itemPath);
-                    contents = contents.Replace("using Windows.UI", "using Microsoft.UI");
+                    contents = contents
+                        .Replace("Windows.UI.", "Microsoft.UI.")
+                        .Replace("Microsoft.UI.Core", "Windows.UI.Core")
+                        .Replace("Microsoft.UI.ViewManagement", "Windows.UI.ViewManagement")
+                        .Replace("Microsoft.Toolkit.Uwp.UI.Animations", "CommunityToolkit.WinUI.UI.Animations")
+                        .Replace("Window.Current.Compositor", "App.Window.Compositor");
+                    File.WriteAllText(itemPath, contents);
+                }
+
+                foreach (var itemPath in project.FindFiles(".xaml", ProjectItemType.None))
+                {
+                    var contents = File.ReadAllText(itemPath);
+                    contents = contents
+                        .Replace("Microsoft.Toolkit.Uwp.UI.Animations", "CommunityToolkit.WinUI.UI.Animations")
+                        .Replace("animations:ReorderGridAnimation", "animations:ItemsReorderAnimation");
+                    var doc = new XmlDocument();
+                    doc.Load(itemPath);
+                    var x = doc.DocumentElement;
                     File.WriteAllText(itemPath, contents);
                 }
             }

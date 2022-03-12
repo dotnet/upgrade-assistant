@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using UWPMigrationSample2;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -20,7 +19,7 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace WinUIMigrationSample
+namespace PhotoLab
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
@@ -43,16 +42,16 @@ namespace WinUIMigrationSample
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs e)
         {
-            m_window = new MainWindow();
-            
+            Window = new MainWindow();
 
-            Frame rootFrame = m_window.Content as Frame;
+
+            Frame rootFrame = Window.Content as Frame;
             if (rootFrame == null)
             {
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
                 // Place the frame in the current Window
-                m_window.Content = rootFrame;
+                Window.Content = rootFrame;
             }
             if (rootFrame.Content == null)
             {
@@ -62,9 +61,12 @@ namespace WinUIMigrationSample
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
 
-            m_window.Activate();
+            Window.Activate();
+            WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(Window);
         }
 
-        private Window m_window;
+        public static MainWindow Window { get; private set; }
+
+        public static IntPtr WindowHandle { get; private set; }
     }
 }
