@@ -29,7 +29,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 var filesToDelete = new List<string>();
                 filesToDelete.AddRange(project.FindFiles("AssemblyInfo.cs"));
-                filesToDelete.AddRange(project.FindFiles("Default.rd.xml"));
                 filesToDelete.AddRange(project.FindFiles("App.xaml.old.cs"));
                 filesToDelete.AddRange(project.FindFiles("App.old.xaml"));
                 foreach (var file in filesToDelete)
