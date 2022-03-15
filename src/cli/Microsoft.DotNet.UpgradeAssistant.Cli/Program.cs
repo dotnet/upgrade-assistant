@@ -6,6 +6,7 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement;
@@ -36,9 +37,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             root.AddCommand(new ExtensionManagementCommand());
             root.AddCommand(new FeatureFlagCommand());
 
+            var helpBuilder = new HelpBuilder(LocalizationResources.Instance, ConsoleUtils.Width);
+            helpBuilder.CustomizeLayout(_ =>
+                            HelpBuilder.Default
+                                       .GetLayout()
+                                       .Prepend(_ => ShowHeader()));
+
             return new CommandLineBuilder(root)
                 .UseDefaults()
-                .UseHelpBuilder(b => new HelpWithHeader(b.Console))
+                .UseHelpBuilder(ctx => helpBuilder)
                 .Build()
                 .InvokeAsync(args);
 
@@ -62,21 +69,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             Console.WriteLine(survey);
             Console.WriteLine(bar);
             Console.WriteLine();
-        }
-
-        private class HelpWithHeader : HelpBuilder
-        {
-            public HelpWithHeader(IConsole console)
-                : base(console, maxWidth: ConsoleUtils.Width)
-            {
-            }
-
-            protected override void AddSynopsis(ICommand command)
-            {
-                ShowHeader();
-
-                WriteHeading(LocalizedStrings.UpgradeAssistantHeaderDetails, null);
-            }
         }
     }
 }
