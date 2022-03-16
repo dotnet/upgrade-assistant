@@ -13,6 +13,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
@@ -70,23 +71,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
             }
             ").GetRootAsync(cancellationToken).ConfigureAwait(false);
-            var backMethodAsStatement = backMethodRoot.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
+            var backMethod = backMethodRoot.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
 
-            //var backMethodAsStatement = ((PropertyDeclarationSyntax)backMethodRoot.ChildNodesAndTokens()[0].AsNode()!);
             SyntaxNode backMethodSibling = backButtonAssignment;
             while (!backMethodSibling.IsKind(SyntaxKind.MethodDeclaration))
             {
                 backMethodSibling = backMethodSibling!.Parent!;
             }
 
-            var newRoot = oldRoot!.InsertNodesAfter(backMethodSibling, ImmutableArray.Create(backMethodAsStatement));
-
             var newBackButtonAssignmentTree = await CSharpSyntaxTree.ParseText("BackButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;").GetRootAsync(cancellationToken).ConfigureAwait(false);
-            var newBackButtonAssignmentAsStatement = ((GlobalStatementSyntax)newBackButtonAssignmentTree.ChildNodesAndTokens()[0].AsNode()!).Statement;
+            var newBackButtonAssignment = ((GlobalStatementSyntax)newBackButtonAssignmentTree.ChildNodesAndTokens()[0].AsNode()!).Statement;
 
-            newRoot = newRoot.ReplaceNode(backButtonAssignment.Parent!, newBackButtonAssignmentAsStatement);
+            var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
+            documentEditor.ReplaceNode(backButtonAssignment.Parent!, newBackButtonAssignment);
+            if (!backMethodSibling.Parent!.ChildNodes().Any(sibling => sibling.GetText().ToString().Contains("BackButton_Click")))
+            {
+                documentEditor.InsertAfter(backMethodSibling, ImmutableArray.Create(backMethod));
+            }
 
-            return document.WithSyntaxRoot(newRoot!);
+            return documentEditor.GetChangedDocument();
         }
     }
 }

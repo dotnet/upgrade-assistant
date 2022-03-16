@@ -24,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             .AddTransient<IUpdater<IProject>, WinUINamespaceUpdater>()
             .AddTransient<IUpdater<IProject>, WinUIPropertiesUpdater>()
             .AddTransient<IUpdater<IProject>, WinUIPackageAppxmanifestUpdater>()
-            .AddTransient<IUpdater<IProject>, WinUIUnnecessaryFilesUpdater>();
+            .AddTransient<IUpdater<IProject>, WinUIUnnecessaryFilesUpdater>()
+            .AddTransient<IUpdater<IProject>, WinUIBackButtonXamlUpdater>();
     }
 }
