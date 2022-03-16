@@ -3,13 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System.Collections.Immutable;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -20,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         private const string Category = "Fix";
 
         private static readonly LocalizableString Title = "BackButton does not exist in WinUI";
-        private static readonly LocalizableString MessageFormat = "Variable '{0}' should be marked const";
+        private static readonly LocalizableString MessageFormat = "Back button '{0}' should be replaced with WinUI back button";
         private static readonly LocalizableString Description = "Detect UWP back button";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
