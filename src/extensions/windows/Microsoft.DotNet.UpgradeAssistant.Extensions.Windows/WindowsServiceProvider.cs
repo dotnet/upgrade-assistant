@@ -25,6 +25,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             services.Services.AddTransient<CodeFixProvider, WinUIBackButtonCodeFixer>();
             services.Services.AddTransient<DiagnosticAnalyzer, WinUIContentDialogAnalyzer>();
             services.Services.AddTransient<CodeFixProvider, WinUIContentDialogCodeFixer>();
+            services.Services.AddTransient<DiagnosticAnalyzer, WinUIFileSavePickerAnalyzer>();
+            services.Services.AddTransient<CodeFixProvider, WinUIFileSavePickerFixer>();
             services.Services.AddWinformsUpdaterStep();
         }
     }
