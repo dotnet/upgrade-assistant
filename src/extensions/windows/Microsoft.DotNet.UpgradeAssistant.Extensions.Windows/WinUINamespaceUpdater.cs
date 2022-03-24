@@ -16,11 +16,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     internal class WinUINamespaceUpdater : IUpdater<IProject>
     {
-        public string Id => typeof(WinformsDpiSettingUpdater).FullName;
+        private const string RuleId = "UA301";
 
-        public string Title => "UWP Namespace updater";
+        public string Id => typeof(WinUINamespaceUpdater).FullName;
 
-        public string Description => "Update namespace to use WindowsAppSDK APIs";
+        public string Title => "WinUI namespace update";
+
+        public string Description => "Update the namespace for APIs that live in different namespaces in Windows App SDK";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
 
@@ -46,22 +48,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         .Replace("Window.Current.Compositor", "App.Window.Compositor");
                     File.WriteAllText(itemPath, contents);
                 }
-
-                foreach (var itemPath in project.FindFiles(".xaml", ProjectItemType.None))
-                {
-                    var contents = File.ReadAllText(itemPath);
-                    contents = contents
-                        .Replace("Microsoft.Toolkit.Uwp.UI.Animations", "CommunityToolkit.WinUI.UI.Animations")
-                        .Replace("animations:ReorderGridAnimation", "animations:ItemsReorderAnimation");
-                    var doc = new XmlDocument();
-                    doc.Load(itemPath);
-                    var x = doc.DocumentElement;
-                    File.WriteAllText(itemPath, contents);
-                }
             }
 
             return new WinformsUpdaterResult(
-                "UA301",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 true,
@@ -72,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
             return new WinformsUpdaterResult(
-                "UA301",
+                RuleId,
                 RuleName: Id,
                 FullDescription: Title,
                 true,
