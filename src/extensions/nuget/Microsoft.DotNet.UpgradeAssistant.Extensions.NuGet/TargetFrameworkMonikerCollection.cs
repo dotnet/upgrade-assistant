@@ -101,6 +101,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
         private static string[] GetNonSdkTargetFramework(IProjectFile file)
         {
+            var nugetTargetFramework = file.GetPropertyValue("NuGetTargetFramework");
+            if (nugetTargetFramework != null && nugetTargetFramework.StartsWith("UAP,Version=v", StringComparison.Ordinal))
+            {
+                var version = nugetTargetFramework!.Replace("UAP,Version=v", string.Empty, StringComparison.Ordinal);
+                var nugetFramework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.UAP, Version.Parse(version)).GetShortFolderName();
+                return new string[] { nugetFramework };
+            }
+
             const string NonSdkTargetFramework = "TargetFrameworkVersion";
 
             var tfms = GetTfms(file, NonSdkTargetFramework);
