@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -22,6 +23,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         public string Description => "Adds a back button to all WinUI XAML pages.";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
+
+        public WinUIBackButtonXamlUpdater(ILogger<WinUIBackButtonXamlUpdater> logger)
+        {
+
+        }
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
@@ -81,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
                "UA302",
                RuleName: Id,
                FullDescription: Title,
@@ -92,7 +98,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
                "UA302",
                RuleName: Id,
                FullDescription: Title,

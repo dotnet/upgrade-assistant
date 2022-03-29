@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -28,29 +29,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private readonly ILogger<WinUINamespaceUpdater> _logger;
 
-        public WinUINamespaceUpdater(ILogger<WinUINamespaceUpdater> logger)
+        private readonly Dictionary<string, string>? _namespaceUpdates;
+
+        public WinUINamespaceUpdater(ILogger<WinUINamespaceUpdater> logger, IOptions<WinUIOptions> options)
         {
             this._logger = logger;
+            this._namespaceUpdates = options.Value.NamespaceUpdates;
         }
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            if (_namespaceUpdates == null)
+            {
+                return new WindowsDesktopUpdaterResult(
+                    RuleId, RuleName: Id, FullDescription: Title, false, "", new List<string>());
+            }
+
             foreach (var project in inputs)
             {
                 foreach (var itemPath in project.FindFiles(".cs", ProjectItemType.Compile))
                 {
-                    var contents = File.ReadAllText(itemPath);
-                    contents = contents
-                        .Replace("Windows.UI.", "Microsoft.UI.")
-                        .Replace("Microsoft.UI.Core", "Windows.UI.Core")
-                        .Replace("Microsoft.UI.ViewManagement", "Windows.UI.ViewManagement")
-                        .Replace("Microsoft.Toolkit.Uwp.UI.Animations", "CommunityToolkit.WinUI.UI.Animations")
-                        .Replace("Window.Current.Compositor", "App.Window.Compositor");
-                    File.WriteAllText(itemPath, contents);
+                    var contents = new StringBuilder(File.ReadAllText(itemPath));
+                    foreach (var nameplaceReplace in _namespaceUpdates)
+                    {
+                        contents.Replace(nameplaceReplace.Key, nameplaceReplace.Value);
+                    }
+
+                    File.WriteAllText(itemPath, contents.ToString());
                 }
             }
 
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
                 RuleId,
                 RuleName: Id,
                 FullDescription: Title,
@@ -61,7 +70,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
-            return new WinformsUpdaterResult(
+            if (_namespaceUpdates == null)
+            {
+                return new WindowsDesktopUpdaterResult(
+                    RuleId,
+                    RuleName: Id,
+                    FullDescription: Title,
+                    false,
+                    "",
+                    new List<string>());
+            }
+
+            return new WindowsDesktopUpdaterResult(
                 RuleId,
                 RuleName: Id,
                 FullDescription: Title,

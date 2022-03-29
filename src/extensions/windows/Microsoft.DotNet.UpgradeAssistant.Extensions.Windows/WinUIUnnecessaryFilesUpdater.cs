@@ -9,29 +9,56 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     [ApplicableComponents(ProjectComponents.WinUI)]
     internal class WinUIUnnecessaryFilesUpdater : IUpdater<IProject>
     {
-        public string Id => "UA304";
+        public const string RuleID = "UA303";
+
+        public string Id => typeof(WinUIUnnecessaryFilesUpdater).FullName;
 
         public string Title => "WinUI unnecessary files removal";
 
-        public string Description => "Removes unnecessary files not required for WinUI";
+        public string Description => "Removes UWP files no longer required for WinUI";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
 
+        private readonly ILogger<WinUIUnnecessaryFilesUpdater> _logger;
+
+        private readonly List<string>? _filesToDelete;
+
+        public WinUIUnnecessaryFilesUpdater(ILogger<WinUIUnnecessaryFilesUpdater> logger, IOptions<WinUIOptions> options)
+        {
+            this._logger = logger;
+            this._filesToDelete = options.Value.FilesToDelete;
+        }
+
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            if (this._filesToDelete == null || this._filesToDelete.Count == 0)
+            {
+                return new WindowsDesktopUpdaterResult(
+                  "UA302",
+                  RuleName: Id,
+                  FullDescription: Title,
+                  false,
+                  "",
+                  new List<string>());
+            }
+
             foreach (var project in inputs)
             {
-                var filesToDelete = new List<string>();
-                filesToDelete.AddRange(project.FindFiles("AssemblyInfo.cs"));
-                filesToDelete.AddRange(project.FindFiles("App.xaml.old.cs"));
-                filesToDelete.AddRange(project.FindFiles("App.old.xaml"));
-                foreach (var file in filesToDelete)
+                var filesFoundToDelete = new List<string>();
+                foreach (var file in this._filesToDelete)
+                {
+                    filesFoundToDelete.AddRange(project.FindFiles(file));
+                }
+
+                foreach (var file in filesFoundToDelete)
                 {
                     if (file != null)
                     {
@@ -40,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
             "UA302",
             RuleName: Id,
             FullDescription: Title,
@@ -51,7 +78,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
-            return new WinformsUpdaterResult(
+            if (this._filesToDelete == null || this._filesToDelete.Count == 0)
+            {
+                return new WindowsDesktopUpdaterResult(
+                  "UA302",
+                  RuleName: Id,
+                  FullDescription: Title,
+                  false,
+                  "",
+                  new List<string>());
+            }
+
+            return new WindowsDesktopUpdaterResult(
                "UA302",
                RuleName: Id,
                FullDescription: Title,

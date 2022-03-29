@@ -15,7 +15,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     internal class WinUIPackageAppxmanifestUpdater : IUpdater<IProject>
     {
-        public string Id => "UA303";
+        public const string RuleID = "UA304";
+
+        public string Id => typeof(WinUIPackageAppxmanifestUpdater).FullName;
 
         public string Title => "WinUI package.appxmanifest updater";
 
@@ -61,8 +63,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 doc.Save(file);
             }
 
-            return new WinformsUpdaterResult(
-               "UA302",
+            return new WindowsDesktopUpdaterResult(
+               RuleID,
                RuleName: Id,
                FullDescription: Title,
                true,
@@ -72,8 +74,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
-            return new WinformsUpdaterResult(
-               "UA302",
+            return new WindowsDesktopUpdaterResult(
+               RuleID,
                RuleName: Id,
                FullDescription: Title,
                true,

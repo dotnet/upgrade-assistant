@@ -9,44 +9,69 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     [ApplicableComponents(ProjectComponents.WinUI)]
     public class WinUIPropertiesUpdater : IUpdater<IProject>
     {
-        public string Id => typeof(WinformsDpiSettingUpdater).FullName;
+        public const string RuleID = "UA302";
+
+        public string Id => typeof(WinUIPropertiesUpdater).FullName;
 
         public string Title => "WinUI Project Properties Updater";
 
-        public string Description => "Update project properties by removing UWP properties and adding WinUI properties";
+        public string Description => "Update project properties to use WinUI and Windows App SDK.";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
 
         private readonly ILogger<WinUIPropertiesUpdater> _logger;
 
-        public WinUIPropertiesUpdater(ILogger<WinUIPropertiesUpdater> logger)
+        private readonly WinUIOptionsProjectFilePropertyUpdates? _projectFilePropertyUpdates;
+
+        public WinUIPropertiesUpdater(ILogger<WinUIPropertiesUpdater> logger, IOptions<WinUIOptions> options)
         {
             this._logger = logger;
+            this._projectFilePropertyUpdates = options?.Value.ProjectFilePropertyUpdates;
         }
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            if (this._projectFilePropertyUpdates == null)
+            {
+                return new WindowsDesktopUpdaterResult(
+                    "UA302",
+                    RuleName: Id,
+                    FullDescription: Title,
+                    false,
+                    "",
+                    new List<string>());
+            }
+
             foreach (var project in inputs)
             {
                 var projectFile = project.GetFile();
-                projectFile.RemoveProperty("WindowsXamlEnableOverview");
-                projectFile.RemoveProperty("AppxPackageSigningEnabled");
-                projectFile.RemoveProperty("GenerateAssemblyInfo");
-                projectFile.SetPropertyValue("Platforms", "x86;x64;arm64");
-                projectFile.SetPropertyValue("ApplicationManifest", "app.manifest");
-                projectFile.SetPropertyValue("EnablePreviewMsixTooling", "true");
-                projectFile.SetPropertyValue("RuntimeIdentifiers", "win10-x86;win10-x64;win10-arm64");
-                projectFile.SetPropertyValue("PublishProfile", "win10-$(Platform).pubxml");
+                if (_projectFilePropertyUpdates.Set != null)
+                {
+                    foreach (var propToSet in _projectFilePropertyUpdates.Set)
+                    {
+                        projectFile.SetPropertyValue(propToSet.Key, propToSet.Value);
+                    }
+                }
+
+                if (_projectFilePropertyUpdates.Remove != null)
+                {
+                    foreach (var propToRemove in _projectFilePropertyUpdates.Remove)
+                    {
+                        projectFile.RemoveProperty(propToRemove);
+                    }
+                }
+
                 await projectFile.SaveAsync(token).ConfigureAwait(false);
             }
 
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
                 "UA302",
                 RuleName: Id,
                 FullDescription: Title,
@@ -57,8 +82,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
-            return new WinformsUpdaterResult(
-                "UA302",
+            if (this._projectFilePropertyUpdates == null)
+            {
+                return new WindowsDesktopUpdaterResult(
+                    RuleID,
+                    RuleName: Id,
+                    FullDescription: Title,
+                    false,
+                    "",
+                    new List<string>());
+            }
+
+            return new WindowsDesktopUpdaterResult(
+                RuleID,
                 RuleName: Id,
                 FullDescription: Title,
                 true,

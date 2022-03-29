@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
                 RuleId,
                 RuleName: Id,
                 FullDescription: Title,

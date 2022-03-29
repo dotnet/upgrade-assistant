@@ -21,13 +21,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             services.Services.AddTransient<ITargetFrameworkSelectorFilter, WindowsSdkTargetFrameworkSelectorFilter>();
             services.Services.AddTransient<IComponentIdentifier, WindowsComponentIdentifier>();
             services.Services.AddTransient<IAnalyzeResultProvider, WinformsResultProvider>();
-            services.Services.AddTransient<DiagnosticAnalyzer, WinUIBackButtonAnalyzer>();
-            services.Services.AddTransient<CodeFixProvider, WinUIBackButtonCodeFixer>();
-            services.Services.AddTransient<DiagnosticAnalyzer, WinUIContentDialogAnalyzer>();
-            services.Services.AddTransient<CodeFixProvider, WinUIContentDialogCodeFixer>();
-            services.Services.AddTransient<DiagnosticAnalyzer, WinUIFileSavePickerAnalyzer>();
-            services.Services.AddTransient<CodeFixProvider, WinUIFileSavePickerFixer>();
+            services.Services.AddUpgradeStep<WindowsDesktopUpdateStep>();
+            services.AddExtensionOption<WinUIOptions>(WinUIOptions.Name);
             services.Services.AddWinformsUpdaterStep();
+            services.Services.AddWinUIUpdateSteps();
         }
     }
 }
