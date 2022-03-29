@@ -10,9 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
-    internal class WinformsUpdaterSubStep : UpgradeStep
+    internal class WindowsDesktopUpdaterSubStep : UpgradeStep
     {
-        private readonly WinformsUpdateStep _winformsUpdateStep;
+        private readonly WindowsDesktopUpdateStep _windowsDesktopUpdateStep;
         private readonly IUpdater<IProject> _updater;
 
         public override string Id => _updater.Id;
@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public override string Description => _updater.Description;
 
-        public WinformsUpdaterSubStep(WinformsUpdateStep winformsUpdateStep, IUpdater<IProject> updater, ILogger<WinformsUpdateStep> logger)
+        public WindowsDesktopUpdaterSubStep(WindowsDesktopUpdateStep windowsDesktopUpdateStep, IUpdater<IProject> updater, ILogger<WindowsDesktopUpdateStep> logger)
             : base(logger)
         {
             if (logger is null)
@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            ParentStep = _winformsUpdateStep = winformsUpdateStep ?? throw new ArgumentNullException(nameof(winformsUpdateStep));
+            ParentStep = _windowsDesktopUpdateStep = windowsDesktopUpdateStep ?? throw new ArgumentNullException(nameof(windowsDesktopUpdateStep));
             _updater = updater ?? throw new ArgumentNullException(nameof(updater));
         }
 
@@ -56,17 +56,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             try
             {
-                var updaterResult = (WinformsUpdaterResult)(await _updater.IsApplicableAsync(context, ImmutableArray<IProject>.Empty.Add(currentProject), token).ConfigureAwait(false));
+                var updaterResult = (WindowsDesktopUpdaterResult)(await _updater.IsApplicableAsync(context, ImmutableArray<IProject>.Empty.Add(currentProject), token).ConfigureAwait(false));
                 return updaterResult.Result
-                    ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Winforms updater \"{_updater.Title}\" needs to be applied", _updater.Risk)
+                    ? new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Windows Desktop updater \"{_updater.Title}\" needs to be applied", _updater.Risk)
                     : new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, string.Empty, BuildBreakRisk.None);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogError(exc, "Unexpected exception while initializing Winforms updater \"{WinformsUpdater}\"", _updater.Title);
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception while initializing Winforms updater \"{_updater.Title}\": {exc}", Risk);
+                Logger.LogError(exc, "Unexpected exception while initializing Windows Desktop updater \"{WinformsUpdater}\"", _updater.Title);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, $"Unexpected exception while initializing Windows Desktop updater \"{_updater.Title}\": {exc}", Risk);
             }
         }
 
@@ -81,22 +81,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             try
             {
-                var updaterResult = (WinformsUpdaterResult)(await _updater.ApplyAsync(context, ImmutableArray<IProject>.Empty.Add(currentProject), token).ConfigureAwait(false));
+                var updaterResult = (WindowsDesktopUpdaterResult)(await _updater.ApplyAsync(context, ImmutableArray<IProject>.Empty.Add(currentProject), token).ConfigureAwait(false));
                 if (updaterResult.Result)
                 {
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
                 }
                 else
                 {
-                    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to apply Winforms updater \"{_updater.Title}\"");
+                    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to apply Windows Desktop updater \"{_updater.Title}\"");
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Logger.LogError(exc, "Unexpected exception while applying Winforms updater \"{WinformsUpdater}\"", _updater.Title);
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while applying Winforms updater \"{_updater.Title}\": {exc}");
+                Logger.LogError(exc, "Unexpected exception while applying Windows Desktop updater \"{WinformsUpdater}\"", _updater.Title);
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while applying Windows Desktop updater \"{_updater.Title}\": {exc}");
             }
         }
 
@@ -111,9 +111,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             // doesn't need to apply anything.
             // Therefore, automatically apply the parent ConfigUpdaterStep's updater
             // once all its children have been applied.
-            if (_winformsUpdateStep.SubSteps.All(s => s.IsDone))
+            if (_windowsDesktopUpdateStep.SubSteps.All(s => s.IsDone))
             {
-                await _winformsUpdateStep.ApplyAsync(context, token).ConfigureAwait(false);
+                await _windowsDesktopUpdateStep.ApplyAsync(context, token).ConfigureAwait(false);
             }
 
             return result;

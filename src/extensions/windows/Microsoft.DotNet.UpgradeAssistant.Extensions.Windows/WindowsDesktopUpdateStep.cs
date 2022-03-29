@@ -13,11 +13,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     /// <summary>
     /// Upgrade step that updates Winforms Projects.
     /// </summary>
-    public class WinformsUpdateStep : UpgradeStep
+    public class WindowsDesktopUpdateStep : UpgradeStep
     {
-        public override string Title => "Update Winforms Project";
+        public override string Title => "Update Windows Desktop Project";
 
-        public override string Description => "Update Winforms Project";
+        public override string Description => "Update Windows Desktop Project";
 
         public override string Id => WellKnownStepIds.WinformsProjectUpdaterStepId;
 
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             WellKnownStepIds.NextProjectStepId,
         };
 
-        public WinformsUpdateStep(IEnumerable<IUpdater<IProject>> winformsUpdaters, ILogger<WinformsUpdateStep> logger)
+        public WindowsDesktopUpdateStep(IEnumerable<IUpdater<IProject>> winformsUpdaters, ILogger<WindowsDesktopUpdateStep> logger)
             : base(logger)
         {
             if (logger is null)
@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            SubSteps = winformsUpdaters.Select(updater => new WinformsUpdaterSubStep(this, updater, logger)).ToList();
+            SubSteps = winformsUpdaters.Select(updater => new WindowsDesktopUpdaterSubStep(this, updater, logger)).ToList();
         }
 
         /// <summary>
@@ -88,8 +88,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
 
             return incompleteSubSteps == 0
-                ? new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No Winforms updaters need applied", BuildBreakRisk.None)
-                : new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Winforms updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
+                ? new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No Windows Desktop updaters need applied", BuildBreakRisk.None)
+                : new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Windows Desktop updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
         }
 
         protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
@@ -103,7 +103,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             return incompleteSubSteps == 0
                 ? Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty))
-                : Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Winforms updaters need applied"));
+                : Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Windows Desktop updaters need applied"));
         }
     }
 }

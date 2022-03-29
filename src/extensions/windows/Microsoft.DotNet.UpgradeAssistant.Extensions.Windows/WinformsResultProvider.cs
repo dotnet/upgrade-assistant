@@ -56,11 +56,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             var context = analysis.UpgradeContext;
             var projects = context.Projects.ToImmutableArray();
-            var updaterResult = new WinformsUpdaterResult(string.Empty, string.Empty, string.Empty, false, string.Empty, new List<string>());
+            var updaterResult = new WindowsDesktopUpdaterResult(string.Empty, string.Empty, string.Empty, false, string.Empty, new List<string>());
             try
             {
                 var result = await _updater.IsApplicableAsync(context, projects, token).ConfigureAwait(false);
-                updaterResult = (WinformsUpdaterResult)result;
+                updaterResult = (WindowsDesktopUpdaterResult)result;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)

@@ -14,6 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         private const string DesktopSdk = "Microsoft.NET.Sdk.Desktop";
         private const string WinRTPackage = "Microsoft.Windows.SDK.Contracts";
+        private const string WinAppSDKPackage = "Microsoft.WindowsAppSDK";
 
         private readonly string[] _desktopFrameworkReferences = new[]
         {
@@ -119,7 +120,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private async ValueTask<bool> IsWinRt(IProject project, CancellationToken token)
         {
-            return await _identifier.IsTransitiveDependencyAsync(WinRTPackage, project, token).ConfigureAwait(false);
+            return (await _identifier.IsTransitiveDependencyAsync(WinRTPackage, project, token).ConfigureAwait(false))
+                || (await _identifier.IsTransitiveDependencyAsync(WinAppSDKPackage, project, token).ConfigureAwait(false));
         }
     }
 }

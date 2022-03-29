@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
               "UA302",
               RuleName: Id,
               FullDescription: Title,
@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
-            return new WinformsUpdaterResult(
+            return new WindowsDesktopUpdaterResult(
                "UA302",
                RuleName: Id,
                FullDescription: Title,
