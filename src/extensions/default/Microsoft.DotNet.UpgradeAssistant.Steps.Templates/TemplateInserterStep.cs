@@ -144,6 +144,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                         return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found");
                     }
 
+                    new FileInfo(filePath).Directory.Create();
                     using var outputStream = File.Create(filePath, BufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
