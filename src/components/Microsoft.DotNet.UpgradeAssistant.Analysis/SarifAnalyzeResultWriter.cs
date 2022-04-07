@@ -3,25 +3,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Sarif;
+using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
     public class SarifAnalyzeResultWriter : IAnalyzeResultWriter
     {
-        private readonly ISerializer _serializer;
-
-        public string Format => "sarif";
-
-        public SarifAnalyzeResultWriter(ISerializer serializer)
+        private readonly JsonSerializer _serializer = JsonSerializer.Create(new()
         {
-            this._serializer = serializer;
-        }
+            Formatting = Formatting.Indented,
+            Culture = CultureInfo.InvariantCulture,
+            TypeNameHandling = TypeNameHandling.None,
+            NullValueHandling = NullValueHandling.Ignore,
+        });
+
+        public string Format => WellKnownFormats.Sarif;
 
         public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, Stream stream, CancellationToken token)
         {
@@ -41,8 +44,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             };
 
             using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true);
+            using var jsonWriter = new JsonTextWriter(writer);
 
-            _serializer.Write(writer, sarifLog);
+            _serializer.Serialize(jsonWriter, sarifLog, typeof(SarifLog));
         }
 
         private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)
