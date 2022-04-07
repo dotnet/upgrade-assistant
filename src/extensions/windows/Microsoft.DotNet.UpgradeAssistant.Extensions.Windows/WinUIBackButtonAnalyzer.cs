@@ -11,8 +11,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
+    [ApplicableComponents(ProjectComponents.WinUI)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal sealed class WinUIBackButtonAnalyzer : DiagnosticAnalyzer
+    public class WinUIBackButtonAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "WinUIBackButton";
         private const string Category = "Fix";

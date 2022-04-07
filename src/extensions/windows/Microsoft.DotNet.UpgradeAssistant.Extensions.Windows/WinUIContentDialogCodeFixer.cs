@@ -18,7 +18,8 @@ using Microsoft.CodeAnalysis.Formatting;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
-    internal class WinUIContentDialogCodeFixer : CodeFixProvider
+    [ApplicableComponents(ProjectComponents.WinUI)]
+    public class WinUIContentDialogCodeFixer : CodeFixProvider
     {
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including
         // the analyzer's ID in the code fix provider's FixableDiagnosticIds array.
@@ -54,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 CodeAction.Create(
                     "",
                     c => FixContentDialogAPI(context.Document, declaration, c),
-                    "Fix Back Button"),
+                    "ContentDialog fixer"),
                 diagnostic);
         }
 
@@ -62,7 +63,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         {
             var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 
-            
             var newMethodDeclarationSibling = contentDialogMemberAccess.Ancestors().OfType<MethodDeclarationSyntax>().First();
 
             var newMethodAccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.IdentifierName("this"),
@@ -86,13 +86,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         }
                         return contentDialog;
                     }
-                }"
-                ).GetRootAsync(cancellationToken).ConfigureAwait(false);
+                }").GetRootAsync(cancellationToken).ConfigureAwait(false);
                 var newMethodDeclaration = newMethodRoot.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
                 documentEditor.InsertAfter(newMethodDeclarationSibling, newMethodDeclaration);
             }
 
-            return documentEditor.GetChangedDocument();
+            return document.WithSyntaxRoot(documentEditor.GetChangedRoot().NormalizeWhitespace());
         }
     }
 }

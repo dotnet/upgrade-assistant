@@ -3,11 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
+using Microsoft.CodeAnalysis;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
+using Microsoft.CodeAnalysis.Text;
 using Moq;
 using Xunit;
 
@@ -15,6 +18,77 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 {
     public class WindowsComponentIdentifierTests
     {
+        private static readonly Dictionary<string, ExpectedDiagnostic[]> ExpectedDiagnostics = new Dictionary<string, ExpectedDiagnostic[]>()
+        {
+            {
+                "ContentDialogCaller",
+                new[]
+                {
+                    new ExpectedDiagnostic(WinUIContentDialogAnalyzer.DiagnosticId, new TextSpan(729, 20))
+                }
+            },
+            {
+                "InitializeWithWindow",
+                new[]
+                {
+                    new ExpectedDiagnostic(WinUIInitializeWindowAnalyzer.DiagnosticId, new TextSpan(415, 20)),
+                    new ExpectedDiagnostic(WinUIInitializeWindowAnalyzer.DiagnosticId, new TextSpan(469, 18))
+                }
+            },
+        };
+
+        [InlineData("ContentDialogCaller")]
+        [Theory]
+        public async void ContentDialogCodeAnalyzerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIContentDialogAnalyzer.DiagnosticId), true).ConfigureAwait(false);
+            AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
+        }
+
+        [InlineData("ContentDialogCaller")]
+        [Theory]
+        public async void ContentDialogCodeFixerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIContentDialogAnalyzer.DiagnosticId)).ConfigureAwait(false);
+            var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
+            Assert.Equal(expectedFix.Trim(), actualFix.Trim());
+        }
+
+        [InlineData("InitializeWithWindow")]
+        [Theory]
+        public async void InitializeWithWindowTestAnalyzerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIInitializeWindowAnalyzer.DiagnosticId), true).ConfigureAwait(false);
+            AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
+        }
+
+        [InlineData("InitializeWithWindow")]
+        [Theory]
+        public async void InitializeWithWindowTestCodeFixerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIInitializeWindowAnalyzer.DiagnosticId)).ConfigureAwait(false);
+            var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
+            Assert.Equal(expectedFix.Trim(), actualFix.Trim());
+        }
+
+        private static void AssertDiagnosticsCorrect(IEnumerable<Diagnostic> diagnostics, IEnumerable<ExpectedDiagnostic> expectedDiagnostics)
+        {
+            Assert.Equal(expectedDiagnostics.Count(), diagnostics.Count());
+
+            var count = 0;
+            foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
+            {
+                var expected = $"{expectedDiagnostics.ElementAt(count).SourceSpan}";
+                var actual = $"{d.Location.SourceSpan}";
+                Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected {expectedDiagnostics.ElementAt(count).Language} diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}; actually at {d.Location.SourceSpan}");
+                count++;
+            }
+        }
+
         [InlineData("UseWPF", "true", ProjectComponents.Wpf | ProjectComponents.WindowsDesktop)]
         [InlineData("UseWPF", "True", ProjectComponents.Wpf | ProjectComponents.WindowsDesktop)]
         [InlineData("UseWPF", "false", ProjectComponents.None)]

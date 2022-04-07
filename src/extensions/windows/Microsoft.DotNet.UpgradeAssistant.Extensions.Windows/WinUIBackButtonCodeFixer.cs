@@ -18,6 +18,7 @@ using Microsoft.CodeAnalysis.Formatting;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
+    [ApplicableComponents(ProjectComponents.WinUI)]
     internal class WinUIBackButtonCodeFixer : CodeFixProvider
     {
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including

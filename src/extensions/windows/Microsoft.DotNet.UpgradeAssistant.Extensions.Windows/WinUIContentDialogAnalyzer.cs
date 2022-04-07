@@ -12,14 +12,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
+    [ApplicableComponents(ProjectComponents.WinUI)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal sealed class WinUIContentDialogAnalyzer : DiagnosticAnalyzer
+    public sealed class WinUIContentDialogAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "WinUIContentDialog";
         private const string Category = "Fix";
 
         private static readonly LocalizableString Title = "ContentDialog API needs to set XamlRoot";
-        private static readonly LocalizableString MessageFormat = "Variable '{0}' should be marked const";
+        private static readonly LocalizableString MessageFormat = "XamlRoot of the Dialog object must be set before making the API call '{0}'";
         private static readonly LocalizableString Description = "Detect content dialog api";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
