@@ -158,6 +158,39 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void AddItem(string name, string path)
             => ProjectRoot.AddItem(name, path);
 
+        public void RemoveItem(ProjectItemType? itemType = null, string? includePath = null, string? excludePath = null, string? elementName = null)
+        {
+            var items = ProjectRoot.Items.Where(item =>
+            {
+                if (itemType != null && item.ItemType != itemType.Name)
+                {
+                    return false;
+                }
+
+                if (includePath != null && item.Include != includePath)
+                {
+                    return false;
+                }
+
+                if (excludePath != null && item.Exclude != excludePath)
+                {
+                    return false;
+                }
+
+                if (elementName != null && item.ElementName != elementName)
+                {
+                    return false;
+                }
+
+                return true;
+            });
+
+            foreach (var item in items)
+            {
+                item.Parent.RemoveChild(item);
+            }
+        }
+
         public bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token)
         {
             var targetItemPath = GetPathRelativeToProject(itemName, FileInfo.DirectoryName ?? string.Empty);
