@@ -158,7 +158,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void AddItem(string name, string path)
             => ProjectRoot.AddItem(name, path);
 
-        public void RemoveItem(ProjectItemType? itemType = null, string? includePath = null, string? excludePath = null, string? elementName = null)
+        public bool RemoveItem(ProjectItemType? itemType = null, string? includePath = null, string? excludePath = null, string? elementName = null)
         {
             var items = ProjectRoot.Items.Where(item =>
             {
@@ -189,6 +189,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 item.Parent.RemoveChild(item);
             }
+
+            return items.Any();
         }
 
         public bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token)
