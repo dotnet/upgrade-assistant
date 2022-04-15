@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HTMLTemplate.html" />
+    <EmbeddedResource Include="HtmlTemplate.html" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Sarif.Sdk" Version="2.4.12" />

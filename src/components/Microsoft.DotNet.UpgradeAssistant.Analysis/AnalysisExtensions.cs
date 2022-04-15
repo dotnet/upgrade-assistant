@@ -16,7 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddTransient<ISerializer, JsonSerializer>();
             services.AddOptions<AnalysisOptions>()
                 .Configure(configure)
                 .ValidateDataAnnotations();
