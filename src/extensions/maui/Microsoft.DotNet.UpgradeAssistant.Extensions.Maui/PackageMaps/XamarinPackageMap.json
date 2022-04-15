@@ -1,6 +1,6 @@
 [
   {
-    "PackageSetName": "Xamarin Packages",
+    "PackageSetName": "Xamarin Legacy Packages",
     "NetFrameworkPackages": [
       {
         "Name": "Xamarin.Forms",
@@ -9,6 +9,10 @@
       {
         "Name": "Xamarin.Essentials",
         "Version": "*"
+      },
+      {
+        "Name": "Xamarin.CommunityToolkit",
+        "Version" : "*"
       }
     ],
     "NetCorePackages": []
@@ -300,6 +304,20 @@
       },
       {
         "Name": "Xamarin.Android.Support.Dynamic.Animation",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "Third Party Unsupported",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Microsoft.AppCenter.Analytics",
+        "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AppCenter.Analytics",
         "Version": "*"
       }
     ],
