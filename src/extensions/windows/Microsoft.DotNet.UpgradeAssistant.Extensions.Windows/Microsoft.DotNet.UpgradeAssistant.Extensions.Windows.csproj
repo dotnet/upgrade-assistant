@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Remove="Templates\WinAppSDKTemplates\App.xaml.cs" />
     <Compile Remove="Templates\WinAppSDKTemplates\MainWindow.xaml.cs" />
+    <Compile Remove="Templates\WinAppSDKTemplates\UWPToWinAppSDKUpgradeHelpers.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -35,6 +35,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
                     new ExpectedDiagnostic(WinUIInitializeWindowAnalyzer.DiagnosticId, new TextSpan(469, 18))
                 }
             },
+            {
+                "DataTransferManagerCaller",
+                new[]
+                {
+                    new ExpectedDiagnostic(WinUIDataTransferManagerAnalyzer.DiagnosticId, new TextSpan(415, 20))
+                }
+            },
+            {
+                "InteropsCaller",
+                new[]
+                {
+                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(415, 20))
+                }
+            }
         };
 
         [InlineData("ContentDialogCaller")]
@@ -56,6 +70,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             Assert.Equal(expectedFix.Trim(), actualFix.Trim());
         }
 
+        [InlineData("DataTransferManagerCaller")]
+        [Theory]
+        public async void DataTransferManagertAnalyzerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIDataTransferManagerAnalyzer.DiagnosticId), true).ConfigureAwait(false);
+            AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
+        }
+
+        [InlineData("DataTransferManagerCaller")]
+        [Theory]
+        public async void DataTransferManagerCodeFixerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIDataTransferManagerAnalyzer.DiagnosticId)).ConfigureAwait(false);
+            var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
+            Assert.Equal(expectedFix.Trim(), actualFix.Trim());
+        }
+
         [InlineData("InitializeWithWindow")]
         [Theory]
         public async void InitializeWithWindowTestAnalyzerTest(string documentPath)
@@ -71,6 +104,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
         {
             using var workspace = new AdhocWorkspace();
             var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIInitializeWindowAnalyzer.DiagnosticId)).ConfigureAwait(false);
+            var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
+            Assert.Equal(expectedFix.Trim(), actualFix.Trim());
+        }
+
+        [InlineData("InteropsCaller")]
+        [Theory]
+        public async void InteropsAnalyzerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIInteropAnalyzer.DiagnosticId), true).ConfigureAwait(false);
+            AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
+        }
+
+        [InlineData("InteropsCaller")]
+        [Theory]
+        public async void InteropsCodeFixerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIInteropAnalyzer.DiagnosticId)).ConfigureAwait(false);
             var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
             Assert.Equal(expectedFix.Trim(), actualFix.Trim());
         }

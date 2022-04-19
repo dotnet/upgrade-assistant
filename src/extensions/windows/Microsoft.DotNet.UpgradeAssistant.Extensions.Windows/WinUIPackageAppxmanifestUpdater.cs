@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public string Id => typeof(WinUIPackageAppxmanifestUpdater).FullName;
 
-        public string Title => "WinUI package.appxmanifest updater";
+        public string Title => "Update package.appxmanifest";
 
         public string Description => "Update the package.appxmanifest file";
 

@@ -36,6 +36,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             "WindowsBase"
         };
 
+        private readonly string[] _uwpPackageReferences = new[]
+        {
+            "Microsoft.NETCore.UniversalWindowsPlatform"
+        };
+
         private readonly ITransitiveDependencyIdentifier _identifier;
 
         public WindowsComponentIdentifier(ITransitiveDependencyIdentifier identifier)
@@ -59,6 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             var references = project.References.Select(r => r.Name);
+            var packageReferences = project.PackageReferences.Select(r => r.Name);
 
             if (references.Any(r => _winFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
@@ -70,6 +76,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 components |= ProjectComponents.WindowsDesktop;
                 components |= ProjectComponents.Wpf;
+            }
+
+            if (packageReferences.Any(p => _uwpPackageReferences.Contains(p, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.WindowsDesktop;
+                components |= ProjectComponents.WinUI;
             }
 
             if (file.IsSdk)

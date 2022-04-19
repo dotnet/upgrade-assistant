@@ -14,40 +14,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     [ApplicableComponents(ProjectComponents.WinUI)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class WinUIInitializeWindowAnalyzer : DiagnosticAnalyzer
+    public sealed class WinUIDataTransferManagerAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "UA3013";
+        public const string DiagnosticId = "UA3012";
         private const string Category = "Fix";
 
-        private static readonly LocalizableString Title = "Classes that implement IInitializeWithWindow need to be initialized with Window Handle";
+        private static readonly LocalizableString Title = "Classes that implement IDataTransferManager should use IDataTransferManagerInterop.ShowShareUIForWindow";
         private static readonly LocalizableString MessageFormat = "The object creation '{0}' should be followed by setting of the window handle";
         private static readonly LocalizableString Description = "Tries to detect the creation of known classes that implement IInitializeWithWindow";
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
-
-        private static readonly HashSet<string> InitializeWithWindowTypes = new HashSet<string>
-        {
-            "FileOpenPicker",
-            "FileSavePicker",
-            "FolderPicker",
-            "PinnedContactManager",
-            "PaymentMediator",
-            "DevicePicker",
-            "GraphicsCapturePicker",
-            "CastingDevicePicker",
-            "DialDevicePicker",
-            "ProvisioningAgent",
-            "OnlineIdAuthenticator",
-            "StoreContext",
-            "FolderLauncherOptions",
-            "LauncherOptions",
-            "CoreWindowDialog",
-            "CoreWindowFlyout",
-            "PopupMenu",
-            "SecondaryTile",
-        };
 
         public override void Initialize(AnalysisContext context)
         {
@@ -58,20 +36,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
-            context.RegisterSyntaxNodeAction(AnalyzeObjectCreationExpression, SyntaxKind.ObjectCreationExpression);
+            context.RegisterSyntaxNodeAction(AnalyzeObjectCreationExpression, SyntaxKind.InvocationExpression);
+        }
+
+        private static IEnumerable<string> AllNamespaces(SyntaxNodeAnalysisContext context)
+        {
+            return context.Node.Ancestors().OfType<CompilationUnitSyntax>().First().DescendantNodes().OfType<UsingDirectiveSyntax>()
+                .Select(usingDirective => usingDirective.Name.ToString());
         }
 
         private void AnalyzeObjectCreationExpression(SyntaxNodeAnalysisContext context)
         {
-            var node = (ObjectCreationExpressionSyntax)context.Node;
-            if (node.Type.IsKind(SyntaxKind.IdentifierName))
+            var node = (InvocationExpressionSyntax)context.Node;
+            var namespaces = AllNamespaces(context);
+            var firstChildText = node.ChildNodes().First().ToString();
+            if ((firstChildText == "DataTransferManager.ShowShareUI" && namespaces.Contains("Windows.ApplicationModel.DataTransfer"))
+                || firstChildText == "Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI")
             {
-                if (InitializeWithWindowTypes.Contains(((IdentifierNameSyntax)node.Type).Identifier.ValueText)
-                    && !node.Ancestors().OfType<InvocationExpressionSyntax>().Any(expr => expr.Expression.ToString().Contains("InitializeWithWindow")))
-                {
-                    var diagnostic = Diagnostic.Create(SupportedDiagnostics.First(), node.GetLocation(), node.GetText().ToString());
-                    context.ReportDiagnostic(diagnostic);
-                }
+                var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), node.GetText().ToString());
+                context.ReportDiagnostic(diagnostic);
             }
         }
     }

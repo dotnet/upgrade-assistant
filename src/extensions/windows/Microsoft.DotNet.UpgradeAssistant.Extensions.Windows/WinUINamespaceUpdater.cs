@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public string Id => typeof(WinUINamespaceUpdater).FullName;
 
-        public string Title => "WinUI namespace update";
+        public string Title => "Update WinUI namespaces";
 
         public string Description => "Update the namespace for APIs that live in different namespaces in Windows App SDK";
 

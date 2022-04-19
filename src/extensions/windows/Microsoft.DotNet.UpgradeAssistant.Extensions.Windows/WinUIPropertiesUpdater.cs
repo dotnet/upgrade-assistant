@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public string Id => typeof(WinUIPropertiesUpdater).FullName;
 
-        public string Title => "WinUI Project Properties Updater";
+        public string Title => "Update WinUI Project Properties";
 
         public string Description => "Update project properties to use WinUI and Windows App SDK.";
 
@@ -52,6 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             foreach (var project in inputs)
             {
                 var projectFile = project.GetFile();
+
                 if (_projectFilePropertyUpdates.Set != null)
                 {
                     foreach (var propToSet in _projectFilePropertyUpdates.Set)
@@ -67,6 +68,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         projectFile.RemoveProperty(propToRemove);
                     }
                 }
+
+                projectFile.RemoveItem(itemType: ProjectItemType.Content, includePath: "Properties\\Default.rd.xml");
 
                 await projectFile.SaveAsync(token).ConfigureAwait(false);
             }

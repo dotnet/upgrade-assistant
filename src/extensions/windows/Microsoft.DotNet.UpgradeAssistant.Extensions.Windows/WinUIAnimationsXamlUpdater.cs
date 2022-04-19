@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         public string Id => "UA310";
 
-        public string Title => "Update the animations library";
+        public string Title => "Update animations library";
 
         public string Description => "Update the animations library";
 

@@ -28,11 +28,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 
         internal static ImmutableArray<DiagnosticAnalyzer> AllAnalyzers => ImmutableArray.Create<DiagnosticAnalyzer>(
             new WinUIContentDialogAnalyzer(),
-            new WinUIInitializeWindowAnalyzer());
+            new WinUIInitializeWindowAnalyzer(),
+            new WinUIDataTransferManagerAnalyzer(),
+            new WinUIInteropAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new WinUIContentDialogCodeFixer(),
-            new WinUIInitializeWindowCodeFixer());
+            new WinUIInitializeWindowCodeFixer(),
+            new WinUIDataTransferManagerCodeFixer(),
+            new WinUIInteropCodeFixer());
 
         public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(this AdhocWorkspace workspace, string documentPath, IEnumerable<string> diagnosticIds, bool isFramework)
         {
@@ -166,7 +170,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 
             var result = await project.Documents
                 .First(d => documentPath.Equals(Path.GetFileNameWithoutExtension(d.Name), StringComparison.Ordinal))
-                .GetTextAsync();
+                .GetTextAsync().ConfigureAwait(false);
 
             return result.ToString();
         }

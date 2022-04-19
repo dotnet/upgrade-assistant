@@ -42,6 +42,11 @@
       "Path": "MainWindow.xaml",
       "Type": "Content",
       "Keywords": []
+    },
+    {
+      "Path": "UWPToWinAppSDKUpgradeHelpers.cs",
+      "Type": "Compile",
+      "Keywords": []
     }
   ],
   "TemplateOutputType": [

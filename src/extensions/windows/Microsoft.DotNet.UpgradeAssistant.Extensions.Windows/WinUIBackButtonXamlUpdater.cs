@@ -16,21 +16,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     internal class WinUIBackButtonXamlUpdater : IUpdater<IProject>
     {
+        public const string NewBackButtonName = "UABackButton";
+        public const string NewBackButtonClickMethodName = $"{NewBackButtonName}_Click";
+
         public string Id => "UA305";
 
-        public string Title => "WinUI Xaml Back button inserter";
+        public string Title => "Insert back button in XAML";
 
         public string Description => "Adds a back button to all WinUI XAML pages.";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
 
-        public WinUIBackButtonXamlUpdater(ILogger<WinUIBackButtonXamlUpdater> logger)
-        {
-
-        }
-
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
             foreach (var project in inputs)
             {
                 foreach (var file in project.FindFiles(".xaml", ProjectItemType.None))
@@ -70,15 +69,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                             }
 
                             var backButtonElement = doc.CreateElement("AppBarButton", element.NamespaceURI);
-                            backButtonElement.SetAttribute("Name", xmlNamespaces["x"], "BackButton");
-                            backButtonElement.SetAttribute("Click", element.NamespaceURI, "BackButton_Click");
+                            backButtonElement.SetAttribute("Name", xmlNamespaces["x"], NewBackButtonName);
+                            backButtonElement.SetAttribute("Click", element.NamespaceURI, NewBackButtonClickMethodName);
                             backButtonElement.SetAttribute("Margin", element.NamespaceURI, "0,0,12,0");
 
                             var backButtonSymbol = doc.CreateElement("SymbolIcon", element.NamespaceURI);
                             backButtonSymbol.SetAttribute("Symbol", element.NamespaceURI, "Back");
                             backButtonElement.AppendChild(backButtonSymbol);
 
+                            var comment = doc.CreateComment(@"
+        Default back button in the title bar does not exist in WinUI3 apps.
+        We have created a custom back button for you. Feel free to rename and edit its position/behavior.
+        Read: https://aka.ms/UA-back-button ");
                             element.PrependChild(backButtonElement);
+                            element.InsertBefore(comment, backButtonElement);
                             break;
                         }
                     }
@@ -92,18 +96,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                RuleName: Id,
                FullDescription: Title,
                true,
-               "",
+               string.Empty,
                new List<string>());
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
             return new WindowsDesktopUpdaterResult(
                "UA302",
                RuleName: Id,
                FullDescription: Title,
                true,
-               "",
+               string.Empty,
                new List<string>());
         }
     }

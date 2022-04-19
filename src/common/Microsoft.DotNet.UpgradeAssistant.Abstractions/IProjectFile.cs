@@ -35,6 +35,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void AddItem(string name, string path);
 
+        bool RemoveItem(ProjectItemType? itemType = null, string? includePath = null, string? excludePath = null, string? elementName = null);
+
         bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token);
 
         string GetPropertyValue(string propertyName);

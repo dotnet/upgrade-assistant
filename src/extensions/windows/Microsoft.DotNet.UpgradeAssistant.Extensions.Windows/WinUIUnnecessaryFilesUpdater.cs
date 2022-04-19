@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public string Id => typeof(WinUIUnnecessaryFilesUpdater).FullName;
 
-        public string Title => "WinUI unnecessary files removal";
+        public string Title => "Remove unnecessary files";
 
         public string Description => "Removes UWP files no longer required for WinUI";
 

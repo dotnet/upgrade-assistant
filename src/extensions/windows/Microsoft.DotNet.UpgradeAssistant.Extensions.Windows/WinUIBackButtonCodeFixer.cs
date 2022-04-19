@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -25,10 +26,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         // the analyzer's ID in the code fix provider's FixableDiagnosticIds array.
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(WinUIBackButtonAnalyzer.DiagnosticId);
 
+        private const string BackButtonComment = @$"
+            /*
+              {BackButtonMessage}
+            */";
+
+        private const string BackButtonMessage = @$"
+            TODO {WinUIBackButtonAnalyzer.DiagnosticId}
+            Default back button in the title bar does not exist in WinUI3 apps.
+            We have created a custom back button for you. Feel free to rename and edit its position/behavior.
+            Read: https://aka.ms/UA-back-button";
+
+        private ILogger<WinUIBackButtonCodeFixer> _logger;
+
         public sealed override FixAllProvider GetFixAllProvider()
         {
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
             return WellKnownFixAllProviders.BatchFixer;
+        }
+
+        public WinUIBackButtonCodeFixer(ILogger<WinUIBackButtonCodeFixer> logger)
+        {
+            this._logger = logger;
         }
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -42,7 +61,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             var diagnostic = context.Diagnostics.First();
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-
+            var lineSpan = diagnostic.Location.GetLineSpan();
+            var fixState = diagnostic.Properties[WinUIBackButtonAnalyzer.FixStateProperty]!;
             var declaration = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<AssignmentExpressionSyntax>().First();
 
             if (declaration is null)
@@ -53,25 +73,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    "",
-                    c => FixBackButton(context.Document, declaration, c),
-                    "Fix Back Button"),
+                    WinUIBackButtonAnalyzer.DiagnosticId,
+                    c => FixBackButton(context.Document, declaration, fixState, lineSpan, c),
+                    equivalenceKey: WinUIBackButtonAnalyzer.DiagnosticId + fixState),
                 diagnostic);
         }
 
-        private static async Task<Document> FixBackButton(Document document, AssignmentExpressionSyntax backButtonAssignment, CancellationToken cancellationToken)
+        private async Task<Document> FixBackButton(Document document, AssignmentExpressionSyntax backButtonAssignment, string fixState, FileLinePositionSpan lineSpan, CancellationToken cancellationToken)
         {
-            var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-
-            var backMethodRoot = await CSharpSyntaxTree.ParseText(@"
+            var backMethodRoot = await CSharpSyntaxTree.ParseText(@$"
             class A
-            {
-            private void BackButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-            {
+            {{
+            private void {WinUIBackButtonXamlUpdater.NewBackButtonClickMethodName}(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+            {{
                 Frame.GoBack();
-            }
-            }
-            ").GetRootAsync(cancellationToken).ConfigureAwait(false);
+            }}
+            }}
+            ", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
             var backMethod = backMethodRoot.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
 
             SyntaxNode backMethodSibling = backButtonAssignment;
@@ -80,17 +98,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 backMethodSibling = backMethodSibling!.Parent!;
             }
 
-            var newBackButtonAssignmentTree = await CSharpSyntaxTree.ParseText("BackButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;").GetRootAsync(cancellationToken).ConfigureAwait(false);
+            _logger!.LogWarning(lineSpan.Path + BackButtonMessage, null);
+            var comment = await CSharpSyntaxTree.ParseText(BackButtonComment, cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
+
+            var backButtonVisibility = backButtonAssignment.ToString().Contains("Collapsed") ? "Collapsed" : "Visible";
+            var newBackButtonAssignmentTree = await CSharpSyntaxTree.ParseText(
+                $"{WinUIBackButtonXamlUpdater.NewBackButtonName}.Visibility = Microsoft.UI.Xaml.Visibility.{backButtonVisibility};", cancellationToken: cancellationToken)
+                .GetRootAsync(cancellationToken).ConfigureAwait(false);
             var newBackButtonAssignment = ((GlobalStatementSyntax)newBackButtonAssignmentTree.ChildNodesAndTokens()[0].AsNode()!).Statement;
+            var newBackButtonAssignmentWithComment = newBackButtonAssignment.WithLeadingTrivia(comment.GetLeadingTrivia());
 
             var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-            documentEditor.ReplaceNode(backButtonAssignment.Parent!, newBackButtonAssignment);
-            if (!backMethodSibling.Parent!.ChildNodes().Any(sibling => sibling.GetText().ToString().Contains("BackButton_Click")))
+            documentEditor.ReplaceNode(backButtonAssignment.Parent!, newBackButtonAssignmentWithComment);
+            if (!backMethodSibling.Parent!.ChildNodes().Any(sibling => sibling.GetText().ToString().Contains(WinUIBackButtonXamlUpdater.NewBackButtonClickMethodName)))
             {
                 documentEditor.InsertAfter(backMethodSibling, ImmutableArray.Create(backMethod));
             }
 
-            return documentEditor.GetChangedDocument();
+            return document.WithSyntaxRoot(documentEditor.GetChangedRoot().NormalizeWhitespace());
         }
     }
 }

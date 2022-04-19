@@ -13,18 +13,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     [ApplicableComponents(ProjectComponents.WinUI)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class WinUIBackButtonAnalyzer : DiagnosticAnalyzer
+    public sealed class WinUIBackButtonAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "WinUIBackButton";
+        public const string DiagnosticId = "UA3015";
         private const string Category = "Fix";
 
-        private static readonly LocalizableString Title = "BackButton does not exist in WinUI";
+        private static readonly LocalizableString Title = "Custom back button implementation is needed";
         private static readonly LocalizableString MessageFormat = "Back button '{0}' should be replaced with WinUI back button";
         private static readonly LocalizableString Description = "Detect UWP back button";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        internal const string FixStateProperty = "FixState";
+        internal const string FixStatePossible = "FixPossible";
+        internal const string FixStateNotPossible = "FixNotPossible";
+        internal const string FixStateComplete = "FixComplete";
 
         public override void Initialize(AnalysisContext context)
         {
@@ -53,7 +58,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 return;
             }
 
-            var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), node.GetText().ToString());
+            var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), properties: ImmutableDictionary.Create<string, string?>().Add(FixStateProperty, FixStatePossible),
+                node.GetText().ToString());
             context.ReportDiagnostic(diagnostic);
         }
     }
