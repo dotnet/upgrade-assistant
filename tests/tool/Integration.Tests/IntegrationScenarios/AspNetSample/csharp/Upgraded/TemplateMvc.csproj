@@ -37,7 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="bootstrap" Version="3.4.1" />
-    <PackageReference Include="jQuery" Version="3.4.1" />
+    <PackageReference Include="jQuery" Version="3.5.0" />
     <PackageReference Include="jQuery.Validation" Version="1.17.0" />
     <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" Version="3.2.11" />
     <PackageReference Include="Modernizr" Version="2.8.3" />
