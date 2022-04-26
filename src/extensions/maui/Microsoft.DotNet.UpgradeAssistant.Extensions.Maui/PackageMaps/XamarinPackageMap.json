@@ -57,7 +57,7 @@
         "Version": "*"
       },
       {
-        "Name": "Xamarin.Android.Support.v7.AppCompat ",
+        "Name": "Xamarin.Android.Support.v7.AppCompat",
         "Version": "*"
       },
       {
@@ -317,7 +317,7 @@
         "Version": "*"
       },
       {
-        "Name": "Microsoft.AppCenter.Analytics",
+        "Name": "Microsoft.AppCenter.Crashes",
         "Version": "*"
       }
     ],
