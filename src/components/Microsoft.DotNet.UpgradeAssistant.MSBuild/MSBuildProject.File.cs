@@ -158,6 +158,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void AddItem(string name, string path)
             => ProjectRoot.AddItem(name, path);
 
+        public void AddItem(ProjectItemType itemType, string? includePath = null, string? removePath = null, string? elementName = null)
+        {
+            var itemGroup = ProjectRoot.GetOrCreateItemGroup(itemType.Name);
+            var item = ProjectRoot.CreateItemElement(itemType.Name);
+            if (includePath != null)
+            {
+                item.Include = includePath;
+            }
+            else if (removePath != null)
+            {
+                item.Remove = removePath;
+            }
+
+            itemGroup.AppendChild(item);
+        }
+
         public bool RemoveItem(ProjectItemType? itemType = null, string? includePath = null, string? excludePath = null, string? elementName = null)
         {
             var items = ProjectRoot.Items.Where(item =>
@@ -184,13 +200,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                     return true;
                 });
-            
+
             var isRemoved = false;
             foreach (var item in items)
             {
                 item.Parent.RemoveChild(item);
                 isRemoved = true;
             }
+
             return isRemoved;
         }
 

@@ -19,6 +19,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         public WinUIOptionsProjectFilePropertyUpdates? ProjectFilePropertyUpdates { get; set; }
 
         public List<string>? FilesToDelete { get; set; }
+
+        public Dictionary<string, string>? FilesToRename { get; set; }
     }
 
 #pragma warning disable SA1402 // Do not have multiple classes in same file

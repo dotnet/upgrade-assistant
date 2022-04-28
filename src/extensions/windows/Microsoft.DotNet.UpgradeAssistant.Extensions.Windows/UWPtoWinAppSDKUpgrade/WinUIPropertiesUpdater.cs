@@ -69,6 +69,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     }
                 }
 
+                projectFile.AddItem(ProjectItemType.Compile, removePath: "App.xaml.old.cs");
+                projectFile.AddItem(ProjectItemType.None, includePath: "App.xaml.old.cs");
                 projectFile.RemoveItem(itemType: ProjectItemType.Content, includePath: "Properties\\Default.rd.xml");
 
                 await projectFile.SaveAsync(token).ConfigureAwait(false);

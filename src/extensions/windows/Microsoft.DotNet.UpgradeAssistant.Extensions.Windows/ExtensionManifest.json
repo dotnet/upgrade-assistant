@@ -13,12 +13,12 @@
 
   "WinUIOptions": {
     "NamespaceUpdates": {
-      "Windows.ApplicationModel.Resources.Core ": "Microsoft.Windows.ApplicationModel.Resources",
+      "Windows.ApplicationModel.Resources.Core": "Microsoft.Windows.ApplicationModel.Resources",
       "Windows.UI.Composition": "Microsoft.UI.Composition",
       "Windows.UI.Xaml": "Microsoft.UI.Xaml",
-      "Windows.UI.Colors":  "Microsoft.UI.Colors",
+      "Windows.UI.Colors": "Microsoft.UI.Colors",
       "Microsoft.Toolkit.Uwp.UI.Animations": "CommunityToolkit.WinUI.UI.Animations",
-      "Window.Current.Compositor": "App.Window.Compositor"
+      "Window.Current": "App.Window"
     },
     "ProjectFilePropertyUpdates": {
       "Set": {
@@ -34,10 +34,9 @@
         "GenerateAssemblyInfo"
       ]
     },
+    "FilesToRename": {},
     "FilesToDelete": [
-      "Properties\\AssemblyInfo.cs",
-      "App.xaml.old.cs",
-      "App.old.xaml"
+      "Properties\\AssemblyInfo.cs"
     ]
   },
 

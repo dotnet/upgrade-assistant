@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             services.Services.AddTransient<IComponentIdentifier, WindowsComponentIdentifier>();
             services.Services.AddTransient<IAnalyzeResultProvider, WinformsResultProvider>();
             services.Services.AddUpgradeStep<WindowsDesktopUpdateStep>();
+            services.Services.AddUpgradeStep<PreConversionAnalysisStep>();
             services.AddExtensionOption<WinUIOptions>(WinUIOptions.Name);
             services.Services.AddWinformsUpdaterStep();
             services.Services.AddWinUIUpdateSteps();

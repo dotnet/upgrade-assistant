@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -38,12 +39,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
             context.RegisterSyntaxNodeAction(AnalyzeObjectCreationExpression, SyntaxKind.InvocationExpression);
-        }
-
-        private static IEnumerable<string> AllNamespaces(SyntaxNodeAnalysisContext context)
-        {
-            return context.Node.Ancestors().OfType<CompilationUnitSyntax>().First().DescendantNodes().OfType<UsingDirectiveSyntax>()
-                .Select(usingDirective => usingDirective.Name.ToString());
         }
 
         // Api ID -> KeyValuePair of (UWPType (namespace, type, method) -> WinUIType (namespace, type, method))
@@ -156,7 +151,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 var id = api.Key;
                 var (typeNamespace, typeName, methodName) = api.Value.Key;
-                if ((firstChildText == $"{typeName}.{methodName}" && AllNamespaces(context).Contains(typeNamespace))
+                if ((firstChildText == $"{typeName}.{methodName}" && UWPToWinUIHelpers.GetAllImportedNamespaces(context).Contains(typeNamespace))
                     || firstChildText == $"{typeNamespace}.{typeName}.{methodName}")
                 {
                     var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), ImmutableDictionary.Create<string, string?>().Add("apiId", id), node.GetText().ToString());

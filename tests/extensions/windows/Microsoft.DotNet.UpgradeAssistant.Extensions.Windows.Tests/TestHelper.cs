@@ -30,13 +30,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             new WinUIContentDialogAnalyzer(),
             new WinUIInitializeWindowAnalyzer(),
             new WinUIDataTransferManagerAnalyzer(),
-            new WinUIInteropAnalyzer());
+            new WinUIInteropAnalyzer(),
+            new WinUIMRTResourceManagerAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new WinUIContentDialogCodeFixer(),
             new WinUIInitializeWindowCodeFixer(),
             new WinUIDataTransferManagerCodeFixer(),
-            new WinUIInteropCodeFixer());
+            new WinUIInteropCodeFixer(),
+            new WinUIMRTResourceManagerCodeFixer());
 
         public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(this AdhocWorkspace workspace, string documentPath, IEnumerable<string> diagnosticIds, bool isFramework)
         {

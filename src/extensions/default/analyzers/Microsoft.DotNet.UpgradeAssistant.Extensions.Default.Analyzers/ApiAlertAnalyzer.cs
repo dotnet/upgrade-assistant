@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using CS = Microsoft.CodeAnalysis.CSharp;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -126,6 +127,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     // get the default (first) one.
                     var id = $"{BaseDiagnosticId}_{match.Mapping.Id}";
                     var diagnosticDescriptor = SupportedDiagnostics.FirstOrDefault(d => d.Id.Equals(id, StringComparison.Ordinal)) ?? SupportedDiagnostics.First();
+
+                    // If the associated comment with the node contains the diagnostic id,
+                    // it means some code fixer has acknoledged it & added a comment. Do not report it again.
+                    var nodeTrivia = context.Node.Ancestors().OfType<StatementSyntax>().First().GetLeadingTrivia();
+                    if (nodeTrivia.Any(trivia => (trivia.IsKind(CS.SyntaxKind.SingleLineCommentTrivia)
+                            || trivia.IsKind(CS.SyntaxKind.MultiLineCommentTrivia))
+                            && trivia.ToString().Contains(id)))
+                    {
+                        continue;
+                    }
 
                     // Create and report the diagnostic. Note that the fully qualified name's location is used so
                     // that any future code fix provider can directly replace the node without needing to consider its parents.

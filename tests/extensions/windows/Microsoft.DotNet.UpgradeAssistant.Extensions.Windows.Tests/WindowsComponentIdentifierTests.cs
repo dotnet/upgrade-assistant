@@ -48,6 +48,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
                 {
                     new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(415, 20))
                 }
+            },
+            {
+                "MRTResourceManagerCaller",
+                new[]
+                {
+                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(415, 20))
+                }
             }
         };
 
@@ -123,6 +130,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
         {
             using var workspace = new AdhocWorkspace();
             var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIInteropAnalyzer.DiagnosticId)).ConfigureAwait(false);
+            var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
+            Assert.Equal(expectedFix.Trim(), actualFix.Trim());
+        }
+
+        [InlineData("MRTResourceManagerCaller")]
+        [Theory]
+        public async void ResourceManagerAnalyzerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIMRTResourceManagerAnalyzer.DiagnosticId), true).ConfigureAwait(false);
+            AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
+        }
+
+        [InlineData("MRTResourceManagerCaller")]
+        [Theory]
+        public async void ResourceManagerCodeFixerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIMRTResourceManagerAnalyzer.DiagnosticId)).ConfigureAwait(false);
             var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
             Assert.Equal(expectedFix.Trim(), actualFix.Trim());
         }

@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     var contents = new StringBuilder(File.ReadAllText(itemPath));
                     foreach (var nameplaceReplace in _namespaceUpdates)
                     {
-                        contents.Replace(nameplaceReplace.Key, nameplaceReplace.Value);
+                        contents.Replace(nameplaceReplace.Key.Trim(), nameplaceReplace.Value.Trim());
                     }
 
                     File.WriteAllText(itemPath, contents.ToString());

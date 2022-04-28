@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public override string Description => "Update Windows Desktop Project";
 
-        public override string Id => WellKnownStepIds.WinformsProjectUpdaterStepId;
+        public override string Id => WellKnownStepIds.WindowsDesktopUpdateStepId;
 
         public override IEnumerable<string> DependsOn { get; } = new[]
         {

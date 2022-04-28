@@ -77,10 +77,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                             backButtonSymbol.SetAttribute("Symbol", element.NamespaceURI, "Back");
                             backButtonElement.AppendChild(backButtonSymbol);
 
-                            var comment = doc.CreateComment(@"
-        Default back button in the title bar does not exist in WinUI3 apps.
+                            var comment = doc.CreateComment(@$"TODO {WinUIBackButtonAnalyzer.DiagnosticId} Default back button in the title bar does not exist in WinUI3 apps.
         We have created a custom back button for you. Feel free to rename and edit its position/behavior.
-        Read: https://aka.ms/UA-back-button ");
+        Read: https://aka.ms/UWP.NetUpgrade/UA3015");
                             element.PrependChild(backButtonElement);
                             element.InsertBefore(comment, backButtonElement);
                             break;
