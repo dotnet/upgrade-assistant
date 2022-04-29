@@ -14,13 +14,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         public static async Task<MauiProjectType> IsMauiProject(IProject project, CancellationToken token)
         {
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-            if (components.HasFlag(ProjectComponents.MauiiOS))
+            if (components.HasFlag(ProjectComponents.MauiiOS) && components.HasFlag(ProjectComponents.MauiAndroid) && components.HasFlag(ProjectComponents.Maui))
             {
-                return MauiProjectType.MauiiOS;
+                return MauiProjectType.Maui;
             }
             else if (components.HasFlag(ProjectComponents.MauiAndroid))
             {
                 return MauiProjectType.MauiAndroid;
+            }
+            else if (components.HasFlag(ProjectComponents.MauiiOS))
+            {
+                return MauiProjectType.MauiiOS;
             }
 
             return MauiProjectType.Maui;

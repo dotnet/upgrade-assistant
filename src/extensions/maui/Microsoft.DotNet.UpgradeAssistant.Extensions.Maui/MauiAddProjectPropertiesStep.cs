@@ -47,6 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var projectType = await MauiUtilties.IsMauiProject(project, token).ConfigureAwait(false);
 
+
             switch (projectType)
             {
                 case MauiProjectType.Maui:
@@ -92,9 +93,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             projectproperties.RemoveProjectProperty("AndroidUseSharedRuntime");
             projectproperties.RemoveProjectProperty("MonoAndroidResourcePrefix");
             projectproperties.RemoveProjectProperty("AndroidUseAapt2");
-
+            projectproperties.RemoveProjectProperty("AndroidManifest");
             projectproperties.RemoveProjectProperty("AndroidSupportedAbis");
-            file.SetPropertyValue("RuntimeIdentifiers", "android-arm;android-arm64;android-x86;android-x64");
 
             var androidLinkMode = projectproperties.GetProjectPropertyValue("AndroidLinkMode");
             foreach (var linkMode in androidLinkMode)
@@ -106,6 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     file.SetPropertyValue("TrimMode", "link");
                 }
             }
+            file.SetPropertyValue("ImplicitUsings", "enable");
         }
 
         private static void UpgradeMauiiOS(IProjectPropertyElements projectproperties, IProjectFile file)
@@ -115,6 +116,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             // remove unneeded Properties
             projectproperties.RemoveProjectProperty("IPhoneResourcePrefix");
+            projectproperties.RemoveProjectProperty("RuntimeIdentifiers");
+            projectproperties.RemoveProjectProperty("EnableSGenConc");
+            projectproperties.RemoveProjectProperty("ProvisioningType");
+            projectproperties.RemoveProjectProperty("MtouchLink");
+            projectproperties.RemoveProjectProperty("MtouchDebug");
+            projectproperties.RemoveProjectProperty("MtouchInterpreter");
         }
 
         private static void UpgradeMaui(IProjectPropertyElements projectproperties, IProjectFile file)
@@ -122,6 +129,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             // remove unneeded Properties
             projectproperties.RemoveProjectProperty("DebugType");
             projectproperties.RemoveProjectProperty("DebugSymbols");
+            projectproperties.RemoveProjectProperty("ProduceReferenceAssembly");
+
+            // adding MAUI Properties
+            file.SetPropertyValue("OutputType", "Library");
+            file.SetPropertyValue("ImplicitUsings", "enable");
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

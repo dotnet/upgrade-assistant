@@ -1,21 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <TargetFrameworks>net6.0-android;net6.0-ios</TargetFrameworks>
-    <RuntimeIdentifier />
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
     <UseMaui>true</UseMaui>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="CommunityToolkit.Maui" Version="1.0.0-rc2" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.222702">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Startup.cs" />
+    <Compile Include="MauiProgram.cs" />
   </ItemGroup>
 </Project>

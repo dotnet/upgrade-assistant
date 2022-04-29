@@ -9,10 +9,6 @@
       {
         "Name": "Xamarin.Essentials",
         "Version": "*"
-      },
-      {
-        "Name": "Xamarin.CommunityToolkit",
-        "Version" : "*"
       }
     ],
     "NetCorePackages": []
@@ -322,5 +318,52 @@
       }
     ],
     "NetCorePackages": []
+  },
+  {
+    "PackageSetName": "Community Toolkit",
+    "NetFrameworkPackages": [
+      {
+        "Name": "Xamarin.CommunityToolkit",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+
+      {
+        "Name": "CommunityToolkit.Maui",
+        "Version": "1.0.0-rc2"
+      }
+    ]
+  },
+  {
+    "PackageSetName": "SkiaSharp",
+    "NetFrameworkPackages": [
+      {
+        "Name": "SkiaSharp",
+        "Version": "*"
+      },
+      {
+        "Name": "SkiaSharp.Views.Forms",
+        "Version": "*"
+      },
+      {
+        "Name": "SkiaSharp.Views",
+        "Version": "*"
+      }
+    ],
+    "NetCorePackages": [
+      {
+        "Name": "SkiaSharp.Views.Maui.Controls",
+        "Version": "2.88.0-preview.256"
+      },
+      {
+        "Name": "SkiaSharp.Views.Maui.Core",
+        "Version": "2.88.0-preview.256"
+      },
+      {
+        "Name": "SkiaSharp.Views.Maui.Controls.Compatibility",
+        "Version": "2.88.0-preview.256"
+      }
+    ]
   }
 ]
