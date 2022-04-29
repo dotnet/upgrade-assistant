@@ -47,7 +47,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var projectType = await MauiUtilties.IsMauiProject(project, token).ConfigureAwait(false);
 
-
             switch (projectType)
             {
                 case MauiProjectType.Maui:
@@ -106,6 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     file.SetPropertyValue("TrimMode", "link");
                 }
             }
+
             file.SetPropertyValue("ImplicitUsings", "enable");
         }
 
