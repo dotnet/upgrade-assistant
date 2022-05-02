@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var file = project.GetFile();
             var projectproperties = project.GetProjectPropertyElements();
 
-            var projectType = await MauiUtilties.IsMauiProject(project, token).ConfigureAwait(false);
+            var projectType = await MauiUtilties.GetMauiProjectTypeForProject(project, token).ConfigureAwait(false);
 
             switch (projectType)
             {

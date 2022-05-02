@@ -74,7 +74,7 @@ The following tutorials will give you a sense of how to upgrade ASP.NET, Windows
 - [Upgrade a Windows Forms App to .NET 6 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-winforms-framework)
 - [Upgrade a WPF App to .NET 6 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-wpf-framework)
 
-To upgrade Xamarin.Forms to .NET MAUI using upgrade-assistant, please follow steps [here](docs/maui_support.md). 
+Learn more about upcoming support for Xamarin.Forms to .NET MAUI upgrades [here](docs/maui_support.md). 
 
 Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook)
 

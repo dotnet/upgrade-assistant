@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
     internal static class MauiUtilties
     {
-        public static async Task<MauiProjectType> IsMauiProject(IProject project, CancellationToken token)
+        public static async Task<MauiProjectType> GetMauiProjectTypeForProject(IProject project, CancellationToken token)
         {
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             if (components.HasFlag(ProjectComponents.MauiiOS) && components.HasFlag(ProjectComponents.MauiAndroid) && components.HasFlag(ProjectComponents.Maui))
