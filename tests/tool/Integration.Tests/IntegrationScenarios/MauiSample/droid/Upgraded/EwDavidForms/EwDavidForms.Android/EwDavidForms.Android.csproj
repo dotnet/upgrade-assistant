@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
+    <ImplicitUsings>enable</ImplicitUsings>
     <UseMaui>true</UseMaui>
   </PropertyGroup>
   <PropertyGroup>
@@ -12,6 +11,7 @@
     <ProjectReference Include="..\EwDavidForms\EwDavidForms.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Maui" Version="1.0.0-rc2" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.222702">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
