@@ -16,9 +16,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Checks
     /// </summary>
     public class WcfServerCheck : IUpgradeReadyCheck
     {
-        private const string UPGRADE_LINK = "https://aka.ms/CoreWCF/migration";
+        private const string WCF_LINK = "https://aka.ms/CoreWCF/migration";
+        private const string gRPC_LINK = "https://aka.ms/migrate-wcf-to-grpc";
         private const string CATEGORY = "WCF Server-side Services";
-        private const string WCF_MESSAGE = $"Support for {CATEGORY} is limited to .NET Full Framework. Suitable replacements are CoreWCF or gRPC. To learn more please read: {UPGRADE_LINK}";
+        private const string WCF_MESSAGE = $"Support for {CATEGORY} is limited to .NET Full Framework. Consider rewriting to use CoreWCF ({WCF_LINK}) or gRPC ({gRPC_LINK}).";
         private readonly ILogger<WcfServerCheck> _logger;
 
         public WcfServerCheck(ILogger<WcfServerCheck> logger)
