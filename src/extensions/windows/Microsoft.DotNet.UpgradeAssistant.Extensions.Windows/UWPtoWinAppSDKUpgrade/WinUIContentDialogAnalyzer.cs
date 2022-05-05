@@ -35,13 +35,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.RegisterSyntaxNodeAction(AnalyzeInvocationExpression, SyntaxKind.InvocationExpression);
         }
 
         private void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
         {
             var node = (InvocationExpressionSyntax)context.Node;
+
+            if (node == null)
+            {
+                return;
+            }
 
             foreach (var child in node.ChildNodesAndTokens())
             {

@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 documentEditor.InsertAfter(newMethodDeclarationSibling, newMethodDeclaration);
             }
 
-            return document.WithSyntaxRoot(documentEditor.GetChangedRoot().NormalizeWhitespace());
+            return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
         }
     }
 }

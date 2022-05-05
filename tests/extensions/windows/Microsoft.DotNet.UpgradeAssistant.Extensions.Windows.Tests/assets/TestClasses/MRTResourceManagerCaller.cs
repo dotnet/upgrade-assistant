@@ -17,5 +17,12 @@ namespace TestProject.TestClasses
             var currentResourceManager = ResourceManager.Current;
             var currentResourceManager2 = Microsoft.Windows.ApplicationModel.Resources.ResourceManager.Current;
         }
+
+        private async void CreateResourceContext()
+        {
+            var currentResourceManager = ResourceManager.Current;
+            var resourceContext1 = ResourceContext.GetForViewIndependentUse();
+            var resourceContext2 = ResourceContext.GetForCurrentView();
+        }
     }
 }

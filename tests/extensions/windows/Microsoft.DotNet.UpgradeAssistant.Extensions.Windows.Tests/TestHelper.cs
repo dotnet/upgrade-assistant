@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Extras.Moq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -15,6 +16,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Xunit;
 
@@ -31,14 +33,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             new WinUIInitializeWindowAnalyzer(),
             new WinUIDataTransferManagerAnalyzer(),
             new WinUIInteropAnalyzer(),
-            new WinUIMRTResourceManagerAnalyzer());
+            new WinUIMRTResourceManagerAnalyzer(),
+            new WinUIBackButtonAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new WinUIContentDialogCodeFixer(),
             new WinUIInitializeWindowCodeFixer(),
             new WinUIDataTransferManagerCodeFixer(),
             new WinUIInteropCodeFixer(),
-            new WinUIMRTResourceManagerCodeFixer());
+            new WinUIMRTResourceManagerCodeFixer(),
+            new WinUIBackButtonCodeFixer(null));
 
         public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(this AdhocWorkspace workspace, string documentPath, IEnumerable<string> diagnosticIds, bool isFramework)
         {

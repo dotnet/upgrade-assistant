@@ -3,7 +3,9 @@
 
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.DotNet.UpgradeAssistant
@@ -11,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     /// <summary>
     /// Extension class with methods for registering WinformsUpdaterStep-related services.
     /// </summary>
-    public static class WinformsUpdaterStepExtensions
+    public static class WindowsDesktopUpdaterStepExtensions
     {
         /// <summary>
         /// Extension method for registering WinformsUpdaterStep and related services.
@@ -38,6 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 .AddTransient<DiagnosticAnalyzer, WinUIMRTResourceManagerAnalyzer>()
                 .AddTransient<CodeFixProvider, WinUIMRTResourceManagerCodeFixer>()
                 .AddTransient<CodeFixProvider, WinUIApiAlertsfixer>()
+                .AddTransient<IDependencyAnalyzer, WinUIReferenceAnalyzer>()
                 .AddTransient<IUpdater<IProject>, WinUINamespaceUpdater>()
                 .AddTransient<IUpdater<IProject>, WinUIPropertiesUpdater>()
                 .AddTransient<IUpdater<IProject>, WinUIPackageAppxmanifestUpdater>()

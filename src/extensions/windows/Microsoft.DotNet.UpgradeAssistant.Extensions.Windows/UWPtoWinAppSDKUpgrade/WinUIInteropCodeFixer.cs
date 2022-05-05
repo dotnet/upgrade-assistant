@@ -89,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var newExpressionWithArgs = newExpression.ReplaceNode(newExpressionArgs, newArgs);
 
             documentEditor.ReplaceNode(invocationExpressionSyntax, newExpressionWithArgs);
-            return document.WithSyntaxRoot(documentEditor.GetChangedRoot().NormalizeWhitespace());
+            return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
         }
     }
 }

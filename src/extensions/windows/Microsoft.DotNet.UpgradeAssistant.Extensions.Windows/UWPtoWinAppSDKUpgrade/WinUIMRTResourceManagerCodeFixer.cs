@@ -21,7 +21,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     public class WinUIMRTResourceManagerCodeFixer : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(WinUIMRTResourceManagerAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(
+            WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId,
+            WinUIMRTResourceManagerAnalyzer.ResourceContextAPIDiagnosticId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -50,7 +52,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.RegisterCodeFix(
                 CodeAction.Create(
                     FixableDiagnosticIds.First(),
-                    c => FixResourceManagerAPI(context.Document, declaration, c),
+                    c => diagnostic.Id == WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId ? FixResourceManagerAPI(context.Document, declaration, c)
+                        : FixResourceContextAPI(context.Document, declaration, c),
                     "MRT to MRT Core ResourceManager"),
                 diagnostic);
         }
@@ -63,6 +66,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var newMemberInitiation = newMemberInitiationRoot.DescendantNodesAndSelf().OfType<ObjectCreationExpressionSyntax>().First();
 
             return document.WithSyntaxRoot(oldRoot!.ReplaceNode(memberAccessExpression, newMemberInitiation));
+        }
+
+        private static async Task<Document> FixResourceContextAPI(Document document, MemberAccessExpressionSyntax memberAccessExpression, CancellationToken cancellationToken)
+        {
+            var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            var invocation = memberAccessExpression.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+            if (invocation == null)
+            {
+                return document;
+            }
+
+            var comment = await CSharpSyntaxTree.ParseText(@"/*
+                TODO ResourceContext.GetForCurrentView and ResourceContext.GetForViewIndependentUse do not exist in Windows App SDK
+                Use your ResourceManager instance to create a ResourceContext as below. If you already have a ResourceManager instance,
+                replace the new instance created below with correct instance.
+                Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/mrtcore
+            */", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
+
+            var newMemberInitiationRoot = await CSharpSyntaxTree.ParseText("new Microsoft.Windows.ApplicationModel.Resources.ResourceManager().CreateResourceContext()", cancellationToken: cancellationToken)
+                .GetRootAsync(cancellationToken).ConfigureAwait(false);
+            var newMemberInitiation = newMemberInitiationRoot.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().First();
+            var newMemberInitiationWithComment = newMemberInitiation.WithLeadingTrivia(comment.GetLeadingTrivia());
+
+            return document.WithSyntaxRoot(oldRoot!.ReplaceNode(invocation, newMemberInitiationWithComment));
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 ").GetRootAsync(cancellationToken).ConfigureAwait(false);
             var newExpression = newExpressionRoot.DescendantNodes().OfType<InvocationExpressionSyntax>().First();
             documentEditor.ReplaceNode(invocationExpressionSyntax, newExpression);
-            return document.WithSyntaxRoot(documentEditor.GetChangedRoot().NormalizeWhitespace());
+            return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
         }
     }
 }

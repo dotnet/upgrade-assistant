@@ -6,26 +6,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace TestProject.TestClasses
 {
     public class ContentDialogCaller
     {
-        private async void CallContentDialog()
+        private async void CreateResourceManager()
         {
-            ContentDialog saveDialog = new ContentDialog()
-            {Title = "Unsaved changes", Content = "You have unsaved changes that will be lost if you leave this page.", PrimaryButtonText = "Leave this page", SecondaryButtonText = "Stay"};
-            ContentDialogResult result = this.SetContentDialogRoot(saveDialog).ShowAsync();
+            var currentResourceManager = new Microsoft.Windows.ApplicationModel.Resources.ResourceManager();
+            var currentResourceManager2 = new Microsoft.Windows.ApplicationModel.Resources.ResourceManager();
         }
 
-        private ContentDialog SetContentDialogRoot(ContentDialog contentDialog)
+        private async void CreateResourceContext()
         {
-            if (Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 8))
-            {
-                contentDialog.XamlRoot = this.Content.XamlRoot;
-            }
-
-            return contentDialog;
+            var currentResourceManager = new Microsoft.Windows.ApplicationModel.Resources.ResourceManager();
+            var resourceContext1 = /*
+                TODO ResourceContext.GetForCurrentView and ResourceContext.GetForViewIndependentUse do not exist in Windows App SDK
+                Use your ResourceManager instance to create a ResourceContext as below. If you already have a ResourceManager instance,
+                replace the new instance created below with correct instance.
+                Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/mrtcore
+            */new Microsoft.Windows.ApplicationModel.Resources.ResourceManager().CreateResourceContext();
+            var resourceContext2 = /*
+                TODO ResourceContext.GetForCurrentView and ResourceContext.GetForViewIndependentUse do not exist in Windows App SDK
+                Use your ResourceManager instance to create a ResourceContext as below. If you already have a ResourceManager instance,
+                replace the new instance created below with correct instance.
+                Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/mrtcore
+            */new Microsoft.Windows.ApplicationModel.Resources.ResourceManager().CreateResourceContext();
         }
     }
 }

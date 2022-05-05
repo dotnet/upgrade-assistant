@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using AutoFixture;
 using Microsoft.CodeAnalysis;
-using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Moq;
 using Xunit;
 
@@ -51,6 +51,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             },
             {
                 "MRTResourceManagerCaller",
+                new[]
+                {
+                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(415, 20))
+                }
+            },
+            {
+                "BackButtonCaller",
                 new[]
                 {
                     new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(415, 20))
@@ -139,7 +146,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
         public async void ResourceManagerAnalyzerTest(string documentPath)
         {
             using var workspace = new AdhocWorkspace();
-            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIMRTResourceManagerAnalyzer.DiagnosticId), true).ConfigureAwait(false);
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId,
+                WinUIMRTResourceManagerAnalyzer.ResourceContextAPIDiagnosticId), true).ConfigureAwait(false);
             AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
         }
 
@@ -148,7 +156,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
         public async void ResourceManagerCodeFixerTest(string documentPath)
         {
             using var workspace = new AdhocWorkspace();
-            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIMRTResourceManagerAnalyzer.DiagnosticId)).ConfigureAwait(false);
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId,
+                WinUIMRTResourceManagerAnalyzer.ResourceContextAPIDiagnosticId)).ConfigureAwait(false);
+            var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
+            Assert.Equal(expectedFix.Trim(), actualFix.Trim());
+        }
+
+        [InlineData("BackButtonCaller")]
+        [Theory]
+        public async void BackButtonAnalyzerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIBackButtonAnalyzer.DiagnosticId), true).ConfigureAwait(false);
+            AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
+        }
+
+        [InlineData("BackButtonCaller")]
+        [Theory]
+        public async void BackButtonCodeFixerTest(string documentPath)
+        {
+            using var workspace = new AdhocWorkspace();
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIBackButtonAnalyzer.DiagnosticId)).ConfigureAwait(false);
             var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
             Assert.Equal(expectedFix.Trim(), actualFix.Trim());
         }

@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 }
             }
 
-            return document.WithSyntaxRoot(documentEditor.GetChangedRoot().NormalizeWhitespace());
+            return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
         }
     }
 }

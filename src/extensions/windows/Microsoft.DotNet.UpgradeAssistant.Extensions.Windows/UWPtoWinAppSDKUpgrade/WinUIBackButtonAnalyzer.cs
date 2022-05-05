@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,6 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
 
             context.RegisterSyntaxNodeAction(AnalyzeLocalDeclarationStatement, SyntaxKind.SimpleAssignmentExpression);
+            context.RegisterSyntaxNodeAction(AnalyzeLocalDeclarationStatement, SyntaxKind.AddAssignmentExpression);
         }
 
         private void AnalyzeLocalDeclarationStatement(SyntaxNodeAnalysisContext context)
@@ -52,15 +54,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 return;
             }
 
-            var left = (MemberAccessExpressionSyntax)node.Left;
-            if (left.GetLastToken().ValueText != "AppViewBackButtonVisibility")
+            if (node.GetLeadingTrivia().Any(trivia => (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia)
+                    || trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
+                    && trivia.ToString().Contains(DiagnosticId)))
             {
                 return;
             }
 
-            var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), properties: ImmutableDictionary.Create<string, string?>().Add(FixStateProperty, FixStatePossible),
-                node.GetText().ToString());
-            context.ReportDiagnostic(diagnostic);
+            var left = (MemberAccessExpressionSyntax)node.Left;
+            if ((left.GetLastToken().ValueText == "AppViewBackButtonVisibility" && node.IsKind(SyntaxKind.SimpleAssignmentExpression))
+                || (left.GetLastToken().ValueText == "BackRequested" && node.IsKind(SyntaxKind.AddAssignmentExpression)))
+            {
+                var diagnostic = Diagnostic.Create(Rule,
+                    node.GetLocation(),
+                    properties: ImmutableDictionary.Create<string, string?>().Add(FixStateProperty, FixStatePossible),
+                    node.GetText().ToString());
+                context.ReportDiagnostic(diagnostic);
+            }
         }
     }
 }

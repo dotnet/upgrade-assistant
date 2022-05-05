@@ -39,6 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
             if (this._filesToDelete == null || this._filesToDelete.Count == 0)
             {
                 return new WindowsDesktopUpdaterResult(
@@ -46,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                   RuleName: Id,
                   FullDescription: Title,
                   false,
-                  "",
+                  "No files to delete",
                   new List<string>());
             }
 
@@ -62,18 +63,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 {
                     if (file != null)
                     {
+                        _logger.LogInformation($"Deleting {file} as it is not required for Windows App SDK projects.");
                         File.Delete(file);
                     }
+                }
+
+                if (!project.FindFiles("App.xaml.old.cs").Any())
+                {
+                    var appXamlCsFiles = project.GetFile().FilePath;
                 }
             }
 
             return new WindowsDesktopUpdaterResult(
-            "UA302",
-            RuleName: Id,
-            FullDescription: Title,
-            true,
-            "",
-            new List<string>());
+                "UA302",
+                RuleName: Id,
+                FullDescription: Title,
+                true,
+                "",
+                new List<string>());
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)

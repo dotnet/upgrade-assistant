@@ -27,7 +27,7 @@
       },
       {
         "Name": "Microsoft.Graphics.Win2D",
-        "Version":  "1.0.0.30",
+        "Version":  "1.0.0.30"
       }
     ]
   }

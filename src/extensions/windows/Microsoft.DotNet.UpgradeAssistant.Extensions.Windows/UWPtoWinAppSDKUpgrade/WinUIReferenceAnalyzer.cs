@@ -1,0 +1,55 @@
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Dependencies;
+using Microsoft.Extensions.Logging;
+
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade
+{
+    internal class WinUIReferenceAnalyzer : IDependencyAnalyzer
+    {
+        public string Name => "Windows App SDK package analysis";
+
+        private readonly IPackageLoader _packageLoader;
+        private readonly ILogger _logger;
+
+        public WinUIReferenceAnalyzer(IPackageLoader packageLoader, ILogger<WinUIReferenceAnalyzer> logger)
+        {
+            this._packageLoader = packageLoader;
+            this._logger = logger;
+        }
+
+        public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
+        {
+            await Task.Yield();
+            foreach (var package in state.Packages)
+            {
+                if (package.Name.StartsWith("Microsoft.Toolkit.Uwp", StringComparison.Ordinal) || package.Name.StartsWith("Microsoft.Toolkit", StringComparison.Ordinal))
+                {
+                    var newPackage = new NuGetReference(package.Name.Replace("Microsoft.Toolkit.Uwp", "CommunityToolkit.WinUI")
+                        .Replace("Microsoft.Toolkit", "CommunityToolkit"), package.Version);
+                    if (!await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newPackage, project.TargetFrameworks, token).ConfigureAwait(true))
+                    {
+                        newPackage = await _packageLoader.GetLatestVersionAsync(newPackage.Name, project.TargetFrameworks,
+                            new PackageSearchOptions { LatestMinorAndBuildOnly = false, Prerelease = false, Unlisted = false }, token).ConfigureAwait(true);
+                        if (newPackage == null)
+                        {
+                            _logger.LogWarning($"Unable to find a supported WinUI nuget package for {package.Name}. Skipping this package.");
+                            continue;
+                        }
+                    }
+
+                    _logger.LogInformation($"UWP Package not supported. Replacing {package.Name} v{package.Version} with {newPackage.Name} v{newPackage.Version}");
+                    state.Packages.Add(newPackage, new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = new List<string>() });
+                    state.Packages.Remove(package, new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = new List<string>() });
+                }
+            }
+        }
+    }
+}

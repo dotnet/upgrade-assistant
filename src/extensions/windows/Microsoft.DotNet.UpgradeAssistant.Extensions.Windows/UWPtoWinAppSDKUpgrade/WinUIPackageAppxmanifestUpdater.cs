@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -23,63 +24,127 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public string Description => "Update the package.appxmanifest file";
 
+        private const string ErrorMessage = @"Unable to your fix package.appxmanifest file automatically.
+                We suggest copying the package.appxmanifest file from a new Windows App SDK projecta and editing it as required.";
+
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
+
+        private readonly ILogger _logger;
+
+        public WinUIPackageAppxmanifestUpdater(ILogger<WinUIPackageAppxmanifestUpdater> logger)
+        {
+            _logger = logger;
+        }
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
+#pragma warning disable CA1031 // Do not catch general exception types
+            try
+            {
+                foreach (var project in inputs)
+                {
+                    var filePath = project.FindFiles("Package.appxmanifest").FirstOrDefault();
+                    if (string.IsNullOrEmpty(filePath))
+                    {
+                        continue;
+                    }
+
+                    var doc = new XmlDocument();
+                    doc.Load(filePath);
+
+                    XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+                    nsmgr.AddNamespace("def", "http://schemas.microsoft.com/appx/manifest/foundation/windows10");
+                    nsmgr.AddNamespace("mp", "http://schemas.microsoft.com/appx/2014/phone/manifest");
+                    nsmgr.AddNamespace("uap", "http://schemas.microsoft.com/appx/manifest/uap/windows10");
+
+                    var root = doc.DocumentElement;
+                    var phoneIdentityElement = root.SelectSingleNode("mp:PhoneIdentity", nsmgr);
+                    if (phoneIdentityElement != null)
+                    {
+                        root.RemoveChild(phoneIdentityElement);
+                    }
+
+                    var appElement = (XmlElement)root.SelectSingleNode("def:Applications/def:Application[@Id]", nsmgr);
+                    appElement.SetAttribute("EntryPoint", "$targetentrypoint$");
+
+                    var targetDevicesUniversalElement = (XmlElement)root.SelectSingleNode("def:Dependencies/def:TargetDeviceFamily[@Name='Windows.Universal']", nsmgr);
+
+                    var targetFramework = context.CurrentProject!.TargetFrameworks.FirstOrDefault();
+                    if (targetFramework != null && targetFramework.PlatformVersion != null)
+                    {
+                        targetDevicesUniversalElement.SetAttribute("MaxVersionTested", targetFramework.PlatformVersion!.ToString());
+                    }
+
+                    targetDevicesUniversalElement.SetAttribute("Name", "Windows.Desktop");
+                    doc.Save(filePath);
+                }
+            }
+            catch (Exception)
+            {
+                this._logger.LogError(ErrorMessage);
+                return new WindowsDesktopUpdaterResult(
+                  RuleID,
+                  RuleName: Id,
+                  FullDescription: Title,
+                  false,
+                  string.Empty,
+                  new List<string>());
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+
+            return new WindowsDesktopUpdaterResult(
+               RuleID,
+               RuleName: Id,
+               FullDescription: Title,
+               true,
+               string.Empty,
+               new List<string>());
+        }
+
+        public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
+        {
+            await Task.Yield();
+            var filesToUpdate = new List<string>();
             foreach (var project in inputs)
             {
-                var file = project.FindFiles("Package.appxmanifest").First();
-                if (file == null)
+                var filePath = project.FindFiles("Package.appxmanifest").FirstOrDefault();
+                if (string.IsNullOrEmpty(filePath))
                 {
                     continue;
                 }
 
                 var doc = new XmlDocument();
-                doc.Load(file);
+                doc.Load(filePath);
 
                 XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
                 nsmgr.AddNamespace("def", "http://schemas.microsoft.com/appx/manifest/foundation/windows10");
-                nsmgr.AddNamespace("mp", "http://schemas.microsoft.com/appx/2014/phone/manifest");
-                nsmgr.AddNamespace("uap", "http://schemas.microsoft.com/appx/manifest/uap/windows10");
 
                 var root = doc.DocumentElement;
-                root.RemoveChild(root.SelectSingleNode("mp:PhoneIdentity", nsmgr));
+                var targetDevicesDesktopElement = (XmlElement)root.SelectSingleNode("def:Dependencies/def:TargetDeviceFamily[@Name='Windows.Desktop']", nsmgr);
+                if (targetDevicesDesktopElement == null)
+                {
+                    filesToUpdate.Add(filePath);
+                }
+            }
 
-                var appElement = (XmlElement)root.SelectSingleNode("def:Applications/def:Application[@Id='App']", nsmgr);
-                appElement.SetAttribute("EntryPoint", "$targetentrypoint$");
-
-                var targetDevicesUniversalElement = (XmlElement)root.SelectSingleNode("def:Dependencies/def:TargetDeviceFamily[@Name='Windows.Universal']", nsmgr);
-                targetDevicesUniversalElement.SetAttribute("MinVersion", "10.0.17763.0");
-                targetDevicesUniversalElement.SetAttribute("MaxVersionTested", "10.0.19041.0");
-
-                var targetDeviceDesktopElement = doc.CreateElement("TargetDeviceFamily", "http://schemas.microsoft.com/appx/manifest/foundation/windows10");
-                targetDeviceDesktopElement.SetAttribute("Name", "Windows.Desktop");
-                targetDeviceDesktopElement.SetAttribute("MinVersion", "10.0.17763.0");
-                targetDeviceDesktopElement.SetAttribute("MaxVersionTested", "10.0.19041.0");
-                targetDeviceDesktopElement.RemoveAttribute("xmlns");
-                root.SelectSingleNode("def:Dependencies", nsmgr).AppendChild(targetDeviceDesktopElement);
-
-                doc.Save(file);
+            if (filesToUpdate.Any())
+            {
+                return new WindowsDesktopUpdaterResult(
+                       RuleID,
+                       RuleName: Id,
+                       FullDescription: Title,
+                       true,
+                       "The package.appxmanifest file needs to be updated with the new Windows App SDK format",
+                       filesToUpdate);
             }
 
             return new WindowsDesktopUpdaterResult(
                RuleID,
                RuleName: Id,
                FullDescription: Title,
-               true,
-               "",
-               new List<string>());
-        }
-
-        public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
-        {
-            return new WindowsDesktopUpdaterResult(
-               RuleID,
-               RuleName: Id,
-               FullDescription: Title,
-               true,
-               "",
+               false,
+               "The package.appxmanifest is up to date",
                new List<string>());
         }
     }

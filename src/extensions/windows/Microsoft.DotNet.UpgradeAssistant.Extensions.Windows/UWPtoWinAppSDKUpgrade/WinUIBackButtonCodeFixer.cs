@@ -20,7 +20,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     [ApplicableComponents(ProjectComponents.WinUI)]
-    internal class WinUIBackButtonCodeFixer : CodeFixProvider
+    public class WinUIBackButtonCodeFixer : CodeFixProvider
     {
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including
         // the analyzer's ID in the code fix provider's FixableDiagnosticIds array.
@@ -33,10 +33,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private const string BackButtonMessage = @$"
             TODO {WinUIBackButtonAnalyzer.DiagnosticId} Default back button in the title bar does not exist in WinUI3 apps.
-            We have created a custom back button for you. Feel free to rename and edit its position/behavior.
+            The tool should have generated a custom back button ""{WinUIBackButtonXamlUpdater.NewBackButtonName}"" in the XAML file.
+            Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://aka.ms/UWP.NetUpgrade/UA3015";
 
-        private ILogger<WinUIBackButtonCodeFixer> _logger;
+        private ILogger<WinUIBackButtonCodeFixer>? _logger;
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -44,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return WellKnownFixAllProviders.BatchFixer;
         }
 
-        public WinUIBackButtonCodeFixer(ILogger<WinUIBackButtonCodeFixer> logger)
+        public WinUIBackButtonCodeFixer(ILogger<WinUIBackButtonCodeFixer>? logger)
         {
             this._logger = logger;
         }
@@ -80,41 +81,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private async Task<Document> FixBackButton(Document document, AssignmentExpressionSyntax backButtonAssignment, string fixState, FileLinePositionSpan lineSpan, CancellationToken cancellationToken)
         {
-            var backMethodRoot = await CSharpSyntaxTree.ParseText(@$"
-            class A
-            {{
-            private void {WinUIBackButtonXamlUpdater.NewBackButtonClickMethodName}(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-            {{
-                Frame.GoBack();
-            }}
-            }}
-            ", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
-            var backMethod = backMethodRoot.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
-
-            SyntaxNode backMethodSibling = backButtonAssignment;
-            while (!backMethodSibling.IsKind(SyntaxKind.MethodDeclaration))
-            {
-                backMethodSibling = backMethodSibling!.Parent!;
-            }
-
-            _logger!.LogWarning(lineSpan.Path + BackButtonMessage, null);
+            _logger?.LogWarning(lineSpan.Path + BackButtonMessage, null);
             var comment = await CSharpSyntaxTree.ParseText(BackButtonComment, cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
+            StatementSyntax newBackButtonAssignmentWithComment;
 
-            var backButtonVisibility = backButtonAssignment.ToString().Contains("Collapsed") ? "Collapsed" : "Visible";
-            var newBackButtonAssignmentTree = await CSharpSyntaxTree.ParseText(
-                $"{WinUIBackButtonXamlUpdater.NewBackButtonName}.Visibility = Microsoft.UI.Xaml.Visibility.{backButtonVisibility};", cancellationToken: cancellationToken)
-                .GetRootAsync(cancellationToken).ConfigureAwait(false);
-            var newBackButtonAssignment = ((GlobalStatementSyntax)newBackButtonAssignmentTree.ChildNodesAndTokens()[0].AsNode()!).Statement;
-            var newBackButtonAssignmentWithComment = newBackButtonAssignment.WithLeadingTrivia(comment.GetLeadingTrivia());
+            if (backButtonAssignment.Left.ToString().Contains("AppViewBackButtonVisibility")
+                && (backButtonAssignment.Right.ToString() == "AppViewBackButtonVisibility.Collapsed"
+                || backButtonAssignment.Right.ToString() == "AppViewBackButtonVisibility.Visible"))
+            {
+                var backButtonVisibility = backButtonAssignment.Right.ToString().Contains("Collapsed") ? "Collapsed" : "Visible";
+                var newBackButtonAssignmentTree = await CSharpSyntaxTree.ParseText(
+                    $"{WinUIBackButtonXamlUpdater.NewBackButtonName}.Visibility = Microsoft.UI.Xaml.Visibility.{backButtonVisibility};", cancellationToken: cancellationToken)
+                    .GetRootAsync(cancellationToken).ConfigureAwait(false);
+                var newBackButtonAssignment = ((GlobalStatementSyntax)newBackButtonAssignmentTree.ChildNodesAndTokens()[0].AsNode()!).Statement;
+                newBackButtonAssignmentWithComment = newBackButtonAssignment.WithLeadingTrivia(comment.GetLeadingTrivia());
+            }
+            else
+            {
+                newBackButtonAssignmentWithComment = backButtonAssignment.Ancestors().OfType<StatementSyntax>().First().WithLeadingTrivia(comment.GetLeadingTrivia());
+            }
 
             var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
             documentEditor.ReplaceNode(backButtonAssignment.Parent!, newBackButtonAssignmentWithComment);
-            if (!backMethodSibling.Parent!.ChildNodes().Any(sibling => sibling.GetText().ToString().Contains(WinUIBackButtonXamlUpdater.NewBackButtonClickMethodName)))
-            {
-                documentEditor.InsertAfter(backMethodSibling, ImmutableArray.Create(backMethod));
-            }
 
-            return document.WithSyntaxRoot(documentEditor.GetChangedRoot().NormalizeWhitespace());
+            return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
         }
     }
 }

@@ -18,16 +18,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class WinUIMRTResourceManagerAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "UA3021";
+        public const string ResourceManagerAPIDiagnosticId = "UA3021";
+        public const string ResourceContextAPIDiagnosticId = "UA3022";
         private const string Category = "Fix";
 
-        private static readonly LocalizableString Title = "ContentDialog API needs to set XamlRoot";
-        private static readonly LocalizableString MessageFormat = "XamlRoot of the Dialog object must be set before making the API call '{0}'";
-        private static readonly LocalizableString Description = "Detect content dialog api";
+        private static readonly LocalizableString Title = "MRT to MRT core migration";
+        private static readonly LocalizableString ResourceManagerMessageFormat = "Creation of ResourceManager '{0}' can be replaced by new ResourceManager()";
+        private static readonly LocalizableString ResourceContextMessageFormat = "Creation of Resourcecontext '{0}' can be replaced by ResourceManager.CreateResourceContext";
+        private static readonly LocalizableString Description = "Detect presence of MRT ResourceManager and ResourceContext creation";
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(ResourceManagerAPIRule, ResourceContextAPIRule);
 
-        private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor ResourceManagerAPIRule = new(ResourceManagerAPIDiagnosticId, Title, ResourceManagerMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor ResourceContextAPIRule = new(ResourceContextAPIDiagnosticId, Title, ResourceContextMessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -58,14 +61,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 || expression == "Microsoft.Windows.ApplicationModel.Resources.ResourceManager")
                 && memberName == "Current")
             {
-                var diagnostic = Diagnostic.Create(Rule, memberAccessExpression.GetLocation(), memberAccessExpression.GetText().ToString());
+                var diagnostic = Diagnostic.Create(ResourceManagerAPIRule, memberAccessExpression.GetLocation(), memberAccessExpression.GetText().ToString());
                 context.ReportDiagnostic(diagnostic);
             }
             else if (((expression == "ResourceContext" && UWPToWinUIHelpers.GetAllImportedNamespaces(context).Contains("Microsoft.Windows.ApplicationModel.Resources"))
                 || expression == "Microsoft.Windows.ApplicationModel.Resources.ResourceContext")
                 && (memberName == "GetForCurrentView" || memberName == "GetForViewIndependentUse"))
             {
-                var diagnostic = Diagnostic.Create(Rule, memberAccessExpression.GetLocation(), memberAccessExpression.GetText().ToString());
+                var diagnostic = Diagnostic.Create(ResourceContextAPIRule, memberAccessExpression.GetLocation(), memberAccessExpression.GetText().ToString());
                 context.ReportDiagnostic(diagnostic);
             }
         }
