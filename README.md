@@ -91,9 +91,7 @@ The following tutorials will give you a sense of how to upgrade ASP.NET, Windows
 
 Learn more about upcoming support for Xamarin.Forms to .NET MAUI upgrades [here](docs/maui_support.md). 
 
-Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook)
-
-[![Porting existing ASP.NET apps to .NET Core by Steve "ardalis" Smith](https://user-images.githubusercontent.com/782127/145730776-4f05fecf-01c3-4587-9e68-b45b42d83e92.png)
+Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook).
 
 ## Installation
 
