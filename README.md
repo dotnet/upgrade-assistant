@@ -15,7 +15,7 @@ We're interested to hearing how your experience with the .NET Upgrade Assistant 
 
 ## Overview
 
-This project and tool enables automation of common tasks related to upgrading .NET Framework projects to the latest versions of .NET (current, LTS, or Preview). See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for more details on the specific versions. Note that this tool will not handle every aspect of upgrading your project(s). Manually work *will* be required after using the tool to complete the upgrade.
+This project and tool enables automation of common tasks related to upgrading .NET Framework projects to the latest versions of .NET (current, LTS, or Preview). See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for more details on the specific versions. Note that this tool will not handle every aspect of upgrading your project(s). Manual work *will* be required after using the tool to complete the upgrade.
 
 The tool has 2 entry points: [Analyze](#analyze-solution-prior-to-upgrade) and [Upgrade](#upgrade-solution) to assist in understanding dependencies before upgrading and then with the actual changes to your project files, code files, and dependencies. There are also several ways to add more support to the tool by adding [extensions](#solution-wide-extension-management), [experimental features](#experimental-features), and [optional features](#optional-features).
 
