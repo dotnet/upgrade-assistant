@@ -87,8 +87,8 @@ Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https:
 
 ### Prerequisites
 
-1. This tool uses MSBuild to work with project files. Make sure that a recent version of MSBuild is installed. An easy way to do this is to [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
-2. This tool requires that your project builds. This may include installing [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) to ensure build SDKs (such as for web applications, etc) are available.
+1. This tool uses MSBuild to work with project files. Make sure that a recent version of MSBuild is installed. An easy way to do this is to [install Visual Studio 2022](https://visualstudio.microsoft.com/downloads/).
+2. This tool requires that your project builds. This may include installing [install Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) to ensure build SDKs (such as for web applications, etc) are available.
 
 ### Installation steps
 
