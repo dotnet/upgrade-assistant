@@ -25,7 +25,7 @@ Currently, the tool supports the following project types:
 - ASP.NET MVC
 - Windows Forms
 - Windows Presentation Foundation (WPF)
-- Console
+- Console app
 - Libraries
 - Xamarin.Forms to .NET MAUI
 
