@@ -59,7 +59,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
 
             foreach (var packageReference in toRemove)
             {
-                state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { "Unnecessary transitive dependency" } });
+                var logMessage = SR.Format("Package {0} needs to be removed as its a transitive dependency that is not required", packageReference.Name);
+
+                state.Packages.Remove(packageReference, new OperationDetails { Details = new[] { logMessage } });
             }
         }
     }

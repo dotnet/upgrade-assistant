@@ -69,6 +69,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 using var stream = File.OpenWrite(output);
                 await writer.WriteAsync(analyzeResultMap.ToAsyncEnumerable(), stream, token).ConfigureAwait(false);
+
+                _logger.LogInformation("Analysis Complete, the report is available at {File}", output);
             }
             else
             {
