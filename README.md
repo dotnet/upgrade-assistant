@@ -15,7 +15,31 @@ We're interested to hearing how your experience with the .NET Upgrade Assistant 
 
 ## Overview
 
-This project enables automation of common tasks related to upgrading .NET Framework projects to the latest versions of .NET (current, LTS, or Preview). See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for more details for what these mean.Note that this is not a complete upgrade tool and work *will* be required after using the tooling to upgrade a project.
+This project and tool enables automation of common tasks related to upgrading .NET Framework projects to the latest versions of .NET (current, LTS, or Preview). See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for more details on the specific versions. Note that this tool will not handle every aspect of upgrading your project(s). Manual work *will* be required after using the tool to complete the upgrade.
+
+The tool has 2 entry points: [Analyze](#analyze-solution-prior-to-upgrade) and [Upgrade](#upgrade-solution) to assist in understanding dependencies before upgrading and then with the actual changes to your project files, code files, and dependencies. There are also several ways to add more support to the tool by adding [extensions](#solution-wide-extension-management), [experimental features](#experimental-features), and [optional features](#optional-features).
+
+### Supported project types and languages
+Currently, the tool supports the following project types:
+
+- ASP.NET MVC
+- Windows Forms
+- Windows Presentation Foundation (WPF)
+- Console app
+- Libraries
+- Xamarin.Forms to .NET MAUI
+
+The tool supports C# and Visual Basic projects.
+
+### Analyze Solution prior to Upgrade
+
+When run on a solution in order to analyze dependencies prior to upgrade, the tool will provide an analysis report for each of the projects in the solution containing details on:
+
+- Package dependencies that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
+- References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
+- Framework References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
+- Call out if there is a package upgrade across major versions that could lead towards having breaking changes.
+- Unsupported API for the chosen TFM (current, LTS, or preview) used in the projects with pointers to recommended path forward if one is available.
 
 ### Upgrade Solution
 
@@ -32,15 +56,6 @@ When run on a solution in order to upgrade, the tool will:
 - Add references to analyzers that help with upgrade, such as the Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers package
 
 After running this tool on a solution to upgrade, the solution will likely not build until the upgrade is completed manually. Analyzers added to the solution will highlight some of the remaining changes needed after the tool runs.
-
-### Analyze Solution prior to Upgrade
-
-When run on a solution in order to analyze dependencies prior to upgrade, the tool will provide an analysis report for each of the projects in the solution containing details on:
-- Package dependencies that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
-- References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
-- Framework References that need to be removed / added / upgraded in order to upgrade the project to chosen TFM (current, LTS, or preview)
-- Call out if there is a package upgrade across major versions that could lead towards having breaking changes.
-- Unsupported API for the chosen TFM (current, LTS, or preview) used in the projects with pointers to recommended path forward if one is available.
 
 ### Solution wide extension management
 
@@ -76,16 +91,14 @@ The following tutorials will give you a sense of how to upgrade ASP.NET, Windows
 
 Learn more about upcoming support for Xamarin.Forms to .NET MAUI upgrades [here](docs/maui_support.md). 
 
-Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook)
-
-[![Porting existing ASP.NET apps to .NET Core by Steve "ardalis" Smith](https://user-images.githubusercontent.com/782127/145730776-4f05fecf-01c3-4587-9e68-b45b42d83e92.png)
+Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https://aka.ms/aspnet-porting-ebook).
 
 ## Installation
 
 ### Prerequisites
 
-1. This tool uses MSBuild to work with project files. Make sure that a recent version of MSBuild is installed. An easy way to do this is to [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
-2. This tool requires that your project builds. This may include installing [install Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) to ensure build SDKs (such as for web applications, etc) are available.
+1. This tool uses MSBuild to work with project files. Make sure that a recent version of MSBuild is installed. An easy way to do this is to [install Visual Studio](https://visualstudio.microsoft.com/downloads/).
+2. This tool requires that your project builds. This may include [installing Visual Studio](https://visualstudio.microsoft.com/downloads/) to ensure build SDKs (such as for web applications, etc) are available.
 
 ### Installation steps
 
@@ -245,7 +258,7 @@ Concepts referred to in this repository which may have unclear meaning are expla
 The project outputs a log file by default in the working directory called `upgrade-assistant.clef` that can be viewed with tools such as [Compact Log Format Viewer](https://github.com/warrenbuckley/Compact-Log-Format-Viewer) available via the [Windows Store](https://www.microsoft.com/store/apps/9N8RV8LKTXRJ?cid=storebadge&ocid=badge).
 
 ## Roadmap
-Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to the latets version of .NET (current, LTS, or preview) and beyond in the [roadmap](docs/roadmap.md).
+Take a look at the high level overview of the roadmap for this tool and the journey to upgrade your apps from .NET Framework to the latest version of .NET (current, LTS, or preview) and beyond in the [roadmap](docs/roadmap.md).
 
 ## Engage, Contribute and Give Feedback
 Some of the best ways to contribute are to use the tool to upgrade your apps to the latest version of .NET (current, LTS, or preview), file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
