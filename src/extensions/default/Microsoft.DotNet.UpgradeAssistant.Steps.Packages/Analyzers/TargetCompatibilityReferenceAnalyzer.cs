@@ -72,20 +72,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                         if (isMajorChange)
                         {
                             var logString = SR.Format("Package {0} needs to be upgraded across major versions ({1} -> {2}) which may introduce breaking changes.", packageReference.Name, packageReference.Version, updatedReference.Version);
-                            details.Add(string.Concat(logMessage, logString));
+                            details.Add($"{logMessage}  {logString}");
                             _logger.LogWarning(logString);
                         }
 
                         if (updatedReference.IsPrerelease)
                         {
                             var logString = SR.Format("Package {0} needs to be upgraded to a prerelease version ({1}) because no released version supports target(s) {2}", packageReference.Name, updatedReference.Version, string.Join(", ", state.TargetFrameworks));
-                            details.Add(string.Concat(logMessage, logString));
+                            details.Add($"{logMessage}  {logString}");
                             _logger.LogWarning(logString);
                         }
 
                         if (!isMajorChange && !updatedReference.IsPrerelease)
                         {
-                            details.Add(string.Concat(logMessage, SR.Format("Package {0} needs to be upgraded from {1} to {2}.", packageReference.Name, packageReference.Version, updatedReference.Version)));
+                            details.Add($"{logMessage}  {SR.Format("Package {0} needs to be upgraded from {1} to {2}.", packageReference.Name, packageReference.Version, updatedReference.Version)}");
                         }
 
                         state.Packages.Remove(packageReference, new OperationDetails() { Risk = BuildBreakRisk.None, Details = details });

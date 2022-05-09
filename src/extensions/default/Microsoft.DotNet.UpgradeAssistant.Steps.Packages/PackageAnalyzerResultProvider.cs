@@ -150,7 +150,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     {
                         foreach (var s in collection)
                         {
-                            var resultMessage = (s.OperationDetails is not null && s.OperationDetails.Details is not null && s.OperationDetails.Details.Any() && !results.Select(i => i.FileLocation == fileLocation & i.ResultMessage == s.OperationDetails.Details.FirstOrDefault()).Any()) ? s.OperationDetails.Details.FirstOrDefault() : string.Concat(name, s.Item, action);
+                            var resultMessage = (s.OperationDetails?.Details?.Any() == true && !results.Select(i => i.FileLocation == fileLocation & i.ResultMessage == s.OperationDetails.Details.FirstOrDefault()).Any()) ? s.OperationDetails.Details.FirstOrDefault() : string.Concat(name, s.Item, action);
 
                             results.Add(new()
                             {
