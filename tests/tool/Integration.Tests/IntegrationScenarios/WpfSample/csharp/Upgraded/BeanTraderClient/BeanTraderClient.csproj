@@ -46,7 +46,6 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.4" />
     <PackageReference Include="Nito.AsyncEx" Version="5.1.0" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
-    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.1.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ViewModels\OldUnusedViewModel.cs" />
