@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             await analyzer.AnalyzeAsync(project.Object, packageState.Object, default).ConfigureAwait(false);
 
             // Assert
-            packages.Verify(p => p.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), new OperationDetails() { Risk = BuildBreakRisk.None }));
+            packages.Verify(p => p.Add(new NuGetReference(NewtonsoftPackageName, NewtonsoftPackageNameVersion), It.IsAny<OperationDetails>()));
             packageLoader.Verify(pl => pl.GetLatestVersionAsync(It.IsAny<string>(), It.IsAny<IEnumerable<TargetFrameworkMoniker>>(), It.IsAny<PackageSearchOptions>(), It.IsAny<CancellationToken>()),
                 Times.Once());
         }
