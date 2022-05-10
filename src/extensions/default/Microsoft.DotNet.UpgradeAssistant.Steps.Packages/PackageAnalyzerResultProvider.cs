@@ -150,30 +150,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     {
                         foreach (var s in collection)
                         {
-                            if (s.OperationDetails is not null && s.OperationDetails.Details is not null && s.OperationDetails.Details.Any())
+                            var resultMessage = (s.OperationDetails?.Details?.Any() == true && !results.Select(i => i.FileLocation == fileLocation & i.ResultMessage == s.OperationDetails.Details.FirstOrDefault()).Any()) ? s.OperationDetails.Details.FirstOrDefault() : string.Concat(name, s.Item, action);
+
+                            results.Add(new()
                             {
-                                results.UnionWith(s.OperationDetails.Details.Select(s => new AnalyzeResult()
-                                {
-                                    RuleId = ruleId,
-                                    RuleName = ruleName,
-                                    FullDescription = fullDescription,
-                                    HelpUri = _helpUri,
-                                    FileLocation = fileLocation,
-                                    ResultMessage = s,
-                                }));
-                            }
-                            else
-                            {
-                                results.Add(new()
-                                {
-                                    RuleId = ruleId,
-                                    RuleName = ruleName,
-                                    FullDescription = fullDescription,
-                                    HelpUri = _helpUri,
-                                    FileLocation = fileLocation,
-                                    ResultMessage = string.Concat(name, s.Item, action),
-                                });
-                            }
+                                RuleId = ruleId,
+                                RuleName = ruleName,
+                                FullDescription = fullDescription,
+                                HelpUri = _helpUri,
+                                FileLocation = fileLocation,
+                                ResultMessage = resultMessage,
+                            });
                         }
                     }
                 }
