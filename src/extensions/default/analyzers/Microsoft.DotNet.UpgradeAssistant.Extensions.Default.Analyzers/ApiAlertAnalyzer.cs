@@ -7,8 +7,10 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+
 using CS = Microsoft.CodeAnalysis.CSharp;
 using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
 using VB = Microsoft.CodeAnalysis.VisualBasic;
@@ -39,7 +41,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiAlertGenericTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiAlertGenericMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ApiAlertGenericDescription), Resources.ResourceManager, typeof(Resources));
-        private static readonly DiagnosticDescriptor GenericRule = new(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor GenericRule = new DiagnosticDescriptor(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
         private readonly Lazy<IEnumerable<TargetSyntaxMessage>> _targetSyntaxes = new(() =>
         {
@@ -134,7 +136,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             }
         }
 
-        private static bool AnalyzeNamespace(SyntaxNodeAnalysisContext context,  string qualifiedName, TargetSyntax targetSyntax)
+        private static bool AnalyzeNamespace(SyntaxNodeAnalysisContext context, string qualifiedName, TargetSyntax targetSyntax)
         {
             // If the node is a fully qualified name from the specified namespace, return true
             // This should cover both import statements and fully qualified type names, so no addtional checks

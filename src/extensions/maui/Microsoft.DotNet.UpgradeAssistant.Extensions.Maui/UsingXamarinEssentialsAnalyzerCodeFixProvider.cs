@@ -54,7 +54,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var documentRoot = (CompilationUnitSyntax)editor.OriginalRoot;
             documentRoot = documentRoot.RemoveNode(node, SyntaxRemoveOptions.KeepNoTrivia);
-            documentRoot = documentRoot?.AddUsingIfMissing("Microsoft.Maui.Essentials");
 
             if (documentRoot is not null)
             {

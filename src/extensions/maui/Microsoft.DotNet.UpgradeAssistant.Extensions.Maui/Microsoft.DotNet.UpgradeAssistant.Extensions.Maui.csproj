@@ -21,10 +21,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageMap Include="PackageMaps\*.json" />
-    <TemplateConfigFile Include="Templates\**\*.json" />
-    <ExtensionFiles Include="PackageMaps\*" PackagePath="PackageMaps/" />
-    <ExtensionFiles Include="Templates\**\*" PackagePath="Templates/"/>
+    <None Update="ExtensionManifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="PackageMaps\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Remove="Templates\**\*.cs" />
   </ItemGroup>
 

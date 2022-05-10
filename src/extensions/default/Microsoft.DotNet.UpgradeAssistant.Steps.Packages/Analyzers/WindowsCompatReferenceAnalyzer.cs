@@ -73,9 +73,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 state.Packages.Remove(existing, new OperationDetails());
             }
 
-            _logger.LogInformation("Adding {PackageName} {Version}", PackageName, latestVersion.Version);
+            var logMessage = SR.Format("Adding {0} {1} helps with speeding up the upgrade process for Windows-based APIs", PackageName, latestVersion.Version);
+            _logger.LogInformation(logMessage);
 
-            state.Packages.Add(new NuGetReference(PackageName, latestVersion.Version), new OperationDetails());
+            state.Packages.Add(new NuGetReference(PackageName, latestVersion.Version), new OperationDetails { Details = new[] { logMessage } });
         }
     }
 }

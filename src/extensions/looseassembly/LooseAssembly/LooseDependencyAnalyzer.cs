@@ -60,10 +60,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly
 
                     if (first is not null)
                     {
-                        _logger.LogDebug("Found package {Package}: {Version}", first.Name, first.Version);
+                        var logMessage = SR.Format("Found package {0}: {1} for loose assembly {2}", first.Name, first.Version, reference);
 
-                        state.References.Remove(reference, new OperationDetails { Risk = BuildBreakRisk.Medium, Details = new[] { "Found package" } });
-                        state.Packages.Add(first, new OperationDetails { Risk = BuildBreakRisk.Medium });
+                        _logger.LogDebug(logMessage);
+
+                        state.References.Remove(reference, new OperationDetails { Risk = BuildBreakRisk.Medium, Details = new[] { logMessage } });
+                        state.Packages.Add(first, new OperationDetails { Risk = BuildBreakRisk.Medium, Details = new[] { logMessage } });
                     }
                 }
             }

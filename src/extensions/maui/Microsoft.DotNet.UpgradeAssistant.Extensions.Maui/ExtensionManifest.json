@@ -1,0 +1,24 @@
+{
+  "ExtensionName": "MAUI",
+
+  "TryConvert": {
+    "Arguments": [
+      "--maui-conversion"
+    ]
+  },
+
+  "PackageUpdater": {
+    "PackageMapPath": "PackageMaps"
+  },
+
+  "TemplateInserter": {
+    "TemplateConfigFiles": [
+      "Templates\\MauiAndroid\\MauiAndroidTemplates.json",
+      "Templates\\MauiHead\\MauiHeadTemplates.json"
+    ]
+  },
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.dll"
+  ]
+}

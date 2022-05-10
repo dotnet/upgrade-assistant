@@ -63,7 +63,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web.Tests
             // Assert
             foreach (var expected in expectedReferencesToRemove)
             {
-                dependency.Verify(d => d.Remove(new Reference(expected), new OperationDetails() { Risk = BuildBreakRisk.None }));
+                dependency.Verify(d => d.Remove(new Reference(expected), It.IsAny<OperationDetails>()));
             }
         }
 
