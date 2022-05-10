@@ -26,18 +26,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 throw new ArgumentNullException(nameof(message));
             }
 
+            // Temporary workaround for https://github.com/dotnet/upgrade-assistant/issues/1117
+            // Suppressing all warnings to Debug or lower
             var logLevel = message.Level switch
             {
-                LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
-                LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
-                LogLevel.Minimal => Microsoft.Extensions.Logging.LogLevel.Information,
+                LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Debug,
+                LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Debug,
+                LogLevel.Minimal => Microsoft.Extensions.Logging.LogLevel.Debug,
                 LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Debug,
                 LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Debug,
                 LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Trace,
                 _ => Microsoft.Extensions.Logging.LogLevel.Debug
             };
 
-            //_logger.Log(logLevel, "[NuGet] {NuGetMessage}", message.Message);
+            _logger.Log(logLevel, "[NuGet] {NuGetMessage}", message.Message);
         }
 
         public void Log(LogLevel level, string data) => Log(new LogMessage(level, data));

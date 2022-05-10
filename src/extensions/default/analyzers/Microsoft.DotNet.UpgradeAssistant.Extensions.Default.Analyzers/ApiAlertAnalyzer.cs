@@ -40,9 +40,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiAlertGenericTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiAlertGenericMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ApiAlertGenericDescription), Resources.ResourceManager, typeof(Resources));
-        private static readonly DiagnosticDescriptor GenericRule = new(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        private readonly Lazy<IEnumerable<TargetSyntaxMessage>> _targetSyntaxes = new(() =>
+        protected virtual DiagnosticDescriptor GenericRule { get; } = new(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        protected virtual Lazy<IEnumerable<TargetSyntaxMessage>> TargetSyntaxes => new(() =>
         {
             using var resourceStream = new StreamReader(typeof(ApiAlertAnalyzer).Assembly.GetManifestResourceStream(DefaultApiAlertsResourceName));
             return TargetSyntaxMessageLoader.LoadMappings(resourceStream.ReadToEnd())
@@ -52,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         // Supported diagnostics include all of the specific diagnostics read from DefaultApiAlerts.json and the generic diagnostic used for additional target syntax messages loaded at runtime.
         // For some reason, Roslyn's analyzer scanning analyzer (that compares diagnostic IDs against AnalyzerReleases.* files) only identifies
         // the generic UA0013 diagnostic here, so that's the only one added to AnalyzerReleases.Unshipped.md.
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(_targetSyntaxes.Value
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(TargetSyntaxes.Value
             .Select(t => new DiagnosticDescriptor($"{BaseDiagnosticId}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
             .Concat(new[] { GenericRule }));
 
@@ -76,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 var additionalTargetSyntaxes =
                     TargetSyntaxMessageLoader.LoadMappings(context.Options.AdditionalFiles);
 
-                var combinedTargetSyntaxes = _targetSyntaxes.Value.Concat(additionalTargetSyntaxes);
+                var combinedTargetSyntaxes = TargetSyntaxes.Value.Concat(additionalTargetSyntaxes);
 
                 // Register actions for handling both C# and VB identifiers
                 context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), CS.SyntaxKind.IdentifierName, CS.SyntaxKind.GenericName);
@@ -129,13 +130,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     var diagnosticDescriptor = SupportedDiagnostics.FirstOrDefault(d => d.Id.Equals(id, StringComparison.Ordinal)) ?? SupportedDiagnostics.First();
 
                     // If the associated comment with the node contains the diagnostic id,
-                    // it means some code fixer has acknoledged it & added a comment. Do not report it again.
-                    var nodeTrivia = context.Node.Ancestors().OfType<StatementSyntax>().First().GetLeadingTrivia();
-                    if (nodeTrivia.Any(trivia => (trivia.IsKind(CS.SyntaxKind.SingleLineCommentTrivia)
-                            || trivia.IsKind(CS.SyntaxKind.MultiLineCommentTrivia))
-                            && trivia.ToString().Contains(id)))
+                    // it means some code fixer has acknowledged it & added a comment. Do not report it again.
+                    var nodeStatement = context.Node.Ancestors().OfType<StatementSyntax>().FirstOrDefault();
+                    if (nodeStatement is not null)
                     {
-                        continue;
+                        var nodeTrivia = nodeStatement.GetLeadingTrivia();
+                        if (nodeTrivia.Any(trivia => (trivia.IsKind(CS.SyntaxKind.SingleLineCommentTrivia)
+                                || trivia.IsKind(CS.SyntaxKind.MultiLineCommentTrivia))
+                                && trivia.ToString().Contains(id)))
+                        {
+                            continue;
+                        }
                     }
 
                     // Create and report the diagnostic. Note that the fully qualified name's location is used so

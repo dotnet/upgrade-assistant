@@ -73,7 +73,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     var targetFramework = context.CurrentProject!.TargetFrameworks.FirstOrDefault();
                     if (targetFramework != null && targetFramework.PlatformVersion != null)
                     {
-                        targetDevicesUniversalElement.SetAttribute("MaxVersionTested", targetFramework.PlatformVersion!.ToString());
+                        var platformVersion = new Version(targetFramework.PlatformVersion.Major == -1 ? 10 : targetFramework.PlatformVersion.Major,
+                            targetFramework.PlatformVersion.Minor == -1 ? 0 : targetFramework.PlatformVersion.Minor,
+                            targetFramework.PlatformVersion.Build == -1 ? 19041 : targetFramework.PlatformVersion.Build,
+                            targetFramework.PlatformVersion.Revision == -1 ? 0 : targetFramework.PlatformVersion.Revision);
+                        targetDevicesUniversalElement.SetAttribute("MaxVersionTested", platformVersion!.ToString());
                     }
 
                     targetDevicesUniversalElement.SetAttribute("Name", "Windows.Desktop");

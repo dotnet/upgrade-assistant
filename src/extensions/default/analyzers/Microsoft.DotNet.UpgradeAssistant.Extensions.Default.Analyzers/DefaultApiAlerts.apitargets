@@ -94,39 +94,3 @@ Type, System.Windows.Forms.ToolBarTextAlign, true
 
 S: Windows Forms Deprecated controls : System.Windows.Forms.Design.IMenuEditorService no longer supported. For more details see - https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
 Type, System.Windows.Forms.Design.IMenuEditorService, true
-
-T1: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
-Type, Windows.UI.Core.CoreDispatcher, true
-
-T2: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
-Member, Window.Current.Dispatcher, true
-
-T3: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
-Member, App.Window.Dispatcher, true
-
-T4: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
-Member, Window.Dispatcher, true
-
-U: UWP CameraCaptureUI : Windows.Media.Capture.CameraCaptureUI is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Type, Windows.Media.Capture.CameraCaptureUI, true
-
-V: UWP InkCanvas : Microsoft.UI.Xaml.Controls.InkCanvas is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Type, Micorsoft.UI.Xaml.Controls.InkCanvas, true
-
-W: UWP MapControl : Microsoft.UI.Xaml.Controls.Maps.MapControl is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Type, Microsoft.UI.Xaml.Controls.Maps.MapControl, true
-
-X: UWP MediaElement : Microsoft.UI.Xaml.Controls.MediaElement is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Type, Microsoft.UI.Xaml.Controls.MediaElement, true
-
-Y: UWP PrintManager : Windows.Graphics.Printing.PrintManager is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Type, Windows.Graphics.Printing.PrintManager, true
-
-Z: UWP WebAuthenticationBroker : Windows.Security.Authentication.Web.WebAuthenticationBroker is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Type, Windows.Security.Authentication.Web.WebAuthenticationBroker, true
-
-AA: UWP AcrylicBrush.BackgroundSource : The AcrylicBrush.BackgroundSource property exists in UWP, but not in the Windows App SDK. Now the AcrylicBrush always samples from the app content. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Member, Windows.UI.Xaml.Media.AcrylicBrush.BackgroundSource, true
-
-AB: UWP TaskbarManager: Windows.UI.Shell.TaskbarManager is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
-Type, Windows.UI.Shell.TaskbarManager, true

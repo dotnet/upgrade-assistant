@@ -25,9 +25,5 @@ namespace TestProject.TestClasses
             var b = Windows.ApplicationModel.DataTransfer.DragDrop.Core.CoreDragDropManager.GetForCurrentView();
         }
 
-        private void CallPrintManager()
-        {
-            var pm = Windows.Graphics.Printing.PrintManager.GetForCurrentView();
-        }
     }
 }

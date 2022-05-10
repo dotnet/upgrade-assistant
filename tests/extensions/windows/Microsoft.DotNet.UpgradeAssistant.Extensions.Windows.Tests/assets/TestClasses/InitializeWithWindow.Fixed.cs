@@ -18,18 +18,16 @@ namespace TestProject.TestClasses
             var folderPicker = this.InitializeWithWindow(new FolderPicker());
             var fileOpenPicker = this.InitializeWithWindow(new FileOpenPicker());
         }
-
-        private FolderPicker InitializeWithWindow(FolderPicker obj)
-        {
-            WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
-            return obj;
-        }
-
-        private FileSavePicker InitializeWithWindow(FileSavePicker obj)
-        {
-            WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
-            return obj;
-        }
+                        private FolderPicker InitializeWithWindow(FolderPicker obj)
+                        {
+                            WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
+                            return obj;
+                        }
+                        private FileSavePicker InitializeWithWindow(FileSavePicker obj)
+                        {
+                            WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
+                            return obj;
+                        }
 
         private FileOpenPicker InitializeWithWindow(FileOpenPicker obj)
         {

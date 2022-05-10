@@ -3,6 +3,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="assets\TestClasses\AppWindowCaller.cs" />
+    <Compile Remove="assets\TestClasses\AppWindowCaller.Fixed.cs" />
     <Compile Remove="assets\TestClasses\BackButtonCaller.cs" />
     <Compile Remove="assets\TestClasses\BackButtonCaller.Fixed.cs" />
     <Compile Remove="assets\TestClasses\ContentDialogCaller.cs" />
@@ -19,6 +21,12 @@
     <Compile Remove="assets\TestClasses\MRTResourceManagerCaller.Fixed.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\TestClasses\AppWindowCaller.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\TestClasses\AppWindowCaller.Fixed.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="assets\TestClasses\BackButtonCaller.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -39,6 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 .AddTransient<CodeFixProvider, WinUIInteropCodeFixer>()
                 .AddTransient<DiagnosticAnalyzer, WinUIMRTResourceManagerAnalyzer>()
                 .AddTransient<CodeFixProvider, WinUIMRTResourceManagerCodeFixer>()
+                .AddTransient<DiagnosticAnalyzer, WinUIAppWindowAnalyzer>()
+                .AddTransient<CodeFixProvider, WinUIAppWindowCodeFixer>()
                 .AddTransient<CodeFixProvider, WinUIApiAlertsfixer>()
                 .AddTransient<IDependencyAnalyzer, WinUIReferenceAnalyzer>()
                 .AddTransient<IUpdater<IProject>, WinUINamespaceUpdater>()

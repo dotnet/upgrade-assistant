@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -30,10 +31,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
             await Task.Yield();
             foreach (var package in state.Packages)
             {
-                if (package.Name.StartsWith("Microsoft.Toolkit.Uwp", StringComparison.Ordinal) || package.Name.StartsWith("Microsoft.Toolkit", StringComparison.Ordinal))
+                if (package.Name.StartsWith("Microsoft.Toolkit", StringComparison.Ordinal))
                 {
-                    var newPackage = new NuGetReference(package.Name.Replace("Microsoft.Toolkit.Uwp", "CommunityToolkit.WinUI")
-                        .Replace("Microsoft.Toolkit", "CommunityToolkit"), package.Version);
+                    var newPackageName = package.Name == "Microsoft.Toolkit" ? "CommunityToolkit.Common"
+                        : package.Name.Replace("Microsoft.Toolkit.Uwp", "CommunityToolkit.WinUI")
+                        .Replace("Microsoft.Toolkit", "CommunityToolkit");
+
+                    var newPackage = new NuGetReference(newPackageName, package.Version);
                     if (!await _packageLoader.DoesPackageSupportTargetFrameworksAsync(newPackage, project.TargetFrameworks, token).ConfigureAwait(true))
                     {
                         newPackage = await _packageLoader.GetLatestVersionAsync(newPackage.Name, project.TargetFrameworks,
@@ -46,8 +50,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
                     }
 
                     _logger.LogInformation($"UWP Package not supported. Replacing {package.Name} v{package.Version} with {newPackage.Name} v{newPackage.Version}");
-                    state.Packages.Add(newPackage, new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = new List<string>() });
-                    state.Packages.Remove(package, new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = new List<string>() });
+                    state.Packages.Add(newPackage, new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = ImmutableList.Create<string>(newPackage.Name) });
+                    state.Packages.Remove(package, new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = ImmutableList.Create<string>(package.Name) });
                 }
             }
         }

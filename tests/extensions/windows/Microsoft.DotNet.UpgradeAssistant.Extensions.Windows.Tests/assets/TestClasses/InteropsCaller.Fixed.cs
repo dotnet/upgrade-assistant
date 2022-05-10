@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Windows.Security.Credentials.UI;
+using Windows.ApplicationModel.DataTransfer.DragDrop.Core;
 
 namespace TestProject.TestClasses
 {
@@ -14,8 +15,23 @@ namespace TestProject.TestClasses
     {
         private async void CallUserConsentVerifier()
         {
-            var x = await Windows.Security.Credentials.UI.UserConsentVerifierInterop.RequestVerificationForWindowAsync(App.WindowHandle, "Test Message");
-            var y = await Windows.Security.Credentials.UI.UserConsentVerifierInterop.RequestVerificationForWindowAsync(App.WindowHandle, "Test Message");
+            var x = await 
+                Windows.Security.Credentials.UI.UserConsentVerifierInterop.RequestVerificationForWindowAsync(App.WindowHandle, "Test Message")
+;
+            var y = await 
+                Windows.Security.Credentials.UI.UserConsentVerifierInterop.RequestVerificationForWindowAsync(App.WindowHandle, "Test Message")
+;
         }
+
+        private void CallDragDrop()
+        {
+            var a = 
+                Windows.ApplicationModel.DataTransfer.DragDrop.Core.DragDropManagerInterop.GetForWindow(App.WindowHandle)
+;
+            var b = 
+                Windows.ApplicationModel.DataTransfer.DragDrop.Core.DragDropManagerInterop.GetForWindow(App.WindowHandle)
+;
+        }
+
     }
 }

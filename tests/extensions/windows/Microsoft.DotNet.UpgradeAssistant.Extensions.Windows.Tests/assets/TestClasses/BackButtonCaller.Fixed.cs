@@ -13,60 +13,57 @@ namespace TestProject.TestClasses
     {
         private async void CallBackButton()
         {
+
             /*
               
             TODO UA3015 Default back button in the title bar does not exist in WinUI3 apps.
             The tool should have generated a custom back button "UAGeneratedBackButton" in the XAML file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://aka.ms/UWP.NetUpgrade/UA3015
-            */
-            SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
+            */SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
         }
 
         private async void SetBackButtonVisibility()
         {
+
             /*
               
             TODO UA3015 Default back button in the title bar does not exist in WinUI3 apps.
             The tool should have generated a custom back button "UAGeneratedBackButton" in the XAML file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://aka.ms/UWP.NetUpgrade/UA3015
-            */
-            UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            */UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
             /*
               
             TODO UA3015 Default back button in the title bar does not exist in WinUI3 apps.
             The tool should have generated a custom back button "UAGeneratedBackButton" in the XAML file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://aka.ms/UWP.NetUpgrade/UA3015
-            */
-            UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        }
+            */UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;        }
 
         private async void SetBackButtonVisibility2()
         {
             var x = SystemNavigationManager.GetForCurrentView();
+
             /*
               
             TODO UA3015 Default back button in the title bar does not exist in WinUI3 apps.
             The tool should have generated a custom back button "UAGeneratedBackButton" in the XAML file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://aka.ms/UWP.NetUpgrade/UA3015
-            */
-            UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        }
+            */UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;        }
 
         private async void SetBackButtonVisibility3()
         {
             var x = SystemNavigationManager.GetForCurrentView();
+
             /*
               
             TODO UA3015 Default back button in the title bar does not exist in WinUI3 apps.
             The tool should have generated a custom back button "UAGeneratedBackButton" in the XAML file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://aka.ms/UWP.NetUpgrade/UA3015
-            */
-            x.AppViewBackButtonVisibility = Hello();
+            */x.AppViewBackButtonVisibility = Hello();
         }
     }
 }

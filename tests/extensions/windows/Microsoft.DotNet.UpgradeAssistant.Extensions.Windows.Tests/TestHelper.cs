@@ -34,7 +34,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             new WinUIDataTransferManagerAnalyzer(),
             new WinUIInteropAnalyzer(),
             new WinUIMRTResourceManagerAnalyzer(),
-            new WinUIBackButtonAnalyzer());
+            new WinUIBackButtonAnalyzer(),
+            new WinUIAppWindowAnalyzer());
 
         internal static ImmutableArray<CodeFixProvider> AllCodeFixProviders => ImmutableArray.Create<CodeFixProvider>(
             new WinUIContentDialogCodeFixer(),
@@ -42,7 +43,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             new WinUIDataTransferManagerCodeFixer(),
             new WinUIInteropCodeFixer(),
             new WinUIMRTResourceManagerCodeFixer(),
-            new WinUIBackButtonCodeFixer(null));
+            new WinUIBackButtonCodeFixer(null),
+            new WinUIAppWindowCodeFixer());
 
         public static Task<IEnumerable<Diagnostic>> GetDiagnosticsAsync(this AdhocWorkspace workspace, string documentPath, IEnumerable<string> diagnosticIds, bool isFramework)
         {
