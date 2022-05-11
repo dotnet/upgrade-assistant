@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private const string BackButtonMessage = @$"
             TODO {WinUIBackButtonAnalyzer.DiagnosticId} Default back button in the title bar does not exist in WinUI3 apps.
-            The tool should have generated a custom back button ""{WinUIBackButtonXamlUpdater.NewBackButtonName}"" in the XAML file.
+            The tool has generated a custom back button ""{WinUIBackButtonXamlUpdater.NewBackButtonName}"" in the XAML file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://aka.ms/UWP.NetUpgrade/UA3015";
 

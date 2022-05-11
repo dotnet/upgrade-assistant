@@ -43,9 +43,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiAlertGenericMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ApiAlertGenericDescription), Resources.ResourceManager, typeof(Resources));
 
-        protected virtual DiagnosticDescriptor GenericRule { get; } = new(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        // This static field is needed by Roslyn to track releases: https://github.com/dotnet/roslyn-analyzers/blob/master/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        protected virtual Lazy<IEnumerable<TargetSyntaxMessage>> TargetSyntaxes => new(() =>
+        protected virtual DiagnosticDescriptor GenericRule { get; } = Rule;
+
+        protected virtual Lazy<IEnumerable<TargetSyntaxMessage>> TargetSyntaxes => new Lazy<IEnumerable<TargetSyntaxMessage>>(() =>
         {
             using var resourceStream = new StreamReader(typeof(ApiAlertAnalyzer).Assembly.GetManifestResourceStream(DefaultApiAlertsResourceName));
             return TargetSyntaxMessageLoader.LoadMappings(resourceStream.ReadToEnd())
@@ -236,7 +239,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return targetSyntax.AlertOnAmbiguousMatch;
         }
 
-        private static readonly Regex GenericParameterMatcher = new(@"[<(].*[>)]", RegexOptions.Compiled);
+        private static readonly Regex GenericParameterMatcher = new Regex(@"[<(].*[>)]", RegexOptions.Compiled);
 
         private static string UnbindGenericName(string name)
         {

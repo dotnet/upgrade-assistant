@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
                 throw new ArgumentNullException(nameof(documentPath));
             }
 
-            var project = await workspace.CreateProjectAsync(lang, isFramework);
+            var project = await workspace.CreateProjectAsync(lang, isFramework).ConfigureAwait(false);
 
             return await GetDiagnosticsFromProjectAsync(project, documentPath, diagnosticIds).ConfigureAwait(false);
         }
@@ -139,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
                 throw new ArgumentNullException(nameof(documentPath));
             }
 
-            var project = await workspace.CreateProjectAsync(lang, isFramework: false);
+            var project = await workspace.CreateProjectAsync(lang, isFramework: false).ConfigureAwait(false);
             var projectId = project.Id;
 
             var diagnosticFixed = false;

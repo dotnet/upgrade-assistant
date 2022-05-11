@@ -237,6 +237,5 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
                 count++;
             }
         }
-
     }
 }
