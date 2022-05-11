@@ -115,6 +115,9 @@
     <Extension Include="$(ExtensionsDirectory)try-convert\Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert\Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert.csproj">
       <Name>try-convert</Name>
     </Extension>
+    <Extension Include="$(ExtensionsDirectory)maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj">
+      <Name>maui</Name>
+    </Extension>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="LocalizedStrings.Designer.cs">

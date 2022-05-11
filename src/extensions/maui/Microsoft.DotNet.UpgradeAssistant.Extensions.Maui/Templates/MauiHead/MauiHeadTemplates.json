@@ -4,10 +4,10 @@
   },
   "TemplateItems": [
     {
-      "Path": "Startup.cs",
+      "Path": "MauiProgram.cs",
       "Type": "Compile",
       "Keywords": [
-        "Startup",
+        "MauiProgram",
         "Microsoft.Maui"
       ]
     }
