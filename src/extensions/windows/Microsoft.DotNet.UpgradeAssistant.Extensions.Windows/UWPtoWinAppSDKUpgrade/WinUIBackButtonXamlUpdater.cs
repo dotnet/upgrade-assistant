@@ -18,9 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     internal class WinUIBackButtonXamlUpdater : IUpdater<IProject>
     {
         public const string NewBackButtonName = "UAGeneratedBackButton";
-        public const string NewBackButtonClickMethodName = $"{NewBackButtonName}_Click";
 
-        public string Id => "UA305";
+        public string Id => "UA308";
 
         public string Title => "Insert back button in XAML";
 
@@ -47,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         { "d", "http://schemas.microsoft.com/expression/blend/2008" },
                         { "mc", "http://schemas.openxmlformats.org/markup-compatibility/2006" }
                     };
-                    XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+                    var nsmgr = new XmlNamespaceManager(doc.NameTable);
                     foreach (var ns in xmlNamespaces)
                     {
                         nsmgr.AddNamespace(ns.Key, ns.Value);
@@ -67,7 +66,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
                     var backButtonElement = doc.CreateElement("AppBarButton", root.NamespaceURI);
                     backButtonElement.SetAttribute("Name", xmlNamespaces["x"], NewBackButtonName);
-                    //backButtonElement.SetAttribute("Click", root.NamespaceURI, NewBackButtonClickMethodName);
                     backButtonElement.SetAttribute("Foreground", root.NamespaceURI, "Black");
                     backButtonElement.SetAttribute("Margin", root.NamespaceURI, "0,0,12,0");
 

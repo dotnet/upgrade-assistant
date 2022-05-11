@@ -18,7 +18,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class WinUIInteropAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "UA3014";
+        public const string DiagnosticId = "UA312";
         private const string Category = "Fix";
 
         private static readonly LocalizableString Title = "Interop APIs should use the window handle";

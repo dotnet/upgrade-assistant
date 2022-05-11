@@ -18,9 +18,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class WinUIAppWindowAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticIdAppWindowNamespace = "UA30177_A";
-        public const string DiagnosticIdAppWindowVarType = "UA30177_B";
-        public const string DiagnosticIdAppWindowMember = "UA30177_C";
+        public const string DiagnosticIdAppWindowNamespace = "UA315_A";
+        public const string DiagnosticIdAppWindowMember = "UA315_B";
+        public const string DiagnosticIdAppWindowVarType = "UA315_C";
 
         private const string Category = "Fix";
 

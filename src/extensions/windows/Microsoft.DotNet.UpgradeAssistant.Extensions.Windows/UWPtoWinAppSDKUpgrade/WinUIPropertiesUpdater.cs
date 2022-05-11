@@ -41,11 +41,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             if (this._projectFilePropertyUpdates == null)
             {
                 return new WindowsDesktopUpdaterResult(
-                    "UA302",
+                    RuleID,
                     RuleName: Id,
                     FullDescription: Title,
                     false,
-                    "",
+                    string.Empty,
                     new List<string>());
             }
 
@@ -77,16 +77,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             return new WindowsDesktopUpdaterResult(
-                "UA302",
+                RuleID,
                 RuleName: Id,
                 FullDescription: Title,
                 true,
-                "",
+                string.Empty,
                 new List<string>());
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
             if (this._projectFilePropertyUpdates == null)
             {
                 return new WindowsDesktopUpdaterResult(
@@ -94,8 +95,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     RuleName: Id,
                     FullDescription: Title,
                     false,
-                    "",
-                    new List<string>());
+                    string.Empty,
+                    ImmutableList.Create<string>());
             }
 
             return new WindowsDesktopUpdaterResult(
@@ -103,8 +104,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 RuleName: Id,
                 FullDescription: Title,
                 true,
-                "",
-                new List<string>());
+                string.Empty,
+                ImmutableList.Create<string>());
         }
     }
 }

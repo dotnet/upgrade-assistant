@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,16 +17,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     internal class WinUIAnimationsXamlUpdater : IUpdater<IProject>
     {
-        public string Id => "UA310";
+        public const string RuleID = "UA305";
 
-        public string Title => "Update animations library";
+        public string Id => typeof(WinUIAnimationsXamlUpdater).FullName;
 
-        public string Description => "Update the animations library";
+        public string Title => "Update animations xaml";
+
+        public string Description => "Update the animations xaml to fix ReorderGridAnimation.Duration attrubute";
 
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
             foreach (var project in inputs)
             {
                 foreach (var file in project.FindFiles(".xaml", ProjectItemType.None))
@@ -55,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         {
                             double newValueNumber = valueNumber / 1000;
                             element.RemoveAttribute("ReorderGridAnimation.Duration", xmlNamespaces["animations"]);
-                            element.SetAttribute("ItemsReorderAnimation.Duration", xmlNamespaces["animations"], string.Format("0:0:{0:0.00}", newValueNumber));
+                            element.SetAttribute("ItemsReorderAnimation.Duration", xmlNamespaces["animations"], string.Format(CultureInfo.CurrentCulture, "0:0:{0:0.00}", newValueNumber));
                         }
                     }
 
@@ -64,23 +69,55 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             return new WindowsDesktopUpdaterResult(
-              "UA302",
+              RuleID,
               RuleName: Id,
               FullDescription: Title,
               true,
-              "",
-              new List<string>());
+              "Update Successful",
+              ImmutableList.Create<string>());
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
+            var filesToUpdate = new List<string>();
+            foreach (var project in inputs)
+            {
+                foreach (var file in project.FindFiles(".xaml", ProjectItemType.None))
+                {
+                    var contents = File.ReadAllText(file);
+                    contents = contents.Replace("using:Microsoft.Toolkit.Uwp.UI.Animations", "using:CommunityToolkit.WinUI.UI.Animations");
+                    File.WriteAllText(file, contents);
+
+                    var doc = new XmlDocument();
+                    doc.Load(file);
+
+                    Dictionary<string, string> xmlNamespaces = new Dictionary<string, string>()
+                    {
+                        { "def",  "http://schemas.microsoft.com/winfx/2006/xaml/presentation" },
+                        { "animations", "using:CommunityToolkit.WinUI.UI.Animations" },
+                    };
+                    XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+                    foreach (var ns in xmlNamespaces)
+                    {
+                        nsmgr.AddNamespace(ns.Key, ns.Value);
+                    }
+
+                    var elements = doc.SelectNodes("//*[@animations:ReorderGridAnimation.Duration]", nsmgr);
+                    if (elements.Count > 0)
+                    {
+                        filesToUpdate.Add(file);
+                    }
+                }
+            }
+
             return new WindowsDesktopUpdaterResult(
-               "UA302",
+               RuleID,
                RuleName: Id,
                FullDescription: Title,
-               true,
-               "",
-               new List<string>());
+               filesToUpdate.Any(),
+               string.Empty,
+               filesToUpdate);
         }
     }
 }

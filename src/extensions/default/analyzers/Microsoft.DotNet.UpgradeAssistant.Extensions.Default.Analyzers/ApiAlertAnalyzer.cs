@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         // For some reason, Roslyn's analyzer scanning analyzer (that compares diagnostic IDs against AnalyzerReleases.* files) only identifies
         // the generic UA0013 diagnostic here, so that's the only one added to AnalyzerReleases.Unshipped.md.
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(TargetSyntaxes.Value
-            .Select(t => new DiagnosticDescriptor($"{BaseDiagnosticId}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
+            .Select(t => new DiagnosticDescriptor($"{GenericRule.Id}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
             .Concat(new[] { GenericRule }));
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     // Get the diagnostic descriptor correspdoning to the target API message map or, if a specific descriptor doesn't exist for it,
                     // get the default (first) one.
-                    var id = $"{BaseDiagnosticId}_{match.Mapping.Id}";
+                    var id = $"{GenericRule.Id}_{match.Mapping.Id}";
                     var diagnosticDescriptor = SupportedDiagnostics.FirstOrDefault(d => d.Id.Equals(id, StringComparison.Ordinal)) ?? SupportedDiagnostics.First();
 
                     // If the associated comment with the node contains the diagnostic id,

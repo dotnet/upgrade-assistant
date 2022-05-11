@@ -18,8 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class WinUIMRTResourceManagerAnalyzer : DiagnosticAnalyzer
     {
-        public const string ResourceManagerAPIDiagnosticId = "UA3021";
-        public const string ResourceContextAPIDiagnosticId = "UA3022";
+        public const string ResourceManagerAPIDiagnosticId = "UA313";
+        public const string ResourceContextAPIDiagnosticId = "UA314";
         private const string Category = "Fix";
 
         private static readonly LocalizableString Title = "MRT to MRT core migration";

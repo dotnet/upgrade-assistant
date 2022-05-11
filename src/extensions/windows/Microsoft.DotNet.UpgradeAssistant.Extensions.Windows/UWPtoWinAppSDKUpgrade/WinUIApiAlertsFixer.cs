@@ -23,18 +23,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public class WinUIApiAlertsfixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(
-            "UA0013_T1",
-            "UA0013_T2",
-            "UA0013_T3",
-            "UA0013_T4",
-            "UA0013_U",
-            "UA0013_V",
-            "UA0013_W",
-            "UA0013_X",
-            "UA0013_Y",
-            "UA0013_Z",
-            "UA0013_AA",
-            "UA0013_AB");
+            "UA306_A1",
+            "UA306_A2",
+            "UA306_A3",
+            "UA306_A4",
+            "UA306_B",
+            "UA306_C",
+            "UA306_D",
+            "UA306_E",
+            "UA306_F",
+            "UA306_G",
+            "UA306_H",
+            "UA306_I");
 
         private readonly ILogger _logger;
 

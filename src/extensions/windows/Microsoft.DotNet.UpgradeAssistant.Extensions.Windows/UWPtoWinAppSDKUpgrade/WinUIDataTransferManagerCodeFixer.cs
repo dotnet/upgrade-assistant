@@ -1,7 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -48,23 +46,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var diagnostic = context.Diagnostics.First();
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<InvocationExpressionSyntax>().First();
+            var declaration = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<InvocationExpressionSyntax>().FirstOrDefault();
 
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    "",
+                    DiagnosticId,
                     c => FixDataTransferManagerAPI(context.Document, declaration, c),
                     DiagnosticId),
                 context.Diagnostics);
         }
 
-        private static async Task<Document> FixDataTransferManagerAPI(Document document, InvocationExpressionSyntax invocationExpressionSyntax, CancellationToken cancellationToken)
+        private static async Task<Document> FixDataTransferManagerAPI(Document document, InvocationExpressionSyntax? invocationExpressionSyntax, CancellationToken cancellationToken)
         {
+            if (invocationExpressionSyntax is null)
+            {
+                return document;
+            }
+
             var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
             var newExpressionRoot = await CSharpSyntaxTree.ParseText(@"
                 Windows.ApplicationModel.DataTransfer.DataTransferManager.As<UWPToWinAppSDKUpgradeHelpers.IDataTransferManagerInterop>().ShowShareUIForWindow(App.WindowHandle)
-                ").GetRootAsync(cancellationToken).ConfigureAwait(false);
+                ", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
             var newExpression = newExpressionRoot.DescendantNodes().OfType<InvocationExpressionSyntax>().First();
             documentEditor.ReplaceNode(invocationExpressionSyntax, newExpression);
             return document.WithSyntaxRoot(documentEditor.GetChangedRoot());

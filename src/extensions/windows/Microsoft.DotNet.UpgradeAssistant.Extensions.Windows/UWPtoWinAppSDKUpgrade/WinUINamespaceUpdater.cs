@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             if (_namespaceUpdates == null)
             {
                 return new WindowsDesktopUpdaterResult(
-                    RuleId, RuleName: Id, FullDescription: Title, false, "", new List<string>());
+                    RuleId, RuleName: Id, FullDescription: Title, false, string.Empty, new List<string>());
             }
 
             foreach (var project in inputs)

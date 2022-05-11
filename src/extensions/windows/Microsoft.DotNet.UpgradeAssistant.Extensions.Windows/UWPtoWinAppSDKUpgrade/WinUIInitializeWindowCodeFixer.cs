@@ -1,7 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -53,9 +51,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    "",
-                    c => FixContentDialogAPI(context.Document, declarations, c),
-                    equivalenceKey: diagnostic.Location.SourceTree.ToString()),
+                    DiagnosticId,
+                    c => FixContentDialogAPI(context.Document, declarations ?? ImmutableList.Create<ObjectCreationExpressionSyntax>(), c),
+                    equivalenceKey: DiagnosticId),
                 context.Diagnostics);
         }
 
@@ -86,8 +84,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                             WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
                             return obj;
                         }}
-                    }}"
-                    ).GetRootAsync(cancellationToken).ConfigureAwait(false);
+                    }}",
+                    cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
                     var newMethodDeclaration = newMethodRoot.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
                     documentEditor.InsertAfter(newMethodDeclarationSibling, newMethodDeclaration);
                 }

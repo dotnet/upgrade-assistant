@@ -53,9 +53,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    "",
+                    WinUIContentDialogAnalyzer.DiagnosticId,
                     c => FixContentDialogAPI(context.Document, declaration, c),
-                    "ContentDialog fixer"),
+                    WinUIContentDialogAnalyzer.DiagnosticId),
                 diagnostic);
         }
 
@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         }
                         return contentDialog;
                     }
-                }").GetRootAsync(cancellationToken).ConfigureAwait(false);
+                }", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
                 var newMethodDeclaration = newMethodRoot.DescendantNodes().OfType<MethodDeclarationSyntax>().First();
                 documentEditor.InsertAfter(newMethodDeclarationSibling, newMethodDeclaration);
             }

@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             if (this._filesToDelete == null || this._filesToDelete.Count == 0)
             {
                 return new WindowsDesktopUpdaterResult(
-                  "UA302",
+                  RuleID,
                   RuleName: Id,
                   FullDescription: Title,
                   false,
@@ -67,41 +67,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         File.Delete(file);
                     }
                 }
-
-                if (!project.FindFiles("App.xaml.old.cs").Any())
-                {
-                    var appXamlCsFiles = project.GetFile().FilePath;
-                }
             }
 
             return new WindowsDesktopUpdaterResult(
-                "UA302",
+                RuleID,
                 RuleName: Id,
                 FullDescription: Title,
                 true,
-                "",
+                string.Empty,
                 new List<string>());
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
         {
+            await Task.Yield();
             if (this._filesToDelete == null || this._filesToDelete.Count == 0)
             {
                 return new WindowsDesktopUpdaterResult(
-                  "UA302",
+                  RuleID,
                   RuleName: Id,
                   FullDescription: Title,
                   false,
-                  "",
+                  string.Empty,
                   new List<string>());
             }
 
             return new WindowsDesktopUpdaterResult(
-               "UA302",
+               RuleID,
                RuleName: Id,
                FullDescription: Title,
                true,
-               "",
+               string.Empty,
                new List<string>());
         }
     }

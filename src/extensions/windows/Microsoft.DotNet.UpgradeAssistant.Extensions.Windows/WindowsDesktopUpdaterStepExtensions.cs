@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 .AddTransient<IUpdater<IProject>, WinformsDefaultFontUpdater>()
                 .AddTransient<IUpdater<IProject>, WinformsDpiSettingUpdater>();
 
-        public static IServiceCollection AddWinUIUpdateSteps(this IServiceCollection services) => 
+        public static IServiceCollection AddWinUIUpdateSteps(this IServiceCollection services) =>
             services
                 .AddTransient<DiagnosticAnalyzer, WinUIBackButtonAnalyzer>()
                 .AddTransient<CodeFixProvider, WinUIBackButtonCodeFixer>()
@@ -49,6 +49,5 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 .AddTransient<IUpdater<IProject>, WinUIUnnecessaryFilesUpdater>()
                 .AddTransient<IUpdater<IProject>, WinUIAnimationsXamlUpdater>()
                 .AddTransient<IUpdater<IProject>, WinUIBackButtonXamlUpdater>();
-
     }
 }

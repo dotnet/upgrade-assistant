@@ -165,7 +165,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             if (_workspace is null)
             {
-                //GlobalProperties["VisualStudioVersion"] = "22.0";
                 var workspace = MSBuildWorkspace.Create(GlobalProperties);
 
                 workspace.WorkspaceFailed += Workspace_WorkspaceFailed;
@@ -178,13 +177,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     await workspace.OpenProjectAsync(InputPath, cancellationToken: token).ConfigureAwait(false);
                 }
-
-                //var compilation = await workspace.CurrentSolution.Projects.ToList()[0].GetCompilationAsync();
-
-                //var workspace2 = MSBuildWorkspace.Create(GlobalProperties);
-                //workspace2.WorkspaceFailed += Workspace_WorkspaceFailed;
-                //await workspace2.OpenProjectAsync("E:\\source\\samples\\Windows-appsample-photo-lab\\PhotoLab.backup\\PhotoLab.csproj", cancellationToken: token).ConfigureAwait(false);
-                //var compilation2 = await workspace2.CurrentSolution.Projects.ToList()[0].GetCompilationAsync();
 
                 _workspace = workspace;
             }

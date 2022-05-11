@@ -3,17 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using CS = Microsoft.CodeAnalysis.CSharp;
-using CSSyntax = Microsoft.CodeAnalysis.CSharp.Syntax;
-using VB = Microsoft.CodeAnalysis.VisualBasic;
-using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
 {
@@ -23,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
     {
         private const string WinUIApiAlertsResourceName = "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers.WinUIApiAlerts.apitargets";
 
-        public new const string BaseDiagnosticId = "UA3013";
+        public new const string BaseDiagnosticId = "UA306";
 
         private const string Category = "Upgrade";
 

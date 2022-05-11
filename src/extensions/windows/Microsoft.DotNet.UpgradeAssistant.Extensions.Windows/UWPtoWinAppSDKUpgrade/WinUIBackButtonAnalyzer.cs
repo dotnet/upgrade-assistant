@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class WinUIBackButtonAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "UA3015";
+        public const string DiagnosticId = "UA307";
         private const string Category = "Fix";
 
         private static readonly LocalizableString Title = "Custom back button implementation is needed";

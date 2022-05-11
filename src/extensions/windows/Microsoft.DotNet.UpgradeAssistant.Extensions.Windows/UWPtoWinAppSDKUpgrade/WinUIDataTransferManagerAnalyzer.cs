@@ -16,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class WinUIDataTransferManagerAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "UA3012";
+        public const string DiagnosticId = "UA311";
         private const string Category = "Fix";
 
         private static readonly LocalizableString Title = "Classes that implement IDataTransferManager should use IDataTransferManagerInterop.ShowShareUIForWindow";
