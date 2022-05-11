@@ -14,6 +14,10 @@ variables:
     - group: UpgradeAssistant_SDL_Settings
   - name: DownloadLooseAssemblyIndex
     value: true
+  - name: net5ver
+    value: 5.0.x
+  - name: net6ver
+    value: 6.0.x
 
 trigger:
   batch: true
@@ -80,16 +84,16 @@ stages:
           clean: true
           submodules: true
         - task: UseDotNet@2
-          displayName: 'Use .NET Core 5.0.x'
+          displayName: Use .NET Core $(net5ver)
           inputs:
             packageType: sdk
-            version: 5.0.x
+            version: $(net5ver)
             installationPath: $(Build.SourcesDirectory)/.dotnet
         - task: UseDotNet@2
-          displayName: 'Use .NET Core 6.0.100'
+          displayName: Use .NET Core $(net6ver)
           inputs:
             packageType: sdk
-            version: 6.0.100
+            version: $(net6ver)
             installationPath: $(Build.SourcesDirectory)/.dotnet
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
           - task: PowerShell@2
