@@ -83,7 +83,13 @@ stages:
           displayName: 'Use .NET Core sdk'
           inputs:
             packageType: sdk
-            version: 5.0.400
+            version: 5.0.x
+            installationPath: $(Build.SourcesDirectory)/.dotnet
+        - task: UseDotNet@2
+          displayName: 'Use .NET Core sdk'
+          inputs:
+            packageType: sdk
+            version: 6.0.100
             installationPath: $(Build.SourcesDirectory)/.dotnet
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
           - task: PowerShell@2
