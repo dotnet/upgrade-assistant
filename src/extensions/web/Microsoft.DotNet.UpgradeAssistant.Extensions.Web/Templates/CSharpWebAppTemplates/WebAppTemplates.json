@@ -35,6 +35,6 @@
   ],
   "TemplateLanguage": "CSharp",
   "TemplateAppliesTo": [
-    "WinUI"
+    "AspNetCore"
   ]
 }

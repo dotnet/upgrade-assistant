@@ -174,41 +174,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             itemGroup.AppendChild(item);
         }
 
-        public bool RemoveItem(ProjectItemType? itemType = null, string? includePath = null, string? excludePath = null, string? elementName = null)
+        public bool RemoveItem(ProjectItemType itemType, string? includePath = null, string? excludePath = null, string? elementName = null)
         {
-            var items = ProjectRoot.Items.Where(item =>
+            var itemsToRemove = ProjectRoot.Items.Where(item =>
                 {
-                    if (itemType != null && item.ItemType != itemType.Name)
-                    {
-                        return false;
-                    }
-
-                    if (includePath != null && item.Include != includePath)
-                    {
-                        return false;
-                    }
-
-                    if (excludePath != null && item.Exclude != excludePath)
-                    {
-                        return false;
-                    }
-
-                    if (elementName != null && item.ElementName != elementName)
-                    {
-                        return false;
-                    }
-
-                    return true;
+                    return item.ItemType == itemType.Name
+                        && (includePath is null || item.Include == includePath)
+                        && (excludePath is null || item.Exclude == excludePath)
+                        && (elementName is null || item.ElementName == elementName);
                 });
 
-            var isRemoved = false;
-            foreach (var item in items)
+            foreach (var item in itemsToRemove)
             {
                 item.Parent.RemoveChild(item);
-                isRemoved = true;
             }
 
-            return isRemoved;
+            return itemsToRemove.Any();
         }
 
         public bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token)
