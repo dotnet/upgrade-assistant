@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         }
 
         /// <summary>
-        /// Determines whether the WinformsUpdaterStep applies to a given context.
+        /// Determines whether the WindowsDesktopUpdateStep applies to a given context.
         /// </summary>
         /// <param name="context">The context to evaluate.</param>
         /// <param name="token">A token that can be used to cancel execution.</param>
@@ -73,6 +74,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return false;
         }
 
+        private async Task<IEnumerable<UpgradeStep>> GetApplicableSubSteps(IUpgradeContext context, CancellationToken token)
+        {
+            if (context?.CurrentProject is null)
+            {
+                return ImmutableList.Create<UpgradeStep>();
+            }
+
+            var applicableSteps = new List<UpgradeStep>();
+            foreach (var subStep in SubSteps)
+            {
+                if (await subStep.IsApplicableAsync(context, token).ConfigureAwait(false))
+                {
+                    applicableSteps.Add(subStep);
+                }
+            }
+
+            return applicableSteps;
+        }
+
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
@@ -80,30 +100,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 throw new ArgumentNullException(nameof(context));
             }
 
-            foreach (var step in SubSteps)
+            var applicableSubsteps = await GetApplicableSubSteps(context, token).ConfigureAwait(false);
+            foreach (var step in applicableSubsteps)
             {
                 await step.InitializeAsync(context, token).ConfigureAwait(false);
             }
 
-            var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
+            var incompleteSubSteps = applicableSubsteps.Count(s => !s.IsDone);
 
             return incompleteSubSteps == 0
-                ? new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No Windows Desktop updaters need applied", BuildBreakRisk.None)
+                ? new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No Windows Desktop Updaters need applied", BuildBreakRisk.None)
                 : new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Windows Desktop updaters need applied", SubSteps.Where(s => !s.IsDone).Max(s => s.Risk));
         }
 
-        protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var incompleteSubSteps = SubSteps.Count(s => !s.IsDone);
+            var applicableSubsteps = await GetApplicableSubSteps(context, token).ConfigureAwait(false);
+            var incompleteSubSteps = applicableSubsteps.Count(s => !s.IsDone);
 
             return incompleteSubSteps == 0
-                ? Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty))
-                : Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Windows Desktop updaters need applied"));
+                ? new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty)
+                : new UpgradeStepApplyResult(UpgradeStepStatus.Incomplete, $"{incompleteSubSteps} Windows Desktop updaters need applied");
         }
     }
 }

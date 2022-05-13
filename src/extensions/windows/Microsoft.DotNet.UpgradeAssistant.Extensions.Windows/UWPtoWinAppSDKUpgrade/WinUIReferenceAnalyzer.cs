@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade
 {
+    [ApplicableComponents(ProjectComponents.WinUI)]
     internal class WinUIReferenceAnalyzer : IDependencyAnalyzer
     {
         public string Name => "Windows App SDK package analysis";
@@ -28,7 +29,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
 
         public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
         {
-            await Task.Yield();
+            if (!(await project.IsWinUIProjectAsync(token).ConfigureAwait(false)))
+            {
+                return;
+            }
+
             foreach (var package in state.Packages)
             {
                 if (package.Name.StartsWith("Microsoft.Toolkit", StringComparison.Ordinal))

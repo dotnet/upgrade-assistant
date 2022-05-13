@@ -19,7 +19,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         public const string NewBackButtonName = "UAGeneratedBackButton";
 
-        public string Id => "UA308";
+        public const string RuleID = "UA308";
+
+        public string Id => typeof(WinUIBackButtonXamlUpdater).FullName;
 
         public string Title => "Insert back button in XAML";
 
@@ -95,12 +97,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             return new WindowsDesktopUpdaterResult(
-               "UA302",
+               RuleID,
                RuleName: Id,
                FullDescription: Title,
                true,
                string.Empty,
-               new List<string>());
+               ImmutableList<string>.Empty);
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)

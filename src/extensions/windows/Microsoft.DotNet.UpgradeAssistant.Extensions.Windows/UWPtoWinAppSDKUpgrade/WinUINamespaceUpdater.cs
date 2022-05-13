@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             if (_namespaceUpdates == null)
             {
                 return new WindowsDesktopUpdaterResult(
-                    RuleId, RuleName: Id, FullDescription: Title, false, string.Empty, new List<string>());
+                    RuleId, RuleName: Id, FullDescription: Title, false, string.Empty, ImmutableList<string>.Empty);
             }
 
             foreach (var project in inputs)
@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 FullDescription: Title,
                 true,
                 string.Empty,
-                new List<string>());
+                ImmutableList<string>.Empty);
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)

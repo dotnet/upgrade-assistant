@@ -34,12 +34,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 foreach (var file in project.FindFiles(".xaml", ProjectItemType.None))
                 {
-                    var contents = File.ReadAllText(file);
-                    contents = contents.Replace("using:Microsoft.Toolkit.Uwp.UI.Animations", "using:CommunityToolkit.WinUI.UI.Animations");
-                    File.WriteAllText(file, contents);
+                    var content = File.ReadAllText(file);
+                    content = content.Replace("using:Microsoft.Toolkit.Uwp.UI.Animations", "using:CommunityToolkit.WinUI.UI.Animations");
 
                     var doc = new XmlDocument();
-                    doc.Load(file);
+                    doc.LoadXml(content);
 
                     Dictionary<string, string> xmlNamespaces = new Dictionary<string, string>()
                     {
@@ -86,27 +85,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 foreach (var file in project.FindFiles(".xaml", ProjectItemType.None))
                 {
                     var contents = File.ReadAllText(file);
-                    contents = contents.Replace("using:Microsoft.Toolkit.Uwp.UI.Animations", "using:CommunityToolkit.WinUI.UI.Animations");
-                    File.WriteAllText(file, contents);
-
-                    var doc = new XmlDocument();
-                    doc.Load(file);
-
-                    Dictionary<string, string> xmlNamespaces = new Dictionary<string, string>()
-                    {
-                        { "def",  "http://schemas.microsoft.com/winfx/2006/xaml/presentation" },
-                        { "animations", "using:CommunityToolkit.WinUI.UI.Animations" },
-                    };
-                    XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
-                    foreach (var ns in xmlNamespaces)
-                    {
-                        nsmgr.AddNamespace(ns.Key, ns.Value);
-                    }
-
-                    var elements = doc.SelectNodes("//*[@animations:ReorderGridAnimation.Duration]", nsmgr);
-                    if (elements.Count > 0)
+                    if (contents.Contains("ReorderGridAnimation.Duration"))
                     {
                         filesToUpdate.Add(file);
+                        continue;
                     }
                 }
             }

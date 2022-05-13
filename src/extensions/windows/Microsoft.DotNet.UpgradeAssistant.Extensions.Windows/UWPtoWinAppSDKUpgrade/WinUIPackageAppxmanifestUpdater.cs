@@ -84,6 +84,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     doc.Save(filePath);
                 }
             }
+
+            // Likely to fail while parsing xml if the format does not match the expected format.
+            // Move on to the next step if it fails
             catch (Exception)
             {
                 this._logger.LogError(ErrorMessage);
@@ -149,7 +152,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                FullDescription: Title,
                false,
                "The package.appxmanifest is up to date",
-               new List<string>());
+               ImmutableList<string>.Empty);
         }
     }
 }

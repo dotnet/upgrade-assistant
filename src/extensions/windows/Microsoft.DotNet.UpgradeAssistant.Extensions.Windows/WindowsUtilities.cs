@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return components.HasFlag(ProjectComponents.WinForms);
         }
 
-        public static async ValueTask<bool> IsWinUIProject(this IProject project, CancellationToken token)
+        public static async ValueTask<bool> IsWinUIProjectAsync(this IProject project, CancellationToken token)
         {
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             return components.HasFlag(ProjectComponents.WinUI);
