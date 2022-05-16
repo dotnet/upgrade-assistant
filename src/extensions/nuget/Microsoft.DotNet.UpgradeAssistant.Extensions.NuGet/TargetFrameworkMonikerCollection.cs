@@ -102,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         private static string[] GetNonSdkTargetFramework(IProjectFile file)
         {
             var nugetTargetFramework = file.GetPropertyValue("NuGetTargetFramework");
-            if (nugetTargetFramework != null && nugetTargetFramework.StartsWith("UAP,Version=v", StringComparison.Ordinal))
+            if (nugetTargetFramework?.StartsWith("UAP,Version=v", StringComparison.Ordinal) == true)
             {
                 var version = nugetTargetFramework!.Replace("UAP,Version=v", string.Empty, StringComparison.Ordinal);
                 var nugetFramework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.UAP, Version.Parse(version)).GetShortFolderName();

@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "UWPMigrationSample2 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "UWPMigrationSample2 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

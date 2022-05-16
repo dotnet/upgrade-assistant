@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         }
 
         // Api ID -> KeyValuePair of (UWPType (namespace, type, method) -> WinUIType (namespace, type, method))
-        public static readonly Dictionary<string, KeyValuePair<(string, string, string), (string, string, string)?>> UWPToWinUIInteropAPIMap
+        public static readonly Dictionary<string, KeyValuePair<(string UWPNamespace, string UWPType, string UWPMethod), (string WinUINamespace, string WinUIType, string WInUIMethod)?>> UWPToWinUIInteropAPIMap
             = new Dictionary<string, KeyValuePair<(string, string, string), (string, string, string)?>>()
         {
             {
@@ -151,7 +151,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 var id = api.Key;
                 var (typeNamespace, typeName, methodName) = api.Value.Key;
-                if ((firstChildText == $"{typeName}.{methodName}" && UWPToWinUIHelpers.GetAllImportedNamespaces(context).Contains(typeNamespace))
+                if ((firstChildText == $"{typeName}.{methodName}" && context.GetAllImportedNamespaces().Contains(typeNamespace))
                     || firstChildText == $"{typeNamespace}.{typeName}.{methodName}")
                 {
                     var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), ImmutableDictionary.Create<string, string?>().Add("apiId", id), node.GetText().ToString());

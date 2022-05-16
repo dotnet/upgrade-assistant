@@ -35,9 +35,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void AddItem(string name, string path);
 
-        public void AddItem(ProjectItemType itemType, string? includePath = null, string? removePath = null, string? elementName = null);
+        public void AddItem(ProjectItemType itemType, ProjectItemAttributeFilter attributeFilter);
 
-        bool RemoveItem(ProjectItemType itemType, string? includePath = null, string? excludePath = null, string? elementName = null);
+        bool RemoveItem(ProjectItemType itemType, ProjectItemAttributeFilter attributeFilter);
 
         bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token);
 

@@ -158,31 +158,39 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void AddItem(string name, string path)
             => ProjectRoot.AddItem(name, path);
 
-        public void AddItem(ProjectItemType itemType, string? includePath = null, string? removePath = null, string? elementName = null)
+        public void AddItem(ProjectItemType itemType, ProjectItemAttributeFilter attributeFilter)
         {
             var itemGroup = ProjectRoot.GetOrCreateItemGroup(itemType.Name);
             var item = ProjectRoot.CreateItemElement(itemType.Name);
-            if (includePath != null)
+
+            if (attributeFilter.Include is not null)
             {
-                item.Include = includePath;
+                item.Include = attributeFilter.Include;
             }
-            else if (removePath != null)
+
+            if (attributeFilter.Exclude is not null)
             {
-                item.Remove = removePath;
+                item.Exclude = attributeFilter.Remove;
+            }
+
+            if (attributeFilter.Remove is not null)
+            {
+                item.Remove = attributeFilter.Remove;
             }
 
             itemGroup.AppendChild(item);
         }
 
-        public bool RemoveItem(ProjectItemType itemType, string? includePath = null, string? excludePath = null, string? elementName = null)
+        public bool RemoveItem(ProjectItemType itemType, ProjectItemAttributeFilter attributeFilter)
         {
             var itemsToRemove = ProjectRoot.Items.Where(item =>
                 {
                     return item.ItemType == itemType.Name
-                        && (includePath is null || item.Include == includePath)
-                        && (excludePath is null || item.Exclude == excludePath)
-                        && (elementName is null || item.ElementName == elementName);
-                });
+                        && (attributeFilter.Include is null || item.Include == attributeFilter.Include)
+                        && (attributeFilter.Exclude is null || item.Exclude == attributeFilter.Exclude)
+                        && (attributeFilter.Remove is null || item.Remove == attributeFilter.Remove)
+                        && (attributeFilter.ElementName is null || item.ElementName == attributeFilter.ElementName);
+                }).ToList();
 
             foreach (var item in itemsToRemove)
             {

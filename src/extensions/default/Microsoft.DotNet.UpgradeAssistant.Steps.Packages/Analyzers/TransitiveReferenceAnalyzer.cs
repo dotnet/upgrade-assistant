@@ -46,6 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
                 .Where(p =>
                 {
                     // Temporary fix for packages to exclude from the removal list
+                    // Until we have a fix for https://github.com/dotnet/upgrade-assistant/issues/1069
                     if (p.Name == "Microsoft.WindowsAppSDK")
                     {
                         return false;

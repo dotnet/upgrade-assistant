@@ -44,9 +44,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ApiAlertGenericDescription), Resources.ResourceManager, typeof(Resources));
 
         // This static field is needed by Roslyn to track releases: https://github.com/dotnet/roslyn-analyzers/blob/master/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor ThisAnalyzerDiagnostic = new DiagnosticDescriptor(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        protected virtual DiagnosticDescriptor GenericRule { get; } = Rule;
+        protected virtual DiagnosticDescriptor ActiveAnalyzerRule { get; } = ThisAnalyzerDiagnostic;
 
         protected virtual Lazy<IEnumerable<TargetSyntaxMessage>> TargetSyntaxes => new Lazy<IEnumerable<TargetSyntaxMessage>>(() =>
         {
@@ -59,8 +59,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         // For some reason, Roslyn's analyzer scanning analyzer (that compares diagnostic IDs against AnalyzerReleases.* files) only identifies
         // the generic UA0013 diagnostic here, so that's the only one added to AnalyzerReleases.Unshipped.md.
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(TargetSyntaxes.Value
-            .Select(t => new DiagnosticDescriptor($"{GenericRule.Id}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
-            .Concat(new[] { GenericRule }));
+            .Select(t => new DiagnosticDescriptor($"{ActiveAnalyzerRule.Id}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
+            .Concat(new[] { ActiveAnalyzerRule }));
 
         /// <summary>
         /// Initializes the analyzer by registering analysis callback methods.
@@ -131,7 +131,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     // Get the diagnostic descriptor correspdoning to the target API message map or, if a specific descriptor doesn't exist for it,
                     // get the default (first) one.
-                    var id = $"{GenericRule.Id}_{match.Mapping.Id}";
+                    var id = $"{ActiveAnalyzerRule.Id}_{match.Mapping.Id}";
                     var diagnosticDescriptor = SupportedDiagnostics.FirstOrDefault(d => d.Id.Equals(id, StringComparison.Ordinal)) ?? SupportedDiagnostics.First();
 
                     // If the associated comment with the node contains the diagnostic id,

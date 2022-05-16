@@ -10,9 +10,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade
 {
-    internal class UWPToWinUIHelpers
+    internal static class UWPToWinUIHelpers
     {
-        public static IEnumerable<string> GetAllImportedNamespaces(SyntaxNodeAnalysisContext context)
+        public static IEnumerable<string> GetAllImportedNamespaces(this SyntaxNodeAnalysisContext context)
         {
             return context.Node.Ancestors().OfType<CompilationUnitSyntax>().First().DescendantNodes().OfType<UsingDirectiveSyntax>()
                 .Select(usingDirective => usingDirective.Name.ToString());

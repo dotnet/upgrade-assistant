@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         // Api ID -> KeyValuePair of (FromType (namespace, type, method) -> ToType (namespace, type, method))
         // * means the member is not static and should use the existing variable name while fixing
-        public static readonly Dictionary<string, KeyValuePair<(string, string, string), (string, string, string)?>> MemberConversions
+        public static readonly Dictionary<string, KeyValuePair<(string FromNamespace, string FromType, string FromMethod), (string ToNamespace, string ToType, string ToMethod)?>> MemberConversions
             = new Dictionary<string, KeyValuePair<(string, string, string), (string, string, string)?>>()
         {
             {

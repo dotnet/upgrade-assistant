@@ -54,6 +54,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             if (root is null)
             {
+                _logger.LogDebug($"[{nameof(WinUIApiAlertsfixer)}] skipping code fix registration - root syntax is null");
+                return;
+            }
+
+            if (!context.Diagnostics.Any())
+            {
                 return;
             }
 
@@ -78,7 +84,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         private async Task<Document> AddApiAlertComment(Document document, StatementSyntax statement, string diagnosticId, string diagnosticMessage,
             FileLinePositionSpan positionSpan, CancellationToken cancellationToken)
         {
-            _logger!.LogWarning(positionSpan.Path + " " + diagnosticMessage);
+            _logger!.LogWarning($"{positionSpan.Path} {diagnosticMessage}");
             var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             var apiAlertComment = @$"/*
                 TODO {diagnosticId}: {diagnosticMessage}
