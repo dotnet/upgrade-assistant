@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             TODO {WinUIBackButtonAnalyzer.DiagnosticId} Default back button in the title bar does not exist in WinUI3 apps.
             The tool has generated a custom back button ""{WinUIBackButtonXamlUpdater.NewBackButtonName}"" in the XAML file.
             Feel free to edit its position, behavior and use the custom back button instead.
-            Read: https://aka.ms/UWP.NetUpgrade/UA3015";
+            Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/case-study-1#restoring-back-button-functionality";
 
         private ILogger<WinUIBackButtonCodeFixer>? _logger;
 
@@ -62,7 +62,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var diagnostic = context.Diagnostics.First();
             var diagnosticSpan = diagnostic.Location.SourceSpan;
             var lineSpan = diagnostic.Location.GetLineSpan();
-            var fixState = diagnostic.Properties[WinUIBackButtonAnalyzer.FixStateProperty]!;
             var declaration = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<AssignmentExpressionSyntax>().First();
 
             if (declaration is null)
@@ -74,12 +73,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.RegisterCodeFix(
                 CodeAction.Create(
                     WinUIBackButtonAnalyzer.DiagnosticId,
-                    c => FixBackButton(context.Document, declaration, fixState, lineSpan, c),
-                    equivalenceKey: WinUIBackButtonAnalyzer.DiagnosticId + fixState),
+                    c => FixBackButton(context.Document, declaration, lineSpan, c),
+                    equivalenceKey: WinUIBackButtonAnalyzer.DiagnosticId),
                 diagnostic);
         }
 
-        private async Task<Document> FixBackButton(Document document, AssignmentExpressionSyntax backButtonAssignment, string fixState, FileLinePositionSpan lineSpan, CancellationToken cancellationToken)
+        private async Task<Document> FixBackButton(Document document, AssignmentExpressionSyntax backButtonAssignment, FileLinePositionSpan lineSpan, CancellationToken cancellationToken)
         {
             _logger?.LogWarning(lineSpan.Path + BackButtonMessage, null);
             var comment = await CSharpSyntaxTree.ParseText(BackButtonComment, cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);

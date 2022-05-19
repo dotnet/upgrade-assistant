@@ -61,8 +61,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private static async Task<Document> FixContentDialogAPI(Document document, MemberAccessExpressionSyntax contentDialogMemberAccess, CancellationToken cancellationToken)
         {
-            var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-
             var newMethodDeclarationSibling = contentDialogMemberAccess.Ancestors().OfType<MethodDeclarationSyntax>().First();
 
             var newMethodAccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.IdentifierName("this"),

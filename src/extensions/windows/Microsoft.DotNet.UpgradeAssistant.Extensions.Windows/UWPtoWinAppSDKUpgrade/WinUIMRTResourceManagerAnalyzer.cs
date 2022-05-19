@@ -20,7 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         public const string ResourceManagerAPIDiagnosticId = "UA313";
         public const string ResourceContextAPIDiagnosticId = "UA314";
-        private const string Category = "Fix";
+        private const string Category = "Upgrade";
 
         private static readonly LocalizableString Title = "MRT to MRT core migration";
         private static readonly LocalizableString ResourceManagerMessageFormat = "Creation of ResourceManager '{0}' can be replaced by new ResourceManager()";

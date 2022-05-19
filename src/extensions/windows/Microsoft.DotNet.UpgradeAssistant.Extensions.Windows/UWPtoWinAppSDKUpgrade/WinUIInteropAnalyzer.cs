@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public sealed class WinUIInteropAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA312";
-        private const string Category = "Fix";
+        private const string Category = "Upgrade";
 
         private static readonly LocalizableString Title = "Interop APIs should use the window handle";
         private static readonly LocalizableString MessageFormat = "The object creation '{0}' should be followed by setting of the window handle";

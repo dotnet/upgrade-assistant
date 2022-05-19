@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         public const string DiagnosticIdAppWindowMember = "UA315_B";
         public const string DiagnosticIdAppWindowVarType = "UA315_C";
 
-        private const string Category = "Fix";
+        private const string Category = "Upgrade";
 
         private static readonly LocalizableString Title = "Windows App SDK apps should use Microsoft.UI.Windowing.AppWindow";
         private static readonly LocalizableString MessageFormat = "'{0}' should use Microsoft.UI.Windowing.AppWindow";
@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.RegisterSyntaxNodeAction(AnalyzeIdentifierName, SyntaxKind.IdentifierName);
         }
 
-        public static readonly Dictionary<string, KeyValuePair<(string, string), (string, string)>> TypeConversions
+        public static readonly Dictionary<string, KeyValuePair<(string FromNamespace, string FromType), (string ToNamespace, string ToType)>> TypeConversions
             = new Dictionary<string, KeyValuePair<(string, string), (string, string)>>()
         {
             {

@@ -52,20 +52,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.RegisterCodeFix(
                 CodeAction.Create(
                     DiagnosticId,
-                    c => FixInteropAPI(context.Document, declaration, apiId, c),
+                    c => FixInteropAPI(context.Document, root, declaration, apiId, c),
                     DiagnosticId + apiId),
                 context.Diagnostics);
         }
 
-        private static async Task<Document> FixInteropAPI(Document document, InvocationExpressionSyntax invocationExpressionSyntax, string apiId, CancellationToken cancellationToken)
+        private static async Task<Document> FixInteropAPI(Document document, SyntaxNode root, InvocationExpressionSyntax invocationExpressionSyntax, string apiId, CancellationToken cancellationToken)
         {
             var mappedApi = WinUIInteropAnalyzer.UWPToWinUIInteropAPIMap[apiId]!.Value;
             if (!mappedApi.HasValue)
             {
-                var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
                 var comment = await CSharpSyntaxTree.ParseText(@$"
                 /*
-                   TODO: This api is not supported.
+                   TODO: This api is not supported in Windows App SDK yet.
+                   Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
                 */
                 ", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
                 var newRoot = root!.ReplaceNode<SyntaxNode>(invocationExpressionSyntax, invocationExpressionSyntax.WithLeadingTrivia(comment.GetLeadingTrivia()));

@@ -10,20 +10,12 @@
       {
         "Name": "Microsoft.UI.Xaml",
         "Version": "*"
-      },
-      {
-        "Name": "Microsoft.Toolkit.Uwp.UI.Animations",
-        "Version": "*"
       }
     ],
     "NetCorePackages": [
       {
         "Name": "Microsoft.WindowsAppSDK",
         "Version": "1.0.0"
-      },
-      {
-        "Name": "CommunityToolkit.WinUI.UI.Animations",
-        "Version": "7.1.2"
       },
       {
         "Name": "Microsoft.Graphics.Win2D",

@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public sealed class WinUIContentDialogAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA309";
-        private const string Category = "Fix";
+        private const string Category = "Upgrade";
 
         private static readonly LocalizableString Title = "ContentDialog API needs to set XamlRoot";
         private static readonly LocalizableString MessageFormat = "XamlRoot of the Dialog object must be set before making the API call '{0}'";

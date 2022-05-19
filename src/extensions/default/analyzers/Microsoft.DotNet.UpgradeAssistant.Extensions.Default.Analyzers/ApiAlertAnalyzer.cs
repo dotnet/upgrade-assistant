@@ -134,18 +134,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                     var id = $"{ActiveAnalyzerRule.Id}_{match.Mapping.Id}";
                     var diagnosticDescriptor = SupportedDiagnostics.FirstOrDefault(d => d.Id.Equals(id, StringComparison.Ordinal)) ?? SupportedDiagnostics.First();
 
-                    // If the associated comment with the node contains the diagnostic id,
-                    // it means some code fixer has acknowledged it & added a comment. Do not report it again.
-                    var nodeStatement = context.Node.Ancestors().OfType<StatementSyntax>().FirstOrDefault();
-                    if (nodeStatement is not null)
+                    if (SkipDiagnostic(context, id))
                     {
-                        var nodeTrivia = nodeStatement.GetLeadingTrivia();
-                        if (nodeTrivia.Any(trivia => (trivia.IsKind(CS.SyntaxKind.SingleLineCommentTrivia)
-                                || trivia.IsKind(CS.SyntaxKind.MultiLineCommentTrivia))
-                                && trivia.ToString().Contains(id)))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     // Create and report the diagnostic. Note that the fully qualified name's location is used so
@@ -154,6 +145,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 }
             }
         }
+
+        protected virtual bool SkipDiagnostic(SyntaxNodeAnalysisContext context, string detectedDiagnosticId) => false;
 
         private static bool AnalyzeNamespace(SyntaxNodeAnalysisContext context, string qualifiedName, TargetSyntax targetSyntax)
         {

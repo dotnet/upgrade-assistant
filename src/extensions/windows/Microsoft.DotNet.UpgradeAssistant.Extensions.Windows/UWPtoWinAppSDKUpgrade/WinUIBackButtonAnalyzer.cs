@@ -27,11 +27,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        internal const string FixStateProperty = "FixState";
-        internal const string FixStatePossible = "FixPossible";
-        internal const string FixStateNotPossible = "FixNotPossible";
-        internal const string FixStateComplete = "FixComplete";
-
         public override void Initialize(AnalysisContext context)
         {
             if (context is null)
@@ -67,7 +62,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 var diagnostic = Diagnostic.Create(Rule,
                     node.GetLocation(),
-                    properties: ImmutableDictionary.Create<string, string?>().Add(FixStateProperty, FixStatePossible),
                     node.GetText().ToString());
                 context.ReportDiagnostic(diagnostic);
             }

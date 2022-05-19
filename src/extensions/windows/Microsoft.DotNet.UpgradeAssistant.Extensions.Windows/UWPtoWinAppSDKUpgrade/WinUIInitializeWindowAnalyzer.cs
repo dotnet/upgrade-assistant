@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public sealed class WinUIInitializeWindowAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "UA310";
-        private const string Category = "Fix";
+        private const string Category = "Upgrade";
 
         private static readonly LocalizableString Title = "Classes that implement IInitializeWithWindow need to be initialized with Window Handle";
         private static readonly LocalizableString MessageFormat = "The object creation '{0}' should be followed by setting of the window handle";

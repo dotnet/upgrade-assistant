@@ -20,7 +20,7 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     [ApplicableComponents(ProjectComponents.WinUI)]
-    public class WinUIApiAlertsfixer : CodeFixProvider
+    public class WinUIApiAlertCodeFixer : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(
             "UA306_A1",
@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private readonly ILogger _logger;
 
-        public WinUIApiAlertsfixer(ILogger<WinUIApiAlertsfixer> logger)
+        public WinUIApiAlertCodeFixer(ILogger<WinUIApiAlertCodeFixer> logger)
         {
             this._logger = logger;
         }
@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             if (root is null)
             {
-                _logger.LogDebug($"[{nameof(WinUIApiAlertsfixer)}] skipping code fix registration - root syntax is null");
+                _logger.LogDebug($"[{nameof(WinUIApiAlertCodeFixer)}] skipping code fix registration - root syntax is null");
                 return;
             }
 
@@ -76,22 +76,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.RegisterCodeFix(
                 CodeAction.Create(
                     string.Empty,
-                    c => AddApiAlertComment(context.Document, declaration, diagnostic.Id, diagnostic.GetMessage(), diagnostic.Location.GetLineSpan(), c),
+                    c => AddApiAlertComment(context.Document, root, declaration, diagnostic.Id, diagnostic.GetMessage(), diagnostic.Location.GetLineSpan(), c),
                     "Api alerter"),
                 diagnostic);
         }
 
-        private async Task<Document> AddApiAlertComment(Document document, StatementSyntax statement, string diagnosticId, string diagnosticMessage,
+        private async Task<Document> AddApiAlertComment(Document document, SyntaxNode root, StatementSyntax statement, string diagnosticId, string diagnosticMessage,
             FileLinePositionSpan positionSpan, CancellationToken cancellationToken)
         {
             _logger!.LogWarning($"{positionSpan.Path} {diagnosticMessage}");
-            var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             var apiAlertComment = @$"/*
                 TODO {diagnosticId}: {diagnosticMessage}
             */";
             var comment = await CSharpSyntaxTree.ParseText(apiAlertComment, cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
             var newStatement = statement.WithLeadingTrivia(comment.GetLeadingTrivia());
-            return document.WithSyntaxRoot(oldRoot!.ReplaceNode(statement, newStatement));
+            return document.WithSyntaxRoot(root.ReplaceNode(statement, newStatement));
         }
     }
 }

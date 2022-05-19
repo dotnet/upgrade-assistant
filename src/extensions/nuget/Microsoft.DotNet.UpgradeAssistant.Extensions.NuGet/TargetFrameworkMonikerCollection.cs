@@ -102,11 +102,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         private static string[] GetNonSdkTargetFramework(IProjectFile file)
         {
             var nugetTargetFramework = file.GetPropertyValue("NuGetTargetFramework");
-            if (nugetTargetFramework?.StartsWith("UAP,Version=v", StringComparison.Ordinal) == true)
+            if (nugetTargetFramework is not null && IsUAPProject(nugetTargetFramework))
             {
-                var version = nugetTargetFramework!.Replace("UAP,Version=v", string.Empty, StringComparison.Ordinal);
-                var nugetFramework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.UAP, Version.Parse(version)).GetShortFolderName();
-                return new string[] { nugetFramework };
+                return new string[] { GetUAPTargetFramework(nugetTargetFramework) };
             }
 
             const string NonSdkTargetFramework = "TargetFrameworkVersion";
@@ -125,5 +123,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
         private static string[] GetTfms(IProjectFile file, string propertyName)
             => file.GetPropertyValue(propertyName).Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        private static bool IsUAPProject(string nugetTargetFramework)
+            => nugetTargetFramework.StartsWith("UAP,Version=v", StringComparison.Ordinal);
+
+        private static string GetUAPTargetFramework(string nugetTargetFramework)
+        {
+            var version = nugetTargetFramework.Replace("UAP,Version=v", string.Empty, StringComparison.Ordinal);
+            var nugetFramework = new NuGetFramework(FrameworkConstants.FrameworkIdentifiers.UAP, Version.Parse(version)).GetShortFolderName();
+            return nugetFramework;
+        }
     }
 }

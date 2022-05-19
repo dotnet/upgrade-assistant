@@ -43,8 +43,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
                 context.Properties.SetPropertyValue("componentFlag", components.ToString(), true);
             }
 
-            await _restorer.RestorePackagesAsync(context, project, token).ConfigureAwait(false);
-
             var result = await RunTryConvertAsync(context, project, token).ConfigureAwait(false);
 
             await _restorer.RestorePackagesAsync(context, project, token).ConfigureAwait(false);

@@ -158,46 +158,46 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void AddItem(string name, string path)
             => ProjectRoot.AddItem(name, path);
 
-        public void AddItem(ProjectItemType itemType, ProjectItemAttributeFilter attributeFilter)
+        public void AddItem(ProjectItemDescriptor projectItem)
         {
-            var itemGroup = ProjectRoot.GetOrCreateItemGroup(itemType.Name);
-            var item = ProjectRoot.CreateItemElement(itemType.Name);
-
-            if (attributeFilter.Include is not null)
+            var itemGroup = ProjectRoot.GetOrCreateItemGroup(projectItem.ItemType.Name);
+            var item = ProjectRoot.CreateItemElement(projectItem.ItemType.Name);
+            if (projectItem.Include is not null)
             {
-                item.Include = attributeFilter.Include;
+                item.Include = projectItem.Include;
             }
 
-            if (attributeFilter.Exclude is not null)
+            if (projectItem.Exclude is not null)
             {
-                item.Exclude = attributeFilter.Remove;
+                item.Exclude = projectItem.Remove;
             }
 
-            if (attributeFilter.Remove is not null)
+            if (projectItem.Remove is not null)
             {
-                item.Remove = attributeFilter.Remove;
+                item.Remove = projectItem.Remove;
             }
 
             itemGroup.AppendChild(item);
         }
 
-        public bool RemoveItem(ProjectItemType itemType, ProjectItemAttributeFilter attributeFilter)
+        public bool RemoveItem(ProjectItemDescriptor projectItem)
         {
             var itemsToRemove = ProjectRoot.Items.Where(item =>
                 {
-                    return item.ItemType == itemType.Name
-                        && (attributeFilter.Include is null || item.Include == attributeFilter.Include)
-                        && (attributeFilter.Exclude is null || item.Exclude == attributeFilter.Exclude)
-                        && (attributeFilter.Remove is null || item.Remove == attributeFilter.Remove)
-                        && (attributeFilter.ElementName is null || item.ElementName == attributeFilter.ElementName);
-                }).ToList();
+                    return item.ItemType == projectItem.ItemType.Name
+                        && (projectItem.Include is null || item.Include == projectItem.Include)
+                        && (projectItem.Exclude is null || item.Exclude == projectItem.Exclude)
+                        && (projectItem.Remove is null || item.Remove == projectItem.Remove);
+                });
 
+            bool isItemRemoved = false;
             foreach (var item in itemsToRemove)
             {
                 item.Parent.RemoveChild(item);
+                isItemRemoved = true;
             }
 
-            return itemsToRemove.Any();
+            return isItemRemoved;
         }
 
         public bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token)
