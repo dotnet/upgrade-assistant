@@ -34,7 +34,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         void RenameFile(string filePath);
 
-        [Obsolete("AddItem(string, string) is deprecated. Use AddItem(ProjectItemDescriptor) instead")]
         void AddItem(string name, string path);
 
         public void AddItem(ProjectItemDescriptor projectItem);
