@@ -35,7 +35,6 @@ namespace Integration.Tests
 
         [InlineData("PCL", "SamplePCL.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-        [InlineData("UWPSample", "UWPMigrationSample2.sln", "UWPMigrationSample2.csproj")]
 
         // Skip on theories has issues in XUnit: https://github.com/xunit/visualstudio.xunit/issues/266
 #if !NET5_0
