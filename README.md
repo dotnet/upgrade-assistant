@@ -88,6 +88,7 @@ The following tutorials will give you a sense of how to upgrade ASP.NET, Windows
 - [Upgrade an ASP.NET MVC App to .NET 6 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-aspnetmvc)
 - [Upgrade a Windows Forms App to .NET 6 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-winforms-framework)
 - [Upgrade a WPF App to .NET 6 with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-wpf-framework)
+- [Upgrade a UWP App to Windows App SDK with the .NET Upgrade Assistant](https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-uwp-framework) (This is still in preview. Read more [here](docs/uwp_support.md))
 
 Learn more about upcoming support for Xamarin.Forms to .NET MAUI upgrades [here](docs/maui_support.md). 
 
