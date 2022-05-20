@@ -29,6 +29,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private const string AnalysisString = "Default back button in the title bar does not exist in WinUI3 apps. You have to add your own back button.";
 
+        private readonly Dictionary<string, string> _xmlNamespaces = new Dictionary<string, string>()
+            {
+                { "def",  "http://schemas.microsoft.com/winfx/2006/xaml/presentation" },
+                { "x", "http://schemas.microsoft.com/winfx/2006/xaml" },
+                { "muxc", "using:Microsoft.UI.Xaml.Controls" },
+                { "d", "http://schemas.microsoft.com/expression/blend/2008" },
+                { "mc", "http://schemas.openxmlformats.org/markup-compatibility/2006" }
+            };
+
         public BuildBreakRisk Risk => BuildBreakRisk.Medium;
 
         public async Task<IUpdaterResult> ApplyAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)
@@ -40,16 +49,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 {
                     var doc = new XmlDocument();
                     doc.Load(file);
-                    Dictionary<string, string> xmlNamespaces = new Dictionary<string, string>()
-                    {
-                        { "def",  "http://schemas.microsoft.com/winfx/2006/xaml/presentation" },
-                        { "x", "http://schemas.microsoft.com/winfx/2006/xaml" },
-                        { "muxc", "using:Microsoft.UI.Xaml.Controls" },
-                        { "d", "http://schemas.microsoft.com/expression/blend/2008" },
-                        { "mc", "http://schemas.openxmlformats.org/markup-compatibility/2006" }
-                    };
                     var nsmgr = new XmlNamespaceManager(doc.NameTable);
-                    foreach (var ns in xmlNamespaces)
+                    foreach (var ns in _xmlNamespaces)
                     {
                         nsmgr.AddNamespace(ns.Key, ns.Value);
                     }
@@ -63,11 +64,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     var lastPageNode = root.ChildNodes.Cast<XmlNode>().LastOrDefault();
 
                     var stackPanel = doc.CreateElement("StackPanel", root.NamespaceURI);
-                    stackPanel.SetAttribute("Name", xmlNamespaces["x"], "UAGeneratedPanel");
+                    stackPanel.SetAttribute("Name", _xmlNamespaces["x"], "UAGeneratedPanel");
                     stackPanel.SetAttribute("Orientation", root.NamespaceURI, "Vertical");
 
                     var backButtonElement = doc.CreateElement("AppBarButton", root.NamespaceURI);
-                    backButtonElement.SetAttribute("Name", xmlNamespaces["x"], NewBackButtonName);
+                    backButtonElement.SetAttribute("Name", _xmlNamespaces["x"], NewBackButtonName);
                     backButtonElement.SetAttribute("Foreground", root.NamespaceURI, "Black");
                     backButtonElement.SetAttribute("Margin", root.NamespaceURI, "0,0,12,0");
 

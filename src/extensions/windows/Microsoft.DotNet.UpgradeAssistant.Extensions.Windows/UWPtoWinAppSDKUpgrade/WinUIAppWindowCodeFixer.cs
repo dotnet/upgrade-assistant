@@ -54,14 +54,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.RegisterCodeFix(
                 CodeAction.Create(
                     diagnostic.Id,
-                    c => diagnostic.Id == WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace ? FixAppWindowNamespace(context.Document, declaration, apiId!, c)
+                    c => diagnostic.Id == WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace ? FixAppWindowNamespace(context.Document, root, declaration, apiId!, c)
                     : diagnostic.Id == WinUIAppWindowAnalyzer.DiagnosticIdAppWindowVarType ? FixAppWindowVarType(context.Document, declaration, c)
                     : FixAppWindowMember(context.Document, declaration.AncestorsAndSelf().OfType<InvocationExpressionSyntax>().First(), apiId!, varName!, c),
                     diagnostic.Id + apiId ?? string.Empty),
                 context.Diagnostics);
         }
 
-        private static async Task<Document> FixAppWindowNamespace(Document document, SyntaxNode invocationExpressionSyntax, string apiId, CancellationToken cancellationToken)
+        private static async Task<Document> FixAppWindowNamespace(Document document, SyntaxNode oldRoot, SyntaxNode invocationExpressionSyntax, string apiId, CancellationToken cancellationToken)
         {
             var comment = await CSharpSyntaxTree.ParseText(@$"
                 /*
@@ -70,12 +70,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 */
                 ", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
 
-            var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             var (newNamespace, newName) = WinUIAppWindowAnalyzer.TypeConversions[apiId].Value;
             var node = (await CSharpSyntaxTree.ParseText($"{newNamespace}.{newName} x;", cancellationToken: cancellationToken)
                 .GetRootAsync(cancellationToken).ConfigureAwait(false))
                 .DescendantNodesAndSelf().OfType<QualifiedNameSyntax>().First();
-            return document.WithSyntaxRoot(oldRoot!.ReplaceNode(invocationExpressionSyntax, node.WithLeadingTrivia(comment.GetLeadingTrivia())));
+            return document.WithSyntaxRoot(oldRoot.ReplaceNode(invocationExpressionSyntax, node.WithLeadingTrivia(comment.GetLeadingTrivia())));
         }
 
         private static async Task<Document> FixAppWindowVarType(Document document, SyntaxNode invocationExpressionSyntax, CancellationToken cancellationToken)

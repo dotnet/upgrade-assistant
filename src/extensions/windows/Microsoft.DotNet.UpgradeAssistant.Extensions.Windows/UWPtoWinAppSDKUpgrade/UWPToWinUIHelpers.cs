@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -12,10 +13,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
 {
     internal static class UWPToWinUIHelpers
     {
-        public static IEnumerable<string> GetAllImportedNamespaces(this SyntaxNodeAnalysisContext context)
+        public static IEnumerable<string> GetAllImportedNamespaces(this SyntaxNode node)
         {
-            return context.Node.Ancestors().OfType<CompilationUnitSyntax>().First().DescendantNodes().OfType<UsingDirectiveSyntax>()
-                .Select(usingDirective => usingDirective.Name.ToString());
+            var root = node.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault();
+            if (root is null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            return root.DescendantNodes().OfType<UsingDirectiveSyntax>().Select(usingDirective => usingDirective.Name.ToString());
         }
     }
 }

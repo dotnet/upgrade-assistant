@@ -151,7 +151,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 var id = api.Key;
                 var (typeNamespace, typeName, methodName) = api.Value.Key;
-                if ((firstChildText == $"{typeName}.{methodName}" && context.GetAllImportedNamespaces().Contains(typeNamespace))
+                if ((firstChildText == $"{typeName}.{methodName}" && node.GetAllImportedNamespaces().Contains(typeNamespace))
                     || firstChildText == $"{typeNamespace}.{typeName}.{methodName}")
                 {
                     var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), ImmutableDictionary.Create<string, string?>().Add("apiId", id), node.GetText().ToString());

@@ -57,14 +57,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var expression = memberAccessExpression.Expression.ToString();
 
             // We use the new namespace because by the time this analyzer runs the namespace would have been updated
-            if (((expression == "ResourceManager" && UWPToWinUIHelpers.GetAllImportedNamespaces(context).Contains("Microsoft.Windows.ApplicationModel.Resources"))
+            if (((expression == "ResourceManager" && memberAccessExpression.GetAllImportedNamespaces().Contains("Microsoft.Windows.ApplicationModel.Resources"))
                 || expression == "Microsoft.Windows.ApplicationModel.Resources.ResourceManager")
                 && memberName == "Current")
             {
                 var diagnostic = Diagnostic.Create(ResourceManagerAPIRule, memberAccessExpression.GetLocation(), memberAccessExpression.GetText().ToString());
                 context.ReportDiagnostic(diagnostic);
             }
-            else if (((expression == "ResourceContext" && UWPToWinUIHelpers.GetAllImportedNamespaces(context).Contains("Microsoft.Windows.ApplicationModel.Resources"))
+            else if (((expression == "ResourceContext" && memberAccessExpression.GetAllImportedNamespaces().Contains("Microsoft.Windows.ApplicationModel.Resources"))
                 || expression == "Microsoft.Windows.ApplicationModel.Resources.ResourceContext")
                 && (memberName == "GetForCurrentView" || memberName == "GetForViewIndependentUse"))
             {

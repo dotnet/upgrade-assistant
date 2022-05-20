@@ -116,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         }
                     }
 
-                    if (UWPToWinUIHelpers.GetAllImportedNamespaces(context).Contains(fromNamespace))
+                    if (node.GetAllImportedNamespaces().Contains(fromNamespace))
                     {
                         ReportDiagnostic(api.Key, node.GetLocation());
                         return;
@@ -144,7 +144,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             var varName = ((MemberAccessExpressionSyntax)memberAccessExpression).Expression;
             var type = context.SemanticModel.GetTypeInfo(varName);
-            var allNamespaces = UWPToWinUIHelpers.GetAllImportedNamespaces(context);
+            var allNamespaces = node.GetAllImportedNamespaces();
             var memberAccessString = memberAccessExpression.ToString();
 
             if ((memberAccessString == "AppWindow.Create" && allNamespaces.Contains("Microsoft.UI.Windowing"))
