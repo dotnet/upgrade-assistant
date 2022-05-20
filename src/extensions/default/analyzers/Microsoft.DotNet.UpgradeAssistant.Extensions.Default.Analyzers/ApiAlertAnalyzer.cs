@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 using CS = Microsoft.CodeAnalysis.CSharp;
@@ -41,9 +42,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.ApiAlertGenericTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.ApiAlertGenericMessageFormat), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.ApiAlertGenericDescription), Resources.ResourceManager, typeof(Resources));
-        private static readonly DiagnosticDescriptor GenericRule = new DiagnosticDescriptor(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
-        private readonly Lazy<IEnumerable<TargetSyntaxMessage>> _targetSyntaxes = new(() =>
+        // This static field is needed by Roslyn to track releases: https://github.com/dotnet/roslyn-analyzers/blob/master/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+        private static readonly DiagnosticDescriptor ThisAnalyzerDiagnostic = new DiagnosticDescriptor(BaseDiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
+        protected virtual DiagnosticDescriptor ActiveAnalyzerRule { get; } = ThisAnalyzerDiagnostic;
+
+        protected virtual Lazy<IEnumerable<TargetSyntaxMessage>> TargetSyntaxes => new Lazy<IEnumerable<TargetSyntaxMessage>>(() =>
         {
             using var resourceStream = new StreamReader(typeof(ApiAlertAnalyzer).Assembly.GetManifestResourceStream(DefaultApiAlertsResourceName));
             return TargetSyntaxMessageLoader.LoadMappings(resourceStream.ReadToEnd())
@@ -53,9 +58,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
         // Supported diagnostics include all of the specific diagnostics read from DefaultApiAlerts.json and the generic diagnostic used for additional target syntax messages loaded at runtime.
         // For some reason, Roslyn's analyzer scanning analyzer (that compares diagnostic IDs against AnalyzerReleases.* files) only identifies
         // the generic UA0013 diagnostic here, so that's the only one added to AnalyzerReleases.Unshipped.md.
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(_targetSyntaxes.Value
-            .Select(t => new DiagnosticDescriptor($"{BaseDiagnosticId}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
-            .Concat(new[] { GenericRule }));
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.CreateRange(TargetSyntaxes.Value
+            .Select(t => new DiagnosticDescriptor($"{ActiveAnalyzerRule.Id}_{t.Id}", $"Replace usage of {string.Join(", ", t.TargetSyntaxes.Select(a => a.FullName))}", t.Message, Category, DiagnosticSeverity.Warning, true, t.Message))
+            .Concat(new[] { ActiveAnalyzerRule }));
 
         /// <summary>
         /// Initializes the analyzer by registering analysis callback methods.
@@ -77,7 +82,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 var additionalTargetSyntaxes =
                     TargetSyntaxMessageLoader.LoadMappings(context.Options.AdditionalFiles);
 
-                var combinedTargetSyntaxes = _targetSyntaxes.Value.Concat(additionalTargetSyntaxes);
+                var combinedTargetSyntaxes = TargetSyntaxes.Value.Concat(additionalTargetSyntaxes);
 
                 // Register actions for handling both C# and VB identifiers
                 context.RegisterSyntaxNodeAction(context => AnalyzeIdentifier(context, combinedTargetSyntaxes), CS.SyntaxKind.IdentifierName, CS.SyntaxKind.GenericName);
@@ -126,8 +131,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 {
                     // Get the diagnostic descriptor correspdoning to the target API message map or, if a specific descriptor doesn't exist for it,
                     // get the default (first) one.
-                    var id = $"{BaseDiagnosticId}_{match.Mapping.Id}";
+                    var id = $"{ActiveAnalyzerRule.Id}_{match.Mapping.Id}";
                     var diagnosticDescriptor = SupportedDiagnostics.FirstOrDefault(d => d.Id.Equals(id, StringComparison.Ordinal)) ?? SupportedDiagnostics.First();
+
+                    if (SkipDiagnostic(context, id))
+                    {
+                        continue;
+                    }
 
                     // Create and report the diagnostic. Note that the fully qualified name's location is used so
                     // that any future code fix provider can directly replace the node without needing to consider its parents.
@@ -135,6 +145,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
                 }
             }
         }
+
+        protected virtual bool SkipDiagnostic(SyntaxNodeAnalysisContext context, string detectedDiagnosticId) => false;
 
         private static bool AnalyzeNamespace(SyntaxNodeAnalysisContext context, string qualifiedName, TargetSyntax targetSyntax)
         {
@@ -220,7 +232,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers
             return targetSyntax.AlertOnAmbiguousMatch;
         }
 
-        private static readonly Regex GenericParameterMatcher = new(@"[<(].*[>)]", RegexOptions.Compiled);
+        private static readonly Regex GenericParameterMatcher = new Regex(@"[<(].*[>)]", RegexOptions.Compiled);
 
         private static string UnbindGenericName(string name)
         {

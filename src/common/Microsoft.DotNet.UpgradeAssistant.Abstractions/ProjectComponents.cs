@@ -20,5 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         Maui = 1 << 8,
         MauiAndroid = 1 << 9,
         MauiiOS = 1 << 10,
+        WinUI = 1 << 11,
+        UWP = 1 << 12,
     }
 }

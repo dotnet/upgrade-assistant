@@ -45,6 +45,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages.Analyzers
             var toRemove = state.Packages
                 .Where(p =>
                 {
+                    // Temporary fix for packages to exclude from the removal list
+                    // Until we have a fix for https://github.com/dotnet/upgrade-assistant/issues/1069
+                    if (p.Name == "Microsoft.WindowsAppSDK")
+                    {
+                        return false;
+                    }
+
                     // Only remove a package iff it is transitively brought in with a higher or equal version
                     var versions = dependencyLookup[p.Name].Select(static d => d.Version);
 

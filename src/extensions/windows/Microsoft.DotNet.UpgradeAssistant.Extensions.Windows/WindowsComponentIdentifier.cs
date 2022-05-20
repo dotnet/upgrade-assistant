@@ -14,6 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         private const string DesktopSdk = "Microsoft.NET.Sdk.Desktop";
         private const string WinRTPackage = "Microsoft.Windows.SDK.Contracts";
+        private const string WinAppSDKPackage = "Microsoft.WindowsAppSDK";
 
         private readonly string[] _desktopFrameworkReferences = new[]
         {
@@ -33,6 +34,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             "PresentationCore",
             "PresentationFramework",
             "WindowsBase"
+        };
+
+        private readonly string[] _uwpPackageReferences = new[]
+        {
+            "Microsoft.NETCore.UniversalWindowsPlatform"
         };
 
         private readonly ITransitiveDependencyIdentifier _identifier;
@@ -58,6 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             var references = project.References.Select(r => r.Name);
+            var packageReferences = project.PackageReferences.Select(r => r.Name);
 
             if (references.Any(r => _winFormsReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
             {
@@ -69,6 +76,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 components |= ProjectComponents.WindowsDesktop;
                 components |= ProjectComponents.Wpf;
+            }
+
+            if (packageReferences.Any(p => _uwpPackageReferences.Contains(p, StringComparer.OrdinalIgnoreCase)))
+            {
+                components |= ProjectComponents.WindowsDesktop;
+                components |= ProjectComponents.WinUI;
             }
 
             if (file.IsSdk)
@@ -87,6 +100,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 if (file.GetPropertyValue("UseWindowsForms").Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
                     components |= ProjectComponents.WinForms;
+                    components |= ProjectComponents.WindowsDesktop;
+                }
+
+                if (file.GetPropertyValue("UseWinUI").Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    components |= ProjectComponents.WinUI;
                     components |= ProjectComponents.WindowsDesktop;
                 }
 
@@ -113,7 +132,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private async ValueTask<bool> IsWinRt(IProject project, CancellationToken token)
         {
-            return await _identifier.IsTransitiveDependencyAsync(WinRTPackage, project, token).ConfigureAwait(false);
+            return (await _identifier.IsTransitiveDependencyAsync(WinRTPackage, project, token).ConfigureAwait(false))
+                || (await _identifier.IsTransitiveDependencyAsync(WinAppSDKPackage, project, token).ConfigureAwait(false));
         }
     }
 }

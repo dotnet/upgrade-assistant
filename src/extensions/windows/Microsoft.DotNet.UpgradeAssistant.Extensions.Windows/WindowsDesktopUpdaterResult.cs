@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
-    public record WinformsUpdaterResult(
+    public record WindowsDesktopUpdaterResult(
         string RuleId,
         string RuleName,
         string FullDescription,

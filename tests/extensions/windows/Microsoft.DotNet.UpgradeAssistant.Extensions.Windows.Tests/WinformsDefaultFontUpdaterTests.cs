@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             context.Setup(c => c.Projects).Returns(new[] { project1.Object, project2.Object });
 
             // Act
-            var updaterResult = (WinformsUpdaterResult)await updater.IsApplicableAsync(context.Object, context.Object.Projects.ToImmutableArray(), CancellationToken.None).ConfigureAwait(false);
+            var updaterResult = (WindowsDesktopUpdaterResult)await updater.IsApplicableAsync(context.Object, context.Object.Projects.ToImmutableArray(), CancellationToken.None).ConfigureAwait(false);
             var fileLocations = updaterResult.FileLocations.Select(i => Path.GetFileNameWithoutExtension(i));
 
             // Assert

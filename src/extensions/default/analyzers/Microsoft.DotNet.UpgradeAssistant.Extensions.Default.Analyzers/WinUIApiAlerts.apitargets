@@ -1,0 +1,41 @@
+﻿# Target syntax messages are defined as an ID and message (formatted as `ID: Message`) followed by APIs that the message applies to.
+# APIs are described by a three-tuple of API type, API name, and a boolean indicating whether the alert should be given in cases where
+# the API is only ambiguously matched.
+#
+# Generic types and members should end with `X where X is the number of generic parameters they take.
+
+A1: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
+Type, Windows.UI.Core.CoreDispatcher, true
+
+A2: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
+Member, Window.Current.Dispatcher, true
+
+A3: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
+Member, App.Window.Dispatcher, true
+
+A4: UWP CoreDispatcher : Windows.UI.Core.CoreDispatcher is no longer supported. Use DispatcherQueue instead. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/threading
+Member, Window.Dispatcher, true
+
+B: UWP CameraCaptureUI : Windows.Media.Capture.CameraCaptureUI is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Type, Windows.Media.Capture.CameraCaptureUI, true
+
+C: UWP InkCanvas : Microsoft.UI.Xaml.Controls.InkCanvas is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Type, Micorsoft.UI.Xaml.Controls.InkCanvas, true
+
+D: UWP MapControl : Microsoft.UI.Xaml.Controls.Maps.MapControl is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Type, Microsoft.UI.Xaml.Controls.Maps.MapControl, true
+
+E: UWP MediaElement : Microsoft.UI.Xaml.Controls.MediaElement is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Type, Microsoft.UI.Xaml.Controls.MediaElement, true
+
+F: UWP PrintManager : Windows.Graphics.Printing.PrintManager is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Type, Windows.Graphics.Printing.PrintManager, true
+
+G: UWP WebAuthenticationBroker : Windows.Security.Authentication.Web.WebAuthenticationBroker is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Type, Windows.Security.Authentication.Web.WebAuthenticationBroker, true
+
+H: UWP AcrylicBrush.BackgroundSource : The AcrylicBrush.BackgroundSource property exists in UWP, but not in the Windows App SDK. Now the AcrylicBrush always samples from the app content. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Member, Windows.UI.Xaml.Media.AcrylicBrush.BackgroundSource, true
+
+I: UWP TaskbarManager: Windows.UI.Shell.TaskbarManager is not yet supported in WindowsAppSDK. Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/what-is-supported
+Type, Windows.UI.Shell.TaskbarManager, true

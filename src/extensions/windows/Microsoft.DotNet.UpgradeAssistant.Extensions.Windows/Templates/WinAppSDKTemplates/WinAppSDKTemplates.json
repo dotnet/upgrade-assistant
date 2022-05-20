@@ -1,0 +1,59 @@
+﻿{
+  "Replacements": {
+    "$AppName": "$(RootNamespace)"
+  },
+  "TemplateItems": [
+    {
+      "Path": "app.manifest",
+      "Type": "Content",
+      "Keywords": []
+    },
+    {
+      "Path": "Properties\\launchSettings.json",
+      "Type": "None",
+      "Keywords": []
+    },
+    {
+      "Path": "Properties\\PublishProfiles\\win10-arm64.pubxml",
+      "Type": "None",
+      "Keywords": []
+    },
+    {
+      "Path": "Properties\\PublishProfiles\\win10-x64.pubxml",
+      "Type": "None",
+      "Keywords": []
+    },
+    {
+      "Path": "Properties\\PublishProfiles\\win10-x86.pubxml",
+      "Type": "None",
+      "Keywords": []
+    },
+    {
+      "Path": "App.xaml.cs",
+      "Type": "Compile",
+      "Keywords": [ "new MainWindow()" ]
+    },
+    {
+      "Path": "MainWindow.xaml.cs",
+      "Type": "Compile",
+      "Keywords": []
+    },
+    {
+      "Path": "MainWindow.xaml",
+      "Type": "Content",
+      "Keywords": []
+    },
+    {
+      "Path": "UWPToWinAppSDKUpgradeHelpers.cs",
+      "Type": "Compile",
+      "Keywords": []
+    }
+  ],
+  "TemplateOutputType": [
+    "WinExe"
+  ],
+  "TemplateLanguage": "CSharp",
+  "TemplateAppliesTo": [
+    "WinUI"
+  ]
+}

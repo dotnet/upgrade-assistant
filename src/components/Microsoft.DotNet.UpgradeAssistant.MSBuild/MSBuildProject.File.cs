@@ -158,6 +158,48 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         public void AddItem(string name, string path)
             => ProjectRoot.AddItem(name, path);
 
+        public void AddItem(ProjectItemDescriptor projectItem)
+        {
+            var itemGroup = ProjectRoot.GetOrCreateItemGroup(projectItem.ItemType.Name);
+            var item = ProjectRoot.CreateItemElement(projectItem.ItemType.Name);
+            if (projectItem.Include is not null)
+            {
+                item.Include = projectItem.Include;
+            }
+
+            if (projectItem.Exclude is not null)
+            {
+                item.Exclude = projectItem.Remove;
+            }
+
+            if (projectItem.Remove is not null)
+            {
+                item.Remove = projectItem.Remove;
+            }
+
+            itemGroup.AppendChild(item);
+        }
+
+        public bool RemoveItem(ProjectItemDescriptor projectItem)
+        {
+            var itemsToRemove = ProjectRoot.Items.Where(item =>
+                {
+                    return item.ItemType == projectItem.ItemType.Name
+                        && (projectItem.Include is null || item.Include == projectItem.Include)
+                        && (projectItem.Exclude is null || item.Exclude == projectItem.Exclude)
+                        && (projectItem.Remove is null || item.Remove == projectItem.Remove);
+                });
+
+            bool isItemRemoved = false;
+            foreach (var item in itemsToRemove)
+            {
+                item.Parent.RemoveChild(item);
+                isItemRemoved = true;
+            }
+
+            return isItemRemoved;
+        }
+
         public bool ContainsItem(string itemName, ProjectItemType? itemType, CancellationToken token)
         {
             var targetItemPath = GetPathRelativeToProject(itemName, FileInfo.DirectoryName ?? string.Empty);

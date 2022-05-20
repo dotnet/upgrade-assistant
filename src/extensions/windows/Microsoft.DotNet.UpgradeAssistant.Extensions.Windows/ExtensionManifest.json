@@ -5,6 +5,41 @@
     "PackageMapPath": "PackageMaps"
   },
 
+  "TemplateInserter": {
+    "TemplateConfigFiles": [
+      "Templates\\WinAppSDKTemplates\\WinAppSDKTemplates.json"
+    ]
+  },
+
+  "WinUIOptions": {
+    "NamespaceUpdates": {
+      "Windows.ApplicationModel.Resources.Core": "Microsoft.Windows.ApplicationModel.Resources",
+      "Windows.UI.Composition": "Microsoft.UI.Composition",
+      "Windows.UI.Xaml": "Microsoft.UI.Xaml",
+      "Windows.UI.Colors": "Microsoft.UI.Colors",
+      "Microsoft.Toolkit.Uwp.UI.Animations": "CommunityToolkit.WinUI.UI.Animations",
+      "Window.Current": "App.Window"
+    },
+    "ProjectFilePropertyUpdates": {
+      "Set": {
+        "Platforms": "x86;x64;arm64",
+        "ApplicationManifest": "app.manifest",
+        "EnablePreviewMsixTooling": "true",
+        "RuntimeIdentifiers": "win10-x86;win10-x64;win10-arm64",
+        "PublishProfile": "win10-$(Platform).pubxml"
+      },
+      "Remove": [
+        "WindowsXamlEnableOverview",
+        "AppxPackageSigningEnabled",
+        "GenerateAssemblyInfo"
+      ]
+    },
+    "FilesToRename": {},
+    "FilesToDelete": [
+      "Properties\\AssemblyInfo.cs"
+    ]
+  },
+
   "ExtensionServiceProviders": [
     "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.dll"
   ]

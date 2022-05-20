@@ -7,6 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="DefaultApiAlerts.apitargets" />
+    <None Remove="WinUIApiAlerts.apitargets" />
+    <EmbeddedResource Include="WinUIApiAlerts.apitargets" />
     <EmbeddedResource Include="DefaultApiAlerts.apitargets" />
   </ItemGroup>
   <ItemGroup>

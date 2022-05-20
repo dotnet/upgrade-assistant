@@ -17,6 +17,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return components.HasFlag(ProjectComponents.WinForms);
         }
 
+        public static async ValueTask<bool> IsWinUIProjectAsync(this IProject project, CancellationToken token)
+        {
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+            return components.HasFlag(ProjectComponents.WinUI);
+        }
+
         public static string GetElementFromAppConfig(string configPath, string configuration, string key)
         {
             if (File.Exists(configPath))

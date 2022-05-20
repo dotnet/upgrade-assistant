@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
@@ -48,8 +49,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
                 if (updater.Components.HasFlag(ProjectComponents.WinRT))
                 {
-                    // TODO: Default to this version to ensure everything is supported.
-                    tfm = tfm with { PlatformVersion = TargetFrameworkMoniker.Net50_Windows_10_0_19041_0.PlatformVersion };
+                    if (updater.Components.HasFlag(ProjectComponents.WinUI))
+                    {
+                        var existingTfm = updater.Project.TargetFrameworks.Count == 0 ? null : updater.Project.TargetFrameworks.First();
+                        if (existingTfm == null
+                            || existingTfm.PlatformVersion == null
+                            || existingTfm.PlatformVersion.CompareTo(TargetFrameworkMoniker.Net50_Windows_10_0_19041_0.PlatformVersion) < 0)
+                        {
+                            // TODO: Default to this version to ensure everything is supported.
+                            tfm = tfm with { PlatformVersion = TargetFrameworkMoniker.Net50_Windows_10_0_19041_0.PlatformVersion };
+                        }
+                        else
+                        {
+                            tfm = tfm with { PlatformVersion = existingTfm.PlatformVersion };
+                        }
+                    }
+                    else
+                    {
+                        // TODO: Default to this version to ensure everything is supported.
+                        tfm = tfm with { PlatformVersion = TargetFrameworkMoniker.Net50_Windows_10_0_19041_0.PlatformVersion };
+                    }
                 }
 
                 return true;

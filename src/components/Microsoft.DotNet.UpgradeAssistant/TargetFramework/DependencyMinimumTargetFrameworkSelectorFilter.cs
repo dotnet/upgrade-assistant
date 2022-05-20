@@ -34,6 +34,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             {
                 _logger.LogInformation("Skip minimum dependency check because .NET MAUI support multiple TFMs.");
             }
+            else if (tfm.Components.HasFlag(ProjectComponents.WinUI))
+            {
+                _logger.LogInformation("Skip minimum dependency check because Windows App SDK cannot work with targets lower than already recommended TFM.");
+            }
             else
             {
                 foreach (var dep in tfm.Project.ProjectReferences)

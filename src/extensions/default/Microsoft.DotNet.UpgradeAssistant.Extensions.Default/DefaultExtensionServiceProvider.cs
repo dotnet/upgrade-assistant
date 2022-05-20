@@ -44,6 +44,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Default
             // Add source analyzers and code fix providers (note that order doesn't matter as they're run alphabetically)
             // Analyzers
             services.AddTransient<DiagnosticAnalyzer, ApiAlertAnalyzer>();
+            services.AddTransient<DiagnosticAnalyzer, WinUIApiAlertAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, AttributeUpgradeAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, BinaryFormatterUnsafeDeserializeAnalyzer>();
             services.AddTransient<DiagnosticAnalyzer, HtmlHelperAnalyzer>();
