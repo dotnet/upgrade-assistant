@@ -1,3 +1,3 @@
-[submodule "modules/try-convert"]
-	path = modules/try-convert
-	url = https://github.com/sotteson1/try-convert.git
+[submodule "modules\\try-convert"]
+	path = modules\\try-convert
+	url = https://github.com/dotnet/try-convert.git
