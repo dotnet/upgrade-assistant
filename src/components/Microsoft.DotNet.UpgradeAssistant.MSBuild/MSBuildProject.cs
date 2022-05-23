@@ -90,9 +90,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     return Context.ProjectCollection.LoadProject(FileInfo.FullName);
                 }
-                catch (InvalidProjectFileException ex)
+                catch (InvalidProjectFileException)
                 {
-                    throw new UpgradeException(LocalizedStrings.InvalidProjectError, ex);
+                    // TODO Delete obj file retry - a change in platform version may cause load to fail for UWP/WinUI apps
+                    var fileDirectory = FileInfo.Directory;
+                    var dirToDelete = fileDirectory?.EnumerateDirectories().Where(directory => directory.Name == "obj").FirstOrDefault();
+                    if (dirToDelete != null)
+                    {
+                        dirToDelete.Delete(true);
+                    }
+
+                    try
+                    {
+                        return Context.ProjectCollection.LoadProject(FileInfo.FullName);
+                    }
+                    catch (InvalidProjectFileException e)
+                    {
+                        throw new UpgradeException(LocalizedStrings.InvalidProjectError, e);
+                    }
                 }
             }
         }
