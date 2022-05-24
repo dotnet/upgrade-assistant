@@ -106,19 +106,13 @@ Download this free e-book on [Porting existing ASP.NET apps to .NET Core](https:
 The tool can be installed [from NuGet](https://www.nuget.org/packages/upgrade-assistant/) as a .NET CLI tool by running:
 
 ```
-dotnet tool install -g upgrade-assistant
+dotnet tool install -g --add-source 'https://api.nuget.org/v3/index.json' --ignore-failed-sources upgrade-assistant
 ```
 
 Similarly, because the Upgrade Assistant is installed as a .NET CLI tool, it can be easily updated from the command line:
 
 ```
-dotnet tool update -g upgrade-assistant
-```
-
-If installation fails, trying running the install command with the `--ignore-failed-sources` parameter:
-
-```
-dotnet tool install -g upgrade-assistant --ignore-failed-sources
+dotnet tool update -g --add-source 'https://api.nuget.org/v3/index.json' --ignore-failed-sources upgrade-assistant
 ```
 
 Upgrade-assistant is installed as a NuGet package, so invalid or authenticated sources in [NuGet configuration](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) can cause installation problems.
