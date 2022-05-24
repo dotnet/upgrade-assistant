@@ -92,12 +92,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 }
                 catch (InvalidProjectFileException)
                 {
-                    // TODO Delete obj file retry - a change in platform version may cause load to fail for UWP/WinUI apps
-                    var fileDirectory = FileInfo.Directory;
-                    var dirToDelete = fileDirectory?.EnumerateDirectories().Where(directory => directory.Name == "obj").FirstOrDefault();
-                    if (dirToDelete != null)
+                    // TODO Delete obj file and retry - a change in platform version may cause load to fail for UWP/WinUI apps
+                    if (!DeleteObjDirectory())
                     {
-                        dirToDelete.Delete(true);
+                        throw;
                     }
 
                     try
@@ -110,6 +108,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                     }
                 }
             }
+        }
+
+        private bool DeleteObjDirectory()
+        {
+            var dirToDelete = FileInfo.Directory?.EnumerateDirectories().FirstOrDefault(directory => directory.Name == "obj");
+            if (dirToDelete is not null)
+            {
+                dirToDelete.Delete(recursive: true);
+                return true;
+            }
+
+            return false;
         }
 
         public ProjectOutputType OutputType =>
