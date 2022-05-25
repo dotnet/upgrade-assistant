@@ -90,32 +90,37 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     return Context.ProjectCollection.LoadProject(FileInfo.FullName);
                 }
-                catch (InvalidProjectFileException)
+                catch (InvalidProjectFileException e)
                 {
-                    // TODO Delete obj file and retry - a change in platform version may cause load to fail for UWP/WinUI apps
-                    if (!DeleteObjDirectory())
+                    // Delete PhotoLab.csproj.nuget.g.* files and retry. A change in platform version may cause load to fail for UWP / WinUI apps
+                    if (!DeleteNugetGeneratedFiles())
                     {
-                        throw;
+                        throw new UpgradeException(LocalizedStrings.InvalidProjectError, e);
                     }
 
                     try
                     {
                         return Context.ProjectCollection.LoadProject(FileInfo.FullName);
                     }
-                    catch (InvalidProjectFileException e)
+                    catch (InvalidProjectFileException ex)
                     {
-                        throw new UpgradeException(LocalizedStrings.InvalidProjectError, e);
+                        throw new UpgradeException(LocalizedStrings.InvalidProjectError, ex);
                     }
                 }
             }
         }
 
-        private bool DeleteObjDirectory()
+        private bool DeleteNugetGeneratedFiles()
         {
-            var dirToDelete = FileInfo.Directory?.EnumerateDirectories().FirstOrDefault(directory => directory.Name == "obj");
-            if (dirToDelete is not null)
+            if (FileInfo.Directory is null)
             {
-                dirToDelete.Delete(recursive: true);
+                return false;
+            }
+
+            var filesToDelete = Directory.GetFiles(FileInfo.Directory.FullName, "PhotoLab.csproj.nuget.g.*", SearchOption.AllDirectories);
+            foreach (var filePath in filesToDelete)
+            {
+                File.Delete(filePath);
                 return true;
             }
 
