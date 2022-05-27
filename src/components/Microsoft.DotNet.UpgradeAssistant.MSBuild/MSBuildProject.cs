@@ -30,6 +30,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             Factories factories,
             FileInfo file,
+            IUpgradeReadyCheck upgradeReadyCheck,
             ILogger<MSBuildProject> logger)
         {
             FileInfo = file ?? throw new ArgumentNullException(nameof(file));
@@ -90,41 +91,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 {
                     return Context.ProjectCollection.LoadProject(FileInfo.FullName);
                 }
-                catch (InvalidProjectFileException e)
+                catch (InvalidProjectFileException ex)
                 {
-                    // Delete PhotoLab.csproj.nuget.g.* files and retry. A change in platform version may cause load to fail for UWP / WinUI apps
-                    if (!DeleteNugetGeneratedFiles())
-                    {
-                        throw new UpgradeException(LocalizedStrings.InvalidProjectError, e);
-                    }
-
-                    try
-                    {
-                        return Context.ProjectCollection.LoadProject(FileInfo.FullName);
-                    }
-                    catch (InvalidProjectFileException ex)
-                    {
-                        throw new UpgradeException(LocalizedStrings.InvalidProjectError, ex);
-                    }
+                    throw new UpgradeException(LocalizedStrings.InvalidProjectError, ex);
                 }
             }
-        }
-
-        private bool DeleteNugetGeneratedFiles()
-        {
-            if (FileInfo.Directory is null)
-            {
-                return false;
-            }
-
-            var filesToDelete = Directory.GetFiles(FileInfo.Directory.FullName, "PhotoLab.csproj.nuget.g.*", SearchOption.AllDirectories);
-            foreach (var filePath in filesToDelete)
-            {
-                File.Delete(filePath);
-                return true;
-            }
-
-            return false;
         }
 
         public ProjectOutputType OutputType =>
