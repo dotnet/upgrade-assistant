@@ -30,7 +30,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             IEnumerable<IComponentIdentifier> componentIdentifiers,
             Factories factories,
             FileInfo file,
-            IUpgradeReadyCheck upgradeReadyCheck,
             ILogger<MSBuildProject> logger)
         {
             FileInfo = file ?? throw new ArgumentNullException(nameof(file));

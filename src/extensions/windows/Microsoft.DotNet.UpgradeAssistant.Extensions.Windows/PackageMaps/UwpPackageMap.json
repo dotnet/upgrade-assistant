@@ -15,7 +15,7 @@
     "NetCorePackages": [
       {
         "Name": "Microsoft.WindowsAppSDK",
-        "Version": "1.1.0-preview1"
+        "Version": "1.1.0"
       },
       {
         "Name": "Microsoft.Graphics.Win2D",
