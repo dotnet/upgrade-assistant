@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="InvalidProjectError" xml:space="preserve">
-    <value>Could not load project. Please ensure the selected VS instance has the correct workloads installed for your projects. If Upgrade Assistant selected the incorrect VS version, please pass the argument --vs-path with the appropriate path. You can see the Visual Studio instances searched by running with the --verbose flag.</value>
+    <value>Could not load project. Please ensure the selected VS instance has the correct workloads installed for your projects. If Upgrade Assistant selected the incorrect VS version, please pass the argument --vs-path with the appropriate path. You can see the Visual Studio instances searched by running with the --verbose flag. If you are migrating UWP to Windows App SDK project, make sure you are using the latest version of VS 2022 (&gt;17.2)</value>
   </data>
 </root>

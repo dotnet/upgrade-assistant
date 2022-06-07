@@ -19,7 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LocalizedStrings {
@@ -61,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not load project. Please ensure the selected VS instance has the correct workloads installed for your projects. If Upgrade Assistant selected the incorrect VS version, please pass the argument --vs-path with the appropriate path. You can see the Visual Studio instances searched by running with the --verbose flag..
+        ///   Looks up a localized string similar to Could not load project. Please ensure the selected VS instance has the correct workloads installed for your projects. If Upgrade Assistant selected the incorrect VS version, please pass the argument --vs-path with the appropriate path. You can see the Visual Studio instances searched by running with the --verbose flag. If you are migrating UWP to Windows App SDK project, make sure you are using the latest version of VS 2022 (&gt;17.2).
         /// </summary>
         internal static string InvalidProjectError {
             get {
