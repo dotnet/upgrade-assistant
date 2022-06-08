@@ -3,6 +3,14 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Version 0.3.330701 - 2022-06-08 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.330701))
+
+### Added
+- UWP conversion support to Windows App SDK (https://github.com/dotnet/upgrade-assistant/pull/1121)
+
+### Changed
+- Updated install command documentation to include nuget source feed URL (https://github.com/dotnet/upgrade-assistant/pull/1138)
+
 ## Version 0.3.326103 - 2022-05-13 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.326103))
 
 ### Fixed
