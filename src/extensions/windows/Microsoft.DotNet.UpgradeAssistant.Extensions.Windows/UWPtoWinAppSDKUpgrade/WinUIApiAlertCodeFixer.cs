@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var diagnostic = context.Diagnostics.First();
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<StatementSyntax>().First();
+            var declaration = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<StatementSyntax>().FirstOrDefault();
 
             if (declaration is null)
             {
