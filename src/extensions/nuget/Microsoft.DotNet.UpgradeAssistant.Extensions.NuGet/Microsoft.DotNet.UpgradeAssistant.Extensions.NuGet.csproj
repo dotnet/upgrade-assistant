@@ -7,10 +7,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
     <PackageReference Include="NuGet.Commands" Version="6.0.2" />
-    <PackageReference Include="NuGet.ProjectModel" Version="6.0.0" />
-    <PackageReference Include="NuGet.Frameworks" Version="6.0.0" />
-    <PackageReference Include="NuGet.Configuration" Version="6.0.0" />
-    <PackageReference Include="NuGet.Credentials" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
