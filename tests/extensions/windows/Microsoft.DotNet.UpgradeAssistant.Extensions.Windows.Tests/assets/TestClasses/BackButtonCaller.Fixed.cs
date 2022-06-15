@@ -17,7 +17,7 @@ namespace TestProject.TestClasses
             /*
               
             TODO UA307 Default back button in the title bar does not exist in WinUI3 apps.
-            The tool has generated a custom back button "UAGeneratedBackButton" in the XAML file.
+            The tool has generated a custom back button in the MainWindow.xaml.cs file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/case-study-1#restoring-back-button-functionality
             */SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
@@ -29,17 +29,17 @@ namespace TestProject.TestClasses
             /*
               
             TODO UA307 Default back button in the title bar does not exist in WinUI3 apps.
-            The tool has generated a custom back button "UAGeneratedBackButton" in the XAML file.
+            The tool has generated a custom back button in the MainWindow.xaml.cs file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/case-study-1#restoring-back-button-functionality
-            */UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            */App.Window.BackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
             /*
               
             TODO UA307 Default back button in the title bar does not exist in WinUI3 apps.
-            The tool has generated a custom back button "UAGeneratedBackButton" in the XAML file.
+            The tool has generated a custom back button in the MainWindow.xaml.cs file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/case-study-1#restoring-back-button-functionality
-            */UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;        }
+            */App.Window.BackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;        }
 
         private async void SetBackButtonVisibility2()
         {
@@ -48,10 +48,10 @@ namespace TestProject.TestClasses
             /*
               
             TODO UA307 Default back button in the title bar does not exist in WinUI3 apps.
-            The tool has generated a custom back button "UAGeneratedBackButton" in the XAML file.
+            The tool has generated a custom back button in the MainWindow.xaml.cs file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/case-study-1#restoring-back-button-functionality
-            */UAGeneratedBackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;        }
+            */App.Window.BackButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;        }
 
         private async void SetBackButtonVisibility3()
         {
@@ -60,7 +60,7 @@ namespace TestProject.TestClasses
             /*
               
             TODO UA307 Default back button in the title bar does not exist in WinUI3 apps.
-            The tool has generated a custom back button "UAGeneratedBackButton" in the XAML file.
+            The tool has generated a custom back button in the MainWindow.xaml.cs file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/case-study-1#restoring-back-button-functionality
             */x.AppViewBackButtonVisibility = Hello();
