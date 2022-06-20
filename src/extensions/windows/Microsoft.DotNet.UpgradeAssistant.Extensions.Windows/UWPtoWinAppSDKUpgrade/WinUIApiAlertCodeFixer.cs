@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             var diagnostic = context.Diagnostics.First();
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<StatementSyntax>().FirstOrDefault();
+            var declaration = root.FindNode(diagnostic.Location.SourceSpan);
 
             if (declaration is null)
             {
@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 diagnostic);
         }
 
-        private async Task<Document> AddApiAlertComment(Document document, SyntaxNode root, StatementSyntax statement, string diagnosticId, string diagnosticMessage,
+        private async Task<Document> AddApiAlertComment(Document document, SyntaxNode root, SyntaxNode statement, string diagnosticId, string diagnosticMessage,
             FileLinePositionSpan positionSpan, CancellationToken cancellationToken)
         {
             _logger!.LogWarning($"{positionSpan.Path} {diagnosticMessage}");

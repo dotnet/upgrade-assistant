@@ -69,27 +69,8 @@ namespace $AppName
                 OnFileActivated(activatedEventArgs);
             }
 
-
             // Initialize MainWindow here
             Window = new MainWindow();
-
-            Frame rootFrame = Window.Content as Frame;
-            if (rootFrame == null)
-            {
-                // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
-                // Place the frame in the current Window
-                Window.Content = rootFrame;
-            }
-            if (rootFrame.Content == null)
-            {
-                // When the navigation stack isn't restored navigate to the first page,
-                // configuring the new page by passing required information as a navigation
-                // parameter
-                // TODO Raname this MainPage type in case your app MainPage has a different name
-                rootFrame.Navigate(typeof(MainPage), e.Arguments);
-            }
-
             Window.Activate();
             WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(Window);
         }

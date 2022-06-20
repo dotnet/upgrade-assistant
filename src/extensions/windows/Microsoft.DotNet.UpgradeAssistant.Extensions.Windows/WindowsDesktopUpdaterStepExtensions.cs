@@ -47,7 +47,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 .AddTransient<IUpdater<IProject>, WinUIPropertiesUpdater>()
                 .AddTransient<IUpdater<IProject>, WinUIPackageAppxmanifestUpdater>()
                 .AddTransient<IUpdater<IProject>, WinUIUnnecessaryFilesUpdater>()
-                .AddTransient<IUpdater<IProject>, WinUIAnimationsXamlUpdater>()
-                .AddTransient<IUpdater<IProject>, WinUIBackButtonXamlUpdater>();
+                .AddTransient<IUpdater<IProject>, WinUIAnimationsXamlUpdater>();
     }
 }

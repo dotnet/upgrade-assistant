@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private const string BackButtonMessage = @$"
             TODO {WinUIBackButtonAnalyzer.DiagnosticId} Default back button in the title bar does not exist in WinUI3 apps.
-            The tool has generated a custom back button ""{WinUIBackButtonXamlUpdater.NewBackButtonName}"" in the XAML file.
+            The tool has generated a custom back button in the MainWindow.xaml.cs file.
             Feel free to edit its position, behavior and use the custom back button instead.
             Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/case-study-1#restoring-back-button-functionality";
 
@@ -90,7 +90,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 var backButtonVisibility = backButtonAssignment.Right.ToString().Contains("Collapsed") ? "Collapsed" : "Visible";
                 var newBackButtonAssignmentTree = await CSharpSyntaxTree.ParseText(
-                    $"{WinUIBackButtonXamlUpdater.NewBackButtonName}.Visibility = Microsoft.UI.Xaml.Visibility.{backButtonVisibility};", cancellationToken: cancellationToken)
+                    $"App.Window.BackButton.Visibility = Microsoft.UI.Xaml.Visibility.{backButtonVisibility};", cancellationToken: cancellationToken)
                     .GetRootAsync(cancellationToken).ConfigureAwait(false);
                 var newBackButtonAssignment = ((GlobalStatementSyntax)newBackButtonAssignmentTree.ChildNodesAndTokens()[0].AsNode()!).Statement;
                 newBackButtonAssignmentWithComment = newBackButtonAssignment.WithLeadingTrivia(comment.GetLeadingTrivia());
