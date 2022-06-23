@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade.Abstractions;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
@@ -23,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including
         // the analyzer's ID in the code fix provider's FixableDiagnosticIds array.
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(
-            WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace,
+            WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType,
             WinUIAppWindowAnalyzer.DiagnosticIdAppWindowVarType,
             WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember);
 
@@ -54,30 +55,42 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             context.RegisterCodeFix(
                 CodeAction.Create(
                     diagnostic.Id,
-                    c => diagnostic.Id == WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace ? FixAppWindowNamespace(context.Document, root, declaration, apiId!, c)
-                    : diagnostic.Id == WinUIAppWindowAnalyzer.DiagnosticIdAppWindowVarType ? FixAppWindowVarType(context.Document, declaration, c)
-                    : FixAppWindowMember(context.Document, declaration.AncestorsAndSelf().OfType<InvocationExpressionSyntax>().First(), apiId!, varName!, c),
+                    c => diagnostic.Id == WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType ? FixTypeName(context.Document, root, declaration, apiId!, c)
+                    : diagnostic.Id == WinUIAppWindowAnalyzer.DiagnosticIdAppWindowVarType ? FixVarType(context.Document, declaration, c)
+                    : FixMember(context.Document, (MemberAccessExpressionSyntax)declaration, apiId!, varName!, c),
                     diagnostic.Id + apiId ?? string.Empty),
                 context.Diagnostics);
         }
 
-        private static async Task<Document> FixAppWindowNamespace(Document document, SyntaxNode oldRoot, SyntaxNode invocationExpressionSyntax, string apiId, CancellationToken cancellationToken)
+        private static async Task<Document> FixTypeName(Document document, SyntaxNode oldRoot, SyntaxNode oldNode, string apiId, CancellationToken cancellationToken)
         {
-            var comment = await CSharpSyntaxTree.ParseText(@$"
+            await Task.Yield();
+            var comment = SyntaxFactory.Comment(@$"
                 /*
-                   TODO: Use Microsoft.UI.Windowing.AppWindow for window Management instead of ApplicationView/CoreWindow or Microsoft.UI.Windowing.AppWindow APIs
+                   TODO {WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType} Use Microsoft.UI.Windowing.AppWindow for window Management instead of ApplicationView/CoreWindow or Microsoft.UI.Windowing.AppWindow APIs
                    Read: https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/windowing
                 */
-                ", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
+                ");
 
-            var (newNamespace, newName) = WinUIAppWindowAnalyzer.TypeConversions[apiId].Value;
-            var node = (await CSharpSyntaxTree.ParseText($"{newNamespace}.{newName} x;", cancellationToken: cancellationToken)
-                .GetRootAsync(cancellationToken).ConfigureAwait(false))
-                .DescendantNodesAndSelf().OfType<QualifiedNameSyntax>().First();
-            return document.WithSyntaxRoot(oldRoot.ReplaceNode(invocationExpressionSyntax, node.WithLeadingTrivia(comment.GetLeadingTrivia())));
+            var apiConversion = WinUIAppWindowAnalyzer.TypeApiConversions[apiId];
+            if (apiConversion.ToApi is not TypeDescription)
+            {
+                throw new InvalidOperationException($"Expecting all types in TypeApiConversions dictionary to be of type TypeDescription but found {apiConversion.ToApi.GetType()}");
+            }
+
+            if (apiConversion.NeedsManualUpgradation)
+            {
+                return document.WithSyntaxRoot(oldRoot.ReplaceNode(oldNode, oldNode.WithLeadingTrivia(comment)));
+            }
+
+            var toType = (TypeDescription)apiConversion.ToApi;
+            var (newNamespace, newName) = (toType.Namespace, toType.TypeName);
+            var node = SyntaxFactory.QualifiedName(SyntaxFactory.ParseName(newNamespace), (SimpleNameSyntax)SyntaxFactory.ParseName(newName));
+
+            return document.WithSyntaxRoot(oldRoot.ReplaceNode(oldNode, node.WithLeadingTrivia(comment)));
         }
 
-        private static async Task<Document> FixAppWindowVarType(Document document, SyntaxNode invocationExpressionSyntax, CancellationToken cancellationToken)
+        private static async Task<Document> FixVarType(Document document, SyntaxNode invocationExpressionSyntax, CancellationToken cancellationToken)
         {
             var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
             VariableDeclarationSyntax variableDeclarator = invocationExpressionSyntax.Ancestors().OfType<VariableDeclarationSyntax>().FirstOrDefault();
@@ -86,9 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 var varIdentifier = variableDeclarator.DescendantNodes().OfType<IdentifierNameSyntax>().Where(id => id.IsVar).FirstOrDefault();
                 if (varIdentifier is not null)
                 {
-                    var node = (await CSharpSyntaxTree.ParseText("Microsoft.UI.Windowing.AppWindow x;", cancellationToken: cancellationToken)
-                        .GetRootAsync(cancellationToken).ConfigureAwait(false))
-                        .DescendantNodesAndSelf().OfType<QualifiedNameSyntax>().First();
+                    var node = SyntaxFactory.QualifiedName(SyntaxFactory.ParseName("Microsoft.UI.Windowing"), (SimpleNameSyntax)SyntaxFactory.ParseName("AppWindow"));
                     documentEditor.ReplaceNode(varIdentifier, node);
                     return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
                 }
@@ -97,37 +108,61 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return document;
         }
 
-        private static async Task<Document> FixAppWindowMember(Document document, InvocationExpressionSyntax invocationExpressionSyntax, string apiId, string varName, CancellationToken cancellationToken)
+        private static async Task<Document> FixMember(Document document, MemberAccessExpressionSyntax memberAccessExpression, string apiId, string varName, CancellationToken cancellationToken)
         {
-            var mappedApi = WinUIAppWindowAnalyzer.MemberConversions[apiId]!.Value;
+            var apiConversion = WinUIAppWindowAnalyzer.MemberApiConversions[apiId]!;
+            if (apiConversion.ToApi is not IMemberDescription)
+            {
+                throw new InvalidOperationException($"Expecting all types in MemberApiConversions dictionary to be of type ITypeMemberDescription but found {apiConversion.ToApi.GetType()}");
+            }
+
+            var fromMember = (IMemberDescription)apiConversion.FromApi;
+            var toMember = (IMemberDescription)apiConversion.ToApi;
+            var (newTypeNamespace, newTypeName, newMemberName) = (toMember.TypeDescription.Namespace, toMember.TypeDescription.TypeName, toMember.MemberName);
+
+            if (apiConversion.NeedsManualUpgradation)
+            {
+                var comment = SyntaxFactory.Comment(@$"
+                    /* 
+                        TODO {WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember}
+                        Use {newTypeNamespace}.{newTypeName}.{newMemberName} instead of {fromMember.MemberName}.
+                        Read: {apiConversion.DocumentationUrl}
+                    */
+                    ");
+                var existingRoot = await document.GetSyntaxRootAsync(cancellationToken);
+                return document.WithSyntaxRoot(existingRoot!.ReplaceNode(memberAccessExpression, memberAccessExpression.WithLeadingTrivia(comment)));
+            }
+
             var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
+            var instance = toMember.IsStatic ? $"{newTypeNamespace}.{newTypeName}" : varName;
+            if (toMember.ApiType == ApiType.PropertyApi)
+            {
+                var expr = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.ParseExpression(instance), (SimpleNameSyntax)SyntaxFactory.ParseName(newMemberName));
 
-            var (newTypeNamespace, newTypeName, newMethodName) = mappedApi!.Value;
+                documentEditor.ReplaceNode(memberAccessExpression, expr.WithLeadingTrivia(memberAccessExpression.GetLeadingTrivia()));
+                return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
+            }
 
-            var argsToAdd = invocationExpressionSyntax.DescendantNodes().OfType<ArgumentListSyntax>().First().Arguments.ToArray();
-
-            var instance = newTypeNamespace == "*" ? varName : $"{newTypeNamespace}.{newTypeName}";
-            var newExpressionRoot = await CSharpSyntaxTree.ParseText(@$"
-                {instance}.{newMethodName}()
-                ", cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
-
-            var newExpression = newExpressionRoot.DescendantNodes().OfType<InvocationExpressionSyntax>().First();
+            var invocationExpression = memberAccessExpression.AncestorsAndSelf().OfType<InvocationExpressionSyntax>().First();
+            var newExpression = SyntaxFactory.InvocationExpression(SyntaxFactory.ParseExpression($"{instance}.{newMemberName}"));
             var newExpressionArgs = newExpression.DescendantNodes().OfType<ArgumentListSyntax>().First();
+            var argsToAdd = invocationExpression.DescendantNodes().OfType<ArgumentListSyntax>().First().Arguments.ToArray();
             var newArgs = newExpressionArgs.AddArguments(argsToAdd);
             var newExpressionWithArgs = newExpression.ReplaceNode(newExpressionArgs, newArgs);
 
-            if (invocationExpressionSyntax.Expression.ToString().EndsWith("Async", StringComparison.Ordinal)
-                && !newMethodName.EndsWith("Async", StringComparison.Ordinal))
+            if (fromMember.ApiType == ApiType.MethodApi && toMember.ApiType == ApiType.MethodApi
+                && ((MethodDescription)fromMember).IsAsync && !((MethodDescription)toMember).IsAsync)
             {
-                var awaitExpression = invocationExpressionSyntax.Ancestors().OfType<AwaitExpressionSyntax>().FirstOrDefault();
+                var awaitExpression = invocationExpression.Ancestors().OfType<AwaitExpressionSyntax>().FirstOrDefault();
                 if (awaitExpression is not null)
                 {
-                    documentEditor.ReplaceNode(awaitExpression, newExpressionWithArgs);
+                    documentEditor.ReplaceNode(awaitExpression, newExpressionWithArgs.WithLeadingTrivia(invocationExpression.GetLeadingTrivia()));
                     return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
                 }
             }
 
-            documentEditor.ReplaceNode(invocationExpressionSyntax, newExpressionWithArgs);
+            documentEditor.ReplaceNode(invocationExpression, newExpressionWithArgs.WithLeadingTrivia(invocationExpression.GetLeadingTrivia()));
             return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
         }
     }
