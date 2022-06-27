@@ -129,7 +129,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         Read: {apiConversion.DocumentationUrl}
                     */
                     ");
-                var existingRoot = await document.GetSyntaxRootAsync(cancellationToken);
+                var existingRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
                 return document.WithSyntaxRoot(existingRoot!.ReplaceNode(memberAccessExpression, memberAccessExpression.WithLeadingTrivia(comment)));
             }
 
