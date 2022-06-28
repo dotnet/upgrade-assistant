@@ -21,8 +21,9 @@
       - Newtonsoft.Json versions 9.0.1 and 12.0.2 are built by source-build
       - Version 12.0.2 is written to Version.props
       - Arcade needs to use 9.0.1 so we need to override Version.props value here
+      - Security vuln flagged 6/23/2022 for <13.0.1
     -->
-    <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
+    <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DotNetBuildOffline)' == 'true'">
