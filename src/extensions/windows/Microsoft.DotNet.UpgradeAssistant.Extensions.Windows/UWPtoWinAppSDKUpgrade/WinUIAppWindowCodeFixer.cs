@@ -28,6 +28,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             WinUIAppWindowAnalyzer.DiagnosticIdAppWindowVarType,
             WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember);
 
+        private const string AppWindowNamespace = "Microsoft.UI.Windowing";
+        private const string AppWindowTypeName = "AppWindow";
+
         public sealed override FixAllProvider GetFixAllProvider()
         {
             // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
@@ -99,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 var varIdentifier = variableDeclarator.DescendantNodes().OfType<IdentifierNameSyntax>().Where(id => id.IsVar).FirstOrDefault();
                 if (varIdentifier is not null)
                 {
-                    var node = SyntaxFactory.QualifiedName(SyntaxFactory.ParseName("Microsoft.UI.Windowing"), (SimpleNameSyntax)SyntaxFactory.ParseName("AppWindow"));
+                    var node = SyntaxFactory.QualifiedName(SyntaxFactory.ParseName(AppWindowNamespace), (SimpleNameSyntax)SyntaxFactory.ParseName(AppWindowTypeName));
                     documentEditor.ReplaceNode(varIdentifier, node);
                     return document.WithSyntaxRoot(documentEditor.GetChangedRoot());
                 }
