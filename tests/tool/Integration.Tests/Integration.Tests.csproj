@@ -13,7 +13,7 @@
   <ItemGroup>
     <!-- The test framework brings in an old NuGet.Frameworks that ends up getting used rather than what MSBuild wants. -->
     <!-- Workaround solution, VSTest issue to remove the dependency for long term solution - https://github.com/microsoft/vstest/issues/3154 -->
-    <PackageReference Include="NuGet.Frameworks" Version="6.*-*" Condition=" '$(TargetFramework)' == 'net6.0' " />
+    <PackageReference Include="NuGet.Frameworks" Version="6.*-*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\cli\Microsoft.DotNet.UpgradeAssistant.Cli\Microsoft.DotNet.UpgradeAssistant.Cli.csproj" />
