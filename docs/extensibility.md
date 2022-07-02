@@ -37,6 +37,8 @@ To create an Upgrade Assistant extension, you will need to start with a manifest
 }
 ```
 
+After creating your extension, please make sure to build it to generate the `MyExtensionLibrary.dll` file. After building, the `ExtensionManifest.json` will be copied into the same output directory as the `MyExtensionLibrary.dll`. When using the extension, you need to point to the path of this output directory, or the `ExtensionManifest.json` inside this output directory. 
+
 An extension can be available as:
 
 - NuGet package on NuGet.org (see [below](#publishing-to-nugetorg) for details)
