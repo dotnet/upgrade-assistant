@@ -60,7 +60,7 @@ namespace Integration.Tests
             var upgradeRunner = new UpgradeRunner();
 
             // Run upgrade
-            var result = await upgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+            var result = await upgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(15)).ConfigureAwait(false);
 
             Assert.Equal(ErrorCodes.Success, result);
 
