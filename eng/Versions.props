@@ -43,7 +43,6 @@
     <MoqVersion>4.8.3</MoqVersion>
     <MonoOptionsVersion>5.3.0.1</MonoOptionsVersion>
     <McMasterExtensionsCommandLineUtils>2.3.0</McMasterExtensionsCommandLineUtils>
-    <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
     <SystemTextJsonVersion>4.7.0</SystemTextJsonVersion>
     <NuGetVersioningVersion>4.4.0</NuGetVersioningVersion>
     <NuGetVersion>5.6.0-preview.2.6489</NuGetVersion>
@@ -91,7 +90,7 @@
     <MicrosoftBuildLocatorVersion>1.4.1</MicrosoftBuildLocatorVersion>
     <MicrosoftBuildVersion>16.7</MicrosoftBuildVersion>
     <MicrosoftWin32RegistryVersion>5.0.0-rc.1.20451.14</MicrosoftWin32RegistryVersion>
-    <NewtonsoftJsonVersion>12.0.3</NewtonsoftJsonVersion>
+    <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
     <NuGetVersioningVersion>5.8.0-preview.3.6823</NuGetVersioningVersion>
     <SystemCollectionsImmutableVersion>5.0.0-rc.1.20451.14</SystemCollectionsImmutableVersion>
     <SystemCommandLineVersion>2.0.0-beta1.20371.2</SystemCommandLineVersion>
