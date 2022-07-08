@@ -12,7 +12,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal class ExtensionAssemblyLoadContext : AssemblyLoadContext
     {
-        private const string UpgradeAssistantFilePrefix = "Microsoft.DotNet.UpgradeAssistant.Abstractions";
+        private const string UpgradeAssistantAbstractionsAssemblyName = "Microsoft.DotNet.UpgradeAssistant.Abstractions";
         private const string ALC_Prefix = "UA_";
 
         private readonly ExtensionInstance _extension;
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             // Don't load Microsoft.DotNet.UpgradeAssistant.Abstractions in extensions' load contexts;
             // That assembly should come from the default ALC so that it's shared between extensions.
-            if (assemblyName.Name.Equals(UpgradeAssistantFilePrefix, StringComparison.OrdinalIgnoreCase))
+            if (assemblyName.Name.Equals(UpgradeAssistantAbstractionsAssemblyName, StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
