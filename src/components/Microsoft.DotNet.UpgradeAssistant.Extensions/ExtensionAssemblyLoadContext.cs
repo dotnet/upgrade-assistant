@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
+
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
@@ -74,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             {
                 return null;
             }
-            
+
             var dll = $"{assemblyName.Name}.dll";
             var dllFile = _extension.FileProvider.GetFileInfo(dll);
 
