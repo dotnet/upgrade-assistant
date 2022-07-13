@@ -45,7 +45,7 @@
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\rules.ruleset</CodeAnalysisRuleSet>
 
     <!-- Ignore CA2254 The logging message template should not vary between calls. EditorConfig doesn't seem to honored for this -->
-    <NoWarn>$(NoWarn);CA2254</NoWarn>
+    <NoWarn>$(NoWarn);CA2254;NU1701</NoWarn>
   </PropertyGroup>
 
   <!-- Treat warnings as errors in release builds, so that all warnings

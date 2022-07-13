@@ -7,37 +7,27 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
-    public class ConsoleAnalyzeCommand : UpgradeAssistantCommand
+    public class ConsoleAnalyzeCommand : UpgradeAssistantCommand<ConsoleAnalyze>
     {
         public ConsoleAnalyzeCommand()
-            : base("analyze")
-        {
-            Handler = CommandHandler.Create<ParseResult, CommandOptions, CancellationToken>((result, options, token) =>
-                Host.CreateDefaultBuilder()
-                    .UseConsoleUpgradeAssistant<ConsoleAnalyze>(options, result)
-                    .RunUpgradeAssistantAsync(token));
+            : base("analyze", allowsOutputFormatting: true) { }
 
-            if (FeatureFlags.IsAnalyzeFormatEnabled)
-            {
-                AddOption(new Option<string>(new[] { "--format", "-f" }, LocalizedStrings.UpgradeAssistantCommandFormat));
-
-                AddCommand(new ListFormatsCommand());
-            }
-        }
-
-        private class ListFormatsCommand : Command
+        internal class ListFormatsCommand : Command
         {
             public ListFormatsCommand()
                 : base("list-formats")
             {
-                Handler = CommandHandler.Create<ParseResult, CommandOptions, CancellationToken>((result, options, token) =>
+                Handler = CommandHandler.Create<ParseResult, UpgradeAssistantCommandOptions, CancellationToken>((result, options, token) =>
                     Host.CreateDefaultBuilder()
+                        .ConfigureServices(options.ConfigureServices)
                         .UseConsoleUpgradeAssistant<ListFormats>(options, result)
                         .RunUpgradeAssistantAsync(token));
             }
