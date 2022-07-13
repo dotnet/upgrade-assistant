@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
             // Don't load Microsoft.DotNet.UpgradeAssistant.Abstractions in extensions' load contexts;
             // That assembly should come from the default ALC so that it's shared between extensions.
-            if (assemblyName.Name.Equals(UpgradeAssistantAbstractionsAssemblyName, StringComparison.OrdinalIgnoreCase))
+            if (assemblyName.Name.Equals(UpgradeAssistantAbstractionsAssemblyName, StringComparison.Ordinal))
             {
                 return null;
             }
