@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
-
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
@@ -13,7 +12,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 {
     internal class ExtensionAssemblyLoadContext : AssemblyLoadContext
     {
-        private const string UpgradeAssistantAbstractionsAssemblyName = "Microsoft.DotNet.UpgradeAssistant.Abstractions";
         private const string ALC_Prefix = "UA_";
 
         private readonly ExtensionInstance _extension;
@@ -64,18 +62,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
 
         protected override Assembly? Load(AssemblyName assemblyName)
         {
-            if (assemblyName.Name is null)
-            {
-                return null;
-            }
-
-            // Don't load Microsoft.DotNet.UpgradeAssistant.Abstractions in extensions' load contexts;
-            // That assembly should come from the default ALC so that it's shared between extensions.
-            if (assemblyName.Name.Equals(UpgradeAssistantAbstractionsAssemblyName, StringComparison.Ordinal))
-            {
-                return null;
-            }
-
             var dll = $"{assemblyName.Name}.dll";
             var dllFile = _extension.FileProvider.GetFileInfo(dll);
 
