@@ -80,9 +80,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
                 "AppWindowCaller",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace, new TextSpan(418, 37)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace, new TextSpan(549, 37)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace, new TextSpan(672, 9))
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(452, 37)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(696, 37)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(819, 9)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember, new TextSpan(935, 46)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1015, 15)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1090, 15)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1122, 15))
                 }
             }
         };
@@ -208,7 +212,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
         public async void AppWindowAnalyzerTest(string documentPath)
         {
             using var workspace = new AdhocWorkspace();
-            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace,
+            var diagnostics = await workspace.GetDiagnosticsAsync(documentPath, ImmutableList.Create(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType,
                 WinUIAppWindowAnalyzer.DiagnosticIdAppWindowVarType, WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember), true).ConfigureAwait(false);
             AssertDiagnosticsCorrect(diagnostics, ExpectedDiagnostics[documentPath]);
         }
@@ -218,7 +222,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
         public async void AppWindowCodeFixerTest(string documentPath)
         {
             using var workspace = new AdhocWorkspace();
-            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowNamespace,
+            var actualFix = await workspace.FixSourceAsync(Language.CSharp, documentPath, ImmutableList.Create(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType,
                 WinUIAppWindowAnalyzer.DiagnosticIdAppWindowVarType, WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember)).ConfigureAwait(false);
             var expectedFix = TestHelper.GetSource($"{documentPath}.Fixed");
             Assert.Equal(expectedFix.Trim(), actualFix.Trim());
@@ -233,7 +237,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             {
                 var expected = $"{expectedDiagnostics.ElementAt(count).SourceSpan}";
                 var actual = $"{d.Location.SourceSpan}";
-                Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected {expectedDiagnostics.ElementAt(count).Language} diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}; actually at {d.Location.SourceSpan}");
+                Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected {expectedDiagnostics.ElementAt(count).Language} diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}" +
+                    $" ; actually at {d.Location.SourceSpan} {d.Location.SourceSpan.End - d.Location.SourceSpan.Start}");
                 count++;
             }
         }
