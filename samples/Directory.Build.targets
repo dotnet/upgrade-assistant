@@ -7,7 +7,7 @@
     <ProjectReference Include="$(MSBuildThisFileDirectory)\..\src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj">
       <!-- The private element indicates that Microsoft.DotNet.UpgradeAssistant.Abstractions doesn't need distributed with this extension -->
       <!-- because it will be loaded from elsewhere (in this case, by the Upgrade Assistant host). -->
-      <!-- In a PacakgeReference (as opposed to ProjectReference, this would be accomplished with ExcludeAssets. -->
+      <!-- In a PackageReference (as opposed to ProjectReference, this would be accomplished with ExcludeAssets. -->
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
