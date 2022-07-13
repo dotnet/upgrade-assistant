@@ -35,17 +35,13 @@ namespace Integration.Tests
 
         [InlineData("PCL", "SamplePCL.csproj", "")]
         [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-
-        // Skip on theories has issues in XUnit: https://github.com/xunit/visualstudio.xunit/issues/266
-#if !NET5_0
-        // Using statements are different for some reason on .NET 5 and .NET 6 after Roslyn runs
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
+/* Maui/Xamarin workload regression in Arcade build agents; temporarily disabling these tests
         [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
         [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
-#endif
-
+*/
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
@@ -60,7 +56,7 @@ namespace Integration.Tests
             var upgradeRunner = new UpgradeRunner();
 
             // Run upgrade
-            var result = await upgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+            var result = await upgradeRunner.UpgradeAsync(Path.Combine(workingDir, inputFileName), entrypoint, _output, TimeSpan.FromMinutes(15)).ConfigureAwait(false);
 
             Assert.Equal(ErrorCodes.Success, result);
 
