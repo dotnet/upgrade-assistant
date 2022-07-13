@@ -1,0 +1,16 @@
+<Project>
+  <ItemGroup>
+    <!-- In a real extension, Upgrade Assistant abstractions would be referenced as a NuGet package -->
+    <!-- To enable building and testing with the latest Upgrade Assistant changes, samples in this repo use -->
+    <!-- a project reference instead. -->
+    <!--<PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Abstractions" Version="0.3.330701" ExcludeAssets="runtime" />-->
+    <ProjectReference Include="$(MSBuildThisFileDirectory)\..\src\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj">
+      <!-- The private element indicates that Microsoft.DotNet.UpgradeAssistant.Abstractions doesn't need distributed with this extension -->
+      <!-- because it will be loaded from elsewhere (in this case, by the Upgrade Assistant host). -->
+      <!-- In a PackageReference (as opposed to ProjectReference, this would be accomplished with ExcludeAssets. -->
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

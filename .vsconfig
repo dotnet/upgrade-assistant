@@ -11,6 +11,7 @@
     "Microsoft.VisualStudio.Component.Roslyn.Compiler",
     "Microsoft.VisualStudio.Component.Roslyn.LanguageServices",
     "Microsoft.VisualStudio.Component.FSharp",
+    "Microsoft.VisualStudio.Component.PortableLibrary",
     "Microsoft.ComponentGroup.ClickOnce.Publish",
     "Microsoft.NetCore.Component.DevelopmentTools",
     "Microsoft.VisualStudio.Component.FSharp.WebTemplates",
