@@ -209,6 +209,9 @@
   <data name="UpgradeAssistantCommandExtension" xml:space="preserve">
     <value>Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times.</value>
   </data>
+  <data name="UpgradeAssistantCommandFormat" xml:space="preserve">
+    <value>Specify format of analyze result. If not provided, a sarif file will be produced. Available default values: "sarif", "html"</value>
+  </data>
   <data name="UpgradeAssistantCommandIgnoreUnsupported" xml:space="preserve">
     <value>Acknowledges that upgrade-assistant will not be able to completely upgrade a project. This indicates that the solution must be redesigned (e.g. consider Blazor to replace Web Forms).</value>
   </data>

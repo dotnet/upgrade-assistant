@@ -331,7 +331,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specify format of analyze result. If not provided, a sarif file will be produced..
+        ///   Looks up a localized string similar to Specify format of analyze result. If not provided, a sarif file will be produced. Available default values: &quot;sarif&quot;, &quot;html&quot;.
         /// </summary>
         internal static string UpgradeAssistantCommandFormat {
             get {
@@ -403,11 +403,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.
+        ///   Looks up a localized string similar to Makes a best-effort attempt to upgrade .NET Framework projects to current, preview, or LTS versions of .NET.
         /// 
-        ///This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 6.
+        ///This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade.
         ///
-        ///This tool&apos;s purpose is to automate some of the &apos;routine&apos; upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers a [rest of string was truncated]&quot;;.
+        ///This tool&apos;s purpose is to automate some of the &apos;routine&apos; upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to t [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string UpgradeAssistantHeaderDetails {
             get {
