@@ -68,7 +68,7 @@ Feature flags can be used to turn some experimental features on or off. Function
 
 Current features that are available to try out include:
 
-- `ANALYZE_OUTPUT_FORMAT`: Enables a `--format` flag for the `analyze` command that can take other options. Currently restricted to `sarif` and `html`
+- `ANALYZE_BINARIES`: Enables [preview command `analyzebinaries`](./docs/binary_analysis.md) to perform .NET compatibility analysis on binary files.
 - `SOLUTION_WIDE_SDK_CONVERSION`: Switches project format conversion from old style project files to SDK style to be solution wide first before any other changes to the project files.
 
 ### Optional Features
