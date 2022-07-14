@@ -19,10 +19,14 @@ Arguments:
   <files-or-directories>  The binary file(s) or directory(ies) to analyze for compatibility
 
 Options:
+  -pre, --allow-prerelease                        Allow pre-release packages to be considered as an option for support of the target framework/platform combination
   -obs, --obsoletion                              Include information about obsoleted APIs
   -p, --platform <Linux|Windows>                  The OS platform(s) to check availability for (e.g. linux windows) [default: Linux]
-  -t, --target-tfm-support <Current|LTS|Preview>  Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean.
+  -t, --target-tfm-support <Current|LTS|Preview>  Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See
+                                                  https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details on what these mean.
   -v, --verbose                                   Enable verbose diagnostics
+  -f, --format <format>                           Specify format of analyze result. If not provided, a sarif file will be produced. Available default values:
+                                                  "sarif", "html"
   -?, -h, --help                                  Show help and usage information
 ```
 
