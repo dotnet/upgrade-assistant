@@ -6,6 +6,8 @@ The Binary Analysis feature (`analyzebinaries`) of Upgrade Assistant allows you 
 
 Binary Analysis currently supports .NET 6.0 as the target framework and Windows and/or Linux as the target platform.
 
+> Note: Binary Analysis is currently in Preview. To enable it, you must add `ANALYZE_BINARIES` to your `UA_FEATURES` environment variable. Read more about feature enablement [here](https://github.com/dotnet/upgrade-assistant#experimental-features).
+
 ## Usage
 
 ### Command Line
