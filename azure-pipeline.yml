@@ -60,7 +60,7 @@ stages:
           - name: _DotNetPublishToBlobFeed
             value: true
           - name: _BuildArgs
-            value:
+            value: >
               -publish
               /p:SignType=$(_SignType)
               /p:DotNetSignType=$(_SignType)
@@ -106,12 +106,12 @@ stages:
               arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
-        - script: eng\common\build.cmd
-            /p:MSBuildEnableWorkloadResolver=$(MSBuildEnableWorkloadResolver)
-            -restore -build -test -sign -pack
+        - script: build.bat
+            -test -sign
             -configuration $(_BuildConfig) 
             -prepareMachine -ci
             $(_BuildArgs)
+            /p:MSBuildEnableWorkloadResolver=$(MSBuildEnableWorkloadResolver)
           displayName: Windows Build / Publish
 
 - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
