@@ -11,25 +11,25 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22364.3">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22364.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-arcade</Uri>
-      <Sha>e3b192e4a719f3b1f576935734a53f6cf20ca6ba</Sha>
+      <Sha>c907366deaa21293f72ac75830b7f5f3cd27cbdc</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.Build.Tasks.Feed" Version="7.0.0-beta.22364.3">
+    <Dependency Name="Microsoft.DotNet.Build.Tasks.Feed" Version="7.0.0-beta.22364.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-arcade</Uri>
-      <Sha>e3b192e4a719f3b1f576935734a53f6cf20ca6ba</Sha>
+      <Sha>c907366deaa21293f72ac75830b7f5f3cd27cbdc</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.SignTool" Version="7.0.0-beta.22364.3">
+    <Dependency Name="Microsoft.DotNet.SignTool" Version="7.0.0-beta.22364.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-arcade</Uri>
-      <Sha>e3b192e4a719f3b1f576935734a53f6cf20ca6ba</Sha>
+      <Sha>c907366deaa21293f72ac75830b7f5f3cd27cbdc</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.Helix.Sdk" Version="7.0.0-beta.22364.3">
+    <Dependency Name="Microsoft.DotNet.Helix.Sdk" Version="7.0.0-beta.22364.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-arcade</Uri>
-      <Sha>e3b192e4a719f3b1f576935734a53f6cf20ca6ba</Sha>
+      <Sha>c907366deaa21293f72ac75830b7f5f3cd27cbdc</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.SwaggerGenerator.MSBuild" Version="7.0.0-beta.22364.3">
+    <Dependency Name="Microsoft.DotNet.SwaggerGenerator.MSBuild" Version="7.0.0-beta.22364.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-arcade</Uri>
-      <Sha>e3b192e4a719f3b1f576935734a53f6cf20ca6ba</Sha>
+      <Sha>c907366deaa21293f72ac75830b7f5f3cd27cbdc</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Maestro.Client" Version="1.1.0-beta.20258.6">
       <Uri>https://github.com/dotnet/arcade-services</Uri>
