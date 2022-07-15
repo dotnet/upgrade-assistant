@@ -51,7 +51,7 @@ stages:
             name: NetCore1ESPool-Internal-Int
             demands: ImageOverride -equals build.windows.amd64.vs2022.pre
         variables:
-        # Enable signing for internal, non-PR builds
+        # Enable signing and publishing for internal, non-PR builds
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
           - group: DotNet-Blob-Feed
           - group: DotNet-Symbol-Server-Pats
@@ -60,7 +60,9 @@ stages:
           - name: _DotNetPublishToBlobFeed
             value: true
           - name: _BuildArgs
-            value: /p:SignType=$(_SignType)
+            value:
+              -publish
+              /p:SignType=$(_SignType)
               /p:DotNetSignType=$(_SignType)
               /p:TeamName=$(_TeamName)
               /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
@@ -104,10 +106,11 @@ stages:
               arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
-        - script: eng\common\cibuild.cmd
+        - script: eng\common\build.cmd
             /p:MSBuildEnableWorkloadResolver=$(MSBuildEnableWorkloadResolver)
+            -restore -build -test -sign -pack
             -configuration $(_BuildConfig) 
-            -prepareMachine
+            -prepareMachine -ci
             $(_BuildArgs)
           displayName: Windows Build / Publish
 
