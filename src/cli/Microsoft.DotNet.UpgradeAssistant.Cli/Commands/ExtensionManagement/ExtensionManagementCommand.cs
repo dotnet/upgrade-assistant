@@ -1,16 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +18,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
         public ExtensionManagementCommand()
             : base("extensions")
         {
+            Handler = CommandHandler.Create<ParseResult, UpgradeAssistantCommandOptions, CancellationToken>((result, options, token) =>
+                Host.CreateDefaultBuilder()
+                    .ConfigureServices(options.ConfigureServices)
+                    .UseConsoleUpgradeAssistant<ConsoleAnalyze>(options, result)
+                    .RunUpgradeAssistantAsync(token));
+
             AddCommand(new AddExtensionCommand());
             AddCommand(new ListExtensionCommand());
             AddCommand(new RemoveExtensionCommand());
@@ -45,6 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
                 where TAppCommand : class, IAppCommand
                 => Handler = CommandHandler.Create<ExtensionUpgradeAssistantOptions, ParseResult, CancellationToken>((opts, parseResult, token)
                        => Host.CreateDefaultBuilder()
+                              .ConfigureServices(opts.ConfigureServices)
                               .UseConsoleUpgradeAssistant<TAppCommand>(opts, parseResult)
                               .ConfigureServices(services =>
                               {
@@ -411,14 +412,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public string Source { get; set; } = null!;
         }
 
-        private class ExtensionUpgradeAssistantOptions : IUpgradeAssistantOptions
+        internal class ExtensionUpgradeAssistantOptions : UpgradeAssistantCommandOptions
         {
-            public bool Verbose { get; set; }
-
-            public bool IsVerbose => Verbose;
-
-            public FileInfo Project { get; set; } = null!;
-
             public IReadOnlyCollection<string> Name { get; set; } = Array.Empty<string>();
 
             public string? Source { get; set; }
@@ -426,20 +421,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement
             public string? Version { get; set; }
 
             public string? ExtensionPath { get; set; }
-
-            public bool IgnoreUnsupportedFeatures { get; set; }
-
-            public UpgradeTarget TargetTfmSupport { get; set; }
-
-            public IReadOnlyCollection<string> Extension => Array.Empty<string>();
-
-            public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
-
-            public DirectoryInfo? VSPath { get; set; }
-
-            public DirectoryInfo? MSBuildPath { get; set; }
-
-            public string? Format { get; set; }
         }
     }
 }

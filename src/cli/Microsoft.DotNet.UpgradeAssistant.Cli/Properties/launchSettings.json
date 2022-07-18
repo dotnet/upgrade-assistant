@@ -5,6 +5,51 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
+    },
+    "Analyze": {
+      "commandName": "Project",
+      "commandLineArgs": "analyze ..\\..\\..\\..\\..\\tests\\tool\\Integration.Tests\\IntegrationScenarios\\MauiSample\\droid\\Original\\EwDavidForms.sln",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Upgrade": {
+      "commandName": "Project",
+      "commandLineArgs": "upgrade ..\\..\\..\\..\\..\\tests\\tool\\Integration.Tests\\IntegrationScenarios\\MauiSample\\droid\\Original\\EwDavidForms.sln",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "AnalyzeBinaries HTML": {
+      "commandName": "Project",
+      "commandLineArgs": "analyzebinaries . -f html",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "UA_FEATURES": "ANALYZE_BINARIES;ANALYZE_OUTPUT_FORMAT"
+      }
+    },
+    "AnalyzeBinaries SARIF": {
+      "commandName": "Project",
+      "commandLineArgs": "analyzebinaries . -f sarif",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "UA_FEATURES": "ANALYZE_BINARIES;ANALYZE_OUTPUT_FORMAT"
+      }
+    },
+    "List Formats": {
+      "commandName": "Project",
+      "commandLineArgs": "analyze list-formats",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "UA_FEATURES": "ANALYZE_OUTPUT_FORMAT"
+      }
+    },
+    "List Features": {
+      "commandName": "Project",
+      "commandLineArgs": "features --list",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }
