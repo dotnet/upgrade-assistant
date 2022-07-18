@@ -12,6 +12,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <IsExtensionHost>true</IsExtensionHost>
     <ExtensionsDirectory>..\..\extensions\</ExtensionsDirectory>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="appsettings.Development.json">
@@ -118,6 +119,9 @@
     </Extension>
     <Extension Include="$(ExtensionsDirectory)maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui\Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.csproj">
       <Name>maui</Name>
+    </Extension>
+    <Extension Include="$(ExtensionsDirectory)binaryanalysis\Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis\Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.csproj">
+      <Name>binaryanalysis</Name>
     </Extension>
   </ItemGroup>
   <ItemGroup>

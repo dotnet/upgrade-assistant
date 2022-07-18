@@ -3,7 +3,7 @@
   <PropertyGroup>
     <!-- This repo version -->
     <MajorVersion>0</MajorVersion>
-    <MinorVersion>3</MinorVersion>
+    <MinorVersion>4</MinorVersion>
     <!-- Build release-only package. -->
     <PreReleaseVersionLabel />
     <SkipPackagePublishingVersionChecks>true</SkipPackagePublishingVersionChecks>
@@ -28,7 +28,7 @@
     <MicrosoftBuildTasksCoreVersion>15.7.179</MicrosoftBuildTasksCoreVersion>
     <MicrosoftBuildUtilitiesCoreVersion>15.7.179</MicrosoftBuildUtilitiesCoreVersion>
     <MicrosoftCodeAnalysisAnalyzersVersion>2.6.3</MicrosoftCodeAnalysisAnalyzersVersion>
-    <MicrosoftCodeAnalysisCSharpVersion>2.9.0</MicrosoftCodeAnalysisCSharpVersion>
+    <MicrosoftCodeAnalysisCSharpVersion>3.8.0</MicrosoftCodeAnalysisCSharpVersion>
     <MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>3.4.0</MsbuildTaskMicrosoftCodeAnalysisCSharpVersion>
     <MicrosoftIdentityModelClientsActiveDirectoryVersion>3.17.2</MicrosoftIdentityModelClientsActiveDirectoryVersion>
     <MicrosoftRestClientRuntimeVersion>2.3.13</MicrosoftRestClientRuntimeVersion>

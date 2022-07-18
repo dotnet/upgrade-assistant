@@ -88,6 +88,60 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Analysis Complete, the report is available at {0}.
+        /// </summary>
+        internal static string AnalysisCompleteMessage {
+            get {
+                return ResourceManager.GetString("AnalysisCompleteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow pre-release packages to be considered as an option for support of the target framework/platform combination.
+        /// </summary>
+        internal static string BinaryAnalysisAllowPrereleaseHelp {
+            get {
+                return ResourceManager.GetString("BinaryAnalysisAllowPrereleaseHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The binary file(s) or directory(ies) to analyze for compatibility.
+        /// </summary>
+        internal static string BinaryAnalysisContentHelp {
+            get {
+                return ResourceManager.GetString("BinaryAnalysisContentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Include information about obsoleted APIs.
+        /// </summary>
+        internal static string BinaryAnalysisObsoletedApisHelp {
+            get {
+                return ResourceManager.GetString("BinaryAnalysisObsoletedApisHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The OS platform(s) to check availability for (e.g. linux windows).
+        /// </summary>
+        internal static string BinaryAnalysisPlatformHelp {
+            get {
+                return ResourceManager.GetString("BinaryAnalysisPlatformHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The target framework(s) for which to analyze for compatibility (e.g. net5.0 net6.0).
+        /// </summary>
+        internal static string BinaryAnalysisTargetFrameworkHelp {
+            get {
+                return ResourceManager.GetString("BinaryAnalysisTargetFrameworkHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name of extension.
         /// </summary>
         internal static string ExtensionManagementName {
@@ -133,6 +187,42 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Features are subject to change and may be disabled in a subsequent release..
+        /// </summary>
+        internal static string FeaturesDisclaimer {
+            get {
+                return ResourceManager.GetString("FeaturesDisclaimer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Features are registered in the environment variable `UA_FEATURES`. Below are available features:.
+        /// </summary>
+        internal static string FeaturesListHeader {
+            get {
+                return ResourceManager.GetString("FeaturesListHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to List available feature flags and status.
+        /// </summary>
+        internal static string FeaturesListOptionHelp {
+            get {
+                return ResourceManager.GetString("FeaturesListOptionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specify --list option to list available features..
+        /// </summary>
+        internal static string FeaturesListOptionRequired {
+            get {
+                return ResourceManager.GetString("FeaturesListOptionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current extensions:.
         /// </summary>
         internal static string ListExtensionDetails {
@@ -174,6 +264,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         internal static string RemovingExtensionFailed {
             get {
                 return ResourceManager.GetString("RemovingExtensionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requested format &apos;{0}&apos; is unavailable.
+        /// </summary>
+        internal static string RequestedFormatUnavailableMessage {
+            get {
+                return ResourceManager.GetString("RequestedFormatUnavailableMessage", resourceCulture);
             }
         }
         
@@ -232,7 +331,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specify format of analyze result. If not provided, a sarif file will be produced..
+        ///   Looks up a localized string similar to Specify format of analyze result. If not provided, a sarif file will be produced. Available default values: &quot;sarif&quot;, &quot;html&quot;.
         /// </summary>
         internal static string UpgradeAssistantCommandFormat {
             get {
@@ -277,7 +376,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean..
+        ///   Looks up a localized string similar to Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details on what these mean..
         /// </summary>
         internal static string UpgradeAssistantCommandTargetTfm {
             get {
@@ -304,11 +403,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Makes a best-effort attempt to upgrade .NET Framework projects to current, preview or LTS versions of .NET.
+        ///   Looks up a localized string similar to Makes a best-effort attempt to upgrade .NET Framework projects to current, preview, or LTS versions of .NET.
         /// 
-        ///This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade to .NET 6.
+        ///This tool does not completely automate the upgrade process and it is expected that projects will have build errors after the tool runs. Manual changes will be required to complete the upgrade.
         ///
-        ///This tool&apos;s purpose is to automate some of the &apos;routine&apos; upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers a [rest of string was truncated]&quot;;.
+        ///This tool&apos;s purpose is to automate some of the &apos;routine&apos; upgrade tasks such as changing project file formats and updating APIs with near-equivalents in the selected target framework. Analyzers added to t [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string UpgradeAssistantHeaderDetails {
             get {
@@ -322,6 +421,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         internal static string VerboseCommand {
             get {
                 return ResourceManager.GetString("VerboseCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writing output to {0}.
+        /// </summary>
+        internal static string WritingOutputMessage {
+            get {
+                return ResourceManager.GetString("WritingOutputMessage", resourceCulture);
             }
         }
     }

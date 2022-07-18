@@ -1,19 +1,17 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.CommandLine.Parsing;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+
 using Autofac.Extensions.DependencyInjection;
+
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+
 using Serilog;
-using Serilog.Configuration;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 
@@ -71,39 +69,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.AddHostedService<ConsoleRunner>();
                     services.AddStepManagement();
-                    services.AddStateFactory(upgradeOptions);
                     services.AddExtensions()
                         .AddDefaultExtensions(context.Configuration)
-                        .AddFromEnvironmentVariables(context.Configuration)
-                        .Configure(options =>
-                        {
-                            options.AdditionalOptions = upgradeOptions.AdditionalOptions;
-                            options.CheckMinimumVersion = !UpgradeVersion.Current.IsDevelopment;
-                            options.CurrentVersion = UpgradeVersion.Current.Version;
-
-                            foreach (var path in upgradeOptions.Extension)
-                            {
-                                options.ExtensionPaths.Add(path);
-                            }
-                        });
-
-                    services.AddMsBuild(optionss =>
-                    {
-                        if (upgradeOptions.Project?.FullName is string fullname)
-                        {
-                            optionss.InputPath = fullname;
-                        }
-
-                        if (upgradeOptions.VSPath?.FullName is string vspath)
-                        {
-                            optionss.VisualStudioPath = vspath;
-                        }
-
-                        if (upgradeOptions.MSBuildPath?.FullName is string msbuildPath)
-                        {
-                            optionss.MSBuildPath = msbuildPath;
-                        }
-                    });
+                        .AddFromEnvironmentVariables(context.Configuration);
 
                     services.AddUserInput();
 
@@ -125,32 +93,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         options.TargetTfmSupport = upgradeOptions.TargetTfmSupport;
                     });
 
-                    services.AddReadinessChecks(options =>
-                    {
-                        options.IgnoreUnsupportedFeatures = upgradeOptions.IgnoreUnsupportedFeatures;
-                    });
-
                     services.AddScoped<IAppCommand, TApp>();
                 })
                 .UseConsoleLifetime(options =>
                 {
                     options.SuppressStatusMessages = true;
                 });
-        }
-
-        private static void AddStateFactory(this IServiceCollection services, IUpgradeAssistantOptions upgradeOptions)
-        {
-            services.AddSingleton<IUpgradeStateManager, FileUpgradeStateFactory>();
-            services
-                .AddOptions<FileStateOptions>()
-                .Configure(options =>
-                {
-                    if (upgradeOptions.Project?.DirectoryName is string directory)
-                    {
-                        options.Path = Path.Combine(directory, ".upgrade-assistant");
-                    }
-                })
-                .ValidateDataAnnotations();
         }
 
         private static void AddUserInput(this IServiceCollection services)

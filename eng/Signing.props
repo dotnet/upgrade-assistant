@@ -16,5 +16,10 @@
     <FileSignInfo Include="Serilog.Sinks.Console.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.Sinks.File.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="CsvHelper.dll" CertificateName="3PartySHA2" />
+
+    <!-- SQL Lite -->
+    <FileSignInfo Include="SQLitePCLRaw.batteries_v2.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="SQLitePCLRaw.core.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="SQLitePCLRaw.provider.e_sqlite3.dll" CertificateName="3PartySHA2" />
   </ItemGroup>
 </Project>
