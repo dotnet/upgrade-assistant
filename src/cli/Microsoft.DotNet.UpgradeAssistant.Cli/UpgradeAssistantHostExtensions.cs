@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                         .AddDefaultExtensions(context.Configuration)
                         .AddFromEnvironmentVariables(context.Configuration);
 
-                    services.AddUserInput();
+                    services.TryAddTransient<IUserInput, ConsoleCollectUserInput>();
 
                     services.AddAnalysis(options =>
                     {
@@ -100,9 +100,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     options.SuppressStatusMessages = true;
                 });
         }
-
-        private static void AddUserInput(this IServiceCollection services)
-            => services.AddTransient<IUserInput, ConsoleCollectUserInput>();
 
         /// <summary>
         /// Configures common services for Upgrade Assistant CLI execution, including an IAppCommand that will run when the host starts.
