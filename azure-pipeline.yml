@@ -24,10 +24,18 @@ trigger:
   branches:
     include:
       - main
+  paths:
+    exclude:
+      - '**/*.md'
+      - docs
 pr:
   branches:
     include:
     - '*'
+  paths:
+    exclude:
+      - '**/*.md'
+      - docs
 
 stages:
 - stage: build
