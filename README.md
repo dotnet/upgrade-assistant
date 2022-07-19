@@ -68,7 +68,7 @@ Feature flags can be used to turn some experimental features on or off. Function
 
 Current features that are available to try out include:
 
-- `ANALYZE_OUTPUT_FORMAT`: Enables a `--format` flag for the `analyze` command that can take other options. Currently restricted to `sarif` and `html`
+- `ANALYZE_BINARIES`: Enables [preview command `analyzebinaries`](./docs/binary_analysis.md) to perform .NET compatibility analysis on binary files.
 - `SOLUTION_WIDE_SDK_CONVERSION`: Switches project format conversion from old style project files to SDK style to be solution wide first before any other changes to the project files.
 
 ### Optional Features
@@ -211,9 +211,8 @@ Note that this tool does not (yet) advise on the feasibility or estimated cost o
 
 If you're just starting to look at the latest versions of .NET (current, LTS, or preview) and would like to understand more about potential challenges in upgrading any particular project, you should begin by looking at .NET Framework dependencies the project has and third-party libraries or NuGet packages it depends on and understand whether those dependencies are likely to work on the latest version of .NET (current, LTS, or preview). Resources that can help with that analysis include:
 
-1. [The .NET Portability Analyzer tool](https://github.com/microsoft/dotnet-apiport)
-2. [.NET Core porting documentation](https://docs.microsoft.com/dotnet/core/porting/)
-3. [Documentation of features not available on .NET Core](https://docs.microsoft.com/dotnet/core/porting/net-framework-tech-unavailable)
+1. [.NET Core porting documentation](https://docs.microsoft.com/dotnet/core/porting/)
+1. [Documentation of features not available on .NET Core](https://docs.microsoft.com/dotnet/core/porting/net-framework-tech-unavailable)
 
 ### Authenticated NuGet sources
 
