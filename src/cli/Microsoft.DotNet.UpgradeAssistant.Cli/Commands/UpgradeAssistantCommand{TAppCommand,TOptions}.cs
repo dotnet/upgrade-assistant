@@ -20,12 +20,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         {
             Handler = CommandHandler.Create<ParseResult, TOptions, CancellationToken>((result, options, token) =>
                 Host.CreateDefaultBuilder()
+                    .UseConsoleUpgradeAssistant<TAppCommand>(options, result)
                     .ConfigureServices((context, services) =>
                     {
                         (options as UpgradeAssistantCommandOptions)?.ConfigureServices(context, services);
                         configure?.Invoke(context, services, options);
                     })
-                    .UseConsoleUpgradeAssistant<TAppCommand>(options, result)
                     .RunUpgradeAssistantAsync(token));
 
             AddArgument(new Argument<FileInfo>("project", LocalizedStrings.UpgradeAssistantCommandProject) { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
