@@ -23,4 +23,37 @@
     <ProjectReference Include="..\..\..\..\src\extensions\wcfMigration\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestExpectedFiles\ExpectedOldConfig.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestExpectedFiles\ExpectedDirective.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestExpectedFiles\ExpectedProj.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestExpectedFiles\ExpectedConfig.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestExpectedFiles\ExpectedSourceCode.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestInputFiles\SampleConfig.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestInputFiles\SampleConfig_NA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestInputFiles\SampleDirective.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestInputFiles\SampleProj.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestInputFiles\SampleSourceCode.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

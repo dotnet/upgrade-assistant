@@ -48,8 +48,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             try
             {
                 SyntaxTree tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
-                SourceCodeUpdater packageUpdater = new SourceCodeUpdater(tree, UpdateTemplateCode(context, logger), logger);
-                return packageUpdater;
+                SourceCodeUpdater sourceCodeUpdater = new SourceCodeUpdater(tree, UpdateTemplateCode(context, logger), logger);
+                return sourceCodeUpdater;
             }
             catch (Exception e)
             {

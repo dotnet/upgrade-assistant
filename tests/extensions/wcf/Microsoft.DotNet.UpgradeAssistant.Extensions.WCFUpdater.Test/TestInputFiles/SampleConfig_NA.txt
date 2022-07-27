@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <system.serviceModel>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior name="beanTraderBehaviour">
+          <serviceMetadata httpGetEnabled="true" />
+          <serviceDebug includeExceptionDetailInFaults="true" />
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <services>
+    </services>
+    <bindings>
+      <netTcpBinding>
+        <binding name="WindowsClient">
+          <!-- Was going to use TransportWithMessageCredential security, but 
+               that is not yet supported on .NET Core. https://github.com/dotnet/wcf/issues/8 -->          
+          <security mode="Transport">
+            <transport clientCredentialType="Certificate" />
+          </security>
+        </binding>
+      </netTcpBinding>
+    </bindings>
+  </system.serviceModel>
+</configuration>

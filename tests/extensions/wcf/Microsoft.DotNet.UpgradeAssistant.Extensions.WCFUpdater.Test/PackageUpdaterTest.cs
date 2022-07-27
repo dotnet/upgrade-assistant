@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
             string expected = @"<?xml version=""1.0"" encoding=""utf - 8""?>
                             <Project Sdk = ""Microsoft.NET.Sdk.Web""> 
                             </Project>";
-            var result = new PackageUpdater(XDocument.Parse(test)).UpdateSDK();
+            var result = new PackageUpdater(XDocument.Parse(test), _logger).UpdateSDK();
             Assert.True(XNode.DeepEquals(XDocument.Parse(expected), result));
         }
 
@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
                                 <PackageReference Include = ""CoreWCF.WebHttp"" Version = ""1.1.0"" />
                               </ItemGroup>
                             </Project>";
-            var result = new PackageUpdater(XDocument.Parse(Input)).UpdatePackages();
+            var result = new PackageUpdater(XDocument.Parse(Input), _logger).UpdatePackages();
             Assert.True(XNode.DeepEquals(XDocument.Parse(expected), result));
         }
 

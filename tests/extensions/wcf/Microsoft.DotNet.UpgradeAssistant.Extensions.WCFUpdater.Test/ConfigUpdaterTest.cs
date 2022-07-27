@@ -117,63 +117,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData(ServiceDebug)]
-        public void SupportsServiceDebugTest(string replace)
+        [InlineData("", false)]
+        [InlineData(ServiceDebug, true)]
+        public void SupportsServiceDebugTest(string replace, bool expected)
         {
             bool result = new ConfigUpdater(XDocument.Parse(Input.Replace(ServiceDebug, replace)), _logger).SupportsServiceDebug();
-            if (replace.Contains("true"))
-            {
-                Assert.True(result);
-            }
-            else
-            {
-                Assert.False(result);
-            }
+            Assert.Equal(expected, result);
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData(Metadata)]
-        [InlineData(MetadataHttps)]
-        [InlineData(MetadataBoth)]
-        public void SupportsMetadataBehaviorTest(string replace)
+        [InlineData("", 0)]
+        [InlineData(Metadata, 1)]
+        [InlineData(MetadataHttps, 2)]
+        [InlineData(MetadataBoth, 3)]
+        public void SupportsMetadataBehaviorTest(string replace, int expected)
         {
             int result = new ConfigUpdater(XDocument.Parse(Input.Replace(Metadata, replace)), _logger).SupportsMetadataBehavior();
             var http = replace.Contains("httpGetEnabled");
             var https = replace.Contains("httpsGetEnabled");
-            if (http && https)
-            {
-                Assert.Equal(3, result);
-            }
-            else if (http)
-            {
-                Assert.Equal(1, result);
-            }
-            else if (https)
-            {
-                Assert.Equal(2, result);
-            }
-            else
-            {
-                Assert.Equal(0, result);
-            }
+            Assert.Equal(expected, result);
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData(MexEndpoint)]
-        public void IncludesMexEndpointTest(string replace)
+        [InlineData("", false)]
+        [InlineData(MexEndpoint, true)]
+        public void IncludesMexEndpointTest(string replace, bool expected)
         {
             bool result = new ConfigUpdater(XDocument.Parse(Input.Replace(MexEndpoint, replace)), _logger).IncludesMexEndpoint();
-            if (replace.Contains("mex"))
-            {
-                Assert.True(result);
-            }
-            else
-            {
-                Assert.False(result);
-            }
+            Assert.Equal(expected, result);
         }
 
         [Fact]

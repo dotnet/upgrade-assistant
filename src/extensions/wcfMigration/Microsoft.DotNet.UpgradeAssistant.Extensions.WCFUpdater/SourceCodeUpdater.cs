@@ -20,9 +20,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         public SourceCodeUpdater(SyntaxTree sourceCode, string template, ILogger logger)
         {
             _programFile = sourceCode;
+            _logger = logger;
             template = ReplaceNames(sourceCode.GetRoot(), template);
             _template = CSharpSyntaxTree.ParseText(template);
-            _logger = logger;
         }
 
         // Simple constructor for source code files which only needs to update the using directives
