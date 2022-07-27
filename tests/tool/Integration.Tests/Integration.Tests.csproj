@@ -24,4 +24,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IntegrationScenarios\WCFSample\Upgraded\" />
+    <Folder Include="IntegrationScenarios\WCFSample\Original\" />
+  </ItemGroup>
 </Project>
