@@ -7,12 +7,16 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Autofac;
+
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using Xunit.Abstractions;
 
 namespace Integration.Tests
@@ -40,8 +44,10 @@ namespace Integration.Tests
             var status = await Host.CreateDefaultBuilder()
                 .UseEnvironment(Environments.Development)
                 .UseUpgradeAssistant<ConsoleUpgrade>(options)
-                .ConfigureServices(services =>
+                    .ConfigureServices((ctx, services) =>
                 {
+                    options.ConfigureServices(ctx, services);
+
                     services.AddNonInteractive(options => options.Wait = TimeSpan.Zero, true);
                     services.AddKnownExtensionOptions(new() { Entrypoints = new[] { entrypoint }, SkipBackup = true });
                 })
@@ -69,23 +75,14 @@ namespace Integration.Tests
             return status;
         }
 
-        private record TestOptions(FileInfo Project) : IUpgradeAssistantOptions
+        private class TestOptions : UpgradeAssistantCommandOptions
         {
-            public bool IsVerbose => true;
-
-            public bool IgnoreUnsupportedFeatures => false;
-
-            public UpgradeTarget TargetTfmSupport => UpgradeTarget.Current;
-
-            public IReadOnlyCollection<string> Extension => Array.Empty<string>();
-
-            public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
-
-            public DirectoryInfo? VSPath { get; }
-
-            public DirectoryInfo? MSBuildPath { get; }
-
-            public string? Format { get; }
+            public TestOptions(FileInfo project)
+            {
+                this.Project = project;
+                this.Verbose = true;
+                this.IgnoreUnsupportedFeatures = false;
+            }
         }
     }
 }

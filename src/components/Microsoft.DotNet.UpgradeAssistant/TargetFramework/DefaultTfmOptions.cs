@@ -17,5 +17,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public string Preview { get; set; } = null!;
 
         public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.Current;
+
+        public string DetermineTargetTfmValue() => this.TargetTfmSupport switch
+        {
+            UpgradeTarget.Current => this.Current,
+            UpgradeTarget.Preview => this.Preview,
+            UpgradeTarget.LTS => this.LTS,
+            _ => this.LTS,
+        };
     }
 }
