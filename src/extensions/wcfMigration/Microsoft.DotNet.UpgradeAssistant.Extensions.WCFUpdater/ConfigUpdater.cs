@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             serviceModel.First().AddBeforeSelf(new XComment(Constants.ServiceModelComment));
             serviceModel.Remove();
 
-            _logger.LogInformation("The original config file finished updating. System.serviceModel element was removed.");
+            _logger.LogDebug("The original config file finished updating. System.serviceModel element was removed.");
             return oldConfig;
         }
 
@@ -61,11 +61,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     select el;
                 unsupported_endpoint.First().AddBeforeSelf(new XComment(Constants.MexEndpoint));
                 unsupported_endpoint.Remove();
-                _logger.LogWarning("The mex endpoint is removed and service metadata behavior is configured in the source code instead.");
+                _logger.LogWarning("The mex endpoint is removed from .config and service metadata behavior is configured in the source code instead.");
             }
 
             wcfConfig = UpdateEndpoints(wcfConfig);
-            _logger.LogInformation("Finished creating the new configuration file.");
+            _logger.LogDebug("Finished creating the new configuration file.");
             return wcfConfig;
         }
 
@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 }
             }
 
-            _logger.LogInformation("Finished creating the new configuration file.");
+            _logger.LogDebug("Finished creating the new configuration file.");
             return config;
         }
 

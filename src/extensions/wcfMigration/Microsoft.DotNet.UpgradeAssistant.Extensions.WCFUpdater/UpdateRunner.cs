@@ -14,7 +14,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start updating configuration files...");
+                logger.LogDebug("Start updating configuration files...");
                 XDocument wcfConfig = updater.GenerateNewConfig();
                 XDocument appConfig = updater.UpdateOldConfig();
                 var result = new List<XDocument>
@@ -22,8 +22,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                                 appConfig,
                                 wcfConfig
                             };
-                return result;
                 logger.LogInformation("Finish updating configuration files.");
+                return result;
             }
             catch (Exception e)
             {
@@ -36,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start writing changes to configuration files...");
+                logger.LogDebug("Start writing changes to configuration files...");
                 wcfConfig.Save(Path.Combine(Path.GetDirectoryName(path), "wcf.config"));
                 appConfig.Save(path);
                 logger.LogInformation("Finish writing changes to configuration files.");
@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start updating project file...");
+                logger.LogDebug("Start updating project file...");
                 packageUpdater.UpdatePackages();
                 var projFile = packageUpdater.UpdateSDK();
                 logger.LogInformation("Finish updating project file.");
@@ -68,7 +68,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start writing changes to project file...");
+                logger.LogDebug("Start writing changes to project file...");
                 projFile.Save(path);
                 logger.LogInformation("Finish writing changes to project file.");
             }
@@ -82,7 +82,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start updating source code...");
+                logger.LogDebug("Start updating source code...");
                 var root = sourceCodeUpdater.UpdateDirectives();
                 root = sourceCodeUpdater.RemoveOldCode(sourceCodeUpdater.AddTemplateCode(root));
                 logger.LogInformation("Finish updating source code.");
@@ -99,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start writing changes to source code to update Main()...");
+                logger.LogDebug("Start writing changes to source code to update Main()...");
                 File.WriteAllText(path, root.ToFullString());
                 logger.LogInformation("Finish writing changes to source code/Main().");
             }
@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start updating directives...");
+                logger.LogDebug("Start updating directives...");
                 var result = new List<SyntaxNode>();
                 foreach (var updater in list)
                 {
@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             try
             {
-                logger.LogInformation("Start writing changes to source code to update directives...");
+                logger.LogDebug("Start writing changes to source code to update directives...");
                 if (root.Count != path.Count())
                 {
                     logger.LogError("The number of files does not match the number of path. Cannot write directive updates.");
