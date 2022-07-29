@@ -152,7 +152,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             bool propertiesValueUpdated = true;
 
             // check project properties updated based on project types
-            if(components.HasFlag(ProjectComponents.Maui))
+            if (components.HasFlag(ProjectComponents.Maui))
             {
                 if (string.IsNullOrEmpty(file.GetPropertyValue("ImplicitUsings")))
                 {
