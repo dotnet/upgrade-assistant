@@ -126,6 +126,25 @@
   <data name="AddExtensionSuccess" xml:space="preserve">
     <value>Added extension {Name} from {Source}</value>
   </data>
+  <data name="AnalysisCompleteMessage" xml:space="preserve">
+    <value>Analysis Complete, the report is available at {0}</value>
+    <comment>0 - Filename</comment>
+  </data>
+  <data name="BinaryAnalysisAllowPrereleaseHelp" xml:space="preserve">
+    <value>Allow pre-release packages to be considered as an option for support of the target framework/platform combination</value>
+  </data>
+  <data name="BinaryAnalysisContentHelp" xml:space="preserve">
+    <value>The binary file(s) or directory(ies) to analyze for compatibility</value>
+  </data>
+  <data name="BinaryAnalysisObsoletedApisHelp" xml:space="preserve">
+    <value>Include information about obsoleted APIs</value>
+  </data>
+  <data name="BinaryAnalysisPlatformHelp" xml:space="preserve">
+    <value>The OS platform(s) to check availability for (e.g. linux windows)</value>
+  </data>
+  <data name="BinaryAnalysisTargetFrameworkHelp" xml:space="preserve">
+    <value>The target framework(s) for which to analyze for compatibility (e.g. net5.0 net6.0)</value>
+  </data>
   <data name="ExtensionManagementName" xml:space="preserve">
     <value>Name of extension</value>
   </data>
@@ -141,6 +160,18 @@
   <data name="ExtensionManagementVersion" xml:space="preserve">
     <value>Version of extension</value>
   </data>
+  <data name="FeaturesDisclaimer" xml:space="preserve">
+    <value>Features are subject to change and may be disabled in a subsequent release.</value>
+  </data>
+  <data name="FeaturesListHeader" xml:space="preserve">
+    <value>Features are registered in the environment variable `UA_FEATURES`. Below are available features:</value>
+  </data>
+  <data name="FeaturesListOptionHelp" xml:space="preserve">
+    <value>List available feature flags and status</value>
+  </data>
+  <data name="FeaturesListOptionRequired" xml:space="preserve">
+    <value>Specify --list option to list available features.</value>
+  </data>
   <data name="ListExtensionDetails" xml:space="preserve">
     <value>Current extensions:</value>
   </data>
@@ -155,6 +186,10 @@
   </data>
   <data name="RemovingExtensionFailed" xml:space="preserve">
     <value>Could not remove extension '{Name}'</value>
+  </data>
+  <data name="RequestedFormatUnavailableMessage" xml:space="preserve">
+    <value>Requested format '{0}' is unavailable</value>
+    <comment>0 - File format requested by user</comment>
   </data>
   <data name="SurveyText" xml:space="preserve">
     <value>We are interested in your feedback! Please use the following link to open a survey: https://aka.ms/DotNetUASurvey</value>
@@ -174,6 +209,9 @@
   <data name="UpgradeAssistantCommandExtension" xml:space="preserve">
     <value>Specifies a .NET Upgrade Assistant extension package to include. This could be an ExtensionManifest.json file, a directory containing an ExtensionManifest.json file, or a zip archive containing an extension. This option can be specified multiple times.</value>
   </data>
+  <data name="UpgradeAssistantCommandFormat" xml:space="preserve">
+    <value>Specify format of analyze result. If not provided, a sarif file will be produced. Available default values: "sarif", "html"</value>
+  </data>
   <data name="UpgradeAssistantCommandIgnoreUnsupported" xml:space="preserve">
     <value>Acknowledges that upgrade-assistant will not be able to completely upgrade a project. This indicates that the solution must be redesigned (e.g. consider Blazor to replace Web Forms).</value>
   </data>
@@ -187,7 +225,7 @@
     <value>The path to a project or solution file to be used.</value>
   </data>
   <data name="UpgradeAssistantCommandTargetTfm" xml:space="preserve">
-    <value>Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details for what these mean.</value>
+    <value>Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details on what these mean.</value>
   </data>
   <data name="UpgradeAssistantCommandVS" xml:space="preserve">
     <value>Path to a VS install directory to be used for %VSINSTALLDIR%. If not provided, the latest installed version will be used.</value>
@@ -204,5 +242,9 @@ This tool's purpose is to automate some of the 'routine' upgrade tasks such as c
   </data>
   <data name="VerboseCommand" xml:space="preserve">
     <value>Enable verbose diagnostics</value>
+  </data>
+  <data name="WritingOutputMessage" xml:space="preserve">
+    <value>Writing output to {0}</value>
+    <comment>0 - Filename</comment>
   </data>
 </root>

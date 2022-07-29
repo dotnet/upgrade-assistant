@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\extensions\vb\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic\Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.csproj" />

@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.DotNet.UpgradeAssistant.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         public FeatureFlagCommand()
             : base("features")
         {
-            AddOption(new Option<bool>("--list", description: "List available feature flags and status"));
+            AddOption(new Option<bool>("--list", description: LocalizedStrings.FeaturesListOptionHelp));
             Handler = CommandHandler.Create<ParseResult, FeatureUpgradeOptions, CancellationToken>((result, options, token) =>
              Host.CreateDefaultBuilder()
                  .UseConsoleUpgradeAssistant<Features>(options, result)
@@ -61,15 +62,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             public Task RunAsync(CancellationToken token)
             {
-                _logger.LogWarning("Features are subject to change and may be disabled in a subsequent release.");
-                _logger.LogInformation("Features are registered in the environment variable `UA_FEATURES`. Below are available features:");
+                _logger.LogWarning(LocalizedStrings.FeaturesDisclaimer);
 
                 if (_options.Value.Command is FeatureCommand.List)
                 {
+                    _logger.LogInformation(LocalizedStrings.FeaturesListHeader);
+
                     foreach (var feature in FeatureFlags.RegisteredFeatures.OrderBy(static f => f))
                     {
                         _logger.LogInformation("'{Feature}': {IsEnabled}", feature, FeatureFlags.IsRegistered(feature));
                     }
+                }
+                else
+                {
+                    _logger.LogError(LocalizedStrings.FeaturesListOptionRequired);
                 }
 
                 return Task.CompletedTask;
@@ -87,29 +93,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             public FeatureCommand Command { get; set; }
         }
 
-        private class FeatureUpgradeOptions : IUpgradeAssistantOptions
+        private class FeatureUpgradeOptions : BaseUpgradeAssistantOptions
         {
             public bool List { get; set; }
-
-            public bool Verbose { get; set; }
-
-            public bool IsVerbose => Verbose;
-
-            public FileInfo? Project => null;
-
-            public bool IgnoreUnsupportedFeatures => false;
-
-            public UpgradeTarget TargetTfmSupport => default;
-
-            public IReadOnlyCollection<string> Extension => Array.Empty<string>();
-
-            public IEnumerable<AdditionalOption> AdditionalOptions => Enumerable.Empty<AdditionalOption>();
-
-            public DirectoryInfo? VSPath => null;
-
-            public DirectoryInfo? MSBuildPath => null;
-
-            public string? Format => null;
         }
     }
 }
