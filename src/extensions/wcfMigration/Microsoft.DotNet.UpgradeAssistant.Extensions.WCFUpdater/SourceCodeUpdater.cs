@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var newDirectives = templateRoot.DescendantNodes().OfType<UsingDirectiveSyntax>();
             root = root.InsertNodesAfter(position, newDirectives);
 
-            _logger.LogDebug("Finish updating directives.");
+            _logger.LogInformation("Finish updating directives.");
             return root;
         }
 
@@ -73,7 +73,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var varName = insertPosition.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText;
             root = UpdateOpenClose(root, varName);
 
-            _logger.LogDebug("Finish adding template code.");
+            _logger.LogInformation("Finish adding template code.");
             return root;
         }
 
@@ -113,7 +113,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                               select s;
             root = root.RemoveNodes(placeholder, 0);
 
-            _logger.LogDebug("Finish removing outdated code.");
+            _logger.LogInformation("Finish removing outdated code.");
             return root;
         }
 

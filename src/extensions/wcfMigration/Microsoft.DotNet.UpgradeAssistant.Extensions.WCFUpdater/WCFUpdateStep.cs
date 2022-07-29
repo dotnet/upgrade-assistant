@@ -107,14 +107,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             FindPath(project);
             if (_path.Count == 0)
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Cannot find required file(s) for WCF update. The project is not applicable for automated update and this step will be skipped.", BuildBreakRisk.Low));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Cannot find required file(s) for WCF update. The project is not applicable and will be skipped.", BuildBreakRisk.Low));
             }
 
             // if the project is not applicable, skip the update step
             if (!WCFUpdateChecker.IsWCFUpdateApplicable(_path, Logger))
             {
-                Logger.LogInformation("This project is not applicable for updating to CoreWCF since references to WCF was not found. This step will be skipped.");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "WCF Update step is not applicable to this project and this step will be skipped.", BuildBreakRisk.Low));
+                Logger.LogInformation("This project is not applicable for updating to CoreWCF since references to WCF was not found.");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "WCF Update step is not applicable to this project and will be skipped.", BuildBreakRisk.Low));
             }
 
             // construct updaters
@@ -133,8 +133,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             if (_configUpdater == null || _packageUpdater == null || _sourceCodeUpdater == null || (_path.ContainsKey("directives") && _directiveUpdaters == null))
             {
-                Logger.LogWarning("Unexpected error happened when trying to construct the updaters. Please review error message and log.");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Updaters cannot be constructed. Please review error message and log for more information.", BuildBreakRisk.Medium));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Updaters cannot be constructed. Please review error message and log file for more information.", BuildBreakRisk.Medium));
             }
 
             return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "WCF updaters are initialized. Ready to update.", BuildBreakRisk.None));
@@ -155,8 +154,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             // check for null
             if (projFile == null || config == null || source == null || directives == null)
             {
-                Logger.LogWarning("Unexpected error happened when trying to making changes to original files. Please review error message and log.");
-                return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Project failed to port to CoreWCF. Please review error message and log for more information."));
+                return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Project failed to port to CoreWCF. Please review error message and log file for more information."));
             }
 
             // Write updates
@@ -168,8 +166,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 UpdateRunner.WriteDirectiveUpdate(directives, _path["directives"], Logger);
             }
 
-            Logger.LogInformation("Project was successfully updated to use CoreWCF services. Please review changes.");
-            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Project was successfully ported to CoreWCF."));
+            return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Project was successfully ported to CoreWCF. Please review changes."));
         }
 
         private void FindPath(IProject project)
@@ -188,21 +185,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             if (!main.Any())
             {
-                Logger.LogWarning("Can not find .cs file with Main() method. The project is not applicable for automated update and this step will be skipped.");
+                Logger.LogWarning("Can not find .cs file with main method.");
             }
             else if (main.Count() > 1)
             {
-                Logger.LogWarning("Find more than one .cs file with Main() method. The project is not applicable for automated update and this step will be skipped.");
+                Logger.LogWarning("Find more than one .cs file with main method.");
             }
             else if (!config.Any())
             {
-                if (File.ReadAllText(main.First()).Contains("ServiceHost"))
-                {
-                    Logger.LogWarning("ServiceHost instance was detected in code but can not find .config file that configures system.serviceModel. " +
-                        "Automated update cannot be applied. Please update the project to CoreWCF manually (https://github.com/CoreWCF/CoreWCF).");
-                }
-
-                Logger.LogWarning("Can not find .config file that configures system.serviceModel. The project is not applicable for automated update and this step will be skipped.");
+                Logger.LogWarning("Can not find .config file that configures system.serviceModel.");
             }
             else
             {
