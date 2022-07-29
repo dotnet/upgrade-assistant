@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -68,10 +69,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     }
             }
 
-            // Use MAUI tag
-            file.SetPropertyValue("UseMaui", "true");
-            await file.SaveAsync(token).ConfigureAwait(false);
+            if (projectproperties.GetProjectPropertyValue("UseMaui").FirstOrDefault() == null)
+            {
+                file.SetPropertyValue("UseMaui", "true");
+            }
 
+            await file.SaveAsync(token).ConfigureAwait(false);
             Logger.LogInformation("Added .NET MAUI Project Properties successfully");
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added Project Properties for {projectType.ToString()} to .NET MAUI project ");
         }
@@ -136,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             file.SetPropertyValue("ImplicitUsings", "enable");
         }
 
-        protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -145,16 +148,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var project = context.CurrentProject.Required();
             var file = project.GetFile();
+            var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
+            bool propertiesValueUpdated = true;
 
-            // var properties =  project.GetProjectPropertyElements();
-            if (string.IsNullOrEmpty(file.GetPropertyValue("UseMaui")))
+            // check project properties updated based on project types
+            if(components.HasFlag(ProjectComponents.Maui))
             {
-                Logger.LogInformation(".NET MAUI Project Properties need to be added.");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project Properties need to be added", BuildBreakRisk.High));
+                if (string.IsNullOrEmpty(file.GetPropertyValue("ImplicitUsings")))
+                {
+                    propertiesValueUpdated = false;
+                }
             }
             else
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project Properties already added.", BuildBreakRisk.None));
+                if (string.IsNullOrEmpty(file.GetPropertyValue("UseMaui")))
+                {
+                    propertiesValueUpdated = false;
+                }
+            }
+
+            if (propertiesValueUpdated)
+            {
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project Properties already added.", BuildBreakRisk.None)).Result;
+            }
+            else
+            {
+                Logger.LogInformation(".NET MAUI Project Properties need to be added.");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project Properties need to be added", BuildBreakRisk.High)).Result;
             }
         }
 
