@@ -156,7 +156,7 @@ namespace SampleServer
         [InlineData(InputWithUsing)]
         public void RemoveCodeTest(string input)
         {
-            var end = @"app.stop();
+            var end = @"app.StopAsync();
                         }".Replace(" ", string.Empty);
             var root = CSharpSyntaxTree.ParseText(input);
             var updater = new SourceCodeUpdater(root, Template, _logger);

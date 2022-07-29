@@ -153,15 +153,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         private string ReplaceNames(SyntaxNode root, string template)
         {
             // gets the name of the service and the host
-            var declarator = FindServiceHost(root).DescendantNodes().OfType<VariableDeclaratorSyntax>();
-            var varName = declarator.First();
-            var serviceName = (from name in declarator.First().DescendantNodes().OfType<IdentifierNameSyntax>()
-                               where name.Parent.GetType() == typeof(TypeOfExpressionSyntax)
-                               select name).First();
-            template = template.Replace("ServiceType", serviceName.Identifier.ValueText);
-            template = template.Replace("varName", varName.Identifier.ValueText);
-            _logger.LogDebug("Finish replacing placeholder names for service type and service host variable name.");
-            return template;
+            try
+            {
+                var declarator = FindServiceHost(root).DescendantNodes().OfType<VariableDeclaratorSyntax>();
+                var varName = declarator.First();
+                var serviceName = (from name in declarator.First().DescendantNodes().OfType<NameSyntax>()
+                                   where name.Parent.GetType() == typeof(TypeOfExpressionSyntax)
+                                   select name).First();
+                template = template.Replace("ServiceType", serviceName.ToString());
+                template = template.Replace("varName", varName.Identifier.ValueText);
+                _logger.LogDebug("Finish replacing placeholder names for service type and service host variable name.");
+                return template;
+            }
+            catch
+            {
+                _logger.LogWarning("Cannot find the variable name for ServiceHost or the service type name. Please edit manually after update complete.");
+                return template;
+            }
         }
 
         private SyntaxNode UpdateOpenClose(SyntaxNode root, string varName)
@@ -209,7 +217,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         private static IEnumerable<SyntaxNode> FindOutdated(SyntaxNode startPosition, SyntaxNode root, string varName)
         {
-            var stopPosition = GetExpressionStatement("stop", root).First();
+            var stopPosition = GetExpressionStatement("StopAsync", root).First();
             var outdated = from s in root.DescendantNodes().OfType<StatementSyntax>()
                        where s.SpanStart > startPosition.SpanStart && s.Span.End < stopPosition.Span.Start
                        && ContainsIdentifier(varName, s)

@@ -177,10 +177,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             _path = new Dictionary<string, IEnumerable<string>>();
             var csFile = project.FindFiles(".cs", ProjectItemType.Compile);
             var main = from f in csFile
-                       where File.Exists(f) && File.ReadAllText(f).Contains("Main()")
+                       where File.Exists(f) && File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(")
                        select f;
             var directives = from f in csFile
-                             where File.Exists(f) && File.ReadAllText(f).Contains("using System.ServiceModel") && !File.ReadAllText(f).Contains("Main()")
+                             where File.Exists(f) && File.ReadAllText(f).Contains("using System.ServiceModel") && !File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(")
                              select f;
             var config = from f in project.FindFiles(".config", ProjectItemType.None)
                          where File.Exists(f) && File.ReadAllText(f).Contains("<system.serviceModel>")

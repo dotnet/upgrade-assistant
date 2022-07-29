@@ -63,7 +63,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
         [Fact]
         private void AssertApplyChanges()
         {
-            
             Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
             Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Config)));
             Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Main)));
