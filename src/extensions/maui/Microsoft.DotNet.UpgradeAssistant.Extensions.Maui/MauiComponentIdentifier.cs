@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private readonly string[] _xamarinAndroidReferences = new[] { "Mono.Android" };
         private readonly string[] _xamariniOSReferences = new[] { "Xamarin.iOS" };
         private readonly string _xamarinFormsPackage = "Xamarin.Forms";
-        private readonly string _useMauiProperty = "TargetFrameworks";
+        private readonly string _useMauiProperty = "UseMaui";
 
         public ValueTask<ProjectComponents> GetComponentsAsync(IProject project, CancellationToken token)
         {
