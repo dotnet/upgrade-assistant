@@ -24,20 +24,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             _doc.Root.Descendants("PackageReference")
                 .Where(x => x.Attribute("Include").Value.Contains("System.ServiceModel"))
                 .Remove();
-            _logger.LogInformation("Finish removing references to System.ServiceModel.");
+            _logger.LogDebug("Finish removing references to System.ServiceModel.");
 
             // adds CoreWCF packages
             var reference_group = _doc.Root.Descendants("PackageReference").Ancestors().First();
             var corewcfPackages = XDocument.Parse(Constants.CoreWCFPackages);
             reference_group.Add(corewcfPackages.Root.Descendants());
-            _logger.LogInformation("Finish adding references to CoreWCF.");
+            _logger.LogDebug("Finish adding references to CoreWCF.");
             return _doc;
         }
 
         public XDocument UpdateSDK()
         {
             _doc.Root.SetAttributeValue("Sdk", "Microsoft.NET.Sdk.Web");
-            _logger.LogInformation("Finish setting Sdk to Sdk.Web.");
+            _logger.LogDebug("Finish setting Sdk to Sdk.Web.");
             return _doc;
         }
     }

@@ -2,8 +2,10 @@
   "profiles": {
     "Microsoft.DotNet.UpgradeAssistant.Cli": {
       "commandName": "Project",
+      "commandLineArgs": "upgrade \"C:\\Users\\t-simonaliao\\OneDrive - Microsoft\\Desktop\\NetFx\\BeanTrader.sln\"",
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development",
+        "UpgradeAssistantExtensionPaths": "C:\\Users\\t-simonaliao\\source\\repos\\UA\\artifacts\\bin\\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater\\Debug\\netstandard2.0\\ExtensionManifest.json"
       }
     },
     "Analyze": {
