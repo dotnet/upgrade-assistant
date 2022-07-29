@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
+    [ApplicableComponents(ProjectComponents.Maui)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UsingXamarinFormsAnalyzerAnalyzer : DiagnosticAnalyzer
     {
