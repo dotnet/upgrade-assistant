@@ -83,15 +83,15 @@ namespace SampleServer
                 serviceBuilder.AddService<ServiceType>(serviceOptions => {});
             });
             
-            app.start();
-            app.stop();
+            app.StartAsync();
+            app.StopAsync();
 }";
 
-        public const string Added = @"app.start();
+        public const string Added = @"app.StartAsync();
                 Console.Writeline(""Service Listening...Press enter to exit."")
                 Console.ReadLine();
                 //host.Exam();
-                app.stop();";
+                app.StopAsync();";
 
         private readonly NullLogger _logger = NullLogger.Instance;
 

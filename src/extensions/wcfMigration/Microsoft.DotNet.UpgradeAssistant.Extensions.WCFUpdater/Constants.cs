@@ -48,29 +48,29 @@ using Microsoft.Extensions.DependencyInjection;
                 
             });
             
-            app.start();
-            app.stop();
+            app.StartAsync();
+            app.StopAsync();
 }";
 
         public const string Metadata1 = ".AddServiceModelMetadata();";
         public const string Metadata2Http = @"// Enable getting metadata/wsdl
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpGetEnabled = true;
-                                   .HttpGetUrl = new Uri(""httpAddress"");";
+            serviceMetadataBehavior.HttpGetUrl = new Uri(""httpAddress"");";
 
         public const string Metadata2Https = @"// Enable getting metadata/wsdl
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpsGetEnabled = true;
-                                   .HttpsGetUrl = new Uri(""httpsAddress"");";
+            serviceMetadataBehavior.HttpsGetUrl = new Uri(""httpsAddress"");";
 
         public const string Metadata2Both = @"// Enable getting metadata/wsdl
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpGetEnabled = true;
-                                   .HttpGetUrl = new Uri(""httpAddress"");
-                                   .HttpsGetEnabled = true;
-                                   .HttpsGetUrl = new Uri(""httpsAddress"");";
+            serviceMetadataBehavior.HttpGetUrl = new Uri(""httpAddress"");
+            serviceMetadataBehavior.HttpsGetEnabled = true;
+            serviceMetadataBehavior.HttpsGetUrl = new Uri(""httpsAddress"");";
 
-        public const string Debug = @"serviceOptions.includeExceptionDetailInFaults = true;";
+        public const string Debug = @"serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;";
 
         public const string NetTcp = "            builder.WebHost.UseNetTcp(netTcpPortNum);\n";
         public const string ConfigureKestrel =

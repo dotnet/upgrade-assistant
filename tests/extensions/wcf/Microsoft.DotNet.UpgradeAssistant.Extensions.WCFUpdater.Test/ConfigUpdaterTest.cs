@@ -64,7 +64,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
 
         public const string MexEndpoint = @"<endpoint address = ""mex"" binding=""mexHttpBinding"" contract=""IMetadataExchange""/>";
 
-        public const string Output = @"<system.serviceModel>
+        public const string Output = @"<configuration>
+                                        <system.serviceModel>
                                         <!--The behavior element is not supported in configuration in CoreWCF. Some service behaviors, such as metadata, are configured in the source code.-->
                                         <!--<behaviors>
                                           <serviceBehaviors>
@@ -89,7 +90,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
                                             </host>-->
                                             </service>
                                         </services>
-                                        </system.serviceModel>";
+                                        </system.serviceModel>
+                                        </configuration>";
 
         private readonly NullLogger _logger = NullLogger.Instance;
 

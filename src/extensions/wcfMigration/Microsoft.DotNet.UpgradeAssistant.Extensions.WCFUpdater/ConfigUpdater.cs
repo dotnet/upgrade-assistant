@@ -35,7 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public XDocument GenerateNewConfig()
         {
-            XDocument wcfConfig = new XDocument(_config.Root.DescendantsAndSelf("system.serviceModel"));
+            XDocument wcfConfig = new XDocument(new XElement("configuration", _config.Root.DescendantsAndSelf("system.serviceModel")));
 
             // comment out host and behavior elements which are not supported by CoreWCF and configured in the code instead
             var baseAddress = wcfConfig.Root.DescendantsAndSelf("host");
@@ -99,7 +99,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
 
 
-        // Returns 0 if metadata is not supported, 1 if it's supported with http, 2 with https, 3 with both http and https</returns>
+        // Returns 0 if metadata is not supported, 1 if it's  supported with http, 2 with https, 3 with both http and https</returns>
         public int SupportsMetadataBehavior()
         {
             var results = _config.Root.DescendantsAndSelf("serviceMetadata");

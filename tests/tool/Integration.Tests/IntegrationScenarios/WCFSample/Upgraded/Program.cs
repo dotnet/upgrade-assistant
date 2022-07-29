@@ -1,4 +1,4 @@
-using Serilog;
+﻿using Serilog;
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -38,7 +38,7 @@ namespace BeanTraderServer
             // Enable getting metadata/wsdl
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpGetEnabled = true;
-                                   .HttpGetUrl = new Uri("http://localhost:8011/");
+            serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost:8011/metadata");
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
@@ -51,16 +51,16 @@ namespace BeanTraderServer
                 });
                 
                 serviceBuilder.AddService<BeanTrader>(serviceOptions => { 
-                    serviceOptions.includeExceptionDetailInFaults = true;
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
                 
             });
             
-            app.start();
+            app.StartAsync();
             Log.Information("Bean Trader Service listening");
             WaitForExitSignal();
             Log.Information("Shutting down...");
-            app.stop();
+            app.StopAsync();
         }
 
         private static void WaitForExitSignal()

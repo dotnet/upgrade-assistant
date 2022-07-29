@@ -168,8 +168,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             var open = GetExpressionStatement("Open", root).First();
             var close = GetExpressionStatement("Close", root);
-            var startPosition = GetExpressionStatement("start", root).First();
-            var stopPosition = GetExpressionStatement("stop", root).First();
+            var startPosition = GetExpressionStatement("StartAsync", root).First();
+            var stopPosition = GetExpressionStatement("StopAsync", root).First();
 
             // gets code between open() and close() and inserts them in between start() and stop()
             IEnumerable<SyntaxNode> openStatements;
