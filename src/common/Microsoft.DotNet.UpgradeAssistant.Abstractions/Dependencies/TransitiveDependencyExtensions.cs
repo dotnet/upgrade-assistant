@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -108,16 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
             }
 
             var result = await identifier.GetTransitiveDependenciesAsync(packages, tfms, token).ConfigureAwait(false);
-
-            foreach (var item in result.References)
-            {
-                if (string.Equals(item.Name, packageName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return result.References.Any(item => string.Equals(item.Name, packageName, StringComparison.OrdinalIgnoreCase));
         }
 
         private static IEnumerable<NuGetReference> GetProjectTranstiveDependencies(this IProject project)

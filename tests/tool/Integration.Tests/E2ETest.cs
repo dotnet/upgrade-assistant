@@ -5,10 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+
+using AutoMapper.Configuration.Annotations;
+
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
+
 using Xunit;
 using Xunit.Abstractions;
 
@@ -65,6 +70,14 @@ namespace Integration.Tests
 
             FileHelpers.CleanupBuildArtifacts(workingDir);
             temp.Dispose();
+        }
+
+        // Due to https://developercommunity.visualstudio.com/t/Profile-Test-doesnt-output-test-profile/10107596
+        // Uncomment this UT if you want to profile one of the Integration tests
+        [Fact]
+        public Task UpgradeTest_Profilable()
+        {
+            return UpgradeTest("AspNetSample/csharp", "TemplateMvc.csproj", string.Empty);
         }
 
         private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
