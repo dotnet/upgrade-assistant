@@ -15,7 +15,8 @@
     },
     "Upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade ..\\..\\..\\..\\..\\tests\\tool\\Integration.Tests\\IntegrationScenarios\\MauiSample\\droid\\Original\\EwDavidForms.sln",
+      "commandLineArgs": "upgrade TemplateMvc.csproj --non-interactive",
+      "workingDirectory": "C:\\s\\ua\\public\\tests\\tool\\Integration.Tests\\IntegrationScenarios\\AspNetSample\\csharp\\Original",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

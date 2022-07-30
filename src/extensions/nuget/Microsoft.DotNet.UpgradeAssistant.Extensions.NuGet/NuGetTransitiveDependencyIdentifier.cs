@@ -3,14 +3,17 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
+
 using NuGet.Commands;
 using NuGet.Configuration;
 using NuGet.DependencyResolver;
@@ -25,10 +28,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetTransitiveDependencyIdentifier : ITransitiveDependencyIdentifier
     {
+        private const string UniquePathPart1 = "dotnet-ua";
+        private const string UniquePathPart2 = "dotnet-ua";
+        private const string UniquePathFilename = "dotnet-ua";
+
+        private static readonly ConcurrentDictionary<string, LibraryDependency> _packageDependencies = new();
+
         private readonly IEnumerable<PackageSource> _packageSources;
         private readonly ISettings _settings;
         private readonly SourceCacheContext _context;
-        private readonly ILogger<NuGetTransitiveDependencyIdentifier> _logger;
+        private readonly NuGetLogger _logger;
+        private readonly CachingSourceProvider _cachingSourceProvider;
+        private readonly RestoreCommandProvidersCache _providerCache = new();
 
         public NuGetTransitiveDependencyIdentifier(
             IEnumerable<PackageSource> packageSources,
@@ -39,7 +50,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             _packageSources = packageSources ?? throw new ArgumentNullException(nameof(packageSources));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
+            _logger = new NuGetLogger(logger);
+            _cachingSourceProvider = new CachingSourceProvider(new PackageSourceProvider(_settings));
         }
 
         public async Task<TransitiveClosureCollection> GetTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
@@ -69,14 +87,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             var tfmInfo = tfms.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToFullString()) }).ToList();
 
             // Create a project in a unique and temporary directory
-            var path = Path.Combine(Path.GetTempPath(), "dotnet-ua", "restores", Guid.NewGuid().ToString(), "project.txt");
+            var path = Path.Combine(Path.GetTempPath(), UniquePathPart1, UniquePathPart2, Guid.NewGuid().ToString(), UniquePathFilename);
 
             var spec = new PackageSpec(tfmInfo)
             {
-                Dependencies = packages.Select(i => new LibraryDependency
+                Dependencies = packages.Select(i => _packageDependencies.GetOrAdd(i.Name, new LibraryDependency
                 {
                     LibraryRange = new LibraryRange(i.Name, new VersionRange(i.GetNuGetVersion()), LibraryDependencyTarget.Package),
-                }).ToList(),
+                })).ToList(),
                 RestoreMetadata = new()
                 {
                     ProjectPath = path,
@@ -84,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                     ProjectStyle = ProjectStyle.PackageReference,
                     ProjectUniqueName = path,
                     OutputPath = Path.GetTempPath(),
-                    OriginalTargetFrameworks = tfms.Select(tfm => tfm.ToFullString()).ToArray(),
+                    OriginalTargetFrameworks = tfms.Select(tfm => tfm.ToFullString()).ToList(),
                     ConfigFilePaths = _settings.GetConfigFilePaths(),
                     PackagesPath = SettingsUtility.GetGlobalPackagesFolder(_settings),
                     Sources = _packageSources.ToList(),
@@ -98,14 +116,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             dependencyGraphSpec.AddProject(spec);
             dependencyGraphSpec.AddRestore(spec.RestoreMetadata.ProjectUniqueName);
 
-            var requestProvider = new DependencyGraphSpecRequestProvider(new RestoreCommandProvidersCache(), dependencyGraphSpec);
+            var requestProvider = new DependencyGraphSpecRequestProvider(_providerCache, dependencyGraphSpec);
 
             var restoreArgs = new RestoreArgs
             {
                 AllowNoOp = true,
                 CacheContext = _context,
-                CachingSourceProvider = new CachingSourceProvider(new PackageSourceProvider(_settings)),
-                Log = new NuGetLogger(_logger),
+                CachingSourceProvider = _cachingSourceProvider,
+                Log = _logger,
             };
 
             // Create requests from the arguments
@@ -114,12 +132,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             // Restore the package without generating extra files
             var result = await RestoreRunner.RunWithoutCommit(requests, restoreArgs).ConfigureAwait(false);
 
-            if (result.Count == 0)
-            {
-                return null;
-            }
-
-            return result[0].Result.RestoreGraphs.FirstOrDefault();
+            return result.FirstOrDefault()?.Result.RestoreGraphs.FirstOrDefault();
         }
 
         private class TargetGraphLookup : ILookup<NuGetReference, NuGetReference>

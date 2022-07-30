@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -62,54 +63,56 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions
             }
         }
 
-        protected override Assembly? Load(AssemblyName assemblyName)
+        private static readonly ConcurrentDictionary<AssemblyName, Assembly?> _loadedAssemblies = new();
+
+        protected override Assembly? Load(AssemblyName assemblyName) => _loadedAssemblies.GetOrAdd(assemblyName, asmName =>
         {
-            if (assemblyName.Name is null)
+            if (asmName.Name is null)
             {
                 return null;
             }
 
             // Don't load Microsoft.DotNet.UpgradeAssistant.Abstractions in extensions' load contexts;
             // That assembly should come from the default ALC so that it's shared between extensions.
-            if (assemblyName.Name.Equals(UpgradeAssistantAbstractionsAssemblyName, StringComparison.Ordinal))
+            if (asmName.Name.Equals(UpgradeAssistantAbstractionsAssemblyName, StringComparison.Ordinal))
             {
                 return null;
             }
 
-            var dll = $"{assemblyName.Name}.dll";
+            var dll = $"{asmName.Name}.dll";
             var dllFile = _extension.FileProvider.GetFileInfo(dll);
 
             if (dllFile.Exists)
             {
                 using var dllStream = GetSeekableStream(dllFile);
 
-                var pdb = $"{assemblyName.Name}.pdb";
+                var pdb = $"{asmName.Name}.pdb";
                 var pdbFile = _extension.FileProvider.GetFileInfo(pdb);
 
                 try
                 {
                     if (pdbFile.Exists)
                     {
-                        _logger.LogDebug("Loading {Name} with pdb from {Extension}", assemblyName, Name);
+                        _logger.LogDebug("Loading {Name} with pdb from {Extension}", asmName, Name);
 
                         using var pdbStream = GetSeekableStream(pdbFile);
                         return LoadFromStream(dllStream, pdbStream);
                     }
                     else
                     {
-                        _logger.LogDebug("Loading {Name} without pdb from {Extension}", assemblyName, Name);
+                        _logger.LogDebug("Loading {Name} without pdb from {Extension}", asmName, Name);
                         return LoadFromStream(dllStream);
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "Could not load {Name} in {Extension}", assemblyName, Name);
+                    _logger.LogError(e, "Could not load {Name} in {Extension}", asmName, Name);
                     throw;
                 }
             }
 
             return null;
-        }
+        });
 
         private static Stream GetSeekableStream(IFileInfo file)
         {

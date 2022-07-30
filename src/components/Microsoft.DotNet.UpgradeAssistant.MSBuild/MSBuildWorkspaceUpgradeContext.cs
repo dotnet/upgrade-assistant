@@ -159,9 +159,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         public async ValueTask<Workspace> InitializeWorkspace(CancellationToken token)
-            => await GetMsBuildWorkspaceAsync(token).ConfigureAwait(false);
-
-        private async ValueTask<MSBuildWorkspace> GetMsBuildWorkspaceAsync(CancellationToken token)
         {
             if (_workspace is null)
             {
