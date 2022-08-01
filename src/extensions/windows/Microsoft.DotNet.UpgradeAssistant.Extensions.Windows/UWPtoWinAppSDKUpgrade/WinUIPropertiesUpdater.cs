@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +19,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     public class WinUIPropertiesUpdater : IUpdater<IProject>
     {
         public const string RuleID = "UA302";
+
+        private const string CsWinRTLogMessage = "A CsWinRTIncludes property with value {0} has been added.\n" +
+                            "If your project assembly name differs from {0}, update this value with the assembly name.\n" +
+                            "Read more about CsWinRT here: https://docs.microsoft.com/en-us/windows/apps/develop/platform/csharp-winrt/";
 
         public string Id => typeof(WinUIPropertiesUpdater).FullName;
 
@@ -69,6 +75,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     }
                 }
 
+                foreach (var projRef in project.AllProjectReferences)
+                {
+                    if (projRef.Contains(".vcxproj"))
+                    {
+                        var projectName = ParseProjectNameWithExtension(projRef, ".vcxproj");
+                        var csWinRTIncludesValue = projectFile.GetPropertyValue("CsWinRTIncludes") ?? string.Empty;
+                        var delimiter = csWinRTIncludesValue.Trim().Length == 0 || csWinRTIncludesValue.EndsWith(";") ? string.Empty : ";";
+                        projectFile.SetPropertyValue("CsWinRTIncludes", $"{csWinRTIncludesValue}{delimiter}{projectName}");
+
+                        _logger.LogInformation(string.Format(CsWinRTLogMessage, projectName));
+                    }
+                }
+
                 projectFile.AddItem(new ProjectItemDescriptor(ProjectItemType.Compile) { Remove = "App.xaml.old.cs" });
                 projectFile.AddItem(new ProjectItemDescriptor(ProjectItemType.None) { Include = "App.xaml.old.cs" });
                 projectFile.RemoveItem(new ProjectItemDescriptor(ProjectItemType.Content) { Include = "Properties\\Default.rd.xml" });
@@ -83,6 +102,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 true,
                 string.Empty,
                 new List<string>());
+        }
+
+        private string ParseProjectNameWithExtension(string projectReference, string extension)
+        {
+            var index = projectReference.IndexOf(".vcxproj");
+            index--;
+            StringBuilder sb = new StringBuilder();
+            while (index > -1 && char.IsLetterOrDigit(projectReference[index]))
+            {
+                sb.Append(projectReference[index]);
+                index--;
+            }
+
+            return new string(sb.ToString().Reverse().ToArray());
         }
 
         public async Task<IUpdaterResult> IsApplicableAsync(IUpgradeContext context, ImmutableArray<IProject> inputs, CancellationToken token)

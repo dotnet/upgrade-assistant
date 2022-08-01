@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IEnumerable<IProject> ProjectReferences { get; }
 
+        public IEnumerable<string> AllProjectReferences { get; }
+
         IEnumerable<Reference> FrameworkReferences { get; }
 
         INuGetReferences NuGetReferences { get; }
