@@ -11,15 +11,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
     /// </summary>
     public static class FeatureFlags
     {
-        private const string AnalyzeOutputFormat = "ANALYZE_OUTPUT_FORMAT";
+        private const string AnalyzeBinaries = "ANALYZE_BINARIES";
         private const string SolutionWideSdkConversion = "SOLUTION_WIDE_SDK_CONVERSION";
         private const string EnableCrossPlatform = "ENABLE_CROSS_PLATFORM";
 
         public static readonly IReadOnlyCollection<string> RegisteredFeatures = new[]
         {
-            AnalyzeOutputFormat,
             SolutionWideSdkConversion,
             EnableCrossPlatform,
+            AnalyzeBinaries
         };
 
         private static readonly ICollection<string> _features = CreateFeatures();
@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         {
             var features = Environment.GetEnvironmentVariable("UA_FEATURES");
 
-            if (features is null)
+            if (string.IsNullOrWhiteSpace(features))
             {
                 return Array.Empty<string>();
             }
@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public static bool IsWindowsCheckEnabled => !_features.Contains(EnableCrossPlatform);
 
-        public static bool IsAnalyzeFormatEnabled => _features.Contains(AnalyzeOutputFormat);
+        public static bool IsAnalyzeBinariesEnabled => _features.Contains(AnalyzeBinaries);
 
         public static bool IsSolutionWideSdkConversionEnabled => _features.Contains(SolutionWideSdkConversion);
     }

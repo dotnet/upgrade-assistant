@@ -3,11 +3,15 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+
 using Autofac;
 using Autofac.Extras.Moq;
+
 using AutoFixture;
+
 using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Microsoft.Extensions.Options;
+
 using Xunit;
 
 using static Microsoft.DotNet.UpgradeAssistant.TargetFrameworkMonikerParser;
@@ -62,7 +66,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             project.Setup(p => p.TargetFrameworks).Returns(currentTfms.Select(t => ParseTfm(t)).ToArray());
             project.Setup(p => p.GetComponentsAsync(default)).Returns(new ValueTask<ProjectComponents>(components));
 
-            mock.Mock<IOptions<DefaultTfmOptions>>().Setup(o => o.Value).Returns(_options with { TargetTfmSupport = target });
+            mock.Mock<IOptions<DefaultTfmOptions>>()
+                .Setup(o => o.Value)
+                .Returns(new DefaultTfmOptions
+                {
+                    Current = Current,
+                    LTS = LTS,
+                    Preview = Preview,
+                    TargetTfmSupport = target
+                });
 
             var moniker = mock.Mock<ITargetFrameworkMonikerComparer>();
             moniker.Setup(c => c.TryMerge(ParseTfm(current), tfm, out finalTfm)).Returns(true);
