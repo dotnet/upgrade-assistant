@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/cli/Microsoft.DotNet.UpgradeAssistant.Cli/Microsoft.DotNet.UpgradeAssistant.Cli.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/src/cli/Microsoft.DotNet.UpgradeAssistant.Cli/Microsoft.DotNet.UpgradeAssistant.Cli.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/src/cli/Microsoft.DotNet.UpgradeAssistant.Cli/Microsoft.DotNet.UpgradeAssistant.Cli.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
