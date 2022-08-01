@@ -21,6 +21,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     public class WinUIContentDialogCodeFixer : CodeFixProvider
     {
+        private const string DialogSetterComment = "/* TODO You should replace 'this' with the instance of UserControl that is ContentDialog is meant to be a part of. */\n";
+
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including
         // the analyzer's ID in the code fix provider's FixableDiagnosticIds array.
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(WinUIContentDialogAnalyzer.DiagnosticId);
@@ -63,24 +65,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         {
             var newMethodDeclarationSibling = contentDialogMemberAccess.Ancestors().OfType<MethodDeclarationSyntax>().First();
 
-            var newMethodAccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.IdentifierName("this"),
-                SyntaxFactory.IdentifierName("SetContentDialogRoot"));
-            var newMethodCall = SyntaxFactory.InvocationExpression(newMethodAccess,
-                SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(contentDialogMemberAccess.Expression) })));
+            var newMethodCall = SyntaxFactory.InvocationExpression(SyntaxFactory.ParseExpression("SetContentDialogRoot"),
+                SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[]
+                {
+                    SyntaxFactory.Argument(contentDialogMemberAccess.Expression),
+                    SyntaxFactory.Argument(SyntaxFactory.ParseExpression("this"))
+                })));
 
+            var newMethodCallComment = SyntaxFactory.Comment(DialogSetterComment);
             var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-            documentEditor.ReplaceNode(contentDialogMemberAccess.Expression, newMethodCall);
+            documentEditor.ReplaceNode(contentDialogMemberAccess.Expression, newMethodCall.WithLeadingTrivia(newMethodCallComment));
             if (!newMethodDeclarationSibling.Parent!.ChildNodes().OfType<MethodDeclarationSyntax>()
                 .Any(sibling => sibling.Identifier.ValueText == "SetContentDialogRoot"))
             {
                 var newMethodRoot = await CSharpSyntaxTree.ParseText(@"
                 class A
                 {
-                    private ContentDialog SetContentDialogRoot(ContentDialog contentDialog)
+                    private static ContentDialog SetContentDialogRoot(ContentDialog contentDialog, UserControl control)
                     {
                         if (Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent(""Windows.Foundation.UniversalApiContract"", 8))
                         {
-                            contentDialog.XamlRoot = this.Content.XamlRoot;
+                            contentDialog.XamlRoot = control.Content.XamlRoot;
                         }
                         return contentDialog;
                     }
