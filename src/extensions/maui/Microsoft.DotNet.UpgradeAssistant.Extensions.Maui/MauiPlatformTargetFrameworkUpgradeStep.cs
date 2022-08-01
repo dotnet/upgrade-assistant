@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     file.SetPropertyValue("TargetFrameworks", "net6.0-android;net6.0-ios");
                     await file.SaveAsync(token).ConfigureAwait(false);
                     Logger.LogInformation("Added TFMs to .NET MAUI project");
-                    return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI Head project ");
+                    return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI Head project");
                 }
                 else
                 {
