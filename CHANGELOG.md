@@ -3,6 +3,19 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Version 0.4.336902 - 2022-07-19 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.4.336902))
+
+### Added
+- Binary Analysis support (https://github.com/dotnet/upgrade-assistant/pull/1210)
+
+### Changed
+- Format flag (`--format`) now available OOB for Analysis output
+
+### Fixed
+- `ConfigurationManager` error (#1151) (https://github.com/dotnet/upgrade-assistant/pull/1162)
+- Bug preventing extension Samples (and presumably any external extensions) from being properly loaded (https://github.com/dotnet/upgrade-assistant/pull/1204)
+- Doc updates around extension development, SARIF viewing
+
 ## Version 0.3.330701 - 2022-06-08 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.3.330701))
 
 ### Added
