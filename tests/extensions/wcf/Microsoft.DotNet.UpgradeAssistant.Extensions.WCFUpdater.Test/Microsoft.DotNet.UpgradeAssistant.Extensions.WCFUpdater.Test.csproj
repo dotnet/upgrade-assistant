@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\extensions\wcfMigration\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.csproj" />
+    <ProjectReference Include="..\..\..\Microsoft.DotNet.UpgradeAssistant.TestHelpers\Microsoft.DotNet.UpgradeAssistant.TestHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
