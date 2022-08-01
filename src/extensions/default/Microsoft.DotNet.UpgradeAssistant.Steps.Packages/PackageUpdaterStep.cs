@@ -160,7 +160,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 {
                     foreach (var f in files)
                     {
-                        if (File.ReadAllText(f).Contains("ChannelFactory") || File.ReadAllText(f).Contains("DuplexClientBase"))
+                        if (File.ReadAllText(f).Contains("ChannelFactory") || File.ReadAllText(f).Contains("ClientBase"))
                         {
                             return packages.Additions;
                         }
