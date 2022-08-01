@@ -48,7 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var oldDirectives = from r in root.DescendantNodes().OfType<UsingDirectiveSyntax>()
                                 where ContainsIdentifier("ServiceModel", r)
                                 select r;
-            root = root.RemoveNodes(oldDirectives, 0);
+            root = root.RemoveNodes(oldDirectives, 0)!;
 
             // adds new directives
             var position = root.DescendantNodes().OfType<UsingDirectiveSyntax>().Last();
@@ -89,29 +89,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 IEnumerable<SyntaxNode> hostStatements;
                 if (close.Any())
                 {
-                    hostStatements = from s in statement.Parent.DescendantNodes().OfType<StatementSyntax>()
+                    hostStatements = from s in statement.Parent!.DescendantNodes().OfType<StatementSyntax>()
                                      where s.SpanStart >= statement.SpanStart && s.Span.End <= close.First().Span.End
                                      select s;
                 }
                 else
                 {
-                    hostStatements = from s in statement.Parent.DescendantNodes().OfType<StatementSyntax>()
+                    hostStatements = from s in statement.Parent!.DescendantNodes().OfType<StatementSyntax>()
                                      where s.SpanStart >= statement.SpanStart
                                      select s;
                 }
 
-                root = root.RemoveNodes(hostStatements, 0);
+                root = root.RemoveNodes(hostStatements, 0)!;
             }
             else
             {
-                root = root.RemoveNode(statement, 0);
+                root = root.RemoveNode(statement, 0)!;
             }
 
             // clean up placeholders if not removed yet
             var placeholder = from s in root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>()
                               where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText == "UA_placeHolder"
                               select s;
-            root = root.RemoveNodes(placeholder, 0);
+            root = root.RemoveNodes(placeholder, 0)!;
 
             _logger.LogDebug("Finish removing outdated code.");
             return root;
@@ -120,16 +120,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         // Returns the statements where serviceHost was created
         private static SyntaxNode FindServiceHost(SyntaxNode root)
         {
-            var identifierNames = root.DescendantNodes().OfType<VariableDeclarationSyntax>();
-            var declaration = from hostDeclaration in identifierNames
-                                        where ContainsIdentifier("ServiceHost", hostDeclaration)
-                                        select hostDeclaration;
+            var declaration = from hostDeclaration in root.DescendantNodes().OfType<VariableDeclarationSyntax>()
+                              where ContainsIdentifier("ServiceHost", hostDeclaration)
+                              select hostDeclaration;
             if (!declaration.Any())
             {
                 throw new Exception("Source code does not initialize a new ServiceHost instance.");
             }
 
-            return declaration.First().Parent;
+            return declaration.First().Parent!;
         }
 
         private SyntaxNode ConfigureServiceHost(SyntaxNode root, SyntaxNode declaration)
@@ -139,8 +138,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                                select s).First();
 
             // gets the code that configures the host
-            var open = GetExpressionStatement("Open", declaration.Parent).First();
-            var config = from s in declaration.Parent.DescendantNodes().OfType<StatementSyntax>()
+            var open = GetExpressionStatement("Open", declaration.Parent!).First();
+            var config = from s in declaration.Parent!.DescendantNodes().OfType<StatementSyntax>()
                          where s.SpanStart > declaration.SpanStart && s.Span.End <= open.SpanStart
                          select s.WithLeadingTrivia(placeholder.GetLeadingTrivia());
 
@@ -158,7 +157,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 var declarator = FindServiceHost(root).DescendantNodes().OfType<VariableDeclaratorSyntax>();
                 var varName = declarator.First();
                 var serviceName = (from name in declarator.First().DescendantNodes().OfType<NameSyntax>()
-                                   where name.Parent.GetType() == typeof(TypeOfExpressionSyntax)
+                                   where name.Parent!.GetType() == typeof(TypeOfExpressionSyntax)
                                    select name).First();
                 template = template.Replace("ServiceType", serviceName.ToString());
                 template = template.Replace("varName", varName.Identifier.ValueText);
@@ -183,13 +182,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             IEnumerable<SyntaxNode> openStatements;
             if (close.Any())
             {
-                openStatements = from s in open.Parent.DescendantNodes().OfType<StatementSyntax>()
+                openStatements = from s in open.Parent!.DescendantNodes().OfType<StatementSyntax>()
                                   where s.SpanStart > open.SpanStart && s.Span.End < close.First().Span.End
                                   select s.WithLeadingTrivia(stopPosition.GetLeadingTrivia());
             }
             else
             {
-                openStatements = from s in open.Parent.DescendantNodes().OfType<StatementSyntax>()
+                openStatements = from s in open.Parent!.DescendantNodes().OfType<StatementSyntax>()
                                  where s.SpanStart > open.SpanStart
                                  select s.WithLeadingTrivia(stopPosition.GetLeadingTrivia());
             }
@@ -208,7 +207,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     root = root.ReplaceNode(node, node.WithLeadingTrivia(SyntaxFactory.Comment("            //" + node.ToFullString().TrimStart())));
                 }
 
-                root = root.RemoveNodes(FindOutdated(startPosition, root, varName), (SyntaxRemoveOptions)1);
+                root = root.RemoveNodes(FindOutdated(startPosition, root, varName), (SyntaxRemoveOptions)1)!;
             }
 
             _logger.LogDebug("Finish adding code between Open() and Close() to app.start() and app.stop().");
@@ -225,14 +224,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return outdated;
         }
 
-        private IEnumerable<SyntaxNode> GetTemplateNodes(SyntaxNode templateRoot)
+        private static IEnumerable<SyntaxNode> GetTemplateNodes(SyntaxNode templateRoot)
         {
             var block = from n in templateRoot.DescendantNodes()
                         where n.GetType() == typeof(BlockSyntax)
                         select n;
             var code = from n in block.First().DescendantNodes()
-                       where ((n.GetType() == typeof(LocalDeclarationStatementSyntax) || (n.GetType() == typeof(ExpressionStatementSyntax)))
-                              && n.Parent.Parent.GetType() != typeof(SimpleLambdaExpressionSyntax))
+                       where (n.GetType() == typeof(LocalDeclarationStatementSyntax) || (n.GetType() == typeof(ExpressionStatementSyntax)))
+                              && n.Parent!.Parent!.GetType() != typeof(SimpleLambdaExpressionSyntax)
                        select n;
             return code;
         }

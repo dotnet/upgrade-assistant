@@ -7,7 +7,6 @@ using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
 {
-
     public class SourceCodeUpdaterTest
     {
         public const string InputWithUsing = @"using Serilog;
@@ -58,7 +57,7 @@ namespace SampleServer
     }
 }";
 
-        public string Template = @"public static void Main()
+        public const string Template = @"public static void Main()
 {
             var builder = WebApplication.CreateBuilder();
 

@@ -5,7 +5,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
     public class Constants
     {
-
         public const string TemplateUsing =
 @"using CoreWCF;
 using CoreWCF.Configuration;

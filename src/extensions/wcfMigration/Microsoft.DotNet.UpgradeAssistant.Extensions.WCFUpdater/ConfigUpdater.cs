@@ -98,7 +98,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return config;
         }
 
-
         // Returns 0 if metadata is not supported, 1 if it's  supported with http, 2 with https, 3 with both http and https</returns>
         public int SupportsMetadataBehavior()
         {

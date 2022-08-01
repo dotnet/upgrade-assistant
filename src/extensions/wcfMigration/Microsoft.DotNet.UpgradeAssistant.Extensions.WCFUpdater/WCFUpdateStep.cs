@@ -104,6 +104,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public Task<UpgradeStepInitializeResult> Initialize(IProject project)
         {
+            _path = new Dictionary<string, IEnumerable<string>>();
             FindPath(project);
             if (_path.Count == 0)
             {
@@ -143,9 +144,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         public Task<UpgradeStepApplyResult> Apply()
         {
             // Run updates
-            var projFile = UpdateRunner.PackageUpdate(_packageUpdater, Logger);
-            var config = UpdateRunner.ConfigUpdate(_configUpdater, Logger);
-            var source = UpdateRunner.SourceCodeUpdate(_sourceCodeUpdater, Logger);
+            var projFile = UpdateRunner.PackageUpdate(_packageUpdater!, Logger);
+            var config = UpdateRunner.ConfigUpdate(_configUpdater!, Logger);
+            var source = UpdateRunner.SourceCodeUpdate(_sourceCodeUpdater!, Logger);
             var directives = new List<SyntaxNode>();
             if (_directiveUpdaters != null)
             {
@@ -160,7 +161,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             // Write updates
-            UpdateRunner.WritePackageUpdate(projFile, _path["proj"].First(), Logger);
+            UpdateRunner.WritePackageUpdate(projFile, _path!["proj"].First(), Logger);
             UpdateRunner.WriteConfigUpdate(config[0], config[1], _path["config"].First(), Logger);
             UpdateRunner.WriteSourceCodeUpdate(source, _path["main"].First(), Logger);
             if (directives.Count > 0)
@@ -174,7 +175,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         private void FindPath(IProject project)
         {
-            _path = new Dictionary<string, IEnumerable<string>>();
             var csFile = project.FindFiles(".cs", ProjectItemType.Compile);
             var main = from f in csFile
                        where File.Exists(f) && File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(")
@@ -206,7 +206,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
             else
             {
-                _path.Add("main", main);
+                _path!.Add("main", main);
                 _path.Add("config", config);
                 _path.Add("proj", new[] { project.GetFile().FilePath });
                 if (directives.Any())
