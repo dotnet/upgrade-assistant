@@ -221,7 +221,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAss
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wcf", "wcf", "{674761D3-2573-4983-AA31-2DC1B4A32A76}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test", "tests\extensions\wcf\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test.csproj", "{BCA7C100-F799-415C-BEFD-96E9027D4600}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests", "tests\extensions\wcf\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests.csproj", "{BCA7C100-F799-415C-BEFD-96E9027D4600}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

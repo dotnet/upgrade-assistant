@@ -5,7 +5,7 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
 {
     public class PackageUpdaterTest
     {
