@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/artifacts/bin/Microsoft.DotNet.UpgradeAssistant.Cli/Debug/net6.0/Microsoft.DotNet.UpgradeAssistant.Cli.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/cli/Microsoft.DotNet.UpgradeAssistant.Cli",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}
