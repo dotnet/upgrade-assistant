@@ -155,7 +155,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             var result = new ConfigUpdater(XDocument.Parse(Input), _logger).UpdateOldConfig();
             var expected = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
                             <configuration >
-                              <!--Service Model elements are moved to a separate Wcf.config file located at the same directory as this file.-->
+                              <!-- system.serviceModel section is moved to a separate wcf.config file located at the same directory as this file.-->
                             </configuration> ";
             Assert.True(XNode.DeepEquals(XDocument.Parse(expected), result));
         }

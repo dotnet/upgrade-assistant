@@ -38,7 +38,7 @@ namespace Integration.Tests
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
-        [InlineData("WCFSample", "BeanTraderServer.csproj", "")]
+        [InlineData("WCFSample", "ConsoleApp.csproj", "")]
         /* Maui/Xamarin workload regression in Arcade build agents; temporarily disabling these tests
                 [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
                 [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]

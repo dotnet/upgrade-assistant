@@ -24,7 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
             // but CoreWCF requires it be done in code)
 [Port PlaceHolder]
 
-             // Add CoreWCF services to the ASP.NET Core app's DI container
+            // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile(""wcf.config"")
                             [Metadata1 PlaceHolder]
@@ -95,7 +95,7 @@ using Microsoft.Extensions.DependencyInjection;
 
         public const string HostComment = "The host element is not supported in configuration in CoreWCF. The port that endpoints listen on is instead configured in the source code.";
         public const string BehaviorComment = "The behavior element is not supported in configuration in CoreWCF. Some service behaviors, such as metadata, are configured in the source code.";
-        public const string ServiceModelComment = "Service Model elements are moved to a separate Wcf.config file located at the same directory as this file.";
+        public const string ServiceModelComment = " system.serviceModel section is moved to a separate wcf.config file located at the same directory as this file.";
         public const string MexEndpoint = "The mex endpoint is removed because it's not support in CoreWCF. Instead, the metadata service is enabled in the source code.";
     }
 }

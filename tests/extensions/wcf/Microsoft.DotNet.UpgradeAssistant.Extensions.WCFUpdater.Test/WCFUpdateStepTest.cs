@@ -56,18 +56,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             if (expected == UpgradeStepStatus.Incomplete && directive != string.Empty)
             {
                 updater.Apply();
-                AssertApplyChanges();
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Config)));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Main)));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Directive)));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Proj)));
             }
-        }
-
-        [Fact]
-        private void AssertApplyChanges()
-        {
-            Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
-            Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Config)));
-            Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Main)));
-            Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Directive)));
-            Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Proj)));
         }
     }
 }

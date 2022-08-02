@@ -105,8 +105,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (results.Any())
             {
                 var el = results.First();
-                var http = el.Attribute("httpGetEnabled") != null && el.Attribute("httpGetEnabled").Value == "true";
-                var https = el.Attribute("httpsGetEnabled") != null && el.Attribute("httpsGetEnabled").Value == "true";
+                var http = el.Attribute("httpGetEnabled") != null && string.Equals(el.Attribute("httpGetEnabled").Value, "true", StringComparison.OrdinalIgnoreCase);
+                var https = el.Attribute("httpsGetEnabled") != null && string.Equals(el.Attribute("httpsGetEnabled").Value, "true", StringComparison.OrdinalIgnoreCase);
                 if (http && https)
                 {
                     return 3;
@@ -143,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (results.Any())
             {
                 var el = results.First();
-                if (el.Attribute("includeExceptionDetailInFaults") != null && el.Attribute("includeExceptionDetailInFaults").Value == "true")
+                if (el.Attribute("includeExceptionDetailInFaults") != null && string.Equals(el.Attribute("includeExceptionDetailInFaults").Value, "true", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }

@@ -1,26 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
-  <system.serviceModel>
-    <behaviors>
-      <serviceBehaviors>
-        <behavior name="beanTraderBehaviour">
-          <serviceMetadata httpGetEnabled="true" />
-          <serviceDebug includeExceptionDetailInFaults="true" />
-        </behavior>
-      </serviceBehaviors>
-    </behaviors>
-    <services>
-    </services>
-    <bindings>
-      <netTcpBinding>
-        <binding name="WindowsClient">
-          <!-- Was going to use TransportWithMessageCredential security, but 
-               that is not yet supported on .NET Core. https://github.com/dotnet/wcf/issues/8 -->          
-          <security mode="Transport">
-            <transport clientCredentialType="Certificate" />
-          </security>
-        </binding>
-      </netTcpBinding>
-    </bindings>
-  </system.serviceModel>
+    <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.7.2" />
+    </startup>
+	<system.serviceModel>
+		<services>
+		</services>
+		<behaviors>
+			<serviceBehaviors>
+				<behavior>
+					<!-- To avoid disclosing metadata information, 
+          set the values below to false before deployment -->
+					<serviceMetadata httpGetEnabled="True"/>
+					<!-- To receive exception details in faults for debugging purposes, 
+          set the value below to true.  Set to false before deployment 
+          to avoid disclosing exception information -->
+					<serviceDebug includeExceptionDetailInFaults="True" />
+				</behavior>
+			</serviceBehaviors>
+		</behaviors>
+	</system.serviceModel>
 </configuration>

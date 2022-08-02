@@ -1,7 +1,9 @@
-﻿using Serilog;
-using System;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
 using CoreWCF;
 using CoreWCF.Configuration;
 using CoreWCF.Description;
@@ -10,25 +12,25 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BeanTraderServer
+namespace ConsoleApp
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            ConfigureLogging();
+            try
+            {
             var builder = WebApplication.CreateBuilder();
 
             // Set up port (previously this was done in configuration,
             // but CoreWCF requires it be done in code)
-            builder.WebHost.UseNetTcp(90);
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(8011);
+                options.ListenAnyIP(8733);
                 
             }); 
 
-             // Add CoreWCF services to the ASP.NET Core app's DI container
+            // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
                             .AddServiceModelMetadata();
@@ -38,44 +40,31 @@ namespace BeanTraderServer
             // Enable getting metadata/wsdl
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpGetEnabled = true;
-            serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost:8011/metadata");
+            serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost:8733/Service1/metadata");
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {
-                serviceBuilder.ConfigureServiceHostBase<BeanTrader>(host =>
+                serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
                 {
-                    var certPath = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "BeanTrader.pfx");
-                    host.Credentials.ServiceCertificate.Certificate = new X509Certificate2(certPath, "password");
-                    host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.None;
                 });
                 
-                serviceBuilder.AddService<BeanTrader>(serviceOptions => { 
+                serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => { 
                     serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
                 
             });
             
             app.StartAsync();
-            Log.Information("Bean Trader Service listening");
-            WaitForExitSignal();
-            Log.Information("Shutting down...");
+            Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
+            Console.ReadKey();
             app.StopAsync();
-        }
-
-        private static void WaitForExitSignal()
-        {
-            Console.WriteLine("Press enter to exit");
-            Console.ReadLine();
-        }
-
-        private static void ConfigureLogging()
-        {
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console()
-                .CreateLogger();
-
-            Log.Information("Logging initialized");
+            }
+            catch(Exception ex)
+            {
+                Debug.Write(ex.ToString());
+            }
+           
         }
     }
 }
