@@ -28,6 +28,7 @@ trigger:
     exclude:
       - '**/*.md'
       - docs
+      - .vscode
 pr:
   branches:
     include:
@@ -36,6 +37,7 @@ pr:
     exclude:
       - '**/*.md'
       - docs
+      - .vscode
 
 stages:
 - stage: build
