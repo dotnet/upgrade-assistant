@@ -19,9 +19,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             services.Services.AddTransient<IUpgradeReadyCheck, XamarinFormsVersionCheck>();
             services.Services.AddTransient<ITargetFrameworkSelectorFilter, MauiTargetFrameworkSelectorFilter>();
-
-            // Disabled due to https://github.com/dotnet/upgrade-assistant/issues/1208
-            // services.Services.AddTransient<IComponentIdentifier, MauiComponentIdentifier>();
+            services.Services.AddTransient<IComponentIdentifier, MauiComponentIdentifier>();
             services.Services.AddUpgradeStep<MauiPlatformTargetFrameworkUpgradeStep>();
             services.Services.AddUpgradeStep<MauiAddProjectPropertiesStep>();
             services.Services.AddTransient<DiagnosticAnalyzer, UsingXamarinFormsAnalyzerAnalyzer>();
