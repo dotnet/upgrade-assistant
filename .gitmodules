@@ -1,3 +1,0 @@
-[submodule "modules/try-convert-repo"]
-	path = modules/try-convert-repo
-	url = https://github.com/dotnet/try-convert
