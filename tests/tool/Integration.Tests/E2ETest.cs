@@ -41,7 +41,6 @@ namespace Integration.Tests
         [InlineData("WCFSample", "BeanTraderServer.csproj", "")]
         [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
         [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
-*/
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
