@@ -39,10 +39,9 @@ namespace Integration.Tests
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
         [InlineData("WCFSample", "BeanTraderServer.csproj", "")]
-        /* Maui/Xamarin workload regression in Arcade build agents; temporarily disabling these tests
-                [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
-                [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
-        */
+        [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
+        [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
+*/
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
