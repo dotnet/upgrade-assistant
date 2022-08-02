@@ -13,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Abstractions\MSBuild.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.Facts\MSBuild.Conversion.Facts.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.Package\MSBuild.Conversion.Package.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.Project\MSBuild.Conversion.Project.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\try-convert\src\MSBuild.Conversion.SDK\MSBuild.Conversion.SDK.csproj" />
+    <ProjectReference Include="..\MSBuild.Abstractions\MSBuild.Abstractions.csproj" />
+    <ProjectReference Include="..\MSBuild.Conversion.Facts\MSBuild.Conversion.Facts.csproj" />
+    <ProjectReference Include="..\MSBuild.Conversion.Package\MSBuild.Conversion.Package.csproj" />
+    <ProjectReference Include="..\MSBuild.Conversion.Project\MSBuild.Conversion.Project.csproj" />
+    <ProjectReference Include="..\MSBuild.Conversion.SDK\MSBuild.Conversion.SDK.csproj" />
   </ItemGroup>
 
   <ItemGroup>
