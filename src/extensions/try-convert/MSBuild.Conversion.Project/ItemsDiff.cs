@@ -1,4 +1,7 @@
-﻿using System.Collections.Immutable;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Collections.Immutable;
 using System.Linq;
 
 using MSBuild.Abstractions;
@@ -13,7 +16,8 @@ namespace MSBuild.Conversion.Project
         public readonly ImmutableArray<IProjectItem> IntroducedItems;
         public readonly ImmutableArray<IProjectItem> ChangedItems;
 
-        public ItemsDiff(string itemType, ImmutableArray<IProjectItem> defaultedItems, ImmutableArray<IProjectItem> notDefaultedItems, ImmutableArray<IProjectItem> introducedItems, ImmutableArray<IProjectItem> changedItems) : this()
+        public ItemsDiff(string itemType, ImmutableArray<IProjectItem> defaultedItems, ImmutableArray<IProjectItem> notDefaultedItems, ImmutableArray<IProjectItem> introducedItems, ImmutableArray<IProjectItem> changedItems)
+            : this()
         {
             ItemType = itemType;
             DefaultedItems = defaultedItems;
@@ -28,7 +32,7 @@ namespace MSBuild.Conversion.Project
 
             if (!DefaultedItems.IsEmpty || !NotDefaultedItems.IsEmpty || !IntroducedItems.IsEmpty || !ChangedItems.IsEmpty)
             {
-                lines.Add($"{ ItemType} items:");
+                lines.Add($"{ItemType} items:");
                 if (!DefaultedItems.IsEmpty)
                 {
                     lines.AddRange(DefaultedItems.Select(s => $"- {s.EvaluatedInclude}"));
@@ -44,7 +48,7 @@ namespace MSBuild.Conversion.Project
                     lines.AddRange(IntroducedItems.Select(s => $"+ {s.EvaluatedInclude}"));
                 }
 
-                lines.Add("");
+                lines.Add(string.Empty);
             }
 
             return lines.ToImmutable();

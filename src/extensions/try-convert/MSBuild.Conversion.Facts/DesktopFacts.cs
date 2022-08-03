@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Immutable;
 
 namespace MSBuild.Conversion.Facts
@@ -9,14 +12,13 @@ namespace MSBuild.Conversion.Facts
     public static class DesktopFacts
     {
         /// <summary>
-        /// For use with conversion of WinForms and WPF projects only.
+        /// Gets for use with conversion of WinForms and WPF projects only.
         /// </summary>
         public static ImmutableArray<string> ReferencesThatNeedRemoval => ImmutableArray.Create(
-            "System.Deployment"
-        );
+            "System.Deployment");
 
         /// <summary>
-        /// The core set of references all desktop WPF projects use.
+        /// Gets the core set of references all desktop WPF projects use.
         /// </summary>
         /// <remarks>
         /// Desktop projects will only convert to .NET Core, so any item includes that have .NET Core equivalents will be removed.
@@ -26,11 +28,10 @@ namespace MSBuild.Conversion.Facts
         public static ImmutableArray<string> KnownWPFReferences => ImmutableArray.Create(
             "System.Xaml",
             "PresentationCore",
-            "PresentationFramework"
-        );
+            "PresentationFramework");
 
         /// <summary>
-        /// The core set of references all desktop WinForms projects use.
+        /// Gets the core set of references all desktop WinForms projects use.
         /// </summary>
         /// <remarks>
         /// Desktop projects will only convert to .NET Core, so any item includes that have .NET Core equivalents will be removed.
@@ -39,22 +40,18 @@ namespace MSBuild.Conversion.Facts
         /// </remarks>
         public static ImmutableArray<string> KnownWinFormsReferences => ImmutableArray.Create(
             "System.Windows.Forms",
-            "System.Deployment"
-        );
+            "System.Deployment");
 
         public static ImmutableArray<string> KnownDesktopReferences => ImmutableArray.Create(
-            "WindowsBase"
-        );
+            "WindowsBase");
 
         public static ImmutableArray<string> KnownUwpReferences => ImmutableArray.Create(
-            "Microsoft.NETCore.UniversalWindowsPlatform"
-        );
+            "Microsoft.NETCore.UniversalWindowsPlatform");
 
         public static ImmutableArray<Guid> KnownSupportedDesktopProjectTypeGuids => ImmutableArray.Create(
             MSBuildFacts.LanguageProjectTypeVisualBasic, // VB.NET
             Guid.Parse("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"), // C#
-            Guid.Parse("{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548}") // WPF
-        );
+            Guid.Parse("{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548}")); // WPF
 
         public const string WinSDKAttribute = "Microsoft.NET.Sdk.WindowsDesktop";
         public const string UseWPFPropertyName = "UseWPF";

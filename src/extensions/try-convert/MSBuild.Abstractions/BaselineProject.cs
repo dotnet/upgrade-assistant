@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using MSBuild.Conversion.Facts;
@@ -13,7 +16,8 @@ namespace MSBuild.Abstractions
         public readonly ProjectOutputType OutputType;
         public readonly string TargetTFM;
 
-        public BaselineProject(UnconfiguredProject project, ImmutableArray<string> globalProperties, ProjectStyle projectStyle, ProjectOutputType outputType, string candidateTargetTFM, bool keepCurrentTFMs) : this()
+        public BaselineProject(UnconfiguredProject project, ImmutableArray<string> globalProperties, ProjectStyle projectStyle, ProjectOutputType outputType, string candidateTargetTFM, bool keepCurrentTFMs)
+            : this()
         {
             GlobalProperties = globalProperties;
             Project = project ?? throw new ArgumentNullException(nameof(project));
@@ -41,12 +45,16 @@ namespace MSBuild.Abstractions
                 return MSBuildFacts.NetStandard20;
             }
 
-            //conditional checks for Xamarin Project Styles
+            // conditional checks for Xamarin Project Styles
             if (projectStyle is ProjectStyle.XamarinDroid)
+            {
                 return XamarinFacts.Net6XamarinAndroid;
+            }
 
             if (projectStyle is ProjectStyle.XamariniOS)
+            {
                 return XamarinFacts.Net6XamariniOS;
+            }
 
             return candidateTargetTFM;
         }
@@ -58,6 +66,7 @@ namespace MSBuild.Abstractions
                 // The original project had a TargetFramework property. No need to add it again.
                 return globalProperties.First(p => p.Equals(MSBuildFacts.TargetFrameworkNodeName, StringComparison.OrdinalIgnoreCase));
             }
+
             var rawTFM = project.FirstConfiguredProject.GetProperty(MSBuildFacts.TargetFrameworkNodeName)?.EvaluatedValue;
             if (rawTFM == null)
             {
@@ -71,7 +80,7 @@ namespace MSBuild.Abstractions
             static string StripDecimals(string tfm)
             {
                 var parts = tfm.Split('.');
-                return string.Join("", parts);
+                return string.Join(string.Empty, parts);
             }
         }
     }

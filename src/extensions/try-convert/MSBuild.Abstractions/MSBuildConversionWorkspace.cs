@@ -1,9 +1,12 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
@@ -45,12 +48,10 @@ namespace MSBuild.Abstractions
                 var root = new MSBuildProjectRootElement(ProjectRootElement.Open(path, collection, preserveFormatting: true));
                 if (IsSupportedProjectType(root, forceWeb, keepCurrentTFMs))
                 {
-
                     var configurations = DetermineConfigurations(root);
 
                     var unconfiguredProject = new UnconfiguredProject(configurations);
                     unconfiguredProject.LoadProjects(collection, globalProperties, path);
-
 
                     if (TryCreateSdkBaselineProject(path, unconfiguredProject.FirstConfiguredProject, root, configurations, tfm, keepCurrentTFMs, out var baseline))
                     {
@@ -82,7 +83,7 @@ namespace MSBuild.Abstractions
                     var name = MSBuildHelpers.GetConfigurationName(dimensionValues);
                     if (!builder.ContainsKey(name))
                     {
-                        builder.Add(name, dimensionValues.ToImmutableDictionary());
+                        builder.Add(name, dimensionValues);
                         foreach (var dimensionValuePair in dimensionValues)
                         {
                             if (!builder.ContainsKey(dimensionValuePair.Value))
@@ -94,6 +95,7 @@ namespace MSBuild.Abstractions
                     }
                 }
             }
+
             return builder.ToImmutable();
         }
 
@@ -104,13 +106,14 @@ namespace MSBuild.Abstractions
             {
                 var replacement =
                     projectFile
+
                         // Legacy web project specify these two targets paths. They aren't loadable by the .NET SDK msbuild process, so we just remove them.
                         // They aren't actually useful as an end result when converting web projects. When people conver to .NET Core they will just use the Web SDK attribute.
-                        .Replace("<Import Project=\"$(VSToolsPath)\\WebApplications\\Microsoft.WebApplication.targets\" Condition=\"'$(VSToolsPath)' != ''\" />", "")
-                        .Replace("<Import Project=\"$(MSBuildExtensionsPath32)\\Microsoft\\VisualStudio\\v10.0\\WebApplications\\Microsoft.WebApplication.targets\" Condition=\"false\" />", "")
+                        .Replace("<Import Project=\"$(VSToolsPath)\\WebApplications\\Microsoft.WebApplication.targets\" Condition=\"'$(VSToolsPath)' != ''\" />", string.Empty)
+                        .Replace("<Import Project=\"$(MSBuildExtensionsPath32)\\Microsoft\\VisualStudio\\v10.0\\WebApplications\\Microsoft.WebApplication.targets\" Condition=\"false\" />", string.Empty)
 
                         // Legacy F# projects specify this import. It's not loadable by the .NET SDK MSBuild, and .NET Core-based F# projects don't use it. So we just remove it.
-                        .Replace("<Import Project=\"$(FSharpTargetsPath)\" />", "");
+                        .Replace("<Import Project=\"$(FSharpTargetsPath)\" />", string.Empty);
 
                 File.WriteAllText(path, replacement);
             }
@@ -145,6 +148,7 @@ namespace MSBuild.Abstractions
                     break;
                 case ProjectStyle.Web:
                     rootElement.Sdk =
+
                         // Web apps should use the web SDK (there's no good way to build a classic web apps with SDK-style projects)
                         // but libraries with web dependencies should only use the web SDK if the TFM is updating. Otherwise, they
                         // can work as classic ASP.NET libraries.
@@ -186,7 +190,7 @@ namespace MSBuild.Abstractions
                 MSBuildHelpers.AddUseWinForms(propGroup);
             }
 
-            if (MSBuildHelpers.HasWPFOrWinForms(propGroup) && tfm.ContainsIgnoreCase(MSBuildFacts.Net5) || tfm.ContainsIgnoreCase(MSBuildFacts.Net6))
+            if ((MSBuildHelpers.HasWPFOrWinForms(propGroup) && tfm.ContainsIgnoreCase(MSBuildFacts.Net5)) || tfm.ContainsIgnoreCase(MSBuildFacts.Net6))
             {
                 MSBuildHelpers.AddImportWindowsDesktopTargets(propGroup);
             }
@@ -219,14 +223,22 @@ namespace MSBuild.Abstractions
             baselineProject = new BaselineProject(newProject, propertiesInTheBaseline, projectStyle, outputType, tfm, keepCurrentTFMs);
             return true;
         }
-        static string GetTFMString(ProjectStyle projectStyle, string tfm) {
+
+        private static string GetTFMString(ProjectStyle projectStyle, string tfm)
+        {
             if (projectStyle == ProjectStyle.WindowsDesktop)
             {
                 if (tfm.ContainsIgnoreCase(MSBuildFacts.Net5))
+                {
                     return MSBuildFacts.Net5Windows;
+                }
+
                 if (tfm.ContainsIgnoreCase(MSBuildFacts.Net6))
+                {
                     return MSBuildFacts.Net6Windows;
+                }
             }
+
             return tfm;
         }
 
@@ -257,7 +269,7 @@ namespace MSBuild.Abstractions
             if (MSBuildHelpers.IsXamarinDroid(root) || MSBuildHelpers.IsXamariniOS(root))
             {
                 // Xamarin.iOS and Xamarin.Android projects use Library but migrating to .NET MAUI output changes to Exe
-                //so force conversion here to Exe as part of Migration journey
+                // so force conversion here to Exe as part of Migration journey
                 return ProjectOutputType.Exe;
             }
 
@@ -318,7 +330,7 @@ namespace MSBuild.Abstractions
             {
                 return ProjectStyle.Web;
             }
-            else if(MSBuildHelpers.IsXamarinDroid(projectRootElement))
+            else if (MSBuildHelpers.IsXamarinDroid(projectRootElement))
             {
                 return ProjectStyle.XamarinDroid;
             }
@@ -441,6 +453,7 @@ namespace MSBuild.Abstractions
 
                     return ProjectSupportType.MSTest;
                 }
+
                 if (MSBuildHelpers.IsDesktop(root) &&
                     !root.PropertyGroups.Any(pg => pg.Properties.Any(ProjectPropertyHelpers.AllProjectTypeGuidsAreDesktopProjectTypeGuids)))
                 {

@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,6 +21,7 @@ namespace MSBuild.Abstractions
             {
                 lines.Add($"{prop.Name} = {prop.EvaluatedValue}");
             }
+
             File.WriteAllLines(logFileName, lines);
         }
 
@@ -81,7 +85,7 @@ namespace MSBuild.Abstractions
             }
             else
             {
-                if (tfv == "")
+                if (tfv == string.Empty)
                 {
                     throw new InvalidOperationException($"{MSBuildFacts.LegacyTargetFrameworkVersionNodeName} is not set!");
                 }

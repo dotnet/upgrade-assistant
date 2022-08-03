@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -12,9 +15,10 @@ namespace MSBuild.Conversion.Facts
         public const string Net6XamarinAndroid = "net6.0-android";
         public const string Net6XamariniOS = "net6.0-ios";
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1114:Parameter list should follow declaration", Justification = "Readability")]
         public static ImmutableArray<string> UnnecessaryXamProperties => ImmutableArray.Create(
-            // The following are unecessary in .NET MAUI
 
+            // The following are unecessary in .NET MAUI
             "Configuration",
             "Platform",
             "ProductVersion",
@@ -36,11 +40,12 @@ namespace MSBuild.Conversion.Facts
             "ErrorReport",
             "WarningLevel",
             "GenerateAssemblyInfo",
-            "GenerateSerializationAssemblies"
-        );
+            "GenerateSerializationAssemblies");
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1114:Parameter list should follow declaration", Justification = "Readability")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1115:Parameter should follow comma", Justification = "Readability")]
         public static ImmutableArray<string> UnnecessaryXamItemIncludes => ImmutableArray.Create(
-          
+
           "System",
           "System.Xml",
           "System.Xml.Linq",
@@ -49,8 +54,7 @@ namespace MSBuild.Conversion.Facts
           "System.Numerics.Vectors",
 
           "Mono.Android",
-          "Xamarin.iOS"
-        );
+          "Xamarin.iOS");
 
         public static ImmutableArray<string> UnnecessaryXamItemTypes => ImmutableArray.Create(
             "Compile",
@@ -60,20 +64,16 @@ namespace MSBuild.Conversion.Facts
             "AndroidAsset",
             "ImageAsset",
             "BundleResource",
-            "InterfaceDefinition"
-        );
+            "InterfaceDefinition");
 
         public static ImmutableArray<string> UnnecessaryXamarinImports => ImmutableArray.Create(
            "$(MSBuildExtensionsPath)\\Xamarin\\Android\\Xamarin.Android.CSharp.targets",
-           "$(MSBuildExtensionsPath)\\Xamarin\\iOS\\Xamarin.iOS.CSharp.targets"
-       );
+           "$(MSBuildExtensionsPath)\\Xamarin\\iOS\\Xamarin.iOS.CSharp.targets");
 
         public static ImmutableArray<Guid> XamarinDroidProjectTypeGuids => ImmutableArray.Create(
-            Guid.Parse("{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}") // Xamarin.Android
-        );
+            Guid.Parse("{EFBA0AD7-5A72-4C68-AF49-83D382785DCF}")); // Xamarin.Android
 
         public static ImmutableArray<Guid> XamariniOSProjectTypeGuids => ImmutableArray.Create(
-          Guid.Parse("{FEACFBD2-3405-455C-9665-78FE426C6842}") // Xamarin.iOS
-        );
+          Guid.Parse("{FEACFBD2-3405-455C-9665-78FE426C6842}")); // Xamarin.iOS
     }
 }

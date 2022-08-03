@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -10,17 +13,16 @@ namespace MSBuild.Conversion.Facts
     public static class MSBuildFacts
     {
         /// <summary>
-        /// Props files which are known to be imported in standard projects created from templates that can be omitted from SDK projects.
+        /// Gets props files which are known to be imported in standard projects created from templates that can be omitted from SDK projects.
         /// </summary>
         public static ImmutableArray<string> PropsToRemove => ImmutableArray.Create(
             "Microsoft.Common.props",
             "MSTest.TestAdapter.props",
             "Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props",
-            "Microsoft.Net.Compilers.props" // https://stackoverflow.com/a/60623906
-        );
+            "Microsoft.Net.Compilers.props"); // https://stackoverflow.com/a/60623906
 
         /// <summary>
-        /// Targets files which are known to be imported in standard projects created from templates that can be omitted from SDK projects.
+        /// Gets targets files which are known to be imported in standard projects created from templates that can be omitted from SDK projects.
         /// </summary>
         public static ImmutableArray<string> TargetsToRemove => ImmutableArray.Create(
             "Microsoft.CSharp.targets",
@@ -30,34 +32,32 @@ namespace MSBuild.Conversion.Facts
             "Microsoft.FSharp.Targets",
             "MSTest.TestAdapter.targets",
             "Microsoft.TestTools.targets",
-            "Microsoft.WebApplication.targets"
-        );
+            "Microsoft.WebApplication.targets");
 
         /// <summary>
-        /// Props and targets files which are recognized and can be left unchanged during conversion.
+        /// Gets props and targets files which are recognized and can be left unchanged during conversion.
         /// </summary>
         public static ImmutableArray<string> ImportsToKeep => ImmutableArray.Create(
             "Microsoft.TypeScript.Default.props",
-            "Microsoft.TypeScript.targets"
-        );
+            "Microsoft.TypeScript.targets");
 
         /// <summary>
-        /// Mapping of PCL profiles to netstandard versions.
+        /// Gets mapping of PCL profiles to netstandard versions.
         /// </summary>
         public static ImmutableDictionary<string, string> PCLToNetStandardVersionMapping => ImmutableDictionary.CreateRange(new Dictionary<string, string>
         {
             // https://github.com/dotnet/standard/blob/main/docs/versions.md#mapping-pcl-profiles-to-net-standard
-            { "Profile7",        "1.1"  },
-            { "Profile31",       "1.0"  },
-            { "Profile32",       "1.2"  },
-            { "Profile44",       "1.2"  },
-            { "Profile49",       "1.0"  },
-            { "Profile78",       "1.0"  },
-            { "Profile84",       "1.0"  },
-            { "Profile111",      "1.1"  },
-            { "Profile151",      "1.2"  },
-            { "Profile157",      "1.0"  },
-            { "Profile259",      "1.0"  },
+            { "Profile7",        "1.1" },
+            { "Profile31",       "1.0" },
+            { "Profile32",       "1.2" },
+            { "Profile44",       "1.2" },
+            { "Profile49",       "1.0" },
+            { "Profile78",       "1.0" },
+            { "Profile84",       "1.0" },
+            { "Profile111",      "1.1" },
+            { "Profile151",      "1.2" },
+            { "Profile157",      "1.0" },
+            { "Profile259",      "1.0" },
         });
 
         public static ImmutableArray<string> GlobbedItemTypes => ImmutableArray.Create(
@@ -65,10 +65,12 @@ namespace MSBuild.Conversion.Facts
             "EmbeddedResource",
             "None",
             "Page",
-            "ApplicationDefinition"
-            );
+            "ApplicationDefinition");
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1114:Parameter list should follow declaration", Justification = "Readability & clarity of the comment")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1115:Parameter should follow comma", Justification = "Readability")]
         public static ImmutableArray<string> UnnecessaryProperties => ImmutableArray.Create(
+
             // The following are unecessary in CPS and/or are already in the .NET SDK
             "OldToolsVersion",
             "ProjectGuid",
@@ -110,30 +112,28 @@ namespace MSBuild.Conversion.Facts
 
             // Not needed for converted UWP apps
             "TargetPlatformIdentifier",
-            "TargetPlatformVersion"
-        );
+            "TargetPlatformVersion");
 
         public static ImmutableArray<string> DefaultDefineConstants => ImmutableArray.Create(
             "DEBUG",
-            "TRACE"
-        );
+            "TRACE");
 
         public static ImmutableArray<string> DefaultOutputPaths => ImmutableArray.Create(
             @"bin\Release\",
             @"bin\Debug\",
-            @"bin\$(Configuration)\"
-        );
+            @"bin\$(Configuration)\");
 
         public static ImmutableArray<string> DefaultPlatformTargets => ImmutableArray.Create(
-            "AnyCPU"
-        );
+            "AnyCPU");
 
         public static ImmutableArray<string> DefaultDebugTypes => ImmutableArray.Create(
             "full",
-            "pdbonly"
-        );
+            "pdbonly");
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1114:Parameter list should follow declaration", Justification = "Readability & clarity of the comment")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1115:Parameter should follow comma", Justification = "Readability")]
         public static ImmutableArray<string> UnnecessaryItemIncludes => ImmutableArray.Create(
+
             // FSharp.Core is referenced by default in the .NET SDK
             "FSharp.Core",
 
@@ -150,10 +150,11 @@ namespace MSBuild.Conversion.Facts
             "System.EnterpriseServices",
 
             // System.Net.Http is a part of the .NET SDK now
-            "System.Net.Http"
-        );
+            "System.Net.Http");
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1114:Parameter list should follow declaration", Justification = "Readability & clarity of the comment")]
         public static ImmutableArray<string> UnnecessaryWebIncludes => ImmutableArray.Create(
+
             // ASP.NET references are no longer used by web apps
             "System.Web",
             "System.Web.Abstractions",
@@ -191,8 +192,7 @@ namespace MSBuild.Conversion.Facts
             "Microsoft.Owin.Security.OAuth",
             "Microsoft.Owin.Security.OpenIdConnect",
             "Microsoft.Web.Infrastructure",
-            "Owin"
-        );
+            "Owin");
 
         public static ImmutableDictionary<string, string> DefaultItemsThatHavePackageEquivalents => ImmutableDictionary.CreateRange(new Dictionary<string, string>
         {
@@ -248,16 +248,14 @@ namespace MSBuild.Conversion.Facts
         });
 
         public static ImmutableArray<string> ItemsThatCanHaveMetadataRemoved => ImmutableArray.Create(
-            "ProjectReference"
-        );
+            "ProjectReference");
 
         public static Guid LanguageProjectTypeVisualBasic => Guid.Parse("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}");
 
         public static ImmutableArray<Guid> LanguageProjectTypeGuids => ImmutableArray.Create(
             Guid.Parse("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"), // C#
             LanguageProjectTypeVisualBasic, // VB.NET
-            Guid.Parse("{F2A71F9B-5D33-465A-A702-920D77279786}") // F#
-        );
+            Guid.Parse("{F2A71F9B-5D33-465A-A702-920D77279786}")); // F#
 
         public const string DefaultSDKAttribute = "Microsoft.NET.Sdk";
         public const string LowestFrameworkVersionWithSystemValueTuple = "net47";

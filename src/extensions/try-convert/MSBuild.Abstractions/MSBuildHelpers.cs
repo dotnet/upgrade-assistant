@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -17,20 +20,20 @@ namespace MSBuild.Abstractions
     public static class MSBuildHelpers
     {
         /// <summary>
-        /// matches $(name) pattern
+        /// matches $(name) pattern.
         /// </summary>
-        private static readonly Regex s_dimensionNameInConditionRegex = new Regex(@"^\$\(([^\$\(\)]*)\)$");
+        private static readonly Regex DimensionNameInConditionRegex = new Regex(@"^\$\(([^\$\(\)]*)\)$");
 
         /// <summary>
         /// Converts configuration dimensional value vector to a msbuild condition
         /// Use the standard format of
-        /// '$(DimensionName1)|$(DimensionName2)|...|$(DimensionNameN)'=='DimensionValue1|...|DimensionValueN'
+        /// '$(DimensionName1)|$(DimensionName2)|...|$(DimensionNameN)'=='DimensionValue1|...|DimensionValueN'.
         /// </summary>
-        /// <param name="dimensionalValues">vector of configuration dimensional properties</param>
-        /// <returns>msbuild condition representation</returns>
+        /// <param name="dimensionalValues">vector of configuration dimensional properties.</param>
+        /// <returns>msbuild condition representation.</returns>
         internal static string DimensionalValuePairsToCondition(ImmutableDictionary<string, string> dimensionalValues)
         {
-            if (null == dimensionalValues || 0 == dimensionalValues.Count)
+            if (dimensionalValues == null || dimensionalValues.Count == 0)
             {
                 return string.Empty; // no condition. Returns empty string to match MSBuild.
             }
@@ -55,26 +58,26 @@ namespace MSBuild.Abstractions
         }
 
         /// <summary>
-        /// Returns a name of a configuration like Debug|AnyCPU
+        /// Returns a name of a configuration like Debug|AnyCPU.
         /// </summary>
-        public static string GetConfigurationName(ImmutableDictionary<string, string> dimensionValues) => dimensionValues.IsEmpty ? "" : dimensionValues.Values.Aggregate((x, y) => $"{x}|{y}");
+        public static string GetConfigurationName(ImmutableDictionary<string, string> dimensionValues) => dimensionValues.IsEmpty ? string.Empty : dimensionValues.Values.Aggregate((x, y) => $"{x}|{y}");
 
         /// <summary>
-        /// Returns a name of a configuration like Debug|AnyCPU
+        /// Returns a name of a configuration like Debug|AnyCPU.
         /// </summary>
         public static string GetConfigurationName(string condition)
         {
-            return ConditionToDimensionValues(condition, out var dimensionValues) ? GetConfigurationName(dimensionValues) : "";
+            return ConditionToDimensionValues(condition, out var dimensionValues) ? GetConfigurationName(dimensionValues) : string.Empty;
         }
 
         /// <summary>
         /// Tries to parse an MSBuild condition to a dimensional vector
         /// only matches standard pattern:
-        /// '$(DimensionName1)|$(DimensionName2)|...|$(DimensionNameN)'=='DimensionValue1|...|DimensionValueN'
+        /// '$(DimensionName1)|$(DimensionName2)|...|$(DimensionNameN)'=='DimensionValue1|...|DimensionValueN'.
         /// </summary>
-        /// <param name="condition">msbuild condition string</param>
-        /// <param name="dimensionalValues">configuration dimensions vector (output)</param>
-        /// <returns>true on success</returns>
+        /// <param name="condition">msbuild condition string.</param>
+        /// <param name="dimensionalValues">configuration dimensions vector (output).</param>
+        /// <returns>true on success.</returns>
         public static bool ConditionToDimensionValues(string condition, out ImmutableDictionary<string, string> dimensionalValues)
         {
             string left;
@@ -116,7 +119,7 @@ namespace MSBuild.Abstractions
             for (var i = 0; i < dimensionNamesInCondition.Length; i++)
             {
                 // matches "$(name)" patern.
-                var match = s_dimensionNameInConditionRegex.Match(dimensionNamesInCondition[i]);
+                var match = DimensionNameInConditionRegex.Match(dimensionNamesInCondition[i]);
                 if (!match.Success)
                 {
                     return false;
@@ -219,7 +222,7 @@ namespace MSBuild.Abstractions
         }
 
         /// <summary>
-        /// Determines if a given project is UWP
+        /// Determines if a given project is UWP.
         /// </summary>
         public static bool IsUwp(IProjectRootElement projectRoot)
         {
@@ -227,6 +230,7 @@ namespace MSBuild.Abstractions
             {
                 return true;
             }
+
             var packageReferences = projectRoot.ItemGroups.SelectMany(GetPackageReferences)?.Select(elem => elem.Include.Split(',').First());
             if (packageReferences is null)
             {
@@ -255,7 +259,7 @@ namespace MSBuild.Abstractions
         }
 
         /// <summary>
-        /// Determines if a given project uses ASP.NET web app project type guid
+        /// Determines if a given project uses ASP.NET web app project type guid.
         /// </summary>
         public static bool IsWebApp(IProjectRootElement projectRoot) =>
             projectRoot.PropertyGroups.Any(pg => pg.Properties.Any(ProjectPropertyHelpers.IsLegacyWebProjectTypeGuidsProperty));
@@ -272,8 +276,6 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Determines if a project is a .NET Framework MSTest project by looking at its references.
         /// </summary>
-        /// <param name="root"></param>
-        /// <returns></returns>
         public static bool IsNETFrameworkMSTestProject(IProjectRootElement projectRoot)
         {
             var references = projectRoot.ItemGroups.SelectMany(GetReferences)?.Select(elem => elem.Include.Split(',').First());
@@ -289,8 +291,8 @@ namespace MSBuild.Abstractions
 
         public static bool HasWPFOrWinForms(ProjectPropertyGroupElement propGroup)
         {
-            return (propGroup.Properties.Any(p => StringComparer.OrdinalIgnoreCase.Compare(p.Name, DesktopFacts.UseWPFPropertyName) == 0) ||
-                    propGroup.Properties.Any(p => StringComparer.OrdinalIgnoreCase.Compare(p.Name, DesktopFacts.UseWinFormsPropertyName) == 0));
+            return propGroup.Properties.Any(p => StringComparer.OrdinalIgnoreCase.Compare(p.Name, DesktopFacts.UseWPFPropertyName) == 0) ||
+                    propGroup.Properties.Any(p => StringComparer.OrdinalIgnoreCase.Compare(p.Name, DesktopFacts.UseWinFormsPropertyName) == 0);
         }
 
         /// <summary>
@@ -301,7 +303,7 @@ namespace MSBuild.Abstractions
             && !tfm.ContainsIgnoreCase(MSBuildFacts.NetstandardPrelude);
 
         /// <summary>
-        /// Checks if a given TFM include -windows
+        /// Checks if a given TFM include -windows.
         /// </summary>
         public static bool IsWindows(string tfm) =>
             tfm.ContainsIgnoreCase(MSBuildFacts.WindowsSuffix);
@@ -336,7 +338,6 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Adds the ImportWindowsDesktopTargets=true property to ensure builds targeting .NET Framework will succeed.
         /// </summary>
-        /// <param name="propGroup"></param>
         public static void AddImportWindowsDesktopTargets(ProjectPropertyGroupElement propGroup) => propGroup.AddProperty(DesktopFacts.ImportWindowsDesktopTargetsName, "true");
 
         /// <summary>
@@ -386,7 +387,7 @@ namespace MSBuild.Abstractions
                 return firstImport is { } && propertyGroup.Location.Line > firstImport.Location.Line;
             }
 
-            return projectRootElement.PropertyGroups.FirstOrDefault(pg => pg.Condition == "" && IsAfterFirstImport(pg))
+            return projectRootElement.PropertyGroups.FirstOrDefault(pg => pg.Condition == string.Empty && IsAfterFirstImport(pg))
                    ?? projectRootElement.AddPropertyGroup();
         }
 
@@ -402,8 +403,8 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Unquote string. It simply removes the starting and ending "'", and checks they are present before.
         /// </summary>
-        /// <param name="s">string to unquote </param>
-        /// <returns>true if string is successfuly unquoted</returns>
+        /// <param name="s">string to unquote. </param>
+        /// <returns>true if string is successfuly unquoted.</returns>
         private static bool UnquoteString(ref string s)
         {
             if (s.Length < 2 || s[0] != '\'' || s[^1] != '\'' || s[1..^1].Contains('\''))
@@ -426,7 +427,6 @@ namespace MSBuild.Abstractions
         /// </summary>
         public static bool IsXamariniOS(IProjectRootElement projectRoot) =>
            projectRoot.PropertyGroups.Any(pg => pg.Properties.Any(ProjectPropertyHelpers.IsXamariniOSProjectTypeGuidsProperty));
-
 
         /// <summary>
         /// Given an optional path to MSBuild, registers an MSBuild.exe to be used for assembly resolution with this tool.
@@ -463,11 +463,13 @@ namespace MSBuild.Abstractions
                 return Path.Combine(vsinstalldir, "MSBuild", "Current", "Bin");
             }
 
-            //Attempt to set the version of MSBuild.
+            // Attempt to set the version of MSBuild.
             var visualStudioInstances = MSBuildLocator.QueryVisualStudioInstances().ToArray();
             var instance = visualStudioInstances.Length == 1
+
                 // If there is only one instance of MSBuild on this machine, set that as the one to use.
                 ? visualStudioInstances[0]
+
                 // Handle selecting the version of MSBuild you want to use.
                 : SelectVisualStudioInstance(visualStudioInstances);
 
@@ -494,6 +496,7 @@ namespace MSBuild.Abstractions
                 {
                     return visualStudioInstances[instanceNumber - 1];
                 }
+
                 Console.WriteLine("Input not accepted, try again.");
             }
         }

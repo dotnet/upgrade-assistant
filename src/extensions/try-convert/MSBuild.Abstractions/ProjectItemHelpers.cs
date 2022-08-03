@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Linq;
 
 using Microsoft.Build.Construction;
@@ -8,7 +11,7 @@ using MSBuild.Conversion.Facts;
 namespace MSBuild.Abstractions
 {
     /// <summary>
-    /// Helper functions for working with ProjectItemElements
+    /// Helper functions for working with ProjectItemElements.
     /// </summary>
     public static class ProjectItemHelpers
     {
@@ -130,9 +133,8 @@ namespace MSBuild.Abstractions
 
         public static bool IsReferencingSettingsSingleFileGenerator(ProjectItemElement item)
         {
-            var metadata = item.Children.FirstOrDefault(child => MSBuildFacts.EmbeddedResourceGeneratorProperty.Equals(child.ElementName, StringComparison.Ordinal) ) as ProjectMetadataElement;
+            var metadata = item.Children.FirstOrDefault(child => MSBuildFacts.EmbeddedResourceGeneratorProperty.Equals(child.ElementName, StringComparison.Ordinal)) as ProjectMetadataElement;
             return metadata is null ? false : metadata.Value.Equals(MSBuildFacts.SettingsSingleFileGenerator, StringComparison.Ordinal);
         }
-
     }
 }

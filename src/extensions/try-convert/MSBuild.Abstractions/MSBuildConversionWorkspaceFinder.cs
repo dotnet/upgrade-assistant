@@ -1,10 +1,7 @@
-﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the MIT license.  See License.txt in the project root for license information.
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
-// Original License:
-// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // See https://github.com/aspnet/DotNetTools/blob/261b27b70027871143540af10a5cba57ce07ff97/src/dotnet-watch/Internal/MsBuildProjectFinder.cs
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +19,7 @@ namespace MSBuild.Abstractions
         /// <param name="searchDirectory">The base directory to search</param>
         /// <param name="workspacePath">A specific project or solution file to find</param>
         /// </summary>
-        public static (bool isSolution, string workspacePath) FindWorkspace(string searchDirectory, string? workspacePath = null)
+        public static (bool IsSolution, string WorkspacePath) FindWorkspace(string searchDirectory, string? workspacePath = null)
         {
             if (!string.IsNullOrEmpty(workspacePath))
             {
@@ -56,7 +53,7 @@ namespace MSBuild.Abstractions
             throw new FileNotFoundException(string.Format("Could not find any an MSBuild project file or solution file in '{0}'. Please specify which to use with '-w'.", searchDirectory));
         }
 
-        private static (bool isSolution, string workspacePath) FindFile(string workspacePath)
+        private static (bool IsSolution, string WorkspacePath) FindFile(string workspacePath)
         {
             var workspaceExtension = Path.GetExtension(workspacePath);
             var isSolution = workspaceExtension.Equals(".sln", StringComparison.OrdinalIgnoreCase);

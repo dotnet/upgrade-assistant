@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -13,7 +16,7 @@ namespace MSBuild.Conversion.SDK
     public static class TargetFrameworkHelper
     {
         /// <summary>
-        /// Determine the TFM to use based on what is installed on the users machine
+        /// Determine the TFM to use based on what is installed on the users machine.
         /// </summary>
         public static string FindHighestInstalledTargetFramework(bool usePreviewSDK, string msbuildPath)
         {
@@ -61,15 +64,18 @@ namespace MSBuild.Conversion.SDK
                 }
 
                 var templateFiles = Directory.EnumerateFiles(templatePath, "microsoft.dotnet.common.projecttemplates.*.nupkg", SearchOption.TopDirectoryOnly);
+
                 // get the highest version of the files found, based on NuGetVersion
                 var templateNugetPackagePath = templateFiles.OrderByDescending(p =>
                 {
                     var versionStr = Path.GetFileNameWithoutExtension(p).Substring("microsoft.dotnet.common.projecttemplates.".Length);
-                    //first two numbers in the version are part of the name of the package, not its nuget version.
+
+                    // first two numbers in the version are part of the name of the package, not its nuget version.
                     versionStr = string.Join(".", versionStr.Split(".").Skip(2));
                     var version = NuGetVersion.Parse(versionStr);
                     return (!usePreviewSDK && version.IsPrerelease) ? new NuGetVersion(0, 0, 0) : version;
                 }).First();
+
                 // upzip the common project templates into memory
                 using var templateNugetPackageFile = File.OpenRead(templateNugetPackagePath);
                 using var templateNugetPackage = new ZipArchive(templateNugetPackageFile, ZipArchiveMode.Read);
@@ -95,11 +101,10 @@ namespace MSBuild.Conversion.SDK
             {
                 return MSBuildFacts.NetCoreApp31;
             }
-
         }
 
         /// <summary>
-        /// Reject obviously wrong TFM specifiers 
+        /// Reject obviously wrong TFM specifiers.
         /// </summary>
         public static bool IsValidTargetFramework(string tfm)
             => !tfm.Contains(" ") && tfm.Contains("net") && Regex.Match(tfm, "[0-9]").Success;

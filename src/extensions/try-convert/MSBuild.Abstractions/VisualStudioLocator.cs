@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Setup.Configuration;
@@ -13,15 +16,15 @@ namespace MSBuild.Abstractions
     /// <remarks>
     /// The package is not supported on .NET 5, so we copied the COM declarations to use instead.
     /// </remarks>
-    ///<codereference>
-    ///https://github.com/dotnet/upgrade-assistant/blob/main/src/components/Microsoft.DotNet.UpgradeAssistant.MSBuild/VisualStudioFinder.cs
-    ///Placeholder class till this PR is merged into MSBuildLocator : https://github.com/microsoft/MSBuildLocator/pull/132
+    /// <codereference>
+    /// https://github.com/dotnet/upgrade-assistant/blob/main/src/components/Microsoft.DotNet.UpgradeAssistant.MSBuild/VisualStudioFinder.cs
+    /// Placeholder class till this PR is merged into MSBuildLocator : https://github.com/microsoft/MSBuildLocator/pull/132.
     /// </code>
-
     public class VisualStudioLocator
     {
         private const int REGDB_E_CLASSNOTREG = unchecked((int)0x80040154);
-        public VisualStudioLocator( )
+
+        public VisualStudioLocator()
         {
         }
 
@@ -39,14 +42,12 @@ namespace MSBuild.Abstractions
 
             if (Directory.Exists(installation))
             {
-                //_logger.LogDebug("Found Visual Studio {VsVersion} at {VsPath}", version, installation);
-
+                // _logger.LogDebug("Found Visual Studio {VsVersion} at {VsPath}", version, installation);
                 return installation;
             }
             else
             {
-                //_logger.LogInformation("Found Visual Studio {VsVersion}, but directory '{VsPath}' does not exist.", version, installation);
-
+                // _logger.LogInformation("Found Visual Studio {VsVersion}, but directory '{VsPath}' does not exist.", version, installation);
                 return null;
             }
         }
@@ -126,15 +127,14 @@ namespace MSBuild.Abstractions
             catch (COMException ex) when (ex.ErrorCode == REGDB_E_CLASSNOTREG)
             {
                 // Try to get the class object using app-local call.
-                //var result = GetSetupConfiguration(out var query, IntPtr.Zero);
+                // var result = GetSetupConfiguration(out var query, IntPtr.Zero);
 
-                //if (result < 0)
-                //{
+                // if (result < 0)
+                // {
                 //    throw;
-                //}
+                // }
 
-                //return query;
-
+                // return query;
                 throw new ArgumentException("Error SetupConfiguration " + ex.Message);
             }
         }

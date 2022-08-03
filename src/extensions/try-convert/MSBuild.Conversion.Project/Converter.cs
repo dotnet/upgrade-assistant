@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Xml;
@@ -37,6 +40,7 @@ namespace MSBuild.Conversion.Project
         internal IProjectRootElement? ConvertProjectFile()
         {
             return _projectRootElement
+
                 // Let's convert packages first, since that's what you should do manually anyways
                 .ConvertAndAddPackages(_sdkBaselineProject.ProjectStyle, _sdkBaselineProject.TargetTFM, removePackagesConfig: _noBackup)
 

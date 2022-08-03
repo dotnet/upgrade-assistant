@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Linq;
 
 using Microsoft.Build.Construction;
@@ -8,7 +11,7 @@ using MSBuild.Conversion.Facts;
 namespace MSBuild.Abstractions
 {
     /// <summary>
-    /// Helper functions for working with ProjectPropertyElements
+    /// Helper functions for working with ProjectPropertyElements.
     /// </summary>
     public static class ProjectPropertyHelpers
     {
@@ -16,6 +19,7 @@ namespace MSBuild.Abstractions
         /// Checks if the given property is the 'Name' property, and if its value is the same as the project file name.
         /// </summary>
         public static bool IsNameDefault(ProjectPropertyElement prop, string projectName) =>
+
             // TODO use: prop.ContainingProject ?
             prop.ElementName.Equals(MSBuildFacts.NameNodeName, StringComparison.OrdinalIgnoreCase)
             && prop.Value.Equals(projectName, StringComparison.OrdinalIgnoreCase);
@@ -88,7 +92,7 @@ namespace MSBuild.Abstractions
             && a.Condition.Equals(b.Condition, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Checks if a property is '<ProjectTypeGuids>'
+        /// Checks if a property is '.<ProjectTypeGuids>'
         /// </summary>
         public static bool IsProjectTypeGuidsNode(ProjectPropertyElement prop) =>
             prop.ElementName.Equals(MSBuildFacts.ProjectTypeGuidsNodeName, StringComparison.OrdinalIgnoreCase);
@@ -111,40 +115,48 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Checks if a given property defines project type guids for C#, VB.NET, or F#.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if all types are language project types, false otherwise.</returns>
         public static bool AllProjectTypeGuidsAreLanguageProjectTypeGuids(ProjectPropertyElement prop) =>
             IsProjectTypeGuidsNode(prop) && prop.Value.Split(';').All(guidString => MSBuildFacts.LanguageProjectTypeGuids.Contains(Guid.Parse(guidString)));
 
         /// <summary>
         /// Checks if all projecttypeguids specified are known desktop project type guids.
         /// </summary>
-        /// <param name="prop"></param>
-        /// <returns></returns>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if all types are desktop project types, false otherwise.</returns>
         public static bool AllProjectTypeGuidsAreDesktopProjectTypeGuids(ProjectPropertyElement prop) =>
             IsProjectTypeGuidsNode(prop) && prop.Value.Split(';').All(guidString => DesktopFacts.KnownSupportedDesktopProjectTypeGuids.Contains(Guid.Parse(guidString)));
 
         /// <summary>
         /// Checks if all projecttypeguids specified are known desktop project type guids.
         /// </summary>
-        /// <param name="prop"></param>
-        /// <returns></returns>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if all types are legacy test types, false otherwise.</returns>
         public static bool AllProjectTypeGuidsAreLegacyTestProjectTypeGuids(ProjectPropertyElement prop) =>
             IsProjectTypeGuidsNode(prop) && prop.Value.Split(';').All(guidString => MSTestFacts.KnownOldMSTestProjectTypeGuids.Contains(Guid.Parse(guidString)));
 
         /// <summary>
         /// Checks if a given property specifies IsCodedUITest=True, which is not only unsupported for .NET Core but is also deprecated after VS 2019.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if property indicates a Coded UI test, false otherwise.</returns>
         public static bool IsCodedUITest(ProjectPropertyElement prop) =>
             prop.ElementName.Equals(MSTestFacts.IsCodedUITestNodeName, StringComparison.OrdinalIgnoreCase) && prop.Value.Equals("True", StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Checks if a test property is TestProjectType=UnitTest
+        /// Checks if a test property is TestProjectType=UnitTest.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if property indicates a unit test, false otherwise.</returns>
         public static bool IsUnitTestType(ProjectPropertyElement prop) =>
             prop.ElementName.Equals(MSTestFacts.TestProjectTypeNodeName, StringComparison.OrdinalIgnoreCase) && prop.Value.Equals(MSTestFacts.UnitTestTestProjectType, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Checks if an OutputType node is Library.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if property indicates a library output type, false otherwise.</returns>
         public static bool IsLibraryOutputType(ProjectPropertyElement prop) =>
             prop.ElementName.Equals(MSBuildFacts.OutputTypeNodeName, StringComparison.OrdinalIgnoreCase)
             && prop.Value.Equals(MSBuildFacts.LibraryOutputType, StringComparison.OrdinalIgnoreCase);
@@ -152,6 +164,8 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Checks if an OutputType node is Exe.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if property indicates an executable, false otherwise.</returns>
         public static bool IsExeOutputType(ProjectPropertyElement prop) =>
             prop.ElementName.Equals(MSBuildFacts.OutputTypeNodeName, StringComparison.OrdinalIgnoreCase)
             && prop.Value.Equals(MSBuildFacts.ExeOutputType, StringComparison.OrdinalIgnoreCase);
@@ -159,6 +173,8 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Checks if an OutputType node is AppContainerExe.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if property indicates an app container executable, false otherwise.</returns>
         public static bool IsAppContainerExeOutputType(ProjectPropertyElement prop) =>
             prop.ElementName.Equals(MSBuildFacts.OutputTypeNodeName, StringComparison.OrdinalIgnoreCase)
             && prop.Value.Equals(MSBuildFacts.AppContainerExeOutputType, StringComparison.OrdinalIgnoreCase);
@@ -166,6 +182,8 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Checks if an OutputType node is Exe.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if property indicates a windows executable, false otherwise.</returns>
         public static bool IsWinExeOutputType(ProjectPropertyElement prop) =>
             prop.ElementName.Equals(MSBuildFacts.OutputTypeNodeName, StringComparison.OrdinalIgnoreCase)
             && prop.Value.Equals(MSBuildFacts.WinExeOutputType, StringComparison.OrdinalIgnoreCase);
@@ -176,15 +194,17 @@ namespace MSBuild.Abstractions
         /// <summary>
         /// Determines if a property lists the default project type GUId for Xamarin.Android.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if any property indicates a Xamarin Android project, false otherwise.</returns>
         public static bool IsXamarinDroidProjectTypeGuidsProperty(ProjectPropertyElement prop) =>
             IsProjectTypeGuidsNode(prop) && prop.Value.Split(';').Any(guidString => XamarinFacts.XamarinDroidProjectTypeGuids.Contains(Guid.Parse(guidString)));
 
         /// <summary>
         /// Determines if a property lists the default project type GUId for Xamarin.iOS projects.
         /// </summary>
+        /// <param name="prop">Element to analyze for type.</param>
+        /// <returns>True if any property indicate a Xamarin IOS project, false otherwise.</returns>
         public static bool IsXamariniOSProjectTypeGuidsProperty(ProjectPropertyElement prop) =>
             IsProjectTypeGuidsNode(prop) && prop.Value.Split(';').Any(guidString => XamarinFacts.XamariniOSProjectTypeGuids.Contains(Guid.Parse(guidString)));
-
-
     }
 }

@@ -1,15 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace MSBuild.Abstractions
 {
     public class ProjectItemComparer : IEqualityComparer<IProjectItem>
     {
         private readonly bool _compareMetadata;
-        
+
+#pragma warning disable SA1401 // Fields should be private - this enables sugar like ProjectItemComparer.IncludeComparer
         public static ProjectItemComparer IncludeComparer = new ProjectItemComparer(compareMetadata: false);
         public static ProjectItemComparer MetadataComparer = new ProjectItemComparer(compareMetadata: true);
+#pragma warning restore SA1401 // Fields should be private
 
         private ProjectItemComparer(bool compareMetadata)
         {

@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,8 +13,7 @@ using MSBuild.Conversion.Facts;
 namespace MSBuild.Conversion.Package
 {
     internal static class PackagesConfigParser
-    { 
-
+    {
         internal static IEnumerable<PackagesConfigPackage> Parse(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -63,7 +65,6 @@ namespace MSBuild.Conversion.Package
             }
 
             return packages.Select(ParsePackageConfig);
-
 
             static PackagesConfigPackage ParsePackageConfig(XElement element) =>
                 new PackagesConfigPackage

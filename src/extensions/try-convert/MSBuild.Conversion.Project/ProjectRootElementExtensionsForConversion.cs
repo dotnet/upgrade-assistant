@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -18,7 +21,7 @@ namespace MSBuild.Conversion.Project
             {
                 if (!forceRemoveCustomImports)
                 {
-                    var fileName = Path.GetFileName(import.Project);                
+                    var fileName = Path.GetFileName(import.Project);
                     if (MSBuildFacts.PropsToRemove.Contains(fileName, StringComparer.OrdinalIgnoreCase) ||
                         MSBuildFacts.TargetsToRemove.Contains(fileName, StringComparer.OrdinalIgnoreCase))
                     {
@@ -79,6 +82,7 @@ namespace MSBuild.Conversion.Project
                     _ => throw new InvalidOperationException("Unsupported output type: " + baselineProject.OutputType)
                 };
             }
+
             return projectRootElement;
         }
 
@@ -159,11 +163,11 @@ namespace MSBuild.Conversion.Project
                         // Old MSTest projects specify library, but this is not valid since tests on .NET Core are netcoreapp projects.
                         propGroup.RemoveChild(prop);
                     }
-                    else if (projectStyle == ProjectStyle.XamarinDroid && (XamarinFacts.UnnecessaryXamProperties.Contains(prop.Name, StringComparer.OrdinalIgnoreCase)))
+                    else if (projectStyle == ProjectStyle.XamarinDroid && XamarinFacts.UnnecessaryXamProperties.Contains(prop.Name, StringComparer.OrdinalIgnoreCase))
                     {
                         propGroup.RemoveChild(prop);
                     }
-                    else if (projectStyle == ProjectStyle.XamariniOS && (XamarinFacts.UnnecessaryXamProperties.Contains(prop.Name, StringComparer.OrdinalIgnoreCase)))
+                    else if (projectStyle == ProjectStyle.XamariniOS && XamarinFacts.UnnecessaryXamProperties.Contains(prop.Name, StringComparer.OrdinalIgnoreCase))
                     {
                         propGroup.RemoveChild(prop);
                     }
@@ -252,10 +256,14 @@ namespace MSBuild.Conversion.Project
                     else if (baselineProject.ProjectStyle is ProjectStyle.XamarinDroid || baselineProject.ProjectStyle is ProjectStyle.XamariniOS)
                     {
                         if (XamarinFacts.UnnecessaryXamItemIncludes.Contains(item.Include, StringComparer.OrdinalIgnoreCase))
+                        {
                             itemGroup.RemoveChild(item);
+                        }
 
                         if (XamarinFacts.UnnecessaryXamItemTypes.Contains(item.ItemType, StringComparer.OrdinalIgnoreCase))
+                        {
                             itemGroup.RemoveChild(item);
+                        }
                     }
                     else
                     {
@@ -532,9 +540,11 @@ namespace MSBuild.Conversion.Project
 
         public static IProjectRootElement AddGenerateAssemblyInfoAsFalse(this IProjectRootElement projectRootElement, ProjectStyle projectStyle)
         {
-            //Skip adding this for .NET MAUI conversion
+            // Skip adding this for .NET MAUI conversion
             if ((projectStyle is ProjectStyle.XamarinDroid) || (projectStyle is ProjectStyle.XamariniOS))
+            {
                 return projectRootElement;
+            }
 
             // Don't create a new prop group; put the desktop properties in the same group as where TFM is located
             var propGroup = MSBuildHelpers.GetOrCreateTopLevelPropertyGroupWithTFM(projectRootElement);

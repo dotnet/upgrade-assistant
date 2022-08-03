@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Immutable;
 
 namespace MSBuild.Conversion.Facts
@@ -16,14 +19,12 @@ namespace MSBuild.Conversion.Facts
             Guid.Parse("{E53F8FEA-EAE0-44A6-8774-FFD645390401}"), // ASP.NET MVC 3
             Guid.Parse("{F85E285D-A4E0-4152-9332-AB1D724D3325}"), // ASP.NET MVC 2
             Guid.Parse("{603C0E0B-DB56-11DC-BE95-000D561079B0}"), // ASP.NET MVC 1
-            Guid.Parse("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") // ASP.NET 5
-        );
+            Guid.Parse("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}")); // ASP.NET 5
 
         /// <summary>
-        /// The core set of references all ASP.NET projects use.
+        /// Gets the core set of references all ASP.NET projects use.
         /// </summary>
         public static ImmutableArray<string> KnownWebReferences => ImmutableArray.Create(
-            "System.Web"
-        );
+            "System.Web");
     }
 }

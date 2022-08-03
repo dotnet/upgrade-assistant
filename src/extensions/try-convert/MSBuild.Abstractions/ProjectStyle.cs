@@ -1,9 +1,12 @@
-﻿namespace MSBuild.Abstractions
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+namespace MSBuild.Abstractions
 {
     public enum ProjectStyle
     {
         /// <summary>
-        /// The project has an import of two defaults. Typically Common.props and CSharp.targets or FSharp.targets, etc. 
+        /// The project has an import of two defaults. Typically Common.props and CSharp.targets or FSharp.targets, etc.
         /// </summary>
         Default,
 
@@ -18,7 +21,7 @@
         Custom,
 
         /// <summary>
-        /// The project is WPF or WinForms, and will use the WinDesktop framework reference
+        /// The project is WPF or WinForms, and will use the WinDesktop framework reference.
         /// </summary>
         WindowsDesktop,
 
@@ -35,12 +38,12 @@
         Web,
 
         /// <summary>
-        /// The project is of type Xamarin.Android 
+        /// The project is of type Xamarin.Android.
         /// </summary>
         XamarinDroid,
 
         /// <summary>
-        /// The project is of type Xamarin.iOS
+        /// The project is of type Xamarin.iOS.
         /// </summary>
         XamariniOS
     }
