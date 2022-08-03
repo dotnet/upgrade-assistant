@@ -24,7 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(Proj, Main, Directive, "", UpgradeStepStatus.Skipped)] // can't find path case
         [InlineData(Proj, Main, Directive, Config_NA, UpgradeStepStatus.Skipped)] // find path but not applicable case
         [InlineData(Proj, Main, Directive, Config, UpgradeStepStatus.Incomplete)] // success case
-        //[InlineData(Proj, Main, "", Config, UpgradeStepStatus.Incomplete)] // no directive cs file but still success case
+        [InlineData(Proj, Main, "", Config, UpgradeStepStatus.Incomplete)] // no directive cs file but still success case
         public void WCFUpdateTest(string proj, string main, string directive, string config, UpgradeStepStatus expected)
         {
             // Arrange
