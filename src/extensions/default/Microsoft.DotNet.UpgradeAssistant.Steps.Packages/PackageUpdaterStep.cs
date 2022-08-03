@@ -9,6 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 {
@@ -156,23 +159,40 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             private static IEnumerable<Operation<NuGetReference>> UpdatePackageAddition(IDependencyCollection<NuGetReference> packages, IProject project)
             {
                 var files = project.FindFiles(".cs", ProjectItemType.Compile);
+                var containsService = false;
                 if (files.Any())
                 {
                     foreach (var f in files)
                     {
-                        if (File.ReadAllText(f).Contains("ChannelFactory") || File.ReadAllText(f).Contains("ClientBase"))
+                        var root = CSharpSyntaxTree.ParseText(f).GetRoot();
+                        if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
                         {
                             return packages.Additions;
                         }
+
+                        if (ContainsIdentifier(root, "ServiceHost"))
+                        {
+                            containsService = true;
+                        }
                     }
 
-                    var additions = from p in packages.Additions
-                                    where !p.Item.Name.Contains("System.ServiceModel")
-                                    select p;
-                    return additions;
+                    if (containsService)
+                    {
+                        return from p in packages.Additions
+                               where !p.Item.Name.Contains("System.ServiceModel")
+                               select p;
+                    }
                 }
 
                 return packages.Additions;
+            }
+
+            // Checks if the root has descendant nodes that contains id
+            private static bool ContainsIdentifier(SyntaxNode root, string id)
+            {
+                return (from n in root.DescendantNodes().OfType<IdentifierNameSyntax>()
+                        where n.Identifier.ValueText.Contains(id)
+                        select n).Any();
             }
 
             public override UpgradeStepInitializeResult Reset()
