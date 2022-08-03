@@ -40,10 +40,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             var project = mock.Mock<IProject>();
             project.Setup(p => p.GetFile()).Returns(projectFile.Object);
             project.Setup(p => p.FileInfo).Returns(new FileInfo("./test"));
-            project.Setup(p => p.FindFiles(".config", ProjectItemType.None)).Returns(new List<string> { Path.Combine(Directory.GetCurrentDirectory(), config) });
+            if (config != string.Empty)
+            {
+                project.Setup(p => p.FindFiles(".config", ProjectItemType.None)).Returns(new List<string> { Path.Combine(Directory.GetCurrentDirectory(), config) });
+            }
+            else
+            {
+                project.Setup(p => p.FindFiles(".config", ProjectItemType.None)).Returns(new List<string>());
+            }
 
-            project.Setup(p => p.FindFiles(".cs", ProjectItemType.Compile)).Returns(new List<string>
+            if (directive != string.Empty)
+            {
+                project.Setup(p => p.FindFiles(".cs", ProjectItemType.Compile)).Returns(new List<string>
             { Path.Combine(Directory.GetCurrentDirectory(), main), Path.Combine(Directory.GetCurrentDirectory(), directive) });
+            }
+            else
+            {
+                project.Setup(p => p.FindFiles(".cs", ProjectItemType.Compile)).Returns(new List<string> { Path.Combine(Directory.GetCurrentDirectory(), main) });
+            }
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(c => c.Projects).Returns(new[] { project.Object });
