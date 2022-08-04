@@ -190,7 +190,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             // Checks if the root has descendant nodes that contains id
             private static bool ContainsIdentifier(SyntaxNode root, string id)
             {
-                return root.DescendantNodes().OfType<IdentifierNameSyntax>().Any(n => n.Identifier.ValueText.Contains(id));
+                return root.DescendantNodes().OfType<IdentifierNameSyntax>().Any(n => n.Identifier.ValueText.IndexOf(id, StringComparison.Ordinal) >= 0);
             }
 
             public override UpgradeStepInitializeResult Reset()
