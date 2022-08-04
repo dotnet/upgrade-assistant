@@ -21,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     public class WinUIContentDialogCodeFixer : CodeFixProvider
     {
-        private const string DialogSetterComment = "/* TODO You should replace 'this' with the instance of UserControl that is ContentDialog is meant to be a part of. */\n";
+        private const string DialogSetterComment = "/* TODO You should replace 'this' with the instance of UserControl that is ContentDialog is meant to be a part of. */";
 
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including
         // the analyzer's ID in the code fix provider's FixableDiagnosticIds array.
