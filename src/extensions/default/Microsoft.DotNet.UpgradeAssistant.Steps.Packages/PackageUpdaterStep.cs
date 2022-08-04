@@ -160,28 +160,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             {
                 var files = project.FindFiles(".cs", ProjectItemType.Compile);
                 var containsService = false;
-                if (files.Any())
+                foreach (var f in files)
                 {
-                    foreach (var f in files)
+                    var root = CSharpSyntaxTree.ParseText(f).GetRoot();
+                    if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
                     {
-                        var root = CSharpSyntaxTree.ParseText(f).GetRoot();
-                        if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
-                        {
-                            return packages.Additions;
-                        }
-
-                        if (!containsService && ContainsIdentifier(root, "ServiceHost"))
-                        {
-                            containsService = true;
-                        }
+                        return packages.Additions;
                     }
 
-                    if (containsService)
+                    if (!containsService && ContainsIdentifier(root, "ServiceHost"))
                     {
-                        return from p in packages.Additions
-                               where !p.Item.Name.StartsWith("System.ServiceModel", StringComparison.OrdinalIgnoreCase)
-                               select p;
+                        containsService = true;
                     }
+                }
+
+                if (containsService)
+                {
+                    return from p in packages.Additions
+                            where !p.Item.Name.StartsWith("System.ServiceModel", StringComparison.OrdinalIgnoreCase)
+                            select p;
                 }
 
                 return packages.Additions;
