@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             // clean up placeholders if not removed yet
             var placeholder = from s in root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>()
-                              where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText == "UA_placeHolder"
+                              where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText.Equals("UA_placeHolder", StringComparison.Ordinal)
                               select s;
             root = root.RemoveNodes(placeholder, 0)!;
 
@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         private SyntaxNode ConfigureServiceHost(SyntaxNode root, SyntaxNode declaration)
         {
             var placeholder = (from s in root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>()
-                               where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText == "UA_placeHolder"
+                               where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText.Equals("UA_placeHolder", StringComparison.Ordinal)
                                select s).First();
 
             // gets the code that configures the host
@@ -241,7 +241,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var descendants = node.DescendantNodes().OfType<IdentifierNameSyntax>();
             foreach (var id in descendants)
             {
-                if (id.Identifier.ValueText.Equals(value))
+                if (id.Identifier.ValueText.Equals(value, StringComparison.Ordinal))
                 {
                     return true;
                 }

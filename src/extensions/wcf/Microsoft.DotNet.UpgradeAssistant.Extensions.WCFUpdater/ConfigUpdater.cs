@@ -57,7 +57,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             {
                 IEnumerable<XElement> unsupported_endpoint =
                     from el in wcfConfig.Root.DescendantsAndSelf("endpoint")
-                    where el.Attribute("binding").Value.Contains("mex")
+                    where el.Attribute("binding").Value.StartsWith("mex", StringComparison.Ordinal)
                     select el;
                 unsupported_endpoint.First().AddBeforeSelf(new XComment(Constants.MexEndpoint));
                 unsupported_endpoint.Remove();
@@ -80,15 +80,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             foreach (var endpoint in endpoints)
             {
                 var ad = endpoint.Attribute("address").Value;
-                if (endpoint.Attribute("binding").Value.Contains("netTcp"))
+                if (endpoint.Attribute("binding").Value.StartsWith("netTcp", StringComparison.Ordinal))
                 {
                     endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeNetTcp].PathAndQuery, ad).Replace("\\", "/");
                 }
-                else if (endpoint.Attribute("binding").Value.Contains("Https"))
+                else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
                 {
                     endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttps].PathAndQuery, ad).Replace("\\", "/");
                 }
-                else if (endpoint.Attribute("binding").Value.Contains("Http"))
+                else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
                 {
                     endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttp].PathAndQuery, ad).Replace("\\", "/");
                 }
@@ -105,8 +105,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (results.Any())
             {
                 var el = results.First();
-                var http = el.Attribute("httpGetEnabled") != null && string.Equals(el.Attribute("httpGetEnabled").Value, "true", StringComparison.OrdinalIgnoreCase);
-                var https = el.Attribute("httpsGetEnabled") != null && string.Equals(el.Attribute("httpsGetEnabled").Value, "true", StringComparison.OrdinalIgnoreCase);
+                var http = el.Attribute("httpGetEnabled") != null && el.Attribute("httpGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+                var https = el.Attribute("httpsGetEnabled") != null && el.Attribute("httpsGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
                 if (http && https)
                 {
                     return 3;
@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             foreach (XElement el in _config.Root.DescendantsAndSelf("endpoint"))
             {
-                if (el.Attribute("address").Value == "mex")
+                if (el.Attribute("address").Value.Equals("mex", StringComparison.Ordinal))
                 {
                     return true;
                 }
@@ -143,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (results.Any())
             {
                 var el = results.First();
-                if (el.Attribute("includeExceptionDetailInFaults") != null && string.Equals(el.Attribute("includeExceptionDetailInFaults").Value, "true", StringComparison.OrdinalIgnoreCase))
+                if (el.Attribute("includeExceptionDetailInFaults") != null && el.Attribute("includeExceptionDetailInFaults").Value.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }

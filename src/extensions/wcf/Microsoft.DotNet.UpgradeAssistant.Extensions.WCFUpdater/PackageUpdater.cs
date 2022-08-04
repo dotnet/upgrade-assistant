@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             // removes references to System.ServiceModel
             _doc.Root.Descendants("PackageReference")
-                .Where(x => x.Attribute("Include").Value.Contains("System.ServiceModel"))
+                .Where(x => x.Attribute("Include").Value.StartsWith("System.ServiceModel", System.StringComparison.OrdinalIgnoreCase))
                 .Remove();
             _logger.LogDebug("Finish removing references to System.ServiceModel.");
 
