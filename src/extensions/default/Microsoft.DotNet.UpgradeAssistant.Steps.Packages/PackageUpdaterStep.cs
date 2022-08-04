@@ -170,7 +170,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                             return packages.Additions;
                         }
 
-                        if (ContainsIdentifier(root, "ServiceHost"))
+                        if (!containsService && ContainsIdentifier(root, "ServiceHost"))
                         {
                             containsService = true;
                         }
@@ -179,7 +179,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                     if (containsService)
                     {
                         return from p in packages.Additions
-                               where !p.Item.Name.Contains("System.ServiceModel")
+                               where !p.Item.Name.StartsWith("System.ServiceModel", StringComparison.OrdinalIgnoreCase)
                                select p;
                     }
                 }
@@ -190,9 +190,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             // Checks if the root has descendant nodes that contains id
             private static bool ContainsIdentifier(SyntaxNode root, string id)
             {
-                return (from n in root.DescendantNodes().OfType<IdentifierNameSyntax>()
-                        where n.Identifier.ValueText.Contains(id)
-                        select n).Any();
+                return root.DescendantNodes().OfType<IdentifierNameSyntax>().Any(n => n.Identifier.ValueText.Contains(id));
             }
 
             public override UpgradeStepInitializeResult Reset()
