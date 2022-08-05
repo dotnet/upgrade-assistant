@@ -14,18 +14,22 @@ namespace TestProject.TestClasses
     {
         private async void CallContentDialog()
         {
-            var filePicker = this.InitializeWithWindow(new FileSavePicker());
-            var folderPicker = this.InitializeWithWindow(new FolderPicker());
+            var filePicker = /* TODO You should replace 'App.WindowHandle' with the your window's handle (HWND) 
+            Read more on retrieving window handle here: https://docs.microsoft.com/en-us/windows/apps/develop/ui-input/retrieve-hwnd */
+        InitializeWithWindow(new FileSavePicker(), App.WindowHandle);
+            var folderPicker = /* TODO You should replace 'App.WindowHandle' with the your window's handle (HWND) 
+            Read more on retrieving window handle here: https://docs.microsoft.com/en-us/windows/apps/develop/ui-input/retrieve-hwnd */
+        InitializeWithWindow(new FolderPicker(), App.WindowHandle);
             var fileOpenPicker = this.InitializeWithWindow(new FileOpenPicker());
         }
-                        private FolderPicker InitializeWithWindow(FolderPicker obj)
+                        private static FolderPicker InitializeWithWindow(FolderPicker obj, IntPtr windowHandle)
                         {
-                            WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
+                            WinRT.Interop.InitializeWithWindow.Initialize(obj, windowHandle);
                             return obj;
                         }
-                        private FileSavePicker InitializeWithWindow(FileSavePicker obj)
+                        private static FileSavePicker InitializeWithWindow(FileSavePicker obj, IntPtr windowHandle)
                         {
-                            WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
+                            WinRT.Interop.InitializeWithWindow.Initialize(obj, windowHandle);
                             return obj;
                         }
 
