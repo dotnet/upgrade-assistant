@@ -106,7 +106,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             _path = new Dictionary<string, IEnumerable<string>>();
             FindPath(project);
-            if (_path.Count == 0)
+            if (_path.Count != 3 && _path.Count != 4)
             {
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Cannot find required file(s) for WCF update. The project is not applicable for automated update and this step will be skipped.", BuildBreakRisk.Low));
             }
@@ -177,13 +177,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             var csFile = project.FindFiles(".cs", ProjectItemType.Compile);
             var main = from f in csFile
-                       where File.Exists(f) && File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(")
+                       where File.Exists(f) && File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(", StringComparison.Ordinal)
                        select f;
             var directives = from f in csFile
-                             where File.Exists(f) && File.ReadAllText(f).Contains("using System.ServiceModel") && !File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(")
+                             where File.Exists(f) && File.ReadAllText(f).Contains("using System.ServiceModel", StringComparison.Ordinal) && !File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(", StringComparison.Ordinal)
                              select f;
             var config = from f in project.FindFiles(".config", ProjectItemType.None)
-                         where File.Exists(f) && File.ReadAllText(f).Contains("<system.serviceModel>")
+                         where File.Exists(f) && File.ReadAllText(f).Contains("<system.serviceModel>", StringComparison.Ordinal)
                          select f;
 
             if (!main.Any())

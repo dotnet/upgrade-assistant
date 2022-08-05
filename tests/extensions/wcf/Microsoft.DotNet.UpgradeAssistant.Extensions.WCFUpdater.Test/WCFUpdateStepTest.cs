@@ -21,18 +21,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         private const string Config = "TestInputFiles\\SampleConfig.txt";
         private const string Config_NA = "TestInputFiles\\SampleConfig_NA.txt";
         private readonly ITestOutputHelper _output;
+        private Dictionary<string, string> original;
 
         public WCFUpdateStepTest(ITestOutputHelper output)
         {
             _output = output;
+            original = new Dictionary<string, string>();
+            original.Add("directive", File.ReadAllText(Directive));
+            original.Add("proj", File.ReadAllText(Proj));
+            original.Add("main", File.ReadAllText(Main));
+            original.Add("config", File.ReadAllText(Config));
         }
 
         [Theory]
-        [InlineData(Proj, Main, Directive, "", UpgradeStepStatus.Skipped)] // can't find path case
-        [InlineData(Proj, Main, Directive, Config_NA, UpgradeStepStatus.Skipped)] // find path but not applicable case
-        [InlineData(Proj, Main, Directive, Config, UpgradeStepStatus.Incomplete)] // success case
-        [InlineData(Proj, Main, "", Config, UpgradeStepStatus.Incomplete)] // no directive cs file but still success case. This test case pass locally but not in the pipeline. Comment it out for now
-        public void WCFUpdateTest(string proj, string main, string directive, string config, UpgradeStepStatus expected)
+        [InlineData(Proj, Main, "", Directive, UpgradeStepStatus.Skipped)] // can't find path case
+        [InlineData(Proj, Main, Config_NA, Directive, UpgradeStepStatus.Skipped)] // find path but not applicable case
+        [InlineData(Proj, Main, Config, Directive, UpgradeStepStatus.Incomplete)] // success case
+        [InlineData(Proj, Main, Config, "", UpgradeStepStatus.Incomplete)] // no directive cs file but still success case. This test case pass locally but not in the pipeline. Comment it out for now
+        public void WCFUpdateTest(string proj, string main, string config, string directive, UpgradeStepStatus expected)
         {
             // Arrange
             using var mock = AutoMock.GetLoose();
@@ -84,7 +90,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                 Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Main)));
                 Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Directive)));
                 Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Proj)));
+                Reset();
             }
+        }
+
+        private void Reset()
+        {
+            File.WriteAllText(Main, original["main"]);
+            File.WriteAllText(Proj, original["proj"]);
+            File.WriteAllText(Config, original["config"]);
+            File.WriteAllText(Directive, original["directive"]);
         }
     }
 }
