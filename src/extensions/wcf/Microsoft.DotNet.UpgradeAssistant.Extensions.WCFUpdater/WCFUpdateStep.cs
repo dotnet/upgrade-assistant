@@ -207,12 +207,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             else
             {
                 _path!.Add("main", main);
+                Logger.LogTrace($"This following file: {main.First()} needs source code update to replace ServiceHost instance.");
                 _path.Add("config", config);
+                Logger.LogTrace($"This following config file: {config.First()} needs to be updated.");
                 _path.Add("proj", new[] { project.GetFile().FilePath });
+                Logger.LogTrace($"This following project file: {project.GetFile().FilePath} needs to be updated");
+
                 if (directives.Any())
                 {
+                    Logger.LogDebug($"This .cs file: {directives.First()} needs using directives updates. Adding the path to collection.");
                     _path.Add("directives", directives);
                 }
+
+                Logger.LogDebug("Retrieved file paths that are needed for updates.");
             }
         }
     }

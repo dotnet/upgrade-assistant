@@ -80,10 +80,10 @@ using Microsoft.Extensions.DependencyInjection;
             }); ";
 
         public const string HttpPort = "options.ListenAnyIP(httpPortNum);";
-        public const string HttpsDelegate = @"options.ListenAnyIP(HttpsListenPort, listenOptions =>
+        public const string HttpsDelegate = @"options.ListenAnyIP(httpsPortNum, listenOptions =>
                     {
-                            listenOptions.UseHttps(httpsPortNum);
-                    })";
+                            listenOptions.UseHttps();
+                    });";
 
         public const string CoreWCFPackages = @"<ItemGroup>
 	<PackageReference Include=""CoreWCF.NetTcp"" Version=""1.1.0"" />
