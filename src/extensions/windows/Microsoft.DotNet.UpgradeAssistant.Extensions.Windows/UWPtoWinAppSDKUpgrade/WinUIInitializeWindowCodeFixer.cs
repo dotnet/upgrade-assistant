@@ -20,6 +20,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     [ApplicableComponents(ProjectComponents.WinUI)]
     public class WinUIInitializeWindowCodeFixer : CodeFixProvider
     {
+        private const string WindowInitializerComment = @"/* TODO You should replace 'App.WindowHandle' with the your window's handle (HWND) 
+            Read more on retrieving window handle here: https://docs.microsoft.com/en-us/windows/apps/develop/ui-input/retrieve-hwnd */
+        ";
+
         // The Upgrade Assistant will only use analyzers that have an associated code fix provider registered including
         // the analyzer's ID in the code fix provider's FixableDiagnosticIds array.
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DiagnosticId);
@@ -66,12 +70,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 var newMethodDeclarationSibling = objectCreationDeclaration.Ancestors().OfType<MethodDeclarationSyntax>().First();
                 var typeName = objectCreationDeclaration.Type.ToString();
 
-                var newMethodAccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.IdentifierName("this"),
-                    SyntaxFactory.IdentifierName("InitializeWithWindow"));
-                var newMethodCall = SyntaxFactory.InvocationExpression(newMethodAccess,
-                    SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Argument(objectCreationDeclaration) })));
+                var newMethodCall = SyntaxFactory.InvocationExpression(SyntaxFactory.ParseExpression("InitializeWithWindow"),
+                    SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(new[]
+                    {
+                        SyntaxFactory.Argument(objectCreationDeclaration),
+                        SyntaxFactory.Argument(SyntaxFactory.ParseExpression("App.WindowHandle"))
+                    })));
 
-                documentEditor.ReplaceNode(objectCreationDeclaration, newMethodCall);
+                var newMethodCallComment = SyntaxFactory.Comment(WindowInitializerComment);
+                documentEditor.ReplaceNode(objectCreationDeclaration, newMethodCall.WithLeadingTrivia(newMethodCallComment));
+
                 if (!newMethodDeclarationSibling.Parent!.ChildNodes().OfType<MethodDeclarationSyntax>()
                     .Any(sibling => sibling.Identifier.ValueText == "InitializeWithWindow"
                         && sibling.ParameterList.Parameters.Any(parameter => parameter.Type!.ToString() == typeName)))
@@ -79,9 +87,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     var newMethodRoot = await CSharpSyntaxTree.ParseText(@$"
                     class A
                     {{
-                        private {typeName} InitializeWithWindow({typeName} obj)
+                        private static {typeName} InitializeWithWindow({typeName} obj, IntPtr windowHandle)
                         {{
-                            WinRT.Interop.InitializeWithWindow.Initialize(obj, App.WindowHandle);
+                            WinRT.Interop.InitializeWithWindow.Initialize(obj, windowHandle);
                             return obj;
                         }}
                     }}",
