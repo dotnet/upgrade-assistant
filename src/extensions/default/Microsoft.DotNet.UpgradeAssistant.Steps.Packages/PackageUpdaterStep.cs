@@ -3,9 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
 
@@ -122,11 +126,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                         return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No package updates needed", BuildBreakRisk.None);
                     }
 
+                    var additions = UpdatePackageAddition(analysis.Packages, context.CurrentProject.Required());
                     var steps = new List<UpgradeStep>();
 
                     AddSubsteps(analysis.References.Deletions, "Remove reference '{0}'", static t => t.Name, static (file, op) => file.RemoveReferences(new[] { op.Item }));
                     AddSubsteps(analysis.Packages.Deletions, "Remove package '{0}'", static t => t.Name, static (file, op) => file.RemovePackages(new[] { op.Item }));
-                    AddSubsteps(analysis.Packages.Additions, "Add package '{0}'", static t => t.Name, static (file, op) => file.AddPackages(new[] { op.Item }));
+                    AddSubsteps<NuGetReference>(additions, "Add package '{0}'", static t => t.Name, static (file, op) => file.AddPackages(new[] { op.Item }));
                     AddSubsteps(analysis.FrameworkReferences.Deletions, "Remove framework reference '{0}'", static t => t.Name, static (file, op) => file.RemoveFrameworkReferences(new[] { op.Item }));
                     AddSubsteps(analysis.FrameworkReferences.Additions, "Add framework reference '{0}'", static t => t.Name, static (file, op) => file.AddFrameworkReferences(new[] { op.Item }));
 
@@ -148,6 +153,41 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 }
 
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"{_analyzer.Name} has identified some recommended changes", Risk: _risk);
+            }
+
+            // For server-only projects, do not need to add System.ServiceModel packages.
+            private static IEnumerable<Operation<NuGetReference>> UpdatePackageAddition(IDependencyCollection<NuGetReference> packages, IProject project)
+            {
+                var files = project.FindFiles(".cs", ProjectItemType.Compile);
+                var containsService = false;
+                foreach (var f in files)
+                {
+                    var root = CSharpSyntaxTree.ParseText(f).GetRoot();
+                    if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
+                    {
+                        return packages.Additions;
+                    }
+
+                    if (!containsService && ContainsIdentifier(root, "ServiceHost"))
+                    {
+                        containsService = true;
+                    }
+                }
+
+                if (containsService)
+                {
+                    return from p in packages.Additions
+                            where !p.Item.Name.StartsWith("System.ServiceModel", StringComparison.OrdinalIgnoreCase)
+                            select p;
+                }
+
+                return packages.Additions;
+            }
+
+            // Checks if the root has descendant nodes that contains id
+            private static bool ContainsIdentifier(SyntaxNode root, string id)
+            {
+                return root.DescendantNodes().OfType<IdentifierNameSyntax>().Any(n => n.Identifier.ValueText.IndexOf(id, StringComparison.Ordinal) >= 0);
             }
 
             public override UpgradeStepInitializeResult Reset()
