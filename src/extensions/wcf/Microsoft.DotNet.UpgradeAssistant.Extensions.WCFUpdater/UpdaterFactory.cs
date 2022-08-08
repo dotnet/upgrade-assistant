@@ -91,11 +91,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             bool httpBinding = false, httpsBinding = false;
             foreach (string b in bindings)
             {
-                if (b.Contains("HttpBinding"))
+                if (b.Contains("HttpBinding", StringComparison.Ordinal))
                 {
                     httpBinding = true;
                 }
-                else if (b.Contains("HttpsBinding"))
+                else if (b.Contains("HttpsBinding", StringComparison.Ordinal))
                 {
                     httpsBinding = true;
                 }
