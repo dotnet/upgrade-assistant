@@ -20,9 +20,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         public const string RuleID = "UA302";
 
-        private const string CsWinRTLogMessage = "A CsWinRTIncludes property with value {0} has been added.\n" +
+        private const string CsWinRTLogMessageFormat = "A CsWinRTIncludes property with value {0} has been added.\n" +
                             "If your project assembly name differs from {0}, update this value with the assembly name.\n" +
                             "Read more about CsWinRT here: https://docs.microsoft.com/en-us/windows/apps/develop/platform/csharp-winrt/";
+
+        private const string CsWinRTIncludesProperty = "CsWinRTIncludes";
 
         public string Id => typeof(WinUIPropertiesUpdater).FullName;
 
@@ -80,11 +82,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     if (projRef.Contains(".vcxproj"))
                     {
                         var projectName = ParseProjectNameWithExtension(projRef, ".vcxproj");
-                        var csWinRTIncludesValue = projectFile.GetPropertyValue("CsWinRTIncludes") ?? string.Empty;
+                        var csWinRTIncludesValue = projectFile.GetPropertyValue(CsWinRTIncludesProperty) ?? string.Empty;
                         var delimiter = csWinRTIncludesValue.Trim().Length == 0 || csWinRTIncludesValue.EndsWith(";") ? string.Empty : ";";
                         projectFile.SetPropertyValue("CsWinRTIncludes", $"{csWinRTIncludesValue}{delimiter}{projectName}");
 
-                        _logger.LogInformation(string.Format(CsWinRTLogMessage, projectName));
+                        _logger.LogInformation(string.Format(CsWinRTLogMessageFormat, projectName));
                     }
                 }
 
