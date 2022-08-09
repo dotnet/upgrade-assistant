@@ -121,7 +121,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             string host = string.Empty;
             if (portNum.ContainsKey(Uri.UriSchemeNetTcp))
             {
-                host += Constants.NetTcp;
+                host += Constants.NetTcp + System.Environment.NewLine;
                 host = host.Replace("netTcpPortNum", portNum[Uri.UriSchemeNetTcp].Port.ToString());
             }
 

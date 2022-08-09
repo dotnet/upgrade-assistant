@@ -71,7 +71,7 @@ using Microsoft.Extensions.DependencyInjection;
 
         public const string Debug = @"serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;";
 
-        public const string NetTcp = "            builder.WebHost.UseNetTcp(netTcpPortNum);\n";
+        public const string NetTcp = "            builder.WebHost.UseNetTcp(netTcpPortNum);";
         public const string ConfigureKestrel =
             @"            builder.WebHost.ConfigureKestrel(options =>
             {
@@ -81,9 +81,9 @@ using Microsoft.Extensions.DependencyInjection;
 
         public const string HttpPort = "options.ListenAnyIP(httpPortNum);";
         public const string HttpsDelegate = @"options.ListenAnyIP(httpsPortNum, listenOptions =>
-                    {
-                            listenOptions.UseHttps();
-                    });";
+                {
+                        listenOptions.UseHttps();
+                });";
 
         public const string CoreWCFPackages = @"<ItemGroup>
 	<PackageReference Include=""CoreWCF.NetTcp"" Version=""1.1.0"" />
