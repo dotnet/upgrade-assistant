@@ -42,8 +42,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public string Id => Context.SolutionInfo.GetProjectId(FileInfo.FullName);
 
-        public IEnumerable<string> AllProjectReferences => GetRoslynProject().AllProjectReferences.Select(projRef => projRef.ProjectId.ToString());
-
         public IEnumerable<IProject> ProjectReferences => GetRoslynProject().ProjectReferences.Select(p =>
         {
             var project = Context.Workspace.CurrentSolution.GetProject(p.ProjectId);

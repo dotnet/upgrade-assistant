@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade
@@ -38,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
                 return;
             }
 
-            if (project.AllProjectReferences.Any(id => id.Contains(".vcxproj")))
+            if (project.AllProjectReferences().Any(id => id.Contains(".vcxproj")))
             {
                 var newPackage = new NuGetReference(CsWinRTPackageName, CsWinRTVersion);
                 state.Packages.Add(newPackage,

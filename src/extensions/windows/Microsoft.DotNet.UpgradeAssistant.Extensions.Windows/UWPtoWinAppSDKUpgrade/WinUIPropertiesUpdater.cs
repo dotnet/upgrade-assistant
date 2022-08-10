@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -77,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     }
                 }
 
-                foreach (var projRef in project.AllProjectReferences)
+                foreach (var projRef in project.AllProjectReferences())
                 {
                     if (projRef.Contains(".vcxproj"))
                     {
