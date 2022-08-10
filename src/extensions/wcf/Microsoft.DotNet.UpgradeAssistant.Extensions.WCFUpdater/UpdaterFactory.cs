@@ -160,17 +160,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 template = template.Replace("[Metadata1 PlaceHolder]", Constants.Metadata1);
                 if (metadataType == 1)
                 {
-                    string metadata2 = Constants.Metadata2Http.Replace("httpAddress", Path.Combine(uri[Uri.UriSchemeHttp].ToString(), "metadata"));
+                    string metadata2 = Constants.Metadata2Http.Replace("httpAddress", new Uri(uri[Uri.UriSchemeHttp], "metadata").ToString());
                     template = template.Replace("[Metadata2 PlaceHolder]", metadata2);
                 }
                 else if (metadataType == 2)
                 {
-                    string metadata2 = Constants.Metadata2Https.Replace("httpsAddress", Path.Combine(uri[Uri.UriSchemeHttps].ToString(), "metadata"));
+                    string metadata2 = Constants.Metadata2Https.Replace("httpsAddress", new Uri(uri[Uri.UriSchemeHttps], "metadata").ToString());
                     template = template.Replace("[Metadata2 PlaceHolder]", metadata2);
                 }
                 else
                 {
-                    string metadata2 = Constants.Metadata2Both.Replace("httpAddress", Path.Combine(uri[Uri.UriSchemeHttp].ToString(), "metadata"));
+                    string metadata2 = Constants.Metadata2Both.Replace("httpAddress", new Uri(uri[Uri.UriSchemeHttp], "metadata").ToString());
                     metadata2 = metadata2.Replace("httpsAddress", Path.Combine(uri[Uri.UriSchemeHttps].ToString(), "metadata"));
                     template = template.Replace("[Metadata2 PlaceHolder]", metadata2);
                 }

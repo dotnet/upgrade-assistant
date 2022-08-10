@@ -35,16 +35,16 @@ using Microsoft.Extensions.DependencyInjection;
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
-            {
+            {                
+                serviceBuilder.AddService<ServiceType>(serviceOptions => 
+                { 
+                    [ServiceDebug PlaceHolder]
+                });
+
                 serviceBuilder.ConfigureServiceHostBase<ServiceType>(varName =>
                 {
                     int UA_placeHolder;
                 });
-                
-                serviceBuilder.AddService<ServiceType>(serviceOptions => { 
-                    [ServiceDebug PlaceHolder]
-                });
-                
             });
             
             app.StartAsync();
