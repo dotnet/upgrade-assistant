@@ -45,26 +45,25 @@ namespace ConsoleApp
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {
+                serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
+                {
+                    
+                });
+
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
                 {
                 });
-                
-                serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => { 
-                    
-                });
-                
             });
             
-            app.StartAsync();
+            app.StartAsync().GetAwaiter().GetResult();
             Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
             Console.ReadKey();
-            app.StopAsync();
+            app.StopAsync().GetAwaiter().GetResult();
             }
             catch(Exception ex)
             {
                 Debug.Write(ex.ToString());
             }
-           
         }
     }
 }

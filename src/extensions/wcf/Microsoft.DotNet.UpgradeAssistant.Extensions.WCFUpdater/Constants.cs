@@ -35,9 +35,9 @@ using Microsoft.Extensions.DependencyInjection;
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
-            {                
+            {
                 serviceBuilder.AddService<ServiceType>(serviceOptions => 
-                { 
+                {
                     [ServiceDebug PlaceHolder]
                 });
 
@@ -47,8 +47,8 @@ using Microsoft.Extensions.DependencyInjection;
                 });
             });
             
-            app.StartAsync();
-            app.StopAsync();
+            app.StartAsync().GetAwaiter().GetResult();
+            app.StopAsync().GetAwaiter().GetResult();
 }";
 
         public const string Metadata1 = ".AddServiceModelMetadata();";

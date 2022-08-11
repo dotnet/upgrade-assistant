@@ -24,7 +24,6 @@ namespace ConsoleApp
             {
                 Debug.Write(ex.ToString());
             }
-           
         }
     }
 }
