@@ -21,9 +21,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
     {
         public const string RuleID = "UA302";
 
-        private const string CsWinRTLogMessageFormat = "A CsWinRTIncludes property with value {0} has been added.\n" +
+        private const string CsWinRTLogMessageFormat = "A CsWinRTIncludes property with value {0} has been added to specify the namespace of the referenced vcxproj component to project..\n" +
                             "If your project assembly name differs from {0}, update this value with the assembly name.\n" +
-                            "Read more about CsWinRT here: https://docs.microsoft.com/en-us/windows/apps/develop/platform/csharp-winrt/";
+                            "Read more about C#/WinRT here: https://docs.microsoft.com/en-us/windows/apps/develop/platform/csharp-winrt/";
 
         private const string CsWinRTIncludesProperty = "CsWinRTIncludes";
 
@@ -85,7 +85,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                         var projectName = ParseProjectNameWithExtension(projRef, ".vcxproj");
                         var csWinRTIncludesValue = projectFile.GetPropertyValue(CsWinRTIncludesProperty) ?? string.Empty;
                         var delimiter = csWinRTIncludesValue.Trim().Length == 0 || csWinRTIncludesValue.EndsWith(";") ? string.Empty : ";";
-                        projectFile.SetPropertyValue("CsWinRTIncludes", $"{csWinRTIncludesValue}{delimiter}{projectName}");
+                        projectFile.SetPropertyValue(CsWinRTIncludesProperty, $"{csWinRTIncludesValue}{delimiter}{projectName}");
 
                         _logger.LogInformation(string.Format(CsWinRTLogMessageFormat, projectName));
                     }
@@ -107,6 +107,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 new List<string>());
         }
 
+        /*
+          This function parses the project name from projectReference string which includes the file path, project id and more text.
+          It does so by finding the position of ".vcxproj" in the string and then reading the name backwards character by character
+          until the first non-alphanumeric character.
+        */
         private string ParseProjectNameWithExtension(string projectReference, string extension)
         {
             var index = projectReference.IndexOf(".vcxproj");
