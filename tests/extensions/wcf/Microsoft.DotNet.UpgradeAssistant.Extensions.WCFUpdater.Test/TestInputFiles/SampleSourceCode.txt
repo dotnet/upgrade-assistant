@@ -23,8 +23,7 @@ namespace ConsoleApp
             catch(Exception ex)
             {
                 Debug.Write(ex.ToString());
-            }
-           
+            } 
         }
     }
 }

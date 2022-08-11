@@ -44,9 +44,9 @@ namespace ConsoleApp
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
-            {                
+            {
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
-                { 
+                {
                     serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
 
@@ -63,8 +63,7 @@ namespace ConsoleApp
             catch(Exception ex)
             {
                 Debug.Write(ex.ToString());
-            }
-           
+            } 
         }
     }
 }
