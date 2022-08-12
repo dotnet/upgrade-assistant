@@ -36,15 +36,7 @@ using Microsoft.Extensions.DependencyInjection;
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {                
-                serviceBuilder.AddService<ServiceType>(serviceOptions => 
-                { 
-                    [ServiceDebug PlaceHolder]
-                });
-
-                serviceBuilder.ConfigureServiceHostBase<ServiceType>(varName =>
-                {
-                    int UA_placeHolder;
-                });
+                [ServiceBuilderPlaceHolder]
             });
             
             app.StartAsync();
@@ -92,6 +84,17 @@ using Microsoft.Extensions.DependencyInjection;
     <PackageReference Include = ""CoreWCF.Http"" Version=""1.1.0"" />
     <PackageReference Include = ""CoreWCF.WebHttp"" Version=""1.1.0"" />
     </ItemGroup>";
+
+        public const string AddConfigureService =
+              @"serviceBuilder.AddService<ServiceType>(serviceOptions => 
+                { 
+                    [ServiceDebug PlaceHolder]
+                });
+
+                serviceBuilder.ConfigureServiceHostBase<ServiceType>(varName =>
+                {
+                    int UA_placeHolder;
+                });";
 
         public const string HostComment = "The host element is not supported in configuration in CoreWCF. The port that endpoints listen on is instead configured in the source code.";
         public const string BehaviorComment = "The behavior element is not supported in configuration in CoreWCF. Some service behaviors, such as metadata, are configured in the source code.";

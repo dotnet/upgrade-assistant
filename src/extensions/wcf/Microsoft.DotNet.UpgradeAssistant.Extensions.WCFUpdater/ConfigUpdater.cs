@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 
@@ -61,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     select el;
                 unsupported_endpoint.First().AddBeforeSelf(new XComment(Constants.MexEndpoint));
                 unsupported_endpoint.Remove();
-                _logger.LogWarning("The mex endpoint is removed from .config and service metadata behavior is configured in the source code instead.");
+                _logger.LogWarning("The mex endpoint is removed from .config file and service metadata behavior is configured in the source code instead.");
             }
 
             wcfConfig = UpdateEndpoints(wcfConfig);
@@ -72,25 +73,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         // Adds path from base address to the beginning of endpoints if needed
         private XDocument UpdateEndpoints(XDocument config)
         {
-            // get base address
-            var uri = GetUri();
-
-            // add path from base address to endpoints
-            var endpoints = config.Root.DescendantsAndSelf("endpoint");
-            foreach (var endpoint in endpoints)
+            foreach (var service in _config.Root.DescendantsAndSelf("service"))
             {
-                var ad = endpoint.Attribute("address").Value;
-                if (endpoint.Attribute("binding").Value.StartsWith("netTcp", StringComparison.Ordinal))
+                var uri = GetUri(service.Attribute("behaviorConfiguration").Value);
+
+                // add relative path from base address to endpoints
+                // if endpoint ad is already a complete uri, then no need to update?
+                // also add complete endpoint path to the getUri method?
+                foreach (var endpoint in config.Root.DescendantsAndSelf("endpoint"))
                 {
-                    endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeNetTcp].PathAndQuery, ad).Replace("\\", "/");
-                }
-                else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
-                {
-                    endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttps].PathAndQuery, ad).Replace("\\", "/");
-                }
-                else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
-                {
-                    endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttp].PathAndQuery, ad).Replace("\\", "/");
+                    var ad = endpoint.Attribute("address").Value;
+                    if (endpoint.Attribute("binding").Value.StartsWith("netTcp", StringComparison.Ordinal))
+                    {
+                        endpoint.Attribute("address").Value = Path.Combine((from u in uri where u.Scheme == Uri.UriSchemeNetTcp select u).First().PathAndQuery, ad).Replace("\\", "/");
+                    }
+                    else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
+                    {
+                        endpoint.Attribute("address").Value = Path.Combine((from u in uri where u.Scheme == Uri.UriSchemeHttps select u).First().PathAndQuery, ad).Replace("\\", "/");
+                    }
+                    else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
+                    {
+                        endpoint.Attribute("address").Value = Path.Combine((from u in uri where u.Scheme == Uri.UriSchemeHttp select u).First().PathAndQuery, ad).Replace("\\", "/");
+                    }
                 }
             }
 
@@ -99,9 +103,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
 
         // Returns 0 if metadata is not supported, 1 if it's  supported with http, 2 with https, 3 with both http and https</returns>
-        public int SupportsMetadataBehavior()
+        public int SupportsMetadataBehavior(string name)
         {
-            var results = _config.Root.DescendantsAndSelf("serviceMetadata");
+            var results = GetBehavior(name).DescendantsAndSelf("serviceMetadata");
             if (results.Any())
             {
                 var el = results.First();
@@ -137,9 +141,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return false;
         }
 
-        public bool SupportsServiceDebug()
+        public bool SupportsServiceDebug(string name)
         {
-            var results = _config.Root.DescendantsAndSelf("serviceDebug");
+            var results = GetBehavior(name).DescendantsAndSelf("serviceDebug");
             if (results.Any())
             {
                 var el = results.First();
@@ -152,32 +156,92 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return false;
         }
 
-        public Dictionary<string, Uri> GetUri()
+        public HashSet<Uri> GetUri(string behaviorName)
         {
-            Dictionary<string, Uri> uri = new Dictionary<string, Uri>();
-            var baseAddress =
-                from address in _config.Root.DescendantsAndSelf("add")
-                where address.Attribute("baseAddress").Value != null
-                select address;
+            HashSet<Uri> uri = new HashSet<Uri>();
+            var baseAddress = from address in GetService(behaviorName).DescendantsAndSelf("add")
+                              where address.Attribute("baseAddress").Value != null
+                              select address;
             foreach (var address in baseAddress)
             {
                 Uri ad = new Uri(address.Attribute("baseAddress").Value);
-                uri.Add(ad.Scheme, ad);
+                uri.Add(ad);
+            }
+
+            var bindings = GetBindings(behaviorName);
+            bool containsNetTcp = (from u in uri where u.Scheme == Uri.UriSchemeNetTcp select u).Any();
+            bool containsHttp = (from u in uri where u.Scheme == Uri.UriSchemeHttp select u).Any();
+            bool containsHttps = (from u in uri where u.Scheme == Uri.UriSchemeHttps select u).Any();
+            bool httpBinding = (from b in bindings where b.Contains("HttpBinding", StringComparison.Ordinal) select b).Any();
+            bool httpsBinding = (from b in bindings where b.Contains("HttpsBinding", StringComparison.Ordinal) select b).Any();
+
+            // adds default address if binding exists but no specific base address
+            if (!containsNetTcp && bindings.Contains("NetTcpBinding"))
+            {
+                uri.Add(new Uri("http://localhost:808"));
+            }
+
+            if (!containsHttp && httpBinding)
+            {
+                uri.Add(new Uri("http://localhost:80"));
+            }
+
+            if (!containsHttps && httpsBinding)
+            {
+                uri.Add(new Uri("http://localhost:443"));
             }
 
             return uri;
         }
 
-        public HashSet<string> GetBindings()
+        public HashSet<string> GetBindings(string behaviorName)
         {
             HashSet<string> bindings = new HashSet<string>();
-            var endpoints = _config.Root.DescendantsAndSelf("endpoint");
+            var endpoints = GetService(behaviorName).DescendantsAndSelf("endpoint");
             foreach (var endpoint in endpoints)
             {
                 bindings.Add(endpoint.Attribute("binding").Value);
             }
 
             return bindings;
+        }
+
+        public HashSet<string> GetAllBehaviorNames()
+        {
+            HashSet<string> behaviors = new HashSet<string>();
+            var behavior = _config.Root.DescendantsAndSelf("serviceBehaviors").DescendantsAndSelf("behavior");
+            foreach (var b in behavior)
+            {
+                // assumes that the default name is string.empty
+                behaviors.Add(b.Attribute("name").Value);
+            }
+
+            return behaviors;
+        }
+
+        public Dictionary<string, string> GetServiceBehaviorPair()
+        {
+            Dictionary<string, string> pair = new Dictionary<string, string>();
+            foreach (var s in _config.Root.DescendantsAndSelf("service"))
+            {
+                pair.Add(s.Attribute("name").Value, s.Attribute("behaviorConfiguration").Value);
+            }
+
+            return pair;
+        }
+
+        private XElement GetBehavior(string name)
+        {
+            return (from b in _config.Root.DescendantsAndSelf("serviceBehaviors").DescendantsAndSelf("behavior")
+                    where b.Attribute("name") == null
+                    select b).First();
+        }
+
+        private XElement GetService(string behaviorName)
+        {
+            return (from s in _config.Root.DescendantsAndSelf("service")
+                    where s.Attribute("behaviorConfiguration").Value == behaviorName
+                    select s).First();
         }
     }
 }

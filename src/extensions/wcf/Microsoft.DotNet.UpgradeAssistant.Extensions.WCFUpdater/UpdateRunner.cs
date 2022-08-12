@@ -157,15 +157,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        public static Dictionary<string, object> GetContext(ConfigUpdater configUpdater)
+        public static Dictionary<string, Dictionary<string, object>> GetContexts(ConfigUpdater configUpdater)
         {
-            Dictionary<string, Uri> uri = configUpdater.GetUri();
+            var contexts = new Dictionary<string, Dictionary<string, object>>();
+            //var behaviorNames = configUpdater.GetAllBehaviorNames();
+            var pair = configUpdater.GetServiceBehaviorPair();
+            foreach (var serviceName in pair.Keys)
+            {
+                contexts.Add(serviceName, GetContext(configUpdater, pair[serviceName]));
+            }
+
+            return contexts;
+        }
+
+        public static Dictionary<string, object> GetContext(ConfigUpdater configUpdater, string name)
+        {
             Dictionary<string, object> context = new Dictionary<string, object>
             {
-                { "uri", uri },
-                { "metadata", configUpdater.SupportsMetadataBehavior() },
-                { "debug", configUpdater.SupportsServiceDebug() },
-                { "bindings", configUpdater.GetBindings() }
+                { "uri", configUpdater.GetUri(name) },
+                { "metadata", configUpdater.SupportsMetadataBehavior(name) },
+                { "debug", configUpdater.SupportsServiceDebug(name) },
+                { "bindings", configUpdater.GetBindings(name) }
             };
             return context;
         }

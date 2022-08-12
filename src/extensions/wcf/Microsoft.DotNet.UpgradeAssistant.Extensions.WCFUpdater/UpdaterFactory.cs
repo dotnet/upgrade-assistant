@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -43,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        public static SourceCodeUpdater? GetSourceCodeUpdater(string path, Dictionary<string, object> context, ILogger logger)
+        public static SourceCodeUpdater? GetSourceCodeUpdater(string path, Dictionary<string, Dictionary<string, object>> context, ILogger logger)
         {
             try
             {
@@ -77,71 +79,49 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        private static string UpdateTemplateCode(Dictionary<string, object> context, ILogger logger)
+        private static string UpdateTemplateCode(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
         {
             string template = Constants.Template;
-            Dictionary<string, Uri> uri = (Dictionary<string, Uri>)context["uri"];
-            template = UpdatePortNumber(template, uri, (HashSet<string>)context["bindings"]);
-            template = UpdateServiceBehavior(template, (int)context["metadata"], (bool)context["debug"], uri);
+            template = UpdatePortNumber(template, GetAllAddress(context, logger));
+            //template = UpdateServiceMetadata(template, (int)context["metadata"], uri);
+            template = template.Replace("[ServiceBuilderPlaceHolder]", AddMultipleServices(context, logger));
             return template;
         }
 
-        private static string UpdatePortNumber(string template, Dictionary<string, Uri> portNum, HashSet<string> bindings)
+        private static string UpdatePortNumber(string template, HashSet<Uri> port)
         {
-            bool httpBinding = false, httpsBinding = false;
-            foreach (string b in bindings)
-            {
-                if (b.Contains("HttpBinding", StringComparison.Ordinal))
-                {
-                    httpBinding = true;
-                }
-                else if (b.Contains("HttpsBinding", StringComparison.Ordinal))
-                {
-                    httpsBinding = true;
-                }
-            }
-
-            // adds default address if binding exists
-            if (!portNum.ContainsKey(Uri.UriSchemeNetTcp) && bindings.Contains("NetTcpBinding"))
-            {
-                portNum.Add(Uri.UriSchemeNetTcp, new Uri("http://localhost:808"));
-            }
-
-            if (!portNum.ContainsKey(Uri.UriSchemeHttp) && httpBinding)
-            {
-                portNum.Add(Uri.UriSchemeHttp, new Uri("http://localhost:80"));
-            }
-
-            if (!portNum.ContainsKey(Uri.UriSchemeHttps) && httpsBinding)
-            {
-                portNum.Add(Uri.UriSchemeHttps, new Uri("http://localhost:443"));
-            }
+            HashSet<Uri> netTcp = new HashSet<Uri>(from p in port where p.Scheme == Uri.UriSchemeNetTcp select p);
+            HashSet<Uri> http = new HashSet<Uri>(from p in port where p.Scheme == Uri.UriSchemeHttp select p);
+            HashSet<Uri> https = new HashSet<Uri>(from p in port where p.Scheme == Uri.UriSchemeHttps select p);
 
             // creates the template code for host based on the scheme type
             string host = string.Empty;
-            if (portNum.ContainsKey(Uri.UriSchemeNetTcp))
+            foreach (var address in netTcp)
             {
-                host += Constants.NetTcp + System.Environment.NewLine;
-                host = host.Replace("netTcpPortNum", portNum[Uri.UriSchemeNetTcp].Port.ToString());
+                host += Constants.NetTcp.Replace("netTcpPortNum", address.Port.ToString()) + System.Environment.NewLine;
             }
 
-            if (portNum.ContainsKey(Uri.UriSchemeHttp) || portNum.ContainsKey(Uri.UriSchemeHttps))
+            if (http.Count > 0 || https.Count > 0)
             {
                 host += Constants.ConfigureKestrel;
-                if (portNum.ContainsKey(Uri.UriSchemeHttp))
+                if (http.Count > 0)
                 {
-                    host = host.Replace("[Http Port]", Constants.HttpPort);
-                    host = host.Replace("httpPortNum", portNum[Uri.UriSchemeHttp].Port.ToString());
+                    foreach (var address in http)
+                    {
+                        host += Constants.HttpPort.Replace("httpPortNum", address.Port.ToString()) + System.Environment.NewLine;
+                    }
                 }
                 else
                 {
                     host = host.Replace("[Http Port]", string.Empty);
                 }
 
-                if (portNum.ContainsKey(Uri.UriSchemeHttps))
+                if (https.Count > 0)
                 {
-                    host = host.Replace("[Https Delegate]", Constants.HttpsDelegate);
-                    host = host.Replace("httpsPortNum", portNum[Uri.UriSchemeHttps].Port.ToString());
+                    foreach (var address in https)
+                    {
+                        host += Constants.HttpsDelegate.Replace("httpsPortNum", address.Port.ToString()) + System.Environment.NewLine;
+                    }
                 }
                 else
                 {
@@ -152,7 +132,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return template.Replace("[Port PlaceHolder]", host);
         }
 
-        private static string UpdateServiceBehavior(string template, int metadataType, bool debug, Dictionary<string, Uri> uri)
+        private static HashSet<Uri> GetAllAddress(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
+        {
+            // unions all uri from different services
+            HashSet<Uri> port = new HashSet<Uri>();
+            foreach (var key in context.Keys)
+            {
+                port.UnionWith((HashSet<Uri>)context[key]["uri"]);
+            }
+
+            return port;
+        }
+
+        private static string UpdateServiceMetadata(string template, int metadataType, Dictionary<string, Uri> uri)
         {
             // updates metadata
             if (metadataType != 0)
@@ -181,6 +173,23 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 template = template.Replace("[Metadata2 PlaceHolder]", string.Empty);
             }
 
+            return template;
+        }
+
+        private static string AddMultipleServices(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
+        {
+            var builder = string.Empty;
+            foreach (var serviceName in context.Keys)
+            {
+                builder += UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), (bool)context[serviceName]["debug"])
+                    + System.Environment.NewLine;
+            }
+
+            return builder;
+        }
+
+        private static string UpdateServiceDebug(string template, bool debug)
+        {
             // updates service debug
             if (debug)
             {

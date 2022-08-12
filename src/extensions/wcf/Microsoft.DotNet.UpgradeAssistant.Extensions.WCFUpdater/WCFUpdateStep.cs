@@ -128,7 +128,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             if (_configUpdater != null)
             {
-                var configContext = UpdateRunner.GetContext(_configUpdater);
+                var configContext = UpdateRunner.GetContexts(_configUpdater);
                 _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path["main"].First(), configContext, Logger);
             }
 
