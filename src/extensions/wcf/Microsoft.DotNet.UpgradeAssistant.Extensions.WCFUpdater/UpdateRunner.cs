@@ -160,7 +160,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         public static Dictionary<string, Dictionary<string, object>> GetContexts(ConfigUpdater configUpdater)
         {
             var contexts = new Dictionary<string, Dictionary<string, object>>();
-            //var behaviorNames = configUpdater.GetAllBehaviorNames();
             var pair = configUpdater.GetServiceBehaviorPair();
             foreach (var serviceName in pair.Keys)
             {

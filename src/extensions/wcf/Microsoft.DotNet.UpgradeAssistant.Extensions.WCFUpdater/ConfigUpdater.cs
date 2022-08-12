@@ -85,15 +85,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     var ad = endpoint.Attribute("address").Value;
                     if (endpoint.Attribute("binding").Value.StartsWith("netTcp", StringComparison.Ordinal))
                     {
-                        endpoint.Attribute("address").Value = Path.Combine((from u in uri where u.Scheme == Uri.UriSchemeNetTcp select u).First().PathAndQuery, ad).Replace("\\", "/");
+                        endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeNetTcp].PathAndQuery, ad).Replace("\\", "/");
                     }
                     else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
                     {
-                        endpoint.Attribute("address").Value = Path.Combine((from u in uri where u.Scheme == Uri.UriSchemeHttps select u).First().PathAndQuery, ad).Replace("\\", "/");
+                        endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttps].PathAndQuery, ad).Replace("\\", "/");
                     }
                     else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
                     {
-                        endpoint.Attribute("address").Value = Path.Combine((from u in uri where u.Scheme == Uri.UriSchemeHttp select u).First().PathAndQuery, ad).Replace("\\", "/");
+                        endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttp].PathAndQuery, ad).Replace("\\", "/");
                     }
                 }
             }
@@ -156,39 +156,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return false;
         }
 
-        public HashSet<Uri> GetUri(string behaviorName)
+        public Dictionary<string, Uri> GetUri(string behaviorName)
         {
-            HashSet<Uri> uri = new HashSet<Uri>();
+            Dictionary<string, Uri> uri = new Dictionary<string, Uri>();
             var baseAddress = from address in GetService(behaviorName).DescendantsAndSelf("add")
                               where address.Attribute("baseAddress").Value != null
                               select address;
             foreach (var address in baseAddress)
             {
                 Uri ad = new Uri(address.Attribute("baseAddress").Value);
-                uri.Add(ad);
+                uri.Add(ad.Scheme, ad);
             }
 
             var bindings = GetBindings(behaviorName);
-            bool containsNetTcp = (from u in uri where u.Scheme == Uri.UriSchemeNetTcp select u).Any();
-            bool containsHttp = (from u in uri where u.Scheme == Uri.UriSchemeHttp select u).Any();
-            bool containsHttps = (from u in uri where u.Scheme == Uri.UriSchemeHttps select u).Any();
             bool httpBinding = (from b in bindings where b.Contains("HttpBinding", StringComparison.Ordinal) select b).Any();
             bool httpsBinding = (from b in bindings where b.Contains("HttpsBinding", StringComparison.Ordinal) select b).Any();
 
             // adds default address if binding exists but no specific base address
-            if (!containsNetTcp && bindings.Contains("NetTcpBinding"))
+            if (!uri.ContainsKey(Uri.UriSchemeNetTcp) && bindings.Contains("NetTcpBinding"))
             {
-                uri.Add(new Uri("http://localhost:808"));
+                uri.Add(Uri.UriSchemeNetTcp, new Uri("http://localhost:808"));
             }
 
-            if (!containsHttp && httpBinding)
+            if (!uri.ContainsKey(Uri.UriSchemeHttp) && httpBinding)
             {
-                uri.Add(new Uri("http://localhost:80"));
+                uri.Add(Uri.UriSchemeHttp, new Uri("http://localhost:80"));
             }
 
-            if (!containsHttps && httpsBinding)
+            if (!uri.ContainsKey(Uri.UriSchemeHttps) && httpsBinding)
             {
-                uri.Add(new Uri("http://localhost:443"));
+                uri.Add(Uri.UriSchemeHttps, new Uri("http://localhost:443"));
             }
 
             return uri;
@@ -233,14 +230,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         private XElement GetBehavior(string name)
         {
             return (from b in _config.Root.DescendantsAndSelf("serviceBehaviors").DescendantsAndSelf("behavior")
-                    where b.Attribute("name") == null
+                    where b.Attribute("name").Value.Equals(name, StringComparison.Ordinal)
                     select b).First();
         }
 
         private XElement GetService(string behaviorName)
         {
             return (from s in _config.Root.DescendantsAndSelf("service")
-                    where s.Attribute("behaviorConfiguration").Value == behaviorName
+                    where s.Attribute("behaviorConfiguration").Value.Equals(behaviorName, StringComparison.Ordinal)
                     select s).First();
         }
     }

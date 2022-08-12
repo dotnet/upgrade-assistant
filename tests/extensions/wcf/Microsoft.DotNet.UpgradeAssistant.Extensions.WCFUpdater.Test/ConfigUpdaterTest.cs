@@ -103,7 +103,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             expected.Add(Uri.UriSchemeHttps, new Uri("https://localhost:443/sample/address"));
             expected.Add(Uri.UriSchemeNetTcp, new Uri("net.tcp://localhost:808/"));
 
-            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetUri();
+            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetUri("SampleBehavior");
             Assert.Equal(expected, result);
         }
 
@@ -114,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             expected.Add("netTcpBinding");
             expected.Add("basicHttpsBinding");
             expected.Add("mexHttpBinding");
-            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetBindings();
+            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetBindings("SampleBehavior");
             Assert.Equal(expected, result);
         }
 
@@ -123,7 +123,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(ServiceDebug, true)]
         public void SupportsServiceDebugTest(string replace, bool expected)
         {
-            bool result = new ConfigUpdater(XDocument.Parse(Input.Replace(ServiceDebug, replace)), _logger).SupportsServiceDebug();
+            bool result = new ConfigUpdater(XDocument.Parse(Input.Replace(ServiceDebug, replace)), _logger).SupportsServiceDebug("SampleBehavior");
             Assert.Equal(expected, result);
         }
 
@@ -134,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(MetadataBoth, 3)]
         public void SupportsMetadataBehaviorTest(string replace, int expected)
         {
-            int result = new ConfigUpdater(XDocument.Parse(Input.Replace(Metadata, replace)), _logger).SupportsMetadataBehavior();
+            int result = new ConfigUpdater(XDocument.Parse(Input.Replace(Metadata, replace)), _logger).SupportsMetadataBehavior("SampleBehavior");
             var http = replace.Contains("httpGetEnabled");
             var https = replace.Contains("httpsGetEnabled");
             Assert.Equal(expected, result);

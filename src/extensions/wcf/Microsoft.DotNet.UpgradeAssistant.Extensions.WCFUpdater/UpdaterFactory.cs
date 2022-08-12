@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             string template = Constants.Template;
             template = UpdatePortNumber(template, GetAllAddress(context, logger));
-            //template = UpdateServiceMetadata(template, (int)context["metadata"], uri);
+            template = UpdateServiceMetadata(template, context);
             template = template.Replace("[ServiceBuilderPlaceHolder]", AddMultipleServices(context, logger));
             return template;
         }
@@ -138,39 +138,65 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             HashSet<Uri> port = new HashSet<Uri>();
             foreach (var key in context.Keys)
             {
-                port.UnionWith((HashSet<Uri>)context[key]["uri"]);
+                var dic = (Dictionary<string, Uri>)context[key]["uri"];
+                port.UnionWith(dic.Values);
             }
 
             return port;
         }
 
-        private static string UpdateServiceMetadata(string template, int metadataType, Dictionary<string, Uri> uri)
+        private static string UpdateServiceMetadata(string template, Dictionary<string, Dictionary<string, object>> context)
         {
+            bool hasMetadata = false;
+            string metadataHttp = string.Empty;
+            string metadataHttps = string.Empty;
+
             // updates metadata
-            if (metadataType != 0)
+            foreach (var key in context.Keys)
             {
-                template = template.Replace("[Metadata1 PlaceHolder]", Constants.Metadata1);
-                if (metadataType == 1)
+                var metadataType = (int)context[key]["metadata"];
+                var uri = (Dictionary<string, Uri>)context[key]["uri"];
+                if (metadataType != 0)
                 {
-                    string metadata2 = Constants.Metadata2Http.Replace("httpAddress", new Uri(uri[Uri.UriSchemeHttp], "metadata").ToString());
-                    template = template.Replace("[Metadata2 PlaceHolder]", metadata2);
-                }
-                else if (metadataType == 2)
-                {
-                    string metadata2 = Constants.Metadata2Https.Replace("httpsAddress", new Uri(uri[Uri.UriSchemeHttps], "metadata").ToString());
-                    template = template.Replace("[Metadata2 PlaceHolder]", metadata2);
-                }
-                else
-                {
-                    string metadata2 = Constants.Metadata2Both.Replace("httpAddress", new Uri(uri[Uri.UriSchemeHttp], "metadata").ToString());
-                    metadata2 = metadata2.Replace("httpsAddress", Path.Combine(uri[Uri.UriSchemeHttps].ToString(), "metadata"));
-                    template = template.Replace("[Metadata2 PlaceHolder]", metadata2);
+                    if (!hasMetadata)
+                    {
+                        hasMetadata = true;
+                        template = template.Replace("[Metadata1 PlaceHolder]", Constants.Metadata1);
+                    }
+
+                    if (metadataType == 1 || metadataType == 3)
+                    {
+                        if (metadataHttp.Equals(string.Empty))
+                        {
+                            metadataHttp += Constants.HttpGetEnabled + System.Environment.NewLine;
+                        }
+
+                        metadataHttp += Constants.HttpGetUrl.Replace("httpAddress", new Uri(uri[Uri.UriSchemeHttp], "metadata").ToString())
+                            + System.Environment.NewLine;
+                    }
+
+                    if (metadataType == 2 || metadataType == 3)
+                    {
+                        if (metadataHttps.Equals(string.Empty))
+                        {
+                            metadataHttps += Constants.HttpsGetEnabled + System.Environment.NewLine;
+                        }
+
+                        metadataHttps += Constants.HttpsGetUrl.Replace("httpsAddress", new Uri(uri[Uri.UriSchemeHttps], "metadata").ToString())
+                            + System.Environment.NewLine;
+                    }
                 }
             }
-            else
+
+            if (!hasMetadata)
             {
                 template = template.Replace("[Metadata1 PlaceHolder]", string.Empty);
                 template = template.Replace("[Metadata2 PlaceHolder]", string.Empty);
+            }
+            else
+            {
+                template = template.Replace("[Metadata2 PlaceHolder]", Constants.Metadata2 + System.Environment.NewLine +
+                    metadataHttp + metadataHttps);
             }
 
             return template;

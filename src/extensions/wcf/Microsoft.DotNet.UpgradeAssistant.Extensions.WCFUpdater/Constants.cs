@@ -44,22 +44,13 @@ using Microsoft.Extensions.DependencyInjection;
 }";
 
         public const string Metadata1 = ".AddServiceModelMetadata();";
-        public const string Metadata2Http = @"// Enable getting metadata/wsdl
-            var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
-            serviceMetadataBehavior.HttpGetEnabled = true;
-            serviceMetadataBehavior.HttpGetUrl = new Uri(""httpAddress"");";
+        public const string Metadata2 = @"// Enable getting metadata/wsdl
+            var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();";
 
-        public const string Metadata2Https = @"// Enable getting metadata/wsdl
-            var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
-            serviceMetadataBehavior.HttpsGetEnabled = true;
-            serviceMetadataBehavior.HttpsGetUrl = new Uri(""httpsAddress"");";
-
-        public const string Metadata2Both = @"// Enable getting metadata/wsdl
-            var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
-            serviceMetadataBehavior.HttpGetEnabled = true;
-            serviceMetadataBehavior.HttpGetUrl = new Uri(""httpAddress"");
-            serviceMetadataBehavior.HttpsGetEnabled = true;
-            serviceMetadataBehavior.HttpsGetUrl = new Uri(""httpsAddress"");";
+        public const string HttpGetEnabled = "            serviceMetadataBehavior.HttpGetEnabled = true;";
+        public const string HttpsGetEnabled = "            serviceMetadataBehavior.HttpGetEnabled = true;";
+        public const string HttpGetUrl = @"            serviceMetadataBehavior.HttpGetUrl = new Uri(""httpAddress"");";
+        public const string HttpsGetUrl = @"            serviceMetadataBehavior.HttpsGetUrl = new Uri(""httpsAddress"");";
 
         public const string Debug = @"serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;";
 
