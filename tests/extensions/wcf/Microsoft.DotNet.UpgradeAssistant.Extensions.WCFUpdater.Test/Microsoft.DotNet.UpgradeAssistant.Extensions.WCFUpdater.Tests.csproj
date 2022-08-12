@@ -29,6 +29,15 @@
     <None Update="TestExpectedFiles\ExpectedSourceCode.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TestExpectedFiles\MultiServicesTemplateCode.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestExpectedFiles\SimpleTemplateCode.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestInputFiles\MultiServicesConfig.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestInputFiles\SampleConfig.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

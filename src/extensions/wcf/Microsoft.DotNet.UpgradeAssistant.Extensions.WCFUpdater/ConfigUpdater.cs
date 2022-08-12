@@ -20,6 +20,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             _config = doc;
             _logger = logger;
+            SetServiceAndBehaviorNames(_logger);
         }
 
         // Updates the original config file by removing the system.serviceModel element
@@ -239,6 +240,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return (from s in _config.Root.DescendantsAndSelf("service")
                     where s.Attribute("behaviorConfiguration").Value.Equals(behaviorName, StringComparison.Ordinal)
                     select s).First();
+        }
+
+        private void SetServiceAndBehaviorNames(ILogger logger)
+        {
+            foreach (var s in _config.Root.DescendantsAndSelf("service"))
+            {
+                if (s.Attribute("behaviorConfiguration") == null)
+                {
+                    s.SetAttributeValue("behaviorConfiguration", string.Empty);
+                    logger.LogWarning("Set the attribute service/behaviorConfiguration value to empty string to avoid null.");
+                }
+            }
+
+            foreach (var s in _config.Root.DescendantsAndSelf("serviceBehaviors").DescendantsAndSelf("behavior"))
+            {
+                if (s.Attribute("name") == null)
+                {
+                    s.SetAttributeValue("name", string.Empty);
+                    logger.LogWarning("Set the attribute behavior/name value to empty string to avoid null.");
+                }
+            }
         }
     }
 }

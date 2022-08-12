@@ -79,7 +79,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        private static string UpdateTemplateCode(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
+        public static string UpdateTemplateCode(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
         {
             string template = Constants.Template;
             template = UpdatePortNumber(template, GetAllAddress(context, logger));
@@ -104,12 +104,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (http.Count > 0 || https.Count > 0)
             {
                 host += Constants.ConfigureKestrel;
+                var httpPort = string.Empty;
+                var httpsPort = string.Empty;
                 if (http.Count > 0)
                 {
                     foreach (var address in http)
                     {
-                        host += Constants.HttpPort.Replace("httpPortNum", address.Port.ToString()) + System.Environment.NewLine;
+                        httpPort += Constants.HttpPort.Replace("httpPortNum", address.Port.ToString());
+                        if (address != http.Last())
+                        {
+                            httpPort += System.Environment.NewLine;
+                        }
                     }
+
+                    host = host.Replace("[Http Port]",  httpPort);
                 }
                 else
                 {
@@ -120,8 +128,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 {
                     foreach (var address in https)
                     {
-                        host += Constants.HttpsDelegate.Replace("httpsPortNum", address.Port.ToString()) + System.Environment.NewLine;
+                        httpsPort += Constants.HttpsDelegate.Replace("httpsPortNum", address.Port.ToString());
+                        if (address != https.Last())
+                        {
+                            httpsPort += System.Environment.NewLine;
+                        }
                     }
+
+                    host = host.Replace("[Https Delegate]", httpsPort);
                 }
                 else
                 {
@@ -209,6 +223,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             {
                 builder += UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), (bool)context[serviceName]["debug"])
                     + System.Environment.NewLine;
+                if (serviceName != context.Keys.Last())
+                {
+                    builder += System.Environment.NewLine;
+                }
             }
 
             return builder;

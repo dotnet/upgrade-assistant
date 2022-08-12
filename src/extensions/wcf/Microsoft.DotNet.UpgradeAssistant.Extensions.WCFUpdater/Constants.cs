@@ -32,11 +32,10 @@ using Microsoft.Extensions.DependencyInjection;
             var app = builder.Build();
 
             [Metadata2 PlaceHolder]
-
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {                
-                [ServiceBuilderPlaceHolder]
+[ServiceBuilderPlaceHolder]
             });
             
             app.StartAsync();
@@ -65,7 +64,7 @@ using Microsoft.Extensions.DependencyInjection;
         public const string HttpPort = "options.ListenAnyIP(httpPortNum);";
         public const string HttpsDelegate = @"options.ListenAnyIP(httpsPortNum, listenOptions =>
                 {
-                        listenOptions.UseHttps();
+                    listenOptions.UseHttps();
                 });";
 
         public const string CoreWCFPackages = @"<ItemGroup>
@@ -77,7 +76,7 @@ using Microsoft.Extensions.DependencyInjection;
     </ItemGroup>";
 
         public const string AddConfigureService =
-              @"serviceBuilder.AddService<ServiceType>(serviceOptions => 
+              @"                serviceBuilder.AddService<ServiceType>(serviceOptions => 
                 { 
                     [ServiceDebug PlaceHolder]
                 });
