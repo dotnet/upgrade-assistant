@@ -288,6 +288,7 @@ namespace MSBuild.Conversion.Facts
         public const string ExeOutputType = "Exe";
         public const string WinExeOutputType = "WinExe";
         public const string AppContainerExeOutputType = "AppContainerExe";
+        public const string WinMdObjOutputType = "winmdobj";
         public const string NuGetPackageImportStampNodeName = "NuGetPackageImportStamp";
         public const string ReferencePathNodeName = "ReferencePath";
         public const string LegacyTargetFrameworkPropertyNodeName = "TargetFrameworkIdentifier";
@@ -311,5 +312,7 @@ namespace MSBuild.Conversion.Facts
         public const string TargetPlatformIdentifierNodeName = "TargetPlatformIdentifier";
         public const string UapValue = "UAP";
         public const string TargetPlatformVersionNodeName = "TargetPlatformVersion";
+        public const string CsWinRTComponentName = "CsWinRTComponent";
+        public static readonly (string Name, string Version) CsWinRTPackageReference = (Name: "Microsoft.Windows.CsWinRT", Version: "1.6.4");
     }
 }

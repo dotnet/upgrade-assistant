@@ -188,6 +188,13 @@ namespace MSBuild.Abstractions
             prop.ElementName.Equals(MSBuildFacts.OutputTypeNodeName, StringComparison.OrdinalIgnoreCase)
             && prop.Value.Equals(MSBuildFacts.WinExeOutputType, StringComparison.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Checks if an OutputType node is WinMdObj.
+        /// </summary>
+        public static bool IsWinMdObjProjectType(ProjectPropertyElement prop) =>
+            prop.ElementName.Equals(MSBuildFacts.OutputTypeNodeName, StringComparison.OrdinalIgnoreCase)
+            && prop.Value.Equals(MSBuildFacts.WinMdObjOutputType, StringComparison.OrdinalIgnoreCase);
+
         public static bool IsVisualBasicProject(ProjectPropertyElement prop) =>
             IsProjectTypeGuidsNode(prop) && prop.Value.Split(';').Any(guidString => Guid.Parse(guidString) == MSBuildFacts.LanguageProjectTypeVisualBasic);
 

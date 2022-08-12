@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
+using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade
@@ -17,6 +19,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
     internal class WinUIReferenceAnalyzer : IDependencyAnalyzer
     {
         public string Name => "Windows App SDK package analysis";
+
+        private const string CsWinRTPackageName = "Microsoft.Windows.CsWinRT";
+        private const string CsWinRTVersion = "1.6.4";
 
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger _logger;
@@ -32,6 +37,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
             if (!(await project.IsWinUIProjectAsync(token).ConfigureAwait(false)))
             {
                 return;
+            }
+
+            if (project.AllProjectReferences().Any(id => id.Contains(".vcxproj")))
+            {
+                var newPackage = new NuGetReference(CsWinRTPackageName, CsWinRTVersion);
+                state.Packages.Add(newPackage,
+                    new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = ImmutableList.Create<string>(newPackage.Name) });
             }
 
             foreach (var package in state.Packages)
