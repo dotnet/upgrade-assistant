@@ -9,9 +9,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade
+namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade.Utils
 {
-    internal static class UWPToWinUIHelpers
+    internal static class SyntaxNodeExtensions
     {
         public static IEnumerable<string> GetAllImportedNamespaces(this SyntaxNode node)
         {

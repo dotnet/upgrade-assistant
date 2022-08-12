@@ -20,13 +20,13 @@ namespace TestProject.TestClasses
                 PrimaryButtonText = "Leave this page",
                 SecondaryButtonText = "Stay"
             };
-            ContentDialogResult result = this.SetContentDialogRoot(saveDialog).ShowAsync();
+            ContentDialogResult result = /* TODO You should replace 'this' with the instance of UserControl that is ContentDialog is meant to be a part of. */SetContentDialogRoot(saveDialog, this).ShowAsync();
         }
-                    private ContentDialog SetContentDialogRoot(ContentDialog contentDialog)
+                    private static ContentDialog SetContentDialogRoot(ContentDialog contentDialog, UserControl control)
                     {
                         if (Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 8))
                         {
-                            contentDialog.XamlRoot = this.Content.XamlRoot;
+                            contentDialog.XamlRoot = control.Content.XamlRoot;
                         }
                         return contentDialog;
                     }

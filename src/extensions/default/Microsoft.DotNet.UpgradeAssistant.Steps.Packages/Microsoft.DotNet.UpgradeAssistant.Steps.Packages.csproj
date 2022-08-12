@@ -11,4 +11,9 @@
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal\Microsoft.DotNet.UpgradeAssistant.Abstractions.Internal.csproj" />
     <ProjectReference Include="..\..\..\common\Microsoft.DotNet.UpgradeAssistant.Abstractions\Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" >
+        <Version>$(MicrosoftCodeAnalysisVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
 </Project>

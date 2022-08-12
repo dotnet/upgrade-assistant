@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     }
             }
 
-            if (projectproperties.GetProjectPropertyValue("UseMaui").FirstOrDefault() == null)
+            if (projectproperties.GetProjectPropertyValue("UseMaui")?.FirstOrDefault() is null)
             {
                 file.SetPropertyValue("UseMaui", "true");
             }
@@ -169,12 +169,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             if (propertiesValueUpdated)
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project Properties already added.", BuildBreakRisk.None)).Result;
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project Properties already added.", BuildBreakRisk.None);
             }
             else
             {
                 Logger.LogInformation(".NET MAUI Project Properties need to be added.");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project Properties need to be added", BuildBreakRisk.High)).Result;
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project Properties need to be added", BuildBreakRisk.High);
             }
         }
 
