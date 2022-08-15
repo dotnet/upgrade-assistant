@@ -17,6 +17,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<IUpgradeStepOrderer, UpgradeStepOrderer>();
 
             services.AddContextTelemetry();
+            services.AddUpgradeResultWriter();
+        }
+
+        public static void AddUpgradeResultWriter(this IServiceCollection services)
+        {
+            services.AddSingleton<IUpgradeResultWriter, UpgradeResultWriter>();
         }
 
         public static void AddContextTelemetry(this IServiceCollection services)

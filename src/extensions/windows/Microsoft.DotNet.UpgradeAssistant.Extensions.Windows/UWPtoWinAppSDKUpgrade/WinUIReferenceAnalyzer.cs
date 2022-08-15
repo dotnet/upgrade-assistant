@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpgrade.Utils;
 using Microsoft.Extensions.Logging;
@@ -25,11 +26,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
 
         private readonly IPackageLoader _packageLoader;
         private readonly ILogger _logger;
+        private readonly IUpgradeResultWriter _upgradeResultWriter;
 
-        public WinUIReferenceAnalyzer(IPackageLoader packageLoader, ILogger<WinUIReferenceAnalyzer> logger)
+        public WinUIReferenceAnalyzer(IPackageLoader packageLoader, ILogger<WinUIReferenceAnalyzer> logger, IUpgradeResultWriter upgradeResultWriter)
         {
             this._packageLoader = packageLoader;
             this._logger = logger;
+            this._upgradeResultWriter = upgradeResultWriter;
         }
 
         public async Task AnalyzeAsync(IProject project, IDependencyAnalysisState state, CancellationToken token)
@@ -71,6 +74,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.UWPtoWinAppSDKUpg
                     state.Packages.Remove(package, new OperationDetails() { Risk = BuildBreakRisk.Medium, Details = ImmutableList.Create<string>(package.Name) });
                 }
             }
+
+            var result = new Analysis.AnalyzeResult { FileLocation = "fileLocation", FullDescription = "Description", ResultMessage = "result" };
+            var resultDefinition = new Analysis.AnalyzeResultDefinition { Name = "name", AnalysisResults = ImmutableList.Create(result).ToAsyncEnumerable() };
+            await this._upgradeResultWriter.WriteAsync(ImmutableList.Create(resultDefinition).ToAsyncEnumerable(), token);
         }
     }
 }

@@ -16,15 +16,15 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
     public class AnalyzerResultProviderWriter : IAnalyzeResultWriterProvider
     {
-    private readonly IEnumerable<IAnalyzeResultWriter> _writers;
+        private readonly IEnumerable<IAnalyzeResultWriter> _writers;
 
-    public AnalyzerResultProviderWriter(IEnumerable<IAnalyzeResultWriter> writers)
-    {
-        _writers = writers;
-    }
+        public AnalyzerResultProviderWriter(IEnumerable<IAnalyzeResultWriter> writers)
+        {
+            _writers = writers;
+        }
 
-    public bool TryGetWriter(string format, [MaybeNullWhen(false)] out IAnalyzeResultWriter writer)
-    {
+        public bool TryGetWriter(string format, [MaybeNullWhen(false)] out IAnalyzeResultWriter writer)
+        {
             foreach (var writ in _writers)
             {
                 if (string.Equals(writ.Format, format, StringComparison.OrdinalIgnoreCase))

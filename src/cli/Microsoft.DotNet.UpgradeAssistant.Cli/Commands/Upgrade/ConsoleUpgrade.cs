@@ -22,6 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly ITelemetry _telemetry;
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleUpgrade> _logger;
+        private readonly IUpgradeResultWriter _upgradeResultWriter;
 
         public ConsoleUpgrade(
             IUserInput input,
@@ -32,7 +33,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             UpgraderManager upgrader,
             ITelemetry telemetry,
             IUpgradeStateManager stateManager,
-            ILogger<ConsoleUpgrade> logger)
+            ILogger<ConsoleUpgrade> logger,
+            IUpgradeResultWriter upgradeResultWriter)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _context = context;
@@ -43,6 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _upgradeResultWriter = upgradeResultWriter ?? throw new ArgumentNullException(nameof(upgradeResultWriter));
         }
 
         public async Task RunAsync(CancellationToken token)
@@ -60,6 +63,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 // to reset state after being initialized by GetNextStepAsync
                 var steps = await _upgrader.InitializeAsync(context, token);
                 var step = await _upgrader.GetNextStepAsync(context, token);
+
+                using var outStream = File.Create("E:\\outa.txt");
+                _upgradeResultWriter.AddWriteDestination(outStream, "html");
 
                 while (step is not null)
                 {
