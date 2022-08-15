@@ -74,27 +74,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         // Adds path from base address to the beginning of endpoints if needed
         private XDocument UpdateEndpoints(XDocument config)
         {
-            foreach (var service in _config.Root.DescendantsAndSelf("service"))
+            foreach (var service in config.Root.DescendantsAndSelf("service"))
             {
                 var uri = GetUri(service.Attribute("behaviorConfiguration").Value);
 
                 // add relative path from base address to endpoints
-                // if endpoint ad is already a complete uri, then no need to update?
-                // also add complete endpoint path to the getUri method?
-                foreach (var endpoint in config.Root.DescendantsAndSelf("endpoint"))
+                foreach (var endpoint in service.DescendantsAndSelf("endpoint"))
                 {
                     var ad = endpoint.Attribute("address").Value;
-                    if (endpoint.Attribute("binding").Value.StartsWith("netTcp", StringComparison.Ordinal))
+                    if (Uri.IsWellFormedUriString(ad, UriKind.Relative))
                     {
-                        endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeNetTcp].PathAndQuery, ad).Replace("\\", "/");
-                    }
-                    else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
-                    {
-                        endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttps].PathAndQuery, ad).Replace("\\", "/");
-                    }
-                    else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
-                    {
-                        endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttp].PathAndQuery, ad).Replace("\\", "/");
+                        if (endpoint.Attribute("binding").Value.StartsWith("netTcp", StringComparison.Ordinal))
+                        {
+                            endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeNetTcp].PathAndQuery, ad).Replace("\\", "/");
+                        }
+                        else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
+                        {
+                            endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttps].PathAndQuery, ad).Replace("\\", "/");
+                        }
+                        else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
+                        {
+                            endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttp].PathAndQuery, ad).Replace("\\", "/");
+                        }
                     }
                 }
             }
@@ -160,13 +161,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         public Dictionary<string, Uri> GetUri(string behaviorName)
         {
             Dictionary<string, Uri> uri = new Dictionary<string, Uri>();
-            var baseAddress = from address in GetService(behaviorName).DescendantsAndSelf("add")
+            var service = GetService(behaviorName);
+
+            // add base address from host element
+            var baseAddress = from address in service.DescendantsAndSelf("add")
                               where address.Attribute("baseAddress").Value != null
                               select address;
             foreach (var address in baseAddress)
             {
                 Uri ad = new Uri(address.Attribute("baseAddress").Value);
                 uri.Add(ad.Scheme, ad);
+            }
+
+            // add absolute uri from endpoint address
+            foreach (var endpoint in service.DescendantsAndSelf("endpoint"))
+            {
+                var ad = endpoint.Attribute("address").Value;
+                if (Uri.IsWellFormedUriString(ad, UriKind.Absolute))
+                {
+                    var value = new Uri(ad);
+                    uri.Add(value.Scheme, value);
+                }
             }
 
             var bindings = GetBindings(behaviorName);
