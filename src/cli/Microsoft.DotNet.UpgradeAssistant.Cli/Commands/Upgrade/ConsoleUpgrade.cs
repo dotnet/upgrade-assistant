@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -22,6 +24,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly ITelemetry _telemetry;
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleUpgrade> _logger;
+        private readonly IAnalyzeResultWriterProvider _writerProvider;
+        private readonly IUpgradeResultCollector _upgradeResultCollector;
 
         public ConsoleUpgrade(
             IUserInput input,
@@ -32,7 +36,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             UpgraderManager upgrader,
             ITelemetry telemetry,
             IUpgradeStateManager stateManager,
-            ILogger<ConsoleUpgrade> logger)
+            ILogger<ConsoleUpgrade> logger,
+            IUpgradeResultCollector upgradeResultCollector,
+            IAnalyzeResultWriterProvider writerProvider)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _context = context;
@@ -43,6 +49,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _upgradeResultCollector = upgradeResultCollector;
+            _writerProvider = writerProvider;
         }
 
         public async Task RunAsync(CancellationToken token)
@@ -61,6 +69,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 var steps = await _upgrader.InitializeAsync(context, token);
                 var step = await _upgrader.GetNextStepAsync(context, token);
 
+                var output = Path.Combine(Directory.GetCurrentDirectory(), $"UpgradeReport.html");
+                using var stream = File.Create(output);
+
                 while (step is not null)
                 {
                     await ShowUpgradeStepsAsync(steps, context, token, step);
@@ -68,6 +79,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     await RunStepAsync(context, step, token);
 
                     step = await _upgrader.GetNextStepAsync(context, token);
+                }
+
+                if (_writerProvider.TryGetWriter("html", out var writer))
+                {
+                    await writer.WriteAsync(_upgradeResultCollector.Results.ToAsyncEnumerable(), stream, token);
                 }
 
                 _logger.LogInformation("Upgrade has completed. Please review any changes.");
