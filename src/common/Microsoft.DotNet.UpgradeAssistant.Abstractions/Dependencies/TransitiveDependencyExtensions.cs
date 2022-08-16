@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -120,30 +121,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Dependencies
             return false;
         }
 
+        private static readonly ConcurrentDictionary<IProject, IEnumerable<NuGetReference>> _transitiveDependencyCache = new();
+
         private static IEnumerable<NuGetReference> GetProjectTranstiveDependencies(this IProject project)
         {
-            var set = new HashSet<NuGetReference>();
-            var visited = new HashSet<IProject>();
-
-            var projects = new Queue<IProject>();
-            projects.Enqueue(project);
-
-            do
+            return _transitiveDependencyCache.GetOrAdd(project, p =>
             {
-                var current = projects.Dequeue();
-                set.UnionWith(current.PackageReferences);
+                var set = new HashSet<NuGetReference>();
+                var visited = new HashSet<IProject>();
 
-                foreach (var child in current.ProjectReferences)
+                var projects = new Queue<IProject>();
+                projects.Enqueue(p);
+
+                do
                 {
-                    if (visited.Add(child))
+                    var current = projects.Dequeue();
+                    set.UnionWith(current.PackageReferences);
+
+                    foreach (var child in current.ProjectReferences)
                     {
-                        projects.Enqueue(child);
+                        if (visited.Add(child))
+                        {
+                            projects.Enqueue(child);
+                        }
                     }
                 }
-            }
-            while (projects.Count > 0);
+                while (projects.Count > 0);
 
-            return set;
+                return set;
+            });
         }
     }
 }
