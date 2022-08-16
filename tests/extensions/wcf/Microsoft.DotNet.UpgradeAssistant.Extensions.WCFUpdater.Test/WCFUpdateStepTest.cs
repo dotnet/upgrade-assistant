@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -38,6 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(Proj, Main, Config_NA, Directive, UpgradeStepStatus.Skipped)] // find path but not applicable case
         [InlineData(Proj, Main, Config, Directive, UpgradeStepStatus.Incomplete)] // success case
         [InlineData(Proj, Main, Config, "", UpgradeStepStatus.Incomplete)] // no directive cs file but still success case. This test case pass locally but not in the pipeline. Comment it out for now
+        [InlineData(Proj, "TestInputFiles\\MultiServicesSourceCode.txt", "TestInputFiles\\MultiServicesConfig.txt", "", UpgradeStepStatus.Incomplete)] // Multiple services case
         public void WCFUpdateTest(string proj, string main, string config, string directive, UpgradeStepStatus expected)
         {
             // Arrange
@@ -86,10 +88,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             {
                 updater.Apply();
                 Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
-                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Config)));
-                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Main)));
-                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Directive)));
-                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), Proj)));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), config)));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), main)));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), directive)));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), proj)));
+                Reset();
+            }
+            else if (main.Equals("TestInputFiles\\MultiServicesSourceCode.txt", StringComparison.Ordinal))
+            {
+                updater.Apply();
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedMultiServicesConfig.txt"), File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
+                Assert.Equal(File.ReadAllLines("TestExpectedFiles\\ExpectedMultiServicesSourceCode.txt"), File.ReadAllLines(main));
                 Reset();
             }
         }

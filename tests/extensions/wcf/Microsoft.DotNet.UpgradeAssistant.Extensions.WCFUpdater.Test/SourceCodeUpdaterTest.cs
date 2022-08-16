@@ -74,7 +74,6 @@ namespace SampleServer
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {
-
                 serviceBuilder.AddService<SampleSer>(serviceOptions => {});                
                 serviceBuilder.ConfigureServiceHostBase<SampleService>(varName =>
                 {
@@ -136,7 +135,6 @@ namespace SampleServer
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {
-
                 serviceBuilder.AddService<SampleService>(serviceOptions => {});                
                 serviceBuilder.ConfigureServiceHostBase<SampleService>(varName =>
                 {
@@ -146,9 +144,8 @@ namespace SampleServer
 
             app.UseServiceModel(serviceBuilder =>
             {
-
                 serviceBuilder.AddService<SecondService>(serviceOptions => {});                
-                serviceBuilder.ConfigureServiceHostBase<SecondService>(varName =>
+                serviceBuilder.ConfigureServiceHostBase<WCFLibrary.SecondService>(varName =>
                 {
                     int UA_placeHolder;
                 });
@@ -157,6 +154,30 @@ namespace SampleServer
             app.StartAsync();
             app.StopAsync();
 }";
+
+        public const string Config1 = @"serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
+                                        { 
+                                            host.AddDefaultEndpoints(); 
+                                        });";
+
+        public const string Config2 =
+            @"app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<SampleService>(serviceOptions => {});                
+                serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
+                {
+                    host.AddDefaultEndpoints(); 
+                });
+            });
+
+            app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<SecondService>(serviceOptions => {});                
+                serviceBuilder.ConfigureServiceHostBase<WCFLibrary.SecondService>(host2 =>
+                {
+                    host2.AddDefaultEndpoints(); 
+                });
+            });";
 
         private readonly NullLogger _logger = NullLogger.Instance;
 
@@ -180,18 +201,14 @@ namespace SampleServer
         }
 
         [Theory]
-        [InlineData(Input, Template)]
-        [InlineData(InputMulti, TemplateMulti)]
-        public void ConfigureServiceHostTest(string input, string template)
+        [InlineData(Input, Template, Config1)]
+        [InlineData(InputMulti, TemplateMulti, Config2)]
+        public void ConfigureServiceHostTest(string input, string template, string config)
         {
             var root = CSharpSyntaxTree.ParseText(input);
             var updater = new SourceCodeUpdater(root, template, _logger);
             var result = updater.AddTemplateCode(root.GetRoot()).ToFullString().Replace(" ", string.Empty);
-            string config = @"serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
-                { 
-                    host.AddDefaultEndpoints(); 
-                });".Replace(" ", string.Empty);
-            Assert.Contains(config, result);
+            Assert.Contains(config.Replace(" ", string.Empty), result);
         }
 
         [Theory]

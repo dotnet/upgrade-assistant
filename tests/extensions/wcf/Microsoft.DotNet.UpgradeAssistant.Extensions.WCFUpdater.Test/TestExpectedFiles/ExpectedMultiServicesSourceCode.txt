@@ -24,10 +24,14 @@ namespace ConsoleApp
 
             // Set up port (previously this was done in configuration,
             // but CoreWCF requires it be done in code)
+            builder.WebHost.UseNetTcp(8000);
             builder.WebHost.ConfigureKestrel(options =>
             {
                 options.ListenAnyIP(8733);
-                
+                options.ListenAnyIP(8700, listenOptions =>
+                {
+                    listenOptions.UseHttps();
+                });
             }); 
 
             // Add CoreWCF services to the ASP.NET Core app's DI container
@@ -41,6 +45,8 @@ namespace ConsoleApp
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpGetEnabled = true;
             serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost:8733/Service1/metadata");
+            serviceMetadataBehavior.HttpGetEnabled = true;
+            serviceMetadataBehavior.HttpsGetUrl = new Uri("https://localhost:8700/Service2/metadata");
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
@@ -51,6 +57,15 @@ namespace ConsoleApp
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
+                {
+                });
+
+                serviceBuilder.AddService<WcfServiceLibrary1.Service2>(serviceOptions => 
+                { 
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
+                });
+
+                serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service2>(host2 =>
                 {
                 });
 
