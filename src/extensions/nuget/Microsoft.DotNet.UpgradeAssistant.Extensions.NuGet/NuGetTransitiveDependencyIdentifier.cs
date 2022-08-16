@@ -28,6 +28,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetTransitiveDependencyIdentifier : ITransitiveDependencyIdentifier
     {
+        private const string UniquePathPart1 = "dotnet-ua";
+        private const string UniquePathPart2 = "dotnet-ua";
+        private const string UniquePathFilename = "dotnet-ua";
+
+        private static readonly ConcurrentDictionary<string, LibraryDependency> _packageDependencies = new();
+
         private readonly IEnumerable<PackageSource> _packageSources;
         private readonly ISettings _settings;
         private readonly SourceCacheContext _context;
@@ -81,14 +87,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             var tfmInfo = tfms.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToFullString()) }).ToList();
 
             // Create a project in a unique and temporary directory
-            var path = Path.Combine(Path.GetTempPath(), "dotnet-ua", "restores", Guid.NewGuid().ToString(), "project.txt");
+            var path = Path.Combine(Path.GetTempPath(), UniquePathPart1, UniquePathPart2, Guid.NewGuid().ToString(), UniquePathFilename);
 
             var spec = new PackageSpec(tfmInfo)
             {
-                Dependencies = packages.Select(i => new LibraryDependency
+                Dependencies = packages.Select(i => _packageDependencies.GetOrAdd(i.Name, new LibraryDependency
                 {
                     LibraryRange = new LibraryRange(i.Name, new VersionRange(i.GetNuGetVersion()), LibraryDependencyTarget.Package),
-                }).ToList(),
+                })).ToList(),
                 RestoreMetadata = new()
                 {
                     ProjectPath = path,
@@ -96,7 +102,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                     ProjectStyle = ProjectStyle.PackageReference,
                     ProjectUniqueName = path,
                     OutputPath = Path.GetTempPath(),
-                    OriginalTargetFrameworks = tfms.Select(tfm => tfm.ToFullString()).ToArray(),
+                    OriginalTargetFrameworks = tfms.Select(tfm => tfm.ToFullString()).ToList(),
                     ConfigFilePaths = _settings.GetConfigFilePaths(),
                     PackagesPath = SettingsUtility.GetGlobalPackagesFolder(_settings),
                     Sources = _packageSources.ToList(),
@@ -125,13 +131,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             // Restore the package without generating extra files
             var result = await RestoreRunner.RunWithoutCommit(requests, restoreArgs).ConfigureAwait(false);
-
-            if (result.Count == 0)
-            {
-                return null;
-            }
-
-            return result[0].Result.RestoreGraphs.FirstOrDefault();
+#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
+            return result?.FirstOrDefault()?.Result.RestoreGraphs.FirstOrDefault();
+#pragma warning restore CA1826 // Do not use Enumerable methods on indexable collections
         }
 
         private class TargetGraphLookup : ILookup<NuGetReference, NuGetReference>
@@ -149,39 +151,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             public bool Contains(NuGetReference key) => TryFind(key, out _);
 
-            public IEnumerator<NuGetReference> GetEnumerator()
-            {
-                foreach (var item in _graph.Flattened)
-                {
-                    var library = item.Data.Match.Library;
-
-                    yield return new(library.Name, library.Version.ToString());
-                }
-            }
+            public IEnumerator<NuGetReference> GetEnumerator() => _graph.Flattened.Select(item => new NuGetReference(item.Data.Match.Library.Name, item.Data.Match.Library.Version.ToString())).GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            IEnumerator<IGrouping<NuGetReference, NuGetReference>> IEnumerable<IGrouping<NuGetReference, NuGetReference>>.GetEnumerator()
-            {
-                foreach (var item in _graph.Flattened)
-                {
-                    yield return new ResolveResultGrouping(item.Data);
-                }
-            }
+            IEnumerator<IGrouping<NuGetReference, NuGetReference>> IEnumerable<IGrouping<NuGetReference, NuGetReference>>.GetEnumerator() => _graph.Flattened.Select(item => new ResolveResultGrouping(item.Data)).GetEnumerator();
 
             private bool TryFind(NuGetReference package, [MaybeNullWhen(false)] out ResolveResultGrouping result)
             {
-                foreach (var item in _graph.Flattened)
-                {
-                    if (string.Equals(item.Data.Match.Library.Name, package.Name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        result = new(item.Data);
-                        return true;
-                    }
-                }
+                var foundItem = _graph.Flattened.FirstOrDefault(item => string.Equals(item.Data.Match.Library.Name, package.Name, StringComparison.OrdinalIgnoreCase));
 
-                result = default;
-                return false;
+                result = foundItem is not null ? new(foundItem.Data) : null;
+
+                return result is not null;
             }
 
             private class ResolveResultGrouping : IGrouping<NuGetReference, NuGetReference>
@@ -196,13 +178,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
                 public NuGetReference Key { get; }
 
-                public IEnumerator<NuGetReference> GetEnumerator()
-                {
-                    foreach (var dependency in _result.Dependencies)
-                    {
-                        yield return new(dependency.Name, dependency.LibraryRange.VersionRange.ToString());
-                    }
-                }
+                public IEnumerator<NuGetReference> GetEnumerator() => _result.Dependencies.Select(dependency => new NuGetReference(dependency.Name, dependency.LibraryRange.VersionRange.ToString())).GetEnumerator();
 
                 IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
             }
