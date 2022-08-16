@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
+    [ApplicableLanguage(Language.CSharp)]
     public class WCFUpdateStep : UpgradeStep
     {
         public override string Title => "Update WCF service to CoreWCF.";
@@ -43,8 +44,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             // Project's config file, source code, and project file need to be updated first before adding CoreWCF services
             WellKnownStepIds.ConfigUpdaterStepId,
-
-            WellKnownStepIds.SourceUpdaterStepId,
 
             WellKnownStepIds.PackageUpdaterStepId
         };
@@ -108,14 +107,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             FindPath(project);
             if (_path.Count != 3 && _path.Count != 4)
             {
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "Cannot find required file(s) for WCF update. The project is not applicable for automated update and this step will be skipped.", BuildBreakRisk.Low));
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Cannot find required file(s) for WCF update. The project is not applicable for automated update and this step is complete.", BuildBreakRisk.Low));
             }
 
             // if the project is not applicable, skip the update step
             if (!WCFUpdateChecker.IsWCFUpdateApplicable(_path, Logger))
             {
-                Logger.LogInformation("This project is not applicable for updating to CoreWCF since references to WCF was not found. This step will be skipped.");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, "WCF Update step is not applicable to this project and this step will be skipped.", BuildBreakRisk.Low));
+                Logger.LogInformation("This project is not applicable for updating to CoreWCF since references to WCF was not found. There is no more work needs to be done and this step is complete.");
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "WCF Update step is not applicable to this project. There is no more work needs to be done and this step is complete.", BuildBreakRisk.Low));
             }
 
             // construct updaters
@@ -188,11 +187,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             if (!main.Any())
             {
-                Logger.LogWarning("Can not find .cs file with Main() method. The project is not applicable for automated update and this step will be skipped.");
+                Logger.LogWarning("Can not find .cs file with Main() method. The project is not applicable for automated WCF update. There is no more work needs to be done and this step is complete.");
             }
             else if (main.Count() > 1)
             {
-                Logger.LogWarning("Find more than one .cs file with Main() method. The project is not applicable for automated update and this step will be skipped.");
+                Logger.LogWarning("Find more than one .cs file with Main() method. The project is not applicable for automated WCF update. There is no more work needs to be done and this step is complete.");
             }
             else if (!config.Any())
             {
@@ -202,7 +201,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                         "Automated update cannot be applied. Please update the project to CoreWCF manually (https://github.com/CoreWCF/CoreWCF).");
                 }
 
-                Logger.LogWarning("Can not find .config file that configures system.serviceModel. The project is not applicable for automated update and this step will be skipped.");
+                Logger.LogWarning("Can not find .config file that configures system.serviceModel. The project is not applicable for automated WCF update. There is no more work needs to be done and this step is complete.");
             }
             else
             {

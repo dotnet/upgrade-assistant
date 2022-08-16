@@ -34,10 +34,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         }
 
         [Theory]
-        [InlineData(Proj, Main, "", Directive, UpgradeStepStatus.Skipped)] // can't find path case
-        [InlineData(Proj, Main, Config_NA, Directive, UpgradeStepStatus.Skipped)] // find path but not applicable case
+        [InlineData(Proj, Main, "", Directive, UpgradeStepStatus.Complete)] // can't find path case
+        [InlineData(Proj, Main, Config_NA, Directive, UpgradeStepStatus.Complete)] // find path but not applicable case
         [InlineData(Proj, Main, Config, Directive, UpgradeStepStatus.Incomplete)] // success case
-        [InlineData(Proj, Main, Config, "", UpgradeStepStatus.Incomplete)] // no directive cs file but still success case. This test case pass locally but not in the pipeline. Comment it out for now
+        [InlineData(Proj, Main, Config, "", UpgradeStepStatus.Incomplete)] // no directive cs file but still success case.
         public void WCFUpdateTest(string proj, string main, string config, string directive, UpgradeStepStatus expected)
         {
             // Arrange
