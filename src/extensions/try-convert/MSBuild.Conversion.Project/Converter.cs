@@ -46,6 +46,7 @@ namespace MSBuild.Conversion.Project
 
                 // Now we can convert the project over
                 .ChangeImportsAndAddSdkAttribute(_sdkBaselineProject, _forceRemoveCustomImports)
+                .AddCsWinRTReferenceAndComponentProperty(_sdkBaselineProject)
                 .UpdateOutputTypeProperty(_sdkBaselineProject)
                 .RemoveDefaultedProperties(_sdkBaselineProject, _differs)
                 .RemoveUnnecessaryPropertiesNotInSDKByDefault(_sdkBaselineProject.ProjectStyle)
