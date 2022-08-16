@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             // gets the code that configures the host
             var open = GetExpressionStatement("Open", declaration.Parent!).First();
             var config = from s in declaration.Parent!.DescendantNodes().OfType<StatementSyntax>()
-                         where s.SpanStart > declaration.SpanStart && s.Span.End <= open.SpanStart
+                         where s.SpanStart > declaration.SpanStart && s.Span.End <= open.SpanStart && !s.ToFullString().Contains("ServiceHost", StringComparison.Ordinal)
                          select s.WithLeadingTrivia(placeholder.First().GetLeadingTrivia());
             var pair = GetVarNamePairs(root);
             if (config.Any())
@@ -156,7 +156,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     foreach (var node in config)
                     {
                         // if this line of code contains any varname, add it to the dictionary
-                        var name = ContainsAny(new HashSet<string>(pair.Keys), node.ToFullString());
+                        var name = ContainsAny(new HashSet<string>(pair.Keys), node);
                         if (!string.IsNullOrEmpty(name))
                         {
                             if (!nodes.ContainsKey(name))
@@ -173,16 +173,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     }
 
                     // for each placeholder, insert code in based on varName
-                    foreach (var replace in placeholder)
+                    while (placeholder.Any())
                     {
-                        var parent = replace.Parent!;
-                        while (parent.GetType() != typeof(InvocationExpressionSyntax))
+                        var parent = placeholder.First().Parent!;
+                        while (parent.GetType() != typeof(ArgumentSyntax))
                         {
                             parent = parent.Parent!;
                         }
 
-                        var name = ContainsAny(new HashSet<string>(pair.Keys), parent.ToFullString());
-                        root = root.ReplaceNode(replace, nodes[name]);
+                        // TODO: test the case with namespace
+                        var name = ContainsAny(new HashSet<string>(pair.Keys), parent);
+                        root = root.ReplaceNode(placeholder.First(), nodes[name]);
+
+                        // need to find the placeholder again
+                        placeholder = from s in root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>()
+                                      where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText.Equals("UA_placeHolder", StringComparison.Ordinal)
+                                      select s;
                     }
                 }
             }
@@ -192,11 +198,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
 
         // returns the variable name if node contains it; empty string if does not contain any variable name.
-        private static string ContainsAny(HashSet<string> names, string node)
+        private static string ContainsAny(HashSet<string> names, SyntaxNode node)
         {
             foreach (var name in names)
             {
-                if (node.Contains(name, StringComparison.Ordinal))
+                var result_id = from n in node.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>()
+                             where n.Identifier.ValueText.Equals(name, StringComparison.Ordinal)
+                             select n;
+                var result_param = from n in node.DescendantNodesAndSelf().OfType<ParameterSyntax>()
+                             where n.Identifier.ValueText.Equals(name, StringComparison.Ordinal)
+                             select n;
+                if (result_id.Any() || result_param.Any())
                 {
                     return name;
                 }
@@ -266,7 +278,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         private SyntaxNode UpdateOpenClose(SyntaxNode root, string varName)
         {
-            var open = GetExpressionStatement("Open", root).First();
+            var open = GetExpressionStatement("Open", root).Last();
             var close = GetExpressionStatement("Close", root);
             var startPosition = GetExpressionStatement("StartAsync", root).First();
             var stopPosition = GetExpressionStatement("StopAsync", root).First();
