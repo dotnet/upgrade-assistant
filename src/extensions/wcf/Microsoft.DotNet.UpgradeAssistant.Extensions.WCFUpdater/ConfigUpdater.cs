@@ -105,8 +105,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (results.Any())
             {
                 var el = results.First();
-                var http = el.Attribute("httpGetEnabled") != null && el.Attribute("httpGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
-                var https = el.Attribute("httpsGetEnabled") != null && el.Attribute("httpsGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+                var http = el.Attribute("httpGetEnabled") is not null && el.Attribute("httpGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+                var https = el.Attribute("httpsGetEnabled") is not null && el.Attribute("httpsGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
                 if (http && https)
                 {
                     return 3;
@@ -143,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (results.Any())
             {
                 var el = results.First();
-                if (el.Attribute("includeExceptionDetailInFaults") != null && el.Attribute("includeExceptionDetailInFaults").Value.Equals("true", StringComparison.OrdinalIgnoreCase))
+                if (el.Attribute("includeExceptionDetailInFaults") is not null && el.Attribute("includeExceptionDetailInFaults").Value.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -157,7 +157,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             Dictionary<string, Uri> uri = new Dictionary<string, Uri>();
             var baseAddress =
                 from address in _config.Root.DescendantsAndSelf("add")
-                where address.Attribute("baseAddress").Value != null
+                where address.Attribute("baseAddress").Value is not null
                 select address;
             foreach (var address in baseAddress)
             {

@@ -91,7 +91,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 }
             }
 
-            if (doc.Root.Attribute("Sdk") != null && !doc.Root.Attribute("Sdk").Value.Contains("Web"))
+            if (doc.Root.Attribute("Sdk") is not null && !doc.Root.Attribute("Sdk").Value.Contains("Web"))
             {
                 return true;
             }

@@ -113,8 +113,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             // if the project is not applicable, skip the update step
             if (!WCFUpdateChecker.IsWCFUpdateApplicable(_path, Logger))
             {
-                Logger.LogInformation("This project is not applicable for updating to CoreWCF since references to WCF was not found. There is no more work needs to be done and this step is complete.");
-                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "WCF Update step is not applicable to this project. There is no more work needs to be done and this step is complete.", BuildBreakRisk.Low));
+                var message = "This project is not applicable for updating to CoreWCF since references to WCF were not found. No more work needs to be done and this step is complete.";
+                Logger.LogInformation(message);
+                return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, message, BuildBreakRisk.Low));
             }
 
             // construct updaters
@@ -125,13 +126,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path["directives"], Logger);
             }
 
-            if (_configUpdater != null)
+            if (_configUpdater is not null)
             {
                 var configContext = UpdateRunner.GetContext(_configUpdater);
                 _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path["main"].First(), configContext, Logger);
             }
 
-            if (_configUpdater == null || _packageUpdater == null || _sourceCodeUpdater == null || (_path.ContainsKey("directives") && _directiveUpdaters == null))
+            if (_configUpdater is null || _packageUpdater is null || _sourceCodeUpdater is null || (_path.ContainsKey("directives") && _directiveUpdaters is null))
             {
                 Logger.LogWarning("Unexpected error happened when trying to construct the updaters. Please review error message and log.");
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Updaters cannot be constructed. Please review error message and log for more information.", BuildBreakRisk.Medium));
@@ -147,13 +148,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var config = UpdateRunner.ConfigUpdate(_configUpdater!, Logger);
             var source = UpdateRunner.SourceCodeUpdate(_sourceCodeUpdater!, Logger);
             var directives = new List<SyntaxNode>();
-            if (_directiveUpdaters != null)
+            if (_directiveUpdaters is not null)
             {
                 directives = UpdateRunner.DirectiveUpdate(_directiveUpdaters, Logger);
             }
 
-            // check for null
-            if (projFile == null || config == null || source == null || directives == null)
+            // check for null changes
+            if (projFile is null || config is null || source is null || directives is null)
             {
                 Logger.LogWarning("Unexpected error happened when trying to making changes to original files. Please review error message and log.");
                 return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Project failed to port to CoreWCF. Please review error message and log for more information."));
@@ -187,11 +188,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             if (!main.Any())
             {
-                Logger.LogWarning("Can not find .cs file with Main() method. The project is not applicable for automated WCF update. There is no more work needs to be done and this step is complete.");
+                Logger.LogWarning("Can not find .cs file with Main() method. The project is not applicable for automated WCF update. No more work needs to be done and this step is complete.");
             }
             else if (main.Count() > 1)
             {
-                Logger.LogWarning("Find more than one .cs file with Main() method. The project is not applicable for automated WCF update. There is no more work needs to be done and this step is complete.");
+                Logger.LogWarning("Found more than one .cs file with Main() method. The project is not applicable for automated WCF update. No more work needs to be done and this step is complete.");
             }
             else if (!config.Any())
             {
@@ -201,7 +202,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                         "Automated update cannot be applied. Please update the project to CoreWCF manually (https://github.com/CoreWCF/CoreWCF).");
                 }
 
-                Logger.LogWarning("Can not find .config file that configures system.serviceModel. The project is not applicable for automated WCF update. There is no more work needs to be done and this step is complete.");
+                Logger.LogWarning("Did not find .config file that configures system.serviceModel. The project is not applicable for automated WCF update. No more work needs to be done and this step is complete.");
             }
             else
             {
