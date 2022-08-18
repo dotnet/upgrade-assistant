@@ -161,7 +161,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             // Write updates
-            UpdateRunner.WritePackageUpdate(projFile, _path!["proj"].First(), Logger);
+            if (_path is null)
+            {
+                return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Lost access to file paths. Please review error message and log for more information."));
+            }
+
+            UpdateRunner.WritePackageUpdate(projFile, _path["proj"].First(), Logger);
             UpdateRunner.WriteConfigUpdate(config[0], config[1], _path["config"].First(), Logger);
             UpdateRunner.WriteSourceCodeUpdate(source, _path["main"].First(), Logger);
             if (directives.Count > 0)

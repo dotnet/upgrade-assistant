@@ -92,25 +92,34 @@ namespace SampleServer
                 //host.Exam();
                 app.StopAsync();";
 
-        private readonly NullLogger _logger = NullLogger.Instance;
-
-        [Fact]
-        public void UpdateDirectivesTest()
-        {
-            var updater = new SourceCodeUpdater(CSharpSyntaxTree.ParseText(Input), Template, _logger);
-            var result = updater.UpdateDirectives().ToFullString().Replace(" ", string.Empty);
-            var outdated = "using System.ServiceModel;using System.ServiceModel.Security;";
-            var directives = @"using CoreWCF;
+        public const string Directives = @"using CoreWCF;
                             using CoreWCF.Configuration;
                             using CoreWCF.Description;
                             using CoreWCF.Security;
                             using Microsoft.AspNetCore.Builder;
                             using Microsoft.AspNetCore.Hosting;
-                            using Microsoft.Extensions.DependencyInjection;
-                            ".Replace(" ", string.Empty);
+                            using Microsoft.Extensions.DependencyInjection;";
 
+        public const string Directives2 = @"using CoreWCF;
+                            using Microsoft.AspNetCore.Builder;
+                            using CoreWCF.Configuration;
+                            using CoreWCF.Description;
+                            using CoreWCF.Security;
+                            using Microsoft.AspNetCore.Hosting;
+                            using Microsoft.Extensions.DependencyInjection;";
+
+        private readonly NullLogger _logger = NullLogger.Instance;
+
+        [Theory]
+        [InlineData("using System.ServiceModel.Security;", Directives)]
+        [InlineData("using System.ServiceModel.Security;using CoreWCF;\r\nusing Microsoft.AspNetCore.Builder;", Directives2)]
+        public void UpdateDirectivesTest(string replace, string expected)
+        {
+            var updater = new SourceCodeUpdater(CSharpSyntaxTree.ParseText(Input.Replace("using System.ServiceModel.Security;", replace)), Template, _logger);
+            var result = updater.UpdateDirectives().ToFullString().Replace(" ", string.Empty);
+            var outdated = "using System.ServiceModel;using System.ServiceModel.Security;";
             Assert.DoesNotContain(outdated, result);
-            Assert.Contains(directives, result);
+            Assert.Contains(expected.Replace(" ", string.Empty), result);
         }
 
         [Fact]

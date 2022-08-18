@@ -15,6 +15,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 ";
 
+        public const string TemplateUsingShort =
+@"using CoreWCF;
+using CoreWCF.Configuration;
+using CoreWCF.Description;
+using CoreWCF.Security;
+";
+
         public const string Template =
             @"public static void Main()
 {

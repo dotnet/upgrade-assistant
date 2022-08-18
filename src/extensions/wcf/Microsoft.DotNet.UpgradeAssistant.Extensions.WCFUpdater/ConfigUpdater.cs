@@ -24,9 +24,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         // Updates the original config file by removing the system.serviceModel element
         public XDocument UpdateOldConfig()
         {
-            XDocument oldConfig = new XDocument(_config);
+            var oldConfig = new XDocument(_config);
             var serviceModel = oldConfig.Root.DescendantsAndSelf("system.serviceModel");
-            serviceModel.First().AddBeforeSelf(new XComment(Constants.ServiceModelComment));
+            serviceModel.Single().AddBeforeSelf(new XComment(Constants.ServiceModelComment));
             serviceModel.Remove();
 
             _logger.LogDebug("The original config file finished updating. System.serviceModel element was removed.");
@@ -35,30 +35,31 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public XDocument GenerateNewConfig()
         {
-            XDocument wcfConfig = new XDocument(new XElement("configuration", _config.Root.DescendantsAndSelf("system.serviceModel")));
+            var wcfConfig = new XDocument(new XElement("configuration", _config.Root.DescendantsAndSelf("system.serviceModel")));
 
             // comment out host and behavior elements which are not supported by CoreWCF and configured in the code instead
             var baseAddress = wcfConfig.Root.DescendantsAndSelf("host");
             var serviceBehavior = wcfConfig.Root.DescendantsAndSelf("behaviors");
             if (baseAddress.Any())
             {
-                baseAddress.First().AddBeforeSelf(new XComment(Constants.HostComment));
-                baseAddress.First().ReplaceWith(new XComment(baseAddress.First().ToString()));
+                var host = baseAddress.First();
+                host.AddBeforeSelf(new XComment(Constants.HostComment));
+                host.ReplaceWith(new XComment(host.ToString()));
             }
 
             if (serviceBehavior.Any())
             {
-                serviceBehavior.First().AddBeforeSelf(new XComment(Constants.BehaviorComment));
-                serviceBehavior.First().ReplaceWith(new XComment(serviceBehavior.First().ToString()));
+                var behaviors = serviceBehavior.Single();
+                behaviors.AddBeforeSelf(new XComment(Constants.BehaviorComment));
+                behaviors.ReplaceWith(new XComment(behaviors.ToString()));
             }
 
             // find and remove the mex endpoint
             if (IncludesMexEndpoint())
             {
-                IEnumerable<XElement> unsupported_endpoint =
-                    from el in wcfConfig.Root.DescendantsAndSelf("endpoint")
-                    where el.Attribute("binding").Value.StartsWith("mex", StringComparison.Ordinal)
-                    select el;
+                var unsupported_endpoint = from el in wcfConfig.Root.DescendantsAndSelf("endpoint")
+                                           where el.Attribute("binding").Value.StartsWith("mex", StringComparison.Ordinal)
+                                           select el;
                 unsupported_endpoint.First().AddBeforeSelf(new XComment(Constants.MexEndpoint));
                 unsupported_endpoint.Remove();
                 _logger.LogWarning("The mex endpoint is removed from .config and service metadata behavior is configured in the source code instead.");
@@ -104,7 +105,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var results = _config.Root.DescendantsAndSelf("serviceMetadata");
             if (results.Any())
             {
-                var el = results.First();
+                var el = results.Single();
                 var http = el.Attribute("httpGetEnabled") is not null && el.Attribute("httpGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
                 var https = el.Attribute("httpsGetEnabled") is not null && el.Attribute("httpsGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
                 if (http && https)
@@ -126,7 +127,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public bool IncludesMexEndpoint()
         {
-            foreach (XElement el in _config.Root.DescendantsAndSelf("endpoint"))
+            foreach (var el in _config.Root.DescendantsAndSelf("endpoint"))
             {
                 if (el.Attribute("address").Value.Equals("mex", StringComparison.Ordinal))
                 {
@@ -142,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var results = _config.Root.DescendantsAndSelf("serviceDebug");
             if (results.Any())
             {
-                var el = results.First();
+                var el = results.Single();
                 if (el.Attribute("includeExceptionDetailInFaults") is not null && el.Attribute("includeExceptionDetailInFaults").Value.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
@@ -154,14 +155,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public Dictionary<string, Uri> GetUri()
         {
-            Dictionary<string, Uri> uri = new Dictionary<string, Uri>();
+            var uri = new Dictionary<string, Uri>();
             var baseAddress =
                 from address in _config.Root.DescendantsAndSelf("add")
                 where address.Attribute("baseAddress").Value is not null
                 select address;
             foreach (var address in baseAddress)
             {
-                Uri ad = new Uri(address.Attribute("baseAddress").Value);
+                var ad = new Uri(address.Attribute("baseAddress").Value);
                 uri.Add(ad.Scheme, ad);
             }
 
@@ -170,7 +171,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public HashSet<string> GetBindings()
         {
-            HashSet<string> bindings = new HashSet<string>();
+            var bindings = new HashSet<string>();
             var endpoints = _config.Root.DescendantsAndSelf("endpoint");
             foreach (var endpoint in endpoints)
             {

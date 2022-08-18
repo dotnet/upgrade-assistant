@@ -7,9 +7,6 @@ using CoreWCF;
 using CoreWCF.Configuration;
 using CoreWCF.Description;
 using CoreWCF.Security;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace WcfServiceLibrary1
 {

@@ -42,7 +42,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             var root = _programFile.GetRoot();
-            var templateRoot = CSharpSyntaxTree.ParseText(Constants.TemplateUsing).GetRoot();
 
             // removes old directives
             var oldDirectives = from r in root.DescendantNodes().OfType<UsingDirectiveSyntax>()
@@ -50,10 +49,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                                 select r;
             root = root.RemoveNodes(oldDirectives, 0)!;
 
-            // adds new directives
-            var position = root.DescendantNodes().OfType<UsingDirectiveSyntax>().Last();
-            var newDirectives = templateRoot.DescendantNodes().OfType<UsingDirectiveSyntax>();
-            root = root.InsertNodesAfter(position, newDirectives);
+            // adds new directives and avoid duplicate using directives
+            var template = Constants.TemplateUsing;
+            if (string.IsNullOrEmpty(_template.GetText().ToString()))
+            {
+                template = Constants.TemplateUsingShort;
+            }
+
+            var currDirectives = from d in root.DescendantNodes().OfType<UsingDirectiveSyntax>()
+                                 where template.Contains(d.ToFullString(), StringComparison.Ordinal)
+                                 select d.ToFullString().Replace(System.Environment.NewLine, string.Empty);
+            var result = string.Empty;
+            foreach (var line in template.Split(System.Environment.NewLine))
+            {
+                if (!currDirectives.Contains(line))
+                {
+                    result += line + System.Environment.NewLine;
+                }
+            }
+
+            var newDirectives = CSharpSyntaxTree.ParseText(result).GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>();
+            root = root.InsertNodesAfter(root.DescendantNodes().OfType<UsingDirectiveSyntax>().Last(), newDirectives);
 
             _logger.LogDebug("Finish updating directives.");
             return root;

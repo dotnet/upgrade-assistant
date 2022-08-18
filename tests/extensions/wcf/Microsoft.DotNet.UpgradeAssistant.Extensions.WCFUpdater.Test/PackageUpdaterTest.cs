@@ -18,6 +18,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                               </ItemGroup>
                             </Project>";
 
+        public const string Input2 = @"<?xml version=""1.0"" encoding=""utf - 8""?>
+                            <Project Sdk = ""Microsoft.NET.Sdk.Web"">
+                              <ItemGroup>
+                                <PackageReference Include = ""Microsoft.CSharp"" Version = ""4.7.0"" />
+                                <PackageReference Include = ""Serilog"" Version = ""2.8.0"" />
+                                <PackageReference Include = ""System.ServiceModel.Duplex"" Version = ""4.8.1"" />
+                                <PackageReference Include = ""CoreWCF.NetTcp"" Version = ""1.1.0"" />
+                                <PackageReference Include = ""CoreWCF.Primitives"" Version = ""1.1.0"" />
+                              </ItemGroup>
+                            </Project>";
+
         private readonly NullLogger _logger = NullLogger.Instance;
 
         [Fact]
@@ -33,8 +44,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             Assert.True(XNode.DeepEquals(XDocument.Parse(expected), result));
         }
 
-        [Fact]
-        public void UpdatePackagesTest()
+        [Theory]
+        [InlineData(Input)]
+        [InlineData(Input2)]
+        public void UpdatePackagesTest(string input)
         {
             string expected = @"<?xml version=""1.0"" encoding=""utf - 8""?>
                             <Project Sdk = ""Microsoft.NET.Sdk.Web"">
@@ -48,7 +61,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                                 <PackageReference Include = ""CoreWCF.WebHttp"" Version = ""1.1.0"" />
                               </ItemGroup>
                             </Project>";
-            var result = new PackageUpdater(XDocument.Parse(Input), _logger).UpdatePackages();
+            var result = new PackageUpdater(XDocument.Parse(input), _logger).UpdatePackages();
             Assert.True(XNode.DeepEquals(XDocument.Parse(expected), result));
         }
 
