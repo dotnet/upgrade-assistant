@@ -9,6 +9,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
@@ -84,7 +85,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             string template = Constants.Template;
             template = UpdatePortNumber(template, GetAllAddress(context, logger));
             template = UpdateServiceMetadata(template, context);
-            template = template.Replace("[ServiceBuilderPlaceHolder]", AddMultipleServices(context, logger));
+            template = template.Replace("[ServiceBuilder PlaceHolder]", AddMultipleServices(context, logger));
+            template = AddServiceType(template, context);
             return template;
         }
 
@@ -221,7 +223,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var builder = string.Empty;
             foreach (var serviceName in context.Keys)
             {
-                builder += UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), (bool)context[serviceName]["debug"])
+                builder += UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), (Dictionary<string, string>)context[serviceName]["debug"])
                     + System.Environment.NewLine;
                 if (serviceName != context.Keys.Last())
                 {
@@ -232,19 +234,60 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return builder;
         }
 
-        private static string UpdateServiceDebug(string template, bool debug)
+        private static string UpdateServiceDebug(string template, Dictionary<string, string> debug)
         {
             // updates service debug
-            if (debug)
+            var result = string.Empty;
+            if (debug.ContainsKey("httpHelpPageEnabled") && debug["httpHelpPageEnabled"].Equals("false", StringComparison.OrdinalIgnoreCase))
             {
-                template = template.Replace("[ServiceDebug PlaceHolder]", Constants.Debug);
-            }
-            else
-            {
-                template = template.Replace("[ServiceDebug PlaceHolder]", string.Empty);
+                result += Constants.HttpPageEnabled + System.Environment.NewLine;
             }
 
-            return template;
+            if (debug.ContainsKey("httpsHelpPageEnabled") && debug["httpsHelpPageEnabled"].Equals("false", StringComparison.OrdinalIgnoreCase))
+            {
+                result += Constants.HttpsPageEnabled + System.Environment.NewLine;
+            }
+
+            if (debug.ContainsKey("httpHelpPageUrl"))
+            {
+                result += Constants.HttpPageUrl.Replace("address", debug["httpHelpPageUrl"]) + System.Environment.NewLine;
+            }
+
+            if (debug.ContainsKey("httpsHelpPageUrl"))
+            {
+                result += Constants.HttpsPageUrl.Replace("address", debug["httpsHelpPageUrl"]) + System.Environment.NewLine;
+            }
+
+            if (debug.ContainsKey("includeExceptionDetailInFaults") && debug["includeExceptionDetailInFaults"].Equals("false", StringComparison.OrdinalIgnoreCase))
+            {
+                result += Constants.DebugFaults;
+            }
+
+            if (result.EndsWith(System.Environment.NewLine))
+            {
+                result = result.TrimEnd(System.Environment.NewLine.ToCharArray());
+            }
+
+            return template.Replace("[ServiceDebug PlaceHolder]", result);
+        }
+
+        private static string AddServiceType(string template, Dictionary<string, Dictionary<string, object>> context)
+        {
+            var result = string.Empty;
+            foreach (var serviceType in context.Keys)
+            {
+                result += Constants.ServiceType.Replace("ServiceType", serviceType);
+                if (serviceType == context.Keys.Last())
+                {
+                    result += ";";
+                }
+                else
+                {
+                    result += System.Environment.NewLine;
+                }
+            }
+
+            return template.Replace("[Add ServiceType PlaceHolder]", result);
         }
     }
 }

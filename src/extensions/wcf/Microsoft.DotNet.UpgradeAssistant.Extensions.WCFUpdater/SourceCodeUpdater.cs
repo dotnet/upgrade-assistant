@@ -153,6 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 else
                 {
                     Dictionary<string, List<SyntaxNode>> nodes = new Dictionary<string, List<SyntaxNode>>();
+                    List<SyntaxNode> noRef = new List<SyntaxNode>();
                     foreach (var node in config)
                     {
                         // if this line of code contains any varname, add it to the dictionary
@@ -168,8 +169,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                         }
                         else
                         {
-                            // else, comment that line of code + add warning + comment
+                            // else, cannot find direct reference to serviceHost variable in this line of code, add it to list
+                            noRef.Add(node);
                         }
+                    }
+
+                    // inserts the no reference code before the configuration delegates
+                    if (noRef.Count > 0)
+                    {
+                        var position = from node in root.DescendantNodes().OfType<ExpressionStatementSyntax>()
+                                       where ContainsIdentifier("UseServiceModel", node)
+                                       select node;
+                        root = root.InsertNodesBefore(position.First(), noRef);
+                        _logger.LogWarning("Found code that does not have a direct reference to any ServiceHost variable. Please manually add it to the correct delegate.");
                     }
 
                     // for each placeholder, insert code in based on varName
@@ -181,7 +193,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                             parent = parent.Parent!;
                         }
 
-                        // TODO: test the case with namespace
                         var name = ContainsAny(new HashSet<string>(pair.Keys), parent);
                         root = root.ReplaceNode(placeholder.First(), nodes[name]);
 

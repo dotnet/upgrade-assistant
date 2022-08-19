@@ -106,6 +106,8 @@ namespace SampleServer
             var host = new ServiceHost(typeof(SampleService));
             var host2 = new ServiceHost(typeof(SecondService));
             host.AddDefaultEndpoints();
+            var authMode = X509CertificateValidationMode.None;
+            host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = authMode;
             host2.AddDefaultEndpoints();
             host.Open();
             host2.Open();
@@ -161,7 +163,10 @@ namespace SampleServer
                                         });";
 
         public const string Config2 =
-            @"app.UseServiceModel(serviceBuilder =>
+            @"var authMode = X509CertificateValidationMode.None;
+
+            // Configure CoreWCF endpoints in the ASP.NET Core hosts
+            app.UseServiceModel(serviceBuilder =>
             {
                 serviceBuilder.AddService<SampleService>(serviceOptions => {});                
                 serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
@@ -175,6 +180,7 @@ namespace SampleServer
                 serviceBuilder.AddService<SecondService>(serviceOptions => {});                
                 serviceBuilder.ConfigureServiceHostBase<WCFLibrary.SecondService>(host2 =>
                 {
+                    host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = authMode;
                     host2.AddDefaultEndpoints(); 
                 });
             });";

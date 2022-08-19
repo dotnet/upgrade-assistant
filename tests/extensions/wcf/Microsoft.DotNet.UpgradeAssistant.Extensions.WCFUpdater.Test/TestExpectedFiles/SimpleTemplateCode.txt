@@ -13,7 +13,8 @@
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
-                            .AddServiceModelMetadata();
+                            .AddServiceModelMetadata()
+                            .AddTransient<WcfServiceLibrary1.Service1>();
 
             var app = builder.Build();
 

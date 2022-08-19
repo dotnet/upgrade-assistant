@@ -10,14 +10,16 @@
                 options.ListenAnyIP(8733);
                 options.ListenAnyIP(8700, listenOptions =>
                 {
-                        listenOptions.UseHttps();
+                    listenOptions.UseHttps();
                 });
             }); 
 
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
-                            .AddServiceModelMetadata();
+                            .AddServiceModelMetadata()
+                            .AddTransient<WcfServiceLibrary1.Service1>()
+                            .AddTransient<WcfServiceLibrary1.Service2>();
 
             var app = builder.Build();
 
@@ -40,7 +42,7 @@
                 {
                     int UA_placeHolder;
                 });
-                
+
                 serviceBuilder.AddService<WcfServiceLibrary1.Service2>(serviceOptions => 
                 { 
                     serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;

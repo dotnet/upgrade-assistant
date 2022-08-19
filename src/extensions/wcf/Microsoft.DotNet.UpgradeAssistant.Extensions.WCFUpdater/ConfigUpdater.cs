@@ -143,19 +143,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return false;
         }
 
-        public bool SupportsServiceDebug(string name)
+        public Dictionary<string, string> SupportsServiceDebug(string name)
         {
-            var results = GetBehavior(name).DescendantsAndSelf("serviceDebug");
-            if (results.Any())
+            // what is the default here
+
+            var results = GetBehavior(name).DescendantsAndSelf("serviceDebug").SingleOrDefault();
+            var debug = new Dictionary<string, string>();
+            foreach (var attribute in results.Attributes())
             {
-                var el = results.First();
-                if (el.Attribute("includeExceptionDetailInFaults") != null && el.Attribute("includeExceptionDetailInFaults").Value.Equals("true", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
+                debug.Add(attribute.Name.ToString(), attribute.Value);
             }
 
-            return false;
+            return debug;
         }
 
         public Dictionary<string, Uri> GetUri(string behaviorName)
