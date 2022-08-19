@@ -15,9 +15,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
     {
         private readonly SyntaxTree _template;
         private readonly SyntaxTree _programFile;
-        private readonly ILogger _logger;
+        private readonly ILogger<SourceCodeUpdater> _logger;
 
-        public SourceCodeUpdater(SyntaxTree sourceCode, string template, ILogger logger)
+        public SourceCodeUpdater(SyntaxTree sourceCode, string template, ILogger<SourceCodeUpdater> logger)
         {
             _programFile = sourceCode;
             _logger = logger;
@@ -26,11 +26,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
 
         // Simple constructor for source code files which only needs to update the using directives
-        public SourceCodeUpdater(SyntaxTree sourceCode, ILogger logger)
+        public SourceCodeUpdater(SyntaxTree sourceCode, ILogger<SourceCodeUpdater> logger)
         {
             _programFile = sourceCode;
             _template = CSharpSyntaxTree.ParseText(string.Empty);
             _logger = logger;
+        }
+
+        // Wraps different steps of source code update in one method
+        public SyntaxNode SourceCodeUpdate()
+        {
+            var root = UpdateDirectives();
+            root = AddTemplateCode(root);
+            return RemoveOldCode(root);
         }
 
         // Updates the using directives by deleting ServiceModel directives and adding CoreWCF directives

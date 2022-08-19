@@ -13,9 +13,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
     public class ConfigUpdater
     {
         private readonly XDocument _config;
-        private readonly ILogger _logger;
+        private readonly ILogger<ConfigUpdater> _logger;
 
-        public ConfigUpdater(XDocument doc, ILogger logger)
+        public ConfigUpdater(XDocument doc, ILogger<ConfigUpdater> logger)
         {
             _config = doc;
             _logger = logger;

@@ -31,6 +31,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         private Dictionary<string, IEnumerable<string>>? _path;
 
+        private ILoggerFactory _loggerFactory;
+
         public override IEnumerable<string> DependsOn { get; } = new[]
         {
             // Project should be backed up before changing source
@@ -43,23 +45,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             WellKnownStepIds.SetTFMStepId,
 
             // Project's config file, source code, and project file need to be updated first before adding CoreWCF services
-            WellKnownStepIds.ConfigUpdaterStepId,
-
             WellKnownStepIds.PackageUpdaterStepId
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
             WellKnownStepIds.NextProjectStepId,
+
+            WellKnownStepIds.ConfigUpdaterStepId,
+
+            WellKnownStepIds.SourceUpdaterStepId
         };
 
-        public WCFUpdateStep(ILogger<WCFUpdateStep> logger)
+        public WCFUpdateStep(ILogger<WCFUpdateStep> logger, ILoggerFactory loggerFactory)
             : base(logger)
         {
             if (logger is null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
+
+            _loggerFactory = loggerFactory;
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
@@ -83,7 +89,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
             {
@@ -92,12 +98,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             try
             {
-                return Apply();
+                var result = Apply();
+                await context.ReloadWorkspaceAsync(token);
+                return result.Result;
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Unexpected error happened during CoreWCF porting.");
-                return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Project failed to port to CoreWCF. Please review error message and log file for more information."));
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Project failed to port to CoreWCF. Please review error message and log file for more information.");
             }
         }
 
@@ -119,17 +127,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             // construct updaters
-            _configUpdater = UpdaterFactory.GetConfigUpdater(_path["config"].First(), Logger);
-            _packageUpdater = UpdaterFactory.GetPackageUpdater(_path["proj"].First(), Logger);
+            _configUpdater = UpdaterFactory.GetConfigUpdater(_path["config"].Single(), _loggerFactory.CreateLogger<ConfigUpdater>());
+            _packageUpdater = UpdaterFactory.GetPackageUpdater(_path["proj"].Single(), _loggerFactory.CreateLogger<PackageUpdater>());
             if (_path.ContainsKey("directives"))
             {
-                _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path["directives"], Logger);
+                _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path["directives"], _loggerFactory.CreateLogger<SourceCodeUpdater>());
             }
 
             if (_configUpdater is not null)
             {
                 var configContext = UpdateRunner.GetContext(_configUpdater);
-                _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path["main"].First(), configContext, Logger);
+                _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path["main"].Single(), configContext, _loggerFactory.CreateLogger<SourceCodeUpdater>());
             }
 
             if (_configUpdater is null || _packageUpdater is null || _sourceCodeUpdater is null || (_path.ContainsKey("directives") && _directiveUpdaters is null))
@@ -138,7 +146,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Updaters cannot be constructed. Please review error message and log for more information.", BuildBreakRisk.Medium));
             }
 
-            return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "WCF updaters are initialized. Ready to update.", BuildBreakRisk.None));
+            return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "WCF updaters are initialized. Ready to update.", BuildBreakRisk.Medium));
         }
 
         public Task<UpgradeStepApplyResult> Apply()
@@ -166,9 +174,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Lost access to file paths. Please review error message and log for more information."));
             }
 
-            UpdateRunner.WritePackageUpdate(projFile, _path["proj"].First(), Logger);
-            UpdateRunner.WriteConfigUpdate(config[0], config[1], _path["config"].First(), Logger);
-            UpdateRunner.WriteSourceCodeUpdate(source, _path["main"].First(), Logger);
+            UpdateRunner.WritePackageUpdate(projFile, _path["proj"].Single(), Logger);
+            UpdateRunner.WriteConfigUpdate(config[0], config[1], _path["config"].Single(), Logger);
+            UpdateRunner.WriteSourceCodeUpdate(source, _path["main"].Single(), Logger);
             if (directives.Count > 0)
             {
                 UpdateRunner.WriteDirectiveUpdate(directives, _path["directives"], Logger);
@@ -201,7 +209,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
             else if (!config.Any())
             {
-                if (File.ReadAllText(main.First()).Contains("ServiceHost"))
+                if (File.ReadAllText(main.Single()).Contains("ServiceHost"))
                 {
                     Logger.LogWarning("ServiceHost instance was detected in code but can not find .config file that configures system.serviceModel. " +
                         "Automated update cannot be applied. Please update the project to CoreWCF manually (https://github.com/CoreWCF/CoreWCF).");
@@ -212,15 +220,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             else
             {
                 _path!.Add("main", main);
-                Logger.LogTrace($"This following file: {main.First()} needs source code update to replace ServiceHost instance.");
+                Logger.LogTrace($"This following file: {main.Single()} needs source code update to replace ServiceHost instance.");
                 _path.Add("config", config);
-                Logger.LogTrace($"This following config file: {config.First()} needs to be updated.");
+                Logger.LogTrace($"This following config file: {config.Single()} needs to be updated.");
                 _path.Add("proj", new[] { project.GetFile().FilePath });
                 Logger.LogTrace($"This following project file: {project.GetFile().FilePath} needs to be updated");
 
+                foreach (var directive in directives)
+                {
+                    Logger.LogDebug($"This .cs file: {directive} needs using directives updates. Adding the path to collection.");
+                }
+
                 if (directives.Any())
                 {
-                    Logger.LogDebug($"This .cs file: {directives.First()} needs using directives updates. Adding the path to collection.");
                     _path.Add("directives", directives);
                 }
 

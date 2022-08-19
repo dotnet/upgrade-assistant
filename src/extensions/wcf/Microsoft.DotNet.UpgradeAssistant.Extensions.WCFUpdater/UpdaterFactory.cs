@@ -13,7 +13,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
     public class UpdaterFactory
     {
-        public static PackageUpdater? GetPackageUpdater(string path, ILogger logger)
+        public static PackageUpdater? GetPackageUpdater(string path, ILogger<PackageUpdater> logger)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        public static ConfigUpdater? GetConfigUpdater(string path, ILogger logger)
+        public static ConfigUpdater? GetConfigUpdater(string path, ILogger<ConfigUpdater> logger)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        public static SourceCodeUpdater? GetSourceCodeUpdater(string path, Dictionary<string, object> context, ILogger logger)
+        public static SourceCodeUpdater? GetSourceCodeUpdater(string path, Dictionary<string, object> context, ILogger<SourceCodeUpdater> logger)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
         }
 
-        public static List<SourceCodeUpdater>? GetDirectiveUpdaters(IEnumerable<string> path, ILogger logger)
+        public static List<SourceCodeUpdater>? GetDirectiveUpdaters(IEnumerable<string> path, ILogger<SourceCodeUpdater> logger)
         {
             try
             {

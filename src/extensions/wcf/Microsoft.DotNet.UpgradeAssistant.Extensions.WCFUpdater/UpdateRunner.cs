@@ -86,8 +86,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             try
             {
                 logger.LogDebug("Start updating source code...");
-                var root = sourceCodeUpdater.UpdateDirectives();
-                root = sourceCodeUpdater.RemoveOldCode(sourceCodeUpdater.AddTemplateCode(root));
+                var root = sourceCodeUpdater.SourceCodeUpdate();
                 logger.LogInformation("Finish updating source code.");
                 return root;
             }

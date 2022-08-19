@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                               </ItemGroup>
                             </Project>";
 
-        private readonly NullLogger _logger = NullLogger.Instance;
+        private readonly NullLogger<PackageUpdater> _logger = NullLogger<PackageUpdater>.Instance;
 
         [Fact]
         public void UpdateSDKTest()

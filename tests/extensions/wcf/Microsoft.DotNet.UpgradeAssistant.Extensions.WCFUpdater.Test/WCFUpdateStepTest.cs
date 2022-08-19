@@ -46,7 +46,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddProvider(new TestOutputHelperLoggerProvider(_output));
             var logger = loggerFactory.CreateLogger<WCFUpdateStep>();
-            var updater = new WCFUpdateStep(logger);
+            var updater = new WCFUpdateStep(logger, loggerFactory);
 
             var projectFile = mock.Mock<IProjectFile>();
             projectFile.Setup(f => f.IsSdk).Returns(true);

@@ -108,7 +108,7 @@ namespace SampleServer
                             using Microsoft.AspNetCore.Hosting;
                             using Microsoft.Extensions.DependencyInjection;";
 
-        private readonly NullLogger _logger = NullLogger.Instance;
+        private readonly NullLogger<SourceCodeUpdater> _logger = NullLogger<SourceCodeUpdater>.Instance;
 
         [Theory]
         [InlineData("using System.ServiceModel.Security;", Directives)]

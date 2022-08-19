@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                                         </system.serviceModel>
                                         </configuration>";
 
-        private readonly NullLogger _logger = NullLogger.Instance;
+        private readonly NullLogger<ConfigUpdater> _logger = NullLogger<ConfigUpdater>.Instance;
 
         [Fact]
         public void GetUriTest()

@@ -11,16 +11,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
     public class PackageUpdater
     {
         private readonly XDocument _doc;
-        private readonly ILogger _logger;
-        //private readonly IProjectFile _file;
-        private List<string> coreWCFPackages = new List<string>
-        { "CoreWCF.NetTcp", "CoreWCF.Primitives", "CoreWCF.ConfigurationManager", "CoreWCF.Http", "CoreWCF.WebHttp" };
+        private readonly ILogger<PackageUpdater> _logger;
 
-        public PackageUpdater(XDocument doc, ILogger logger)
+        public PackageUpdater(XDocument doc, ILogger<PackageUpdater> logger)
         {
             _doc = doc;
             _logger = logger;
-            //_file = file;
         }
 
         public XDocument UpdatePackages()
@@ -37,15 +33,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                            select package.Attribute("Include").Value;
             var corewcfPackages = XDocument.Parse(Constants.CoreWCFPackages).Root.Descendants();
             corewcfPackages.Where(x => currPackages.Contains(x.Attribute("Include").Value)).Remove();
-
-            //List<NuGetReference> addPackages = new List<NuGetReference>();
-            //foreach (var package in coreWCFPackages)
-            //{
-            //    if (!packages.Contains(package))
-            //    {
-            //        addPackages.Add(new NuGetReference(package, "1.1.0"));
-            //    }
-            //}
 
             _doc.Root.Descendants("PackageReference").Ancestors().First().Add(corewcfPackages);
             _logger.LogDebug("Finish adding references to CoreWCF packages.");
