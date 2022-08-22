@@ -159,11 +159,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             private bool TryFind(NuGetReference package, [MaybeNullWhen(false)] out ResolveResultGrouping result)
             {
-                var foundItem = _graph.Flattened.FirstOrDefault(item => string.Equals(item.Data.Match.Library.Name, package.Name, StringComparison.OrdinalIgnoreCase));
+                foreach (var item in _graph.Flattened)
+                {
+                    if (string.Equals(item.Data.Match.Library.Name, package.Name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result = new(item.Data);
+                        return true;
+                    }
+                }
 
-                result = foundItem is not null ? new(foundItem.Data) : null;
-
-                return result is not null;
+                result = default;
+                return false;
             }
 
             private class ResolveResultGrouping : IGrouping<NuGetReference, NuGetReference>
