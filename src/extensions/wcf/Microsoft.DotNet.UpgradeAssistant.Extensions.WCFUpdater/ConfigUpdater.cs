@@ -146,7 +146,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         public Dictionary<string, string> SupportsServiceDebug(string name)
         {
             // what is the default here
-
             var results = GetBehavior(name).DescendantsAndSelf("serviceDebug").SingleOrDefault();
             var debug = new Dictionary<string, string>();
             foreach (var attribute in results.Attributes())
@@ -204,6 +203,73 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             return uri;
+        }
+
+        public Dictionary<string, string> GetServiceCredentials(string name)
+        {
+            var result = new Dictionary<string, string>();
+            var behavior = GetBehavior(name);
+            string[] names = { "clientCertificate", "serviceCertificate", "userNameAuthentication", "windowsAuthentication" };
+            foreach (var n in names)
+            {
+                foreach (var c in behavior.DescendantsAndSelf(n))
+                {
+                    if (!c.HasAttributes)
+                    {
+                        foreach (var element in c.Elements())
+                        {
+                            foreach (var a in element.Attributes())
+                            {
+                                result.Add(n + "/" + a.Name, a.Value);
+                            }
+                        }
+                    }
+
+                    foreach (var a in c.Attributes())
+                    {
+                        result.Add(n + "/" + a.Name, a.Value);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public bool HasServiceCertificate(string name)
+        {
+            var cert = GetBehavior(name).DescendantsAndSelf("serviceCertificate");
+            if (cert.Any())
+            {
+                return cert.First().Attribute("storeLocation") != null && cert.First().Attribute("storeName") != null &&
+                    cert.First().Attribute("x509FindType") != null && cert.First().Attribute("findValue") != null;
+            }
+
+            return false;
+        }
+
+        // returns if the NetTcp binding is configured to use certificate
+        public bool HasNetTcpCertificate()
+        {
+            var netTcp = _config.Root.DescendantsAndSelf("netTcpBinding");
+            if (netTcp.Any())
+            {
+                var security = netTcp.First().DescendantsAndSelf("security").First();
+                if (security != null)
+                {
+                    if (security.Attribute("mode").Value.Equals("TransportWithMessageCredential", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+
+                    if (security.Element("transport") != null &&
+                        security.Element("transport").Attribute("clientCredentialType").Value.Equals("Certificate", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public HashSet<string> GetBindings(string behaviorName)

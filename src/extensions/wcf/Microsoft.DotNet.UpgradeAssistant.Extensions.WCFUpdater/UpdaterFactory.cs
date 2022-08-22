@@ -83,14 +83,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         public static string UpdateTemplateCode(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
         {
             string template = Constants.Template;
-            template = UpdatePortNumber(template, GetAllAddress(context, logger));
+            template = UpdatePortNumber(template, GetAllAddress(context), GetHttpsCredentials(context));
             template = UpdateServiceMetadata(template, context);
             template = template.Replace("[ServiceBuilder PlaceHolder]", AddMultipleServices(context, logger));
             template = AddServiceType(template, context);
             return template;
         }
 
-        private static string UpdatePortNumber(string template, HashSet<Uri> port)
+        private static string UpdatePortNumber(string template, HashSet<Uri> port, Dictionary<Uri, Dictionary<string, string>> credentials)
         {
             HashSet<Uri> netTcp = new HashSet<Uri>(from p in port where p.Scheme == Uri.UriSchemeNetTcp select p);
             HashSet<Uri> http = new HashSet<Uri>(from p in port where p.Scheme == Uri.UriSchemeHttp select p);
@@ -130,7 +130,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 {
                     foreach (var address in https)
                     {
-                        httpsPort += Constants.HttpsDelegate.Replace("httpsPortNum", address.Port.ToString());
+                        var httpsDelegate = Constants.HttpsDelegate.Replace("httpsPortNum", address.Port.ToString());
+                        if (credentials.ContainsKey(address))
+                        {
+                            var httpsWithCert = Constants.HttpsCert.Replace("storeLocation", credentials[address]["serviceCertificate/storeLocation"])
+                                       .Replace("storeName", credentials[address]["serviceCertificate/storeName"])
+                                       .Replace("findType", credentials[address]["serviceCertificate/x509FindType"])
+                                       .Replace("findValue", "\"" + credentials[address]["serviceCertificate/findValue"] + "\"");
+                            httpsPort += httpsDelegate.Replace("[Configure Https]", httpsWithCert);
+                        }
+                        else
+                        {
+                            httpsPort += httpsDelegate.Replace("[Configure Https]", Constants.UseHttps);
+                        }
+
                         if (address != https.Last())
                         {
                             httpsPort += System.Environment.NewLine;
@@ -148,10 +161,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return template.Replace("[Port PlaceHolder]", host);
         }
 
-        private static HashSet<Uri> GetAllAddress(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
+        private static HashSet<Uri> GetAllAddress(Dictionary<string, Dictionary<string, object>> context)
         {
             // unions all uri from different services
-            HashSet<Uri> port = new HashSet<Uri>();
+            var port = new HashSet<Uri>();
             foreach (var key in context.Keys)
             {
                 var dic = (Dictionary<string, Uri>)context[key]["uri"];
@@ -161,11 +174,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return port;
         }
 
+        // for each https binding that has a service cretificate configured, returns the pair of uri and credentials configuration
+        private static Dictionary<Uri, Dictionary<string, string>> GetHttpsCredentials(Dictionary<string, Dictionary<string, object>> context)
+        {
+            var credentials = new Dictionary<Uri, Dictionary<string, string>>();
+            foreach (var key in context.Keys)
+            {
+                var uri = (Dictionary<string, Uri>)context[key]["uri"];
+                if ((bool)context[key]["hasCert"] && uri.ContainsKey(Uri.UriSchemeHttps))
+                {
+                    credentials.Add(uri[Uri.UriSchemeHttps], (Dictionary<string, string>)context[key]["credentials"]);
+                }
+            }
+
+            return credentials;
+        }
+
         private static string UpdateServiceMetadata(string template, Dictionary<string, Dictionary<string, object>> context)
         {
-            bool hasMetadata = false;
-            string metadataHttp = string.Empty;
-            string metadataHttps = string.Empty;
+            var hasMetadata = false;
+            var metadataHttp = string.Empty;
+            var metadataHttps = string.Empty;
 
             // updates metadata
             foreach (var key in context.Keys)
@@ -223,8 +252,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var builder = string.Empty;
             foreach (var serviceName in context.Keys)
             {
-                builder += UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), (Dictionary<string, string>)context[serviceName]["debug"])
-                    + System.Environment.NewLine;
+                var addDebug = UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), (Dictionary<string, string>)context[serviceName]["debug"]);
+                var addCredentials = ConfigureServiceCredentials(addDebug, (bool)context[serviceName]["netTcpCert"], (Dictionary<string, string>)context[serviceName]["credentials"]);
+                builder += addCredentials + System.Environment.NewLine;
                 if (serviceName != context.Keys.Last())
                 {
                     builder += System.Environment.NewLine;
@@ -288,6 +318,60 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             return template.Replace("[Add ServiceType PlaceHolder]", result);
+        }
+
+        private static string ConfigureServiceCredentials(string template, bool hasNetTcpCert, Dictionary<string, string> credentials)
+        {
+            var cert = string.Empty;
+
+            // add netTcp service certificate if applicable
+            if (hasNetTcpCert)
+            {
+                string service = Constants.NetTcpCert.Replace("storeLocation", credentials["serviceCertificate/storeLocation"])
+                                                     .Replace("storeName", credentials["serviceCertificate/storeName"])
+                                                     .Replace("findType", credentials["serviceCertificate/x509FindType"])
+                                                     .Replace("findValue", "\"" + credentials["serviceCertificate/findValue"] + "\"");
+                cert = Constants.Trivia + service + System.Environment.NewLine;
+            }
+
+            // configure client certificate
+            if (credentials.ContainsKey("clientCertificate/findValue"))
+            {
+                string client = Constants.ClientCert.Replace("storeLocation", credentials["clientCertificate/storeLocation"])
+                                                    .Replace("storeName", credentials["clientCertificate/storeName"])
+                                                    .Replace("findType", credentials["clientCertificate/x509FindType"])
+                                                    .Replace("findValue", "\"" + credentials["clientCertificate/findValue"] + "\"");
+                cert += Constants.Trivia + client + System.Environment.NewLine;
+            }
+
+            // configure client certificate authentication
+            var auth = new List<string[]>();
+            if (credentials.ContainsKey("clientCertificate/certificateValidationMode"))
+            {
+                cert += Constants.Trivia + Constants.ClientAuthMode.Replace("ModeType", credentials["clientCertificate/certificateValidationMode"]) + System.Environment.NewLine;
+                if (credentials["clientCertificate/certificateValidationMode"].Equals("custom", StringComparison.OrdinalIgnoreCase))
+                {
+                    cert += Constants.Trivia + Constants.ClientAuthCustom.Replace("CustomValidatorType", credentials["clientCertificate/customCertificateValidatorType"]) + System.Environment.NewLine;
+                }
+            }
+
+            // configure username authentication
+            if (credentials.ContainsKey("userNameAuthentication/userNamePasswordValidationMode"))
+            {
+                cert += Constants.Trivia + Constants.UserAuthMode.Replace("ModeType", credentials["userNameAuthentication/userNamePasswordValidationMode"]) + System.Environment.NewLine;
+                if (credentials["userNameAuthentication/userNamePasswordValidationMode"].Equals("custom", StringComparison.OrdinalIgnoreCase))
+                {
+                    cert += Constants.Trivia + Constants.UserAuthCustom.Replace("CustomValidatorType", credentials["userNameAuthentication/customUserNamePasswordValidatorType"]) + System.Environment.NewLine;
+                }
+            }
+
+            // configure windows group
+            if (credentials.ContainsKey("windowsAuthentication/includeWindowsGroups"))
+            {
+                cert += Constants.Trivia + Constants.WindowsAuth.Replace("boolean", credentials["windowsAuthentication/includeWindowsGroups"]);
+            }
+
+            return template.Replace("[ServiceCredentials PlaceHolder]", cert);
         }
     }
 }

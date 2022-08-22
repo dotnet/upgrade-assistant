@@ -18,6 +18,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         private readonly NullLogger _logger = NullLogger.Instance;
 
         [Theory]
+        [InlineData("TestInputFiles\\CredentialsConfig.txt", "TestExpectedFiles\\CredentialsTemplateCode.txt")]
+        [InlineData("TestInputFiles\\CredentialsHttpsConfig.txt", "TestExpectedFiles\\CredentialsHttpsTemplateCode.txt")]
         [InlineData("TestInputFiles\\SampleConfig.txt", "TestExpectedFiles\\SimpleTemplateCode.txt")]
         [InlineData("TestInputFiles\\MultiServicesConfig.txt", "TestExpectedFiles\\MultiServicesTemplateCode.txt")]
         public void UpdateFactoryTemplateTest(string input, string expected)

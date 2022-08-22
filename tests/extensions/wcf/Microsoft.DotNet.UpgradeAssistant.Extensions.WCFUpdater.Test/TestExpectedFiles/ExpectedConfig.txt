@@ -22,7 +22,7 @@
   <serviceBehaviors>
     <behavior name="">
       <serviceMetadata httpGetEnabled="True" />
-      <serviceDebug includeExceptionDetailInFaults="True" />
+      <serviceDebug includeExceptionDetailInFaults="False" />
     </behavior>
   </serviceBehaviors>
 </behaviors>-->

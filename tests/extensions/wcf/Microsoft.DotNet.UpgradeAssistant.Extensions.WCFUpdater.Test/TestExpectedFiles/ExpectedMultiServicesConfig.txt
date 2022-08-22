@@ -40,7 +40,7 @@
     </behavior>
     <behavior name="SampleBehavior">
       <serviceMetadata httpsGetEnabled="True" />
-      <serviceDebug includeExceptionDetailInFaults="True" />
+      <serviceDebug includeExceptionDetailInFaults="False" />
     </behavior>
   </serviceBehaviors>
 </behaviors>-->

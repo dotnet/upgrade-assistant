@@ -176,7 +176,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 { "uri", configUpdater.GetUri(name) },
                 { "metadata", configUpdater.SupportsMetadataBehavior(name) },
                 { "debug", configUpdater.SupportsServiceDebug(name) },
-                { "bindings", configUpdater.GetBindings(name) }
+                { "bindings", configUpdater.GetBindings(name) },
+                { "hasCert", configUpdater.HasServiceCertificate(name) },
+                { "credentials", configUpdater.GetServiceCredentials(name) },
+                { "netTcpCert", configUpdater.HasNetTcpCertificate() }
             };
             return context;
         }

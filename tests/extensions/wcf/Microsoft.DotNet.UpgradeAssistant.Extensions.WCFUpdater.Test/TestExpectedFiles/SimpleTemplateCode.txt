@@ -8,7 +8,7 @@
             {
                 options.ListenAnyIP(8733);
                 
-            }); 
+            });
 
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
@@ -28,12 +28,13 @@
             {                
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
                 { 
-                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = false;
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(varName =>
                 {
                     int UA_placeHolder;
+
                 });
 
             });
