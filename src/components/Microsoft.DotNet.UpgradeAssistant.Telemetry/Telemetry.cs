@@ -38,16 +38,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Telemetry
             }
 
             _telemetryConfig = TelemetryConfiguration.CreateDefault();
+            _telemetryConfig.ConnectionString = _options.ConnectionString;
 
             foreach (var initializer in initializers)
             {
                 _telemetryConfig.TelemetryInitializers.Add(initializer);
             }
 
-            _client = new TelemetryClient(_telemetryConfig)
-            {
-                InstrumentationKey = _options.InstrumentationKey
-            };
+            _client = new TelemetryClient(_telemetryConfig) ;
 
             _client.Context.Session.Id = _options.CurrentSessionId;
             _client.Context.Device.OperatingSystem = RuntimeEnvironment.OperatingSystem;

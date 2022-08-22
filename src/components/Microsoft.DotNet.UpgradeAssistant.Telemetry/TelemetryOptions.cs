@@ -11,7 +11,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Telemetry
 
         public string DisplayName { get; set; } = string.Empty;
 
-        public string InstrumentationKey { get; set; } = string.Empty;
+        public string ConnectionString { get; set; } = string.Empty;
 
         public string DetailsLink { get; set; } = string.Empty;
 
