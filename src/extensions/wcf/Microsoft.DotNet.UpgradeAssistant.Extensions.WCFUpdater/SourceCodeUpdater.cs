@@ -66,7 +66,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             var currDirectives = from d in root.DescendantNodes().OfType<UsingDirectiveSyntax>()
                                  where template.Contains(d.ToFullString(), StringComparison.Ordinal)
-                                 select d.ToFullString().Replace(System.Environment.NewLine, string.Empty);
+                                 select d.ToFullString().Trim();
             var result = string.Empty;
             foreach (var line in template.Split(System.Environment.NewLine))
             {
