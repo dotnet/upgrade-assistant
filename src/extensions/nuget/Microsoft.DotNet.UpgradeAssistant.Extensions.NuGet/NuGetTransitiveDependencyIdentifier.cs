@@ -84,13 +84,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             // Create a project in a unique and temporary directory
             var path = CreateUniquePath();
-
             var spec = new PackageSpec(tfmInfo)
             {
-                Dependencies = packages.Select(i => _packageDependencies.GetOrAdd(i.Name, new LibraryDependency
+                Dependencies = packages.Select(i =>
                 {
-                    LibraryRange = new LibraryRange(i.Name, new VersionRange(i.GetNuGetVersion()), LibraryDependencyTarget.Package),
-                })).ToList(),
+                    var lookupKey = $@"{i.Name}|{i.GetNuGetVersion()?.ToString() ?? "null"}";
+                    return _packageDependencies.GetOrAdd(lookupKey, new LibraryDependency
+                    {
+                        LibraryRange = new LibraryRange(i.Name, new VersionRange(i.GetNuGetVersion()), LibraryDependencyTarget.Package),
+                    });
+                }).ToList(),
                 RestoreMetadata = new()
                 {
                     ProjectPath = path,
