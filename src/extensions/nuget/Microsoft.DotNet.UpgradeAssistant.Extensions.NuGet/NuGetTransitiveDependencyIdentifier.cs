@@ -29,8 +29,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
     public class NuGetTransitiveDependencyIdentifier : ITransitiveDependencyIdentifier
     {
         private const string UniquePathPart1 = "dotnet-ua";
-        private const string UniquePathPart2 = "dotnet-ua";
-        private const string UniquePathFilename = "dotnet-ua";
+        private const string UniquePathPart2 = "restores";
+        private const string UniquePathFilename = "project.txt";
 
         private static readonly ConcurrentDictionary<string, LibraryDependency> _packageDependencies = new();
 
