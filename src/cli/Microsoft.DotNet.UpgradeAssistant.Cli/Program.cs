@@ -42,7 +42,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             return new CommandLineBuilder(root)
                 .UseDefaults()
-                .UseHelpBuilder(b => new HelpWithHeader(b.Console))
+                .UseHelp(ctx => ctx.HelpBuilder.CustomizeLayout(_ =>
+                    HelpBuilder.Default
+                    .GetLayout()
+                    .Skip(1)
+                    .Prepend(_ =>
+                    {
+                        ShowHeader();
+
+                        _.Output.WriteLine(LocalizedStrings.UpgradeAssistantHeaderDetails);
+                    })))
                 .Build()
                 .InvokeAsync(args);
 
@@ -66,21 +75,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             Console.WriteLine(survey);
             Console.WriteLine(bar);
             Console.WriteLine();
-        }
-
-        private class HelpWithHeader : HelpBuilder
-        {
-            public HelpWithHeader(IConsole console)
-                : base(console, maxWidth: ConsoleUtils.Width)
-            {
-            }
-
-            protected override void AddSynopsis(ICommand command)
-            {
-                ShowHeader();
-
-                WriteHeading(LocalizedStrings.UpgradeAssistantHeaderDetails, null);
-            }
         }
     }
 }
