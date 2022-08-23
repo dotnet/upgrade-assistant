@@ -270,27 +270,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var result = string.Empty;
             if (debug.ContainsKey("httpHelpPageEnabled") && debug["httpHelpPageEnabled"].Equals("false", StringComparison.OrdinalIgnoreCase))
             {
-                result += Constants.HttpPageEnabled + System.Environment.NewLine;
+                result += Constants.Trivia + Constants.HttpPageEnabled + System.Environment.NewLine;
             }
 
             if (debug.ContainsKey("httpsHelpPageEnabled") && debug["httpsHelpPageEnabled"].Equals("false", StringComparison.OrdinalIgnoreCase))
             {
-                result += Constants.HttpsPageEnabled + System.Environment.NewLine;
+                result += Constants.Trivia + Constants.HttpsPageEnabled + System.Environment.NewLine;
             }
 
             if (debug.ContainsKey("httpHelpPageUrl"))
             {
-                result += Constants.HttpPageUrl.Replace("address", debug["httpHelpPageUrl"]) + System.Environment.NewLine;
+                result += Constants.Trivia + Constants.HttpPageUrl.Replace("address", debug["httpHelpPageUrl"]) + System.Environment.NewLine;
             }
 
             if (debug.ContainsKey("httpsHelpPageUrl"))
             {
-                result += Constants.HttpsPageUrl.Replace("address", debug["httpsHelpPageUrl"]) + System.Environment.NewLine;
+                result += Constants.Trivia + Constants.HttpsPageUrl.Replace("address", debug["httpsHelpPageUrl"]) + System.Environment.NewLine;
             }
 
-            if (debug.ContainsKey("includeExceptionDetailInFaults") && debug["includeExceptionDetailInFaults"].Equals("false", StringComparison.OrdinalIgnoreCase))
+            if (debug.ContainsKey("includeExceptionDetailInFaults") && debug["includeExceptionDetailInFaults"].Equals("true", StringComparison.OrdinalIgnoreCase))
             {
-                result += Constants.DebugFaults;
+                result += Constants.Trivia + Constants.DebugFaults;
             }
 
             if (result.EndsWith(System.Environment.NewLine))

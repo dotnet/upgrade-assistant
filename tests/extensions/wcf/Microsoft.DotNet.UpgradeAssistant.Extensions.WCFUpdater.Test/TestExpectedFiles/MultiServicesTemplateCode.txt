@@ -27,15 +27,15 @@
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpGetEnabled = true;
             serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost:8733/Service1/metadata");
-            serviceMetadataBehavior.HttpGetEnabled = true;
+            serviceMetadataBehavior.HttpsGetEnabled = true;
             serviceMetadataBehavior.HttpsGetUrl = new Uri("https://localhost:8700/Service2/metadata");
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
-            {                
+            {
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
-                { 
-                    
+                {
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(varName =>
@@ -45,8 +45,8 @@
                 });
 
                 serviceBuilder.AddService<WcfServiceLibrary1.Service2>(serviceOptions => 
-                { 
-                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = false;
+                {
+
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service2>(varName =>

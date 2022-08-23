@@ -25,10 +25,10 @@
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
-            {                
+            {
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
-                { 
-                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = false;
+                {
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(varName =>

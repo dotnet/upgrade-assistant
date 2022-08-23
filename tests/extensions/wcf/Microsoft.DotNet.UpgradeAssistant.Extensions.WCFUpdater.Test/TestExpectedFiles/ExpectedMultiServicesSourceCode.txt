@@ -55,7 +55,7 @@ namespace ConsoleApp
             {
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
                 {
-                    
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
@@ -65,7 +65,7 @@ namespace ConsoleApp
 
                 serviceBuilder.AddService<WcfServiceLibrary1.Service2>(serviceOptions => 
                 {
-                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = false;
+                    
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service2>(host2 =>

@@ -52,7 +52,7 @@ using Microsoft.Extensions.DependencyInjection;
         public const string HttpGetUrl = @"            serviceMetadataBehavior.HttpGetUrl = new Uri(""httpAddress"");";
         public const string HttpsGetUrl = @"            serviceMetadataBehavior.HttpsGetUrl = new Uri(""httpsAddress"");";
 
-        public const string DebugFaults = "serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = false;";
+        public const string DebugFaults = "serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;";
         public const string HttpPageEnabled = "serviceOptions.DebugBehavior.HttpHelpPageEnabled = false;";
         public const string HttpsPageEnabled = "serviceOptions.DebugBehavior.HttpsHelpPageEnabled = false;";
         public const string HttpPageUrl = @"serviceOptions.DebugBehavior.HttpHelpPageUrl = new Uri(""address"");";
@@ -84,7 +84,7 @@ using Microsoft.Extensions.DependencyInjection;
         public const string AddConfigureService =
               @"                serviceBuilder.AddService<ServiceType>(serviceOptions => 
                 {
-                    [ServiceDebug PlaceHolder]
+[ServiceDebug PlaceHolder]
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<ServiceType>(varName =>

@@ -17,6 +17,9 @@
     <None Update="TestExpectedFiles\CredentialsHttpsTemplateCode.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TestExpectedFiles\DebugTemplateCode.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestExpectedFiles\ExpectedMultiServicesConfig.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -45,6 +48,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="TestExpectedFiles\SimpleTemplateCode.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestInputFiles\DebugConfig.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="TestInputFiles\CredentialsHttpsConfig.txt">
