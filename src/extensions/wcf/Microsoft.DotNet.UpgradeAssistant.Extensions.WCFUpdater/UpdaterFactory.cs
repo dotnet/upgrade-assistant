@@ -13,68 +13,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
     public class UpdaterFactory
     {
-        public static PackageUpdater? GetPackageUpdater(string path, ILogger<PackageUpdater> logger)
+        public static PackageUpdater GetPackageUpdater(string path, ILogger<PackageUpdater> logger)
         {
-            try
-            {
-                XDocument doc = XDocument.Load(path);
-                PackageUpdater packageUpdater = new PackageUpdater(doc, logger);
-                return packageUpdater;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"Error loading project file {path}");
-                return null;
-            }
+            XDocument doc = XDocument.Load(path);
+            PackageUpdater packageUpdater = new PackageUpdater(doc, logger);
+            return packageUpdater;
         }
 
-        public static ConfigUpdater? GetConfigUpdater(string path, ILogger<ConfigUpdater> logger)
+        public static ConfigUpdater GetConfigUpdater(string path, ILogger<ConfigUpdater> logger)
         {
-            try
-            {
-                XDocument doc = XDocument.Load(path);
-                ConfigUpdater configUpdater = new ConfigUpdater(doc, logger);
-                return configUpdater;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"Error loading project file {path}");
-                return null;
-            }
+            XDocument doc = XDocument.Load(path);
+            ConfigUpdater configUpdater = new ConfigUpdater(doc, logger);
+            return configUpdater;
         }
 
-        public static SourceCodeUpdater? GetSourceCodeUpdater(string path, Dictionary<string, object> context, ILogger<SourceCodeUpdater> logger)
+        public static SourceCodeUpdater GetSourceCodeUpdater(string path, Dictionary<string, object> context, ILogger<SourceCodeUpdater> logger)
         {
-            try
-            {
-                SyntaxTree tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
-                SourceCodeUpdater sourceCodeUpdater = new SourceCodeUpdater(tree, UpdateTemplateCode(context, logger), logger);
-                return sourceCodeUpdater;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"Error parsing project file {path}");
-                return null;
-            }
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
+            SourceCodeUpdater sourceCodeUpdater = new SourceCodeUpdater(tree, UpdateTemplateCode(context, logger), logger);
+            return sourceCodeUpdater;
         }
 
-        public static List<SourceCodeUpdater>? GetDirectiveUpdaters(IEnumerable<string> path, ILogger<SourceCodeUpdater> logger)
+        public static List<SourceCodeUpdater> GetDirectiveUpdaters(IEnumerable<string> path, ILogger<SourceCodeUpdater> logger)
         {
-            try
+            var result = new List<SourceCodeUpdater>();
+            foreach (var p in path)
             {
-                var result = new List<SourceCodeUpdater>();
-                foreach (var p in path)
-                {
-                    result.Add(new SourceCodeUpdater(CSharpSyntaxTree.ParseText(File.ReadAllText(p)), logger));
-                }
+                result.Add(new SourceCodeUpdater(CSharpSyntaxTree.ParseText(File.ReadAllText(p)), logger));
+            }
 
-                return result;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"Error parsing project file {path}");
-                return null;
-            }
+            return result;
         }
 
         private static string UpdateTemplateCode(Dictionary<string, object> context, ILogger logger)

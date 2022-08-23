@@ -103,7 +103,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             expected.Add(Uri.UriSchemeHttps, new Uri("https://localhost:443/sample/address"));
             expected.Add(Uri.UriSchemeNetTcp, new Uri("net.tcp://localhost:808/"));
 
-            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetUri();
+            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetSchemeToAddressMapping();
             Assert.Equal(expected, result);
         }
 

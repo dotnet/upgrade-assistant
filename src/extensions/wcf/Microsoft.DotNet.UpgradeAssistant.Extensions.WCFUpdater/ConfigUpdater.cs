@@ -74,7 +74,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         private XDocument UpdateEndpoints(XDocument config)
         {
             // get base address
-            var uri = GetUri();
+            var uri = GetSchemeToAddressMapping();
 
             // add path from base address to endpoints
             var endpoints = config.Root.DescendantsAndSelf("endpoint");
@@ -153,7 +153,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return false;
         }
 
-        public Dictionary<string, Uri> GetUri()
+        public Dictionary<string, Uri> GetSchemeToAddressMapping()
         {
             var uri = new Dictionary<string, Uri>();
             var baseAddress =

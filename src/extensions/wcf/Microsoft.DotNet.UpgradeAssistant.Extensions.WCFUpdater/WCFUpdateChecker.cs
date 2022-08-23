@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
-    public class WCFUpdateChecker
+    public static class WCFUpdateChecker
     {
         public static bool IsWCFUpdateApplicable(Dictionary<string, IEnumerable<string>> path, ILogger logger)
         {
@@ -76,7 +76,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         public static bool IsSourceCodeApplicable(SyntaxTree tree)
         {
             var descendants = from id in tree.GetRoot().DescendantNodes().OfType<IdentifierNameSyntax>()
-                                where id.Identifier.ValueText.Equals("ServiceHost")
+                                where id.Identifier.ValueText.Equals("ServiceHost", StringComparison.Ordinal)
                                 select id;
             return descendants.Any();
         }
@@ -85,13 +85,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             foreach (var element in doc.Root.Descendants("PackageReference"))
             {
-                if (element.Attribute("Include").Value.Contains("System.ServiceModel"))
+                if (element.Attribute("Include").Value.Contains("System.ServiceModel", StringComparison.Ordinal))
                 {
                     return true;
                 }
             }
 
-            if (doc.Root.Attribute("Sdk") is not null && !doc.Root.Attribute("Sdk").Value.Contains("Web"))
+            if (doc.Root.Attribute("Sdk") is not null && !doc.Root.Attribute("Sdk").Value.Contains("Web", StringComparison.Ordinal))
             {
                 return true;
             }

@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                               select hostDeclaration;
             if (!declaration.Any())
             {
-                throw new Exception("Source code does not initialize a new ServiceHost instance.");
+                throw new NotSupportedException("Source code does not initialize a new ServiceHost instance.");
             }
 
             return declaration.First().Parent!;
