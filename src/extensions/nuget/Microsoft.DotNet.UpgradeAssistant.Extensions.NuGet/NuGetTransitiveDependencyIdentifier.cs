@@ -28,10 +28,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetTransitiveDependencyIdentifier : ITransitiveDependencyIdentifier
     {
-        private const string UniquePathPart1 = "dotnet-ua";
-        private const string UniquePathPart2 = "restores";
-        private const string UniquePathFilename = "project.txt";
-
         private static readonly ConcurrentDictionary<string, LibraryDependency> _packageDependencies = new();
 
         private readonly IEnumerable<PackageSource> _packageSources;
@@ -87,7 +83,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             var tfmInfo = tfms.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToFullString()) }).ToList();
 
             // Create a project in a unique and temporary directory
-            var path = Path.Combine(Path.GetTempPath(), UniquePathPart1, UniquePathPart2, Guid.NewGuid().ToString(), UniquePathFilename);
+            var path = CreateUniquePath();
 
             var spec = new PackageSpec(tfmInfo)
             {
@@ -134,6 +130,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 #pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
             return result?.FirstOrDefault()?.Result.RestoreGraphs.FirstOrDefault();
 #pragma warning restore CA1826 // Do not use Enumerable methods on indexable collections
+
+            static string CreateUniquePath()
+            {
+                const string UniquePathPart1 = "dotnet-ua";
+                const string UniquePathPart2 = "restores";
+                const string UniquePathFilename = "project.txt";
+
+                return Path.Combine(Path.GetTempPath(), UniquePathPart1, UniquePathPart2, Guid.NewGuid().ToString(), UniquePathFilename);
+            }
         }
 
         private class TargetGraphLookup : ILookup<NuGetReference, NuGetReference>
