@@ -24,12 +24,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
 {
     public sealed class ApiChecker : IBinaryAnalysisExecutor
     {
-        private readonly ILogger<ApiChecker> _logger;
         private readonly IBinaryAnalysisExecutorOptions _options;
         private readonly DefaultTfmOptions _tfmSelector;
+        private readonly ILogger<ApiChecker> _logger;
 
         public ApiChecker(IBinaryAnalysisExecutorOptions options,
-            ITargetFrameworkSelector tfmSelector,
             IOptions<DefaultTfmOptions> selectorOptions,
             ILogger<ApiChecker> logger)
         {
