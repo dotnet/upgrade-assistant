@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private async Task<bool> WriteUpgradeReport(IUpgradeContext context, CancellationToken token)
         {
             var outputDirectory = Path.GetDirectoryName(context.InputPath);
-            if (outputDirectory == null)
+            if (outputDirectory == null || context.Results.Count() == 0)
             {
                 return false;
             }
@@ -104,9 +104,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 await writer.WriteAsync(context.Results.ToAsyncEnumerable(), stream, token);
                 _logger.LogInformation($"The Upgrade Report is generated at {outputDirectory}\\{outputFileName}");
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private async Task RunStepAsync(IUpgradeContext context, UpgradeStep step, CancellationToken token)
