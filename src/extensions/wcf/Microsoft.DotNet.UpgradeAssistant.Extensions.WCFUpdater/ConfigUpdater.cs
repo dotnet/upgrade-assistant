@@ -85,11 +85,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 {
                     endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeNetTcp].PathAndQuery, ad).Replace("\\", "/");
                 }
-                else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
+                else if (endpoint.Attribute("binding").Value.IndexOf("Https", StringComparison.Ordinal) >= 0)
                 {
                     endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttps].PathAndQuery, ad).Replace("\\", "/");
                 }
-                else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
+                else if (endpoint.Attribute("binding").Value.IndexOf("Http", StringComparison.Ordinal) >= 0)
                 {
                     endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttp].PathAndQuery, ad).Replace("\\", "/");
                 }

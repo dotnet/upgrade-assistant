@@ -85,13 +85,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             foreach (var element in doc.Root.Descendants("PackageReference"))
             {
-                if (element.Attribute("Include").Value.Contains("System.ServiceModel", StringComparison.Ordinal))
+                if (element.Attribute("Include").Value.IndexOf("System.ServiceModel", StringComparison.Ordinal) >= 0)
                 {
                     return true;
                 }
             }
 
-            if (doc.Root.Attribute("Sdk") is not null && !doc.Root.Attribute("Sdk").Value.Contains("Web", StringComparison.Ordinal))
+            if (doc.Root.Attribute("Sdk") is not null && doc.Root.Attribute("Sdk").Value.IndexOf("Web", StringComparison.Ordinal) < 0)
             {
                 return true;
             }
