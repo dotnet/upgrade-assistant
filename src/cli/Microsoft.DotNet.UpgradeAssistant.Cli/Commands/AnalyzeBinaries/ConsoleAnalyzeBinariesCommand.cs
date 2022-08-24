@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     throw new ArgumentException(@"Must specify target file/directory for analysis");
                 }
 
-                return r.Tokens.Select<Token, FileSystemInfo>(i =>
+                return r.Tokens.Select<Token, FileSystemInfo?>(i =>
                 {
                     var path = i.Value;
                     if (string.IsNullOrEmpty(path))
@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     {
                         return new FileInfo(path);
                     }
-                }).ToArray();
+                }).Where(i => i is not null).Cast<FileSystemInfo>().ToArray();
             }, description: LocalizedStrings.BinaryAnalysisContentHelp)
             {
                 Arity = ArgumentArity.OneOrMore,
