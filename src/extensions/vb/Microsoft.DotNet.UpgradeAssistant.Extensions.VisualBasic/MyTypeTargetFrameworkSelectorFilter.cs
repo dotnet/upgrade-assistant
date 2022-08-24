@@ -37,9 +37,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 
             if (_windowsMyTypes.Contains(myType))
             {
-                _logger.LogInformation("Project {Name} contains MyType node that requires at least net5.0-windows.", tfm.Project);
+                _logger.LogInformation("Project {Name} contains MyType node that requires at least {framework}-windows.", tfm.Project, tfm.AppBase);
 
-                tfm.TryUpdate(TargetFrameworkMoniker.Net50_Windows);
+                tfm.TryUpdate(tfm.AppBase);
             }
         }
     }
