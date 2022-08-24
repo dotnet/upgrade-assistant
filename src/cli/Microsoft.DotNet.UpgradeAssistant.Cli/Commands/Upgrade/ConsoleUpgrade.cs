@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
@@ -25,7 +27,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleUpgrade> _logger;
         private readonly IAnalyzeResultWriterProvider _writerProvider;
-        private readonly IUpgradeResultCollector _upgradeResultCollector;
+        private readonly IOptions<AnalysisOptions> _analysisOptions;
 
         public ConsoleUpgrade(
             IUserInput input,
@@ -37,8 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             ITelemetry telemetry,
             IUpgradeStateManager stateManager,
             ILogger<ConsoleUpgrade> logger,
-            IUpgradeResultCollector upgradeResultCollector,
-            IAnalyzeResultWriterProvider writerProvider)
+            IAnalyzeResultWriterProvider writerProvider,
+            IOptions<AnalysisOptions> analysisOptions)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _context = context;
@@ -49,8 +51,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _upgradeResultCollector = upgradeResultCollector;
             _writerProvider = writerProvider;
+            _analysisOptions = analysisOptions ?? throw new ArgumentNullException(nameof(analysisOptions));
         }
 
         public async Task RunAsync(CancellationToken token)
@@ -69,9 +71,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 var steps = await _upgrader.InitializeAsync(context, token);
                 var step = await _upgrader.GetNextStepAsync(context, token);
 
-                var output = Path.Combine(Directory.GetCurrentDirectory(), $"UpgradeReport.html");
-                using var stream = File.Create(output);
-
                 while (step is not null)
                 {
                     await ShowUpgradeStepsAsync(steps, context, token, step);
@@ -81,18 +80,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     step = await _upgrader.GetNextStepAsync(context, token);
                 }
 
-                if (_writerProvider.TryGetWriter("html", out var writer))
-                {
-                    await writer.WriteAsync(_upgradeResultCollector.Results.ToAsyncEnumerable(), stream, token);
-                }
-
                 _logger.LogInformation("Upgrade has completed. Please review any changes.");
             }
             finally
             {
                 // Do not pass the same token as it may have been canceled and we still need to persist this.
                 await _stateManager.SaveStateAsync(context, default);
+                await WriteUpgradeReport(context, token);
             }
+        }
+
+        private async Task<bool> WriteUpgradeReport(IUpgradeContext context, CancellationToken token)
+        {
+            var outputDirectory = Path.GetDirectoryName(context.InputPath);
+            if (outputDirectory == null)
+            {
+                return false;
+            }
+
+            var outputFileName = $"UpgradeReport.{_analysisOptions.Value.Format}";
+            using var stream = File.Create(Path.Combine(outputDirectory, outputFileName));
+            if (_writerProvider.TryGetWriter(_analysisOptions.Value.Format, out var writer))
+            {
+                await writer.WriteAsync(context.Results.ToAsyncEnumerable(), stream, token);
+                _logger.LogInformation($"The Upgrade Report is generated at {outputDirectory}\\{outputFileName}");
+            }
+
+            return true;
         }
 
         private async Task RunStepAsync(IUpgradeContext context, UpgradeStep step, CancellationToken token)
