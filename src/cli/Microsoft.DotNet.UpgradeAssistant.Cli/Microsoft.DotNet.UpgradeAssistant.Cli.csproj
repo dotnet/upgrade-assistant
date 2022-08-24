@@ -124,6 +124,9 @@
     <Extension Include="$(ExtensionsDirectory)binaryanalysis\Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis\Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.csproj">
       <Name>binaryanalysis</Name>
     </Extension>
+    <Extension Include="$(ExtensionsDirectory)wcf\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.csproj">
+      <Name>wcf</Name>
+    </Extension>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="LocalizedStrings.Designer.cs">

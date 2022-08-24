@@ -20,5 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public const string TemplateInserterStepId = "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep";
         public const string VisualBasicProjectUpdaterStepId = "Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.VisualBasicProjectUpdaterStep";
         public const string WindowsDesktopUpdateStepId = "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.WindowsDesktopUpdateStep";
+        public const string WCFUpdateStepId = "Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.WCFUpdateStep";
     }
 }

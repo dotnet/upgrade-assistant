@@ -52,10 +52,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
 
                 foreach (var (section, issue) in GetUnsupportedSections(configFile))
                 {
-                    section.ReplaceWith(
+                    // only comments out the system.serviceModel when it does not include services element
+                    if (section.Name == "system.serviceModel" && ContainsServices(configFile))
+                    {
+                        _logger.LogDebug("system.serviceModel element won't be commented because it will be used for WCF Update later.");
+                        applied = true;
+                    }
+                    else
+                    {
+                        section.ReplaceWith(
                         new XComment($" {section.Name} section is not supported on .NET 6 (see {issue})"),
                         new XComment(section.ToString()));
-                    updated = true;
+                        updated = true;
+                    }
                 }
 
                 if (updated)
@@ -116,6 +125,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration.Updaters
                     yield return (section, issue);
                 }
             }
+        }
+
+        private static bool ContainsServices(ConfigFile file)
+        {
+            var serviceModel = file.Contents.Root.DescendantsAndSelf("system.serviceModel").First();
+            foreach (var element in serviceModel.Descendants())
+            {
+                if (element.Name == "services" && element.HasElements)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

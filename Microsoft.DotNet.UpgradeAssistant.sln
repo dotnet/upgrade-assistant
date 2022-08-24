@@ -215,6 +215,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSBuild.Conversion.Project"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSBuild.Conversion.SDK", "src\extensions\try-convert\MSBuild.Conversion.SDK\MSBuild.Conversion.SDK.csproj", "{5AE4C64D-3BB3-446E-B5E2-CE364B231CC7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wcf", "wcf", "{33D0F0FE-9437-4811-A9B6-E7A5F010A8C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wcf", "wcf", "{674761D3-2573-4983-AA31-2DC1B4A32A76}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests", "tests\extensions\wcf\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Test\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests.csproj", "{BCA7C100-F799-415C-BEFD-96E9027D4600}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater", "src\extensions\wcf\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater\Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.csproj", "{6056A8FC-26BE-422D-8096-DF69A3298CAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -981,6 +989,30 @@ Global
 		{5AE4C64D-3BB3-446E-B5E2-CE364B231CC7}.Release|x64.Build.0 = Release|Any CPU
 		{5AE4C64D-3BB3-446E-B5E2-CE364B231CC7}.Release|x86.ActiveCfg = Release|Any CPU
 		{5AE4C64D-3BB3-446E-B5E2-CE364B231CC7}.Release|x86.Build.0 = Release|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Debug|x64.Build.0 = Debug|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Debug|x86.Build.0 = Debug|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Release|x64.ActiveCfg = Release|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Release|x64.Build.0 = Release|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Release|x86.ActiveCfg = Release|Any CPU
+		{BCA7C100-F799-415C-BEFD-96E9027D4600}.Release|x86.Build.0 = Release|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Debug|x64.Build.0 = Debug|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Debug|x86.Build.0 = Debug|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Release|x64.ActiveCfg = Release|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Release|x64.Build.0 = Release|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Release|x86.ActiveCfg = Release|Any CPU
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1076,6 +1108,10 @@ Global
 		{BD878A65-4069-445C-83B2-1AD7C5DC2FB1} = {560581F2-23CA-4A68-84A4-FB6470EC6D68}
 		{7D99F0D6-8A5C-411C-9ED6-56325258DD2F} = {560581F2-23CA-4A68-84A4-FB6470EC6D68}
 		{5AE4C64D-3BB3-446E-B5E2-CE364B231CC7} = {560581F2-23CA-4A68-84A4-FB6470EC6D68}
+		{33D0F0FE-9437-4811-A9B6-E7A5F010A8C2} = {AA22EE67-3BBE-49A2-8868-531FE68FE162}
+		{674761D3-2573-4983-AA31-2DC1B4A32A76} = {82BC0AAB-94CA-4D5B-BF95-F7329D1150CB}
+		{BCA7C100-F799-415C-BEFD-96E9027D4600} = {674761D3-2573-4983-AA31-2DC1B4A32A76}
+		{6056A8FC-26BE-422D-8096-DF69A3298CAF} = {33D0F0FE-9437-4811-A9B6-E7A5F010A8C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D02F665B-C14D-43C2-955C-9338A23836E0}

@@ -1,0 +1,7 @@
+﻿{
+  "ExtensionName": "WCFUpdater",
+
+  "ExtensionServiceProviders": [
+    "Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.dll"
+  ]
+}

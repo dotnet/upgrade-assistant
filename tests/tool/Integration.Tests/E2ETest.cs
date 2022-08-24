@@ -38,6 +38,7 @@ namespace Integration.Tests
         [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
         [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
+        [InlineData("WCFSample", "ConsoleApp.csproj", "")]
         [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
         [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
         [Theory]
