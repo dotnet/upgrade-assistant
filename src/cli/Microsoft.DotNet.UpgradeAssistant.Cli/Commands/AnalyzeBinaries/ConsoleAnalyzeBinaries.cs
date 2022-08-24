@@ -21,20 +21,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly IAnalyzeResultWriterProvider _writerProvider;
         private readonly ILogger<ConsoleAnalyzeBinaries> _logger;
         private readonly IExtensionProvider _extensionProvider;
-        private readonly ITargetFrameworkSelector _tfmSelector;
 
         public ConsoleAnalyzeBinaries(IOptions<AnalysisOptions> analysisOptions,
             IBinaryAnalysisExecutor apiChecker,
             IAnalyzeResultWriterProvider writerProvider,
             IExtensionProvider extensionProvider,
-            ITargetFrameworkSelector tfmSelector,
             ILogger<ConsoleAnalyzeBinaries> logger)
         {
             _analysisOptions = analysisOptions ?? throw new ArgumentNullException(nameof(analysisOptions));
             _apiChecker = apiChecker ?? throw new ArgumentNullException(nameof(apiChecker));
             _writerProvider = writerProvider ?? throw new ArgumentNullException(nameof(writerProvider));
             _extensionProvider = extensionProvider ?? throw new ArgumentNullException(nameof(extensionProvider));
-            _tfmSelector = tfmSelector ?? throw new ArgumentNullException(nameof(tfmSelector));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
