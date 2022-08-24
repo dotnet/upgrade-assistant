@@ -10,6 +10,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
+    [Flags]
+    public enum MetadataType
+    {
+        Http = 1,
+        Https = 2,
+        Both = 3,
+        None = 0
+    }
+
     public class ConfigUpdater
     {
         private readonly XDocument _config;
@@ -99,10 +108,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return config;
         }
 
-        // Returns 0 if metadata is not supported, 1 if it's  supported with http, 2 with https, 3 with both http and https</returns>
-        public int SupportsMetadataBehavior()
+        public MetadataType SupportsMetadataBehavior()
         {
             var results = _config.Root.DescendantsAndSelf("serviceMetadata");
+
             if (results.Any())
             {
                 var el = results.Single();
@@ -110,19 +119,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 var https = el.Attribute("httpsGetEnabled") is not null && el.Attribute("httpsGetEnabled").Value.Equals("true", StringComparison.OrdinalIgnoreCase);
                 if (http && https)
                 {
-                    return 3;
+                    return MetadataType.Both;
                 }
                 else if (http)
                 {
-                    return 1;
+                    return MetadataType.Http;
                 }
                 else if (https)
                 {
-                    return 2;
+                    return MetadataType.Https;
                 }
             }
 
-            return 0;
+            return MetadataType.None;
         }
 
         public bool IncludesMexEndpoint()

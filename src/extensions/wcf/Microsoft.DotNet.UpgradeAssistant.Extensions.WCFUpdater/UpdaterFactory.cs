@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             string template = Constants.Template;
             Dictionary<string, Uri> uri = (Dictionary<string, Uri>)context["uri"];
             template = UpdatePortNumber(template, uri, (HashSet<string>)context["bindings"]);
-            template = UpdateServiceBehavior(template, (int)context["metadata"], (bool)context["debug"], uri);
+            template = UpdateServiceBehavior(template, (MetadataType)context["metadata"], (bool)context["debug"], uri);
             return template;
         }
 
@@ -120,18 +120,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return template.Replace("[Port PlaceHolder]", host);
         }
 
-        private static string UpdateServiceBehavior(string template, int metadataType, bool debug, Dictionary<string, Uri> uri)
+        private static string UpdateServiceBehavior(string template, MetadataType metadataType, bool debug, Dictionary<string, Uri> uri)
         {
             // updates metadata
-            if (metadataType != 0)
+            if (metadataType != MetadataType.None)
             {
                 template = template.Replace("[Metadata1 PlaceHolder]", Constants.Metadata1);
-                if (metadataType == 1)
+                if (metadataType == MetadataType.Http)
                 {
                     string metadata2 = Constants.Metadata2Http.Replace("httpAddress", new Uri(uri[Uri.UriSchemeHttp], "metadata").ToString());
                     template = template.Replace("[Metadata2 PlaceHolder]", metadata2);
                 }
-                else if (metadataType == 2)
+                else if (metadataType == MetadataType.Https)
                 {
                     string metadata2 = Constants.Metadata2Https.Replace("httpsAddress", new Uri(uri[Uri.UriSchemeHttps], "metadata").ToString());
                     template = template.Replace("[Metadata2 PlaceHolder]", metadata2);

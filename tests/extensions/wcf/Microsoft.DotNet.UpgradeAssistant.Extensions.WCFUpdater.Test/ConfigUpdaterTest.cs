@@ -134,10 +134,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(MetadataBoth, 3)]
         public void SupportsMetadataBehaviorTest(string replace, int expected)
         {
-            int result = new ConfigUpdater(XDocument.Parse(Input.Replace(Metadata, replace)), _logger).SupportsMetadataBehavior();
+            var result = new ConfigUpdater(XDocument.Parse(Input.Replace(Metadata, replace)), _logger).SupportsMetadataBehavior();
             var http = replace.Contains("httpGetEnabled");
             var https = replace.Contains("httpsGetEnabled");
-            Assert.Equal(expected, result);
+            Assert.Equal((MetadataType)expected, result);
         }
 
         [Theory]
