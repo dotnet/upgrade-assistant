@@ -162,7 +162,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 var containsService = false;
                 foreach (var f in files)
                 {
-                    var root = CSharpSyntaxTree.ParseText(f).GetRoot();
+                    var root = CSharpSyntaxTree.ParseText(File.ReadAllText(f)).GetRoot();
                     if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
                     {
                         return packages.Additions;
