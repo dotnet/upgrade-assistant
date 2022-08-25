@@ -47,7 +47,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return false;
         }
 
-        public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<OutputResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
         {
             if (analysis is null)
             {

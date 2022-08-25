@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public class SarifAnalyzeResultWriter : IAnalyzeResultWriter
+    public class SarifAnalyzeResultWriter : IOutputResultWriter
     {
         private readonly JsonSerializer _serializer = JsonSerializer.Create(new()
         {
@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 
         public string Format => WellKnownFormats.Sarif;
 
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, Stream stream, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<OutputResultDefinition> results, Stream stream, CancellationToken token)
         {
             if (results is null)
             {
@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             _serializer.Serialize(jsonWriter, sarifLog, typeof(SarifLog));
         }
 
-        private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<AnalyzeResultDefinition> analyzeResultDefinitions)
+        private static async IAsyncEnumerable<Run> ExtractRunsAsync(IAsyncEnumerable<OutputResultDefinition> analyzeResultDefinitions)
         {
             await foreach (var ar in analyzeResultDefinitions)
             {
@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             }
         }
 
-        private static ReportingDescriptor ExtractRule(IGrouping<string, AnalyzeResult> analyzeResults)
+        private static ReportingDescriptor ExtractRule(IGrouping<string, OutputResult> analyzeResults)
         {
             var analyzeResult = analyzeResults.First();
 
@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             return rule;
         }
 
-        private static IList<Result> ExtractResults(IList<AnalyzeResult> analyzeResults)
+        private static IList<Result> ExtractResults(IList<OutputResult> analyzeResults)
         {
             var results = new List<Result>();
             foreach (var r in analyzeResults)

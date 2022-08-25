@@ -43,6 +43,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         IUpgradeContextProperties Properties { get; }
 
-        ICollector<AnalyzeResultDefinition> Results { get; }
+        ICollector<OutputResultDefinition> Results { get; }
     }
 }

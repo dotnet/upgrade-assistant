@@ -225,7 +225,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public IUpgradeContextProperties Properties { get; }
 
-        public ICollector<AnalyzeResultDefinition> Results { get; } = new ListCollector<AnalyzeResultDefinition>();
+        public ICollector<OutputResultDefinition> Results { get; } = new Collector<OutputResultDefinition>();
 
         public void SetCurrentProject(IProject? project)
         {

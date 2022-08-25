@@ -33,7 +33,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             using var ms = new MemoryStream();
 
             // Acct
-            await mock.Create<HtmlAnalyzeResultWriter>().WriteAsync(AsyncEnumerable.Empty<AnalyzeResultDefinition>(), ms, CancellationToken.None).ConfigureAwait(false);
+            await mock.Create<HtmlAnalyzeResultWriter>().WriteAsync(AsyncEnumerable.Empty<OutputResultDefinition>(), ms, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             Assert.Empty(ms.ToArray());
@@ -45,14 +45,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             // Arrange
             using var mock = AutoMock.GetLoose();
 
-            var sarifWriter = new Mock<IAnalyzeResultWriter>().Object;
+            var sarifWriter = new Mock<IOutputResultWriter>().Object;
 
-            mock.Mock<IAnalyzeResultWriterProvider>().Setup(p => p.TryGetWriter("sarif", out sarifWriter)).Returns(true);
+            mock.Mock<IOutputResultWriterProvider>().Setup(p => p.TryGetWriter("sarif", out sarifWriter)).Returns(true);
 
             using var ms = new MemoryStream();
 
             // Acct
-            await mock.Create<HtmlAnalyzeResultWriter>().WriteAsync(AsyncEnumerable.Empty<AnalyzeResultDefinition>(), ms, CancellationToken.None).ConfigureAwait(false);
+            await mock.Create<HtmlAnalyzeResultWriter>().WriteAsync(AsyncEnumerable.Empty<OutputResultDefinition>(), ms, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             // Attempt to move position to ensure stream is still open
@@ -67,12 +67,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             // Arrange
             using var mock = AutoMock.GetLoose();
 
-            var sarifWriter = new Mock<IAnalyzeResultWriter>();
+            var sarifWriter = new Mock<IOutputResultWriter>();
             var sarifWriterObject = sarifWriter.Object;
 
-            mock.Mock<IAnalyzeResultWriterProvider>().Setup(p => p.TryGetWriter("sarif", out sarifWriterObject)).Returns(true);
+            mock.Mock<IOutputResultWriterProvider>().Setup(p => p.TryGetWriter("sarif", out sarifWriterObject)).Returns(true);
 
-            var definitions = _fixture.CreateMany<AnalyzeResultDefinition>().ToAsyncEnumerable();
+            var definitions = _fixture.CreateMany<OutputResultDefinition>().ToAsyncEnumerable();
 
             using var ms = new MemoryStream();
 

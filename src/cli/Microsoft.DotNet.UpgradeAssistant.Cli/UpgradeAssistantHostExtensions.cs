@@ -75,10 +75,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.TryAddTransient<IUserInput, ConsoleCollectUserInput>();
 
-                    services.AddAnalysis(options =>
+                    services.ConfigureOutputOptions(options =>
                     {
                         options.Format = upgradeOptions.Format ?? context.Configuration["Analysis:DefaultFormat"];
                     });
+                    services.AddAnalysis();
 
                     services.AddSingleton(new InputOutputStreams(Console.In, Console.Out));
                     services.AddSingleton<CommandProvider>();

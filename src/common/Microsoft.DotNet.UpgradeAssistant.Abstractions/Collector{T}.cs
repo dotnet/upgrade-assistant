@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public class ListCollector<T> : ICollector<T>
+    public class Collector<T> : ICollector<T>
     {
         private readonly List<T> _list = new List<T>();
 

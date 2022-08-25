@@ -26,8 +26,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly ITelemetry _telemetry;
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleUpgrade> _logger;
-        private readonly IAnalyzeResultWriterProvider _writerProvider;
-        private readonly IOptions<AnalysisOptions> _analysisOptions;
+        private readonly IOutputResultWriterProvider _writerProvider;
+        private readonly IOptions<OutputOptions> _options;
 
         public ConsoleUpgrade(
             IUserInput input,
@@ -39,8 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             ITelemetry telemetry,
             IUpgradeStateManager stateManager,
             ILogger<ConsoleUpgrade> logger,
-            IAnalyzeResultWriterProvider writerProvider,
-            IOptions<AnalysisOptions> analysisOptions)
+            IOutputResultWriterProvider writerProvider,
+            IOptions<OutputOptions> options)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _context = context;
@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _writerProvider = writerProvider;
-            _analysisOptions = analysisOptions ?? throw new ArgumentNullException(nameof(analysisOptions));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async Task RunAsync(CancellationToken token)
@@ -93,20 +93,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private async Task<bool> WriteUpgradeReport(IUpgradeContext context, CancellationToken token)
         {
             var outputDirectory = Path.GetDirectoryName(context.InputPath);
-            if (outputDirectory == null || context.Results.Count() == 0)
+            if (outputDirectory is null || !context.Results.Any())
             {
                 return false;
             }
 
-            var outputFileName = $"UpgradeReport.{_analysisOptions.Value.Format}";
+            var outputFileName = $"UpgradeReport.{_options.Value.Format}";
+            var outputFilePath = Path.Combine(outputDirectory, outputFileName);
             using var stream = File.Create(Path.Combine(outputDirectory, outputFileName));
-            if (_writerProvider.TryGetWriter(_analysisOptions.Value.Format, out var writer))
+            if (_writerProvider.TryGetWriter(_options.Value.Format, out var writer))
             {
                 await writer.WriteAsync(context.Results.ToAsyncEnumerable(), stream, token);
-                _logger.LogInformation($"The Upgrade Report is generated at {outputDirectory}\\{outputFileName}");
+                _logger.LogInformation($"The Upgrade Report is generated at {outputFilePath}");
                 return true;
             }
 
+            _logger.LogError(LocalizedStrings.RequestedFormatUnavailableMessage, _options.Value.Format);
             return false;
         }
 

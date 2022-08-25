@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public class AnalysisOptions
+    public class OutputOptions
     {
         [Required]
         public string Format { get; set; } = null!;
