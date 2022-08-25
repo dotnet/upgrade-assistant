@@ -42,7 +42,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
                 
                 tfm.TryUpdate(final);
 
-                tfm.TryUpdate(tfm.AppBase);
             }
         }
     }
