@@ -37,7 +37,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 
             if (_windowsMyTypes.Contains(myType))
             {
-                _logger.LogInformation("Project {Name} contains MyType node that requires at least {framework}-windows.", tfm.Project, tfm.AppBase);
+                var final = tfm.AppBase with { Platform = TargetFrameworkSelector.Platforms.Windows };
+                _logger.LogInformation("Project {Name} contains MyType node that requires at least {framework}", tfm.Project, final);
+                
+                tfm.TryUpdate(final);
 
                 tfm.TryUpdate(tfm.AppBase);
             }
