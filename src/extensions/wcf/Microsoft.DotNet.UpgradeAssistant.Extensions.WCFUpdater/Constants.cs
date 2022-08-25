@@ -27,8 +27,7 @@ using Microsoft.Extensions.DependencyInjection;
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile(""wcf.config"")
-                            [Metadata1 PlaceHolder]
-[Add ServiceType PlaceHolder]
+[Add to DI Container]
 
             var app = builder.Build();
 
@@ -43,7 +42,7 @@ using Microsoft.Extensions.DependencyInjection;
             app.StopAsync();
 }";
 
-        public const string Metadata1 = ".AddServiceModelMetadata()";
+        public const string Metadata1 = "                            .AddServiceModelMetadata()";
         public const string Metadata2 = @"// Enable getting metadata/wsdl
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();";
 
@@ -94,6 +93,7 @@ using Microsoft.Extensions.DependencyInjection;
                 });";
 
         public const string ServiceType = "                            .AddTransient<ServiceType>()";
+        public const string HttpWindowsAuth = "                            .AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();";
         public const string HostComment = "The host element is not supported in configuration in CoreWCF. The port that endpoints listen on is instead configured in the source code.";
         public const string BehaviorComment = "The behavior element is not supported in configuration in CoreWCF. Some service behaviors, such as metadata, are configured in the source code.";
         public const string ServiceModelComment = " system.serviceModel section is moved to a separate wcf.config file located at the same directory as this file.";

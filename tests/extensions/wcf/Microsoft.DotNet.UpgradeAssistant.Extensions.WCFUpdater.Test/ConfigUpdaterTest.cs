@@ -75,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                                           <serviceBehaviors>
                                             <behavior name=""SampleBehavior"">
                                               <serviceMetadata httpGetEnabled = ""true"" />
-                                              <serviceDebug includeExceptionDetailInFaults=""true""/>
+                                              <serviceDebug includeExceptionDetailInFaults=""true"" httpHelpPageEnabled=""false"" httpHelpPageUrl=""http://localhost:80/help""/>
                                             </behavior>
                                           </serviceBehaviors>
                                         </behaviors>-->

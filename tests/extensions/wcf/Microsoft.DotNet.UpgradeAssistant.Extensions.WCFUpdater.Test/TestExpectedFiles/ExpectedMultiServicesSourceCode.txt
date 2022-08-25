@@ -65,7 +65,7 @@ namespace ConsoleApp
 
                 serviceBuilder.AddService<WcfServiceLibrary1.Service2>(serviceOptions => 
                 {
-                    
+
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service2>(host2 =>

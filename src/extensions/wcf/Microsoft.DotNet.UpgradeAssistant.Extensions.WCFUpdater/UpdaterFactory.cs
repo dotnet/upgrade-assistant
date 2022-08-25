@@ -86,7 +86,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             template = UpdatePortNumber(template, GetAllAddress(context), GetHttpsCredentials(context));
             template = UpdateServiceMetadata(template, context);
             template = template.Replace("[ServiceBuilder PlaceHolder]", AddMultipleServices(context, logger));
-            template = AddServiceType(template, context);
+            template = UpdateDIContainer(template, context);
             return template;
         }
 
@@ -203,12 +203,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 var uri = (Dictionary<string, Uri>)context[key]["uri"];
                 if (metadataType != 0)
                 {
-                    if (!hasMetadata)
-                    {
-                        hasMetadata = true;
-                        template = template.Replace("[Metadata1 PlaceHolder]", Constants.Metadata1);
-                    }
-
+                    hasMetadata = true;
                     if (metadataType == 1 || metadataType == 3)
                     {
                         if (metadataHttp.Equals(string.Empty))
@@ -235,7 +230,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             if (!hasMetadata)
             {
-                template = template.Replace("[Metadata1 PlaceHolder]", string.Empty);
+
                 template = template.Replace("[Metadata2 PlaceHolder]", string.Empty);
             }
             else
@@ -301,23 +296,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return template.Replace("[ServiceDebug PlaceHolder]", result);
         }
 
-        private static string AddServiceType(string template, Dictionary<string, Dictionary<string, object>> context)
+        // update template to add metadata service, service types, and windows authentication to the DI container
+        private static string UpdateDIContainer(string template, Dictionary<string, Dictionary<string, object>> context)
+        {
+            var result = string.Empty;
+            if (template.Contains("metadata", StringComparison.Ordinal))
+            {
+                result += Constants.Metadata1 + System.Environment.NewLine;
+            }
+
+            result += AddServiceType(context);
+
+            // TODO: add windows authentication
+            result += ";";
+            return template.Replace("[Add to DI Container]", result);
+        }
+
+        private static string AddServiceType(Dictionary<string, Dictionary<string, object>> context)
         {
             var result = string.Empty;
             foreach (var serviceType in context.Keys)
             {
                 result += Constants.ServiceType.Replace("ServiceType", serviceType);
-                if (serviceType == context.Keys.Last())
-                {
-                    result += ";";
-                }
-                else
+                if (serviceType != context.Keys.Last())
                 {
                     result += System.Environment.NewLine;
                 }
             }
 
-            return template.Replace("[Add ServiceType PlaceHolder]", result);
+            return result;
         }
 
         private static string ConfigureServiceCredentials(string template, bool hasNetTcpCert, Dictionary<string, string> credentials)

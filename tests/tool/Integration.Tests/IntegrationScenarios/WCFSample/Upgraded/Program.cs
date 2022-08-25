@@ -33,7 +33,8 @@ namespace ConsoleApp
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
-                            .AddServiceModelMetadata();
+                            .AddServiceModelMetadata()
+                            .AddTransient<WcfServiceLibrary1.Service1>();
 
             var app = builder.Build();
 
@@ -45,14 +46,16 @@ namespace ConsoleApp
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {
+                serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
+                {
+
+                });
+
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
                 {
+
                 });
-                
-                serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => { 
-                    
-                });
-                
+
             });
             
             app.StartAsync();

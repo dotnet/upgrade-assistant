@@ -254,15 +254,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             if (netTcp.Any())
             {
                 var security = netTcp.First().DescendantsAndSelf("security").First();
-                if (security != null)
+                if (security is not null)
                 {
                     if (security.Attribute("mode").Value.Equals("TransportWithMessageCredential", StringComparison.Ordinal))
                     {
                         return true;
                     }
 
-                    if (security.Element("transport") != null &&
+                    if (security.Element("transport") is not null &&
                         security.Element("transport").Attribute("clientCredentialType").Value.Equals("Certificate", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool HasWindowsAuthentication()
+        {
+            string[] httpBindings = new string[] { "basicHttpBinding", "netHttpBinding", "webHttpBinding", "wsHttpBinding" };
+            foreach (var httpBinding in httpBindings)
+            {
+                var binding = _config.Root.DescendantsAndSelf(httpBinding);
+                if (binding.Any())
+                {
+                    var transport = binding.First().DescendantsAndSelf("transport").Single();
+                    if (transport.Attribute("clientCredentialType") is not null &&
+                        (transport.Attribute("clientCredentialType").Value.Equals("Windows", StringComparison.OrdinalIgnoreCase) ||
+                        transport.Attribute("clientCredentialType").Value.Equals("Ntml", StringComparison.OrdinalIgnoreCase)))
                     {
                         return true;
                     }

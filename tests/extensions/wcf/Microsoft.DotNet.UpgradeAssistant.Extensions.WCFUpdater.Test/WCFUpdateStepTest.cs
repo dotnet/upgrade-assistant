@@ -86,20 +86,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             Assert.Equal(expected, result.Result.Status);
             if (expected == UpgradeStepStatus.Incomplete && directive != string.Empty)
             {
-                updater.Apply();
-                Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
-                Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), config)));
-                Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), main)));
-                Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), directive)));
-                Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), proj)));
-                Reset();
+                try
+                {
+                    updater.Apply();
+                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
+                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), config)));
+                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), main)));
+                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), directive)));
+                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), proj)));
+                    Reset();
+                }
+                catch
+                {
+                    Reset();
+                    throw;
+                }
             }
             else if (main.Equals("TestInputFiles\\MultiServicesSourceCode.txt", StringComparison.Ordinal))
             {
-                updater.Apply();
-                Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedMultiServicesConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
-                Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedMultiServicesSourceCode.txt"), File.ReadAllText(main));
-                Reset();
+                try
+                {
+                    updater.Apply();
+                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedMultiServicesConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
+                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedMultiServicesSourceCode.txt"), File.ReadAllText(main));
+                    Reset();
+                }
+                catch
+                {
+                    Reset();
+                    throw;
+                }
             }
         }
 
