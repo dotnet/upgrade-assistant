@@ -39,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic.Tests
 
             // Assert
             var expectedTimes = update ? Times.Once() : Times.Never();
-            state.Verify(s => s.TryUpdate(TargetFrameworkMoniker.Net60), expectedTimes);
+            state.Verify(s => s.TryUpdate(TargetFrameworkMoniker.Net60_Windows), expectedTimes);
         }
     }
 }
