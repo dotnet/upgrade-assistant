@@ -28,7 +28,7 @@ namespace ConsoleApp
             {
                 options.ListenAnyIP(8733);
                 
-            }); 
+            });
 
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()

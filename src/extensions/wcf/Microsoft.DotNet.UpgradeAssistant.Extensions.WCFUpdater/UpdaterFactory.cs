@@ -300,7 +300,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         private static string UpdateDIContainer(string template, Dictionary<string, Dictionary<string, object>> context)
         {
             var result = string.Empty;
-            if (template.Contains("metadata", StringComparison.Ordinal))
+            if (template.IndexOf("metadata", StringComparison.Ordinal) >= 0)
             {
                 result += Constants.Metadata1 + System.Environment.NewLine;
             }

@@ -177,13 +177,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             var csFile = project.FindFiles(".cs", ProjectItemType.Compile);
             var main = from f in csFile
-                       where File.Exists(f) && File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(", StringComparison.Ordinal)
+                       where File.Exists(f) && File.ReadAllText(f).Replace(" ", string.Empty).IndexOf("Main(", StringComparison.Ordinal) >= 0
                        select f;
             var directives = from f in csFile
-                             where File.Exists(f) && File.ReadAllText(f).Contains("using System.ServiceModel", StringComparison.Ordinal) && !File.ReadAllText(f).Replace(" ", string.Empty).Contains("Main(", StringComparison.Ordinal)
+                             where File.Exists(f) && File.ReadAllText(f).IndexOf("using System.ServiceModel", StringComparison.Ordinal) >= 0 && File.ReadAllText(f).Replace(" ", string.Empty).IndexOf("Main(", StringComparison.Ordinal) < 0
                              select f;
             var config = from f in project.FindFiles(".config", ProjectItemType.None)
-                         where File.Exists(f) && File.ReadAllText(f).Contains("<system.serviceModel>", StringComparison.Ordinal)
+                         where File.Exists(f) && File.ReadAllText(f).IndexOf("<system.serviceModel>", StringComparison.Ordinal) >= 0
                          select f;
 
             if (!main.Any())

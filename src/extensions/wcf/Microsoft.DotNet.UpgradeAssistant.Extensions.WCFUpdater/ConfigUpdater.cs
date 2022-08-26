@@ -88,11 +88,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                         {
                             endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeNetTcp].PathAndQuery, ad).Replace("\\", "/");
                         }
-                        else if (endpoint.Attribute("binding").Value.Contains("Https", StringComparison.Ordinal))
+                        else if (endpoint.Attribute("binding").Value.IndexOf("Https", StringComparison.Ordinal) >= 0)
                         {
                             endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttps].PathAndQuery, ad).Replace("\\", "/");
                         }
-                        else if (endpoint.Attribute("binding").Value.Contains("Http", StringComparison.Ordinal))
+                        else if (endpoint.Attribute("binding").Value.IndexOf("Http", StringComparison.Ordinal) >= 0)
                         {
                             endpoint.Attribute("address").Value = Path.Combine(uri[Uri.UriSchemeHttp].PathAndQuery, ad).Replace("\\", "/");
                         }
@@ -183,8 +183,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             var bindings = GetBindings(behaviorName);
-            bool httpBinding = (from b in bindings where b.Contains("HttpBinding", StringComparison.Ordinal) select b).Any();
-            bool httpsBinding = (from b in bindings where b.Contains("HttpsBinding", StringComparison.Ordinal) select b).Any();
+            bool httpBinding = (from b in bindings where b.IndexOf("HttpBinding", StringComparison.Ordinal) >= 0 select b).Any();
+            bool httpsBinding = (from b in bindings where b.IndexOf("HttpsBinding", StringComparison.Ordinal) >= 0 select b).Any();
 
             // adds default address if binding exists but no specific base address
             if (!uri.ContainsKey(Uri.UriSchemeNetTcp) && bindings.Contains("NetTcpBinding"))

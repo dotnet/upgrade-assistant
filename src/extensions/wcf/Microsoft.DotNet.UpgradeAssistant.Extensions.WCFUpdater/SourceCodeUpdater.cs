@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             // gets the code that configures the host
             var open = GetExpressionStatement("Open", declaration.Parent!).First();
             var config = from s in declaration.Parent!.DescendantNodes().OfType<StatementSyntax>()
-                         where s.SpanStart > declaration.SpanStart && s.Span.End <= open.SpanStart && !s.ToFullString().Contains("ServiceHost", StringComparison.Ordinal)
+                         where s.SpanStart > declaration.SpanStart && s.Span.End <= open.SpanStart && s.ToFullString().IndexOf("ServiceHost", StringComparison.Ordinal) < 0
                          select s.WithLeadingTrivia(placeholder.First().GetLeadingTrivia());
             var pair = GetVarNamePairs(root);
             if (config.Any())
@@ -233,7 +233,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             try
             {
                 // split by line and then replace the varName with variable name
-                var lines = template.Split(System.Environment.NewLine);
+                var lines = template.Split(System.Environment.NewLine.ToCharArray());
                 var pair = GetVarNamePairs(root);
                 var index = new Dictionary<int, string>();
 
