@@ -96,17 +96,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             logger.LogInformation("Finish writing changes to source code/directives.");
         }
 
-        public static Dictionary<string, object> GetContext(ConfigUpdater configUpdater)
+        public static Dictionary<string, Dictionary<string, object>> GetContexts(ConfigUpdater configUpdater)
         {
-            Dictionary<string, Uri> uri = configUpdater!.GetSchemeToAddressMapping();
+            var contexts = new Dictionary<string, Dictionary<string, object>>();
+            var pair = configUpdater.GetServiceBehaviorPair();
+            foreach (var serviceName in pair.Keys)
+            {
+                contexts.Add(serviceName, GetContext(configUpdater, pair[serviceName]));
+            }
+
+            return contexts;
+        }
+
+        public static Dictionary<string, object> GetContext(ConfigUpdater configUpdater, string name)
+        {
             Dictionary<string, object> context = new Dictionary<string, object>
             {
-                { "uri", uri },
-                { "metadata", configUpdater.SupportsMetadataBehavior() },
-                { "debug", configUpdater.SupportsServiceDebug() },
-                { "bindings", configUpdater.GetBindings() }
+                { "uri", configUpdater.GetSchemeToAddressMapping(name) },
+                { "metadata", configUpdater.SupportsMetadataBehavior(name) },
+                { "debug", configUpdater.SupportsServiceDebug(name) },
+                { "bindings", configUpdater.GetBindings(name) },
+                { "hasCert", configUpdater.HasServiceCertificate(name) },
+                { "credentials", configUpdater.GetServiceCredentials(name) },
+                { "netTcpCert", configUpdater.HasNetTcpCertificate() }
             };
             return context;
         }
     }
 }
+

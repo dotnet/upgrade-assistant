@@ -62,8 +62,7 @@ namespace SampleServer
             var builder = WebApplication.CreateBuilder();
 
             // Set up port (previously this was done in configuration,
-            // but CoreWCF requires it be done in code)
-[Port PlaceHolder]
+            builder.UseNetTcp(8090);
 
              // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
@@ -74,7 +73,8 @@ namespace SampleServer
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {
-                serviceBuilder.ConfigureServiceHostBase<ServiceType>(varName =>
+                serviceBuilder.AddService<SampleService>(serviceOptions => {});                
+                serviceBuilder.ConfigureServiceHostBase<SampleService>(varName =>
                 {
                     int UA_placeHolder;
                 });
@@ -108,6 +108,100 @@ namespace SampleServer
                             using Microsoft.AspNetCore.Hosting;
                             using Microsoft.Extensions.DependencyInjection;";
 
+        public const string InputMulti = @"using Serilog;
+using System;
+using System.IO;
+using System.ServiceModel;
+using System.ServiceModel.Security;
+
+namespace SampleServer
+{
+    class Program
+    {
+        static void Main()
+        {
+            var host = new ServiceHost(typeof(SampleService));
+            var host2 = new ServiceHost(typeof(SecondService));
+            host.AddDefaultEndpoints();
+            var authMode = X509CertificateValidationMode.None;
+            host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = authMode;
+            host2.AddDefaultEndpoints();
+            host.Open();
+            host2.Open();
+            Console.Writeline(""Service Listening...Press enter to exit."")
+            Console.ReadLine();
+            host.Exam();
+            host.Close();
+            host2.Close();
+        }
+    }
+}";
+
+        public const string TemplateMulti = @"public static void Main()
+{
+            var builder = WebApplication.CreateBuilder();
+
+            // Set up port (previously this was done in configuration,
+            // but CoreWCF requires it be done in code)
+            builder.UseNetTcp(8090);
+
+             // Add CoreWCF services to the ASP.NET Core app's DI container
+            builder.Services.AddServiceModelServices()
+                            .AddServiceModelConfigurationManagerFile(""wcf.config"")
+
+            var app = builder.Build();
+
+            // Configure CoreWCF endpoints in the ASP.NET Core hosts
+            app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<SampleService>(serviceOptions => {});                
+                serviceBuilder.ConfigureServiceHostBase<SampleService>(varName =>
+                {
+                    int UA_placeHolder;
+                });
+            });
+
+            app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<SecondService>(serviceOptions => {});                
+                serviceBuilder.ConfigureServiceHostBase<WCFLibrary.SecondService>(varName =>
+                {
+                    int UA_placeHolder;
+                });
+            });
+            
+            app.StartAsync();
+            app.StopAsync();
+}";
+
+        public const string Config1 = @"serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
+                                        { 
+                                            host.AddDefaultEndpoints(); 
+                                        });";
+
+        public const string Config2 =
+            @"var authMode = X509CertificateValidationMode.None;
+
+            // Configure CoreWCF endpoints in the ASP.NET Core hosts
+            app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<SampleService>(serviceOptions => {});                
+                serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
+                {
+                    host.AddDefaultEndpoints(); 
+                });
+            });
+
+            app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<SecondService>(serviceOptions => {});                
+                serviceBuilder.ConfigureServiceHostBase<WCFLibrary.SecondService>(host2 =>
+                {
+                    host2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = authMode;
+                    host2.AddDefaultEndpoints(); 
+                });
+            });";
+
         private readonly NullLogger<SourceCodeUpdater> _logger = NullLogger<SourceCodeUpdater>.Instance;
 
         [Theory]
@@ -118,21 +212,20 @@ namespace SampleServer
             var updater = new SourceCodeUpdater(CSharpSyntaxTree.ParseText(Input.Replace("using System.ServiceModel.Security;", replace)), Template, _logger);
             var result = updater.UpdateDirectives().ToFullString().Replace(" ", string.Empty);
             var outdated = "using System.ServiceModel;using System.ServiceModel.Security;";
+
             Assert.DoesNotContain(outdated, result);
             Assert.Contains(expected.Replace(" ", string.Empty), result);
         }
 
-        [Fact]
-        public void ConfigureServiceHostTest()
+        [Theory]
+        [InlineData(Input, Template, Config1)]
+        [InlineData(InputMulti, TemplateMulti, Config2)]
+        public void ConfigureServiceHostTest(string input, string template, string config)
         {
-            var root = CSharpSyntaxTree.ParseText(Input);
-            var updater = new SourceCodeUpdater(root, Template, _logger);
+            var root = CSharpSyntaxTree.ParseText(input);
+            var updater = new SourceCodeUpdater(root, template, _logger);
             var result = updater.AddTemplateCode(root.GetRoot()).ToFullString().Replace(" ", string.Empty);
-            string config = @"serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
-                { 
-                    host.AddDefaultEndpoints(); 
-                });".Replace(" ", string.Empty);
-            Assert.Contains(config, result);
+            Assert.Contains(config.Replace(" ", string.Empty), result);
         }
 
         [Theory]

@@ -1,25 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using CoreWCF;
-using CoreWCF.Configuration;
-using CoreWCF.Description;
-using CoreWCF.Security;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace ConsoleApp
+﻿public static void Main()
 {
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            try
-            {
             var builder = WebApplication.CreateBuilder();
 
             // Set up port (previously this was done in configuration,
@@ -48,25 +28,17 @@ namespace ConsoleApp
             {
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
                 {
-
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
 
-                serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
+                serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(varName =>
                 {
+                    int UA_placeHolder;
 
                 });
 
             });
             
             app.StartAsync().GetAwaiter().GetResult();
-            Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
-            Console.ReadKey();
             app.StopAsync().GetAwaiter().GetResult();
-            }
-            catch(Exception ex)
-            {
-                Debug.Write(ex.ToString());
-            }
-        }
-    }
 }

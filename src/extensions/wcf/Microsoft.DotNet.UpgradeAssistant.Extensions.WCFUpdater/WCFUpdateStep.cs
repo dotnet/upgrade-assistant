@@ -45,6 +45,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             WellKnownStepIds.SetTFMStepId,
 
             // Project's config file, source code, and project file need to be updated first before adding CoreWCF services
+            WellKnownStepIds.ConfigUpdaterStepId,
+
+            WellKnownStepIds.SourceUpdaterStepId,
+
             WellKnownStepIds.PackageUpdaterStepId
         };
 
@@ -138,14 +142,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 _packageUpdater = UpdaterFactory.GetPackageUpdater(_path["proj"].Single(), _loggerFactory.CreateLogger<PackageUpdater>());
                 if (_path.ContainsKey("directives"))
                 {
-                    step = "creating using directivies updaters for .cs files that reference System.ServiceModel";
-                    _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path["directives"], _loggerFactory.CreateLogger<SourceCodeUpdater>());
+                        step = "creating using directivies updaters for .cs files that reference System.ServiceModel";
+                        _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path["directives"], _loggerFactory.CreateLogger<SourceCodeUpdater>());
                 }
 
                 if (_configUpdater is not null)
                 {
                     step = "retrieving project contexts from the configuration updater";
-                    var configContext = UpdateRunner.GetContext(_configUpdater);
+                    var configContext = UpdateRunner.GetContexts(_configUpdater);
                     step = "creating source code updater from this path:" + _path["main"].Single();
                     _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path["main"].Single(), configContext, _loggerFactory.CreateLogger<SourceCodeUpdater>());
                 }

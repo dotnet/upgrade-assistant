@@ -28,12 +28,13 @@ namespace ConsoleApp
             {
                 options.ListenAnyIP(8733);
                 
-            }); 
+            });
 
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
-                            .AddServiceModelMetadata();
+                            .AddServiceModelMetadata()
+                            .AddTransient<WcfServiceLibrary1.Service1>();
 
             var app = builder.Build();
 
@@ -52,7 +53,9 @@ namespace ConsoleApp
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
                 {
+
                 });
+
             });
             
             app.StartAsync().GetAwaiter().GetResult();
@@ -63,7 +66,7 @@ namespace ConsoleApp
             catch(Exception ex)
             {
                 Debug.Write(ex.ToString());
-            } 
+            }
         }
     }
 }

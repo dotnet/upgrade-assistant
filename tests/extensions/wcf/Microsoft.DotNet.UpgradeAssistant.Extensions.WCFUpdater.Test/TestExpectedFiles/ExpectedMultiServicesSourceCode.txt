@@ -24,17 +24,22 @@ namespace ConsoleApp
 
             // Set up port (previously this was done in configuration,
             // but CoreWCF requires it be done in code)
+            builder.WebHost.UseNetTcp(8000);
             builder.WebHost.ConfigureKestrel(options =>
             {
                 options.ListenAnyIP(8733);
-                
+                options.ListenAnyIP(8700, listenOptions =>
+                {
+                    listenOptions.UseHttps();
+                });
             });
 
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
                             .AddServiceModelMetadata()
-                            .AddTransient<WcfServiceLibrary1.Service1>();
+                            .AddTransient<WcfServiceLibrary1.Service1>()
+                            .AddTransient<WcfServiceLibrary1.Service2>();
 
             var app = builder.Build();
 
@@ -42,13 +47,15 @@ namespace ConsoleApp
             var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
             serviceMetadataBehavior.HttpGetEnabled = true;
             serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost:8733/Service1/metadata");
+            serviceMetadataBehavior.HttpsGetEnabled = true;
+            serviceMetadataBehavior.HttpsGetUrl = new Uri("https://localhost:8700/Service2/metadata");
 
             // Configure CoreWCF endpoints in the ASP.NET Core hosts
             app.UseServiceModel(serviceBuilder =>
             {
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
                 {
-
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
@@ -56,12 +63,22 @@ namespace ConsoleApp
 
                 });
 
+                serviceBuilder.AddService<WcfServiceLibrary1.Service2>(serviceOptions => 
+                {
+
+                });
+
+                serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service2>(host2 =>
+                {
+
+                });
+
             });
             
-            app.StartAsync().GetAwaiter().GetResult();
+            app.StartAsync().GetAwaiter().GetResult();;
             Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
             Console.ReadKey();
-            app.StopAsync().GetAwaiter().GetResult();
+            app.StopAsync().GetAwaiter().GetResult();;
             }
             catch(Exception ex)
             {
