@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
@@ -37,9 +38,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
 
             if (_windowsMyTypes.Contains(myType))
             {
-                _logger.LogInformation("Project {Name} contains MyType node that requires at least net5.0-windows.", tfm.Project);
+                var final = tfm.AppBase with { Platform = TargetFrameworkMoniker.Platforms.Windows };
+                _logger.LogInformation("Project {Name} contains MyType node that requires at least {framework}", tfm.Project, final);
 
-                tfm.TryUpdate(TargetFrameworkMoniker.Net50_Windows);
+                tfm.TryUpdate(final);
             }
         }
     }
