@@ -260,7 +260,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             var netTcp = _config.Root.DescendantsAndSelf("netTcpBinding");
             if (netTcp.Any())
             {
-                var security = netTcp.First().DescendantsAndSelf("security").First();
+                var security = netTcp.First().DescendantsAndSelf("security").Single();
                 if (security is not null)
                 {
                     if (security.Attribute("mode").Value.Equals("TransportWithMessageCredential", StringComparison.Ordinal))
@@ -287,12 +287,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 var binding = _config.Root.DescendantsAndSelf(httpBinding);
                 if (binding.Any())
                 {
-                    var transport = binding.First().DescendantsAndSelf("transport").Single();
-                    if (transport.Attribute("clientCredentialType") is not null &&
-                        (transport.Attribute("clientCredentialType").Value.Equals("Windows", StringComparison.OrdinalIgnoreCase) ||
-                        transport.Attribute("clientCredentialType").Value.Equals("Ntml", StringComparison.OrdinalIgnoreCase)))
+                    var security = binding.First().DescendantsAndSelf("security").Single();
+                    if (security is not null)
                     {
-                        return true;
+                        if (security.Attribute("mode").Value.Equals("Transport", StringComparison.OrdinalIgnoreCase) ||
+                            security.Attribute("mode").Value.Equals("TransportCredentialOnly", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var transport = security.Element("transport");
+                            if (transport.Attribute("clientCredentialType") is not null &&
+                                (transport.Attribute("clientCredentialType").Value.Equals("Windows", StringComparison.OrdinalIgnoreCase) ||
+                                transport.Attribute("clientCredentialType").Value.Equals("Ntlm", StringComparison.OrdinalIgnoreCase)))
+                            {
+                                return true;
+                            }
+                        }
                     }
                 }
             }

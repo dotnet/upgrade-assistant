@@ -4,18 +4,61 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
     public class ConfigContext
     {
+        public Dictionary<string, ServiceSpecificContext> ServiceContext { get; }
 
-        public Dictionary<string, Uri> SchemeToAddressMapping { get; }
+        public bool NetTcpCertificate { get; }
 
-        public ConfigContext(ConfigUpdater configUpdater, string name)
+        public bool HasMetadata { get; }
+
+        public bool WindowsAuthentication { get; }
+
+        public class ServiceSpecificContext
         {
-            SchemeToAddressMapping = configUpdater.GetSchemeToAddressMapping(name);
+            public Dictionary<string, Uri> SchemeToAddressMapping { get; }
 
+            public MetadataType MetadataType { get; }
+
+            public Dictionary<string, string> ServiceDebug { get; }
+
+            public HashSet<string> Bindings { get; }
+
+            public bool ServiceCertificate { get; }
+
+            public Dictionary<string, string> ServiceCredentials { get; }
+
+            public ServiceSpecificContext(ConfigUpdater configUpdater, string behaviorName)
+            {
+                SchemeToAddressMapping = configUpdater.GetSchemeToAddressMapping(behaviorName);
+                MetadataType = configUpdater.SupportsMetadataBehavior(behaviorName);
+                ServiceDebug = configUpdater.SupportsServiceDebug(behaviorName);
+                Bindings = configUpdater.GetBindings(behaviorName);
+                ServiceCertificate = configUpdater.HasServiceCertificate(behaviorName);
+                ServiceCredentials = configUpdater.GetServiceCredentials(behaviorName);
+            }
+        }
+
+        public ConfigContext(ConfigUpdater configUpdater)
+        {
+            NetTcpCertificate = configUpdater.HasNetTcpCertificate();
+            WindowsAuthentication = configUpdater.HasWindowsAuthentication();
+            HasMetadata = false;
+
+            var pair = configUpdater.GetServiceBehaviorPair();
+            ServiceContext = new Dictionary<string, ServiceSpecificContext>();
+            foreach (var serviceName in pair.Keys)
+            {
+                ServiceContext.Add(serviceName, new ServiceSpecificContext(configUpdater, pair[serviceName]));
+                if (ServiceContext[serviceName].MetadataType != MetadataType.None)
+                {
+                    HasMetadata = true;
+                }
+            }
         }
     }
 }

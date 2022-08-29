@@ -143,7 +143,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 if (_configUpdater is not null)
                 {
                     step = "retrieving project contexts from the configuration updater";
-                    var configContext = UpdateRunner.GetContexts(_configUpdater);
+                    var configContext = new ConfigContext(_configUpdater);
                     step = "creating source code updater from this path:" + _path.MainFile;
                     _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path.MainFile, configContext, _loggerFactory.CreateLogger<SourceCodeUpdater>());
                 }

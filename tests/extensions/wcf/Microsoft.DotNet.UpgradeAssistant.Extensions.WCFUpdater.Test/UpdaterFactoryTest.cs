@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData("TestInputFiles\\MultiServicesConfig.txt", "TestExpectedFiles\\MultiServicesTemplateCode.txt")]
         public void UpdateFactoryTemplateTest(string input, string expected)
         {
-            var context = UpdateRunner.GetContexts(new ConfigUpdater(XDocument.Load(input), _configLogger));
+            var context = new ConfigContext(new ConfigUpdater(XDocument.Load(input), _configLogger));
             var actual = UpdaterFactory.UpdateTemplateCode(context, _logger);
             Assert.Equal(File.ReadAllText(expected), actual);
         }

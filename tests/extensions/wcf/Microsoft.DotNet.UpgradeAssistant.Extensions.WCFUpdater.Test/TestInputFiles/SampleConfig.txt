@@ -27,5 +27,14 @@
 				</behavior>
 			</serviceBehaviors>
 		</behaviors>
-	</system.serviceModel>
+	    <bindings>
+            <basicHttpBinding>
+                <binding>           
+                    <security mode="Transport">
+                    <transport clientCredentialType="Ntlm"/>
+                    </security>
+                </binding>
+            </basicHttpBinding>
+        </bindings>
+    </system.serviceModel>
 </configuration>

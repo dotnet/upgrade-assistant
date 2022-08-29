@@ -152,6 +152,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
            </bindings>
            </system.serviceModel>";
 
+        public const string HttpWindowsAuth = @"
+            <bindings>
+              <basicHttpBinding>
+                <binding>           
+                  <security mode=""Transport"">
+                    <transport clientCredentialType=""Ntlm""/>
+                  </security>
+                </binding>
+              </basicHttpBinding>
+           </bindings>
+           </system.serviceModel>";
+
         private readonly NullLogger<ConfigUpdater> _logger = NullLogger<ConfigUpdater>.Instance;
 
         [Fact]
@@ -288,6 +300,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         {
             var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", netTcpInput)), _logger).HasNetTcpCertificate();
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void HasWindowsAuthenticationTest()
+        {
+            var inputWithWrongMode = HttpWindowsAuth.Replace("Transport", "None");
+            var inputWithWrongMode2 = HttpWindowsAuth.Replace("Transport", "TransportWithMessageCredential");
+            var inputWithWrongType = HttpWindowsAuth.Replace("Ntlm", "Basic");
+            List<string> falseInputs = new List<string> { inputWithWrongMode, inputWithWrongMode2, inputWithWrongType };
+
+            var inputWithCorrectMode = HttpWindowsAuth.Replace("Transport", "TransportCredentialOnly");
+            var inputWithCorrectType = HttpWindowsAuth.Replace("Ntlm", "Windows");
+            var inputWithNetBinding = HttpWindowsAuth.Replace("basicHttp", "netHttp");
+            var inputWithWebBinding = HttpWindowsAuth.Replace("basicHttp", "webHttp");
+            List<string> trueInputs = new List<string> { inputWithCorrectMode, inputWithCorrectType, inputWithNetBinding, inputWithWebBinding };
+
+            foreach (var input in falseInputs)
+            {
+                Assert.False(new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", input)), _logger).HasWindowsAuthentication(),
+                    "This input should return false" + input);
+            }
+
+            foreach (var input in trueInputs)
+            {
+                Assert.True(new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", input)), _logger).HasWindowsAuthentication(),
+                    "This input should return true" + input);
+            }
         }
     }
 }

@@ -34,7 +34,8 @@ namespace ConsoleApp
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
                             .AddServiceModelMetadata()
-                            .AddTransient<WcfServiceLibrary1.Service1>();
+                            .AddTransient<WcfServiceLibrary1.Service1>()
+                            .AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
             var app = builder.Build();
 

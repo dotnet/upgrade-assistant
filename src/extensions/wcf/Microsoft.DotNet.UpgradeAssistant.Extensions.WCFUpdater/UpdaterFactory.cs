@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -30,7 +31,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return configUpdater;
         }
 
-        public static SourceCodeUpdater GetSourceCodeUpdater(string path, Dictionary<string, Dictionary<string, object>> context, ILogger<SourceCodeUpdater> logger)
+        public static SourceCodeUpdater GetSourceCodeUpdater(string path, ConfigContext context, ILogger<SourceCodeUpdater> logger)
         {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
             SourceCodeUpdater sourceCodeUpdater = new SourceCodeUpdater(tree, UpdateTemplateCode(context, logger), logger);
@@ -48,12 +49,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return result;
         }
 
-        public static string UpdateTemplateCode(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
+        public static string UpdateTemplateCode(ConfigContext context, ILogger logger)
         {
             string template = Constants.Template;
             template = UpdatePortNumber(template, GetAllAddress(context), GetHttpsCredentials(context));
             template = UpdateServiceMetadata(template, context);
-            template = template.Replace("[ServiceBuilder PlaceHolder]", AddMultipleServices(context, logger));
+            template = template.Replace("[ServiceBuilder PlaceHolder]", AddMultipleServices(context));
             template = UpdateDIContainer(template, context);
             return template;
         }
@@ -129,13 +130,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return template.Replace("[Port PlaceHolder]", host);
         }
 
-        private static HashSet<Uri> GetAllAddress(Dictionary<string, Dictionary<string, object>> context)
+        private static HashSet<Uri> GetAllAddress(ConfigContext context)
         {
             // unions all uri from different services
             var port = new HashSet<Uri>();
-            foreach (var key in context.Keys)
+            foreach (var key in context.ServiceContext.Keys)
             {
-                var dic = (Dictionary<string, Uri>)context[key]["uri"];
+                var dic = context.ServiceContext[key].SchemeToAddressMapping;
                 port.UnionWith(dic.Values);
             }
 
@@ -143,32 +144,34 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
 
         // for each https binding that has a service cretificate configured, returns the pair of uri and credentials configuration
-        private static Dictionary<Uri, Dictionary<string, string>> GetHttpsCredentials(Dictionary<string, Dictionary<string, object>> context)
+        private static Dictionary<Uri, Dictionary<string, string>> GetHttpsCredentials(ConfigContext context)
         {
             var credentials = new Dictionary<Uri, Dictionary<string, string>>();
-            foreach (var key in context.Keys)
+            foreach (var key in context.ServiceContext.Keys)
             {
-                var uri = (Dictionary<string, Uri>)context[key]["uri"];
-                if ((bool)context[key]["hasCert"] && uri.ContainsKey(Uri.UriSchemeHttps))
+                var serviceContext = context.ServiceContext[key];
+                var uri = serviceContext.SchemeToAddressMapping;
+                if (serviceContext.ServiceCertificate && uri.ContainsKey(Uri.UriSchemeHttps))
                 {
-                    credentials.Add(uri[Uri.UriSchemeHttps], (Dictionary<string, string>)context[key]["credentials"]);
+                    credentials.Add(uri[Uri.UriSchemeHttps], serviceContext.ServiceCredentials);
                 }
             }
 
             return credentials;
         }
 
-        private static string UpdateServiceMetadata(string template, Dictionary<string, Dictionary<string, object>> context)
+        private static string UpdateServiceMetadata(string template, ConfigContext context)
         {
             var hasMetadata = false;
             var metadataHttp = string.Empty;
             var metadataHttps = string.Empty;
 
             // updates metadata
-            foreach (var key in context.Keys)
+            foreach (var key in context.ServiceContext.Keys)
             {
-                var metadataType = (MetadataType)context[key]["metadata"];
-                var uri = (Dictionary<string, Uri>)context[key]["uri"];
+                var serviceContext = context.ServiceContext[key];
+                var metadataType = serviceContext.MetadataType;
+                var uri = serviceContext.SchemeToAddressMapping;
                 if (metadataType != 0)
                 {
                     hasMetadata = true;
@@ -208,15 +211,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return template;
         }
 
-        private static string AddMultipleServices(Dictionary<string, Dictionary<string, object>> context, ILogger logger)
+        private static string AddMultipleServices(ConfigContext context)
         {
             var builder = string.Empty;
-            foreach (var serviceName in context.Keys)
+            foreach (var serviceName in context.ServiceContext.Keys)
             {
-                var addDebug = UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), (Dictionary<string, string>)context[serviceName]["debug"]);
-                var addCredentials = ConfigureServiceCredentials(addDebug, (bool)context[serviceName]["netTcpCert"], (Dictionary<string, string>)context[serviceName]["credentials"]);
+                var serviceContext = context.ServiceContext[serviceName];
+                var addDebug = UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), serviceContext.ServiceDebug);
+                var addCredentials = ConfigureServiceCredentials(addDebug, context.NetTcpCertificate, serviceContext.ServiceCredentials);
                 builder += addCredentials + System.Environment.NewLine;
-                if (serviceName != context.Keys.Last())
+                if (serviceName != context.ServiceContext.Keys.Last())
                 {
                     builder += System.Environment.NewLine;
                 }
@@ -263,28 +267,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
 
         // update template to add metadata service, service types, and windows authentication to the DI container
-        private static string UpdateDIContainer(string template, Dictionary<string, Dictionary<string, object>> context)
+        private static string UpdateDIContainer(string template, ConfigContext context)
         {
             var result = string.Empty;
-            if (template.IndexOf("metadata", StringComparison.Ordinal) >= 0)
+            if (context.HasMetadata)
             {
                 result += Constants.Metadata1 + System.Environment.NewLine;
             }
 
             result += AddServiceType(context);
 
-            // TODO: add windows authentication
+            if (context.WindowsAuthentication)
+            {
+                result += System.Environment.NewLine + Constants.HttpWindowsAuth;
+            }
+
             result += ";";
             return template.Replace("[Add to DI Container]", result);
         }
 
-        private static string AddServiceType(Dictionary<string, Dictionary<string, object>> context)
+        private static string AddServiceType(ConfigContext context)
         {
             var result = string.Empty;
-            foreach (var serviceType in context.Keys)
+            foreach (var serviceType in context.ServiceContext.Keys)
             {
                 result += Constants.ServiceType.Replace("ServiceType", serviceType);
-                if (serviceType != context.Keys.Last())
+                if (serviceType != context.ServiceContext.Keys.Last())
                 {
                     result += System.Environment.NewLine;
                 }

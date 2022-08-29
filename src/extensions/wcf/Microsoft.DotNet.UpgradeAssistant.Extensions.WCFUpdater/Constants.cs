@@ -100,7 +100,7 @@ using CoreWCF.Security;
                 });";
 
         public const string ServiceType = "                            .AddTransient<ServiceType>()";
-        public const string HttpWindowsAuth = "                            .AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();";
+        public const string HttpWindowsAuth = "                            .AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate()";
         public const string HostComment = "The host element is not supported in configuration in CoreWCF. The port that endpoints listen on is instead configured in the source code.";
         public const string BehaviorComment = "The behavior element is not supported in configuration in CoreWCF. Some service behaviors, such as metadata, are configured in the source code.";
         public const string ServiceModelComment = " system.serviceModel section is moved to a separate wcf.config file located at the same directory as this file.";
