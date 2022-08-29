@@ -124,4 +124,3 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
     }
 }
-

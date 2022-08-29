@@ -15,39 +15,39 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 {
     public static class WCFUpdateChecker
     {
-        public static bool IsWCFUpdateApplicable(Dictionary<string, IEnumerable<string>> path, ILogger logger)
+        public static bool IsWCFUpdateApplicable(FilePath path, ILogger logger)
         {
             try
             {
-                var config = IsConfigApplicable(XDocument.Load(path["config"].First()));
-                var source = IsSourceCodeApplicable(CSharpSyntaxTree.ParseText(File.ReadAllText(path["main"].First())));
-                var proj = IsProjFileApplicable(XDocument.Load(path["proj"].First()));
+                var config = IsConfigApplicable(XDocument.Load(path.Config));
+                var source = IsSourceCodeApplicable(CSharpSyntaxTree.ParseText(File.ReadAllText(path.MainFile)));
+                var proj = IsProjFileApplicable(XDocument.Load(path.ProjectFile));
 
                 if (config)
                 {
-                    logger.LogInformation(path["config"].First(), $"This config file is applicable for upgrade: {path}. System.serviceModel/services elements were found.");
+                    logger.LogInformation($"This config file is applicable for upgrade: {path.Config}. System.serviceModel/services elements were found.");
                 }
                 else
                 {
-                    logger.LogInformation(path["config"].First(), $"This config file is not applicable for update: {path}. System.serviceModel/services elements were not found.");
+                    logger.LogInformation($"This config file is not applicable for update: {path.Config}. System.serviceModel/services elements were not found.");
                 }
 
                 if (source)
                 {
-                    logger.LogInformation(path["main"].First(), $"This  file is applicable for upgrade: {path}. ServiceHost object was found.");
+                    logger.LogInformation($"This  file is applicable for upgrade: {path.MainFile}. ServiceHost object was found.");
                 }
                 else
                 {
-                    logger.LogInformation(path["main"].First(), $"This config file is not applicable for update: {path}. ServiceHost object was not found.");
+                    logger.LogInformation($"This config file is not applicable for update: {path.MainFile}. ServiceHost object was not found.");
                 }
 
                 if (proj)
                 {
-                    logger.LogInformation(path["proj"].First(), $"This project file is applicable for upgrade: {path}. Reference to System.serviceModel was found.");
+                    logger.LogInformation($"This project file is applicable for upgrade: {path.ProjectFile}. Reference to System.serviceModel was found.");
                 }
                 else
                 {
-                    logger.LogInformation(path["proj"].First(), $"This project file is not applicable for upgrade: {path}. Reference to System.serviceModel was not found.");
+                    logger.LogInformation($"This project file is not applicable for upgrade: {path.ProjectFile}. Reference to System.serviceModel was not found.");
                 }
 
                 return config && source && proj;

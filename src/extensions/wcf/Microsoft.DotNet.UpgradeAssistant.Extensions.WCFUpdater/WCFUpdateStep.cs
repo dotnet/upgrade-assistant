@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         private List<SourceCodeUpdater>? _directiveUpdaters;
 
-        private Dictionary<string, IEnumerable<string>>? _path;
+        private FilePath _path;
 
         private ILoggerFactory _loggerFactory;
 
@@ -42,20 +42,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             WellKnownStepIds.TemplateInserterStepId,
 
             // Project should have correct TFM
-            WellKnownStepIds.SetTFMStepId,
-
-            // Project's config file, source code, and project file need to be updated first before adding CoreWCF services
-            WellKnownStepIds.ConfigUpdaterStepId,
-
-            WellKnownStepIds.SourceUpdaterStepId,
-
-            WellKnownStepIds.PackageUpdaterStepId
+            WellKnownStepIds.SetTFMStepId
         };
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
             WellKnownStepIds.NextProjectStepId,
 
+            // runs before default config/source updater so they won't have warnings about WCF
             WellKnownStepIds.ConfigUpdaterStepId,
 
             WellKnownStepIds.SourceUpdaterStepId
@@ -70,6 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             _loggerFactory = loggerFactory;
+            _path = new FilePath();
         }
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
@@ -115,9 +110,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public Task<UpgradeStepInitializeResult> Initialize(IProject project)
         {
-            _path = new Dictionary<string, IEnumerable<string>>();
             FindPath(project);
-            if (_path.Count != 3 && _path.Count != 4)
+            if (_path.MainFile is null || _path.ProjectFile is null || _path.Config is null)
             {
                 return Task.FromResult(new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Cannot find required file(s) for WCF update. The project is not applicable for automated update and this step is complete.", BuildBreakRisk.Low));
             }
@@ -136,22 +130,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             try
             {
                 // construct updaters
-                step = "creating configuration updater from this path:" + _path["config"].Single();
-                _configUpdater = UpdaterFactory.GetConfigUpdater(_path["config"].Single(), _loggerFactory.CreateLogger<ConfigUpdater>());
-                step = "creating project file updater from this path:" + _path["proj"].Single();
-                _packageUpdater = UpdaterFactory.GetPackageUpdater(_path["proj"].Single(), _loggerFactory.CreateLogger<PackageUpdater>());
-                if (_path.ContainsKey("directives"))
+                step = "creating configuration updater from this path:" + _path.Config;
+                _configUpdater = UpdaterFactory.GetConfigUpdater(_path.Config, _loggerFactory.CreateLogger<ConfigUpdater>());
+                step = "creating project file updater from this path:" + _path.ProjectFile;
+                _packageUpdater = UpdaterFactory.GetPackageUpdater(_path.ProjectFile, _loggerFactory.CreateLogger<PackageUpdater>());
+                if (_path.DirectiveFiles is not null)
                 {
                         step = "creating using directivies updaters for .cs files that reference System.ServiceModel";
-                        _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path["directives"], _loggerFactory.CreateLogger<SourceCodeUpdater>());
+                        _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path.DirectiveFiles, _loggerFactory.CreateLogger<SourceCodeUpdater>());
                 }
 
                 if (_configUpdater is not null)
                 {
                     step = "retrieving project contexts from the configuration updater";
                     var configContext = UpdateRunner.GetContexts(_configUpdater);
-                    step = "creating source code updater from this path:" + _path["main"].Single();
-                    _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path["main"].Single(), configContext, _loggerFactory.CreateLogger<SourceCodeUpdater>());
+                    step = "creating source code updater from this path:" + _path.MainFile;
+                    _sourceCodeUpdater = UpdaterFactory.GetSourceCodeUpdater(_path.MainFile, configContext, _loggerFactory.CreateLogger<SourceCodeUpdater>());
                 }
             }
             catch (Exception e)
@@ -185,21 +179,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 }
 
                 // Write updates
-                if (_path is null)
+                if (_path.MainFile is null || _path.ProjectFile is null || _path.Config is null)
                 {
                     return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Lost access to file paths. Please review error message and log for more information."));
                 }
 
-                step = "writing project file updates to path:" + _path["proj"].Single();
-                UpdateRunner.WritePackageUpdate(projFile, _path["proj"].Single(), Logger);
-                step = "writing configuration file updates to path:" + _path["config"].Single();
-                UpdateRunner.WriteConfigUpdate(config[0], config[1], _path["config"].Single(), Logger);
-                step = "writing source code updates to path:" + _path["main"].Single();
-                UpdateRunner.WriteSourceCodeUpdate(source, _path["main"].Single(), Logger);
-                if (directives.Count > 0)
+                step = "writing project file updates to path:" + _path.ProjectFile;
+                UpdateRunner.WritePackageUpdate(projFile, _path.ProjectFile, Logger);
+                step = "writing configuration file updates to path:" + _path.Config;
+                UpdateRunner.WriteConfigUpdate(config[0], config[1], _path.Config, Logger);
+                step = "writing source code updates to path:" + _path.MainFile;
+                UpdateRunner.WriteSourceCodeUpdate(source, _path.MainFile, Logger);
+                if (directives.Count > 0 && _path.DirectiveFiles is not null)
                 {
                     step = "writing using directives updates to .cs files that references System.ServiceModel";
-                    UpdateRunner.WriteUsingDirectivesUpdate(directives, _path["directives"], Logger);
+                    UpdateRunner.WriteUsingDirectivesUpdate(directives, _path.DirectiveFiles, Logger);
                 }
 
                 Logger.LogInformation("Project was successfully updated to use CoreWCF services. Please review changes.");
@@ -246,11 +240,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
             else
             {
-                _path!.Add("main", main);
+                _path.MainFile = main.Single();
                 Logger.LogTrace($"This following file: {main.Single()} needs source code update to replace ServiceHost instance.");
-                _path.Add("config", config);
+                _path.Config = config.Single();
                 Logger.LogTrace($"This following config file: {config.Single()} needs to be updated.");
-                _path.Add("proj", new[] { project.GetFile().FilePath });
+                _path.ProjectFile = project.GetFile().FilePath;
                 Logger.LogTrace($"This following project file: {project.GetFile().FilePath} needs to be updated");
 
                 foreach (var directive in directives)
@@ -260,7 +254,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
                 if (directives.Any())
                 {
-                    _path.Add("directives", directives);
+                    _path.DirectiveFiles = new List<string>(directives);
                 }
 
                 Logger.LogDebug("Retrieved file paths that are needed for updates.");

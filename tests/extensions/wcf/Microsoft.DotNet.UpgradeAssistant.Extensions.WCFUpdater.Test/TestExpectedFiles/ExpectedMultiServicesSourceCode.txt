@@ -75,10 +75,10 @@ namespace ConsoleApp
 
             });
             
-            app.StartAsync().GetAwaiter().GetResult();;
+            app.StartAsync().GetAwaiter().GetResult();
             Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
             Console.ReadKey();
-            app.StopAsync().GetAwaiter().GetResult();;
+            app.StopAsync().GetAwaiter().GetResult();
             }
             catch(Exception ex)
             {

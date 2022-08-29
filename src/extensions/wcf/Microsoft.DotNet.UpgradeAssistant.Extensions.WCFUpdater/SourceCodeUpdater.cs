@@ -258,7 +258,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             try
             {
                 // split by line and then replace the varName placeholder with variable name
-                var lines = template.Split(System.Environment.NewLine.ToCharArray());
+                var lines = template.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.None);
                 var pair = GetVarNamePairs(root);
                 var index = new Dictionary<int, string>();
 
