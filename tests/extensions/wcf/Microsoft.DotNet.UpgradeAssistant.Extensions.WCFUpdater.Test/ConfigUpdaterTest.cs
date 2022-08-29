@@ -196,7 +196,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             var expected = new Dictionary<string, string>
             {
                 { "includeExceptionDetailInFaults", "true" },
-                { "httpHelpPageEnabled", "false"},
+                { "httpHelpPageEnabled", "false" },
                 { "httpHelpPageUrl", "http://localhost:80/help" }
             };
             Assert.Equal(expected, result);
