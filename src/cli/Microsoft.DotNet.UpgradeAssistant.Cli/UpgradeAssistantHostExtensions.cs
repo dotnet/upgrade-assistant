@@ -77,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                     services.ConfigureOutputOptions(options =>
                     {
-                        options.Format = upgradeOptions.Format ?? context.Configuration["Analysis:DefaultFormat"];
+                        options.Format = upgradeOptions.Format ?? context.Configuration["Output:DefaultFormat"];
                     });
                     services.AddAnalysis();
 

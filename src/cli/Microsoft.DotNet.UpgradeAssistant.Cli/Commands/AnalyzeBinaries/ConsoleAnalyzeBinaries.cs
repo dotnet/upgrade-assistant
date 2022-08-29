@@ -60,7 +60,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 await writer.WriteAsync(allResults
                     .Select(g => new OutputResultDefinition
                     {
-                        AnalysisResults = g.Value.ToAsyncEnumerable(),
+                        Results = g.Value.ToAsyncEnumerable(),
                         Name = $"{resultDefName} | {g.Key}",
                         Version = version,
                         InformationUri = resultDefInformationUri,

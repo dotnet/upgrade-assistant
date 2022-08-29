@@ -51,7 +51,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _writerProvider = writerProvider;
+            _writerProvider = writerProvider ?? throw new ArgumentNullException(nameof(logger));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 

@@ -58,7 +58,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     Version = GetProviderVersion(provider),
                     Name = provider.Name,
                     InformationUri = provider.InformationUri,
-                    AnalysisResults = provider.AnalyzeAsync(analzyerContext, token),
+                    Results = provider.AnalyzeAsync(analzyerContext, token),
                 });
             }
 

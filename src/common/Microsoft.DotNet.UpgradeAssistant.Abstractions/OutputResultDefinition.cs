@@ -30,6 +30,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets results of the analysis type defined above.
         /// </summary>
-        public IAsyncEnumerable<OutputResult> AnalysisResults { get; init; } = AsyncEnumerable.Empty<OutputResult>();
+        public IAsyncEnumerable<OutputResult> Results { get; init; } = AsyncEnumerable.Empty<OutputResult>();
     }
 }

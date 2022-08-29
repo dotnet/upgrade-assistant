@@ -52,7 +52,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                     Name = "some-name",
                     Version = "1.0.0",
                     InformationUri = new Uri("https://github.com/dotnet/upgrade-assistant"),
-                    AnalysisResults = analyzeResults.ToAsyncEnumerable()
+                    Results = analyzeResults.ToAsyncEnumerable()
                 }
             };
 
@@ -109,7 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
                     Name = "some-name",
                     Version = "1.0.0",
                     InformationUri = new Uri("https://github.com/dotnet/upgrade-assistant"),
-                    AnalysisResults = analyzeResults.ToAsyncEnumerable()
+                    Results = analyzeResults.ToAsyncEnumerable()
                 }
             };
 
