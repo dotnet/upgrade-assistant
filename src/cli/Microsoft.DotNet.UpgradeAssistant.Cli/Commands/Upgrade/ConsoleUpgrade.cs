@@ -62,6 +62,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _context.Current = context;
 
             await _stateManager.LoadStateAsync(context, token);
+            if (!_writerProvider.TryGetWriter(_options.Value.Format, out var resultWriter))
+            {
+                _logger.LogError(LocalizedStrings.RequestedFormatUnavailableMessage, _options.Value.Format);
+                return;
+            }
 
             try
             {
@@ -86,11 +91,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 // Do not pass the same token as it may have been canceled and we still need to persist this.
                 await _stateManager.SaveStateAsync(context, default);
-                await WriteUpgradeReport(context, token);
+                await WriteUpgradeReport(resultWriter, context, default);
             }
         }
 
-        private async Task<bool> WriteUpgradeReport(IUpgradeContext context, CancellationToken token)
+        private async Task<bool> WriteUpgradeReport(IOutputResultWriter resultWriter, IUpgradeContext context, CancellationToken token)
         {
             var outputDirectory = Path.GetDirectoryName(context.InputPath);
             if (outputDirectory is null || !context.Results.Any())
@@ -101,15 +106,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             var outputFileName = $"UpgradeReport.{_options.Value.Format}";
             var outputFilePath = Path.Combine(outputDirectory, outputFileName);
             using var stream = File.Create(Path.Combine(outputDirectory, outputFileName));
-            if (_writerProvider.TryGetWriter(_options.Value.Format, out var writer))
-            {
-                await writer.WriteAsync(context.Results.ToAsyncEnumerable(), stream, token);
-                _logger.LogInformation($"The Upgrade Report is generated at {outputFilePath}");
-                return true;
-            }
-
-            _logger.LogError(LocalizedStrings.RequestedFormatUnavailableMessage, _options.Value.Format);
-            return false;
+            await resultWriter.WriteAsync(context.Results.ToAsyncEnumerable(), stream, token);
+            _logger.LogInformation($"The Upgrade Report is generated at {outputFilePath}");
+            return true;
         }
 
         private async Task RunStepAsync(IUpgradeContext context, UpgradeStep step, CancellationToken token)
