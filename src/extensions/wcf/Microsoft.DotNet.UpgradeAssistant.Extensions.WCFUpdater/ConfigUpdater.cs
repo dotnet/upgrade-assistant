@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     select el;
                 unsupported_endpoint.First().AddBeforeSelf(new XComment(Constants.MexEndpoint));
                 unsupported_endpoint.Remove();
-                _logger.LogWarning("The mex endpoint is removed from .config file and service metadata behavior is configured in the source code instead.");
+                _logger.LogWarning("The mex endpoint is removed from .config file, and service metadata behavior is configured in the source code instead.");
             }
 
             wcfConfig = UpdateEndpoints(wcfConfig);

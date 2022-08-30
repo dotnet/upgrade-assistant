@@ -61,27 +61,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public static void WriteSourceCodeUpdate(SyntaxNode root, string path, ILogger logger)
         {
-            logger.LogDebug("Start writing changes to source code to update Main()...");
+            logger.LogDebug("Start writing changes to the source code to replace the ServiceHost instance(s).");
             File.WriteAllText(path, root.ToFullString());
-            logger.LogInformation("Finish writing changes to source code/Main().");
+            logger.LogInformation("Finish writing changes to the source code to replace the ServiceHost instance(s).");
         }
 
         public static List<SyntaxNode> UsingDirectivesUpdate(List<SourceCodeUpdater> list, ILogger logger)
         {
-            logger.LogDebug("Start updating directives...");
+            logger.LogDebug("Start updating using directives...");
             var result = new List<SyntaxNode>();
             foreach (var updater in list)
             {
                 result.Add(updater.UpdateDirectives());
             }
 
-            logger.LogInformation("Finish updating directives.");
+            logger.LogInformation("Finish updating using directives.");
             return result;
         }
 
         public static void WriteUsingDirectivesUpdate(List<SyntaxNode> root, IEnumerable<string> path, ILogger logger)
         {
-            logger.LogDebug("Start writing changes to source code to update directives...");
+            logger.LogDebug("Start writing changes to the source code to update using directives...");
             if (root.Count != path.Count())
             {
                 logger.LogError("The number of files does not match the number of path. Cannot write directive updates.");
@@ -93,7 +93,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 File.WriteAllText(path.ElementAtOrDefault(i), root[i].ToFullString());
             }
 
-            logger.LogInformation("Finish writing changes to source code/directives.");
+            logger.LogInformation("Finish writing changes to the source code to update using directives.");
         }
     }
 }

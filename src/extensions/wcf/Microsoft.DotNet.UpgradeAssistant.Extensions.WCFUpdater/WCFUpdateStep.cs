@@ -15,7 +15,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
     [ApplicableLanguage(Language.CSharp)]
     public class WCFUpdateStep : UpgradeStep
     {
-        public override string Title => "Update WCF service to CoreWCF.";
+        public override string Title => "Update WCF service to CoreWCF";
 
         public override string Description => "Update WCF service to use CoreWCF services. For more information about CoreWCF, please go to: https://github.com/CoreWCF/CoreWCF";
 
