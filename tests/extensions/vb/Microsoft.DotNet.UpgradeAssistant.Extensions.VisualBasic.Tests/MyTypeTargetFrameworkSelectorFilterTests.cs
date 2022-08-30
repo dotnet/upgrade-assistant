@@ -2,8 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Autofac.Extras.Moq;
+
 using Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic;
+
 using Moq;
+
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic.Tests
@@ -21,6 +24,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic.Tests
             // Arrange
             using var mock = AutoMock.GetLoose();
             var state = new Mock<ITargetFrameworkSelectorFilterState>();
+            state.Setup(s => s.AppBase).Returns(TargetFrameworkMoniker.Net60);
 
             var project = new Mock<IProject>();
             state.Setup(s => s.Project).Returns(project.Object);
@@ -35,7 +39,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.VisualBasic.Tests
 
             // Assert
             var expectedTimes = update ? Times.Once() : Times.Never();
-            state.Verify(s => s.TryUpdate(TargetFrameworkMoniker.Net50_Windows), expectedTimes);
+            state.Verify(s => s.TryUpdate(TargetFrameworkMoniker.Net60_Windows), expectedTimes);
         }
     }
 }
