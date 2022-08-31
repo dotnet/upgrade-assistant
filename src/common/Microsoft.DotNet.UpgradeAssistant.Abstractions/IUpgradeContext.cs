@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -41,5 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         ValueTask ReloadWorkspaceAsync(CancellationToken token);
 
         IUpgradeContextProperties Properties { get; }
+
+        ICollector<OutputResultDefinition> Results { get; }
     }
 }

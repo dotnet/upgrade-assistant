@@ -16,15 +16,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public class ConsoleAnalyzeBinaries : IAppCommand
     {
-        private readonly IOptions<AnalysisOptions> _analysisOptions;
+        private readonly IOptions<OutputOptions> _analysisOptions;
         private readonly IBinaryAnalysisExecutor _apiChecker;
-        private readonly IAnalyzeResultWriterProvider _writerProvider;
+        private readonly IOutputResultWriterProvider _writerProvider;
         private readonly ILogger<ConsoleAnalyzeBinaries> _logger;
         private readonly IExtensionProvider _extensionProvider;
 
-        public ConsoleAnalyzeBinaries(IOptions<AnalysisOptions> analysisOptions,
+        public ConsoleAnalyzeBinaries(IOptions<OutputOptions> analysisOptions,
             IBinaryAnalysisExecutor apiChecker,
-            IAnalyzeResultWriterProvider writerProvider,
+            IOutputResultWriterProvider writerProvider,
             IExtensionProvider extensionProvider,
             ILogger<ConsoleAnalyzeBinaries> logger)
         {
@@ -49,18 +49,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
                 using var stream = File.Create(output);
 
-                var allResults = new ConcurrentDictionary<string, ConcurrentBag<AnalyzeResult>>();
+                var allResults = new ConcurrentDictionary<string, ConcurrentBag<OutputResult>>();
 
                 await _apiChecker.RunAsync(result => Task.Run(() =>
                 {
-                    var bagToPopulate = allResults.GetOrAdd(result.FileLocation, new ConcurrentBag<AnalyzeResult>());
+                    var bagToPopulate = allResults.GetOrAdd(result.FileLocation, new ConcurrentBag<OutputResult>());
                     bagToPopulate.Add(result);
                 }));
 
                 await writer.WriteAsync(allResults
-                    .Select(g => new AnalyzeResultDefinition
+                    .Select(g => new OutputResultDefinition
                     {
-                        AnalysisResults = g.Value.ToAsyncEnumerable(),
+                        Results = g.Value.ToAsyncEnumerable(),
                         Name = $"{resultDefName} | {g.Key}",
                         Version = version,
                         InformationUri = resultDefInformationUri,
