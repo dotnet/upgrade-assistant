@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             };
 
             // TODO: once we update all the other types of rules, we will be able to remove this condition.
-            if (!string.IsNullOrWhiteSpace(analyzeResult.FullDescription))
+            if (!string.IsNullOrWhiteSpace(analyzeResult.RuleName))
             {
                 rule.Name = analyzeResult.RuleName;
             }
