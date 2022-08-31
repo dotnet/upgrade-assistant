@@ -3,11 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
@@ -22,6 +26,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
         private readonly ITelemetry _telemetry;
         private readonly IUpgradeStateManager _stateManager;
         private readonly ILogger<ConsoleUpgrade> _logger;
+        private readonly IOutputResultWriterProvider _writerProvider;
+        private readonly IOptions<OutputOptions> _options;
 
         public ConsoleUpgrade(
             IUserInput input,
@@ -32,7 +38,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             UpgraderManager upgrader,
             ITelemetry telemetry,
             IUpgradeStateManager stateManager,
-            ILogger<ConsoleUpgrade> logger)
+            ILogger<ConsoleUpgrade> logger,
+            IOutputResultWriterProvider writerProvider,
+            IOptions<OutputOptions> options)
         {
             _input = input ?? throw new ArgumentNullException(nameof(input));
             _context = context;
@@ -43,6 +51,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _writerProvider = writerProvider ?? throw new ArgumentNullException(nameof(logger));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         public async Task RunAsync(CancellationToken token)
@@ -52,6 +62,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             _context.Current = context;
 
             await _stateManager.LoadStateAsync(context, token);
+            if (!_writerProvider.TryGetWriter(_options.Value.Format, out var resultWriter))
+            {
+                _logger.LogError(LocalizedStrings.RequestedFormatUnavailableMessage, _options.Value.Format);
+                return;
+            }
 
             try
             {
@@ -76,7 +91,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             {
                 // Do not pass the same token as it may have been canceled and we still need to persist this.
                 await _stateManager.SaveStateAsync(context, default);
+                await WriteUpgradeReport(resultWriter, context, default);
             }
+        }
+
+        private async Task<bool> WriteUpgradeReport(IOutputResultWriter resultWriter, IUpgradeContext context, CancellationToken token)
+        {
+            var outputDirectory = Path.GetDirectoryName(context.InputPath);
+            if (outputDirectory is null || !context.Results.Any())
+            {
+                return false;
+            }
+
+            var outputFileName = $"UpgradeReport.{_options.Value.Format}";
+            var outputFilePath = Path.Combine(outputDirectory, outputFileName);
+            using var stream = File.Create(Path.Combine(outputDirectory, outputFileName));
+            await resultWriter.WriteAsync(context.Results.ToAsyncEnumerable(), stream, token);
+            _logger.LogInformation($"The Upgrade Report is generated at {outputFilePath}");
+            return true;
         }
 
         private async Task RunStepAsync(IUpgradeContext context, UpgradeStep step, CancellationToken token)

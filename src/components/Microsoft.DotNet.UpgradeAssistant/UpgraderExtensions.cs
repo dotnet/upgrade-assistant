@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.DotNet.UpgradeAssistant.Checks;
 using Microsoft.DotNet.UpgradeAssistant.TargetFramework;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             services.AddTransient<ITargetFrameworkSelectorFilter, DependencyMinimumTargetFrameworkSelectorFilter>();
             services.AddTransient<ITargetFrameworkSelectorFilter, ExecutableTargetFrameworkSelectorFilter>();
+        }
+
+        public static void ConfigureOutputOptions(this IServiceCollection services, Action<OutputOptions> configure)
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddOptions<OutputOptions>()
+                .Configure(configure)
+                .ValidateDataAnnotations();
         }
     }
 }

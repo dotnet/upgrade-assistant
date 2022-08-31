@@ -3,16 +3,16 @@
 
 using System;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Analysis
+namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public record AnalyzeResult
+    public record OutputResult
     {
         public string RuleId { get; init; } = string.Empty;
 
         public string RuleName { get; init; } = string.Empty;
 
         /// <summary>
-        /// Gets the full description of the analysis.
+        /// Gets the full description of the output.
         /// </summary>
         public string FullDescription { get; init; } = string.Empty;
 
