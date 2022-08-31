@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Analysis
+namespace Microsoft.DotNet.UpgradeAssistant
 {
     /// <summary>
     /// Definition for storing Analysis Results per type of Analysis.
     /// </summary>
-    public record AnalyzeResultDefinition
+    public record OutputResultDefinition
     {
         /// <summary>
         /// Gets version of Analysis Tool.
@@ -30,6 +30,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
         /// <summary>
         /// Gets results of the analysis type defined above.
         /// </summary>
-        public IAsyncEnumerable<AnalyzeResult> AnalysisResults { get; init; } = AsyncEnumerable.Empty<AnalyzeResult>();
+        public IAsyncEnumerable<OutputResult> Results { get; init; } = AsyncEnumerable.Empty<OutputResult>();
     }
 }

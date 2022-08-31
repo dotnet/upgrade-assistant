@@ -42,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return await Task.FromResult(true).ConfigureAwait(false);
         }
 
-        public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<OutputResult> AnalyzeAsync(AnalyzeContext analysis, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
         {
             if (analysis is null)
             {
@@ -63,9 +63,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             }
         }
 
-        private HashSet<AnalyzeResult> ProcessDiagnostics(IEnumerable<Diagnostic> diagnostics)
+        private HashSet<OutputResult> ProcessDiagnostics(IEnumerable<Diagnostic> diagnostics)
         {
-            var results = new HashSet<AnalyzeResult>();
+            var results = new HashSet<OutputResult>();
             foreach (var diag in diagnostics)
             {
                 _logger.LogInformation("Diagnostic {Id} with the message {Message} generated", diag.Id, diag.Descriptor.Description.ToString(System.Globalization.CultureInfo.InvariantCulture));

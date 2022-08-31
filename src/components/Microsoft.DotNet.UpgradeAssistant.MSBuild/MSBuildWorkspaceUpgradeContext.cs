@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -223,6 +224,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         }
 
         public IUpgradeContextProperties Properties { get; }
+
+        public ICollector<OutputResultDefinition> Results { get; } = new Collector<OutputResultDefinition>();
 
         public void SetCurrentProject(IProject? project)
         {

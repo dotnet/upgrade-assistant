@@ -9,19 +9,16 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class AnalysisExtensions
     {
-        public static void AddAnalysis(this IServiceCollection services, Action<AnalysisOptions> configure)
+        public static void AddAnalysis(this IServiceCollection services)
         {
             if (services is null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddOptions<AnalysisOptions>()
-                .Configure(configure)
-                .ValidateDataAnnotations();
-            services.AddTransient<IAnalyzeResultWriterProvider, AnalyzerResultProviderWriter>();
-            services.AddTransient<IAnalyzeResultWriter, HtmlAnalyzeResultWriter>();
-            services.AddTransient<IAnalyzeResultWriter, SarifAnalyzeResultWriter>();
+            services.AddTransient<IOutputResultWriterProvider, AnalyzerResultProviderWriter>();
+            services.AddTransient<IOutputResultWriter, HtmlAnalyzeResultWriter>();
+            services.AddTransient<IOutputResultWriter, SarifAnalyzeResultWriter>();
         }
     }
 }

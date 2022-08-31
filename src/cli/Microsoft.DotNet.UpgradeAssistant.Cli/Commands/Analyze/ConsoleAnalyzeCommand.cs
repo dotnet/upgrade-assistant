@@ -30,10 +30,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
             private class ListFormats : IAppCommand
             {
-                private readonly IEnumerable<IAnalyzeResultWriter> _writers;
+                private readonly IEnumerable<IOutputResultWriter> _writers;
                 private readonly ILogger<ListFormats> _logger;
 
-                public ListFormats(IEnumerable<IAnalyzeResultWriter> writers, ILogger<ListFormats> logger)
+                public ListFormats(IEnumerable<IOutputResultWriter> writers, ILogger<ListFormats> logger)
                 {
                     _writers = writers;
                     _logger = logger;

@@ -6,11 +6,11 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.DotNet.UpgradeAssistant.Analysis
+namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IAnalyzeResultWriter
+    public interface IOutputResultWriter
     {
-        Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, Stream stream, CancellationToken token);
+        Task WriteAsync(IAsyncEnumerable<OutputResultDefinition> results, Stream stream, CancellationToken token);
 
         string Format { get; }
     }
