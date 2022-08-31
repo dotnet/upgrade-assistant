@@ -256,7 +256,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     var root = CSharpSyntaxTree.ParseText(File.ReadAllText(directive)).GetRoot();
                     if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
                     {
-                        Logger.LogDebug($"This .cs file: {directive} needs using directives updates. Adding the path to collection.");
+                        Logger.LogDebug($"This .cs file: {directive} does not need using directives updates.");
                     }
                     else
                     {

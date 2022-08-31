@@ -3,7 +3,6 @@
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json.Bson;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
