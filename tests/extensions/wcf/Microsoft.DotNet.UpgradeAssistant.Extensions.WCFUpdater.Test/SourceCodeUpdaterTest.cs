@@ -3,6 +3,7 @@
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json.Bson;
 using Xunit;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
@@ -57,6 +58,33 @@ namespace SampleServer
     }
 }";
 
+        public const string InputNotMain = @"using Serilog;
+using System;
+using System.IO;
+using System.ServiceModel;
+using System.ServiceModel.Security;
+
+namespace SampleServer
+{
+    class Program
+    {
+        static void Main()
+        {
+            RunHost();
+        }
+
+        public static void RunHost() 
+        {
+            var host = new ServiceHost(typeof(SampleService));
+            host.AddDefaultEndpoints();
+            host.Open();
+            Console.Writeline(""Service Listening...Press enter to exit."")
+            Console.ReadLine();
+            host.Exam();
+            host.Close();
+        }
+}";
+
         public const string Template = @"public static void Main()
 {
             var builder = WebApplication.CreateBuilder();
@@ -82,15 +110,15 @@ namespace SampleServer
                 serviceBuilder.AddService<ServiceType>(serviceOptions => {});
             });
             
-            app.StartAsync();
-            app.StopAsync();
+            await app.StartAsync();
+            await app.StopAsync();
 }";
 
-        public const string Added = @"app.StartAsync();
+        public const string Added = @"await app.StartAsync();
                 Console.Writeline(""Service Listening...Press enter to exit."")
                 Console.ReadLine();
                 //host.Exam();
-                app.StopAsync();";
+                await app.StopAsync();";
 
         public const string Directives = @"using CoreWCF;
                             using CoreWCF.Configuration;
@@ -170,8 +198,8 @@ namespace SampleServer
                 });
             });
             
-            app.StartAsync();
-            app.StopAsync();
+            await app.StartAsync();
+            await app.StopAsync();
 }";
 
         public const string Config1 = @"serviceBuilder.ConfigureServiceHostBase<SampleService>(host =>
@@ -257,13 +285,28 @@ namespace SampleServer
         [InlineData(InputWithUsing)]
         public void RemoveCodeTest(string input)
         {
-            var end = @"app.StopAsync();
+            var end = @"await app.StopAsync();
                         }".Replace(" ", string.Empty);
             var root = CSharpSyntaxTree.ParseText(input);
             var updater = new SourceCodeUpdater(root, Template, _logger);
             var result = updater.RemoveOldCode(updater.AddTemplateCode(root.GetRoot())).ToFullString().Replace(" ", string.Empty);
             Assert.Contains(end, result);
             Assert.DoesNotContain("int UA_placeHolder;", result);
+        }
+
+        [Theory]
+        [InlineData(Input, true)]
+        [InlineData(InputNotMain, false)]
+        public void UpdateAsyncTest(string input, bool isMain)
+        {
+            var root = CSharpSyntaxTree.ParseText(input);
+            var updater = new SourceCodeUpdater(root, Template, _logger);
+            var result = updater.UpdateAsync(updater.RemoveOldCode(updater.AddTemplateCode(root.GetRoot())));
+
+            var resultInString = result.ToFullString();
+            Assert.Equal(isMain, resultInString.Contains("async Task Main()", System.StringComparison.Ordinal));
+            Assert.Equal(isMain, !resultInString.Contains("app.StartAsync().GetAwaiter().GetResult();", System.StringComparison.Ordinal));
+            Assert.Equal(isMain, !resultInString.Contains("((IDisposable)host).Dispose();", System.StringComparison.Ordinal));
         }
 
         [Fact]

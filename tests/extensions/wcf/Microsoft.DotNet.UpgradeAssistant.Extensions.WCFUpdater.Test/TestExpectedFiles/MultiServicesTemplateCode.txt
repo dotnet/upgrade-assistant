@@ -57,6 +57,6 @@
 
             });
             
-            app.StartAsync().GetAwaiter().GetResult();
-            app.StopAsync().GetAwaiter().GetResult();
+            await app.StartAsync();
+            await app.StopAsync();
 }

@@ -285,9 +285,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [Fact]
         public void HasServiceCertificateTest()
         {
-            var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</behavior>", Credentials)), _logger).HasServiceCertificate("SampleBehavior");
+            var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</behavior>", Credentials)), _logger).UsesServiceCertificate("SampleBehavior");
             Assert.True(actual);
-            actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</behavior>", Credentials.Replace(@"x509FindType=""FindBySubjectName""", string.Empty))), _logger).HasServiceCertificate("SampleBehavior");
+            actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</behavior>", Credentials.Replace(@"x509FindType=""FindBySubjectName""", string.Empty))), _logger).UsesServiceCertificate("SampleBehavior");
             Assert.False(actual);
         }
 
@@ -298,7 +298,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData("</system.serviceModel>", false)]
         public void HasNetTcpCertificateTest(string netTcpInput, bool expected)
         {
-            var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", netTcpInput)), _logger).HasNetTcpCertificate();
+            var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", netTcpInput)), _logger).NetTcpUsesCertificate();
             Assert.Equal(expected, actual);
         }
 

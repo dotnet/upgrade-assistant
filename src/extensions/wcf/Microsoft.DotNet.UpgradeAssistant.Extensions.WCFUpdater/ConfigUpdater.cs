@@ -29,7 +29,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             _config = doc;
             _logger = logger;
-            SetServiceAndBehaviorNames(_logger);
+            SetServiceAndBehaviorNames();
         }
 
         // Updates the original config file by removing the system.serviceModel element
@@ -152,7 +152,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         public Dictionary<string, string> SupportsServiceDebug(string name)
         {
-            // what is the default here
             var results = GetBehavior(name).DescendantsAndSelf("serviceDebug").SingleOrDefault();
             var debug = new Dictionary<string, string>();
             foreach (var attribute in results.Attributes())
@@ -242,7 +241,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             return result;
         }
 
-        public bool HasServiceCertificate(string name)
+        public bool UsesServiceCertificate(string name)
         {
             var cert = GetBehavior(name).DescendantsAndSelf("serviceCertificate");
             if (cert.Any())
@@ -255,7 +254,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         }
 
         // returns if the NetTcp binding is configured to use certificate
-        public bool HasNetTcpCertificate()
+        public bool NetTcpUsesCertificate()
         {
             var netTcp = _config.Root.DescendantsAndSelf("netTcpBinding");
             if (netTcp.Any())
@@ -358,14 +357,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     select s).First();
         }
 
-        private void SetServiceAndBehaviorNames(ILogger logger)
+        private void SetServiceAndBehaviorNames()
         {
             foreach (var s in _config.Root.DescendantsAndSelf("service"))
             {
                 if (s.Attribute("behaviorConfiguration") == null)
                 {
                     s.SetAttributeValue("behaviorConfiguration", string.Empty);
-                    logger.LogWarning("Set the attribute service/behaviorConfiguration value to empty string to avoid null.");
+                    _logger.LogWarning("Set the attribute service/behaviorConfiguration value to empty string to avoid null.");
                 }
             }
 
@@ -374,7 +373,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 if (s.Attribute("name") == null)
                 {
                     s.SetAttributeValue("name", string.Empty);
-                    logger.LogWarning("Set the attribute behavior/name value to empty string to avoid null.");
+                    _logger.LogWarning("Set the attribute behavior/name value to empty string to avoid null.");
                 }
             }
         }

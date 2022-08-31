@@ -45,8 +45,8 @@ using CoreWCF.Security;
 [ServiceBuilder PlaceHolder]
             });
             
-            app.StartAsync().GetAwaiter().GetResult();
-            app.StopAsync().GetAwaiter().GetResult();
+            await app.StartAsync();
+            await app.StopAsync();
 }";
 
         public const string Metadata1 = "                            .AddServiceModelMetadata()";

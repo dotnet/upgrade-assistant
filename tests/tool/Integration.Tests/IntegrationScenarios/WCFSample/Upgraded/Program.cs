@@ -16,7 +16,7 @@ namespace ConsoleApp
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
@@ -58,10 +58,10 @@ namespace ConsoleApp
 
             });
             
-            app.StartAsync().GetAwaiter().GetResult();
+            await app.StartAsync();
             Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
             Console.ReadKey();
-            app.StopAsync().GetAwaiter().GetResult();
+            await app.StopAsync();
             }
             catch(Exception ex)
             {

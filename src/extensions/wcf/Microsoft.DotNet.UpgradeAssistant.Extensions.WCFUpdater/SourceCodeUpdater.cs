@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -38,7 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             var root = UpdateDirectives();
             root = AddTemplateCode(root);
-            return RemoveOldCode(root);
+            root = RemoveOldCode(root);
+            return UpdateAsync(root);
         }
 
         // Updates the using directives by deleting ServiceModel directives and adding CoreWCF directives
@@ -50,7 +52,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             var root = _programFile.GetRoot();
-            var templateRoot = CSharpSyntaxTree.ParseText(Constants.TemplateUsing).GetRoot();
 
             // removes old directives
             var oldDirectives = from r in root.DescendantNodes().OfType<UsingDirectiveSyntax>()
@@ -206,7 +207,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                                        where ContainsIdentifier("UseServiceModel", node)
                                        select node;
                         root = root.InsertNodesBefore(position.First(), noRef);
-                        _logger.LogWarning("Found code that does not have a direct reference to any ServiceHost variable. Please manually add it to the correct delegate.");
+                        _logger.LogWarning("Found code that does not have a direct reference to any ServiceHost variable. Please manually add it to the correct ConfigureServiceHostBase delegate.");
                     }
 
                     // for each placeholder, insert code in based on varName
@@ -262,7 +263,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 var pair = GetVarNamePairs(root);
                 var index = new Dictionary<int, string>();
 
-                // can this be improved?
                 foreach (var name in pair.Keys)
                 {
                     for (var i = 0; i < lines.Length; i++)
@@ -279,7 +279,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                     lines[i] = lines[i].Replace("varName", index[i]);
                 }
 
-                _logger.LogDebug("Finish replacing placeholder names for service type and service host variable name.");
+                _logger.LogDebug("Finish replacing placeholder names with ServiceHost variable name.");
                 return string.Join(System.Environment.NewLine, lines);
             }
             catch
@@ -352,6 +352,55 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             _logger.LogDebug("Finish adding code between Open() and Close() to app.start() and app.stop().");
+            return root;
+        }
+
+        public SyntaxNode UpdateAsync(SyntaxNode root)
+        {
+            var stop = GetExpressionStatement("StopAsync", root).First();
+            var method = stop.Ancestors().OfType<MethodDeclarationSyntax>().SingleOrDefault();
+            var isAsync = false;
+            foreach (SyntaxToken n in method.ChildTokens())
+            {
+                if (n.IsKind(SyntaxKind.AsyncKeyword))
+                {
+                    isAsync = true;
+                    break;
+                }
+            }
+
+            if (!isAsync)
+            {
+                // if it's Main, change the method signature to async Task; Not main, use GetAwaiter() instead of await
+                if (method is not null && method.Identifier.ValueText.Equals("Main", StringComparison.OrdinalIgnoreCase))
+                {
+                    method = method.AddModifiers(SyntaxFactory.Token(SyntaxKind.AsyncKeyword).WithTrailingTrivia(SyntaxFactory.Whitespace(" ")));
+                    var voidNode = (from n in method.DescendantNodesAndSelf().OfType<PredefinedTypeSyntax>()
+                                    where n.Keyword.ValueText.Equals("void", StringComparison.OrdinalIgnoreCase)
+                                    select n).Single();
+
+                    method = method.ReplaceNode(voidNode, SyntaxFactory.IdentifierName("Task").WithTrailingTrivia(SyntaxFactory.Whitespace(" ")));
+                    var originalMethod = stop.Ancestors().OfType<MethodDeclarationSyntax>().SingleOrDefault();
+                    root = root.ReplaceNode(originalMethod, method);
+
+                    _logger.LogWarning("Changing void Main() to async Task Main() to enable awaiting starting and stopping the ASP.NET Core host.");
+                }
+                else
+                {
+                    _logger.LogWarning("Consider changing the method where ServiceHost is instantiated to be async to enable awaiting starting and stopping the ASP.NET Core host.");
+                    var start = GetExpressionStatement("StartAsync", root).First();
+                    var getAwaiterStart = SyntaxFactory.ParseStatement("app.StartAsync().GetAwaiter().GetResult();")
+                        .WithLeadingTrivia(start.GetLeadingTrivia()).WithTrailingTrivia(start.GetTrailingTrivia());
+                    var dispose = SyntaxFactory.ParseStatement("((IDisposable)host).Dispose();")
+                        .WithLeadingTrivia(stop.GetLeadingTrivia()).WithTrailingTrivia(stop.GetTrailingTrivia());
+                    root = root.ReplaceNode(stop, dispose);
+
+                    // find the position of startAsync again after replacing the stopAsync line
+                    start = GetExpressionStatement("StartAsync", root).First();
+                    root = root.ReplaceNode(start, getAwaiterStart);
+                }
+            }
+
             return root;
         }
 

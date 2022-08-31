@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
@@ -15,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
     [ApplicableLanguage(Language.CSharp)]
     public class WCFUpdateStep : UpgradeStep
     {
-        public override string Title => "Update WCF service to CoreWCF";
+        public override string Title => "Update WCF service to CoreWCF (Preview)";
 
         public override string Description => "Update WCF service to use CoreWCF services. For more information about CoreWCF, please go to: https://github.com/CoreWCF/CoreWCF";
 
@@ -136,8 +138,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 _packageUpdater = UpdaterFactory.GetPackageUpdater(_path.ProjectFile, _loggerFactory.CreateLogger<PackageUpdater>());
                 if (_path.DirectiveFiles is not null)
                 {
-                        step = "creating using directivies updaters for .cs files that reference System.ServiceModel";
-                        _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path.DirectiveFiles, _loggerFactory.CreateLogger<SourceCodeUpdater>());
+                    step = "creating using directivies updaters for .cs files that reference System.ServiceModel";
+                    _directiveUpdaters = UpdaterFactory.GetDirectiveUpdaters(_path.DirectiveFiles, _loggerFactory.CreateLogger<SourceCodeUpdater>());
                 }
 
                 if (_configUpdater is not null)
@@ -247,18 +249,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 _path.ProjectFile = project.GetFile().FilePath;
                 Logger.LogTrace($"This following project file: {project.GetFile().FilePath} needs to be updated");
 
+                // only updates the namespace for .cs files does not include clients
+                var usingDirectivesUpdates = new List<string>();
                 foreach (var directive in directives)
                 {
-                    Logger.LogDebug($"This .cs file: {directive} needs using directives updates. Adding the path to collection.");
+                    var root = CSharpSyntaxTree.ParseText(File.ReadAllText(directive)).GetRoot();
+                    if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
+                    {
+                        Logger.LogDebug($"This .cs file: {directive} needs using directives updates. Adding the path to collection.");
+                    }
+                    else
+                    {
+                        usingDirectivesUpdates.Add(directive);
+                        Logger.LogDebug($"This .cs file: {directive} needs using directives updates. Adding the path to collection.");
+                    }
                 }
 
-                if (directives.Any())
+                if (usingDirectivesUpdates.Any())
                 {
-                    _path.DirectiveFiles = new List<string>(directives);
+                    _path.DirectiveFiles = usingDirectivesUpdates;
                 }
 
                 Logger.LogDebug("Retrieved file paths that are needed for updates.");
             }
         }
+
+        // Checks if the root has descendant nodes that contains id
+        private static bool ContainsIdentifier(SyntaxNode root, string id)
+        {
+            return root.DescendantNodes().OfType<IdentifierNameSyntax>().Any(n => n.Identifier.ValueText.IndexOf(id, StringComparison.Ordinal) >= 0);
+        }
+
     }
 }

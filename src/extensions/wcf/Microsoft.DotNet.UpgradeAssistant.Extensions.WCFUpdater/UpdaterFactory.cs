@@ -151,9 +151,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             {
                 var serviceContext = context.ServiceContext[key];
                 var uri = serviceContext.SchemeToAddressMapping;
-                if (serviceContext.ServiceCertificate && uri.ContainsKey(Uri.UriSchemeHttps))
+                if (serviceContext.UsesServiceCertificate && uri.ContainsKey(Uri.UriSchemeHttps))
                 {
-                    credentials.Add(uri[Uri.UriSchemeHttps], serviceContext.ServiceCredentials);
+                    credentials.Add(uri[Uri.UriSchemeHttps], serviceContext.ServiceCredentialsProperties);
                 }
             }
 
@@ -218,7 +218,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             {
                 var serviceContext = context.ServiceContext[serviceName];
                 var addDebug = UpdateServiceDebug(Constants.AddConfigureService.Replace("ServiceType", serviceName), serviceContext.ServiceDebug);
-                var addCredentials = ConfigureServiceCredentials(addDebug, context.NetTcpCertificate, serviceContext.ServiceCredentials);
+                var addCredentials = ConfigureServiceCredentials(addDebug, context.NetTcpUsesCertificate, serviceContext.ServiceCredentialsProperties);
                 builder += addCredentials + System.Environment.NewLine;
                 if (serviceName != context.ServiceContext.Keys.Last())
                 {
@@ -277,7 +277,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             result += AddServiceType(context);
 
-            if (context.WindowsAuthentication)
+            if (context.HasWindowsAuthentication)
             {
                 result += System.Environment.NewLine + Constants.HttpWindowsAuth;
             }
