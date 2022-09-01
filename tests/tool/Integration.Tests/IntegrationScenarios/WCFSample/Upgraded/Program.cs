@@ -16,7 +16,7 @@ namespace ConsoleApp
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
@@ -28,12 +28,13 @@ namespace ConsoleApp
             {
                 options.ListenAnyIP(8733);
                 
-            }); 
+            });
 
             // Add CoreWCF services to the ASP.NET Core app's DI container
             builder.Services.AddServiceModelServices()
                             .AddServiceModelConfigurationManagerFile("wcf.config")
-                            .AddServiceModelMetadata();
+                            .AddServiceModelMetadata()
+                            .AddTransient<WcfServiceLibrary1.Service1>();
 
             var app = builder.Build();
 
@@ -47,18 +48,20 @@ namespace ConsoleApp
             {
                 serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
                 {
-                    
+
                 });
 
                 serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(host =>
                 {
+
                 });
+
             });
             
-            app.StartAsync().GetAwaiter().GetResult();
+            await app.StartAsync();
             Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
             Console.ReadKey();
-            app.StopAsync().GetAwaiter().GetResult();
+            await app.StopAsync();
             }
             catch(Exception ex)
             {

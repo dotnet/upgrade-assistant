@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.7.2" />
+    </startup>
+	<system.serviceModel>
+		<services>
+			<service name="WcfServiceLibrary1.Service1">
+				<host>
+					<baseAddresses>
+						<add baseAddress = "http://localhost:80/Service1/" />
+                        <add baseAddress = "https://localhost:8080/" />
+					</baseAddresses>
+				</host>
+				<endpoint address="" binding="basicHttpBinding" contract="WcfServiceLibrary1.IService1"/>
+                <endpoint address="" binding="basicHttpsBinding" contract="WcfServiceLibrary1.IService1"/>
+				<endpoint address="mex" binding="mexHttpBinding" contract="IMetadataExchange"/>
+			</service>
+		</services>
+		<behaviors>
+			<serviceBehaviors>
+				<behavior>
+					<serviceMetadata httpGetEnabled="True"/>
+                    <serviceDebug includeExceptionDetailInFaults="true"
+                                  httpHelpPageEnabled="false"
+                                  httpHelpPageUrl="http://localhost:80/Service1/help"
+                                  httpsHelpPageEnabled="true"
+                                  httpsHelpPageUrl="https://localhost:8080/help"/>
+				</behavior>
+			</serviceBehaviors>
+		</behaviors>
+	</system.serviceModel>
+</configuration>
