@@ -1,0 +1,17 @@
+name: Auto-assign Opened Issues to UA Project
+
+on:
+  issues:
+    types:
+      - opened
+env:
+  MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+
+jobs:
+  assign_one_project:
+    runs-on: ubuntu-latest
+    name: Assign to UA Project
+    steps:
+    - uses: srggrs/assign-one-project-github-action@1.2.1
+      with:
+        project: 'https://github.com/orgs/dotnet/projects/108'
