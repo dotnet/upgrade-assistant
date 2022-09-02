@@ -1,4 +1,13 @@
 # Users referenced in this file will automatically be requested as reviewers for PRs that modify the given paths.
 # See https://help.github.com/articles/about-code-owners/
 
-*                        @dotnet/dotnet-upgrade-assistant-admin
+**/*maui*               @dotnet/dotnet-upgrade-assistant-maui
+src/extensions/maui/    @dotnet/dotnet-upgrade-assistant-maui
+
+**/*uwp*                @dotnet/dotnet-upgrade-assistant-uwp
+src/extensions/windows/ @dotnet/dotnet-upgrade-assistant-uwp
+
+**/*wcf*                @dotnet/dotnet-upgrade-assistant-wcf
+src/extensions/wcf/     @dotnet/dotnet-upgrade-assistant-wcf
+
+*                       @dotnet/dotnet-upgrade-assistant-admin
