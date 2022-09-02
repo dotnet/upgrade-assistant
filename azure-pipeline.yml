@@ -29,6 +29,7 @@ trigger:
       - '**/*.md'
       - docs
       - .vscode
+      - '.github/**'
 pr:
   branches:
     include:
@@ -38,6 +39,7 @@ pr:
       - '**/*.md'
       - docs
       - .vscode
+      - '.github/**'
 
 stages:
 - stage: build
