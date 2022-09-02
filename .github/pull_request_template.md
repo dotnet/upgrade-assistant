@@ -25,10 +25,7 @@ Extension changes won't be approved by a member of the `dotnet-upgrade-assistant
 
 <!-- Once all that is done, you're ready to go. Open the PR with the content below. -->
 
-**PR Title**
-Summary of the changes (Less than 80 chars)
-
-**PR Description**
+## Description
 Detail 1
 Detail 2
 
