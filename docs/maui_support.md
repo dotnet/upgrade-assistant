@@ -4,6 +4,7 @@ We are currently building out support for upgrade-assistant to handle Xamarin.Fo
 
 ## Supported Project types and minimum requirements
 
+- The latest version of .NET Upgrade Assistant from the [Azure Devops Pipeline](https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-tools)
 - Xamarin.Forms app using Xamarin.Forms 5.0 or higher
   - ✅ iOS project
   - ✅ Android project
