@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Smoke.Tests" />
+    <To Include="Smoke.Tests" />
     <InternalsVisibleTo Include="MauiSmoke.Tests" />
   </ItemGroup>
 
