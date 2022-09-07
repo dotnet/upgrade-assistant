@@ -32,7 +32,7 @@ To assist your migration process, please check out the following documentation a
 - Manual upgrade guide: [Upgrading a WCF service to .NET 6 with CoreWCF](https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/migrate-to-windows-app-sdk-ovw)
 - CoreWCF Blog: [CoreWCF 1.0 has been Released, WCF for .NET Core and .NET 5+](https://devblogs.microsoft.com/dotnet/corewcf-v1-released/)
 
-After upgrading the project, you'll need to compile and test them. The upgrade assistant will do what it can, but it can't solve every incompatibility as part of the project upgrade. Please pay close attention to the upgrade-assistant console output and complete any manual updates requested by the tool.
+After upgrading the project, you'll need to compile and test them. Upgrade Assistant will do what it can, but it can't solve every incompatibility as part of the project upgrade. Please pay close attention to the upgrade-assistant console output and complete any manual updates requested by the tool.
 
 ## Issues
 
