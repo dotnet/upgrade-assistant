@@ -2,7 +2,7 @@
 
 This article documents the current support for upgrade-assistant to update WCF server-side projects on .NET Framework to use [CoreWCF](https://github.com/corewcf/corewcf) on .NET 6. 
 
-> Note: At the time this documentation was written, the WCF updater extension is supplied as a Preview release. The list below summarizes the functionality and requirements for the Preview release version. When new features are added to the extension in the future, we will also update the list.
+> Note: At the time of this writing, the WCF extension is supplied as a Preview release. The list below summarizes the functionality and requirements for the Preview release version. When new features are added to the extension in the future, we will also update this list.
 ## Supported functionality and minimum requirements
 
 - The latest version of .NET Upgrade Assistant with CoreWCF extension (Preview) from the [Azure Devops Pipeline](https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-tools)
