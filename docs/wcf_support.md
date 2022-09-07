@@ -18,7 +18,7 @@ This article documents the current support for upgrade-assistant to update WCF s
 
 
 - For a WCF project to be applicable for this upgrade, it must meet the following requirements:
-  - Includes a .cs file that references `System.ServiceModel` and creates new `ServiceHost`.
+  - Include a .cs file that references `System.ServiceModel` and creates new `ServiceHost`
     - If the WCF project has multiple `ServiceHost`, all hosts need to be created in the same method.
   - Includes a .config file that stores `System.ServiceModel` properties
 
