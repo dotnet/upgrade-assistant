@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             return targetFrameworks.All(tfm => packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(tfm.Name), f)));
         }
 
-        public Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
+        public IAsyncEnumerable<NuGetReference> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
         {
             if (reference is null)
             {
@@ -88,12 +89,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var result = await SearchByNameAsync(packageName, tfms, options, null, sources, token: token).ConfigureAwait(false);
+            var result = SearchByNameAsync(packageName, tfms, options, null, sources, token: token);
 
-            return result.LastOrDefault();
+            return await result.LastOrDefaultAsync(token).ConfigureAwait(false);
         }
 
-        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, NuGetVersion? currentVersion = null, IEnumerable<PackageSource>? sources = null, CancellationToken token = default)
+        private async IAsyncEnumerable<NuGetReference> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, NuGetVersion? currentVersion = null, IEnumerable<PackageSource>? sources = null, [EnumeratorCancellation] CancellationToken token = default)
         {
             var results = new List<IPackageSearchMetadata>();
 
@@ -122,7 +123,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 }
             }
 
-            return FilterSearchResultsAsync(name, results, tfms, currentVersion, options.LatestMinorAndBuildOnly, token).ToEnumerable();
+            // Switch to an IEnumerable here because consumers of this API 
+            await foreach (var result in FilterSearchResultsAsync(name, results, tfms, currentVersion, options.LatestMinorAndBuildOnly, token).WithCancellation(token))
+            {
+                yield return result;
+            }
         }
 
         internal IAsyncEnumerable<NuGetReference> FilterSearchResultsAsync(
