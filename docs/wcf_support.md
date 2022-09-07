@@ -9,7 +9,7 @@ This article documents the current support for upgrade-assistant to update WCF s
   - ✅ Upgrade csproj to the newer SDK style format
   - ✅ Update project TFM to net6.0
   - ✅ Update WCF project with a single `ServiceHost` instance and replace it with ASP.NET Core hosting.
-  - ✅ Update WCF project with multiple services and all `ServiceHost` are instantiated and configured in the same method.
+  - ✅ Update WCF project with multiple services. All `ServiceHost` objects are instantiated and configured in the same method.
   - ✅ Update the original configuration file in the project and generate a new configuration file for CoreWCF.
   - ✅ Replace `System.ServiceModel` namespace and references with CoreWCF ones in .cs and project files.
   - ❌ WCF server that are Web-hosted and use .svc file.
