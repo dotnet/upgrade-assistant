@@ -8,7 +8,7 @@ This article documents the current support for upgrade-assistant to update WCF s
 - The latest version of .NET Upgrade Assistant with CoreWCF extension (Preview) from the [Azure Devops Pipeline](https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-tools)
   - ✅ Upgrade csproj to the newer SDK style format
   - ✅ Update project TFM to net6.0
-  - ✅ Update WCF project with a single `ServiceHost` instance and replace it with ASP .NET Core hosting.
+  - ✅ Update WCF project with a single `ServiceHost` instance and replace it with ASP.NET Core hosting.
   - ✅ Update WCF project with multiple services and all `ServiceHost` are instantiated and configured in the same method.
   - ✅ Update the original configuration file in the project and generate a new configuration file for CoreWCF.
   - ✅ Replace `System.ServiceModel` namespace and references with CoreWCF ones in .cs and project files.
