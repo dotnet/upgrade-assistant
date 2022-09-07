@@ -20,7 +20,7 @@ This article documents the current support for upgrade-assistant to update WCF s
 - For a WCF project to be applicable for this upgrade, it must meet the following requirements:
   - Include a .cs file that references `System.ServiceModel` and creates new `ServiceHost`
     - If the WCF project has multiple `ServiceHost`, all hosts need to be created in the same method.
-  - Includes a .config file that stores `System.ServiceModel` properties
+  - Include a .config file that stores `System.ServiceModel` properties
 
 > Note: If your project is not applicable for this tool, we recommend you to check out the [CoreWCF walkthrough guide](https://github.com/CoreWCF/CoreWCF/blob/main/Documentation/Walkthrough.md) and
 [BeanTrader Sample demo](https://devblogs.microsoft.com/dotnet/upgrading-a-wcf-service-to-dotnet-6/) and manually update the project.
