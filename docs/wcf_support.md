@@ -5,7 +5,7 @@ This article documents the current support for upgrade-assistant to update WCF s
 > Note: At the time of this writing, the WCF extension is supplied as a Preview release. The list below summarizes the functionality and requirements for the Preview release version. When new features are added to the extension in the future, we will also update this list.
 ## Supported functionality and minimum requirements
 
-- The latest version of .NET Upgrade Assistant with CoreWCF extension (Preview) from the [Azure Devops Pipeline](https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-tools)
+- The latest version of .NET Upgrade Assistant with CoreWCF extension (Preview) from the [Azure DevOps Pipeline](https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-tools)
   - ✅ Upgrade csproj to the newer SDK style format
   - ✅ Update project TFM to net6.0
   - ✅ Update WCF project with a single `ServiceHost` instance and replace it with ASP.NET Core hosting.
