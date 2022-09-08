@@ -14,10 +14,13 @@ namespace ConsoleApp
             try
             {
                 ServiceHost host = new ServiceHost(typeof(WcfServiceLibrary1.Service1));
+                ServiceHost host2 = new ServiceHost(typeof(WcfServiceLibrary1.Service2));
                 host.Open();
+                host2.Open();
                 Console.WriteLine("Service Hosted Sucessfully. Hit any key to exit");
                 Console.ReadKey();
                 host.Close();
+                host2.Close();
             }
             catch(Exception ex)
             {

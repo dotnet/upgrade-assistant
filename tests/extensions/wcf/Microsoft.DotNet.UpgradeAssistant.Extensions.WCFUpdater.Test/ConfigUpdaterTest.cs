@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
+using static System.Net.WebRequestMethods;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
 {
@@ -18,7 +20,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                                           <serviceBehaviors>
                                             <behavior name=""SampleBehavior"">
                                               <serviceMetadata httpGetEnabled = ""true"" />
-                                              <serviceDebug includeExceptionDetailInFaults=""true""/>
+                                              <serviceDebug includeExceptionDetailInFaults=""true""
+                                                            httpHelpPageEnabled=""false""
+                                                            httpHelpPageUrl=""http://localhost:80/help""/>
                                             </behavior>
                                           </serviceBehaviors>
                                         </behaviors>
@@ -71,7 +75,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                                           <serviceBehaviors>
                                             <behavior name=""SampleBehavior"">
                                               <serviceMetadata httpGetEnabled = ""true"" />
-                                              <serviceDebug includeExceptionDetailInFaults=""true""/>
+                                              <serviceDebug includeExceptionDetailInFaults=""true"" httpHelpPageEnabled=""false"" httpHelpPageUrl=""http://localhost:80/help""/>
                                             </behavior>
                                           </serviceBehaviors>
                                         </behaviors>-->
@@ -93,6 +97,73 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                                         </system.serviceModel>
                                         </configuration>";
 
+        public const string Credentials = @"
+            <serviceCredentials>
+                <clientCertificate>
+                  <certificate findValue=""certificateValue""
+                               storeLocation=""CurrentUser""
+                               storeName=""TrustedPeople""
+                               x509FindType=""FindByIssuerName"" />
+                  <authentication customCertificateValidatorType=""MyType""
+                                  certificateValidationMode=""Custom"" />
+                </clientCertificate>
+                <serviceCertificate findValue=""certificateValue""
+                            storeLocation=""CurrentUser""
+                            storeName=""AddressBook""
+                            x509FindType=""FindBySubjectName"" />
+                <userNameAuthentication customUserNamePasswordValidatorType=""String""
+                                userNamePasswordValidationMode=""Custom"" />
+                <windowsAuthentication includeWindowsGroups=""true"" />
+            </serviceCredentials>
+          </behavior>";
+
+        public const string NetTcpBinding = @"
+            <bindings>
+              <netTcpBinding>
+                <binding>           
+                  <security mode=""None"">
+                    <transport clientCredentialType = ""Certificate""/>
+                  </security>
+                </binding>
+              </netTcpBinding>
+           </bindings>
+           </system.serviceModel>";
+
+        public const string NetTcpBindingWithMode = @"
+            <bindings>
+              <netTcpBinding>
+                <binding>           
+                  <security mode=""TransportWithMessageCredential"">
+                  </security>
+                </binding>
+              </netTcpBinding>
+           </bindings>
+           </system.serviceModel>";
+
+        public const string NetTcpBindingNoCertificate = @"
+            <bindings>
+              <netTcpBinding>
+                <binding>           
+                  <security mode=""Transport"">
+                    <transport clientCredentialType = ""Windows""/>
+                  </security>
+                </binding>
+              </netTcpBinding>
+           </bindings>
+           </system.serviceModel>";
+
+        public const string HttpWindowsAuth = @"
+            <bindings>
+              <basicHttpBinding>
+                <binding>           
+                  <security mode=""Transport"">
+                    <transport clientCredentialType=""Ntlm""/>
+                  </security>
+                </binding>
+              </basicHttpBinding>
+           </bindings>
+           </system.serviceModel>";
+
         private readonly NullLogger<ConfigUpdater> _logger = NullLogger<ConfigUpdater>.Instance;
 
         [Fact]
@@ -103,7 +174,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             expected.Add(Uri.UriSchemeHttps, new Uri("https://localhost:443/sample/address"));
             expected.Add(Uri.UriSchemeNetTcp, new Uri("net.tcp://localhost:808/"));
 
-            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetSchemeToAddressMapping();
+            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetSchemeToAddressMapping("SampleBehavior");
             Assert.Equal(expected, result);
         }
 
@@ -114,16 +185,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
             expected.Add("netTcpBinding");
             expected.Add("basicHttpsBinding");
             expected.Add("mexHttpBinding");
-            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetBindings();
+            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).GetBindings("SampleBehavior");
             Assert.Equal(expected, result);
         }
 
-        [Theory]
-        [InlineData("", false)]
-        [InlineData(ServiceDebug, true)]
-        public void SupportsServiceDebugTest(string replace, bool expected)
+        [Fact]
+        public void SupportsServiceDebugTest()
         {
-            bool result = new ConfigUpdater(XDocument.Parse(Input.Replace(ServiceDebug, replace)), _logger).SupportsServiceDebug();
+            var result = new ConfigUpdater(XDocument.Parse(Input), _logger).SupportsServiceDebug("SampleBehavior");
+            var expected = new Dictionary<string, string>
+            {
+                { "includeExceptionDetailInFaults", "true" },
+                { "httpHelpPageEnabled", "false" },
+                { "httpHelpPageUrl", "http://localhost:80/help" }
+            };
             Assert.Equal(expected, result);
         }
 
@@ -134,7 +209,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(MetadataBoth, 3)]
         public void SupportsMetadataBehaviorTest(string replace, int expected)
         {
-            var result = new ConfigUpdater(XDocument.Parse(Input.Replace(Metadata, replace)), _logger).SupportsMetadataBehavior();
+            var result = new ConfigUpdater(XDocument.Parse(Input.Replace(Metadata, replace)), _logger).SupportsMetadataBehavior("SampleBehavior");
             var http = replace.Contains("httpGetEnabled");
             var https = replace.Contains("httpsGetEnabled");
             Assert.Equal((MetadataType)expected, result);
@@ -181,6 +256,77 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         {
             Assert.True(WCFUpdateChecker.IsConfigApplicable(XDocument.Parse(Input)));
             Assert.False(WCFUpdateChecker.IsConfigApplicable(XDocument.Parse(NotApplicableInput)));
+        }
+
+        [Fact]
+        public void GetServiceCredentialsTest()
+        {
+            Dictionary<string, string> expected = new Dictionary<string, string>
+            {
+                { "clientCertificate/findValue", "certificateValue" },
+                { "clientCertificate/storeLocation", "CurrentUser" },
+                { "clientCertificate/storeName", "TrustedPeople" },
+                { "clientCertificate/x509FindType", "FindByIssuerName" },
+                { "serviceCertificate/findValue", "certificateValue" },
+                { "serviceCertificate/storeLocation", "CurrentUser" },
+                { "serviceCertificate/storeName", "AddressBook" },
+                { "serviceCertificate/x509FindType", "FindBySubjectName" },
+                { "clientCertificate/customCertificateValidatorType", "MyType" },
+                { "clientCertificate/certificateValidationMode", "Custom" },
+                { "userNameAuthentication/customUserNamePasswordValidatorType", "String" },
+                { "userNameAuthentication/userNamePasswordValidationMode", "Custom" },
+                { "windowsAuthentication/includeWindowsGroups", "true" }
+            };
+
+            var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</behavior>", Credentials)), _logger).GetServiceCredentials("SampleBehavior");
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void HasServiceCertificateTest()
+        {
+            var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</behavior>", Credentials)), _logger).UsesServiceCertificate("SampleBehavior");
+            Assert.True(actual);
+            actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</behavior>", Credentials.Replace(@"x509FindType=""FindBySubjectName""", string.Empty))), _logger).UsesServiceCertificate("SampleBehavior");
+            Assert.False(actual);
+        }
+
+        [Theory]
+        [InlineData(NetTcpBinding, true)]
+        [InlineData(NetTcpBindingWithMode, true)]
+        [InlineData(NetTcpBindingNoCertificate, false)]
+        [InlineData("</system.serviceModel>", false)]
+        public void HasNetTcpCertificateTest(string netTcpInput, bool expected)
+        {
+            var actual = new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", netTcpInput)), _logger).NetTcpUsesCertificate();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void HasWindowsAuthenticationTest()
+        {
+            var inputWithWrongMode = HttpWindowsAuth.Replace("Transport", "None");
+            var inputWithWrongMode2 = HttpWindowsAuth.Replace("Transport", "TransportWithMessageCredential");
+            var inputWithWrongType = HttpWindowsAuth.Replace("Ntlm", "Basic");
+            List<string> falseInputs = new List<string> { inputWithWrongMode, inputWithWrongMode2, inputWithWrongType };
+
+            var inputWithCorrectMode = HttpWindowsAuth.Replace("Transport", "TransportCredentialOnly");
+            var inputWithCorrectType = HttpWindowsAuth.Replace("Ntlm", "Windows");
+            var inputWithNetBinding = HttpWindowsAuth.Replace("basicHttp", "netHttp");
+            var inputWithWebBinding = HttpWindowsAuth.Replace("basicHttp", "webHttp");
+            List<string> trueInputs = new List<string> { inputWithCorrectMode, inputWithCorrectType, inputWithNetBinding, inputWithWebBinding };
+
+            foreach (var input in falseInputs)
+            {
+                Assert.False(new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", input)), _logger).HasWindowsAuthentication(),
+                    "This input should return false" + input);
+            }
+
+            foreach (var input in trueInputs)
+            {
+                Assert.True(new ConfigUpdater(XDocument.Parse(Input.Replace("</system.serviceModel>", input)), _logger).HasWindowsAuthentication(),
+                    "This input should return true" + input);
+            }
         }
     }
 }

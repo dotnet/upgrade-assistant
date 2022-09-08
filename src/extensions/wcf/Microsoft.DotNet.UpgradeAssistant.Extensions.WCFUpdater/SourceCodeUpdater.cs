@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -38,7 +39,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
         {
             var root = UpdateDirectives();
             root = AddTemplateCode(root);
-            return RemoveOldCode(root);
+            root = RemoveOldCode(root);
+            return UpdateAsync(root);
         }
 
         // Updates the using directives by deleting ServiceModel directives and adding CoreWCF directives
@@ -114,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 if (close.Any())
                 {
                     hostStatements = from s in statement.Parent!.DescendantNodes().OfType<StatementSyntax>()
-                                     where s.SpanStart >= statement.SpanStart && s.Span.End <= close.First().Span.End
+                                     where s.SpanStart >= statement.SpanStart && s.Span.End <= close.Last().Span.End
                                      select s;
                 }
                 else
@@ -157,47 +159,162 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         private SyntaxNode ConfigureServiceHost(SyntaxNode root, SyntaxNode declaration)
         {
-            var placeholder = (from s in root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>()
-                               where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText.Equals("UA_placeHolder", StringComparison.Ordinal)
-                               select s).First();
+            var placeholder = from s in root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>()
+                              where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText.Equals("UA_placeHolder", StringComparison.Ordinal)
+                              select s;
 
             // gets the code that configures the host
             var open = GetExpressionStatement("Open", declaration.Parent!).First();
             var config = from s in declaration.Parent!.DescendantNodes().OfType<StatementSyntax>()
-                         where s.SpanStart > declaration.SpanStart && s.Span.End <= open.SpanStart
-                         select s.WithLeadingTrivia(placeholder.GetLeadingTrivia());
+                         where s.SpanStart > declaration.SpanStart && s.Span.End <= open.SpanStart && s.ToFullString().IndexOf("ServiceHost", StringComparison.Ordinal) < 0
+                         select s.WithLeadingTrivia(placeholder.First().GetLeadingTrivia());
+            var pair = GetVarNamePairs(root);
+            if (config.Any())
+            {
+                if (pair.Count == 1)
+                {
+                    // when there is only one service, no need to group the code based on variable name
+                    root = root.ReplaceNode(placeholder.First(), config);
+                }
+                else
+                {
+                    Dictionary<string, List<SyntaxNode>> nodes = new Dictionary<string, List<SyntaxNode>>();
+                    List<SyntaxNode> noRef = new List<SyntaxNode>();
+                    foreach (var node in config)
+                    {
+                        // if this line of code contains any varname, add it to the dictionary
+                        var name = ContainsAny(new HashSet<string>(pair.Keys), node);
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            if (!nodes.ContainsKey(name))
+                            {
+                                nodes.Add(name, new List<SyntaxNode>());
+                            }
 
-            root = root.ReplaceNode(placeholder, config);
+                            nodes[name].Add(node);
+                        }
+                        else
+                        {
+                            // else, cannot find direct reference to serviceHost variable in this line of code, add it to list
+                            noRef.Add(node);
+                        }
+                    }
+
+                    // inserts the no reference code before the configuration delegates
+                    if (noRef.Count > 0)
+                    {
+                        var position = from node in root.DescendantNodes().OfType<ExpressionStatementSyntax>()
+                                       where ContainsIdentifier("UseServiceModel", node)
+                                       select node;
+                        root = root.InsertNodesBefore(position.First(), noRef);
+                        _logger.LogWarning("Found code that does not have a direct reference to any ServiceHost variable. Please manually add it to the correct ConfigureServiceHostBase delegate.");
+                    }
+
+                    // for each placeholder, insert code in based on varName
+                    while (placeholder.Any())
+                    {
+                        var parent = placeholder.First().Parent!;
+                        while (parent.GetType() != typeof(ArgumentSyntax))
+                        {
+                            parent = parent.Parent!;
+                        }
+
+                        var name = ContainsAny(new HashSet<string>(pair.Keys), parent);
+                        root = root.ReplaceNode(placeholder.First(), nodes[name]);
+
+                        // need to find the placeholder again
+                        placeholder = from s in root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>()
+                                      where s.DescendantNodes().OfType<VariableDeclaratorSyntax>().First().Identifier.ValueText.Equals("UA_placeHolder", StringComparison.Ordinal)
+                                      select s;
+                    }
+                }
+            }
 
             _logger.LogDebug("Finish adding code that configures the service host to the delegate.");
             return root;
         }
 
+        // returns the variable name if node contains it; empty string if does not contain any variable name.
+        private static string ContainsAny(HashSet<string> names, SyntaxNode node)
+        {
+            foreach (var name in names)
+            {
+                var result_id = from n in node.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>()
+                             where n.Identifier.ValueText.Equals(name, StringComparison.Ordinal)
+                             select n;
+                var result_param = from n in node.DescendantNodesAndSelf().OfType<ParameterSyntax>()
+                             where n.Identifier.ValueText.Equals(name, StringComparison.Ordinal)
+                             select n;
+                if (result_id.Any() || result_param.Any())
+                {
+                    return name;
+                }
+            }
+
+            return string.Empty;
+        }
+
         private string ReplaceNames(SyntaxNode root, string template)
         {
-            // gets the name of the service and the host
             try
             {
-                var declarator = FindServiceHost(root).DescendantNodes().OfType<VariableDeclaratorSyntax>();
-                var varName = declarator.First();
-                var serviceName = (from name in declarator.First().DescendantNodes().OfType<NameSyntax>()
-                                   where name.Parent!.GetType() == typeof(TypeOfExpressionSyntax)
-                                   select name).First();
-                template = template.Replace("ServiceType", serviceName.ToString());
-                template = template.Replace("varName", varName.Identifier.ValueText);
-                _logger.LogDebug("Finish replacing placeholder names for service type and service host variable name.");
-                return template;
+                // split by line and then replace the varName placeholder with variable name
+                var lines = template.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.None);
+                var pair = GetVarNamePairs(root);
+                var index = new Dictionary<int, string>();
+
+                foreach (var name in pair.Keys)
+                {
+                    for (var i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i].IndexOf("varName", StringComparison.Ordinal) >= 0 && lines[i].IndexOf(pair[name], StringComparison.Ordinal) >= 0)
+                        {
+                            index.Add(i, name);
+                        }
+                    }
+                }
+
+                foreach (var i in index.Keys)
+                {
+                    lines[i] = lines[i].Replace("varName", index[i]);
+                }
+
+                _logger.LogDebug("Finish replacing placeholder names with ServiceHost variable name.");
+                return string.Join(System.Environment.NewLine, lines);
             }
             catch
             {
-                _logger.LogWarning("Cannot find the variable name for ServiceHost or the service type name. Please edit manually after update complete.");
+                _logger.LogWarning("Cannot find the variable name for the corresponding ServiceHost. Please update manually after update complete.");
                 return template;
             }
         }
 
+        private static Dictionary<string, string> GetVarNamePairs(SyntaxNode root)
+        {
+            var pair = new Dictionary<string, string>();
+            var declaration = from hostDeclaration in root.DescendantNodes().OfType<VariableDeclarationSyntax>()
+                              where ContainsIdentifier("ServiceHost", hostDeclaration)
+                              select hostDeclaration;
+            foreach (var node in declaration)
+            {
+                var varName = node.Parent!.DescendantNodes().OfType<VariableDeclaratorSyntax>().First();
+                var serviceType = (from name in node.Parent!.DescendantNodes().OfType<NameSyntax>()
+                                   where name.Parent!.GetType() == typeof(TypeOfExpressionSyntax)
+                                   select name).First();
+                pair.Add(varName.Identifier.ValueText, serviceType.ToString());
+            }
+
+            if (pair.Count == 0)
+            {
+                throw new Exception("Source code does not initialize a new ServiceHost instance.");
+            }
+
+            return pair;
+        }
+
         private SyntaxNode UpdateOpenClose(SyntaxNode root, string varName)
         {
-            var open = GetExpressionStatement("Open", root).First();
+            var open = GetExpressionStatement("Open", root).Last();
             var close = GetExpressionStatement("Close", root);
             var startPosition = GetExpressionStatement("StartAsync", root).First();
             var stopPosition = GetExpressionStatement("StopAsync", root).First();
@@ -235,6 +352,55 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
 
             _logger.LogDebug("Finish adding code between Open() and Close() to app.start() and app.stop().");
+            return root;
+        }
+
+        public SyntaxNode UpdateAsync(SyntaxNode root)
+        {
+            var stop = GetExpressionStatement("StopAsync", root).First();
+            var method = stop.Ancestors().OfType<MethodDeclarationSyntax>().SingleOrDefault();
+            var isAsync = false;
+            foreach (SyntaxToken n in method.ChildTokens())
+            {
+                if (n.IsKind(SyntaxKind.AsyncKeyword))
+                {
+                    isAsync = true;
+                    break;
+                }
+            }
+
+            if (!isAsync)
+            {
+                // if it's Main, change the method signature to async Task; Not main, use GetAwaiter() instead of await
+                if (method is not null && method.Identifier.ValueText.Equals("Main", StringComparison.OrdinalIgnoreCase))
+                {
+                    method = method.AddModifiers(SyntaxFactory.Token(SyntaxKind.AsyncKeyword).WithTrailingTrivia(SyntaxFactory.Whitespace(" ")));
+                    var voidNode = (from n in method.DescendantNodesAndSelf().OfType<PredefinedTypeSyntax>()
+                                    where n.Keyword.ValueText.Equals("void", StringComparison.OrdinalIgnoreCase)
+                                    select n).Single();
+
+                    method = method.ReplaceNode(voidNode, SyntaxFactory.IdentifierName("Task").WithTrailingTrivia(SyntaxFactory.Whitespace(" ")));
+                    var originalMethod = stop.Ancestors().OfType<MethodDeclarationSyntax>().SingleOrDefault();
+                    root = root.ReplaceNode(originalMethod, method);
+
+                    _logger.LogWarning("Changing void Main() to async Task Main() to enable awaiting starting and stopping the ASP.NET Core host.");
+                }
+                else
+                {
+                    _logger.LogWarning("Consider changing the method where ServiceHost is instantiated to be async to enable awaiting starting and stopping the ASP.NET Core host.");
+                    var start = GetExpressionStatement("StartAsync", root).First();
+                    var getAwaiterStart = SyntaxFactory.ParseStatement("app.StartAsync().GetAwaiter().GetResult();")
+                        .WithLeadingTrivia(start.GetLeadingTrivia()).WithTrailingTrivia(start.GetTrailingTrivia());
+                    var dispose = SyntaxFactory.ParseStatement("((IDisposable)host).Dispose();")
+                        .WithLeadingTrivia(stop.GetLeadingTrivia()).WithTrailingTrivia(stop.GetTrailingTrivia());
+                    root = root.ReplaceNode(stop, dispose);
+
+                    // find the position of startAsync again after replacing the stopAsync line
+                    start = GetExpressionStatement("StartAsync", root).First();
+                    root = root.ReplaceNode(start, getAwaiterStart);
+                }
+            }
+
             return root;
         }
 
