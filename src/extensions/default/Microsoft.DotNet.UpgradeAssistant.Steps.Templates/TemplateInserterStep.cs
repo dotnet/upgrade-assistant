@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -156,7 +157,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Expected template {item.Path} not found");
                 }
 
-                Logger.LogInformation("Added template file {ItemName}", item.Path);
+                var description = $"Added template file {item.Path}";
+                AddResultToContext(context, "Success", description, item.Path);
+                Logger.LogInformation(description);
             }
 
             // After adding the items on disk, reload the workspace and check whether they were picked up automatically or not
@@ -167,7 +170,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 {
                     // Add the new item to the project if it wasn't auto-included
                     projectFile.AddItem(item.Type.Name, item.Path);
-                    Logger.LogDebug("Added {ItemName} to project file", item.Path);
+
+                    var description = $"Added {item.Path} to project file";
+                    Logger.LogDebug(description);
                 }
             }
 
@@ -175,6 +180,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
             Logger.LogInformation("{ItemCount} template items added", _itemsToAdd.Count);
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
+        }
+
+        private void AddResultToContext(IUpgradeContext context, string status, string resultMessage, string location)
+        {
+            var result = new OutputResult()
+            {
+                FileLocation = location,
+                RuleId = WellKnownStepIds.TryConvertProjectConverterStepId,
+                ResultMessage = $"{status}: {resultMessage}",
+                FullDescription = resultMessage,
+            };
+
+            var outputResultDefinition = new OutputResultDefinition()
+            {
+                Name = "Template Inserter Step",
+                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
+                Results = ImmutableList.Create(result).ToAsyncEnumerable()
+            };
+
+            context.Results.Add(outputResultDefinition);
         }
 
         private bool IsTemplateNeeded(IProject project, RuntimeItemSpec template)

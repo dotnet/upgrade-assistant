@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -83,6 +85,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             }
         }
 
+        private void AddResultToContext(IUpgradeContext context, string status, string resultMessage)
+        {
+            var result = new OutputResult()
+            {
+                FileLocation = context.CurrentProject?.GetFile()?.FilePath ?? string.Empty,
+                RuleId = WellKnownStepIds.TryConvertProjectConverterStepId,
+                ResultMessage = $"{status}: {resultMessage}",
+                FullDescription = resultMessage,
+            };
+
+            var outputResultDefinition = new OutputResultDefinition()
+            {
+                Name = "Project File Converter Step (Try-Convert)",
+                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
+                Results = ImmutableList.Create(result).ToAsyncEnumerable()
+            };
+
+            context.Results.Add(outputResultDefinition);
+        }
+
         private async Task<UpgradeStepApplyResult> RunTryConvertAsync(IUpgradeContext context, IProject project, CancellationToken token)
         {
             _logger.LogInformation($"Converting project file format with try-convert{VersionString}");
@@ -95,12 +117,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 
             if (!result)
             {
-                _logger.LogCritical("Conversion with try-convert failed.");
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Conversion with try-convert failed.");
+                var description = "Conversion with try-convert failed.";
+                _logger.LogCritical(description);
+                AddResultToContext(context, "Failed", description);
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
             }
             else
             {
-                _logger.LogInformation("Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.");
+                var description = "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.";
+                _logger.LogInformation(description);
+                AddResultToContext(context, "Success", description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Project file converted successfully");
             }
         }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,8 +59,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             // With an updated TFM, we should restore packages
             await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
-            Logger.LogInformation("Updated TFM to {TargetTFM}", targetTfm);
+            var description = $"Updated TFM to {targetTfm}";
+            Logger.LogInformation(description);
+            AddResultToContext(context, "Success", description);
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Updated TFM to {targetTfm}");
+        }
+
+        private void AddResultToContext(IUpgradeContext context, string status, string resultMessage)
+        {
+            var result = new OutputResult()
+            {
+                FileLocation = context.CurrentProject?.GetFile()?.FilePath ?? string.Empty,
+                RuleId = Id,
+                ResultMessage = $"{status}: {resultMessage}",
+                FullDescription = resultMessage,
+            };
+
+            var outputResultDefinition = new OutputResultDefinition()
+            {
+                Name = "Set TFM Step",
+                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
+                Results = ImmutableList.Create(result).ToAsyncEnumerable()
+            };
+
+            context.Results.Add(outputResultDefinition);
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

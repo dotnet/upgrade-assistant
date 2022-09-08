@@ -3,9 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -89,6 +92,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
         }
 
+        private void AddResultToContext(IUpgradeContext context, string? backupLocation, UpgradeStepStatus status, string description)
+        {
+            var result = new OutputResult()
+            {
+                FileLocation = backupLocation ?? "Not specified",
+                RuleId = Id,
+                ResultMessage = status switch
+                {
+                    UpgradeStepStatus.Skipped => "Backup Skipped",
+                    UpgradeStepStatus.Failed => "Backup Failed",
+                    UpgradeStepStatus.Complete => "Backup Complete",
+                    UpgradeStepStatus.Incomplete => "Backup Incomplete",
+                    _ => throw new Exception("Invalid UpgradeStepStatus")
+                },
+                FullDescription = description
+            };
+
+            var outputResultDefinition = new OutputResultDefinition()
+            {
+                Name = "Backup Step",
+                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
+                Results = ImmutableList.Create(result).ToAsyncEnumerable()
+            };
+
+            context.Results.Add(outputResultDefinition);
+        }
+
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
         {
             if (context is null)
@@ -98,7 +128,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             if (_skipBackup)
             {
-                Logger.LogInformation("Skipping backup");
+                var description = "Skipping backup";
+                Logger.LogInformation(description);
+                AddResultToContext(context, null, UpgradeStepStatus.Skipped, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, "Backup skipped");
             }
 
@@ -106,7 +138,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             if (baseBackupPath is null)
             {
-                Logger.LogDebug("No backup path specified");
+                var description = "No backup path specified";
+                Logger.LogDebug(description);
+                AddResultToContext(context, baseBackupPath, UpgradeStepStatus.Failed, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location");
             }
 
@@ -120,7 +154,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
             if (File.Exists(Path.Combine(backupPath, FlagFileName)))
             {
-                Logger.LogInformation("Backup already exists at {BackupPath}; nothing to do", backupPath);
+                var description = $"Backup already exists at {backupPath}; nothing to do";
+                Logger.LogInformation(description);
+                AddResultToContext(context, backupPath, UpgradeStepStatus.Complete, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Backup already exists at {backupPath}; nothing to do");
             }
 
@@ -130,14 +166,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
                 Directory.CreateDirectory(backupPath);
                 if (!Directory.Exists(backupPath))
                 {
-                    Logger.LogError("Failed to create backup directory ({BackupPath})", backupPath);
+                    var failDescription = $"Failed to create backup directory ({backupPath})";
+                    Logger.LogError(failDescription);
+                    AddResultToContext(context, baseBackupPath, UpgradeStepStatus.Failed, failDescription);
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Failed to create backup directory {backupPath}");
                 }
 
                 await CopyDirectoryAsync(projectDir, backupPath).ConfigureAwait(false);
                 var completedTime = DateTimeOffset.UtcNow;
                 File.WriteAllText(Path.Combine(backupPath, FlagFileName), $"Backup created at {completedTime.ToUnixTimeSeconds()} ({completedTime})");
-                Logger.LogInformation("Project backed up to {BackupPath}", backupPath);
+
+                var description = $"Project backed up to {backupPath}";
+                Logger.LogInformation(description);
+                AddResultToContext(context, backupPath, UpgradeStepStatus.Complete, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project backed up to {backupPath}");
             }
             catch (IOException exc)
