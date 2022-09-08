@@ -54,7 +54,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             }
         }
 
-        private string? GetPackagesConfigPath() => _project.FindFiles("packages.config", ProjectItemType.None).FirstOrDefault();
+        private string? GetPackagesConfigPath() => _project.FindFiles("packages.config").FirstOrDefault();
 
         public IEnumerable<NuGetReference> PackageReferences
         {
