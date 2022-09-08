@@ -123,7 +123,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 }
             }
 
-            // Switch to an IEnumerable here because consumers of this API 
+            // Switch to an IEnumerable here because consumers of this API
             await foreach (var result in FilterSearchResultsAsync(name, results, tfms, currentVersion, options.LatestMinorAndBuildOnly, token).WithCancellation(token))
             {
                 yield return result;
