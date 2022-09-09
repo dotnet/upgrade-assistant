@@ -78,7 +78,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                     // numbering) by the LinePostion struct offsetting by one to support VS 1-based line numbering.
                     LineNumber = diag.Location.GetLineSpan().Span.End.Line + 1,
                     FileLocation = diag.Location.GetLineSpan().Path,
-                    ResultMessage = diag.Descriptor.Description.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    ResultMessage = diag.GetMessage(System.Globalization.CultureInfo.InvariantCulture),
                 });
             }
 
