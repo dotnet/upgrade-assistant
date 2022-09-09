@@ -29,7 +29,7 @@ This article documents the current support for upgrade-assistant to update WCF s
 
 To assist your migration process, please check out the following documentation and blogs:
 
-- Step-by-Step demo: [Upgrade WCF Server-side Project to use CoreWCF on .NET 6](Need to insert link here after that PR merged in)
+- Step-by-Step demo: [Upgrade WCF Server-side Project to use CoreWCF on .NET 6](https://aka.ms/CoreWCFUpgradeAssistant)
 - Manual upgrade guide: [Upgrading a WCF service to .NET 6 with CoreWCF](https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/migrate-to-windows-app-sdk-ovw)
 - CoreWCF Blog: [CoreWCF 1.0 has been Released, WCF for .NET Core and .NET 5+](https://devblogs.microsoft.com/dotnet/corewcf-v1-released/)
 
