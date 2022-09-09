@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="ExtensionManifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
