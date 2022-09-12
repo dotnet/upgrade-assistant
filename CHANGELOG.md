@@ -3,6 +3,17 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Version 0.4.346201 - 2022-09-12 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.4.346201))
+
+### Added
+- WCF -> CoreWCF migration support (https://github.com/dotnet/upgrade-assistant/pull/1237)
+- Post-Upgrade report generation (https://github.com/dotnet/upgrade-assistant/pull/1260)
+
+### Fixed
+- MAUI bug fixes (https://github.com/dotnet/upgrade-assistant/pull/1238)
+- Binary Analysis `-p windows` error (https://github.com/dotnet/upgrade-assistant/pull/1266)
+- Improved the Analysis experience (https://github.com/dotnet/upgrade-assistant/pull/1291)
+
 ## Version 0.4.336902 - 2022-07-19 ([Link](https://www.nuget.org/packages/upgrade-assistant/0.4.336902))
 
 ### Added
