@@ -26,6 +26,7 @@ trigger:
       - main
   paths:
     exclude:
+      - '*.md'
       - '**/*.md'
       - docs
       - .vscode
@@ -36,6 +37,7 @@ pr:
     - '*'
   paths:
     exclude:
+      - '*.md'
       - '**/*.md'
       - docs
       - .vscode
