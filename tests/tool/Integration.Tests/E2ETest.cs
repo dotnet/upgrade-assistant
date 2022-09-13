@@ -130,7 +130,8 @@ namespace Integration.Tests
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
                 {
-                    var message = $"The contents of \"{file}\" do not match.";
+                    var diff = FindFileDiff(Path.Combine(Directory.GetCurrentDirectory(), expectedDir, file!), Path.Combine(actualDir, file!));
+                    var message = $"The contents of \"{file}\" do not match.\nFile Diff:\n{diff}";
 
                     _output.WriteLine(message);
                     _output.WriteLine(string.Empty);
@@ -146,6 +147,26 @@ namespace Integration.Tests
 
             static string ReadFile(string directory, string file)
                 => File.ReadAllText(Path.Combine(directory, file));
+        }
+
+        private string FindFileDiff(string file1, string file2)
+        {
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            process.StartInfo = new System.Diagnostics.ProcessStartInfo()
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                FileName = "cmd.exe",
+                Arguments = $"/C fc {file1} {file2} /c",
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+            process.Start();
+
+            string output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return output;
         }
     }
 }
