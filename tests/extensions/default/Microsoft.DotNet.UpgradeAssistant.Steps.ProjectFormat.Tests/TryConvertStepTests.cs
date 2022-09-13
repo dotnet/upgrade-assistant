@@ -115,6 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert.Tests
 
             var context = mock.Mock<IUpgradeContext>();
             context.Setup(m => m.CurrentProject).Returns(project.Object);
+            context.Setup(c => c.Results).Returns(new Mock<ICollector<OutputResultDefinition>>().Object);
 
             mock.Mock<ITryConvertTool>().Setup(m => m.RunAsync(context.Object, project.Object, default)).ReturnsAsync(isSuccess);
 

@@ -79,7 +79,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
 
             // Act
             try
-            
             {
                 await step.ApplyAsync(context, CancellationToken.None).ConfigureAwait(true);
                 var status = step.Status;

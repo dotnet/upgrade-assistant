@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
@@ -120,6 +121,12 @@ namespace Integration.Tests
             {
                 var expectedText = ReadFile(expectedDir, file);
                 var actualText = ReadFile(actualDir, file);
+
+                if (file is not null && file.StartsWith("UpgradeReport."))
+                {
+                    actualText = actualText.Replace(actualDir.Replace("\\", "\\\\"), "[PROJECT_ROOT]")
+                        .Replace(actualDir.Replace("\\", "/"), "[PROJECT_ROOT]");
+                }
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
                 {
