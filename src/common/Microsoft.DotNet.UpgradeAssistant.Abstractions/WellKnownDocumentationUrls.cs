@@ -9,6 +9,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class WellKnownDocumentationUrls
     {
-        public static readonly Uri UpgradeAssistantUsageDocumentationLink = new Uri("https://github.com/dotnet/upgrade-assistant#usage");
+        public static readonly Uri UpgradeAssistantUsage = new Uri("https://github.com/dotnet/upgrade-assistant#usage");
     }
 }

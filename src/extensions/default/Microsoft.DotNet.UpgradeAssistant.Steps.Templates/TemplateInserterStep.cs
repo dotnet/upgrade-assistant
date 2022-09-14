@@ -158,7 +158,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
                 }
 
                 var description = $"Added template file {item.Path}";
-                AddResultToContext(context, "Success", description, item.Path);
+                AddResultToContext(context, UpgradeStepStatus.Complete, description, item.Path);
                 Logger.LogInformation(description);
             }
 
@@ -182,24 +182,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"{_itemsToAdd.Count} template items added");
         }
 
-        private void AddResultToContext(IUpgradeContext context, string status, string resultMessage, string location)
+        private void AddResultToContext(IUpgradeContext context, UpgradeStepStatus status, string resultMessage, string location)
         {
-            var result = new OutputResult()
-            {
-                FileLocation = location,
-                RuleId = WellKnownStepIds.TryConvertProjectConverterStepId,
-                ResultMessage = $"{status}: {resultMessage}",
-                FullDescription = resultMessage,
-            };
-
-            var outputResultDefinition = new OutputResultDefinition()
-            {
-                Name = "Template Inserter Step",
-                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
-                Results = ImmutableList.Create(result).ToAsyncEnumerable()
-            };
-
-            context.Results.Add(outputResultDefinition);
+            context.AddResult("Template Inserter Step", location, WellKnownStepIds.TemplateInserterStepId, status, resultMessage);
         }
 
         private bool IsTemplateNeeded(IProject project, RuntimeItemSpec template)

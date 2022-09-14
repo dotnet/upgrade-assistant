@@ -92,31 +92,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             }
         }
 
-        private void AddResultToContext(IUpgradeContext context, string? backupLocation, UpgradeStepStatus status, string description)
+        private void AddResultToContext(IUpgradeContext context, string backupLocation, UpgradeStepStatus status, string description)
         {
-            var result = new OutputResult()
-            {
-                FileLocation = backupLocation ?? "Not specified",
-                RuleId = Id,
-                ResultMessage = status switch
-                {
-                    UpgradeStepStatus.Skipped => "Backup Skipped",
-                    UpgradeStepStatus.Failed => "Backup Failed",
-                    UpgradeStepStatus.Complete => "Backup Complete",
-                    UpgradeStepStatus.Incomplete => "Backup Incomplete",
-                    _ => throw new Exception("Invalid UpgradeStepStatus")
-                },
-                FullDescription = description
-            };
-
-            var outputResultDefinition = new OutputResultDefinition()
-            {
-                Name = "Backup Step",
-                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
-                Results = ImmutableList.Create(result).ToAsyncEnumerable()
-            };
-
-            context.Results.Add(outputResultDefinition);
+            context.AddResult("Backup Step", backupLocation, Id, status, description);
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
@@ -130,7 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             {
                 var description = "Skipping backup";
                 Logger.LogInformation(description);
-                AddResultToContext(context, null, UpgradeStepStatus.Skipped, description);
+                AddResultToContext(context, string.Empty, UpgradeStepStatus.Skipped, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, "Backup skipped");
             }
 
@@ -140,7 +118,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
             {
                 var description = "No backup path specified";
                 Logger.LogDebug(description);
-                AddResultToContext(context, baseBackupPath, UpgradeStepStatus.Failed, description);
+                AddResultToContext(context, baseBackupPath ?? string.Empty, UpgradeStepStatus.Failed, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Backup step cannot be applied without a backup location");
             }
 

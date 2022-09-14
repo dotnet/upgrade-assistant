@@ -12,6 +12,8 @@ using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
 using Xunit.Abstractions;
+using static System.Net.WebRequestMethods;
+using File = System.IO.File;
 
 namespace Integration.Tests
 {
@@ -122,16 +124,23 @@ namespace Integration.Tests
                 var expectedText = ReadFile(expectedDir, file);
                 var actualText = ReadFile(actualDir, file);
 
-                if (file is not null && file.StartsWith("UpgradeReport."))
+                if (file.StartsWith("UpgradeReport."))
                 {
-                    actualText = actualText.Replace(actualDir.Replace("\\", "\\\\"), "[PROJECT_ROOT]")
-                        .Replace(actualDir.Replace("\\", "/"), "[PROJECT_ROOT]");
+                    actualText = actualText.Replace(actualDir.Replace("\\", "\\\\"), "[ACTUAL_PROJECT_ROOT]")
+                        .Replace(actualDir.Replace("\\", "/"), "[ACTUAL_PROJECT_ROOT]")
+                        .Replace(Directory.GetCurrentDirectory().Replace("\\", "/"), "[UA_PROJECT_BIN]");
                 }
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
                 {
-                    var diff = FindFileDiff(Path.Combine(Directory.GetCurrentDirectory(), expectedDir, file!), Path.Combine(actualDir, file!));
-                    var message = $"The contents of \"{file}\" do not match.\nFile Diff:\n{diff}";
+                    var message = $"The contents of \"{file}\" do not match.";
+                    if (file.StartsWith("UpgradeReport."))
+                    {
+                        var fileToCompare = Path.Combine(actualDir, "UpgradeReport.relative.txt");
+                        File.WriteAllText(fileToCompare, actualText);
+                        var diff = FindFileDiff(Path.Combine(Directory.GetCurrentDirectory(), expectedDir, file!), fileToCompare);
+                        message += $"\nFile Diff:\n{diff}";
+                    }
 
                     _output.WriteLine(message);
                     _output.WriteLine(string.Empty);

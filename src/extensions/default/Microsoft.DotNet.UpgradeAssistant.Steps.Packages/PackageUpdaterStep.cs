@@ -269,19 +269,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
             private void AddResultToContext(IUpgradeContext context)
             {
-                var result = new OutputResult()
-                {
-                    FileLocation = context.CurrentProject?.GetFile()?.FilePath ?? "Project not loaded",
-                    RuleId = Id,
-                    ResultMessage = Title
-                };
-
-                context.Results.Add(new OutputResultDefinition()
-                {
-                    Name = "Package Update",
-                    InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
-                    Results = ImmutableList.Create(result).ToAsyncEnumerable()
-                });
+                context.AddResult("Package Updater Step", context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, Id, UpgradeStepStatus.Complete, Title);
             }
 
             protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

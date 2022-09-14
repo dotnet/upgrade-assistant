@@ -107,21 +107,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                     if (updatedSolution is null)
                     {
                         var description = $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}";
-                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, "Failed", description);
+                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Failed, description);
                         Logger.LogError(description);
                         return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
                     }
                     else if (!context.UpdateSolution(updatedSolution))
                     {
                         var description = $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}";
-                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, "Failed", description);
+                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Failed, description);
                         Logger.LogError(description);
                         return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
                     }
                     else
                     {
                         var description = $"Diagnostic {diagnostic.Id} fixed in {doc.FilePath}";
-                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, "Success", description);
+                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Complete, description);
                         Logger.LogInformation(description);
                     }
                 }
@@ -137,7 +137,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 {
                     var description = $"Diagnostic {DiagnosticId} was not fixed as expected. This may be caused by the project being in a bad state (did NuGet packages restore correctly?) or by errors in analyzers or code fix providers related to this diagnostic.";
                     Logger.LogWarning(description);
-                    AddResultToContext(context, DiagnosticId, string.Empty, "Success", description);
+                    AddResultToContext(context, DiagnosticId, string.Empty, UpgradeStepStatus.Failed, description);
                     break;
                 }
                 else
@@ -163,24 +163,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
 
-        private void AddResultToContext(IUpgradeContext context, string diagnosticId, string location, string status, string resultMessage)
+        private void AddResultToContext(IUpgradeContext context, string diagnosticId, string location, UpgradeStepStatus status, string resultMessage)
         {
-            var result = new OutputResult()
-            {
-                FileLocation = location,
-                RuleId = diagnosticId,
-                ResultMessage = $"{status}: {resultMessage}",
-                FullDescription = resultMessage,
-            };
-
-            var outputResultDefinition = new OutputResultDefinition()
-            {
-                Name = "Code Fixer Step",
-                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
-                Results = ImmutableList.Create(result).ToAsyncEnumerable()
-            };
-
-            context.Results.Add(outputResultDefinition);
+            context.AddResult("Code Fixer Step", location, diagnosticId, status, resultMessage);
         }
 
         private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document, CancellationToken token)

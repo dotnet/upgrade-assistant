@@ -61,28 +61,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 
             var description = $"Updated TFM to {targetTfm}";
             Logger.LogInformation(description);
-            AddResultToContext(context, "Success", description);
+            AddResultToContext(context, UpgradeStepStatus.Complete, description);
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Updated TFM to {targetTfm}");
         }
 
-        private void AddResultToContext(IUpgradeContext context, string status, string resultMessage)
+        private void AddResultToContext(IUpgradeContext context, UpgradeStepStatus status, string resultMessage)
         {
-            var result = new OutputResult()
-            {
-                FileLocation = context.CurrentProject?.GetFile()?.FilePath ?? string.Empty,
-                RuleId = Id,
-                ResultMessage = $"{status}: {resultMessage}",
-                FullDescription = resultMessage,
-            };
-
-            var outputResultDefinition = new OutputResultDefinition()
-            {
-                Name = "Set TFM Step",
-                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsageDocumentationLink,
-                Results = ImmutableList.Create(result).ToAsyncEnumerable()
-            };
-
-            context.Results.Add(outputResultDefinition);
+            context.AddResult("Set TFM Step", context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, Id, status, resultMessage);
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
