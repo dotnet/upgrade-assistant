@@ -5,7 +5,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Project File Converter Step (Try-Convert)",
+          "name": "Convert project file to SDK style",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -42,7 +42,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove reference 'System.ServiceModel'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -79,7 +79,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Primitives'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -116,7 +116,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -153,7 +153,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Duplex'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -190,7 +190,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.NetTcp'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -227,7 +227,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Security'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -264,7 +264,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Federation'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -301,7 +301,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -338,7 +338,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.ServiceModel.Primitives'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -375,7 +375,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.ServiceModel.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -412,7 +412,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.ServiceModel.Security'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -449,7 +449,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Set TFM Step",
+          "name": "Update TFM",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -486,7 +486,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Project File Converter Step (Try-Convert)",
+          "name": "Convert project file to SDK style",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -523,7 +523,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove reference 'System.Configuration'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -560,7 +560,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove reference 'System.Net.Http.WebRequest'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -597,7 +597,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove reference 'System.ServiceModel'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -634,7 +634,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Net.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -671,7 +671,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.Net.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -708,7 +708,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.Configuration.ConfigurationManager'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -745,7 +745,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Primitives'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -782,7 +782,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -819,7 +819,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Duplex'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -856,7 +856,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.NetTcp'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -893,7 +893,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Security'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -930,7 +930,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.ServiceModel.Federation'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -967,7 +967,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1004,7 +1004,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Castle.Core'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1041,7 +1041,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'ControlzEx'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1078,7 +1078,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Bcl'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1115,7 +1115,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Bcl.Async'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1152,7 +1152,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Bcl.Build'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1189,7 +1189,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.CodeQuality.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1226,7 +1226,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.NetCore.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1263,7 +1263,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.NetFramework.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1300,7 +1300,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Rest.ClientRuntime'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1337,7 +1337,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.Security.Cryptography.X509Certificates'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1374,7 +1374,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Text.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1411,7 +1411,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.ServiceModel.Primitives'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1448,7 +1448,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.ServiceModel.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1485,7 +1485,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.ServiceModel.Security'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1522,7 +1522,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Set TFM Step",
+          "name": "Update TFM",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1559,7 +1559,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Hyak.Common'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1596,7 +1596,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'MahApps.Metro'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1633,7 +1633,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Newtonsoft.Json'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1670,7 +1670,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Nito.AsyncEx'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1707,7 +1707,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Hyak.Common'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1744,7 +1744,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'MahApps.Metro'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1781,7 +1781,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Newtonsoft.Json'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1818,7 +1818,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Nito.AsyncEx'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1855,7 +1855,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.Windows.Compatibility'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1892,7 +1892,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.Data.DataSetExtensions'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1929,7 +1929,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'System.Configuration.ConfigurationManager'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -1966,7 +1966,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Newtonsoft.Json'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -2003,7 +2003,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Windows Desktop Updater Step",
+          "name": "Default Font API Alert",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [

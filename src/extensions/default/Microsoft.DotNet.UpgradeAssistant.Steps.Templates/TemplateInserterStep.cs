@@ -184,7 +184,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Templates
 
         private void AddResultToContext(IUpgradeContext context, UpgradeStepStatus status, string resultMessage, string location)
         {
-            context.AddResult("Template Inserter Step", location, WellKnownStepIds.TemplateInserterStepId, status, resultMessage);
+            context.AddResultForStep(this, location, status, resultMessage);
         }
 
         private bool IsTemplateNeeded(IProject project, RuntimeItemSpec template)

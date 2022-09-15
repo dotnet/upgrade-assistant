@@ -165,7 +165,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         private void AddResultToContext(IUpgradeContext context, string diagnosticId, string location, UpgradeStepStatus status, string resultMessage)
         {
-            context.AddResult("Code Fixer Step", location, diagnosticId, status, resultMessage);
+            context.AddResult(Title, location, diagnosticId, status, resultMessage);
         }
 
         private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document, CancellationToken token)

@@ -5,7 +5,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.AppCenter.Analytics'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -42,7 +42,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.AppCenter.Crashes'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -79,7 +79,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.CommunityToolkit'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -116,7 +116,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.Forms'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -153,7 +153,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.Essentials'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -190,7 +190,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'CommunityToolkit.Maui'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -227,7 +227,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -264,7 +264,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Template Inserter Step",
+          "name": "Add template files",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -301,7 +301,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Code Fixer Step",
+          "name": "Apply fix for UA0014: .NET MAUI projects should not reference Xamarin.Forms namespaces",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -338,7 +338,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Code Fixer Step",
+          "name": "Apply fix for UA0014: .NET MAUI projects should not reference Xamarin.Forms namespaces",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -375,7 +375,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Code Fixer Step",
+          "name": "Apply fix for UA0014: .NET MAUI projects should not reference Xamarin.Forms namespaces",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -412,7 +412,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Code Fixer Step",
+          "name": "Apply fix for UA0014: .NET MAUI projects should not reference Xamarin.Forms namespaces",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -449,7 +449,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Project File Converter Step (Try-Convert)",
+          "name": "Convert project file to SDK style",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -486,7 +486,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.AppCenter.Analytics'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -523,7 +523,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.AppCenter.Crashes'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -560,7 +560,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.CommunityToolkit'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -597,7 +597,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.Forms'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -634,7 +634,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.Essentials'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -671,7 +671,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.Android.Support.Design'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -708,7 +708,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.Android.Support.v7.AppCompat'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -745,7 +745,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Xamarin.Android.Support.v4'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -782,7 +782,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'CommunityToolkit.Maui'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -819,7 +819,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -856,7 +856,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Set TFM Step",
+          "name": "Update TFM",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -893,7 +893,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Template Inserter Step",
+          "name": "Add template files",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [

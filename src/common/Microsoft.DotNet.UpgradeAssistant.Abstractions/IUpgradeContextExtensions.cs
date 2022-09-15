@@ -11,6 +11,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public static class IUpgradeContextExtensions
     {
+        public static void AddResultForStep(this IUpgradeContext context, UpgradeStep step,
+            string location, UpgradeStepStatus upgradeStepStatus, string message)
+        {
+            AddResult(context, step.Title, location, step.Id, upgradeStepStatus, message);
+        }
+
         public static void AddResult(this IUpgradeContext context, string stepName, string location, string ruleId,
             UpgradeStepStatus upgradeStepStatus, string message)
         {

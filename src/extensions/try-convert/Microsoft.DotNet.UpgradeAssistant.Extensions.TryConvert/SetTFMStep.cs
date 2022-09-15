@@ -67,7 +67,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 
         private void AddResultToContext(IUpgradeContext context, UpgradeStepStatus status, string resultMessage)
         {
-            context.AddResult("Set TFM Step", context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, Id, status, resultMessage);
+            context.AddResultForStep(this, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, status, resultMessage);
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

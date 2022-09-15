@@ -5,7 +5,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Project File Converter Step (Try-Convert)",
+          "name": "Convert project file to SDK style",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -42,7 +42,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -79,7 +79,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.AspNet.Razor'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -116,7 +116,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.AspNet.WebPages'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -153,7 +153,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Web.Infrastructure'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -190,7 +190,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Set TFM Step",
+          "name": "Update TFM",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -227,7 +227,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove reference 'System.Web'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -264,7 +264,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.AspNet.Mvc'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -301,7 +301,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add framework reference 'Microsoft.AspNetCore.App'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -338,7 +338,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Newtonsoft.Json'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -375,7 +375,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Newtonsoft.Json'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -412,7 +412,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Code Fixer Step",
+          "name": "Apply fix for UA0001: ASP.NET Core projects should not reference ASP.NET namespaces",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -449,7 +449,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Code Fixer Step",
+          "name": "Apply fix for UA0001: ASP.NET Core projects should not reference ASP.NET namespaces",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -486,7 +486,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Code Fixer Step",
+          "name": "Apply fix for UA0005: Do not use HttpContext.Current",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [

@@ -5,7 +5,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Project File Converter Step (Try-Convert)",
+          "name": "Convert project file to SDK style",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -42,7 +42,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove reference 'System.ServiceModel'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -79,7 +79,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -116,7 +116,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Set TFM Step",
+          "name": "Update TFM",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [

@@ -87,7 +87,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 
         private void AddResultToContext(IUpgradeContext context, UpgradeStepStatus status, string resultMessage)
         {
-            context.AddResult("Project File Converter Step (Try-Convert)", context.CurrentProject?.GetFile()?.FilePath ?? string.Empty,
+            context.AddResult(TryConvertProjectConverterStep.StepTitle, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty,
                 WellKnownStepIds.TryConvertProjectConverterStepId, status, resultMessage);
         }
 

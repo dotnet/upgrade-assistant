@@ -5,7 +5,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Project File Converter Step (Try-Convert)",
+          "name": "Convert project file to SDK style",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -42,7 +42,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Bcl'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -79,7 +79,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Bcl.Build'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -116,7 +116,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Microsoft.Net.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -153,7 +153,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'System.Net.Http'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -190,7 +190,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Remove package 'Newtonsoft.Json'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -227,7 +227,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Newtonsoft.Json'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
@@ -264,7 +264,7 @@
     {
       "tool": {
         "driver": {
-          "name": "Package Updater Step",
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [

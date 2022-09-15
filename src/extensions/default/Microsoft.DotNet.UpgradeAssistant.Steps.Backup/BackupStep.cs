@@ -94,7 +94,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup
 
         private void AddResultToContext(IUpgradeContext context, string backupLocation, UpgradeStepStatus status, string description)
         {
-            context.AddResult("Backup Step", backupLocation, Id, status, description);
+            context.AddResultForStep(this, backupLocation, status, description);
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)

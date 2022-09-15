@@ -117,7 +117,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             var outputResultDefinition = new OutputResultDefinition()
             {
-                Name = "Windows Desktop Updater Step",
+                Name = Title,
                 InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsage,
                 Results = results.ToAsyncEnumerable()
             };
