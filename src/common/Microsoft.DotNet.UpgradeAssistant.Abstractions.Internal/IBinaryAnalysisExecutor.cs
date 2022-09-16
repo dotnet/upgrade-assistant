@@ -11,6 +11,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public interface IBinaryAnalysisExecutor
     {
-        Task RunAsync(Func<AnalyzeResult, Task> receiver);
+        Task RunAsync(Func<OutputResult, Task> receiver);
     }
 }

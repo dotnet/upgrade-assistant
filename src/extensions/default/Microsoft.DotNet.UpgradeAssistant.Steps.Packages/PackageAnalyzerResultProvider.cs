@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             return await Task.FromResult(true).ConfigureAwait(false);
         }
 
-        public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<OutputResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
         {
             if (analysis is null)
             {
@@ -85,9 +85,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
             }
         }
 
-        private HashSet<AnalyzeResult> ExtractAnalysisResult(string fileLocation, IDependencyAnalysisState? analysisState)
+        private HashSet<OutputResult> ExtractAnalysisResult(string fileLocation, IDependencyAnalysisState? analysisState)
         {
-            var results = new HashSet<AnalyzeResult>();
+            var results = new HashSet<OutputResult>();
 
             if (analysisState is null || !analysisState.AreChangesRecommended)
             {

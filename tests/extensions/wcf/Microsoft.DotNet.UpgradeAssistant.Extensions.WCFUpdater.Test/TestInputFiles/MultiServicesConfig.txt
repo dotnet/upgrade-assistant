@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.7.2" />
+    </startup>
+	<system.serviceModel>
+		<services>
+			<service name="WcfServiceLibrary1.Service1">
+				<host>
+					<baseAddresses>
+						<add baseAddress = "http://localhost:8733/Service1/" />
+					</baseAddresses>
+				</host>
+				<!-- Service Endpoints -->
+				<!-- Unless fully qualified, address is relative to base address supplied above -->
+				<endpoint address="" binding="basicHttpBinding" contract="WcfServiceLibrary1.IService1" />
+				<!-- Metadata Endpoints -->
+				<!-- The Metadata Exchange endpoint is used by the service to describe itself to clients. -->
+				<endpoint address="mex" binding="mexHttpBinding" contract="IMetadataExchange" />
+			</service>
+            <service name="WcfServiceLibrary1.Service2" behaviorConfiguration="SampleBehavior">
+				<host>
+					<baseAddresses>
+						<add baseAddress = "https://localhost:8700/Service2/" />
+                        <add baseAddress = "net.tcp://localhost:8000/" />
+					</baseAddresses>
+				</host>
+				<!-- Service Endpoints -->
+				<!-- Unless fully qualified, address is relative to base address supplied above -->
+				<endpoint address="" binding="basicHttpsBinding" contract="WcfServiceLibrary1.IService1" />
+                <endpoint address="" binding="netTcpBinding" contract="WcfServiceLibrary1.IService1" />
+				<!-- Metadata Endpoints -->
+				<!-- The Metadata Exchange endpoint is used by the service to describe itself to clients. -->
+				<endpoint address="mex" binding="mexHttpsBinding" contract="IMetadataExchange" />
+			</service>
+		</services>
+		<behaviors>
+			<serviceBehaviors>
+				<behavior>
+					<serviceMetadata httpGetEnabled="True"/>
+					<serviceDebug includeExceptionDetailInFaults="True" />
+				</behavior>
+                <behavior name="SampleBehavior">
+					<serviceMetadata httpsGetEnabled="True"/>
+					<serviceDebug includeExceptionDetailInFaults="False" />
+				</behavior>
+			</serviceBehaviors>
+		</behaviors>
+	</system.serviceModel>
+</configuration>

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -162,7 +163,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 var containsService = false;
                 foreach (var f in files)
                 {
-                    var root = CSharpSyntaxTree.ParseText(f).GetRoot();
+                    var root = CSharpSyntaxTree.ParseText(File.ReadAllText(f)).GetRoot();
                     if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
                     {
                         return packages.Additions;
@@ -262,7 +263,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 _action(file, _operation);
 
+                AddResultToContext(context);
                 return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, Title));
+            }
+
+            private void AddResultToContext(IUpgradeContext context)
+            {
+                context.AddResultForStep(this, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, UpgradeStepStatus.Complete, Title);
             }
 
             protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.UpgradeAssistant;
@@ -49,22 +50,26 @@ namespace Integration.Tests
             return latest;
         }
 
-        public async Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
+        public async IAsyncEnumerable<NuGetReference> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, [EnumeratorCancellation] CancellationToken token)
         {
             if (_packages.TryGetValue(reference.Name, out var known))
             {
-                return new NuGetReference[] { known };
+                yield return known;
+                yield break;
             }
 
-            var latest = await _other.GetNewerVersionsAsync(reference, tfms, options, token).ConfigureAwait(false);
-
-            if (latest is not null && latest.LastOrDefault() is NuGetReference latestReference)
+            var latest = _other.GetNewerVersionsAsync(reference, tfms, options, token);
+            var last = await latest.LastAsync(token).ConfigureAwait(false);
+            if (latest is NuGetReference latestReference)
             {
                 _unknownPackages[latestReference.Name] = latestReference.Version;
                 _logger.LogError("Unexpected check for newer version: {Name}, {Version}", reference.Name, reference.Version);
             }
 
-            return latest ?? Enumerable.Empty<NuGetReference>();
+            await foreach (var l in latest.WithCancellation(token))
+            {
+                yield return l;
+            }
         }
 
         public Task<NuGetPackageMetadata?> GetPackageMetadata(NuGetReference reference, CancellationToken token)

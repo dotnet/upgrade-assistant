@@ -2,3 +2,12 @@
 # See https://help.github.com/articles/about-code-owners/
 
 *                        @dotnet/dotnet-upgrade-assistant-admin
+
+*maui*                   @dotnet/dotnet-upgrade-assistant-maui @dotnet/dotnet-upgrade-assistant-admin
+/src/extensions/maui/    @dotnet/dotnet-upgrade-assistant-maui @dotnet/dotnet-upgrade-assistant-admin
+
+*uwp*                    @dotnet/dotnet-upgrade-assistant-uwp @dotnet/dotnet-upgrade-assistant-admin
+/src/extensions/windows/ @dotnet/dotnet-upgrade-assistant-uwp @dotnet/dotnet-upgrade-assistant-admin
+
+*wcf*                    @dotnet/dotnet-upgrade-assistant-wcf @dotnet/dotnet-upgrade-assistant-admin
+/src/extensions/wcf/     @dotnet/dotnet-upgrade-assistant-wcf @dotnet/dotnet-upgrade-assistant-admin

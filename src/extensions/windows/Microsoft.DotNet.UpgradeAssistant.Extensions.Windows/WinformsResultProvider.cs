@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +16,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 {
     public class WinformsResultProvider : IAnalyzeResultProvider
     {
-        private readonly IUpdater<IProject> _updater;
+        private readonly IEnumerable<IUpdater<IProject>> _updaters;
 
         private ILogger Logger { get; }
 
@@ -22,11 +24,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         public Uri InformationUri => new("https://docs.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview");
 
-        public WinformsResultProvider(IUpdater<IProject> updater,
+        public WinformsResultProvider(IEnumerable<IUpdater<IProject>> updaters,
            ILogger<WinformsResultProvider> logger)
         {
             Logger = logger;
-            _updater = updater ?? throw new ArgumentNullException(nameof(updater));
+            _updaters = updaters ?? throw new ArgumentNullException(nameof(updaters));
         }
 
         public async Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token)
@@ -38,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             foreach (var project in analysis.UpgradeContext.Projects)
             {
-                if (await project.IsApplicableAsync(_updater, token).ConfigureAwait(false))
+                if (await project.IsApplicableAsync(_updaters, token).ConfigureAwait(false))
                 {
                     return true;
                 }
@@ -47,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             return false;
         }
 
-        public async IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<OutputResult> AnalyzeAsync(AnalyzeContext analysis, [EnumeratorCancellation] CancellationToken token)
         {
             if (analysis is null)
             {
@@ -56,31 +58,36 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
             var context = analysis.UpgradeContext;
             var projects = context.Projects.ToImmutableArray();
-            var updaterResult = new WindowsDesktopUpdaterResult(string.Empty, string.Empty, string.Empty, false, string.Empty, new List<string>());
+            var updaterResults = new List<WindowsDesktopUpdaterResult>();
             try
             {
-                var result = await _updater.IsApplicableAsync(context, projects, token).ConfigureAwait(false);
-                updaterResult = (WindowsDesktopUpdaterResult)result;
+                foreach (var updater in _updaters)
+                {
+                    var result = await updater.IsApplicableAsync(context, projects, token).ConfigureAwait(false);
+                    updaterResults.Add((WindowsDesktopUpdaterResult)result);
+                }
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exc)
-#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Logger.LogCritical(exc, "Unexpected exception analyzing winforms references");
             }
 
-            if (updaterResult.Result)
+            var applicableUpgraderResults = updaterResults.Where(r => r.Result).ToList();
+            if (applicableUpgraderResults.Any())
             {
-                foreach (var s in updaterResult.FileLocations)
+                foreach (var updaterResult in applicableUpgraderResults)
                 {
-                    yield return new()
+                    foreach (var s in updaterResult.FileLocations)
                     {
-                        RuleId = updaterResult.RuleId,
-                        RuleName = updaterResult.RuleName,
-                        FullDescription = updaterResult.FullDescription,
-                        FileLocation = s,
-                        ResultMessage = updaterResult.Message,
-                    };
+                        yield return new()
+                        {
+                            RuleId = updaterResult.RuleId,
+                            RuleName = updaterResult.RuleName,
+                            FullDescription = updaterResult.FullDescription,
+                            FileLocation = s,
+                            ResultMessage = updaterResult.Message,
+                        };
+                    }
                 }
             }
             else

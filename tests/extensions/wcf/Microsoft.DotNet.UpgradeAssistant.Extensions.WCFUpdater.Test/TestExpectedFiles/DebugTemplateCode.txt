@@ -1,0 +1,50 @@
+﻿public static void Main()
+{
+            var builder = WebApplication.CreateBuilder();
+
+            // Set up port (previously this was done in configuration,
+            // but CoreWCF requires it be done in code)
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(80);
+                options.ListenAnyIP(8080, listenOptions =>
+                {
+                    listenOptions.UseHttps();
+                });
+            });
+
+            // Add CoreWCF services to the ASP.NET Core app's DI container
+            builder.Services.AddServiceModelServices()
+                            .AddServiceModelConfigurationManagerFile("wcf.config")
+                            .AddServiceModelMetadata()
+                            .AddTransient<WcfServiceLibrary1.Service1>();
+
+            var app = builder.Build();
+
+            // Enable getting metadata/wsdl
+            var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
+            serviceMetadataBehavior.HttpGetEnabled = true;
+            serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost/Service1/metadata");
+
+            // Configure CoreWCF endpoints in the ASP.NET Core hosts
+            app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
+                {
+                    serviceOptions.DebugBehavior.HttpHelpPageEnabled = false;
+                    serviceOptions.DebugBehavior.HttpHelpPageUrl = new Uri("http://localhost:80/Service1/help");
+                    serviceOptions.DebugBehavior.HttpsHelpPageUrl = new Uri("https://localhost:8080/help");
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
+                });
+
+                serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(varName =>
+                {
+                    int UA_placeHolder;
+
+                });
+
+            });
+            
+            await app.StartAsync();
+            await app.StopAsync();
+}

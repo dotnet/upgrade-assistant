@@ -1,0 +1,45 @@
+﻿public static void Main()
+{
+            var builder = WebApplication.CreateBuilder();
+
+            // Set up port (previously this was done in configuration,
+            // but CoreWCF requires it be done in code)
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(8733);
+                
+            });
+
+            // Add CoreWCF services to the ASP.NET Core app's DI container
+            builder.Services.AddServiceModelServices()
+                            .AddServiceModelConfigurationManagerFile("wcf.config")
+                            .AddServiceModelMetadata()
+                            .AddTransient<WcfServiceLibrary1.Service1>()
+                            .AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+
+            var app = builder.Build();
+
+            // Enable getting metadata/wsdl
+            var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
+            serviceMetadataBehavior.HttpGetEnabled = true;
+            serviceMetadataBehavior.HttpGetUrl = new Uri("http://localhost:8733/Service1/metadata");
+
+            // Configure CoreWCF endpoints in the ASP.NET Core hosts
+            app.UseServiceModel(serviceBuilder =>
+            {
+                serviceBuilder.AddService<WcfServiceLibrary1.Service1>(serviceOptions => 
+                {
+                    serviceOptions.DebugBehavior.IncludeExceptionDetailInFaults = true;
+                });
+
+                serviceBuilder.ConfigureServiceHostBase<WcfServiceLibrary1.Service1>(varName =>
+                {
+                    int UA_placeHolder;
+
+                });
+
+            });
+            
+            await app.StartAsync();
+            await app.StopAsync();
+}

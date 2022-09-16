@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,8 +59,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             // With an updated TFM, we should restore packages
             await _restorer.RestorePackagesAsync(context, context.CurrentProject.Required(), token).ConfigureAwait(false);
 
-            Logger.LogInformation("Updated TFM to {TargetTFM}", targetTfm);
+            var description = $"Updated TFM to {targetTfm}";
+            Logger.LogInformation(description);
+            AddResultToContext(context, UpgradeStepStatus.Complete, description);
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Updated TFM to {targetTfm}");
+        }
+
+        private void AddResultToContext(IUpgradeContext context, UpgradeStepStatus status, string resultMessage)
+        {
+            context.AddResultForStep(this, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, status, resultMessage);
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

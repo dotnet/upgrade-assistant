@@ -12,15 +12,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 {
-    public class HtmlAnalyzeResultWriter : IAnalyzeResultWriter
+    public class HtmlAnalyzeResultWriter : IOutputResultWriter
     {
-        private readonly Lazy<IAnalyzeResultWriter?> _sarifWriter;
+        private readonly Lazy<IOutputResultWriter?> _sarifWriter;
         private readonly ILogger<HtmlAnalyzeResultWriter> _logger;
 
         public string Format => WellKnownFormats.Html;
 
         public HtmlAnalyzeResultWriter(
-            Lazy<IAnalyzeResultWriterProvider> provider,
+            Lazy<IOutputResultWriterProvider> provider,
             ILogger<HtmlAnalyzeResultWriter> logger)
         {
             if (provider is null)
@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             });
         }
 
-        public async Task WriteAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, Stream stream, CancellationToken token)
+        public async Task WriteAsync(IAsyncEnumerable<OutputResultDefinition> results, Stream stream, CancellationToken token)
         {
             if (results is null)
             {
@@ -69,7 +69,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
             await writer.WriteAsync(finishedTemplate).ConfigureAwait(false);
         }
 
-        private async Task<string?> GetSarifContentAsync(IAsyncEnumerable<AnalyzeResultDefinition> results, CancellationToken token)
+        private async Task<string?> GetSarifContentAsync(IAsyncEnumerable<OutputResultDefinition> results, CancellationToken token)
         {
             var sarifWriter = _sarifWriter.Value;
 

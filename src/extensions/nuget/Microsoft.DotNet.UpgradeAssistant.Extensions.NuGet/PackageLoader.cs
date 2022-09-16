@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             return targetFrameworks.All(tfm => packageFrameworks.Any(f => DefaultCompatibilityProvider.Instance.IsCompatible(NuGetFramework.Parse(tfm.Name), f)));
         }
 
-        public Task<IEnumerable<NuGetReference>> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
+        public IAsyncEnumerable<NuGetReference> GetNewerVersionsAsync(NuGetReference reference, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, CancellationToken token)
         {
             if (reference is null)
             {
@@ -88,12 +89,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var result = await SearchByNameAsync(packageName, tfms, options, null, sources, token: token).ConfigureAwait(false);
+            var result = SearchByNameAsync(packageName, tfms, options, null, sources, token: token);
 
-            return result.LastOrDefault();
+            return await result.LastOrDefaultAsync(token).ConfigureAwait(false);
         }
 
-        private async Task<IEnumerable<NuGetReference>> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, NuGetVersion? currentVersion = null, IEnumerable<PackageSource>? sources = null, CancellationToken token = default)
+        private async IAsyncEnumerable<NuGetReference> SearchByNameAsync(string name, IEnumerable<TargetFrameworkMoniker> tfms, PackageSearchOptions options, NuGetVersion? currentVersion = null, IEnumerable<PackageSource>? sources = null, [EnumeratorCancellation] CancellationToken token = default)
         {
             var results = new List<IPackageSearchMetadata>();
 
@@ -122,19 +123,24 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 }
             }
 
-            return FilterSearchResults(name, results, tfms, currentVersion, options.LatestMinorAndBuildOnly);
+            // Switch to an IEnumerable here because consumers of this API
+            await foreach (var result in FilterSearchResultsAsync(name, results, tfms, currentVersion, options.LatestMinorAndBuildOnly, token).WithCancellation(token))
+            {
+                yield return result;
+            }
         }
 
-        public static IEnumerable<NuGetReference> FilterSearchResults(
+        internal IAsyncEnumerable<NuGetReference> FilterSearchResultsAsync(
             string name,
             IReadOnlyCollection<IPackageSearchMetadata> searchResults,
             IEnumerable<TargetFrameworkMoniker> tfms,
             NuGetVersion? currentVersion = null,
-            bool latestMinorAndBuildOnly = false)
+            bool latestMinorAndBuildOnly = false,
+            CancellationToken token = default)
         {
             if (searchResults is null || searchResults.Count == 0)
             {
-                return Enumerable.Empty<NuGetReference>();
+                return AsyncEnumerable.Empty<NuGetReference>();
             }
 
             var tfmSet = ImmutableHashSet.CreateRange(tfms.Select(t => NuGetFramework.Parse(t.Name)));
@@ -154,8 +160,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                     });
             }
 
-            return results
-                .Where(r =>
+            return results.ToAsyncEnumerable()
+                .WhereAwait(async r =>
                 {
                     // If the package has no dependency sets, then include it (as it may be build tools, analyzers, etc.).
                     if (!r.DependencySets.Any())
@@ -168,15 +174,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                     var unsupported = tfmSet;
                     foreach (var dep in r.DependencySets)
                     {
-                        foreach (var t in unsupported)
+                        if (dep.TargetFramework.IsAny)
                         {
-                            if (DefaultCompatibilityProvider.Instance.IsCompatible(t, dep.TargetFramework))
+                            // If dependencies have an 'Any' target, download the package and examine its actual contents to determine
+                            // framework support.
+                            return await DoesPackageSupportTargetFrameworksAsync(new NuGetReference(r.Identity.Id, r.Identity.Version.ToString()), tfms, CancellationToken.None).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            // If the dependencies have a particular target, note that that target is supported
+                            foreach (var t in unsupported)
                             {
-                                unsupported = unsupported.Remove(t);
+                                if (DefaultCompatibilityProvider.Instance.IsCompatible(t, dep.TargetFramework))
+                                {
+                                    unsupported = unsupported.Remove(t);
+                                }
                             }
                         }
                     }
 
+                    // Return true if all the needed TFMs were supported
                     return unsupported.IsEmpty;
                 })
                 .Select(r => r.Identity.Version)

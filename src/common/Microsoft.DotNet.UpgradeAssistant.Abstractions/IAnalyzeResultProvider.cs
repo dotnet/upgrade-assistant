@@ -16,6 +16,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 
         Task<bool> IsApplicableAsync(AnalyzeContext analysis, CancellationToken token);
 
-        IAsyncEnumerable<AnalyzeResult> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
+        IAsyncEnumerable<OutputResult> AnalyzeAsync(AnalyzeContext analysis, CancellationToken token);
     }
 }

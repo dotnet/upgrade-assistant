@@ -24,12 +24,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
 {
     public sealed class ApiChecker : IBinaryAnalysisExecutor
     {
-        private readonly ILogger<ApiChecker> _logger;
         private readonly IBinaryAnalysisExecutorOptions _options;
         private readonly DefaultTfmOptions _tfmSelector;
+        private readonly ILogger<ApiChecker> _logger;
 
         public ApiChecker(IBinaryAnalysisExecutorOptions options,
-            ITargetFrameworkSelector tfmSelector,
             IOptions<DefaultTfmOptions> selectorOptions,
             ILogger<ApiChecker> logger)
         {
@@ -38,7 +37,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task RunAsync(Func<AnalyzeResult, Task> receiver)
+        public async Task RunAsync(Func<OutputResult, Task> receiver)
         {
             var framework = NuGetFramework.ParseFolder(_tfmSelector.DetermineTargetTfmValue());
             var platforms = _options.Platform.Select(p => p.ToString().ToLowerInvariant()).ToImmutableList();
@@ -134,7 +133,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
             resultSinkTask.Wait();
         }
 
-        private IEnumerable<AnalyzeResult> CreateUaResults(AssemblyResult asmResult)
+        private IEnumerable<OutputResult> CreateUaResults(AssemblyResult asmResult)
         {
             const string BINARY_ANALYSIS_ASSEMBLY_ISSUE_RULE_ID = "UA9000";
             const string BINARY_ANALYSIS_API_UNAVAILABLE_RULE_ID = "UA9010";
@@ -146,7 +145,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
 
             if (!string.IsNullOrEmpty(asmResult.AssemblyIssues))
             {
-                yield return new AnalyzeResult
+                yield return new OutputResult
                 {
                     FileLocation = asmResult.AssemblyName,
                     ResultMessage = asmResult.AssemblyIssues,
@@ -177,7 +176,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
                         message = string.Concat(message, string.Format(CultureInfo.CurrentCulture, Resources.BinaryAnalysisApiAvailabilityFormatMessageFormat, frameworkResult.FrameworkName, frameworkResult.Availability), ' ');
                         if (!frameworkResult.Availability.IsAvailable)
                         {
-                            yield return new AnalyzeResult
+                            yield return new OutputResult
                             {
                                 FileLocation = asmResult.AssemblyName,
                                 ResultMessage = message,
@@ -189,7 +188,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
                         }
                         else if (frameworkResult.Availability.Package is not null)
                         {
-                            yield return new AnalyzeResult
+                            yield return new OutputResult
                             {
                                 FileLocation = asmResult.AssemblyName,
                                 ResultMessage = string.Concat(message, string.Format(CultureInfo.CurrentCulture, Resources.BinaryAnalysisApiPackageVersionMessageFormat, frameworkResult.Availability.Package.Value.Version)),
@@ -202,7 +201,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
 
                         if (_options.Obsoletion && frameworkResult.Obsoletion is not null)
                         {
-                            yield return new AnalyzeResult
+                            yield return new OutputResult
                             {
                                 FileLocation = asmResult.AssemblyName,
                                 ResultMessage = string.Concat(message, Resources.BinaryAnalysisApiObsoletedMessage),
@@ -215,7 +214,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.Analysis
 
                         foreach (var platformResult in frameworkResult.Platforms.Where(p => p is not null && !p.IsSupported))
                         {
-                            yield return new AnalyzeResult
+                            yield return new OutputResult
                             {
                                 FileLocation = asmResult.AssemblyName,
                                 ResultMessage = string.Concat(message, string.Format(CultureInfo.CurrentCulture, Resources.BinaryAnalysisPackageUnsupportedPlatformMessageFormat, platformResult!.PlatformName)),

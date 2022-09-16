@@ -144,6 +144,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
             context.Setup(c => c.InputPath).Returns(inputPath);
             context.Setup(c => c.InputIsSolution).Returns(Path.GetExtension(inputPath).Equals(".sln", StringComparison.OrdinalIgnoreCase));
             context.Setup(c => c.Properties).Returns(mock.Container.Resolve<IUpgradeContextProperties>());
+            context.Setup(c => c.Results).Returns(new Mock<ICollector<OutputResultDefinition>>().Object);
 
             if (projectPath is not null)
             {

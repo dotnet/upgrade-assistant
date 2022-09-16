@@ -17,7 +17,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                 yield break;
             }
 
-            var packages = doc.Root.Element("packages");
+            // Don't use doc.Root.Element because the
+            // packages element likely *is* the root
+            var packages = doc.Element("packages");
 
             if (packages is null)
             {

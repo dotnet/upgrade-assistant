@@ -9,21 +9,21 @@ using Microsoft.DotNet.UpgradeAssistant.Analysis;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
-    public interface IAnalyzeResultWriterProvider
+    public interface IOutputResultWriterProvider
     {
-        bool TryGetWriter(string format, [MaybeNullWhen(false)] out IAnalyzeResultWriter writer);
+        bool TryGetWriter(string format, [MaybeNullWhen(false)] out IOutputResultWriter writer);
     }
 
-    public class AnalyzerResultProviderWriter : IAnalyzeResultWriterProvider
+    public class AnalyzerResultProviderWriter : IOutputResultWriterProvider
     {
-    private readonly IEnumerable<IAnalyzeResultWriter> _writers;
+    private readonly IEnumerable<IOutputResultWriter> _writers;
 
-    public AnalyzerResultProviderWriter(IEnumerable<IAnalyzeResultWriter> writers)
+    public AnalyzerResultProviderWriter(IEnumerable<IOutputResultWriter> writers)
     {
         _writers = writers;
     }
 
-    public bool TryGetWriter(string format, [MaybeNullWhen(false)] out IAnalyzeResultWriter writer)
+    public bool TryGetWriter(string format, [MaybeNullWhen(false)] out IOutputResultWriter writer)
     {
             foreach (var writ in _writers)
             {
