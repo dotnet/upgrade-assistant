@@ -11,11 +11,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
 {
     public class TryConvertProjectConverterStep : UpgradeStep
     {
+        internal const string StepTitle = $"Convert project file to SDK style";
+
         private readonly TryConvertRunner _runner;
 
         public override string Description => $"Use the try-convert tool ({_runner.Path}{_runner.VersionString}) to convert the project file to an SDK-style csproj";
 
-        public override string Title => $"Convert project file to SDK style";
+        public override string Title => StepTitle;
 
         public override string Id => WellKnownStepIds.TryConvertProjectConverterStepId;
 

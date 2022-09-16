@@ -1,0 +1,2042 @@
+{
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Convert project file to SDK style",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+              "fullDescription": {
+                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+          "message": {
+            "text": "Complete: Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove reference 'System.ServiceModel'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove reference 'System.ServiceModel'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove reference 'System.ServiceModel'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Primitives'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Primitives'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Primitives'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Http'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Http'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Http'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Duplex'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Duplex'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Duplex'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.NetTcp'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.NetTcp'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.NetTcp'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Security'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Security'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Security'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Federation'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Federation'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Federation'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.ServiceModel.Primitives'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.ServiceModel.Primitives'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.ServiceModel.Primitives'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.ServiceModel.Http'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.ServiceModel.Http'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.ServiceModel.Http'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.ServiceModel.Security'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.ServiceModel.Security'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.ServiceModel.Security'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Update TFM",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+              "fullDescription": {
+                "text": "Updated TFM to netstandard2.0"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+          "message": {
+            "text": "Complete: Updated TFM to netstandard2.0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderInterfaces/BeanTraderCommon.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Convert project file to SDK style",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+              "fullDescription": {
+                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+          "message": {
+            "text": "Complete: Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove reference 'System.Configuration'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove reference 'System.Configuration'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove reference 'System.Configuration'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove reference 'System.Net.Http.WebRequest'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove reference 'System.Net.Http.WebRequest'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove reference 'System.Net.Http.WebRequest'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove reference 'System.ServiceModel'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove reference 'System.ServiceModel'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove reference 'System.ServiceModel'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.Net.Http'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.Net.Http'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.Net.Http'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.Net.Http'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.Net.Http'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.Net.Http'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.Configuration.ConfigurationManager'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.Configuration.ConfigurationManager'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.Configuration.ConfigurationManager'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Primitives'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Primitives'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Primitives'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Http'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Http'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Http'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Duplex'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Duplex'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Duplex'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.NetTcp'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.NetTcp'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.NetTcp'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Security'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Security'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Security'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'System.ServiceModel.Federation'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'System.ServiceModel.Federation'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'System.ServiceModel.Federation'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Castle.Core'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Castle.Core'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Castle.Core'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'ControlzEx'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'ControlzEx'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'ControlzEx'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.Bcl'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.Bcl'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.Bcl'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.Bcl.Async'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.Bcl.Async'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.Bcl.Async'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.Bcl.Build'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.Bcl.Build'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.Bcl.Build'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.CodeQuality.Analyzers'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.CodeQuality.Analyzers'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.CodeQuality.Analyzers'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.NetCore.Analyzers'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.NetCore.Analyzers'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.NetCore.Analyzers'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.NetFramework.Analyzers'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.NetFramework.Analyzers'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.NetFramework.Analyzers'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Microsoft.Rest.ClientRuntime'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Microsoft.Rest.ClientRuntime'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Microsoft.Rest.ClientRuntime'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.Security.Cryptography.X509Certificates'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.Security.Cryptography.X509Certificates'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.Security.Cryptography.X509Certificates'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Text.Analyzers'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Text.Analyzers'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Text.Analyzers'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.ServiceModel.Primitives'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.ServiceModel.Primitives'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.ServiceModel.Primitives'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.ServiceModel.Http'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.ServiceModel.Http'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.ServiceModel.Http'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.ServiceModel.Security'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.ServiceModel.Security'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.ServiceModel.Security'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Update TFM",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+              "fullDescription": {
+                "text": "Updated TFM to net6.0-windows"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+          "message": {
+            "text": "Complete: Updated TFM to net6.0-windows"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Hyak.Common'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Hyak.Common'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Hyak.Common'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'MahApps.Metro'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'MahApps.Metro'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'MahApps.Metro'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Newtonsoft.Json'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Newtonsoft.Json'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Newtonsoft.Json'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Nito.AsyncEx'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Nito.AsyncEx'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Nito.AsyncEx'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'Hyak.Common'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'Hyak.Common'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'Hyak.Common'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'MahApps.Metro'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'MahApps.Metro'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'MahApps.Metro'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'Newtonsoft.Json'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'Newtonsoft.Json'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'Newtonsoft.Json'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'Nito.AsyncEx'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'Nito.AsyncEx'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'Nito.AsyncEx'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add package 'Microsoft.Windows.Compatibility'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Add package 'Microsoft.Windows.Compatibility'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Add package 'Microsoft.Windows.Compatibility'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.Data.DataSetExtensions'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.Data.DataSetExtensions'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.Data.DataSetExtensions'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'System.Configuration.ConfigurationManager'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'System.Configuration.ConfigurationManager'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'System.Configuration.ConfigurationManager'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Remove package 'Newtonsoft.Json'",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Remove package 'Newtonsoft.Json'"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "message": {
+            "text": "Complete: Remove package 'Newtonsoft.Json'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Default Font API Alert",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "UA209",
+              "name": "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.WinformsDefaultFontUpdater",
+              "fullDescription": {
+                "text": "Default Font API Alert"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "UA209",
+          "message": {
+            "text": "Success: Default font in Windows Forms has been changed from Microsoft Sans Serif to Seg Segoe UI, in order to change the default font use the API - Application.SetDefaultFont(Font font). For more details see here - https://devblogs.microsoft.com/dotnet/whats-new-in-windows-forms-in-net-6-0-preview-5/#application-wide-default-font."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/BeanTraderClient/BeanTraderClient.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    }
+  ]
+}

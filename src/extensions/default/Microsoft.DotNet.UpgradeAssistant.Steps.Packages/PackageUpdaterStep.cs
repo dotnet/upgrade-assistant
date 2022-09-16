@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -262,7 +263,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
 
                 _action(file, _operation);
 
+                AddResultToContext(context);
                 return Task.FromResult(new UpgradeStepApplyResult(UpgradeStepStatus.Complete, Title));
+            }
+
+            private void AddResultToContext(IUpgradeContext context)
+            {
+                context.AddResultForStep(this, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, UpgradeStepStatus.Complete, Title);
             }
 
             protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

@@ -82,6 +82,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             try
             {
                 var updaterResult = (WindowsDesktopUpdaterResult)(await _updater.ApplyAsync(context, ImmutableArray<IProject>.Empty.Add(currentProject), token).ConfigureAwait(false));
+                AddResultToContext(context, updaterResult);
+
                 if (updaterResult.Result)
                 {
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, string.Empty);
@@ -98,6 +100,29 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 Logger.LogError(exc, "Unexpected exception while applying Windows Desktop updater \"{WinformsUpdater}\"", _updater.Title);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"Unexpected exception while applying Windows Desktop updater \"{_updater.Title}\": {exc}");
             }
+        }
+
+        private void AddResultToContext(IUpgradeContext context, WindowsDesktopUpdaterResult updaterResult)
+        {
+            var fileLocations = updaterResult.FileLocations.Any() ? updaterResult.FileLocations
+                : ImmutableList.Create(context.CurrentProject!.GetFile().FilePath);
+            var results = fileLocations.Select(location => new OutputResult()
+            {
+                FileLocation = location,
+                RuleId = updaterResult.RuleId,
+                ResultMessage = $"{(updaterResult.Result ? "Success" : "Failed")}: {updaterResult.Message}",
+                FullDescription = updaterResult.FullDescription,
+                RuleName = updaterResult.RuleName,
+            });
+
+            var outputResultDefinition = new OutputResultDefinition()
+            {
+                Name = Title,
+                InformationUri = WellKnownDocumentationUrls.UpgradeAssistantUsage,
+                Results = results.ToAsyncEnumerable()
+            };
+
+            context.Results.Add(outputResultDefinition);
         }
 
         public override async Task<bool> ApplyAsync(IUpgradeContext context, CancellationToken token)
