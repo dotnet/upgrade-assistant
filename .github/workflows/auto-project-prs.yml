@@ -4,15 +4,16 @@ on:
   pull_request:
     types:
       - opened
-env:
-  MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
 jobs:
   assign_one_project:
     runs-on: ubuntu-latest
+    environment: 'Auto-Project Secret'
     name: Assign to UA Project
     steps:
     - uses: srggrs/assign-one-project-github-action@1.2.1
+      env:
+        MY_GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
       with:
         project: 'https://github.com/orgs/dotnet/projects/108'
         column_name: 'Dev In Progress'
