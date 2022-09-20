@@ -5,7 +5,7 @@ on:
     types:
       - opened
 env:
-  MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+  MY_GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
 
 jobs:
   assign_one_project:
