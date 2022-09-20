@@ -3,14 +3,17 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.DotNet.UpgradeAssistant.Dependencies;
 using Microsoft.Extensions.Logging;
+
 using NuGet.Commands;
 using NuGet.Configuration;
 using NuGet.DependencyResolver;
@@ -25,10 +28,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 {
     public class NuGetTransitiveDependencyIdentifier : ITransitiveDependencyIdentifier
     {
+        private static readonly ConcurrentDictionary<string, LibraryDependency> _packageDependencies = new();
+
         private readonly IEnumerable<PackageSource> _packageSources;
         private readonly ISettings _settings;
         private readonly SourceCacheContext _context;
-        private readonly ILogger<NuGetTransitiveDependencyIdentifier> _logger;
+        private readonly NuGetLogger _logger;
+        private readonly CachingSourceProvider _cachingSourceProvider;
+        private readonly RestoreCommandProvidersCache _providerCache = new();
 
         public NuGetTransitiveDependencyIdentifier(
             IEnumerable<PackageSource> packageSources,
@@ -39,7 +46,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             _packageSources = packageSources ?? throw new ArgumentNullException(nameof(packageSources));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
+            _logger = new NuGetLogger(logger);
+            _cachingSourceProvider = new CachingSourceProvider(new PackageSourceProvider(_settings));
         }
 
         public async Task<TransitiveClosureCollection> GetTransitiveDependenciesAsync(IEnumerable<NuGetReference> packages, IEnumerable<TargetFrameworkMoniker> tfms, CancellationToken token)
@@ -69,13 +83,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             var tfmInfo = tfms.Select(tfm => new TargetFrameworkInformation { FrameworkName = NuGetFramework.Parse(tfm.ToFullString()) }).ToList();
 
             // Create a project in a unique and temporary directory
-            var path = Path.Combine(Path.GetTempPath(), "dotnet-ua", "restores", Guid.NewGuid().ToString(), "project.txt");
-
+            var path = CreateUniquePath();
             var spec = new PackageSpec(tfmInfo)
             {
-                Dependencies = packages.Select(i => new LibraryDependency
+                Dependencies = packages.Select(i =>
                 {
-                    LibraryRange = new LibraryRange(i.Name, new VersionRange(i.GetNuGetVersion()), LibraryDependencyTarget.Package),
+                    var lookupKey = $@"{i.Name}|{i.GetNuGetVersion()?.ToString() ?? "null"}";
+                    return _packageDependencies.GetOrAdd(lookupKey, new LibraryDependency
+                    {
+                        LibraryRange = new LibraryRange(i.Name, new VersionRange(i.GetNuGetVersion()), LibraryDependencyTarget.Package),
+                    });
                 }).ToList(),
                 RestoreMetadata = new()
                 {
@@ -84,7 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
                     ProjectStyle = ProjectStyle.PackageReference,
                     ProjectUniqueName = path,
                     OutputPath = Path.GetTempPath(),
-                    OriginalTargetFrameworks = tfms.Select(tfm => tfm.ToFullString()).ToArray(),
+                    OriginalTargetFrameworks = tfms.Select(tfm => tfm.ToFullString()).ToList(),
                     ConfigFilePaths = _settings.GetConfigFilePaths(),
                     PackagesPath = SettingsUtility.GetGlobalPackagesFolder(_settings),
                     Sources = _packageSources.ToList(),
@@ -98,14 +115,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             dependencyGraphSpec.AddProject(spec);
             dependencyGraphSpec.AddRestore(spec.RestoreMetadata.ProjectUniqueName);
 
-            var requestProvider = new DependencyGraphSpecRequestProvider(new RestoreCommandProvidersCache(), dependencyGraphSpec);
+            var requestProvider = new DependencyGraphSpecRequestProvider(_providerCache, dependencyGraphSpec);
 
             var restoreArgs = new RestoreArgs
             {
                 AllowNoOp = true,
                 CacheContext = _context,
-                CachingSourceProvider = new CachingSourceProvider(new PackageSourceProvider(_settings)),
-                Log = new NuGetLogger(_logger),
+                CachingSourceProvider = _cachingSourceProvider,
+                Log = _logger,
             };
 
             // Create requests from the arguments
@@ -113,13 +130,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             // Restore the package without generating extra files
             var result = await RestoreRunner.RunWithoutCommit(requests, restoreArgs).ConfigureAwait(false);
+#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
+            return result?.FirstOrDefault()?.Result.RestoreGraphs.FirstOrDefault();
+#pragma warning restore CA1826 // Do not use Enumerable methods on indexable collections
 
-            if (result.Count == 0)
+            static string CreateUniquePath()
             {
-                return null;
-            }
+                const string UniquePathPart1 = "dotnet-ua";
+                const string UniquePathPart2 = "restores";
+                const string UniquePathFilename = "project.txt";
 
-            return result[0].Result.RestoreGraphs.FirstOrDefault();
+                return Path.Combine(Path.GetTempPath(), UniquePathPart1, UniquePathPart2, Guid.NewGuid().ToString(), UniquePathFilename);
+            }
         }
 
         private class TargetGraphLookup : ILookup<NuGetReference, NuGetReference>
@@ -137,25 +159,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
             public bool Contains(NuGetReference key) => TryFind(key, out _);
 
-            public IEnumerator<NuGetReference> GetEnumerator()
-            {
-                foreach (var item in _graph.Flattened)
-                {
-                    var library = item.Data.Match.Library;
-
-                    yield return new(library.Name, library.Version.ToString());
-                }
-            }
+            public IEnumerator<NuGetReference> GetEnumerator() => _graph.Flattened.Select(item => new NuGetReference(item.Data.Match.Library.Name, item.Data.Match.Library.Version.ToString())).GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            IEnumerator<IGrouping<NuGetReference, NuGetReference>> IEnumerable<IGrouping<NuGetReference, NuGetReference>>.GetEnumerator()
-            {
-                foreach (var item in _graph.Flattened)
-                {
-                    yield return new ResolveResultGrouping(item.Data);
-                }
-            }
+            IEnumerator<IGrouping<NuGetReference, NuGetReference>> IEnumerable<IGrouping<NuGetReference, NuGetReference>>.GetEnumerator() => _graph.Flattened.Select(item => new ResolveResultGrouping(item.Data)).GetEnumerator();
 
             private bool TryFind(NuGetReference package, [MaybeNullWhen(false)] out ResolveResultGrouping result)
             {
@@ -184,13 +192,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
 
                 public NuGetReference Key { get; }
 
-                public IEnumerator<NuGetReference> GetEnumerator()
-                {
-                    foreach (var dependency in _result.Dependencies)
-                    {
-                        yield return new(dependency.Name, dependency.LibraryRange.VersionRange.ToString());
-                    }
-                }
+                public IEnumerator<NuGetReference> GetEnumerator() => _result.Dependencies.Select(dependency => new NuGetReference(dependency.Name, dependency.LibraryRange.VersionRange.ToString())).GetEnumerator();
 
                 IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
             }
