@@ -4,18 +4,17 @@ We are currently building out support for upgrade-assistant to handle UWP to Win
 
 ## Supported functionality and minimum requirements
 
-- The latest version of .NET Upgrade Assistant from the [Azure Devops Pipeline](https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-tools)
   - ✅ Upgrade csproj to the newer SDK style format
   - ✅ Update project TFM to net6.0
   - ✅ Try to add supported nuget packages and remove unsupported ones
   - ✅ Update the package.appxmanifest file to the newer style
   - ✅ Try to detect and fix APIs that have changed, and marks APIs that are no longer supported, with //TODO code comments.
-  - ❌ ApplicationView APIs not supported.
-  - ❌ AppWindow related APIs not supported (though it tries to generate a warning where possible and deliberately breaks your code so it doesn't compile until you manually fix things).
+  - ✅ ApplicationView APIs are supported.
+  - ✅ AppWindow related APIs are supported (though it tries to generate a warning where possible and deliberately breaks your code so it doesn't compile until you manually fix things).
   - ❌ Custom Views not supported (For example a CustomDialog that extends MessageDialog and calls an api incorrectly, it will not be warned about or fixed).
-  - ❌ WinRT Components not supported.
+  - ✅ WinRT Components are supported.
   - ❌ Multi window apps might not convert correctly.
-  - ❌ Apps that follow a nonstandard file structure (Such as App.xaml, App.xaml.cs missing from the root folder) might not be converted correctly.
+  - ✅ Support for apps that follow a nonstandard file structure (Such as App.xaml, App.xaml.cs missing from the root folder).
 
 - Complete environment setup for Windows App SDK including all necessary workloads installed. Confirm that your environment can build and run a blank Windows App SDK template app. Be sure to follow all steps mentioned in the [Getting Started](https://docs.microsoft.com/en-us/windows/apps/windows-app-sdk/).
 - We recommend using version control to create a backup of your current codebase before starting the upgrade process.
