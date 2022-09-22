@@ -4,17 +4,14 @@ on:
   issues:
     types:
       - opened
-
-environment: 'Auto-Project Secret'
-
-env:
-  MY_GITHUB_TOKEN: ${{ secrets.ACTIONS_PAT }}
+      - reopened
 
 jobs:
-  assign_one_project:
+  Add_PR_to_Dev_In_Progress:
     runs-on: ubuntu-latest
-    name: Assign to UA Project
     steps:
-    - uses: srggrs/assign-one-project-github-action@1.2.1
+    - uses: konradpabjan/actions-add-new-issue-to-column@v1.1
       with:
-        project: 'https://github.com/orgs/dotnet/projects/108'
+        action-token: "${{ secrets.ACTIONS_PAT }}"
+        project-url: 'https://github.com/orgs/dotnet/projects/108'
+        column-name: 'Dev In Progress'
