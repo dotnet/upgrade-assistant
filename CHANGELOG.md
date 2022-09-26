@@ -4,7 +4,7 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## Version 0.4.346202
+## Version 0.4.346202 - 2022-09-20([Link](https://www.nuget.org/packages/upgrade-assistant/0.4.346202))
 
 ### Added
 - Generation of post upgrade report for UWP -> Windows App SDK migration (https://github.com/dotnet/upgrade-assistant/pull/1292)
