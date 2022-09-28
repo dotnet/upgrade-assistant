@@ -16,13 +16,13 @@ Extensions will now be something that are managed at a workspace level. This wil
 Below are the commands to manage extensions:
 
 ```
-upgrade-assistant extension list
+upgrade-assistant extensions list
 ```
 
 This command will list current extensions applied to a project.
 
 ```
-upgrade-assistant extension restore
+upgrade-assistant extensions restore
 ```
 
 This command will restore current extensions applied to a project.
@@ -30,25 +30,25 @@ This command will restore current extensions applied to a project.
 > NOTE: This will hopefully be removed in the near future
 
 ```
-upgrade-assistant extension add --name [name] [--version [version]] [--source [source]]
+upgrade-assistant extensions add --name [name] [--version [version]] [--source [source]]
 ```
 
 This command will allow users to add extensions to a project.
 
 ```
-upgrade-assistant extension remove --name [name]
+upgrade-assistant extensions remove --name [name]
 ```
 
 This command will remove an installed extension from a current workspace.
 
 ```
-upgrade-assistant extension update [--name [name]] [--version [version]]
+upgrade-assistant extensions update [--name [name]] [--version [version]]
 ```
 
 This command will update all extensions, or a specific one if the name is given.
 
 ```
-upgrade-assistant extension create [path]
+upgrade-assistant extensions create [path]
 ```
 
 This command will create a valid NuGet package given an extension path.
