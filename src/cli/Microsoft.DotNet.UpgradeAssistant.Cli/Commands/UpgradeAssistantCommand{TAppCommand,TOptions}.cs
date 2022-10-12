@@ -29,9 +29,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                     .RunUpgradeAssistantAsync(token));
 
             AddArgument(new Argument<FileInfo>("project", LocalizedStrings.UpgradeAssistantCommandProject) { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
-            AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--extension", "-x" }, LocalizedStrings.UpgradeAssistantCommandExtension));
-            AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--option", "-o" }, LocalizedStrings.UpgradeAssistantCommandOption));
-            AddOption(new Option<IReadOnlyCollection<string>>(new[] { "--entry-point", "-e" }, LocalizedStrings.UpgradeAssistantCommandEntrypoint));
+            AddOption(new Option<ICollection<string>>(new[] { "--extension", "-x" }, LocalizedStrings.UpgradeAssistantCommandExtension));
+            AddOption(new Option<ICollection<string>>(new[] { "--option", "-o" }, LocalizedStrings.UpgradeAssistantCommandOption));
+            AddOption(new Option<ICollection<string>>(new[] { "--entry-point", "-e" }, LocalizedStrings.UpgradeAssistantCommandEntrypoint));
             AddOption(new Option<bool>(new[] { "--ignore-unsupported-features", "-i" }, LocalizedStrings.UpgradeAssistantCommandIgnoreUnsupported));
             AddOption(new Option<DirectoryInfo>(new[] { "--vs-path" }, LocalizedStrings.UpgradeAssistantCommandVS));
             AddOption(new Option<DirectoryInfo>(new[] { "--msbuild-path" }, LocalizedStrings.UpgradeAssistantCommandMsbuild));
