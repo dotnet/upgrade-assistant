@@ -10,7 +10,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Microsoft.AppCenter.Analytics'"
               },
@@ -21,7 +21,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Analytics'"
           },
@@ -47,7 +47,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Microsoft.AppCenter.Crashes'"
               },
@@ -58,7 +58,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Crashes'"
           },
@@ -84,7 +84,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Xamarin.CommunityToolkit'"
               },
@@ -95,7 +95,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Xamarin.CommunityToolkit'"
           },
@@ -121,7 +121,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Xamarin.Forms'"
               },
@@ -132,7 +132,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Forms'"
           },
@@ -158,7 +158,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Xamarin.Essentials'"
               },
@@ -169,7 +169,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Essentials'"
           },
@@ -195,7 +195,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Add package 'CommunityToolkit.Maui'"
               },
@@ -206,7 +206,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Add package 'CommunityToolkit.Maui'"
           },
@@ -232,7 +232,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
               },
@@ -243,7 +243,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
           },
@@ -491,7 +491,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Microsoft.AppCenter.Analytics'"
               },
@@ -502,7 +502,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Analytics'"
           },
@@ -528,7 +528,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Microsoft.AppCenter.Crashes'"
               },
@@ -539,7 +539,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Crashes'"
           },
@@ -565,7 +565,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Xamarin.CommunityToolkit'"
               },
@@ -576,7 +576,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Xamarin.CommunityToolkit'"
           },
@@ -602,7 +602,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Xamarin.Forms'"
               },
@@ -613,7 +613,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Forms'"
           },
@@ -639,7 +639,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Remove package 'Xamarin.Essentials'"
               },
@@ -650,7 +650,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Essentials'"
           },
@@ -676,7 +676,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Add package 'CommunityToolkit.Maui'"
               },
@@ -687,7 +687,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Add package 'CommunityToolkit.Maui'"
           },
@@ -713,7 +713,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
                 "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
               },
@@ -724,7 +724,7 @@
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, Version=42.42.42.42, Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
           },

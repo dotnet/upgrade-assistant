@@ -129,6 +129,8 @@ namespace Integration.Tests
                     actualText = actualText.Replace(actualDir.Replace("\\", "\\\\"), "[ACTUAL_PROJECT_ROOT]")
                         .Replace(actualDir.Replace("\\", "/"), "[ACTUAL_PROJECT_ROOT]")
                         .Replace(Directory.GetCurrentDirectory().Replace("\\", "/"), "[UA_PROJECT_BIN]");
+
+                    actualText = Regex.Replace(actualText, "Version=(\\d+\\.){3}([\\da-zA-Z\\-])+", "[VERSION]");
                 }
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
