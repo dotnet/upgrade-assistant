@@ -315,9 +315,26 @@
       {
         "Name": "Microsoft.AppCenter.Crashes",
         "Version": "*"
+      },
+      {
+        "Name": "Microsoft.AppCenter",
+        "Version": "*"
       }
     ],
-    "NetCorePackages": []
+    "NetCorePackages": [
+      {
+        "Name": "Microsoft.AppCenter.Analytics",
+        "Version": "5.0.0-preview.1"
+      },
+      {
+        "Name": "Microsoft.AppCenter.Crashes",
+        "Version": "5.0.0-preview.1"
+      },
+      {
+        "Name": "Microsoft.AppCenter",
+        "Version": "5.0.0-preview.1"
+      }
+    ]
   },
   {
     "PackageSetName": "Community Toolkit",
@@ -331,7 +348,7 @@
 
       {
         "Name": "CommunityToolkit.Maui",
-        "Version": "1.0.0-rc2"
+        "Version": "1.3.0"
       }
     ]
   },
@@ -354,15 +371,15 @@
     "NetCorePackages": [
       {
         "Name": "SkiaSharp.Views.Maui.Controls",
-        "Version": "2.88.0-preview.256"
+        "Version": "2.88.3"
       },
       {
         "Name": "SkiaSharp.Views.Maui.Core",
-        "Version": "2.88.0-preview.256"
+        "Version": "2.88.3"
       },
       {
         "Name": "SkiaSharp.Views.Maui.Controls.Compatibility",
-        "Version": "2.88.0-preview.256"
+        "Version": "2.88.3"
       }
     ]
   }
