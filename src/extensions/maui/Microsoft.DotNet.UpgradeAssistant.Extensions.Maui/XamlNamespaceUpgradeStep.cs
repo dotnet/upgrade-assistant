@@ -20,13 +20,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     {
         private static readonly IReadOnlyDictionary<string, string> XamarinToMauiReplacementMap = new Dictionary<string, string>
         {
-            {"http://xamarin.com/schemas/2014/forms", "http://schemas.microsoft.com/dotnet/2021/maui"},
-            {"http://xamarin.com/schemas/2020/toolkit", "http://schemas.microsoft.com/dotnet/2022/maui/toolkit"},
-            {"clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"},
-            {"clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"},
-            {"clr-namespace:Xamarin.Forms.PlatformConfiguration.macOSSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.macOSSpecific;assembly=Microsoft.Maui.Controls"},
-            {"clr-namespace:Xamarin.Forms.PlatformConfiguration.TizenSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;assembly=Microsoft.Maui.Controls"},
-            {"clr-namespace:Xamarin.Forms.PlatformConfiguration.WindowsSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;assembly=Microsoft.Maui.Controls"},
+            { "http://xamarin.com/schemas/2014/forms", "http://schemas.microsoft.com/dotnet/2021/maui" },
+            { "http://xamarin.com/schemas/2020/toolkit", "http://schemas.microsoft.com/dotnet/2022/maui/toolkit" },
+            { "clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls" },
+            { "clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls" },
+            { "clr-namespace:Xamarin.Forms.PlatformConfiguration.macOSSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.macOSSpecific;assembly=Microsoft.Maui.Controls" },
+            { "clr-namespace:Xamarin.Forms.PlatformConfiguration.TizenSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.TizenSpecific;assembly=Microsoft.Maui.Controls" },
+            { "clr-namespace:Xamarin.Forms.PlatformConfiguration.WindowsSpecific;assembly=Xamarin.Forms.Core", "clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;assembly=Microsoft.Maui.Controls" },
         };
 
         private readonly IPackageRestorer _restorer;
@@ -124,19 +124,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // With updated TFMs and UseMaui, we need to restore packages
-            var project = context.CurrentProject.Required();
-            var roslynProject = GetBestRoslynProject(project.GetRoslynProject());
-            var hasXamlFiles = GetXamlDocuments(roslynProject).Any();
-            if (hasXamlFiles)
+            return await Task.Run(() =>
             {
-                Logger.LogInformation(".NET MAUI Project Properties need to be added.");
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project XAML files need to be updated", BuildBreakRisk.High);
-            }
-            else
-            {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project does not contain any XAML files.", BuildBreakRisk.None);
-            }
+                // With updated TFMs and UseMaui, we need to restore packages
+                var project = context.CurrentProject.Required();
+                var roslynProject = GetBestRoslynProject(project.GetRoslynProject());
+                var hasXamlFiles = GetXamlDocuments(roslynProject).Any();
+                if (hasXamlFiles)
+                {
+                    Logger.LogInformation(".NET MAUI Project Properties need to be added.");
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project XAML files need to be updated", BuildBreakRisk.High);
+                }
+                else
+                {
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project does not contain any XAML files.", BuildBreakRisk.None);
+                }
+            });
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
