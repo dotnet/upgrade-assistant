@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
+    [ApplicableComponents(ProjectComponents.Maui)]
     [ExportCodeFixProvider(LanguageNames.CSharp)]
     public class UsingXamarinFormsAnalyzerCodeFixProvider : CodeFixProvider
     {
