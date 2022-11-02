@@ -61,16 +61,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var project = context.CurrentProject.Required();
             var roslynProject = GetBestRoslynProject(project.GetRoslynProject());
             var solution = roslynProject.Solution;
-            int fileCount = 0;
-            int errorCount = 0;
 
-            // MSBuildWorkspace does not allow AdditionalDocument changes before MicrosoftCodeAnalysisVersion 4.0.0,
-            // which UA doesn't use (see Directory.Build.props, so we have to write the changes ourselves for now...
             foreach (var file in GetXamlDocuments(roslynProject))
             {
                 var sourceText = await file.GetTextAsync(token).ConfigureAwait(false);
                 var text = sourceText.ToString();
-                fileCount++;
 
                 // Make replacements...
                 foreach (var key in XamarinToMauiReplacementMap.Keys)
@@ -80,31 +75,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
                 var newText = SourceText.From(text, encoding: sourceText.Encoding);
 
-                try
-                {
-                    using var writer = new StreamWriter(file.FilePath, append: false, encoding: sourceText.Encoding);
-                    newText.Write(writer);
-                }
-                catch (IOException ex)
-                {
-                    errorCount++;
-                    Logger.LogError(ex, $"Failed to update {file.Name}");
-                }
-
-                // solution = solution.WithAdditionalDocumentText(file.Id, newText);
+                solution = solution.WithAdditionalDocumentText(file.Id, newText);
             }
 
-            // var status = context.UpdateSolution(solution) ? UpgradeStepStatus.Complete : UpgradeStepStatus.Failed;
-            var status = UpgradeStepStatus.Complete;
-
-            if (errorCount == fileCount)
-            {
-                status = UpgradeStepStatus.Failed;
-            }
-            else if (errorCount > 0)
-            {
-                status = UpgradeStepStatus.Incomplete;
-            }
+            var status = context.UpdateSolution(solution) ? UpgradeStepStatus.Complete : UpgradeStepStatus.Failed;
 
             // Remove MauiProgram.cs added by MauiHeadTemplates.json from project file manually again if necessary
             // because WorkAroundRoslynIssue36781 doesn't think it's a duplicate item - but it is.
@@ -132,12 +106,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 var hasXamlFiles = GetXamlDocuments(roslynProject).Any();
                 if (hasXamlFiles)
                 {
-                    Logger.LogInformation(".NET MAUI Project Properties need to be added.");
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI Project XAML files need to be updated", BuildBreakRisk.High);
+                    Logger.LogInformation(".NET MAUI project has XAML files that may need to be updated");
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, ".NET MAUI project has XAML files that may need to be updated", BuildBreakRisk.High);
                 }
                 else
                 {
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI Project does not contain any XAML files.", BuildBreakRisk.None);
+                    Logger.LogInformation(".NET MAUI project does not contain any XAML files");
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI project does not contain any XAML files", BuildBreakRisk.None);
                 }
             });
         }

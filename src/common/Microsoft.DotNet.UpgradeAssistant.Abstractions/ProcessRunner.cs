@@ -67,6 +67,9 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
             await tcs.Task.ConfigureAwait(false);
 
+            // Async output may still be pending (see Process.HasExited)
+            process.WaitForExit();
+
             if (process.ExitCode != args.SuccessCode)
             {
                 const string Message = "[{Tool}] Error: Exited with non-success code: {ExitCode}";
