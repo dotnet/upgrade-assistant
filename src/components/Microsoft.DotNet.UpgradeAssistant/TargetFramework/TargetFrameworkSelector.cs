@@ -38,14 +38,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
             var appBase = _selectorOptions.TargetTfmSupport switch
             {
-                UpgradeTarget.Current => _selectorOptions.Current,
+                UpgradeTarget.STS => _selectorOptions.STS,
                 UpgradeTarget.Preview => _selectorOptions.Preview,
                 UpgradeTarget.LTS => _selectorOptions.LTS,
-                _ => _selectorOptions.LTS,
+                _ => _selectorOptions.STS,
             };
 
             var current = GetDefaultTargetFrameworkMoniker(project);
-
             if (!_comparer.TryParse(appBase, out var appBaseTfm))
             {
                 throw new InvalidOperationException("Invalid app base TFM");
