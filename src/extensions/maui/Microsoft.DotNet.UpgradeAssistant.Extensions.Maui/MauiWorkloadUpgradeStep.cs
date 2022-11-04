@@ -17,9 +17,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         {
             { "maui-android", ProjectComponents.MauiAndroid },
             { "maui-ios", ProjectComponents.MauiiOS },
-            { "maui", ProjectComponents.Maui },
+            { "maui", ProjectComponents.MauiAndroid | ProjectComponents.MauiiOS },
         };
 
+        private static bool? _infoSucceeded;
+        private static bool? _installSucceeded;
         private readonly IProcessRunner _runner;
 
         public override string Title => "Install .NET MAUI Workload";
@@ -40,8 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
         public override IEnumerable<string> DependencyOf { get; } = new[]
         {
-            WellKnownStepIds.NextProjectStepId,
-            WellKnownStepIds.SetTFMStepId,
+            typeof(XamlNamespaceUpgradeStep).FullName,
         };
 
         // Install or update the MAUI workload
@@ -52,9 +53,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var result = await RunWorkloadCommandAsync(context, "install maui", (_, message) => LogLevel.Information, token).ConfigureAwait(false);
+            if (_installSucceeded.HasValue)
+            {
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Skipped, ".NET MAUI workload install has already been run");
+            }
 
-            if (!result)
+            _installSucceeded = await RunDotnetCommandAsync(context, "workload install maui", (_, message) => LogLevel.Information, token).ConfigureAwait(false);
+
+            if (!_installSucceeded.Value)
             {
                 Logger.LogError("Command 'dotnet workload install maui' failed!");
 
@@ -72,11 +78,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (_installSucceeded.HasValue)
+            {
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, ".NET MAUI workload install has already been run", _installSucceeded.Value ? BuildBreakRisk.None : BuildBreakRisk.High);
+            }
+
             var project = context.CurrentProject.Required();
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             var workloads = ProjectComponents.None;
 
-            var result = await RunWorkloadCommandAsync(context, "list", (_, message) =>
+            if (!_infoSucceeded.HasValue)
+            {
+                // We only need to display the dotnet info debug information once
+                _infoSucceeded = await RunDotnetCommandAsync(context, "--info", (_, message) => LogLevel.Debug, token).ConfigureAwait(false);
+            }
+
+            var result = await RunDotnetCommandAsync(context, "workload list", (_, message) =>
                 {
                     var workload = message.Split(' ').First();
                     if (MauiWorkloadMap.TryGetValue(workload, out var component))
@@ -92,10 +109,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 Logger.LogError("Failed to run 'dotnet workload install maui' command!");
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, "Failed to list .NET MAUI workloads", BuildBreakRisk.High);
             }
-            else if (workloads.HasFlag(components) || workloads.HasFlag(ProjectComponents.Maui))
+            else if (workloads.HasFlag(components & (ProjectComponents.MauiAndroid | ProjectComponents.MauiiOS)))
             {
                 Logger.LogInformation($".NET MAUI workloads installed: {workloads}");
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI workload is already installed", BuildBreakRisk.None);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI workload(s) already installed", BuildBreakRisk.None);
             }
             else
             {
@@ -131,7 +148,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         /// <summary>
         /// Run specified `dotnet workload` command.
         /// </summary>
-        public Task<bool> RunWorkloadCommandAsync(IUpgradeContext context, string command, Func<bool, string, LogLevel> getMessageLogLevel, CancellationToken token)
+        public Task<bool> RunDotnetCommandAsync(IUpgradeContext context, string command, Func<bool, string, LogLevel> getMessageLogLevel, CancellationToken token)
         {
             if (context is null)
             {
@@ -141,9 +158,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             return _runner.RunProcessAsync(new ProcessInfo
             {
                 Command = "dotnet",
-                Arguments = Invariant($"workload {command}"),
+                Arguments = command,
                 EnvironmentVariables = context.GlobalProperties,
-                Name = "dotnet-workload",
+                Name = "dotnet",
                 GetMessageLogLevel = getMessageLogLevel,
             }, token);
         }

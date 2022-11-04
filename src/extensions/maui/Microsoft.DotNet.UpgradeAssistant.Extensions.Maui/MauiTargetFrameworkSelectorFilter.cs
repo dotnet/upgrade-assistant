@@ -25,26 +25,26 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             if (tfm.Components.HasFlag(ProjectComponents.XamarinAndroid))
             {
-                _logger.LogInformation("Project {Name} is of type Xamarin.Android, migration to .NET MAUI requires to be least net6.0-android.", tfm.Project);
-                tfm.TryUpdate(TargetFrameworkMoniker.Net60_Android);
+                _logger.LogInformation("Project {Name} is of type Xamarin.Android, migration to .NET MAUI recommends net7.0-android.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net70_Android);
             }
 
             if (tfm.Components.HasFlag(ProjectComponents.XamariniOS))
             {
-                _logger.LogInformation("Project {Name} is of type Xamarin.iOS, migration to .NET MAUI requires to be least net6.0-ios.", tfm.Project);
-                tfm.TryUpdate(TargetFrameworkMoniker.Net60_iOS);
+                _logger.LogInformation("Project {Name} is of type Xamarin.iOS, migration to .NET MAUI recommends net7.0-ios.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net70_iOS);
             }
 
             if (tfm.Components.HasFlag(ProjectComponents.MauiAndroid))
             {
-                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:Android, migration to .NET MAUI requires to be least net6.0-android.", tfm.Project);
-                tfm.TryUpdate(TargetFrameworkMoniker.Net60_Android);
+                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:Android, migration to .NET MAUI recommends net7.0-android.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net70_Android);
             }
 
             if (tfm.Components.HasFlag(ProjectComponents.MauiiOS))
             {
-                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:iOS, migration to .NET MAUI requires to be least net6.0-ios.", tfm.Project);
-                tfm.TryUpdate(TargetFrameworkMoniker.Net60_iOS);
+                _logger.LogInformation("Project {Name} is of type .NET MAUI Target:iOS, migration to .NET MAUI recommends net7.0-ios.", tfm.Project);
+                tfm.TryUpdate(TargetFrameworkMoniker.Net70_iOS);
             }
 
             if (tfm.Components.HasFlag(ProjectComponents.Maui))
@@ -56,7 +56,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 else
                 {
                     _logger.LogInformation("Project {Name} is of type .NET MAUI Target: MAUI head, migration to .NET MAUI requires to be multiplatform", tfm.Project);
-                    tfm.TryUpdate(TargetFrameworkMoniker.Net60_Android);
+                    tfm.TryUpdate(TargetFrameworkMoniker.Net70_Android);
                 }
             }
         }

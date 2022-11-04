@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PackExtension>true</PackExtension>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <Description>Provides data for loose assembly lookup based on NuGet.org</Description>
