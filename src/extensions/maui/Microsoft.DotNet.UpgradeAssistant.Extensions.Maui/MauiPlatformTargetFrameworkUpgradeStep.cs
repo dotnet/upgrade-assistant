@@ -130,11 +130,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var propertyValue = Enum.Parse(typeof(ProjectComponents), componentFlagProperty);
             if (ProjectComponents.XamarinAndroid.CompareTo(propertyValue) == 0)
             {
-                return TargetFrameworkMoniker.Net60_Android_31;
+                return TargetFrameworkMoniker.Net70_Android;
             }
             else
             {
-                return TargetFrameworkMoniker.Net60_iOS_13_5;
+                return TargetFrameworkMoniker.Net70_iOS;
             }
         }
 

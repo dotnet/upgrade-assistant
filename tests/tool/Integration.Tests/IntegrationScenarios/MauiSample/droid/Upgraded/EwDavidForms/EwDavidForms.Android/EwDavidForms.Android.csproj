@@ -5,7 +5,7 @@
     <UseMaui>true</UseMaui>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net6.0-android</TargetFramework>
+    <TargetFramework>net7.0-android</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\EwDavidForms\EwDavidForms.csproj" />
