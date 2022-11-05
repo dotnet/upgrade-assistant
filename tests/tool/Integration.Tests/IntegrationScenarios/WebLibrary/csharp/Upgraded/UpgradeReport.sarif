@@ -412,6 +412,80 @@
     {
       "tool": {
         "driver": {
+          "name": "Apply fix for UA0001: ASP.NET Core projects should not reference ASP.NET namespaces",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "UA0001",
+              "fullDescription": {
+                "text": "Diagnostic UA0001 fixed in [ACTUAL_PROJECT_ROOT]\\WebHelpers.cs"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "UA0001",
+          "message": {
+            "text": "Complete: Diagnostic UA0001 fixed in [ACTUAL_PROJECT_ROOT]\\WebHelpers.cs"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/WebHelpers.cs"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Apply fix for UA0001: ASP.NET Core projects should not reference ASP.NET namespaces",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "UA0001",
+              "fullDescription": {
+                "text": "Diagnostic UA0001 fixed in [ACTUAL_PROJECT_ROOT]\\WebHelpers.cs"
+              },
+              "helpUri": "about:blank"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "UA0001",
+          "message": {
+            "text": "Complete: Diagnostic UA0001 fixed in [ACTUAL_PROJECT_ROOT]\\WebHelpers.cs"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/WebHelpers.cs"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
           "name": "Apply fix for UA0005: Do not use HttpContext.Current",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
