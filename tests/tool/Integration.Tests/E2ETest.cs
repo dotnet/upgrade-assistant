@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AutoMapper.Configuration.Annotations;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
@@ -44,8 +45,9 @@ namespace Integration.Tests
 */
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
         [InlineData("WCFSample", "ConsoleApp.csproj", "")]
-        [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
-        [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
+        // TODO: [mgoertz] Re-enable after .NET 7 GA
+        //[InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
+        //[InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
