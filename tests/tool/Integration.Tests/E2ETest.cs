@@ -45,9 +45,10 @@ namespace Integration.Tests
 */
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
         [InlineData("WCFSample", "ConsoleApp.csproj", "")]
+
         // TODO: [mgoertz] Re-enable after .NET 7 GA
-        //[InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
-        //[InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
+        // [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
+        // [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
