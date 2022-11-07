@@ -20,6 +20,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         public string? Format { get; set; }
 
-        public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.LTS;
+        public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.STS;
     }
 }
