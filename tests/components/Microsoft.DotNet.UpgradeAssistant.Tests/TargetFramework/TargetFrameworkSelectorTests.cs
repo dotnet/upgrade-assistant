@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
     {
         private readonly DefaultTfmOptions _options = new DefaultTfmOptions
         {
-            Current = Current,
+            STS = STS,
             LTS = LTS,
             Preview = Preview,
         };
@@ -30,27 +30,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         [Fact]
         public void VerifyTestTfms()
         {
-            Assert.True(ParseTfm(Current).IsNetCore);
+            Assert.True(ParseTfm(STS).IsNetCore);
             Assert.True(ParseTfm(LTS).IsNetCore);
             Assert.True(ParseTfm(Preview).IsNetCore);
             Assert.True(ParseTfm(NetStandard20).IsNetStandard);
         }
 
-        [InlineData(new[] { NetStandard20 }, NetStandard20, UpgradeTarget.Current, ProjectComponents.None)]
+        [InlineData(new[] { NetStandard20 }, NetStandard20, UpgradeTarget.STS, ProjectComponents.None)]
         [InlineData(new[] { NetStandard20 }, NetStandard20, UpgradeTarget.LTS, ProjectComponents.None)]
-        [InlineData(new[] { NetStandard21 }, NetStandard21, UpgradeTarget.Current, ProjectComponents.None)]
+        [InlineData(new[] { NetStandard21 }, NetStandard21, UpgradeTarget.STS, ProjectComponents.None)]
         [InlineData(new[] { NetStandard21 }, NetStandard21, UpgradeTarget.LTS, ProjectComponents.None)]
         [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.LTS, ProjectComponents.None)]
         [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.LTS, ProjectComponents.WindowsDesktop)]
-        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.Current, ProjectComponents.WindowsDesktop)]
+        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.STS, ProjectComponents.WindowsDesktop)]
         [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.LTS, ProjectComponents.WindowsDesktop | ProjectComponents.WinRT)]
-        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.Current, ProjectComponents.WindowsDesktop | ProjectComponents.WinRT)]
-        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.Current, ProjectComponents.None)]
-        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.Current, ProjectComponents.AspNet)]
+        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.STS, ProjectComponents.WindowsDesktop | ProjectComponents.WinRT)]
+        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.STS, ProjectComponents.None)]
+        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.STS, ProjectComponents.AspNet)]
         [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.LTS, ProjectComponents.AspNet)]
-        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.Current, ProjectComponents.AspNetCore)]
-        [InlineData(new[] { Preview }, NetStandard20, UpgradeTarget.Current, ProjectComponents.AspNetCore)]
-        [InlineData(new[] { Net45, Preview }, NetStandard20, UpgradeTarget.Current, ProjectComponents.AspNetCore)]
+        [InlineData(new[] { Net45 }, NetStandard20, UpgradeTarget.STS, ProjectComponents.AspNetCore)]
+        [InlineData(new[] { Preview }, NetStandard20, UpgradeTarget.STS, ProjectComponents.AspNetCore)]
+        [InlineData(new[] { Net45, Preview }, NetStandard20, UpgradeTarget.STS, ProjectComponents.AspNetCore)]
         [Theory]
         public async Task NoDependencies(string[] currentTfms, string current, UpgradeTarget target, ProjectComponents components)
         {
@@ -70,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
                 .Setup(o => o.Value)
                 .Returns(new DefaultTfmOptions
                 {
-                    Current = Current,
+                    STS = STS,
                     LTS = LTS,
                     Preview = Preview,
                     TargetTfmSupport = target
@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             moniker.Setup(c => c.TryMerge(ParseTfm(current), tfm, out finalTfm)).Returns(true);
             moniker.SetupTryParse();
 
-            var appBase = target == UpgradeTarget.Current ? _options.Current : _options.LTS;
+            var appBase = target == UpgradeTarget.STS ? _options.STS : _options.LTS;
 
             var selector = mock.Create<TargetFrameworkSelector>();
 

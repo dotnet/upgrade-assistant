@@ -38,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public const string Net60_Android = "net6.0-android";
         public const string Net60_iOS = "net6.0-ios";
 
-        public const string Current = Net50;
+        public const string STS = Net50;
         public const string Preview = Net60;
         public const string LTS = NetCoreApp31;
 

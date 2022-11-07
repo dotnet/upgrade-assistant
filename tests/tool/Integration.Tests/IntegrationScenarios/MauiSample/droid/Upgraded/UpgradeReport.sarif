@@ -863,7 +863,7 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
               "fullDescription": {
-                "text": "Updated TFM to net6.0-android"
+                "text": "Updated TFM to net7.0-android"
               },
               "helpUri": "about:blank"
             }
@@ -874,7 +874,7 @@
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
           "message": {
-            "text": "Complete: Updated TFM to net6.0-android"
+            "text": "Complete: Updated TFM to net7.0-android"
           },
           "locations": [
             {
