@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PackExtension>true</PackExtension>
     <Description>Provides some services for the .NET Upgrade Assistant to identify loose dependencies based off of available NuGet feeds.</Description>
     <AssemblyName>Microsoft.DotNet.UpgradeAssistant.Extensions.LooseAssembly</AssemblyName>

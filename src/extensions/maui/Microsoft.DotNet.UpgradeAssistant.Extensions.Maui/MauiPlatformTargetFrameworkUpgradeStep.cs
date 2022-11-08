@@ -55,7 +55,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 {
                     projectproperties.RemoveProjectProperty("TargetFramework");
                     file.SetPropertyValue("UseMaui", "true");
-                    file.SetPropertyValue("TargetFrameworks", "net6.0-android;net6.0-ios");
+                    file.SetPropertyValue("TargetFrameworks", "net7.0-android;net7.0-ios");
                     await file.SaveAsync(token).ConfigureAwait(false);
                     Logger.LogInformation("Added TFMs to .NET MAUI project");
                     return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI Head project");
@@ -130,11 +130,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var propertyValue = Enum.Parse(typeof(ProjectComponents), componentFlagProperty);
             if (ProjectComponents.XamarinAndroid.CompareTo(propertyValue) == 0)
             {
-                return TargetFrameworkMoniker.Net60_Android_31;
+                return TargetFrameworkMoniker.Net70_Android;
             }
             else
             {
-                return TargetFrameworkMoniker.Net60_iOS_13_5;
+                return TargetFrameworkMoniker.Net70_iOS;
             }
         }
 
