@@ -8,7 +8,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public class DefaultTfmOptions
     {
         [Required]
-        public string Current { get; set; } = null!;
+        public string STS { get; set; } = null!;
 
         [Required]
         public string LTS { get; set; } = null!;
@@ -16,14 +16,14 @@ namespace Microsoft.DotNet.UpgradeAssistant
         [Required]
         public string Preview { get; set; } = null!;
 
-        public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.Current;
+        public UpgradeTarget TargetTfmSupport { get; set; } = UpgradeTarget.STS;
 
         public string DetermineTargetTfmValue() => this.TargetTfmSupport switch
         {
-            UpgradeTarget.Current => this.Current,
+            UpgradeTarget.STS => this.STS,
             UpgradeTarget.Preview => this.Preview,
             UpgradeTarget.LTS => this.LTS,
-            _ => this.LTS,
+            _ => this.STS,
         };
     }
 }

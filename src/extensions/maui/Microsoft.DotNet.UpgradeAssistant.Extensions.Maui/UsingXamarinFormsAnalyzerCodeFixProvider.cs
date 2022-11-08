@@ -2,16 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
+    [ApplicableComponents(ProjectComponents.Maui)]
     [ExportCodeFixProvider(LanguageNames.CSharp)]
     public class UsingXamarinFormsAnalyzerCodeFixProvider : CodeFixProvider
     {
@@ -39,16 +42,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 return;
             }
 
-            // Register a code action that will invoke the fix.
-            context.RegisterCodeFix(
-                CodeAction.Create(
-                    Resources.UsingXamarinFormsTitle,
-                    cancellationToken => ReplaceNodeAsync(context.Document, node, cancellationToken),
-                    nameof(Resources.UsingXamarinFormsTitle)),
-                context.Diagnostics);
+            // Register the appropriate code action that will invoke the fix
+            switch (node.RawKind)
+            {
+                case (int)SyntaxKind.UsingDirective:
+                case (int)SyntaxKind.UsingStatement:
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            Resources.UsingXamarinFormsTitle,
+                            cancellationToken => ReplaceUsingStatementAsync(context.Document, node, cancellationToken),
+                            nameof(Resources.UsingXamarinFormsTitle)),
+                        context.Diagnostics);
+                    break;
+                case (int)SyntaxKind.QualifiedName:
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            Resources.NamespaceXamarinFormsTitle,
+                            cancellationToken => RemoveNamespaceQualifierAsync(context.Document, node, cancellationToken),
+                            nameof(Resources.NamespaceXamarinFormsTitle)),
+                        context.Diagnostics);
+                    break;
+            }
         }
 
-        private static async Task<Document> ReplaceNodeAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private static async Task<Document> ReplaceUsingStatementAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
             var documentRoot = (CompilationUnitSyntax)editor.OriginalRoot;
@@ -59,6 +76,18 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             if (documentRoot is not null)
             {
                 editor.ReplaceNode(editor.OriginalRoot, documentRoot);
+            }
+
+            return editor.GetChangedDocument();
+        }
+
+        private static async Task<Document> RemoveNamespaceQualifierAsync(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        {
+            var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
+
+            if (node.Parent is not null)
+            {
+                editor.ReplaceNode(node.Parent, node.Parent.ChildNodes().Last());
             }
 
             return editor.GetChangedDocument();

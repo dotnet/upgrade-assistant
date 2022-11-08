@@ -34,6 +34,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public static readonly TargetFrameworkMoniker Net60_Android_31 = Net60_Android with { PlatformVersion = new Version(31, 0) };
         public static readonly TargetFrameworkMoniker Net60_iOS = Net60 with { Platform = Platforms.IOS };
         public static readonly TargetFrameworkMoniker Net60_iOS_13_5 = Net60_iOS with { PlatformVersion = new Version(13, 5) };
+        public static readonly TargetFrameworkMoniker Net70 = Net60 with { FrameworkVersion = new Version(7, 0) };
+        public static readonly TargetFrameworkMoniker Net70_Android = Net70 with { Platform = Platforms.Android };
+        public static readonly TargetFrameworkMoniker Net70_iOS = Net70 with { Platform = Platforms.IOS };
+        public static readonly TargetFrameworkMoniker Net70_Windows = Net70 with { Platform = Platforms.Windows };
 
 #pragma warning restore CA1707 // Identifiers should not contain underscores
 

@@ -20,12 +20,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             services.Services.AddTransient<IUpgradeReadyCheck, XamarinFormsVersionCheck>();
             services.Services.AddTransient<ITargetFrameworkSelectorFilter, MauiTargetFrameworkSelectorFilter>();
             services.Services.AddTransient<IComponentIdentifier, MauiComponentIdentifier>();
+            services.Services.AddUpgradeStep<MauiWorkloadUpgradeStep>();
             services.Services.AddUpgradeStep<MauiPlatformTargetFrameworkUpgradeStep>();
             services.Services.AddUpgradeStep<MauiAddProjectPropertiesStep>();
             services.Services.AddTransient<DiagnosticAnalyzer, UsingXamarinFormsAnalyzerAnalyzer>();
             services.Services.AddTransient<DiagnosticAnalyzer, UsingXamarinEssentialsAnalyzer>();
             services.Services.AddTransient<CodeFixProvider, UsingXamarinFormsAnalyzerCodeFixProvider>();
             services.Services.AddTransient<CodeFixProvider, UsingXamarinEssentialsAnalyzerCodeFixProvider>();
+            services.Services.AddUpgradeStep<XamlNamespaceUpgradeStep>();
         }
     }
 }

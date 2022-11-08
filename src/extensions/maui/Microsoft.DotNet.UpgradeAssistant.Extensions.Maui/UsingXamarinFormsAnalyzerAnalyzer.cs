@@ -34,10 +34,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-            context.RegisterSyntaxNodeAction(AnalyzeUsingStatements, SyntaxKind.UsingDirective);
+            context.RegisterSyntaxNodeAction(AnalyzeUsingDirectives, SyntaxKind.UsingDirective);
+            context.RegisterSyntaxNodeAction(AnalyzeQualifiedNames, SyntaxKind.QualifiedName);
         }
 
-        private void AnalyzeUsingStatements(SyntaxNodeAnalysisContext context)
+        private void AnalyzeUsingDirectives(SyntaxNodeAnalysisContext context)
         {
             var usingDirective = (UsingDirectiveSyntax)context.Node;
 
@@ -51,6 +52,33 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             if (DisallowedNamespaces.Any(name => namespaceName.Equals(name, StringComparison.Ordinal) || namespaceName.StartsWith($"{name}.", StringComparison.Ordinal)))
             {
                 var diagnostic = Diagnostic.Create(Rule, usingDirective.GetLocation(), namespaceName);
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+
+        private void AnalyzeQualifiedNames(SyntaxNodeAnalysisContext context)
+        {
+            var qualifiedNameNode = (QualifiedNameSyntax)context.Node;
+            if (qualifiedNameNode is null)
+            {
+                return;
+            }
+
+            var parentNode = qualifiedNameNode.Parent;
+            while (parentNode is not null)
+            {
+                if (parentNode.IsKind(SyntaxKind.UsingDirective) || parentNode.IsKind(SyntaxKind.UsingStatement))
+                {
+                    return;
+                }
+
+                parentNode = parentNode.Parent;
+            }
+
+            var qualifiedName = qualifiedNameNode.ToString();
+            if (DisallowedNamespaces.Any(name => qualifiedName.Equals(name, StringComparison.Ordinal)))
+            {
+                var diagnostic = Diagnostic.Create(Rule, qualifiedNameNode.GetLocation(), qualifiedName);
                 context.ReportDiagnostic(diagnostic);
             }
         }

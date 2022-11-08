@@ -225,7 +225,7 @@
     <value>The path to a project or solution file to be used.</value>
   </data>
   <data name="UpgradeAssistantCommandTargetTfm" xml:space="preserve">
-    <value>Select if you would like the Long Term Support (LTS), Current, or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details on what these mean.</value>
+    <value>Select if you would like the Long Term Support (LTS), Standard Term Support (STS), or Preview TFM. See https://dotnet.microsoft.com/platform/support/policy/dotnet-core for details on what these mean.</value>
   </data>
   <data name="UpgradeAssistantCommandVS" xml:space="preserve">
     <value>Path to a VS install directory to be used for %VSINSTALLDIR%. If not provided, the latest installed version will be used.</value>

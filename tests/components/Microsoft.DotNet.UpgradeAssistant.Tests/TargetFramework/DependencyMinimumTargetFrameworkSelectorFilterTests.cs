@@ -18,16 +18,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
         [InlineData(new string[] { }, new string[] { }, null)]
         [InlineData(new[] { NetStandard20 }, new[] { NetStandard20 }, NetStandard20)]
         [InlineData(new[] { NetStandard21 }, new[] { NetStandard20 }, NetStandard21)]
-        [InlineData(new[] { Current }, new[] { NetStandard20 }, Current)]
-        [InlineData(new[] { NetStandard20 }, new[] { Current }, Current)]
-        [InlineData(new[] { NetStandard20 }, new[] { NetStandard20, Current }, NetStandard20)]
-        [InlineData(new[] { NetStandard20 }, new[] { Current, NetStandard20 }, NetStandard20)]
-        [InlineData(new[] { Current, LTS }, new[] { Current, NetStandard20 }, LTS)]
-        [InlineData(new[] { LTS, Current }, new[] { Current, NetStandard20 }, LTS)]
-        [InlineData(new[] { Current, NetStandard20 }, new[] { Current, LTS }, LTS)]
-        [InlineData(new[] { Current }, new[] { Current, NetStandard20 }, Current)]
-        [InlineData(new[] { Current, NetStandard20 }, new[] { Current }, Current)]
-        [InlineData(new[] { Current, NetStandard20 }, new[] { NetStandard20 }, NetStandard20)]
+        [InlineData(new[] { STS }, new[] { NetStandard20 }, STS)]
+        [InlineData(new[] { NetStandard20 }, new[] { STS }, STS)]
+        [InlineData(new[] { NetStandard20 }, new[] { NetStandard20, STS }, NetStandard20)]
+        [InlineData(new[] { NetStandard20 }, new[] { STS, NetStandard20 }, NetStandard20)]
+        [InlineData(new[] { STS, LTS }, new[] { STS, NetStandard20 }, LTS)]
+        [InlineData(new[] { LTS, STS }, new[] { STS, NetStandard20 }, LTS)]
+        [InlineData(new[] { STS, NetStandard20 }, new[] { STS, LTS }, LTS)]
+        [InlineData(new[] { STS }, new[] { STS, NetStandard20 }, STS)]
+        [InlineData(new[] { STS, NetStandard20 }, new[] { STS }, STS)]
+        [InlineData(new[] { STS, NetStandard20 }, new[] { NetStandard20 }, NetStandard20)]
         [Theory]
         public void WithDependencies(string[] dep1Tfms, string[] dep2tfms, string? expected)
         {
@@ -65,16 +65,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
                     _ when x == y => 0,
                     (Net45, _) => -1,
                     (_, Net45) => 1,
-                    (Preview, Current) => 1,
-                    (Current, Preview) => -1,
+                    (Preview, STS) => 1,
                     (NetStandard20, NetStandard21) => -1,
                     (NetStandard21, NetStandard20) => 1,
-                    (NetStandard20, Current) => -1,
-                    (Current, NetStandard20) => 1,
+                    (NetStandard20, STS) => -1,
+                    (STS, NetStandard20) => 1,
                     (NetStandard20, LTS) => -1,
                     (LTS, NetStandard20) => 1,
-                    (LTS, Current) => -1,
-                    (Current, LTS) => 1,
+                    (LTS, STS) => -1,
+                    (STS, LTS) => 1,
                     _ => throw new NotImplementedException(),
                 };
 

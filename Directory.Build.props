@@ -8,11 +8,7 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
 
-    <!--
-      Use version 3.8.0 of CodeAnalysis assemblies to preserve compatibility
-      with Visual Studio 2019 16.8
-    -->
-    <MicrosoftCodeAnalysisVersion>3.8.0</MicrosoftCodeAnalysisVersion>
+    <MicrosoftCodeAnalysisVersion>4.0.0</MicrosoftCodeAnalysisVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(DotNetBuildFromSource)' == 'true'">

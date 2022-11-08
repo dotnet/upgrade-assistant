@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
+    [ApplicableComponents(ProjectComponents.Maui)]
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = "Using Microsoft.Maui.Essentials code fixer")]
     public class UsingXamarinEssentialsAnalyzerCodeFixProvider : CodeFixProvider
     {

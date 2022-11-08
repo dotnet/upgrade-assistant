@@ -12,7 +12,5 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="MauiProgram.cs" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

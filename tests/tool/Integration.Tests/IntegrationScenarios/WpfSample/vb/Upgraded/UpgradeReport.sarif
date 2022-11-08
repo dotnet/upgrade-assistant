@@ -86,7 +86,7 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
               "fullDescription": {
-                "text": "Updated TFM to net6.0-windows"
+                "text": "Updated TFM to net7.0-windows"
               },
               "helpUri": "about:blank"
             }
@@ -97,7 +97,7 @@
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
           "message": {
-            "text": "Complete: Updated TFM to net6.0-windows"
+            "text": "Complete: Updated TFM to net7.0-windows"
           },
           "locations": [
             {
