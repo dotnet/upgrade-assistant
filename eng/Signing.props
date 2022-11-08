@@ -8,6 +8,8 @@
     <FileSignInfo Include="Autofac.Extensions.DependencyInjection.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="AutoMapper.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="DiffPlex.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="MessagePack.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="MessagePack.Annotations.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Newtonsoft.Json.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Serilog.Extensions.Hosting.dll" CertificateName="3PartySHA2" />
