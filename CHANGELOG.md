@@ -3,6 +3,17 @@ All notable changes to the .NET Upgrade Assistant will be documented in this fil
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
+## Version 0.4.355802 - 2022-11-08([Link](https://www.nuget.org/packages/upgrade-assistant/0.4.355802))
+
+### Added
+- Added STS (Standard Term Support) as an option to the Target framework selection (`-t, --target-tfm-support <LTS|Preview|STS>`) (https://github.com/dotnet/upgrade-assistant/pull/1350)
+- Additional support for Xamarin Forms to MAUI migration (https://github.com/dotnet/upgrade-assistant/pull/1349)
+  - XAML namespace updates
+  - MAUI workload install step
+  - Target net7.0 for MAUI projects
+  
+### Changed
+- Removed Current as an option from the Target framework selection (https://github.com/dotnet/upgrade-assistant/pull/1350)
 
 ## Version 0.4.346202 - 2022-09-20([Link](https://www.nuget.org/packages/upgrade-assistant/0.4.346202))
 
