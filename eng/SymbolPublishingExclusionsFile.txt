@@ -1,2 +1,4 @@
 tools/net6.0/any/extensions/binaryanalysis/runtimes/alpine-x64/native/libe_sqlite3.so
 tools/net6.0/any/extensions/binaryanalysis/runtimes/linux-musl-x64/native/libe_sqlite3.so
+tools/net7.0/any/extensions/binaryanalysis/runtimes/alpine-x64/native/libe_sqlite3.so
+tools/net7.0/any/extensions/binaryanalysis/runtimes/linux-musl-x64/native/libe_sqlite3.so
