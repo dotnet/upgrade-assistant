@@ -18,6 +18,8 @@ variables:
     value: 5.0.x
   - name: net6ver
     value: 6.0.x
+  - name: Codeql.Enabled
+    value: true
 
 trigger:
   batch: true
