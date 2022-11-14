@@ -14,12 +14,12 @@ variables:
     - group: UpgradeAssistant_SDL_Settings
   - name: DownloadLooseAssemblyIndex
     value: true
+  - name: Codeql.Enabled
+    value: true
   - name: net5ver
     value: 5.0.x
   - name: net6ver
     value: 6.0.x
-  - name: Codeql.Enabled
-    value: true
 
 trigger:
   batch: true
