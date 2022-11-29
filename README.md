@@ -190,7 +190,7 @@ Options:
                                                  ExtensionManifest.json file, or a zip archive containing an extension.
                                                  This option can be specified multiple times.
   -v, --verbose                                  Enable verbose diagnostics
-  --target-tfm-support <STS|LTS|Preview>     Select if you would like the Long Term Support (LTS), Short Term Support (STS), or
+  --target-tfm-support <STS|LTS|Preview>         Select if you would like the Long Term Support (LTS), Short Term Support (STS), or
                                                  Preview TFM. See
                                                  https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
                                                  details for what these mean.
