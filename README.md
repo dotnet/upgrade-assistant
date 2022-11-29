@@ -161,7 +161,7 @@ Options:
   --non-interactive                              Automatically select each first option in non-interactive mode.
   --non-interactive-wait <non-interactive-wait>  Wait the supplied seconds before moving on to the next option in
                                                  non-interactive mode.
-  --target-tfm-support <Current|LTS|Preview>     Select if you would like the Long Term Support (LTS), Current, or
+  --target-tfm-support <STS|LTS|Preview>         Select if you would like the Long Term Support (LTS), Short Term Support (STS), or
                                                  Preview TFM. See
                                                  https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
                                                  details for what these mean.
@@ -190,7 +190,7 @@ Options:
                                                  ExtensionManifest.json file, or a zip archive containing an extension.
                                                  This option can be specified multiple times.
   -v, --verbose                                  Enable verbose diagnostics
-  --target-tfm-support <Current|LTS|Preview>     Select if you would like the Long Term Support (LTS), Current, or
+  --target-tfm-support <STS|LTS|Preview>     Select if you would like the Long Term Support (LTS), Short Term Support (STS), or
                                                  Preview TFM. See
                                                  https://dotnet.microsoft.com/platform/support/policy/dotnet-core for
                                                  details for what these mean.
