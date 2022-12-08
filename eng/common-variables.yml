@@ -1,0 +1,9 @@
+variables:
+  - name: _TsaBugAreaPath
+    value: 'DevDiv\Web Tools'
+  - name: _TsaInstanceURL
+    value: 'https://devdiv.visualstudio.com/'
+  - name: _TsaIterationPath
+    value: DevDiv
+  - name: _TsaProjectName
+    value: DEVDIV

@@ -56,6 +56,9 @@ jobs:
       -configuration $(_BuildConfig)
       -prepareMachine
       /p:Test=false
+      /p:Sign=false
+      /p:Pack=false
+      /p:Publish=false
     displayName: Windows Build
 
   - task: CodeQL3000Finalize@0
