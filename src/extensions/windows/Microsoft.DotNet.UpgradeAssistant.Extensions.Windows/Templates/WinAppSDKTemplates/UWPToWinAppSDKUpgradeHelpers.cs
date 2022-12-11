@@ -16,4 +16,16 @@ namespace UWPToWinAppSDKUpgradeHelpers
             [System.Runtime.InteropServices.In] ref Guid riid);
         void ShowShareUIForWindow(IntPtr appWindow);
     }
+
+    static class DataTransferManagerHelper
+    {
+        public static Windows.ApplicationModel.DataTransfer.DataTransferManager MarshalledDataTransferManagerFromWindow(IntPtr appWindow)
+        {
+            var _dtm_iid = new Guid(0xa5caee9b, 0x8708, 0x49d1, 0x8d, 0x36, 0x67, 0xd2, 0x5a, 0x8d, 0xa0, 0x0c);
+            var result = Windows.ApplicationModel.DataTransfer.DataTransferManager.As<UWPToWinAppSDKUpgradeHelpers.IDataTransferManagerInterop>()
+                .GetForWindow(appWindow, _dtm_iid);
+
+            return WinRT.MarshalInterface<Windows.ApplicationModel.DataTransfer.DataTransferManager>.FromAbi(result);
+        }
+    }
 }
