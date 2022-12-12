@@ -65,9 +65,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             }
 
             var documentEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-            var newExpressionText = invocationExpressionSyntax.ToString().Contains("GetForCurrentView") ?
-                "\n   UWPToWinAppSDKUpgradeHelpers.DataTransferManagerHelper.MarshalledDataTransferManagerFromWindow(App.WindowHandle)" :
-                "\n   Windows.ApplicationModel.DataTransfer.DataTransferManager.As<UWPToWinAppSDKUpgradeHelpers.IDataTransferManagerInterop>().ShowShareUIForWindow(App.WindowHandle)";
+            var newExpressionText = invocationExpressionSyntax.ToString().Contains("GetForCurrentView") ? @"
+                UWPToWinAppSDKUpgradeHelpers.DataTransferManagerHelper.MarshalledDataTransferManagerFromWindow(App.WindowHandle)
+                " : @"
+                Windows.ApplicationModel.DataTransfer.DataTransferManager.As<UWPToWinAppSDKUpgradeHelpers.IDataTransferManagerInterop>().ShowShareUIForWindow(App.WindowHandle)
+                ";
             var newExpressionRoot = await CSharpSyntaxTree.ParseText(newExpressionText, cancellationToken: cancellationToken).GetRootAsync(cancellationToken).ConfigureAwait(false);
             var newExpression = newExpressionRoot.DescendantNodes().OfType<InvocationExpressionSyntax>().First();
             documentEditor.ReplaceNode(invocationExpressionSyntax, newExpression);
