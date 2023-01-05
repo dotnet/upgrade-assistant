@@ -25,7 +25,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"error: can't open catalog: {ex.Message}");
+                await Console.Error.WriteLineAsync($"error: can't open catalog: {ex.Message}").ConfigureAwait(false);
                 Environment.Exit(1);
                 return null;
             }

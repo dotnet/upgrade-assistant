@@ -85,7 +85,7 @@ namespace MSBuild.Abstractions
             }
             else
             {
-                if (tfv == string.Empty)
+                if (string.IsNullOrEmpty(tfv))
                 {
                     throw new InvalidOperationException($"{MSBuildFacts.LegacyTargetFrameworkVersionNodeName} is not set!");
                 }
