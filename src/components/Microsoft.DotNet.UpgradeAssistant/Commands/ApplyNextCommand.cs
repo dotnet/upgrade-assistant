@@ -21,9 +21,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Commands
         // todo - support localization
         public override string CommandText => $"Apply next step ({_step.Title})";
 
-        public override async Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
+        public override Task<bool> ExecuteAsync(IUpgradeContext context, CancellationToken token)
         {
-            return await _step.ApplyAsync(context, token).ConfigureAwait(false);
+            return _step.ApplyAsync(context, token);
         }
     }
 }
