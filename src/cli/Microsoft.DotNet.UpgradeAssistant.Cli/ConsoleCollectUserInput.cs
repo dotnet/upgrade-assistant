@@ -25,10 +25,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 
         public async Task<string?> AskUserAsync(string prompt)
         {
-            await _io.Output.WriteLineAsync(prompt);
-            await _io.Output.WriteAsync(Prompt);
+            await _io.Output.WriteLineAsync(prompt).ConfigureAwait(false);
+            await _io.Output.WriteAsync(Prompt).ConfigureAwait(false);
 
-            return await _io.Input.ReadLineAsync();
+            return await _io.Input.ReadLineAsync().ConfigureAwait(false);
         }
 
         public async Task<T> ChooseAsync<T>(string message, IEnumerable<T> commands, CancellationToken token)
