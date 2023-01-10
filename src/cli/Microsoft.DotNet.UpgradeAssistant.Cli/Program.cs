@@ -5,6 +5,9 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 using Microsoft.DotNet.UpgradeAssistant.Cli.Commands.ExtensionManagement;
@@ -15,6 +18,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
 {
     public static class Program
     {
+        static readonly string location;
+
+        static Program()
+        {
+            location = Assembly.GetCallingAssembly().Location;
+            location = Path.GetDirectoryName(location) ?? string.Empty;
+        }
+
         public static Task<int> Main(string[] args)
         {
             if (FeatureFlags.IsWindowsCheckEnabled && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -22,6 +33,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 Console.WriteLine(LocalizedStrings.NonWindowsWarning);
                 return Task.FromResult(ErrorCodes.PlatformNotSupported);
             }
+
+            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
 
             var root = new RootCommand
             {
@@ -60,6 +73,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
                 using var current = System.Diagnostics.Process.GetCurrentProcess();
                 return current.ProcessName;
             }
+        }
+
+        private static Assembly? OnAssemblyResolve(object? sender, ResolveEventArgs args)
+        {
+            Assembly? result = null;
+            AssemblyName an = new(args.Name);
+            if (an.Name?.EndsWith(".resources", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                string dllName = an.Name + ".dll";
+                string path = Path.Combine(location, dllName);
+                if (!File.Exists(path))
+                {
+                    Debug.WriteLine("ADDED " + dllName);
+                    string source = @"C:\v1\out\tests\x86chk\DesignTools.Tests.Component.SurfaceDesigner\" + dllName;
+                    string dest = @"C:\x1\upas\artifacts\bin\Microsoft.DotNet.UpgradeAssistant.Cli\Debug\net7.0\" + dllName;
+                    File.Copy(source, dest);
+                }
+
+                try
+                {
+                    result = Assembly.LoadFile(path);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+            }
+
+            return result;
         }
 
         public static void ShowHeader()

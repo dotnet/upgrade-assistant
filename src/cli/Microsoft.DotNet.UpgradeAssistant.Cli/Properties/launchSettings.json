@@ -50,6 +50,20 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
+    },
+    "XamApp1 Analyze": {
+      "commandName": "Project",
+      "commandLineArgs": "analyze C:\\Users\\evgenyt\\source\\repos\\XamApp1\\XamApp1.sln",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "XamApp1 Upgrade": {
+      "commandName": "Project",
+      "commandLineArgs": "upgrade C:\\Users\\evgenyt\\source\\repos\\XamApp1\\XamApp1.sln",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }
