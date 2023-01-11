@@ -22,7 +22,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
     public class XamlNamespaceUpgradeStep : UpgradeStep
     {
-        private static readonly IReadOnlyDictionary<string, string> XamarinToMauiReplacementMap = new Dictionary<string, string>
+        public static readonly IReadOnlyDictionary<string, string> XamarinToMauiReplacementMap = new Dictionary<string, string>
         {
             { "http://xamarin.com/schemas/2014/forms", "http://schemas.microsoft.com/dotnet/2021/maui" },
             { "http://xamarin.com/schemas/2020/toolkit", "http://schemas.microsoft.com/dotnet/2022/maui/toolkit" },
@@ -35,7 +35,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
         private readonly IPackageRestorer _restorer;
         private readonly XamlTreeProvider _xamlTreeProvider = new();
-        private readonly Identifier xmlns = Identifier.For("xmlns");
 
         public override string Title => "Update XAML Namespaces";
 

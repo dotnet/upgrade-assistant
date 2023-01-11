@@ -140,5 +140,32 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui {
                 return ResourceManager.GetString("UsingXamarinFormsTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Xamarin construct is not supported on .NET MAUI and should be replaced..
+        /// </summary>
+        internal static string XamlAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("XamlAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .NET MAUI projects should not reference Xamarin in XAML.
+        /// </summary>
+        internal static string XamlAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("XamlAnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix XF=&gt;MAUI in file.
+        /// </summary>
+        internal static string XamlsAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("XamlsAnalyzerMessageFormat", resourceCulture);
+            }
+        }
     }
 }

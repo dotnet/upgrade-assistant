@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
@@ -72,12 +73,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                 var compilation = await roslynProject.GetCompilationAsync(token).ConfigureAwait(false);
                 if (compilation is not null)
                 {
+                    // Include *.xaml files
+                    List<AdditionalText> xamlFiles = new List<AdditionalText>();
+                    foreach (var document in roslynProject.AdditionalDocuments)
+                    {
+                        if (document.FilePath?.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            SourceText sourceText = await document.GetTextAsync(token).ConfigureAwait(false);
+                            xamlFiles.Add(new AdditionalTextWrapper(document, sourceText));
+                        }
+                    }
+
+                    var texts = _additionalTexts.AddRange(xamlFiles);
                     var compilationWithAnalyzer = compilation
-                        .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(_additionalTexts), ProcessAnalyzerException, true, true));
+                        .WithAnalyzers(ImmutableArray.CreateRange(applicableAnalyzers), new CompilationWithAnalyzersOptions(new AnalyzerOptions(texts), ProcessAnalyzerException, true, true));
 
                     // Find all diagnostics that registered analyzers produce
-                    var diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false)).Where(d => d.Location.IsInSource);
-                    _logger.LogInformation("Identified {DiagnosticCount} diagnostics in project {ProjectName}", diagnostics.Count(), roslynProject.Name);
+                    var diagnostics = (await compilationWithAnalyzer.GetAnalyzerDiagnosticsAsync(token).ConfigureAwait(false))
+                        /*.Where(d => d.Location.IsInSource)*/.ToList();
+                    _logger.LogInformation("Identified {DiagnosticCount} diagnostics in project {ProjectName}", diagnostics.Count, roslynProject.Name);
                     return diagnostics;
                 }
             }
@@ -94,5 +108,25 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         public IEnumerable<DiagnosticDescriptor> GetDiagnosticDescriptors(CodeFixProvider provider)
             => _allAnalyzers.SelectMany(a => a.SupportedDiagnostics).Where(d => provider.FixableDiagnosticIds.Contains(d.Id));
+
+        private class AdditionalTextWrapper : AdditionalText
+        {
+            private readonly TextDocument document;
+            private SourceText text;
+
+            public AdditionalTextWrapper(TextDocument document, SourceText text)
+            {
+                this.document = document ?? throw new ArgumentNullException(nameof(document));
+                this.text = text ?? throw new ArgumentNullException(nameof(text));
+            }
+
+            public override string Path => this.document.FilePath ?? throw new InvalidOperationException();
+
+            public override SourceText? GetText(CancellationToken cancellationToken = default)
+            {
+                this.document.TryGetText(out var sourceText);
+                return sourceText;
+            }
+        }
     }
 }

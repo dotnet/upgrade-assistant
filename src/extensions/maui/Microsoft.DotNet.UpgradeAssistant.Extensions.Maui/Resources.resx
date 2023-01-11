@@ -144,4 +144,14 @@
   <data name="UsingXamarinFormsTitle" xml:space="preserve">
     <value>Replace using directive</value>
   </data>
+  <data name="XamlAnalyzerTitle" xml:space="preserve">
+    <value>.NET MAUI projects should not reference Xamarin in XAML</value>
+  </data>
+  <data name="XamlsAnalyzerMessageFormat" xml:space="preserve">
+    <value>Fix XF=>MAUI in file</value>
+  </data>
+  <data name="XamlAnalyzerDescription" xml:space="preserve">
+    <value>This Xamarin construct is not supported on .NET MAUI and should be replaced.</value>
+  </data>
+
 </root>

@@ -25,9 +25,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             services.Services.AddUpgradeStep<MauiAddProjectPropertiesStep>();
             services.Services.AddTransient<DiagnosticAnalyzer, UsingXamarinFormsAnalyzerAnalyzer>();
             services.Services.AddTransient<DiagnosticAnalyzer, UsingXamarinEssentialsAnalyzer>();
+            services.Services.AddTransient<DiagnosticAnalyzer, XamlAnalyzer>();
             services.Services.AddTransient<CodeFixProvider, UsingXamarinFormsAnalyzerCodeFixProvider>();
             services.Services.AddTransient<CodeFixProvider, UsingXamarinEssentialsAnalyzerCodeFixProvider>();
-            services.Services.AddUpgradeStep<XamlNamespaceUpgradeStep>();
+            services.Services.AddTransient<CodeFixProvider, XamlCodeFixProvider>();
+            //services.Services.AddUpgradeStep<XamlNamespaceUpgradeStep>();
         }
     }
 }
