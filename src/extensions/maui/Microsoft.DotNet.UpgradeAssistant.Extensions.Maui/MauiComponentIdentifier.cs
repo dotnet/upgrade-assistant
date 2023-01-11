@@ -40,7 +40,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 }
             }
 
-            if (project.NuGetReferences.PackageReferences.Any(x => x.Name.Equals(_xamarinFormsPackage, StringComparison.OrdinalIgnoreCase)) && project.TargetFrameworks.FirstOrDefault().Equals(TargetFrameworkMoniker.NetStandard20))
+            if (project.NuGetReferences.PackageReferences.Any(x => x.Name.Equals(_xamarinFormsPackage, StringComparison.OrdinalIgnoreCase)) && project.IsNetStandard())
             {
                 components |= ProjectComponents.Maui;
             }

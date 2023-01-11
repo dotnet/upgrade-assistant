@@ -32,7 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
 
             if (tfm.Components.HasFlag(ProjectComponents.MauiAndroid) || tfm.Components.HasFlag(ProjectComponents.MauiiOS) || tfm.Components.HasFlag(ProjectComponents.Maui))
             {
-                _logger.LogInformation("Skip minimum dependency check because .NET MAUI support multiple TFMs.");
+                _logger.LogInformation("Skip minimum dependency check because .NET MAUI supports multiple TFMs.");
             }
             else if (tfm.Components.HasFlag(ProjectComponents.WinUI))
             {
@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
                     {
                         if (tfm.TryUpdate(min))
                         {
-                            _logger.LogInformation("Recommending TFM {TFM} because of dependency on project {Dependency}", min, dep.GetFile().FilePath);
+                            _logger.LogInformation("Recommending TFM {TFM} for project {Name} because of dependency on project {Dependency}", min, tfm.Project, dep.GetFile().FilePath);
                         }
                     }
                 }

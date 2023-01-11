@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.TargetFramework
             {
                 if (tfm.TryUpdate(tfm.AppBase))
                 {
-                    _logger.LogInformation("Recommending executable TFM {TFM} because the project builds to an executable", tfm.AppBase);
+                    _logger.LogInformation("Recommending executable TFM {TFM} for project {Name} because the project builds to an executable", tfm.AppBase, tfm.Project);
                 }
             }
         }
