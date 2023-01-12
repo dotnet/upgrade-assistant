@@ -6,94 +6,25 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Channels;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.DesignTools.Markup.Metadata;
-using Microsoft.VisualStudio.DesignTools.Xaml.LanguageService.RoslynPrototype;
 using Microsoft.VisualStudio.DesignTools.Xaml.LanguageService.Semantics;
 using Microsoft.VisualStudio.DesignTools.XamlAnalyzer;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
-    [DebuggerDisplay("{Offset}, {Text,nq}")]
-    public struct Change
-    {
-        public Change(int offset, int length, string text)
-        {
-            this.Offset = offset;
-            this.Length = length;
-            this.Text = text;
-        }
-
-        public Change(SourceLocation loc, string text)
-        {
-            this.Offset = loc.Location;
-            this.Length = loc.Length;
-            this.Text = text;
-        }
-
-        public readonly int Offset;
-        public readonly int Length;
-        public readonly string Text;
-
-        public Change Shift(int offset) => new(Offset + offset, Length, Text);
-
-        public string Serialize() => $"{Offset},{Length},{Text}";
-
-        public static bool TryParse(string value, out Change change)
-        {
-            change = default;
-
-            int first = value.IndexOf(',');
-            int second = value.IndexOf(',', first + 1);
-            if (first <= 0 || second <= first ||
-                !int.TryParse(value.Substring(0, first), out var offset) ||
-                !int.TryParse(value.Substring(first + 1, second - first - 1), out var length))
-            {
-                return false;
-            }
-
-            string text = value.Substring(second + 1);
-            change = new Change(offset, length, text);
-            return true;
-        }
-
-        public static string Serialize(IEnumerable<Change> changes) => string.Join("|", changes.Select(c => c.Serialize()));
-        
-        public static bool TryParse(string value, out IReadOnlyList<Change> changes)
-        {
-            changes = Array.Empty<Change>();
-
-            string[] parts = value.Split('|');
-            List<Change> list = new List<Change>(parts.Length);
-            foreach (var part in parts)
-            {
-                if (Change.TryParse(part, out Change change))
-                {
-                    list.Add(change);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            changes = list;
-            return true;
-        }
-
-    }
 
     [ApplicableComponents(ProjectComponents.Maui)]
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class XamlAnalyzer : XamlAnalyzerBase
     {
+        public const string NewText = nameof(NewText);
+        public const string FilePath = nameof(FilePath);
+
         public const string DiagnosticId = "UA0020";
         private const string Category = "Upgrade";
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.XamlAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
@@ -101,16 +32,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private static readonly LocalizableString Description = new LocalizableResourceString(nameof(Resources.XamlAnalyzerDescription), Resources.ResourceManager, typeof(Resources));
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
 
-        public XamlAnalyzer()
-        {
-        }
-
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Rule);
-
-        public override void Initialize(AnalysisContext context)
-        {
-            base.Initialize(context);
-        }
 
         protected override void AnalyzeAdditoinalFile(AdditionalFileAnalysisContext context)
         {
@@ -143,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             // Collect namespace replacements
-            List<Change> xmlChanges = new();
+            List<TextChange> xmlChanges = new();
             CollectXmlnsChanges(xmlTree.RootElement, xmlChanges);
             if (xmlChanges.Count == 0)
             {
@@ -151,7 +73,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             // Create XAML containing new namespaces
-            var newSourceText = UpdateText(sourceText, xmlChanges);
+            var newText = GetUpdatedText(sourceText, xmlChanges);
+            var newSourceText = SourceText.From(newText, sourceText.Encoding);
             xmlTree = GetValidXmlTree(newSourceText, file.Path, context.CancellationToken);
             if (xmlTree == null)
             {
@@ -160,67 +83,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var compilation = EnsureMauiGraphics(context.Compilation);
             XamlTree xamlTree = this.XamlTreeProvider.GetXamlTree(compilation, xmlTree, context.CancellationToken);
-            List<Change> xamlChanges = new();
+            List<TextChange> xamlChanges = new();
             CollectXamlChanges(xamlTree.RootElement, xamlChanges);
+            newText = GetUpdatedText(newSourceText, xamlChanges);
 
-            // Remap XAML changes back to original text
-            List<Change> changes = new List<Change>(xamlChanges);
-            UpdateRanges(xmlChanges, changes);
-            changes.AddRange(xmlChanges);
-            changes.Sort((a, b) => a.Offset.CompareTo(b.Offset));
-            string allChanges = Change.Serialize(changes);
-
-            // Create single action
+            // Create "replace all text" action
             TextSpan span = new TextSpan(0, sourceText.Length);
             LinePositionSpan lineSpan = sourceText.Lines.GetLinePositionSpan(span);
             var location = Location.Create(context.AdditionalFile.Path, span, lineSpan);
-            var props = ImmutableDictionary.CreateRange(new KeyValuePair<string, string?>[]
-            {
-                new("Changes", allChanges),
-                new("Path", context.AdditionalFile.Path)
-            });
+            var props = ImmutableDictionary.CreateRange(new KeyValuePair<string, string?>[] { new(XamlAnalyzer.NewText, newText) });
             var diagnostic = Diagnostic.Create(XamlAnalyzer.Rule, location, props);
             context.ReportDiagnostic(diagnostic);
         }
 
-        private static void UpdateRanges(List<Change> xmlChanges, List<Change> changes)
+        private static string GetUpdatedText(SourceText sourceText, List<TextChange> changes)
         {
-            xmlChanges.Sort((a, b) => a.Offset.CompareTo(b.Offset));
-            changes.Sort((a, b) => a.Offset.CompareTo(b.Offset));
-
-            List<(int offset, int shift)> shifts = new(xmlChanges.Count);
-            int runningDelta = 0;
-            for (int i = 0; i < xmlChanges.Count; i++)
-            {
-                var change = xmlChanges[i];
-                var offset = change.Offset + runningDelta;
-                runningDelta += change.Text.Length - change.Length;
-                shifts.Add((offset, runningDelta));
-            }
-
-            for (int i = 0; i < changes.Count; i++)
-            {
-                var change = changes[i];
-                (int offset, int shift) item = (change.Offset, 0);
-                int index = shifts.BinarySearch(item);
-                if (index < 0)
-                {
-                    index = ~index - 1;
-                }
-
-                item = shifts[index];
-                changes[i] = change.Shift(-item.shift);
-            }
-        }
-
-        private static SourceText UpdateText(SourceText sourceText, List<Change> changes)
-        {
+            var text = sourceText.ToString();
             if (changes.Count == 0)
             {
-                return sourceText;
+                return text;
             }
 
-            var text = sourceText.ToString();
             StringBuilder builder = new StringBuilder(text.Length);
             changes.Sort((a, b) => a.Offset.CompareTo(b.Offset));
             int start = 0;
@@ -234,12 +117,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             builder.Append(text.Substring(start));
-            text = builder.ToString();
-            var newSourceText = SourceText.From(text, sourceText.Encoding);
+            var newSourceText = builder.ToString();
             return newSourceText;
         }
 
-        private static void CollectXmlnsChanges(XmlElement element, List<Change> changes)
+        private static void CollectXmlnsChanges(XmlElement element, List<TextChange> changes)
         {
             if (element.Attributes != null)
             {
@@ -250,7 +132,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     {
                         // Range for attribute value includes quotes. We need to exclude them.
                         var range = attribute.Value.Range;
-                        var change = new Change(range.Location + 1, range.Length - 2, newns);
+                        var change = new TextChange(range.Location + 1, range.Length - 2, newns);
                         changes.Add(change);
                     }
                 }
@@ -265,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
         }
 
-        private static void CollectXamlChanges(XamlElement element, List<Change> changes)
+        private static void CollectXamlChanges(XamlElement element, List<TextChange> changes)
         {
             // Example: <x:StaticExtension> Color.Red </x:StaticExtension>
             if (element.AsObject is XamlObjectElement xamlObject &&
@@ -287,7 +169,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     if (isOkay)
                     {
                         SourceLocation range = new(child.Range.Location + index, color.Length);
-                        changes.Add(new Change(range, "Colors."));
+                        changes.Add(new TextChange(range, "Colors."));
                     }
                 }
 
@@ -315,7 +197,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
         }
 
-        private static void CollectMarkupExtensionChanges(XamlMarkupExtensionNode ext, List<Change> changes)
+        private static void CollectMarkupExtensionChanges(XamlMarkupExtensionNode ext, List<TextChange> changes)
         {
             if (ext.Values is not XamlMarkupExtensionValue[] nodes || nodes.Length == 0)
             {
@@ -337,7 +219,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                         if (value.StartsWith(color, StringComparison.Ordinal))
                         {
                             SourceLocation range = new(node.ValueRange.Location, color.Length);
-                            changes.Add(new Change(range, "Colors."));
+                            changes.Add(new TextChange(range, "Colors."));
                         }
                     }
                 }
@@ -417,6 +299,30 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             return compilation;
+        }
+
+        [DebuggerDisplay("{Offset}, {Text,nq}")]
+        private struct TextChange
+        {
+            public TextChange(int offset, int length, string text)
+            {
+                this.Offset = offset;
+                this.Length = length;
+                this.Text = text;
+            }
+
+            public TextChange(SourceLocation loc, string text)
+            {
+                this.Offset = loc.Location;
+                this.Length = loc.Length;
+                this.Text = text;
+            }
+
+            public readonly int Offset;
+            public readonly int Length;
+            public readonly string Text;
+
+            public TextChange Shift(int offset) => new(Offset + offset, Length, Text);
         }
     }
 }

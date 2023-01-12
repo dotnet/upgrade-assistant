@@ -104,66 +104,35 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
                     var roslynProject = _sourceUpdater.Project.GetRoslynProject();
                     var doc = roslynProject.GetDocument(diagnostic.Location.SourceTree)!;
                     var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc, token).ConfigureAwait(false);
-
-                    if (updatedSolution is null)
+                    if (this.ApplyChange(context, updatedSolution, diagnostic.Id, doc.FilePath) is UpgradeStepApplyResult fault)
                     {
-                        var description = $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}";
-                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Failed, description);
-                        Logger.LogError(description);
-                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
-                    }
-                    else if (!context.UpdateSolution(updatedSolution))
-                    {
-                        var description = $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}";
-                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Failed, description);
-                        Logger.LogError(description);
-                        return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
-                    }
-                    else
-                    {
-                        var description = $"Diagnostic {diagnostic.Id} fixed in {doc.FilePath}";
-                        AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Complete, description);
-                        Logger.LogInformation(description);
+                        return fault;
                     }
                 }
 
-                var xamlDiags = Diagnostics.Where(d => !d.Location.IsInSource).GroupBy(d => d.Properties["Path"]);
-                foreach (var g in xamlDiags)
+                // Process non-source diagnostics (e.g. *.xaml ones).
+                foreach (var diagnostic in Diagnostics)
                 {
-                    var roslynProject = _sourceUpdater.Project.GetRoslynProject();
-                    if (g.Key is not string path)
+                    var location = diagnostic.Location;
+                    if (location.IsInSource || location.GetLineSpan().Path is not string path)
                     {
                         continue;
                     }
 
+                    var roslynProject = _sourceUpdater.Project.GetRoslynProject();
                     var doc = roslynProject.AdditionalDocuments.FirstOrDefault(d => string.Equals(d.FilePath, path, StringComparison.OrdinalIgnoreCase));
                     if (doc == null)
                     {
                         continue;
                     }
 
-                    await TryFixAdditionalTextAsync(g, doc, token).ConfigureAwait(false);
-                    //if (updatedSolution is null)
-                    //{
-                    //    var description = $"Failed to fix diagnostic {diagnostic.Id} in {doc.FilePath}";
-                    //    AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Failed, description);
-                    //    Logger.LogError(description);
-                    //    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
-                    //}
-                    //else if (!context.UpdateSolution(updatedSolution))
-                    //{
-                    //    var description = $"Failed to apply changes after fixing {diagnostic.Id} to {doc.FilePath}";
-                    //    AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Failed, description);
-                    //    Logger.LogError(description);
-                    //    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
-                    //}
-                    //else
-                    //{
-                    //    var description = $"Diagnostic {diagnostic.Id} fixed in {doc.FilePath}";
-                    //    AddResultToContext(context, diagnostic.Id, doc.FilePath ?? string.Empty, UpgradeStepStatus.Complete, description);
-                    //    Logger.LogInformation(description);
-                    //}
+                    var updatedSolution = await TryFixDiagnosticAsync(diagnostic, doc, token).ConfigureAwait(false);
+                    if (this.ApplyChange(context, updatedSolution, diagnostic.Id, doc.FilePath) is UpgradeStepApplyResult fault)
+                    {
+                        return fault;
+                    }
                 }
+
                 // Re-build and get an updated list of diagnostics
                 await _sourceUpdater.RefreshDiagnosticsAsync(_sourceUpdater.Project, token).ConfigureAwait(false);
 
@@ -201,56 +170,61 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"No instances of {DiagnosticId} need fixed");
         }
 
+        /// <summary>
+        /// Applies change. Returns null if succeeds, otherwise returns error result.
+        /// </summary>
+        private UpgradeStepApplyResult? ApplyChange(IUpgradeContext context, Solution? updatedSolution, string diagnosticId, string? location)
+        {
+            if (updatedSolution is null)
+            {
+                var description = $"Failed to fix diagnostic {diagnosticId} in {location}";
+                AddResultToContext(context, diagnosticId, location ?? string.Empty, UpgradeStepStatus.Failed, description);
+                Logger.LogError(description);
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
+            }
+            else if (!context.UpdateSolution(updatedSolution))
+            {
+                var description = $"Failed to apply changes after fixing {diagnosticId} to {location}";
+                AddResultToContext(context, diagnosticId, location ?? string.Empty, UpgradeStepStatus.Failed, description);
+                Logger.LogError(description);
+                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
+            }
+            else
+            {
+                var description = $"Diagnostic {diagnosticId} fixed in {location}";
+                AddResultToContext(context, diagnosticId, location ?? string.Empty, UpgradeStepStatus.Complete, description);
+                Logger.LogInformation(description);
+                return null;
+            }
+        }
+
         private void AddResultToContext(IUpgradeContext context, string diagnosticId, string location, UpgradeStepStatus status, string resultMessage)
         {
             context.AddResult(Title, location, diagnosticId, status, resultMessage);
         }
 
-        private async Task TryFixAdditionalTextAsync(IEnumerable<Diagnostic> diagnostics, TextDocument document, CancellationToken token)
+        private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, TextDocument document, CancellationToken token)
         {
-            foreach (var diagnostic in diagnostics)
-            {
-                CodeAction? fixAction = null;
-                var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, token);
-                await _fixProvider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
-
-                // fixAction may not be null if the code fixer is applied.
-#pragma warning disable CA1508 // Avoid dead conditional code
-                if (fixAction is null)
-#pragma warning restore CA1508 // Avoid dead conditional code
-                {
-                    Logger.LogWarning("No code fix found for {DiagnosticId}", diagnostic.Id);
-                    return;
-                }
-
-                var applyOperation = (await fixAction.GetOperationsAsync(token).ConfigureAwait(false))
-                    .OfType<ApplyChangesOperation>()
-                    .FirstOrDefault();
-
-                if (applyOperation is null)
-                {
-                    Logger.LogWarning("Code fix could not be applied for {DiagnosticId}", diagnostic.Id);
-                    return;
-                }
-            }
-        }
-
-        private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document, CancellationToken token)
-        {
-            if (diagnostic is null)
-            {
-                throw new ArgumentNullException(nameof(diagnostic));
-            }
-
-            if (document is null)
-            {
-                throw new ArgumentNullException(nameof(document));
-            }
-
             CodeAction? fixAction = null;
             var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, token);
             await _fixProvider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
+            var result = await TryApplyDiagnosticAsync(fixAction, diagnostic, token).ConfigureAwait(false);
+            return result;
+        }
+
+        private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document, CancellationToken token)
+        {
+            CodeAction? fixAction = null;
+            var context = new CodeFixContext(document, diagnostic, (action, _) => fixAction = action, token);
+            await _fixProvider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
+
+            var result = await TryApplyDiagnosticAsync(fixAction, diagnostic, token).ConfigureAwait(false);
+            return result;
+        }
+
+        private async Task<Solution?> TryApplyDiagnosticAsync(CodeAction? fixAction, Diagnostic diagnostic, CancellationToken token)
+        {
             // fixAction may not be null if the code fixer is applied.
 #pragma warning disable CA1508 // Avoid dead conditional code
             if (fixAction is null)
