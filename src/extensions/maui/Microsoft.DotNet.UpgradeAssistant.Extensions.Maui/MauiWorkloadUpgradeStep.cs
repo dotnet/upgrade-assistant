@@ -139,10 +139,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         // Check if this is a MAUI conversion
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            //if (_testOptions.Value.IsRunningTest)
-            //{
-            //    return false;
-            //}
+            /* if (_testOptions.Value.IsRunningTest)
+            {
+                return false;
+            }*/
 
             if (context?.CurrentProject is null)
             {
