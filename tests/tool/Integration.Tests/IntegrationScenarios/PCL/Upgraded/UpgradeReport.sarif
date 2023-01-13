@@ -185,7 +185,7 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Package Newtonsoft.Json, Version=8.0.1 does not support the target(s) netstandard1.1 but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (8.0.1 -> 9.0.1) which may introduce breaking changes."
+                "text": "Package Newtonsoft.Json, [VERSION] does not support the target(s) netstandard1.1 but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (8.0.1 -> 9.0.1) which may introduce breaking changes."
               }
             }
           ]
@@ -222,7 +222,7 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Package Newtonsoft.Json, Version=8.0.1 does not support the target(s) netstandard1.1 but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (8.0.1 -> 9.0.1) which may introduce breaking changes."
+                "text": "Package Newtonsoft.Json, [VERSION] does not support the target(s) netstandard1.1 but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (8.0.1 -> 9.0.1) which may introduce breaking changes."
               }
             }
           ]

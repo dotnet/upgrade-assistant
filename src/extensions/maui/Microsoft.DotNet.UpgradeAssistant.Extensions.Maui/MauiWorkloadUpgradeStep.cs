@@ -86,6 +86,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (_testOptions.Value.IsRunningTest)
+            {
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, ".NET MAUI workload install not performed during test", BuildBreakRisk.High);
+            }
+
             if (_installSucceeded.HasValue)
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Skipped, ".NET MAUI workload install has already been run", _installSucceeded.Value ? BuildBreakRisk.None : BuildBreakRisk.High);
@@ -139,11 +144,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         // Check if this is a MAUI conversion
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            /* if (_testOptions.Value.IsRunningTest)
-            {
-                return false;
-            }*/
-
             if (context?.CurrentProject is null)
             {
                 return false;

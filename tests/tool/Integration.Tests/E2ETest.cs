@@ -46,8 +46,10 @@ namespace Integration.Tests
         */
         [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
         [InlineData("WCFSample", "ConsoleApp.csproj", "")]
-        [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
-        [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
+
+        // TODO: [mgoertz] Re-enable after MAUI workloads are installed on test machines
+        // [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
+        // [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
