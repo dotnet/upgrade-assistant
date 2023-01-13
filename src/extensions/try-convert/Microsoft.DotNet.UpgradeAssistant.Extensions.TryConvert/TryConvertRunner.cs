@@ -23,7 +23,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             _logger = logger;
         }
 
-        public string VersionString => _tool?.Version is null ? string.Empty : $", version {_tool.Version}";
+        public string VersionString => _tool?.Version is null ? string.Empty : $", Version={_tool.Version}";
 
         public string Path => _tool.Path;
 

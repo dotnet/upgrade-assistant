@@ -12,7 +12,7 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
+                "text": "Use the try-convert tool (, [VERSION]) to convert the project file to an SDK-style csproj"
               },
               "helpUri": "about:blank"
             }

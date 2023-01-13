@@ -12,7 +12,7 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Use the try-convert tool (, version 0.4.0-dev) to convert the project file to an SDK-style csproj"
+                "text": "Use the try-convert tool (, [VERSION]) to convert the project file to an SDK-style csproj"
               }
             }
           ]
@@ -47,7 +47,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -81,7 +81,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -115,7 +115,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -149,7 +149,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -184,6 +184,9 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Package Newtonsoft.Json, Version=8.0.1 does not support the target(s) netstandard1.1 but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (8.0.1 -> 9.0.1) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -218,6 +221,9 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "fullDescription": {
+                "text": "Package Newtonsoft.Json, Version=8.0.1 does not support the target(s) netstandard1.1 but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (8.0.1 -> 9.0.1) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -251,7 +257,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }

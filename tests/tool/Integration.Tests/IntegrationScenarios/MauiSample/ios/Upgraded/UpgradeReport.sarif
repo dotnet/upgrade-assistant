@@ -546,7 +546,7 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Use the try-convert tool (, version 0.4.0-dev) to convert the project file to an SDK-style csproj"
+                "text": "Use the try-convert tool (, [VERSION]) to convert the project file to an SDK-style csproj"
               }
             }
           ]

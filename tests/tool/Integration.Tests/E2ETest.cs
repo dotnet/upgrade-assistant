@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper.Configuration.Annotations;
+using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
@@ -133,7 +134,8 @@ namespace Integration.Tests
                         .Replace(actualDir.Replace("\\", "/"), "[ACTUAL_PROJECT_ROOT]")
                         .Replace(Directory.GetCurrentDirectory().Replace("\\", "/"), "[UA_PROJECT_BIN]");
 
-                    actualText = Regex.Replace(actualText, "Version=(\\d+\\.){3}([\\da-zA-Z\\-])+", "[VERSION]");
+                    // Replace version strings, such as "Version=42.42.42.42" or "Version=0.4.0-dev"
+                    actualText = Regex.Replace(actualText, @"Version=\d+(\.\d+){2}(((\.\d+){1})|([\da-zA-Z\-])*)", "[VERSION]");
                 }
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
