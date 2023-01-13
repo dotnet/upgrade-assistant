@@ -74,6 +74,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
             var upgrader = mock.Create<UpgraderManager>();
 
+            mock.Mock<IUserInput>().Setup(u => u.IsInteractive).Returns(true);
+
             var context = mock.Mock<IUpgradeContext>();
             context.SetupProperty(c => c.CurrentStep);
 
@@ -98,6 +100,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Tests
 
             using var mock = AutoMock.GetLoose(b => b.RegisterInstance(GetOrderer(steps)));
             var upgrader = mock.Create<UpgraderManager>();
+
+            mock.Mock<IUserInput>().Setup(u => u.IsInteractive).Returns(true);
 
             var context = mock.Mock<IUpgradeContext>();
             context.SetupProperty(c => c.CurrentStep);

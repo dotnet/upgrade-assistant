@@ -76,7 +76,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             Assert.Equal(analyzeResult.RuleId, result.RuleId);
             Assert.Equal(analyzeResult.ResultMessage, result.Message.Text);
             Assert.Equal(FailureLevel.Error, result.Level);
-
         }
 
         [Fact]

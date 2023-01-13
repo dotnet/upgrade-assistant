@@ -40,7 +40,7 @@ namespace Integration.Tests
             var project = new FileInfo(inputPath);
             using var cts = new CancellationTokenSource(maxDuration);
 
-            var options = new TestOptions(project);
+            var options = new IntegrationTestOptions(project);
             var status = await Host.CreateDefaultBuilder()
                 .UseEnvironment(Environments.Development)
                 .UseUpgradeAssistant<ConsoleUpgrade>(options)
@@ -50,6 +50,7 @@ namespace Integration.Tests
 
                     services.AddNonInteractive(options => options.Wait = TimeSpan.Zero, true);
                     services.AddKnownExtensionOptions(new() { Entrypoints = new[] { entrypoint }, SkipBackup = true });
+                    services.AddOptions<TestOptions>().Configure(options => options.IsRunningTest = true);
                 })
                 .ConfigureContainer<ContainerBuilder>(builder =>
                 {
@@ -75,9 +76,9 @@ namespace Integration.Tests
             return status;
         }
 
-        private class TestOptions : UpgradeAssistantCommandOptions
+        private class IntegrationTestOptions : UpgradeAssistantCommandOptions
         {
-            public TestOptions(FileInfo project)
+            public IntegrationTestOptions(FileInfo project)
             {
                 this.Project = project;
                 this.Verbose = true;

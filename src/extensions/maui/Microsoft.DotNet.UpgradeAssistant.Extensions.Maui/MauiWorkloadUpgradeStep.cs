@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static System.FormattableString;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
@@ -23,15 +24,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
         private static StringBuilder? _infoResult;
         private static bool? _installSucceeded;
+        private readonly IOptions<TestOptions> _testOptions;
         private readonly IProcessRunner _runner;
 
         public override string Title => "Install .NET MAUI Workload";
 
         public override string Description => "Check the .NET SDK for the MAUI workload and install it if necessary.";
 
-        public MauiWorkloadUpgradeStep(ILogger<MauiWorkloadUpgradeStep> logger, IProcessRunner runner)
+        public MauiWorkloadUpgradeStep(IOptions<TestOptions> testOptions, ILogger<MauiWorkloadUpgradeStep> logger, IProcessRunner runner)
             : base(logger)
         {
+            _testOptions = testOptions;
             _runner = runner ?? throw new ArgumentNullException(nameof(runner));
         }
 
@@ -136,6 +139,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         // Check if this is a MAUI conversion
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
+            if (_testOptions.Value.IsRunningTest)
+            {
+                return false;
+            }
+
             if (context?.CurrentProject is null)
             {
                 return false;

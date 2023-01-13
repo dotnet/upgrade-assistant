@@ -85,7 +85,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public bool IsDone => Status switch
         {
             UpgradeStepStatus.Complete => true,
-            UpgradeStepStatus.Failed => true,
             UpgradeStepStatus.Skipped => true,
             _ => false,
         };

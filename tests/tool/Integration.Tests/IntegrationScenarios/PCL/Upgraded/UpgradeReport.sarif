@@ -12,9 +12,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
-              },
-              "helpUri": "about:blank"
+                "text": "Use the try-convert tool (, version 0.4.0-dev) to convert the project file to an SDK-style csproj"
+              }
             }
           ]
         }
@@ -22,6 +21,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+          "level": "note",
           "message": {
             "text": "Complete: Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
           },
@@ -48,10 +48,6 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.Bcl'"
-              },
-              "helpUri": "about:blank"
             }
           ]
         }
@@ -59,6 +55,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Bcl'"
           },
@@ -85,10 +82,6 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.Bcl.Build'"
-              },
-              "helpUri": "about:blank"
             }
           ]
         }
@@ -96,6 +89,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Bcl.Build'"
           },
@@ -122,10 +116,6 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.Net.Http'"
-              },
-              "helpUri": "about:blank"
             }
           ]
         }
@@ -133,6 +123,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Net.Http'"
           },
@@ -159,10 +150,6 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.Net.Http'"
-              },
-              "helpUri": "about:blank"
             }
           ]
         }
@@ -170,6 +157,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.Net.Http'"
           },
@@ -196,10 +184,6 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Newtonsoft.Json'"
-              },
-              "helpUri": "about:blank"
             }
           ]
         }
@@ -207,6 +191,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Newtonsoft.Json'"
           },
@@ -233,10 +218,6 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'Newtonsoft.Json'"
-              },
-              "helpUri": "about:blank"
             }
           ]
         }
@@ -244,6 +225,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Newtonsoft.Json'"
           },
@@ -270,10 +252,6 @@
           "rules": [
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
-              },
-              "helpUri": "about:blank"
             }
           ]
         }
@@ -281,6 +259,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
           },
