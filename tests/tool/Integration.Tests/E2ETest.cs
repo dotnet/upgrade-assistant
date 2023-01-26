@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -137,14 +139,22 @@ namespace Integration.Tests
 
             foreach (var file in expectedFiles)
             {
-                var expectedText = ReadFile(expectedDir, file);
-                var actualText = ReadFile(actualDir, file);
+                var expectedText = ReadFile(expectedDir, file).ReplaceLineEndings();
+                var actualText = ReadFile(actualDir, file).ReplaceLineEndings();
 
                 if (file.StartsWith("UpgradeReport.", StringComparison.Ordinal))
                 {
-                    actualText = actualText.Replace(actualDir.Replace("\\", "\\\\", StringComparison.Ordinal), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
-                                           .Replace(actualDir.Replace("\\", "/", StringComparison.Ordinal), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
-                                           .Replace(Directory.GetCurrentDirectory().Replace("\\", "/", StringComparison.Ordinal), "[UA_PROJECT_BIN]", StringComparison.Ordinal);
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        actualText = actualText.Replace(actualDir.Replace("\\", "\\\\", StringComparison.Ordinal), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
+                                               .Replace(actualDir.Replace("\\", "/", StringComparison.Ordinal), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
+                                               .Replace(Directory.GetCurrentDirectory().Replace("\\", "/", StringComparison.Ordinal), "[UA_PROJECT_BIN]", StringComparison.Ordinal);
+                    }
+                    else
+                    {
+                        actualText = actualText.Replace(actualDir.TrimStart('/'), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
+                                               .Replace(Directory.GetCurrentDirectory().TrimStart('/'), "[UA_PROJECT_BIN]", StringComparison.Ordinal);
+                    }
 
                     actualText = ReplaceVersionStrings(actualText);
                 }
@@ -184,14 +194,27 @@ namespace Integration.Tests
 
         private static string FindFileDiff(string file1, string file2)
         {
-            using var process = new System.Diagnostics.Process();
-            process.StartInfo = new System.Diagnostics.ProcessStartInfo()
+            string command, arguments;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                command = "cmd.exe";
+                arguments = $"/C fc {file1} {file2} /c";
+            }
+            else
+            {
+                command = "diff";
+                arguments = $"-u {file1} {file2}";
+            }
+
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo()
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
-                FileName = "cmd.exe",
-                Arguments = $"/C fc {file1} {file2} /c",
+                FileName = command,
+                Arguments = arguments,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };

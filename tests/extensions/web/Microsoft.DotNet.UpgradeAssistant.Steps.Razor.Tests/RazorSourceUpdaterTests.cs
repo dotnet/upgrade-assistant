@@ -380,9 +380,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             return updaterStep.RazorDocuments;
         }
 
-        private static string GetFullPath(string path) =>
-            Path.IsPathFullyQualified(path)
-            ? path
-            : Path.Combine(AppContext.BaseDirectory, path);
+        private static string GetFullPath(string path)
+        {
+            path = path.Replace('\\', Path.DirectorySeparatorChar);
+
+            return Path.IsPathFullyQualified(path) ? path : Path.Combine(AppContext.BaseDirectory, path);
+        }
     }
 }

@@ -65,7 +65,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             Assert.Collection(inputFiles, expectedPostReplacementFiles.Select<string, Action<string>>(e => a =>
             {
                 Assert.Equal(Path.GetFileName(e), Path.GetFileName(a));
-                Assert.Equal(File.ReadAllText(e), File.ReadAllText(a));
+
+                var expectedText = File.ReadAllText(e).ReplaceLineEndings().TrimEnd();
+                var actualText = File.ReadAllText(a).ReplaceLineEndings().TrimEnd();
+
+                Assert.Equal(expectedText, actualText);
             }).ToArray());
         }
 

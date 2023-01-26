@@ -26,6 +26,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData("TestInputFiles\\MultiServicesConfig.txt", "TestExpectedFiles\\MultiServicesTemplateCode.txt")]
         public void UpdateFactoryTemplateTest(string input, string expected)
         {
+            input = input.Replace('\\', Path.DirectorySeparatorChar);
+            expected = expected.Replace('\\', Path.DirectorySeparatorChar);
+
             var context = new ConfigContext(new ConfigUpdater(XDocument.Load(input), _configLogger));
             var actual = UpdaterFactory.UpdateTemplateCode(context, _logger);
             Assert.Equal(File.ReadAllText(expected), actual);
