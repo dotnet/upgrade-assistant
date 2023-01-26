@@ -17,7 +17,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
     {
         public static Task<int> Main(string[] args)
         {
-            if (FeatureFlags.IsWindowsCheckEnabled && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!(RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)))
             {
                 Console.WriteLine(LocalizedStrings.NonWindowsWarning);
                 return Task.FromResult(ErrorCodes.PlatformNotSupported);
