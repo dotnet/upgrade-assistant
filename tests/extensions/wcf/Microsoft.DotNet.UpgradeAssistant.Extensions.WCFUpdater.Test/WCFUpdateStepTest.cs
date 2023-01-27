@@ -126,10 +126,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
 
         private void Reset()
         {
-            File.WriteAllText(Main, original["main"]);
-            File.WriteAllText(Proj, original["proj"]);
-            File.WriteAllText(Config, original["config"]);
-            File.WriteAllText(Directive, original["directive"]);
+            File.WriteAllText(Main.Replace('\\', Path.DirectorySeparatorChar), original["main"]);
+            File.WriteAllText(Proj.Replace('\\', Path.DirectorySeparatorChar), original["proj"]);
+            File.WriteAllText(Config.Replace('\\', Path.DirectorySeparatorChar), original["config"]);
+            File.WriteAllText(Directive.Replace('\\', Path.DirectorySeparatorChar), original["directive"]);
         }
     }
 }
