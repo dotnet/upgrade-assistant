@@ -102,8 +102,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     new MappedTextReplacement[]
                     {
                         new MappedTextReplacement(
-                            "{\r\n    <div>\r\n        <p>@Model[1]</p>\r\n    </div>\r\n}\r\n",
-                            "<h1>\r\n    Hi!\r\n</h1>",
+                            "{\r\n    <div>\r\n        <p>@Model[1]</p>\r\n    </div>\r\n}\r\n".ReplaceLineEndings(),
+                            "<h1>\r\n    Hi!\r\n</h1>".ReplaceLineEndings(),
                             GetPath("View.cshtml"),
                             16)
                     }
@@ -116,7 +116,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     new MappedTextReplacement[]
                     {
                         new MappedTextReplacement("DateTime", "DateTimeOffset", GetPath("Simple.cshtml"), 2),
-                        new MappedTextReplacement("<div>\r\n ", "<div>\r\n", GetPath("View.cshtml"), 9),
+                        new MappedTextReplacement("<div>\r\n ".ReplaceLineEndings(), "<div>\r\n".ReplaceLineEndings(), GetPath("View.cshtml"), 9),
                     }
                 },
 
@@ -126,7 +126,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     "NewTextAtStart",
                     new MappedTextReplacement[]
                     {
-                        new MappedTextReplacement("Something inapplicable", "using Foo;\r\nSomething inapplicable", GetPath("Simple.cshtml"), 0),
+                        new MappedTextReplacement("Something inapplicable", "using Foo;\r\nSomething inapplicable".ReplaceLineEndings(), GetPath("Simple.cshtml"), 0),
                         new MappedTextReplacement(string.Empty, "Test", GetPath("View.cshtml"), 0),
                     }
                 },
@@ -140,7 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                         new MappedTextReplacement("DateTime.Now.ToString();", string.Empty, GetPath("Simple.cshtml"), 1),
                         new MappedTextReplacement("using Foo;", string.Empty, GetPath("View2.cshtml"), 1),
                         new MappedTextReplacement("Model[0]", string.Empty, GetPath("View2.cshtml"), 7),
-                        new MappedTextReplacement("\r\n        var x = 0;\r\n", string.Empty, GetPath("View2.cshtml"), 23),
+                        new MappedTextReplacement("\r\n        var x = 0;\r\n".ReplaceLineEndings(), string.Empty, GetPath("View2.cshtml"), 23),
                     }
                 },
 
