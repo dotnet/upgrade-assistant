@@ -132,7 +132,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var backupName = $"{Path.GetFileNameWithoutExtension(fileName)}.old{Path.GetExtension(fileName)}";
             var counter = 0;
 
-            while (File.Exists(backupName))
+            while (File.Exists(Path.Combine(Path.GetDirectoryName(filePath)!, backupName)))
             {
                 backupName = $"{Path.GetFileNameWithoutExtension(fileName)}.old.{counter++}{Path.GetExtension(fileName)}";
             }

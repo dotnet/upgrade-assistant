@@ -108,6 +108,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 : ImmutableList.Create(context.CurrentProject!.GetFile().FilePath);
             var results = fileLocations.Select(location => new OutputResult()
             {
+                Level = updaterResult.Result ? OutputLevel.Info : OutputLevel.Error,
                 FileLocation = location,
                 RuleId = updaterResult.RuleId,
                 ResultMessage = $"{(updaterResult.Result ? "Success" : "Failed")}: {updaterResult.Message}",

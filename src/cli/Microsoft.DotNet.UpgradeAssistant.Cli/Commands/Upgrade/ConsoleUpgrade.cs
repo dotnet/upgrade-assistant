@@ -127,7 +127,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli
             if (!await ExecuteAndTimeCommand(context, step, command, token))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                await _io.Output.WriteAsync($"Command ({command.CommandText}) did not succeed");
+                await _io.Output.WriteLineAsync($"Command ({command.CommandText}) did not succeed");
                 Console.ResetColor();
             }
             else if (!await _input.WaitToProceedAsync(token))
