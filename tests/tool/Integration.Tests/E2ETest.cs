@@ -75,6 +75,16 @@ namespace Integration.Tests
             temp.Dispose();
         }
 
+        [InlineData("Version=42.42.42.42")]
+        [InlineData("Version=9.0.1")]
+        [InlineData("Version=0.4.0-dev")]
+        [InlineData("Version=0.4.0+5d07f3b86b233108d705e3c0549ca845e5e54964")]
+        [Theory]
+        public async Task VersionReplacementTest(string version)
+        {
+            Assert.Equal(ReplaceVersionStrings(version), "[VERSION]");
+        }
+
         private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
         {
             if (!unknownPackages.Keys.Any())
@@ -136,8 +146,7 @@ namespace Integration.Tests
                                            .Replace(actualDir.Replace("\\", "/", StringComparison.Ordinal), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
                                            .Replace(Directory.GetCurrentDirectory().Replace("\\", "/", StringComparison.Ordinal), "[UA_PROJECT_BIN]", StringComparison.Ordinal);
 
-                    // Replace version strings, such as "Version=42.42.42.42" or "Version=0.4.0-dev" or "Version=0.4.0+5d07f3b86b233108d705e3c0549ca845e5e54964"
-                    actualText = Regex.Replace(actualText, @"Version=\d+(\.\d+){2}(((\.\d+))|(\-|\+)([\da-zA-Z])*)", "[VERSION]");
+                    actualText = ReplaceVersionStrings(actualText);
                 }
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
@@ -167,9 +176,15 @@ namespace Integration.Tests
                 => File.ReadAllText(Path.Combine(directory, file));
         }
 
+        /// <summary>
+        /// Replace version strings, such as "Version=42.42.42.42" or "Version=0.4.0-dev" or "Version=0.4.0+5d07f3b86b233108d705e3c0549ca845e5e54964"
+        /// </summary>
+        private static string ReplaceVersionStrings(string actualText)
+            => Regex.Replace(actualText, @"Version=\d+(\.\d+){2}(((\.\d+))|((\-|\+)([\da-zA-Z])*)?)", "[VERSION]");
+
         private static string FindFileDiff(string file1, string file2)
         {
-            using System.Diagnostics.Process process = new System.Diagnostics.Process();
+            using var process = new System.Diagnostics.Process();
             process.StartInfo = new System.Diagnostics.ProcessStartInfo()
             {
                 UseShellExecute = false,
