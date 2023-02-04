@@ -80,9 +80,9 @@ namespace Integration.Tests
         [InlineData("Version=0.4.0-dev")]
         [InlineData("Version=0.4.0+5d07f3b86b233108d705e3c0549ca845e5e54964")]
         [Theory]
-        public async Task VersionReplacementTest(string version)
+        public void VersionReplacementTest(string version)
         {
-            Assert.Equal(ReplaceVersionStrings(version), "[VERSION]");
+            Assert.Equal("[VERSION]", ReplaceVersionStrings(version));
         }
 
         private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
