@@ -23,11 +23,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             _logger = logger;
         }
 
-        public string VersionString => _tool?.Version is null ? string.Empty : $", version {_tool.Version}";
+        public string VersionString => _tool?.Version is null ? string.Empty : $", Version={_tool.Version}";
 
         public string Path => _tool.Path;
 
-        public async Task<UpgradeStepApplyResult> ApplyAsync(IUpgradeContext context, IProject project, CancellationToken token)
+        public async Task<UpgradeStepApplyResult> ApplyAsync(UpgradeStep step, IUpgradeContext context, IProject project, CancellationToken token)
         {
             if (context is null)
             {
@@ -45,7 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
                 context.Properties.SetPropertyValue("componentFlag", components.ToString(), true);
             }
 
-            var result = await RunTryConvertAsync(context, project, token).ConfigureAwait(false);
+            var result = await RunTryConvertAsync(step, context, project, token).ConfigureAwait(false);
 
             await _restorer.RestorePackagesAsync(context, project, token).ConfigureAwait(false);
 
@@ -85,13 +85,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             }
         }
 
-        private void AddResultToContext(IUpgradeContext context, UpgradeStepStatus status, string resultMessage)
+        private static void AddResultToContext(UpgradeStep step, IUpgradeContext context, UpgradeStepStatus status, string resultMessage)
         {
-            context.AddResult(TryConvertProjectConverterStep.StepTitle, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty,
-                WellKnownStepIds.TryConvertProjectConverterStepId, status, resultMessage);
+            context.AddResultForStep(step, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, status, resultMessage);
         }
 
-        private async Task<UpgradeStepApplyResult> RunTryConvertAsync(IUpgradeContext context, IProject project, CancellationToken token)
+        private async Task<UpgradeStepApplyResult> RunTryConvertAsync(UpgradeStep step, IUpgradeContext context, IProject project, CancellationToken token)
         {
             _logger.LogInformation($"Converting project file format with try-convert{VersionString}");
 
@@ -105,14 +104,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             {
                 var description = "Conversion with try-convert failed.";
                 _logger.LogCritical(description);
-                AddResultToContext(context, UpgradeStepStatus.Failed, description);
+                AddResultToContext(step, context, UpgradeStepStatus.Failed, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, description);
             }
             else
             {
                 var description = "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target.";
                 _logger.LogInformation(description);
-                AddResultToContext(context, UpgradeStepStatus.Complete, description);
+                AddResultToContext(step, context, UpgradeStepStatus.Complete, description);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, "Project file converted successfully");
             }
         }

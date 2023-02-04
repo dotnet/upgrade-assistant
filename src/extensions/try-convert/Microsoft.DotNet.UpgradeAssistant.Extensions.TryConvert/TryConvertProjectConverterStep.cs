@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
                 throw new ArgumentNullException(nameof(context));
             }
 
-            return _runner.ApplyAsync(context, context.CurrentProject.Required(), token);
+            return _runner.ApplyAsync(this, context, context.CurrentProject.Required(), token);
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)

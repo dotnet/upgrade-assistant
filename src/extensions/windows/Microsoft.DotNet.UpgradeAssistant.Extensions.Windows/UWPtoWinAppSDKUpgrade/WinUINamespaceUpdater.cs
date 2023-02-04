@@ -65,7 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                     var oldContent = File.ReadAllText(oldAppXamlCs);
                     var newContent = File.ReadAllText(newAppXamlCs);
                     var rootNamespace = context.CurrentProject?.GetFile().GetPropertyValue("RootNamespace");
-                    var match = Regex.Match(oldContent.Replace("\n", string.Empty), "namespace([a-zA-Z]|\\s)*");
+                    var match = Regex.Match(oldContent.Replace("\n", string.Empty), "namespace([a-zA-Z_\\d]|\\s)*");
                     if (match.Success && match.Groups.Count > 0 && rootNamespace != null)
                     {
                         var namespaceToUse = match.Groups[0].Value.Trim();

@@ -12,13 +12,13 @@ namespace Microsoft.DotNet.UpgradeAssistant
     public static class IUpgradeContextExtensions
     {
         public static void AddResultForStep(this IUpgradeContext context, UpgradeStep step,
-            string location, UpgradeStepStatus upgradeStepStatus, string message)
+            string location, UpgradeStepStatus upgradeStepStatus, string message, string? details = null, Uri? helpUri = null, OutputLevel? outputLevel = null)
         {
-            AddResult(context, step.Title, location, step.Id, upgradeStepStatus, message);
+            AddResult(context, step.Title, step.Description, location, step.Id, upgradeStepStatus, message, details, helpUri, outputLevel);
         }
 
-        public static void AddResult(this IUpgradeContext context, string stepName, string location, string ruleId,
-            UpgradeStepStatus upgradeStepStatus, string message)
+        public static void AddResult(this IUpgradeContext context, string stepName, string stepDescription, string location, string ruleId,
+            UpgradeStepStatus upgradeStepStatus, string message, string? details = null, Uri? helpUri = null, OutputLevel? outputLevel = null)
         {
             var status = upgradeStepStatus switch
             {
@@ -29,12 +29,23 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 _ => throw new ArgumentException("Invalid UpgradeStepStatus", nameof(upgradeStepStatus))
             };
 
+            var level = outputLevel ?? upgradeStepStatus switch
+            {
+                UpgradeStepStatus.Skipped => OutputLevel.Info,
+                UpgradeStepStatus.Failed => OutputLevel.Warning,
+                UpgradeStepStatus.Complete => OutputLevel.Info,
+                UpgradeStepStatus.Incomplete => OutputLevel.Info,
+                _ => throw new ArgumentException("Invalid UpgradeStepStatus", nameof(upgradeStepStatus))
+            };
+
             var result = new OutputResult()
             {
+                Level = level,
                 FileLocation = location,
                 RuleId = ruleId,
-                ResultMessage = $"{status}: {message}",
-                FullDescription = message,
+                ResultMessage = string.IsNullOrEmpty(details) ? $"{status}: {message}" : $"{status}: {message}{Environment.NewLine}{details}",
+                FullDescription = stepDescription,
+                HelpUri = helpUri
             };
 
             var outputResultDefinition = new OutputResultDefinition()

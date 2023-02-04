@@ -7,6 +7,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
 {
     public record OutputResult
     {
+        public OutputLevel Level { get; init; } = OutputLevel.Info;
+
         public string RuleId { get; init; } = string.Empty;
 
         public string RuleName { get; init; } = string.Empty;
@@ -19,7 +21,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Gets the link to the documentation.
         /// </summary>
-        public Uri HelpUri { get; init; } = new("about:blank");
+        public Uri? HelpUri { get; init; }
 
         public int LineNumber { get; init; }
 
