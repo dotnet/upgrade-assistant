@@ -302,7 +302,7 @@ namespace MSBuild.Conversion.Project
                 if (!itemTypeDiff.DefaultedItems.IsDefault)
                 {
                     var defaultedItems = itemTypeDiff.DefaultedItems.Select(i => i.EvaluatedInclude);
-                    if (defaultedItems.Contains(item.Include, StringComparer.OrdinalIgnoreCase))
+                    if (defaultedItems.Contains(item.Include, PathComparer.Default))
                     {
                         itemGroup.RemoveChild(item);
                     }
@@ -311,7 +311,7 @@ namespace MSBuild.Conversion.Project
                 if (!itemTypeDiff.ChangedItems.IsDefault)
                 {
                     var changedItems = itemTypeDiff.ChangedItems.Select(i => i.EvaluatedInclude);
-                    if (changedItems.Contains(item.Include, StringComparer.OrdinalIgnoreCase))
+                    if (changedItems.Contains(item.Include, PathComparer.Default))
                     {
                         var path = item.Include;
                         item.Include = null;
