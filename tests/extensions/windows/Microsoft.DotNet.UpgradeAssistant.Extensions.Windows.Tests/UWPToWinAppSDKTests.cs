@@ -232,28 +232,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
         {
             Assert.Equal(expectedDiagnostics.Count(), diagnostics.Count());
 
-            var sb = new System.Text.StringBuilder();
-            var identical = true;
-
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
                 var e = expectedDiagnostics.ElementAt(count);
                 var expected = $"{e.SourceSpan}";
                 var actual = $"{d.Location.SourceSpan}";
-                //Assert.True(e.Matches(d), $"Expected {e.Language} diagnostic {count} to be at {e.SourceSpan}" +
-                //    $" ; actually at {d.Location.SourceSpan} {d.Location.SourceSpan.End - d.Location.SourceSpan.Start}");
-                identical = identical && e.Matches(d);
-                sb.AppendLine($"new ExpectedDiagnostic(\"{e.Id}\", new TextSpan({e.SourceSpan.Start}, {e.SourceSpan.Length}), new TextSpan({d.Location.SourceSpan.Start}, {d.Location.SourceSpan.Length})),");
+                Assert.True(e.Matches(d), $"Expected {e.Language} diagnostic {count} to be at {e.SourceSpan}" +
+                    $" ; actually at {d.Location.SourceSpan} {d.Location.SourceSpan.End - d.Location.SourceSpan.Start}");
                 count++;
             }
-
-            if (!identical)
-            {
-                var text = sb.ToString();
-            }
-
-            Assert.True(identical);
         }
     }
 }
