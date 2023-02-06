@@ -297,10 +297,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                     },
                     new[]
                     {
-                        new MappedTextReplacement("using Microsoft.AspNetCore.Mvc;\r\n", "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml"), 1),
-                        new MappedTextReplacement(" Write(DateTime.Now.ToString());\r\n", " Write(DateTime.Now.ToString() /* Test! */);\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml"), 1),
-                        new MappedTextReplacement("      Write(Model[0]);\r\n", "      Write(Model[0] /* Test! */);\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 6),
-                        new MappedTextReplacement("      Write(Model[1]);\r\n", "      Write(Model[1] /* Test! */);\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 18),
+                        new MappedTextReplacement("using Microsoft.AspNetCore.Mvc;\r\n".ReplaceLineEndings(), "using Microsoft.AspNetCore.Mvc; /* Test! */\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\_ViewImports.cshtml"), 1),
+                        new MappedTextReplacement(" Write(DateTime.Now.ToString());\r\n".ReplaceLineEndings(), " Write(DateTime.Now.ToString() /* Test! */);\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\Simple.cshtml"), 1),
+                        new MappedTextReplacement("      Write(Model[0]);\r\n".ReplaceLineEndings(), "      Write(Model[0] /* Test! */);\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 6),
+                        new MappedTextReplacement("      Write(Model[1]);\r\n".ReplaceLineEndings(), "      Write(Model[1] /* Test! */);\r\n".ReplaceLineEndings(), GetFullPath("RazorSourceUpdaterStepViews\\TestViews\\View.cshtml"), 18),
                     }
                 }
             };
