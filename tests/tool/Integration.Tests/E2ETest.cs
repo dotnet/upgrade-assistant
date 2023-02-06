@@ -204,7 +204,7 @@ namespace Integration.Tests
             else
             {
                 command = "diff";
-                arguments = $"-u {file1} {file2}";
+                arguments = $"-u --strip-trailing-cr {file1} {file2}";
             }
 
             using var process = new Process();

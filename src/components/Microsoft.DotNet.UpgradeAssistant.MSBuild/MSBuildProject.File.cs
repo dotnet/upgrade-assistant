@@ -230,9 +230,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        private static string GetPathRelativeToProject(string path, string projectDir) =>
-            Path.IsPathFullyQualified(path)
-            ? path
-            : Path.Combine(projectDir, path);
+        private static string GetPathRelativeToProject(string path, string projectDir)
+        {
+            if (Path.DirectorySeparatorChar == '/')
+            {
+                path = path.Replace('\\', '/');
+            }
+
+            return Path.IsPathFullyQualified(path) ? path : Path.Combine(projectDir, path);
+        }
     }
 }

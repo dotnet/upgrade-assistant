@@ -201,7 +201,7 @@ namespace MSBuild.Conversion.Project
 
             static string GetProjectName(string projectPath)
             {
-                var projName = projectPath.Split('\\').Last();
+                var projName = projectPath.Split(Path.DirectorySeparatorChar).Last();
                 return projName.Substring(0, projName.LastIndexOf('.'));
             }
         }
