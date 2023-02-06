@@ -134,6 +134,8 @@ namespace MSBuild.Conversion.Project
 
         public static IProjectRootElement RemoveUnnecessaryPropertiesNotInSDKByDefault(this IProjectRootElement projectRootElement, ProjectStyle projectStyle)
         {
+            var projectName = GetProjectName(projectRootElement.FullPath);
+
             foreach (var propGroup in projectRootElement.PropertyGroups)
             {
                 foreach (var prop in propGroup.Properties)
@@ -158,7 +160,7 @@ namespace MSBuild.Conversion.Project
                     {
                         propGroup.RemoveChild(prop);
                     }
-                    else if (ProjectPropertyHelpers.IsNameDefault(prop, GetProjectName(projectRootElement.FullPath)))
+                    else if (ProjectPropertyHelpers.IsNameDefault(prop, projectName))
                     {
                         propGroup.RemoveChild(prop);
                     }
