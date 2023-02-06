@@ -164,17 +164,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var item = ProjectRoot.CreateItemElement(projectItem.ItemType.Name);
             if (projectItem.Include is not null)
             {
-                item.Include = projectItem.Include;
+                item.Include = GetCanonicalIncludePath(projectItem.Include);
             }
 
             if (projectItem.Exclude is not null)
             {
-                item.Exclude = projectItem.Remove;
+                item.Exclude = GetCanonicalIncludePath(projectItem.Exclude);
             }
 
             if (projectItem.Remove is not null)
             {
-                item.Remove = projectItem.Remove;
+                item.Remove = GetCanonicalIncludePath(projectItem.Remove);
             }
 
             itemGroup.AppendChild(item);
@@ -228,6 +228,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 Project.RemoveProperty(property);
             }
+        }
+
+        private static string GetCanonicalIncludePath(string path)
+        {
+            if (Path.DirectorySeparatorChar == '/')
+            {
+                return path.Replace('/', '\\');
+            }
+
+            return path;
         }
 
         private static string GetPathRelativeToProject(string path, string projectDir)
