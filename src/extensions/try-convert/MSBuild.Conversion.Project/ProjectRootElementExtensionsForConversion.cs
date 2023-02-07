@@ -201,8 +201,15 @@ namespace MSBuild.Conversion.Project
 
             static string GetProjectName(string projectPath)
             {
-                var projName = projectPath.Split(Path.DirectorySeparatorChar).Last();
-                return projName.Substring(0, projName.LastIndexOf('.'));
+                int startIndex = projectPath.LastIndexOf(Path.DirectorySeparatorChar) + 1;
+                int endIndex = projectPath.LastIndexOf('.');
+
+                if (endIndex > startIndex)
+                {
+                    return projectPath.Substring(startIndex, endIndex - startIndex);
+                }
+
+                return projectPath.Substring(startIndex);
             }
         }
 
