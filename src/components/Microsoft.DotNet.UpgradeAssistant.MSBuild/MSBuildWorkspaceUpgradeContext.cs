@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
@@ -144,16 +145,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
         {
             var properties = new Dictionary<string, string>();
 
-            if (options.VisualStudioPath is string vsPath)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                properties.Add("VSINSTALLDIR", vsPath);
-                properties.Add("MSBuildExtensionsPath32", Path.Combine(vsPath, "MSBuild"));
-                properties.Add("MSBuildExtensionsPath", Path.Combine(vsPath, "MSBuild"));
-            }
+                if (options.VisualStudioPath is string vsPath)
+                {
+                    properties.Add("VSINSTALLDIR", vsPath);
+                    properties.Add("MSBuildExtensionsPath32", Path.Combine(vsPath, "MSBuild"));
+                    properties.Add("MSBuildExtensionsPath", Path.Combine(vsPath, "MSBuild"));
+                }
 
-            if (options.VisualStudioVersion is int version)
-            {
-                properties.Add("VisualStudioVersion", $"{version}.0");
+                if (options.VisualStudioVersion is int version)
+                {
+                    properties.Add("VisualStudioVersion", $"{version}.0");
+                }
             }
 
             return properties;
