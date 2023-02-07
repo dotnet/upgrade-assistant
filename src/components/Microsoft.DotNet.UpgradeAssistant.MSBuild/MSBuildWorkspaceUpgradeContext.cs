@@ -19,6 +19,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
+        private const string MacOSMonoFrameworkMSBuildExtensionsDir = "/Library/Frameworks/Mono.framework/External/xbuild";
+
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly Dictionary<string, IProject> _projectCache;
         private readonly IOptions<WorkspaceOptions> _options;
@@ -141,6 +143,75 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        private static void CreateSymbolicLinks(string targetDir, string sourceDir)
+        {
+            foreach (var entry in Directory.EnumerateFileSystemEntries(sourceDir))
+            {
+                var target = Path.Combine(targetDir, Path.GetFileName(entry));
+
+                if (File.GetAttributes(entry) == FileAttributes.Directory)
+                {
+                    Directory.CreateSymbolicLink(target, entry);
+                }
+                else
+                {
+                    File.CreateSymbolicLink(target, entry);
+                }
+            }
+        }
+
+        private static string? GetMacOSMSBuildExtensionsPath(WorkspaceOptions options)
+        {
+            string? msbuildExtensionsPath = null;
+
+            if (options.MSBuildPath != null && Directory.Exists(MacOSMonoFrameworkMSBuildExtensionsDir))
+            {
+                // Check to see if the specified MSBuildPath contains the Mono.framework build extensions.
+                var monoExtensionDirectories = Directory.GetDirectories(MacOSMonoFrameworkMSBuildExtensionsDir);
+                var createTempExtensionsDir = false;
+
+                foreach (var monoExtensionDir in monoExtensionDirectories)
+                {
+                    var dotnetExtensionDir = Path.Combine(options.MSBuildPath, Path.GetFileName(monoExtensionDir));
+                    if (!Directory.Exists(dotnetExtensionDir))
+                    {
+                        createTempExtensionsDir = true;
+                        break;
+                    }
+                }
+
+                // If the specified MSBuildPath does not contain the Mono.framework build extensions, create a temp
+                // directory that we'll use to symlink everything.
+                if (createTempExtensionsDir)
+                {
+                    msbuildExtensionsPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                    try
+                    {
+                        Directory.CreateDirectory(msbuildExtensionsPath);
+
+                        // First, create symbolic links to all of the dotnet MSBuild file system entries.
+                        CreateSymbolicLinks(msbuildExtensionsPath, options.MSBuildPath);
+
+                        // Then create the symbolic links to the Mono.framework/External/xbuild system entries.
+                        CreateSymbolicLinks(msbuildExtensionsPath, MacOSMonoFrameworkMSBuildExtensionsDir);
+                    }
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch (Exception)
+#pragma warning restore CA1031 // Do not catch general exception types
+                    {
+                        if (Directory.Exists(msbuildExtensionsPath))
+                        {
+                            Directory.Delete(msbuildExtensionsPath, true);
+                        }
+
+                        msbuildExtensionsPath = null;
+                    }
+                }
+            }
+
+            return msbuildExtensionsPath;
+        }
+
         private static Dictionary<string, string> CreateProperties(WorkspaceOptions options)
         {
             var properties = new Dictionary<string, string>();
@@ -157,6 +228,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 if (options.VisualStudioVersion is int version)
                 {
                     properties.Add("VisualStudioVersion", $"{version}.0");
+                }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                var msbuildExtensionsPath = GetMacOSMSBuildExtensionsPath(options);
+
+                if (msbuildExtensionsPath != null)
+                {
+                    properties.Add("MSBuildExtensionsPath32", msbuildExtensionsPath);
+                    properties.Add("MSBuildExtensionsPath", msbuildExtensionsPath);
                 }
             }
 
