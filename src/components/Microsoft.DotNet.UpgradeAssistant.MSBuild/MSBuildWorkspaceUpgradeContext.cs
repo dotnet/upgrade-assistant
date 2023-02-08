@@ -184,7 +184,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 // directory that we'll use to symlink everything.
                 if (createTempExtensionsDir)
                 {
-                    msbuildExtensionsPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                    msbuildExtensionsPath = Path.Combine(Path.GetTempPath(), "dotnet-upgrade-assistant." + Path.GetRandomFileName());
                     try
                     {
                         Directory.CreateDirectory(msbuildExtensionsPath);
