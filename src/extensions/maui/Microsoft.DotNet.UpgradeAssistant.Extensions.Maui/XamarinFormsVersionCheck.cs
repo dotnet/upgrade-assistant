@@ -17,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     {
         private const string CATEGORY = ".NET MAUI Upgrade";
         private const string UPGRADE_LINK = "https://aka.ms/upgradeassistant/maui/requirements";
-        private const string XAMARIN_FORMS_MESSAGE = $"Support for upgrading to {CATEGORY} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {UPGRADE_LINK}";
+        private const string XAMARIN_FORMS_MESSAGE = "Support for upgrading to {0} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {1}";
         private const string MINIMUM_XAMARIN_VERSION = "4.8";
 
         private readonly ILogger<XamarinFormsVersionCheck> _logger;
@@ -48,8 +48,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             if (components.HasFlag(ProjectComponents.XamarinAndroid) || components.HasFlag(ProjectComponents.XamariniOS))
             {
-                if (!DoesHaveMinimumXamarinVersion(project, _comparer)
-                    && project.NuGetReferences.PackageReferences.Any(x => x.Name.Equals("Xamarin.Forms", StringComparison.OrdinalIgnoreCase)))
+                if (!DoesHaveMinimumXamarinVersion(project, _comparer))
                 {
                     _logger.LogError(UpgradeMessage);
                     return UpgradeReadiness.Unsupported;
@@ -62,7 +61,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private static bool DoesHaveMinimumXamarinVersion(IProject project, IVersionComparer comparer)
         {
             var packageReferences = project.NuGetReferences.PackageReferences;
-
             foreach (var package in packageReferences)
             {
                 if (package.Name == "Xamarin.Forms")
@@ -71,10 +69,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     {
                         return true;
                     }
+
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
     }
 }
