@@ -82,7 +82,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (!context.EntryPoints.Any())
             {
-                throw new InvalidOperationException("Entrypoint must be set before using this step");
+                throw new InvalidOperationException("Entry point must be set before using this step");
             }
 
             // If a current project is selected, then this step is done
@@ -101,7 +101,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (allProjectsAreUpgraded)
             {
-                Logger.LogInformation("No projects need to be upgraded for selected entrypoint");
+                Logger.LogInformation("No projects need to be upgraded for the selected entry point");
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need to be upgraded", BuildBreakRisk.None);
             }
 
