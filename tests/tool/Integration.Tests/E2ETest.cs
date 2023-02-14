@@ -55,6 +55,11 @@ namespace Integration.Tests
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && scenarioPath == "PCL")
+            {
+                return;
+            }
+
             // Create a temporary working directory
             var workingDir = Path.Combine(Path.GetTempPath(), TempDirectoryName, Guid.NewGuid().ToString());
             var dir = Directory.CreateDirectory(workingDir);
