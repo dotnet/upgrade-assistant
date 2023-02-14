@@ -184,7 +184,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             string command = "dotnet";
 
-            if (requiresAdmin && RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            if (requiresAdmin && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 arguments = $"dotnet {arguments}";
                 command = "sudo";
