@@ -55,7 +55,8 @@ namespace Integration.Tests
         [Theory]
         public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && scenarioPath == "PCL")
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
+                (scenarioPath == "PCL" || scenarioPath == "WpfSample/csharp"))
             {
                 return;
             }
