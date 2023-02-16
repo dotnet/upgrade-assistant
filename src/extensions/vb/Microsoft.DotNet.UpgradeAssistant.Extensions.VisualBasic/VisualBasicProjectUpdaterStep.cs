@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -61,7 +62,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
             // The VisualBasicProjectUpdaterStep is only applicable when a project is loaded
-            if (context?.CurrentProject is null)
+            if (context?.CurrentProject is null || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return false;
             }

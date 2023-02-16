@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -26,6 +27,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData("TestInputFiles\\MultiServicesConfig.txt", "TestExpectedFiles\\MultiServicesTemplateCode.txt")]
         public void UpdateFactoryTemplateTest(string input, string expected)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
             input = input.Replace('\\', Path.DirectorySeparatorChar);
             expected = expected.Replace('\\', Path.DirectorySeparatorChar);
 

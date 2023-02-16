@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.CodeAnalysis.CSharp;
@@ -42,6 +43,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(Proj, "TestInputFiles\\MultiServicesSourceCode.txt", "TestInputFiles\\MultiServicesConfig.txt", "", UpgradeStepStatus.Incomplete)] // Multiple services case
         public void WCFUpdateTest(string proj, string main, string config, string directive, UpgradeStepStatus expected)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
             proj = proj.Replace('\\', Path.DirectorySeparatorChar);
             main = main.Replace('\\', Path.DirectorySeparatorChar);
             config = config.Replace('\\', Path.DirectorySeparatorChar);

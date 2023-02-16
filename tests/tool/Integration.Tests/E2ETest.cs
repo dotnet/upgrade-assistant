@@ -40,23 +40,22 @@ namespace Integration.Tests
             _output = output;
         }
 
-        [InlineData("PCL", "SamplePCL.csproj", "")]
-        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
+        [InlineData("PCL", "SamplePCL.csproj", "", true)]
+        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj", true)]
         /*
-                [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
-                [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
+                [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "", true)]
+                [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "", true)]
         */
-        [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
-        [InlineData("WCFSample", "ConsoleApp.csproj", "")]
+        [InlineData("WpfSample/vb", "WpfApp1.sln", "", true)]
+        [InlineData("WCFSample", "ConsoleApp.csproj", "", true)]
 
         // TODO: [mgoertz] Re-enable after MAUI workloads are installed on test machines
-        // [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
-        // [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
+        // [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj", false)]
+        // [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj", false)]
         [Theory]
-        public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
+        public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint, bool windowsOnly)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
-                (scenarioPath == "PCL" || scenarioPath == "WpfSample/csharp"))
+            if (windowsOnly && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return;
             }
