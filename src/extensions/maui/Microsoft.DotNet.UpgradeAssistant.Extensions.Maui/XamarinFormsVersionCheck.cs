@@ -50,7 +50,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 if (!DoesHaveMinimumXamarinVersion(project, _comparer))
                 {
-                    _logger.LogError(UpgradeMessage);
+                    _logger.LogError(XAMARIN_FORMS_MESSAGE, CATEGORY, UPGRADE_LINK);
                     return UpgradeReadiness.Unsupported;
                 }
             }
@@ -65,12 +65,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             {
                 if (package.Name == "Xamarin.Forms")
                 {
-                    if (comparer.Compare(package.Version, MINIMUM_XAMARIN_VERSION) > 0)
-                    {
-                        return true;
-                    }
-
-                    return false;
+                    return comparer.Compare(package.Version, MINIMUM_XAMARIN_VERSION) > 0;
                 }
             }
 
