@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
     {
         private const string CATEGORY = ".NET MAUI Upgrade";
         private const string UPGRADE_LINK = "https://aka.ms/upgradeassistant/maui/requirements";
-        private const string XAMARIN_FORMS_MESSAGE = "Support for upgrading to {Category} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {Link}";
+        private const string XAMARIN_FORMS_MESSAGE = "Support for upgrading to {0} is limited to Xamarin.Forms version 4.8 or higher. To learn more please read: {1}";
         private const string MINIMUM_XAMARIN_VERSION = "4.8";
 
         private readonly ILogger<XamarinFormsVersionCheck> _logger;
@@ -60,19 +61,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         private static bool DoesHaveMinimumXamarinVersion(IProject project, IVersionComparer comparer)
         {
             var packageReferences = project.NuGetReferences.PackageReferences;
-
             foreach (var package in packageReferences)
             {
                 if (package.Name == "Xamarin.Forms")
                 {
-                    if (comparer.Compare(package.Version, MINIMUM_XAMARIN_VERSION) > 0)
-                    {
-                        return true;
-                    }
+                    return comparer.Compare(package.Version, MINIMUM_XAMARIN_VERSION) > 0;
                 }
             }
 
-            return false;
+            return true;
         }
     }
 }
