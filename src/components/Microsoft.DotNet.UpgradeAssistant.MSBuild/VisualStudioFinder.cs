@@ -36,11 +36,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
             else
             {
-                // FIXME: Perhaps WorkspaceOptions should have MSBuildExtensionsPath instead of VisualStudioPath?
-                //
-                // MSBuildWorkspaceUpgradeContext.CreateProperties() uses it to set the MSBuildExtensionsPath[32]
-                // environment variables and there is some logging in UpgraderMsBuildExtensions.AddMsBuild(),
-                // but that's about it.
+                // MSBuildWorkspaceUpgradeContext.CreateProperties() uses the VS path to set the MSBuildExtensionsPath[32]
+                // environment variables and there is some logging in UpgraderMsBuildExtensions.AddMsBuild().
                 _logger.LogInformation("Visual Studio path not required on macOS");
             }
         }
