@@ -194,26 +194,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                     msbuildExtensionsPath = Path.Combine(homeDir, ".dotnet-upgrade-assistant", "dotnet-sdk", versionDir);
 
-                    try
+                    if (!Directory.Exists(msbuildExtensionsPath))
                     {
-                        if (!Directory.Exists(msbuildExtensionsPath))
-                        {
-                            Directory.CreateDirectory(msbuildExtensionsPath);
-                        }
-
-                        // First, create symbolic links to all of the dotnet MSBuild file system entries.
-                        CreateSymbolicLinks(msbuildExtensionsPath, options.MSBuildPath);
-
-                        // Then create the symbolic links to the Mono.framework/External/xbuild system entries.
-                        CreateSymbolicLinks(msbuildExtensionsPath, MacOSMonoFrameworkMSBuildExtensionsDir);
+                        Directory.CreateDirectory(msbuildExtensionsPath);
                     }
-#pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception)
-#pragma warning restore CA1031 // Do not catch general exception types
-                    {
-                        // Something failed so we may be better off just using the default dotnet MSBuildExtensionsPath.
-                        msbuildExtensionsPath = null;
-                    }
+
+                    // First, create symbolic links to all of the dotnet MSBuild file system entries.
+                    CreateSymbolicLinks(msbuildExtensionsPath, options.MSBuildPath);
+
+                    // Then create the symbolic links to the Mono.framework/External/xbuild system entries.
+                    CreateSymbolicLinks(msbuildExtensionsPath, MacOSMonoFrameworkMSBuildExtensionsDir);
                 }
             }
 
