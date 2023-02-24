@@ -179,7 +179,7 @@
     <value>{Name}: {Source}</value>
   </data>
   <data name="MacOSWarning" xml:space="preserve">
-    <value>MacOS support for this tool is limited to migrating Xamarin.Forms to MAUI. Other migration paths may or may not work correctly.</value>
+    <value>MacOS support for this tool is limited to migrating Xamarin.Forms to MAUI. Other migration paths are not supported and may or may not work correctly.</value>
   </data>
   <data name="NonWindowsWarning" xml:space="preserve">
     <value>This tool is not supported on non-Windows platforms due to dependencies on Visual Studio.</value>
