@@ -221,7 +221,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
             foreach (var item in compileItems)
             {
-                var path = Path.DirectorySeparatorChar == '/' ? item.Replace('\\', '/') : item;
+                var path = PathHelpers.GetNativePath(item);
 
                 // Note: on macOS, we'll sometimes get duplicate items because one will be from an explicit
                 // <Compile Include="Properties\AssemblyInfo.cs"/> which will use \'s in the path and the
@@ -249,7 +249,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             distinct.Clear();
             foreach (var item in configItems)
             {
-                var path = Path.DirectorySeparatorChar == '/' ? item.Replace('\\', '/') : item;
+                var path = PathHelpers.GetNativePath(item);
 
                 // Note: on macOS, we'll sometimes get duplicate items because one will be from an explicit
                 // <None Include=.../> which will use \'s in the path and the other will be an implicit

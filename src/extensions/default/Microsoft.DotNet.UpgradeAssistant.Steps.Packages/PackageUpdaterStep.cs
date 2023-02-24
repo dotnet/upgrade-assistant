@@ -163,7 +163,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 var containsService = false;
                 foreach (var f in files)
                 {
-                    var path = Path.DirectorySeparatorChar == '/' ? f.Replace('\\', '/') : f;
+                    var path = PathHelpers.GetNativePath(f);
 
                     if (File.Exists(path))
                     {

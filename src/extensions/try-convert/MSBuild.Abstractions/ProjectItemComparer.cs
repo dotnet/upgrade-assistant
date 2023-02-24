@@ -23,16 +23,6 @@ namespace MSBuild.Abstractions
             _compareMetadata = compareMetadata;
         }
 
-        private static string GetCanonicalIncludePath(string path)
-        {
-            if (Path.DirectorySeparatorChar == '/')
-            {
-                return path.Replace('/', '\\');
-            }
-
-            return path;
-        }
-
         public bool Equals([AllowNull] IProjectItem x, [AllowNull] IProjectItem y)
         {
             if (x == null && y == null)
@@ -55,8 +45,8 @@ namespace MSBuild.Abstractions
                 return false;
             }
 
-            var xPath = GetCanonicalIncludePath(x.EvaluatedInclude);
-            var yPath = GetCanonicalIncludePath(y.EvaluatedInclude);
+            var xPath = PathHelpers.GetIncludePath(x.EvaluatedInclude);
+            var yPath = PathHelpers.GetIncludePath(y.EvaluatedInclude);
 
             if (!xPath.Equals(yPath, StringComparison.OrdinalIgnoreCase))
             {
@@ -82,9 +72,11 @@ namespace MSBuild.Abstractions
 
         public int GetHashCode(IProjectItem obj)
         {
-            var path = GetCanonicalIncludePath(obj.EvaluatedInclude);
+            obj = obj ?? throw new ArgumentNullException(nameof(obj));
 
-            return (obj.ItemType + ":" + path).GetHashCode();
+            var path = PathHelpers.GetIncludePath(obj.EvaluatedInclude);
+
+            return (obj.ItemType + ":" + path).GetHashCode(StringComparison.Ordinal);
         }
     }
 }

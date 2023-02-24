@@ -164,17 +164,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             var item = ProjectRoot.CreateItemElement(projectItem.ItemType.Name);
             if (projectItem.Include is not null)
             {
-                item.Include = GetCanonicalIncludePath(projectItem.Include);
+                item.Include = PathHelpers.GetIncludePath(projectItem.Include);
             }
 
             if (projectItem.Exclude is not null)
             {
-                item.Exclude = GetCanonicalIncludePath(projectItem.Exclude);
+                item.Exclude = PathHelpers.GetIncludePath(projectItem.Exclude);
             }
 
             if (projectItem.Remove is not null)
             {
-                item.Remove = GetCanonicalIncludePath(projectItem.Remove);
+                item.Remove = PathHelpers.GetIncludePath(projectItem.Remove);
             }
 
             itemGroup.AppendChild(item);
@@ -230,22 +230,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
-        private static string GetCanonicalIncludePath(string path)
-        {
-            if (Path.DirectorySeparatorChar == '/')
-            {
-                return path.Replace('/', '\\');
-            }
-
-            return path;
-        }
-
         private static string GetPathRelativeToProject(string path, string projectDir)
         {
-            if (Path.DirectorySeparatorChar == '/')
-            {
-                path = path.Replace('\\', '/');
-            }
+            path = PathHelpers.GetNativePath(path);
 
             return Path.IsPathFullyQualified(path) ? path : Path.Combine(projectDir, path);
         }

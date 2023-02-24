@@ -322,7 +322,7 @@ namespace MSBuild.Conversion.Project
                     var changedItems = itemTypeDiff.ChangedItems.Select(i => i.EvaluatedInclude);
                     if (changedItems.Contains(item.Include, PathComparer.Default))
                     {
-                        var path = Path.DirectorySeparatorChar == '/' ? item.Include.Replace('/', '\\') : item.Include;
+                        var path = PathHelpers.GetIncludePath(item.Include);
                         item.Include = null;
                         item.Update = path;
                     }
@@ -357,7 +357,7 @@ namespace MSBuild.Conversion.Project
                 var itemGroup = projectRootElement.AddItemGroup();
                 foreach (var introducedItem in introducedItems)
                 {
-                    var include = Path.DirectorySeparatorChar == '/' ? introducedItem.EvaluatedInclude.Replace('/', '\\') : introducedItem.EvaluatedInclude;
+                    var include = PathHelpers.GetIncludePath(introducedItem.EvaluatedInclude);
                     var item = itemGroup.AddItem(introducedItem.ItemType, include);
                     item.Include = null;
                     item.Remove = include;

@@ -47,11 +47,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
             services.AddTransient<Func<MSBuildWorkspaceUpgradeContext>>(sp => () => sp.GetRequiredService<MSBuildWorkspaceUpgradeContext>());
         }
 
-        private static string GetCanonicalIncludePath(string path)
-        {
-            return Path.DirectorySeparatorChar == '/' ? path.Replace('/', '\\') : path;
-        }
-
         // TEMPORARY WORKAROUND
         // https://github.com/dotnet/roslyn/issues/36781
         // Adding documents to a project can result in extra "<include Compile=...>" items
@@ -84,8 +79,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 }
 
                 // Skip items that are only included once
-                var path = GetCanonicalIncludePath(i.EvaluatedInclude);
-                if (project.Items.Count(i2 => GetCanonicalIncludePath(i2.EvaluatedInclude).Equals(path, StringComparison.OrdinalIgnoreCase)) <= 1)
+                var path = PathHelpers.GetIncludePath(i.EvaluatedInclude);
+                if (project.Items.Count(i2 => PathHelpers.GetIncludePath(i2.EvaluatedInclude).Equals(path, StringComparison.OrdinalIgnoreCase)) <= 1)
                 {
                     return false;
                 }

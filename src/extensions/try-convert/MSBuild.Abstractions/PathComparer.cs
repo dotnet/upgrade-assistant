@@ -16,16 +16,6 @@ namespace MSBuild.Abstractions
         {
         }
 
-        private static string GetCanonicalIncludePath(string path)
-        {
-            if (Path.DirectorySeparatorChar == '/')
-            {
-                return path.Replace('/', '\\');
-            }
-
-            return path;
-        }
-
         public bool Equals([AllowNull] string x, [AllowNull] string y)
         {
             if (x == null && y == null)
@@ -43,15 +33,15 @@ namespace MSBuild.Abstractions
                 return false;
             }
 
-            var xPath = GetCanonicalIncludePath(x);
-            var yPath = GetCanonicalIncludePath(y);
+            var xPath = PathHelpers.GetIncludePath(x);
+            var yPath = PathHelpers.GetIncludePath(y);
 
             return xPath.Equals(yPath, StringComparison.OrdinalIgnoreCase);
         }
 
         public int GetHashCode(string obj)
         {
-            var path = GetCanonicalIncludePath(obj ?? string.Empty);
+            var path = PathHelpers.GetIncludePath(obj ?? string.Empty);
 
             return path.GetHashCode();
         }
