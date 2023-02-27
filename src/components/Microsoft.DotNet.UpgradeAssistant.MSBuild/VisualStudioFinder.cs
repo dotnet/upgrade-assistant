@@ -43,8 +43,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 return default;
             }
 
-            _logger.LogError("InstallationPath:{InstallPath}  Version:{Version}", latest.InstallPath, latest.Version);
-
             if (Directory.Exists(latest.InstallPath))
             {
                 _logger.LogDebug("Using Visual Studio v{VsVersion} [{VsPath}]", latest.Version, latest.InstallPath);
