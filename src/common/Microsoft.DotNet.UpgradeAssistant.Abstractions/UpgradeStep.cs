@@ -147,6 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error initializing step.");
                 Logger.LogError(e, "Unexpected error initializing step");
+                context.Telemetry.TrackException(e);
             }
         }
 

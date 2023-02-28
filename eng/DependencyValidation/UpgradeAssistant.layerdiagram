@@ -274,6 +274,11 @@
       </childLayers>
     </layer>
     <layer Id="421742ad-4313-43e3-bcee-4c01cd3c4c8c" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">
+      <dependencyToLayers>
+        <dependencyFromLayerToLayer Id="24b067d3-eca7-42f4-a15e-1b72a148fbe1" direction="Forward">
+          <layerMoniker Id="df9ce3fc-9390-4adf-a3cd-e94d15fbfc6c" />
+        </dependencyFromLayerToLayer>
+      </dependencyToLayers>
       <references>
         <reference Id="1c270efd-b624-4981-ab59-92abac31ed44" name="Microsoft.DotNet.UpgradeAssistant.Abstractions">
           <ArtifactNode Label="Microsoft.DotNet.UpgradeAssistant.Abstractions" Category="CodeSchema_Project" Id="(Assembly=../../src/common/Microsoft.DotNet.UpgradeAssistant.Abstractions/Microsoft.DotNet.UpgradeAssistant.Abstractions.csproj)">
