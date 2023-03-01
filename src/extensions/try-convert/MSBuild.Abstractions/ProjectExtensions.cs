@@ -50,8 +50,8 @@ namespace MSBuild.Abstractions
                 ".NETCore" => "net", // UWP
                 ".NETCoreApp" => "netcoreapp",
                 ".NETPortable" => "netstandard",
-                "MonoAndroid" => "net",
-                "Xamarin.iOS" => "net",
+                "MonoAndroid" => "net6.0-android",
+                "Xamarin.iOS" => "net6.0-ios",
                 _ => throw new InvalidOperationException($"Unknown {MSBuildFacts.LegacyTargetFrameworkPropertyNodeName}: {tfi}"),
             };
 
@@ -68,8 +68,11 @@ namespace MSBuild.Abstractions
                     }
                 }
             }
-
-            if (tfi.Equals(MSBuildFacts.NETPortableTFValuePrefix, StringComparison.OrdinalIgnoreCase))
+            else if (tfi == "MonoAndroid" || tfi == "Xamarin.iOS")
+            {
+                return tf;
+            }
+            else if (tfi.Equals(MSBuildFacts.NETPortableTFValuePrefix, StringComparison.OrdinalIgnoreCase))
             {
                 var profile = project.GetPropertyValue(MSBuildFacts.LegacyTargetFrameworkProfileNodeName);
 

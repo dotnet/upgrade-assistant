@@ -274,6 +274,7 @@ namespace MSBuild.Conversion.Facts
         public const string DesignerSubType = "Designer";
         public const string CodeSubTypeValue = "Code";
         public const string TargetFrameworkNodeName = "TargetFramework";
+        public const string TargetFrameworksNodeName = "TargetFrameworks";
         public const string OutputTypeNodeName = "OutputType";
         public const string GenerateAssemblyInfoNodeName = "GenerateAssemblyInfo";
         public const string RequiredTargetFrameworkNodeName = "RequiredTargetFramework";
