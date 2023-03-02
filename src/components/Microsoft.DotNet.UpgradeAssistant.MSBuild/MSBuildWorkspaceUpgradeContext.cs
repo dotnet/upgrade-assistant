@@ -149,9 +149,28 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             {
                 var target = Path.Combine(targetDir, Path.GetFileName(entry));
 
-                if (File.Exists(target))
+                var fileInfo = new FileInfo(target);
+                if (fileInfo.Exists)
                 {
+                    if (fileInfo.LinkTarget is not null && fileInfo.LinkTarget.Equals(entry, StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
                     File.Delete(target);
+                }
+                else
+                {
+                    var dirInfo = new DirectoryInfo(target);
+                    if (dirInfo.Exists)
+                    {
+                        if (dirInfo.LinkTarget is not null && dirInfo.LinkTarget.Equals(entry, StringComparison.Ordinal))
+                        {
+                            continue;
+                        }
+
+                        Directory.Delete(target);
+                    }
                 }
 
                 File.CreateSymbolicLink(target, entry);
