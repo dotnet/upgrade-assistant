@@ -82,7 +82,6 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             _workspace?.Dispose();
             _workspace = null;
             ProjectCollection.Dispose();
-            Telemetry.Dispose();
         }
 
         public IProject GetProject(string path)
