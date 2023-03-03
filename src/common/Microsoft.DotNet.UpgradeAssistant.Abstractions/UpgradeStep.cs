@@ -147,7 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error initializing step.");
                 Logger.LogError(e, "Unexpected error initializing step");
-                context.Telemetry.TrackException(e);
+                context.Telemetry?.TrackException(e);
             }
         }
 
@@ -200,7 +200,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 (Status, StatusDetails) = (UpgradeStepStatus.Failed, $"Unexpected error applying upgrade step '{Title}'");
                 Logger.LogError(e, "Unexpected error applying upgrade step {StepTitle}", Title);
                 context.AddResultForStep(this, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, Status, StatusDetails, details: e.ToString(), outputLevel: OutputLevel.Error);
-                context.Telemetry.TrackException(e);
+                context.Telemetry?.TrackException(e);
                 return false;
             }
         }

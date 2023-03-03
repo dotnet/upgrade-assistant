@@ -46,6 +46,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
 
         ICollector<OutputResultDefinition> Results { get; }
 
-        ITelemetry Telemetry { get; }
+        ITelemetry? Telemetry { get; }
     }
 }
