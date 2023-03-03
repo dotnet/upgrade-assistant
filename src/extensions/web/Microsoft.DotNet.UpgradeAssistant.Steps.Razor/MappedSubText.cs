@@ -61,8 +61,21 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor
                 // Close the previous sub-text
                 if (currentMappedSubText is not null)
                 {
-                    // Subtract two from directive.SpanStart to account for end-of-line trivia
-                    ret.Add(currentMappedSubText with { Text = documentText.GetSubText(new TextSpan(subTextStart, directive.SpanStart - 2 - subTextStart)) });
+                    // Calculate the length of the new-line sequence (which may or may not be the native Environment.NewLine length)
+                    var text = documentText.GetSubText(new TextSpan(subTextStart, directive.SpanStart - subTextStart));
+                    int lineEndingLength = 0;
+
+                    if (text[text.Length - 1] == '\n')
+                    {
+                        lineEndingLength++;
+                        if (text[text.Length - 2] == '\r')
+                        {
+                            lineEndingLength++;
+                        }
+                    }
+
+                    // Capture the mapped subtext minus the new-line sequence.
+                    ret.Add(currentMappedSubText with { Text = documentText.GetSubText(new TextSpan(subTextStart, directive.SpanStart - lineEndingLength - subTextStart)) });
                     currentMappedSubText = null;
                 }
 

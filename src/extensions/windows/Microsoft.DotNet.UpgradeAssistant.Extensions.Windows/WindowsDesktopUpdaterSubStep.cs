@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            if (context?.CurrentProject is null)
+            if (context?.CurrentProject is null || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return Task.FromResult(false);
             }

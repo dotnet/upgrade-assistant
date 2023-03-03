@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             StringBuilder resultBuilder = new();
-            _installSucceeded = await RunDotnetCommandAsync(context, "workload install maui", (_, message) =>
+            _installSucceeded = await RunDotnetCommandAsync(context, "workload install maui", true, (_, message) =>
             {
                 resultBuilder.AppendLine(message);
                 return LogLevel.Information;
@@ -106,14 +107,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
                 // We only need to display the dotnet info debug information once
                 // Save the output to add to result details in case of a workload install failure
-                await RunDotnetCommandAsync(context, "--info", (_, message) =>
+                await RunDotnetCommandAsync(context, "--info", false, (_, message) =>
                 {
                     _infoResult.AppendLine(message);
                     return LogLevel.Debug;
                 }, token).ConfigureAwait(false);
             }
 
-            var result = await RunDotnetCommandAsync(context, "workload list", (_, message) =>
+            var result = await RunDotnetCommandAsync(context, "workload list", false, (_, message) =>
                 {
                     var workload = message.Split(' ').First();
                     if (MauiWorkloadMap.TryGetValue(workload, out var component))
@@ -172,19 +173,27 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
         }
 
         /// <summary>
-        /// Run specified `dotnet workload` command.
+        /// Run specified `dotnet` command.
         /// </summary>
-        public Task<bool> RunDotnetCommandAsync(IUpgradeContext context, string command, Func<bool, string, LogLevel> getMessageLogLevel, CancellationToken token)
+        public Task<bool> RunDotnetCommandAsync(IUpgradeContext context, string arguments, bool requiresAdmin, Func<bool, string, LogLevel> getMessageLogLevel, CancellationToken token)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
+            string command = "dotnet";
+
+            if (requiresAdmin && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                arguments = $"dotnet {arguments}";
+                command = "sudo";
+            }
+
             return _runner.RunProcessAsync(new ProcessInfo
             {
-                Command = "dotnet",
-                Arguments = command,
+                Command = command,
+                Arguments = arguments,
                 EnvironmentVariables = context.GlobalProperties,
                 Name = "dotnet",
                 GetMessageLogLevel = getMessageLogLevel,

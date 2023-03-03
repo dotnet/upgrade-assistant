@@ -134,6 +134,8 @@ namespace MSBuild.Conversion.Project
 
         public static IProjectRootElement RemoveUnnecessaryPropertiesNotInSDKByDefault(this IProjectRootElement projectRootElement, ProjectStyle projectStyle)
         {
+            var projectName = GetProjectName(projectRootElement.FullPath);
+
             foreach (var propGroup in projectRootElement.PropertyGroups)
             {
                 foreach (var prop in propGroup.Properties)
@@ -158,7 +160,7 @@ namespace MSBuild.Conversion.Project
                     {
                         propGroup.RemoveChild(prop);
                     }
-                    else if (ProjectPropertyHelpers.IsNameDefault(prop, GetProjectName(projectRootElement.FullPath)))
+                    else if (ProjectPropertyHelpers.IsNameDefault(prop, projectName))
                     {
                         propGroup.RemoveChild(prop);
                     }
@@ -199,8 +201,15 @@ namespace MSBuild.Conversion.Project
 
             static string GetProjectName(string projectPath)
             {
-                var projName = projectPath.Split('\\').Last();
-                return projName.Substring(0, projName.LastIndexOf('.'));
+                int startIndex = projectPath.LastIndexOf(Path.DirectorySeparatorChar) + 1;
+                int endIndex = projectPath.LastIndexOf('.');
+
+                if (endIndex > startIndex)
+                {
+                    return projectPath.Substring(startIndex, endIndex - startIndex);
+                }
+
+                return projectPath.Substring(startIndex);
             }
         }
 
@@ -302,7 +311,7 @@ namespace MSBuild.Conversion.Project
                 if (!itemTypeDiff.DefaultedItems.IsDefault)
                 {
                     var defaultedItems = itemTypeDiff.DefaultedItems.Select(i => i.EvaluatedInclude);
-                    if (defaultedItems.Contains(item.Include, StringComparer.OrdinalIgnoreCase))
+                    if (defaultedItems.Contains(item.Include, PathComparer.Default))
                     {
                         itemGroup.RemoveChild(item);
                     }
@@ -311,9 +320,9 @@ namespace MSBuild.Conversion.Project
                 if (!itemTypeDiff.ChangedItems.IsDefault)
                 {
                     var changedItems = itemTypeDiff.ChangedItems.Select(i => i.EvaluatedInclude);
-                    if (changedItems.Contains(item.Include, StringComparer.OrdinalIgnoreCase))
+                    if (changedItems.Contains(item.Include, PathComparer.Default))
                     {
-                        var path = item.Include;
+                        var path = PathHelpers.GetIncludePath(item.Include);
                         item.Include = null;
                         item.Update = path;
                     }
@@ -348,9 +357,10 @@ namespace MSBuild.Conversion.Project
                 var itemGroup = projectRootElement.AddItemGroup();
                 foreach (var introducedItem in introducedItems)
                 {
-                    var item = itemGroup.AddItem(introducedItem.ItemType, introducedItem.EvaluatedInclude);
+                    var include = PathHelpers.GetIncludePath(introducedItem.EvaluatedInclude);
+                    var item = itemGroup.AddItem(introducedItem.ItemType, include);
                     item.Include = null;
-                    item.Remove = introducedItem.EvaluatedInclude;
+                    item.Remove = include;
                 }
             }
 

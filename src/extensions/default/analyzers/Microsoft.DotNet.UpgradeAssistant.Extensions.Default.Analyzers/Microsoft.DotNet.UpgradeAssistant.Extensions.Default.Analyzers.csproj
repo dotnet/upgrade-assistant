@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <!-- Avoid ID conflicts with the package project. -->
-    <PackageId>*$(MSBuildProjectFullPath)*</PackageId>
+    <PackageId>Real.Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="DefaultApiAlerts.apitargets" />

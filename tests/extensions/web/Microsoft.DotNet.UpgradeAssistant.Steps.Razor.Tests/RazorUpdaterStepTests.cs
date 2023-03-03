@@ -5,6 +5,7 @@ using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,6 +68,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
         [InlineData("RazorSourceUpdaterStepViews/Test.csproj", 1, 0, true, true)] // Applicable even with only complete updaters (updater status is not checked)
         public async Task IsApplicableTests(string projectPath, int completeUpdaterCount, int incompleteUpdaterCount, bool projectLoaded, bool expected)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                expected = false;
+            }
+
             // Arrange
             using var mock = GetMock(projectLoaded, projectPath, completeUpdaterCount, incompleteUpdaterCount);
             var step = mock.Create<RazorUpdaterStep>();
