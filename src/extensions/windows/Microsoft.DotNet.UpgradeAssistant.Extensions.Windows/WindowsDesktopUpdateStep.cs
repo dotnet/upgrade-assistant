@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -58,7 +59,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
         /// <returns>True if the Winforms updater step might apply, false otherwise.</returns>
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            if (context?.CurrentProject is null)
+            if (context?.CurrentProject is null || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return false;
             }
@@ -76,7 +77,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
 
         private async Task<IEnumerable<UpgradeStep>> GetApplicableSubSteps(IUpgradeContext context, CancellationToken token)
         {
-            if (context?.CurrentProject is null)
+            if (context?.CurrentProject is null || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return ImmutableList.Create<UpgradeStep>();
             }

@@ -13,12 +13,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         private const string AnalyzeBinaries = "ANALYZE_BINARIES";
         private const string SolutionWideSdkConversion = "SOLUTION_WIDE_SDK_CONVERSION";
-        private const string EnableCrossPlatform = "ENABLE_CROSS_PLATFORM";
 
         public static readonly IReadOnlyCollection<string> RegisteredFeatures = new[]
         {
             SolutionWideSdkConversion,
-            EnableCrossPlatform,
             AnalyzeBinaries
         };
 
@@ -37,8 +35,6 @@ namespace Microsoft.DotNet.UpgradeAssistant
         }
 
         public static bool IsRegistered(string name) => _features.Contains(name);
-
-        public static bool IsWindowsCheckEnabled => !_features.Contains(EnableCrossPlatform);
 
         public static bool IsAnalyzeBinariesEnabled => _features.Contains(AnalyzeBinaries);
 

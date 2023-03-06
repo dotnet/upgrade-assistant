@@ -163,15 +163,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Packages
                 var containsService = false;
                 foreach (var f in files)
                 {
-                    var root = CSharpSyntaxTree.ParseText(File.ReadAllText(f)).GetRoot();
-                    if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
-                    {
-                        return packages.Additions;
-                    }
+                    var path = PathHelpers.GetNativePath(f);
 
-                    if (!containsService && ContainsIdentifier(root, "ServiceHost"))
+                    if (File.Exists(path))
                     {
-                        containsService = true;
+                        var root = CSharpSyntaxTree.ParseText(File.ReadAllText(path)).GetRoot();
+                        if (ContainsIdentifier(root, "ChannelFactory") || ContainsIdentifier(root, "ClientBase"))
+                        {
+                            return packages.Additions;
+                        }
+
+                        if (!containsService && ContainsIdentifier(root, "ServiceHost"))
+                        {
+                            containsService = true;
+                        }
                     }
                 }
 
