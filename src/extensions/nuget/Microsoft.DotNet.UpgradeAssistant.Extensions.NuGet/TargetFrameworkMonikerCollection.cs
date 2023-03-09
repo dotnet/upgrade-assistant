@@ -108,6 +108,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
             }
 
             const string NonSdkTargetFramework = "TargetFrameworkVersion";
+            const string TargetFrameworkIdentifier = "TargetFrameworkIdentifier";
+
+            var tfi = file.GetPropertyValue(TargetFrameworkIdentifier);
+            if (tfi == FrameworkConstants.FrameworkIdentifiers.MonoAndroid || tfi == FrameworkConstants.FrameworkIdentifiers.XamarinIOs)
+            {
+                var tf = tfi == FrameworkConstants.FrameworkIdentifiers.MonoAndroid ? "net6.0-android" : "net6.0-ios";
+                return new string[] { tf };
+            }
 
             var tfms = GetTfms(file, NonSdkTargetFramework);
 
