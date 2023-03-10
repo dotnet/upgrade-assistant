@@ -49,7 +49,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
             else if (tfm.Components.HasFlag(ProjectComponents.MauiiOS))
             {
-                _logger.LogInformation("Recommending TFM {TFM} for project {Name} because project is of type .NET MAUI Target:iOS", TargetFrameworkMoniker.Net70_Android, tfm.Project);
+                _logger.LogInformation("Recommending TFM {TFM} for project {Name} because project is of type .NET MAUI Target:iOS", TargetFrameworkMoniker.Net70_iOS, tfm.Project);
                 tfm.TryUpdate(TargetFrameworkMoniker.Net70_iOS);
             }
             else if (tfm.Components.HasFlag(ProjectComponents.Maui))
