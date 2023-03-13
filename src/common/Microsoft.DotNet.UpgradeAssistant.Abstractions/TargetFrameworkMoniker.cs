@@ -61,6 +61,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
         private static class DefaultVersions
         {
             public static readonly Version Windows = new(7, 0, 0, 0);
+            public static readonly Version Android = new(31, 0);
+            public static readonly Version IOS = new(13, 5);
         }
 
 #pragma warning restore CA1034 // Nested types should not be visible
@@ -206,6 +208,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     var defaultVersion = platform switch
                     {
                         Platforms.Windows => DefaultVersions.Windows,
+                        Platforms.Android => DefaultVersions.Android,
+                        Platforms.IOS => DefaultVersions.IOS,
                         _ => null,
                     };
 
