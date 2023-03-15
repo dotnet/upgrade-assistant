@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic
         protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
             // VB updates don't apply until a project is selected
-            if (context?.CurrentProject is null)
+            if (context?.CurrentProject is null || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return Task.FromResult(false);
             }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -69,7 +70,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             _path = new FilePath();
         }
 
-        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null);
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token) => Task.FromResult(context?.CurrentProject is not null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
         {
@@ -210,29 +211,71 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
 
         private void FindPath(IProject project)
         {
-            var csFile = project.FindFiles(".cs", ProjectItemType.Compile);
-            var main = from f in csFile
-                       where File.Exists(f) && File.ReadAllText(f).Replace(" ", string.Empty).IndexOf("Main(", StringComparison.Ordinal) >= 0
-                       select f;
-            var directives = from f in csFile
-                             where File.Exists(f) && File.ReadAllText(f).IndexOf("using System.ServiceModel", StringComparison.Ordinal) >= 0
-                             && File.ReadAllText(f).Replace(" ", string.Empty).IndexOf("Main(", StringComparison.Ordinal) < 0
-                             select f;
-            var config = from f in project.FindFiles(".config", ProjectItemType.None)
-                         where File.Exists(f) && File.ReadAllText(f).IndexOf("<system.serviceModel>", StringComparison.Ordinal) >= 0
-                         select f;
+            var compileItems = project.FindFiles(".cs", ProjectItemType.Compile);
+            var configItems = project.FindFiles(".config", ProjectItemType.None);
+            var distinct = new HashSet<string>();
+            var serviceHostDetected = false;
+            var directives = new List<string>();
+            var config = new List<string>();
+            var main = new List<string>();
 
-            if (!main.Any())
+            foreach (var item in compileItems)
+            {
+                var path = PathHelpers.GetNativePath(item);
+
+                // Note: on macOS, we'll sometimes get duplicate items because one will be from an explicit
+                // <Compile Include="Properties\AssemblyInfo.cs"/> which will use \'s in the path and the
+                // other will be an implicit <Compile Include="**/*.cs"/> which will obviously use /'s.
+                if (distinct.Add(path) && File.Exists(path))
+                {
+                    var text = File.ReadAllText(path);
+
+                    if (text.Replace(" ", string.Empty).IndexOf("Main(", StringComparison.Ordinal) >= 0)
+                    {
+                        if (main.Count == 0 && text.IndexOf("ServiceHost", StringComparison.Ordinal) >= 0)
+                        {
+                            serviceHostDetected = true;
+                        }
+
+                        main.Add(path);
+                    }
+                    else if (text.IndexOf("using System.ServiceModel", StringComparison.Ordinal) >= 0)
+                    {
+                        directives.Add(path);
+                    }
+                }
+            }
+
+            distinct.Clear();
+            foreach (var item in configItems)
+            {
+                var path = PathHelpers.GetNativePath(item);
+
+                // Note: on macOS, we'll sometimes get duplicate items because one will be from an explicit
+                // <None Include=.../> which will use \'s in the path and the other will be an implicit
+                // <None Include="**/*.config"/> which will obviously use /'s.
+                if (distinct.Add(path) && File.Exists(path))
+                {
+                    var text = File.ReadAllText(path);
+
+                    if (text.IndexOf("<system.serviceModel>", StringComparison.Ordinal) >= 0)
+                    {
+                        config.Add(path);
+                    }
+                }
+            }
+
+            if (main.Count == 0)
             {
                 Logger.LogWarning("Can not find .cs file with Main() method. The project is not applicable for automated WCF update. No more work needs to be done and this step is complete.");
             }
-            else if (main.Count() > 1)
+            else if (main.Count > 1)
             {
                 Logger.LogWarning("Found more than one .cs file with Main() method. The project is not applicable for automated WCF update. No more work needs to be done and this step is complete.");
             }
-            else if (!config.Any())
+            else if (config.Count == 0)
             {
-                if (File.ReadAllText(main.Single()).IndexOf("ServiceHost", StringComparison.Ordinal) >= 0)
+                if (serviceHostDetected)
                 {
                     Logger.LogWarning("ServiceHost instance was detected in code but can not find .config file that configures system.serviceModel. " +
                         "Automated update cannot be applied. Please update the project to CoreWCF manually (https://github.com/CoreWCF/CoreWCF).");
@@ -242,10 +285,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
             }
             else
             {
-                _path.MainFile = main.Single();
-                Logger.LogTrace($"This following file: {main.Single()} needs source code update to replace ServiceHost instance.");
-                _path.Config = config.Single();
-                Logger.LogTrace($"This following config file: {config.Single()} needs to be updated.");
+                _path.MainFile = main[0];
+                Logger.LogTrace($"This following file: {main[0]} needs source code update to replace ServiceHost instance.");
+                _path.Config = config[0];
+                Logger.LogTrace($"This following config file: {config[0]} needs to be updated.");
                 _path.ProjectFile = project.GetFile().FilePath;
                 Logger.LogTrace($"This following project file: {project.GetFile().FilePath} needs to be updated");
 

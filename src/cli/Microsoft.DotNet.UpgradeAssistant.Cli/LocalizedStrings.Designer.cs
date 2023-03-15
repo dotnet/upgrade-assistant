@@ -241,6 +241,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MacOS support for this tool is limited to migrating Xamarin.Forms to MAUI. Other migration paths are not supported and may or may not work correctly..
+        /// </summary>
+        internal static string MacOSWarning {
+            get {
+                return ResourceManager.GetString("MacOSWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This tool is not supported on non-Windows platforms due to dependencies on Visual Studio..
         /// </summary>
         internal static string NonWindowsWarning {

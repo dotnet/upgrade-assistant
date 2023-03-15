@@ -73,7 +73,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             // Assert
             var fileUpdaterResult = Assert.IsType<FileUpdaterResult>(result);
             Assert.Equal(expectedResult.Result, fileUpdaterResult.Result);
-            Assert.Collection(fileUpdaterResult.FilePaths, expectedResult.FilePaths.Select<string, Action<string>>(e => a => Assert.EndsWith(e, a, StringComparison.Ordinal)).ToArray());
+
+            var sortedFilePaths = fileUpdaterResult.FilePaths.ToList();
+            sortedFilePaths.Sort();
+
+            Assert.Collection(sortedFilePaths, expectedResult.FilePaths.Select<string, Action<string>>(e => a => Assert.EndsWith(e.Replace('\\', Path.DirectorySeparatorChar), a, StringComparison.Ordinal)).ToArray());
         }
 
         [Fact]
@@ -102,14 +106,20 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
             // Assert
             var fileUpdaterResult = Assert.IsType<FileUpdaterResult>(result);
             Assert.True(fileUpdaterResult.Result);
-            Assert.Collection(fileUpdaterResult.FilePaths, expectedResult.FilePaths.Select<string, Action<string>>(e => a => Assert.EndsWith(e, a, StringComparison.Ordinal)).ToArray());
+
+            var sortedFilePaths = fileUpdaterResult.FilePaths.ToList();
+            sortedFilePaths.Sort();
+
+            Assert.Collection(sortedFilePaths, expectedResult.FilePaths.Select<string, Action<string>>(e => a => Assert.EndsWith(e.Replace('\\', Path.DirectorySeparatorChar), a, StringComparison.Ordinal)).ToArray());
 
             // Confirm that files are updated as expected
             var projectFiles = context.CurrentProject!.FileInfo.Directory!.GetFiles("*.*", new EnumerationOptions { RecurseSubdirectories = true });
             var expectedFiles = new DirectoryInfo($"{Path.GetDirectoryName(projectPath)}.Fixed").GetFiles("*.*", new EnumerationOptions { RecurseSubdirectories = true });
             Assert.Collection(projectFiles, expectedFiles.Select<FileInfo, Action<FileInfo>>(e => a =>
             {
-                Assert.Equal(File.ReadAllText(e.FullName), File.ReadAllText(a.FullName));
+                var expectedText = File.ReadAllText(e.FullName).ReplaceLineEndings();
+                var actualText = File.ReadAllText(a.FullName).ReplaceLineEndings();
+                Assert.Equal(expectedText, actualText);
             }).ToArray());
         }
 
@@ -124,7 +134,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Razor.Tests
                 new object[]
                 {
                     "RazorHelperUpdaterViews/HelperInSubDir/Test.csproj",
-                    new FileUpdaterResult("RULE0001", "RuleName", "Full Description", true, new[] { @"\OneHelper\MyView.cshtml", @"\OneHelper\AnotherHelper\MyView.cshtml" })
+                    new FileUpdaterResult("RULE0001", "RuleName", "Full Description", true, new[] { @"\OneHelper\AnotherHelper\MyView.cshtml", @"\OneHelper\MyView.cshtml" })
                 },
                 new object[]
                 {

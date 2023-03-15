@@ -24,69 +24,69 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
                 "ContentDialogCaller",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIContentDialogAnalyzer.DiagnosticId, new TextSpan(729, 20))
+                    new ExpectedDiagnostic(WinUIContentDialogAnalyzer.DiagnosticId, new TextSpan(729, 20), new TextSpan(707, 20))
                 }
             },
             {
                 "InitializeWithWindow",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIInitializeWindowAnalyzer.DiagnosticId, new TextSpan(415, 20)),
-                    new ExpectedDiagnostic(WinUIInitializeWindowAnalyzer.DiagnosticId, new TextSpan(469, 18))
+                    new ExpectedDiagnostic(WinUIInitializeWindowAnalyzer.DiagnosticId, new TextSpan(415, 20), new TextSpan(399, 20)),
+                    new ExpectedDiagnostic(WinUIInitializeWindowAnalyzer.DiagnosticId, new TextSpan(469, 18), new TextSpan(452, 18))
                 }
             },
             {
                 "DataTransferManagerCaller",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIDataTransferManagerAnalyzer.DiagnosticId, new TextSpan(413, 33)),
-                    new ExpectedDiagnostic(WinUIDataTransferManagerAnalyzer.DiagnosticId, new TextSpan(461, 53)),
-                    new ExpectedDiagnostic(WinUIDataTransferManagerAnalyzer.DiagnosticId, new TextSpan(529, 71))
+                    new ExpectedDiagnostic(WinUIDataTransferManagerAnalyzer.DiagnosticId, new TextSpan(413, 33), new TextSpan(397, 33)),
+                    new ExpectedDiagnostic(WinUIDataTransferManagerAnalyzer.DiagnosticId, new TextSpan(461, 53), new TextSpan(444, 53)),
+                    new ExpectedDiagnostic(WinUIDataTransferManagerAnalyzer.DiagnosticId, new TextSpan(529, 71), new TextSpan(511, 71))
                 }
             },
             {
                 "InteropsCaller",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(481, 60)),
-                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(570, 92)),
-                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(746, 39)),
-                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(808, 91))
+                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(481, 60), new TextSpan(464, 60)),
+                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(570, 92), new TextSpan(552, 92)),
+                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(746, 39), new TextSpan(723, 39)),
+                    new ExpectedDiagnostic(WinUIInteropAnalyzer.DiagnosticId, new TextSpan(808, 91), new TextSpan(784, 91))
                 }
             },
             {
                 "MRTResourceManagerCaller",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId, new TextSpan(452, 23)),
-                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId, new TextSpan(520, 68)),
-                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId, new TextSpan(708, 23)),
-                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceContextAPIDiagnosticId, new TextSpan(769, 40)),
-                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceContextAPIDiagnosticId, new TextSpan(849, 33))
+                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId, new TextSpan(452, 23), new TextSpan(436, 23)),
+                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId, new TextSpan(520, 68), new TextSpan(503, 68)),
+                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceManagerAPIDiagnosticId, new TextSpan(708, 23), new TextSpan(686, 23)),
+                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceContextAPIDiagnosticId, new TextSpan(769, 40), new TextSpan(746, 40)),
+                    new ExpectedDiagnostic(WinUIMRTResourceManagerAnalyzer.ResourceContextAPIDiagnosticId, new TextSpan(849, 33), new TextSpan(825, 33))
                 }
             },
             {
                 "BackButtonCaller",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(360, 78)),
-                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(531, 111)),
-                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(657, 111)),
-                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(928, 69)),
-                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(1157, 39))
+                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(360, 78), new TextSpan(345, 78)),
+                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(531, 111), new TextSpan(511, 111)),
+                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(657, 111), new TextSpan(636, 111)),
+                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(928, 69), new TextSpan(901, 69)),
+                    new ExpectedDiagnostic(WinUIBackButtonAnalyzer.DiagnosticId, new TextSpan(1157, 39), new TextSpan(1124, 39))
                 }
             },
             {
                 "AppWindowCaller",
                 new[]
                 {
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(452, 37)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(696, 37)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(819, 9)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember, new TextSpan(935, 46)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1015, 15)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1090, 15)),
-                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1122, 15))
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(452, 37), new TextSpan(435, 37)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(696, 37), new TextSpan(671, 37)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(819, 9), new TextSpan(791, 9)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowMember, new TextSpan(935, 46), new TextSpan(902, 46)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1015, 15), new TextSpan(979, 15)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1090, 15), new TextSpan(1052, 15)),
+                    new ExpectedDiagnostic(WinUIAppWindowAnalyzer.DiagnosticIdAppWindowType, new TextSpan(1122, 15), new TextSpan(1083, 15))
                 }
             }
         };
@@ -235,9 +235,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
             var count = 0;
             foreach (var d in diagnostics.OrderBy(d => d.Location.SourceSpan.Start))
             {
-                var expected = $"{expectedDiagnostics.ElementAt(count).SourceSpan}";
+                var e = expectedDiagnostics.ElementAt(count);
+                var expected = $"{e.SourceSpan}";
                 var actual = $"{d.Location.SourceSpan}";
-                Assert.True(expectedDiagnostics.ElementAt(count).Matches(d), $"Expected {expectedDiagnostics.ElementAt(count).Language} diagnostic {count} to be at {expectedDiagnostics.ElementAt(count).SourceSpan}" +
+                Assert.True(e.Matches(d), $"Expected {e.Language} diagnostic {count} to be at {e.SourceSpan}" +
                     $" ; actually at {d.Location.SourceSpan} {d.Location.SourceSpan.End - d.Location.SourceSpan.Start}");
                 count++;
             }
