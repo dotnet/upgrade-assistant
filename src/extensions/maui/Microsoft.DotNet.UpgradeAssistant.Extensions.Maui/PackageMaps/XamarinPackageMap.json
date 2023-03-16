@@ -379,15 +379,15 @@
     "NetCorePackages": [
       {
         "Name": "SkiaSharp.Views.Maui.Controls",
-        "Version": "2.88.0-preview.256"
+        "Version": "2.88.3"
       },
       {
         "Name": "SkiaSharp.Views.Maui.Core",
-        "Version": "2.88.0-preview.256"
+        "Version": "2.88.3"
       },
       {
         "Name": "SkiaSharp.Views.Maui.Controls.Compatibility",
-        "Version": "2.88.0-preview.256"
+        "Version": "2.88.3"
       }
     ]
   }

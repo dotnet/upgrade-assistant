@@ -68,7 +68,8 @@ namespace MSBuild.Abstractions
                     }
                 }
             }
-            else if (tfi == "MonoAndroid" || tfi == "Xamarin.iOS")
+            else if (tfi.Equals(MSBuildFacts.MonoAndroid, StringComparison.OrdinalIgnoreCase) ||
+                tfi.Equals(MSBuildFacts.XamariniOS, StringComparison.OrdinalIgnoreCase))
             {
                 return tf;
             }
