@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
@@ -78,7 +79,8 @@ namespace Microsoft.DotNet.UpgradeAssistant
                 }
 
                 // Skip items that are only included once
-                if (project.Items.Count(i2 => i2.EvaluatedInclude.Equals(i.EvaluatedInclude, StringComparison.Ordinal)) <= 1)
+                var path = PathHelpers.GetIncludePath(i.EvaluatedInclude);
+                if (project.Items.Count(i2 => PathHelpers.GetIncludePath(i2.EvaluatedInclude).Equals(path, StringComparison.OrdinalIgnoreCase)) <= 1)
                 {
                     return false;
                 }
