@@ -12,6 +12,7 @@ using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
+using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -55,11 +56,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public UpgradeStep? CurrentStep { get; set; }
 
+        public ITelemetry Telemetry { get; }
+
         public MSBuildWorkspaceUpgradeContext(
             IOptions<WorkspaceOptions> options,
             Factories factories,
             Func<MSBuildWorkspaceUpgradeContext, FileInfo, MSBuildProject> projectFactory,
-            ILogger<MSBuildWorkspaceUpgradeContext> logger)
+            ILogger<MSBuildWorkspaceUpgradeContext> logger,
+            ITelemetry telemetry)
         {
             _projectFactory = projectFactory ?? throw new ArgumentNullException(nameof(projectFactory));
             _options = options ?? throw new ArgumentNullException(nameof(options));
@@ -67,6 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
 
+            Telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             Properties = new UpgradeContextProperties();
             SolutionInfo = factories.CreateSolutionInfo(InputPath);
             GlobalProperties = CreateProperties(options.Value);
