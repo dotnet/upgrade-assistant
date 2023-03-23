@@ -12,9 +12,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
-              },
-              "helpUri": "about:blank"
+                "text": "Use the try-convert tool (, [VERSION]) to convert the project file to an SDK-style csproj"
+              }
             }
           ]
         }
@@ -22,6 +21,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+          "level": "note",
           "message": {
             "text": "Complete: Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
           },
@@ -47,11 +47,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove reference 'System.ServiceModel'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -59,6 +55,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove reference 'System.ServiceModel'"
           },
@@ -84,11 +81,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -96,6 +89,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
           },
@@ -123,9 +117,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
               "fullDescription": {
-                "text": "Updated TFM to net7.0"
-              },
-              "helpUri": "about:blank"
+                "text": "Update TFM for current project"
+              }
             }
           ]
         }
@@ -133,6 +126,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+          "level": "note",
           "message": {
             "text": "Complete: Updated TFM to net7.0"
           },

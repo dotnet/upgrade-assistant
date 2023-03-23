@@ -80,7 +80,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         public BuildBreakRisk Risk { get; private set; }
 
         /// <summary>
-        /// Gets a value indicating whether the upgrade is done (has completed successfully or was skipped).
+        /// Gets a value indicating whether the upgrade is done (has completed successfully, failed, or was skipped).
         /// </summary>
         public bool IsDone => Status switch
         {
@@ -97,7 +97,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         /// <summary>
         /// Implementers should use this method to indicate whether the upgrade step applies to a given upgrade context.
         /// Note that applicability is not about whether the step is complete or not (InitializeImplAsync should check that),
-        /// rather it is about whether it would ever make sense to run the migraiton step on the given context or not.
+        /// rather it is about whether it would ever make sense to run the migration step on the given context or not.
         /// For example, a upgrade step that acts at the project level would be inapplicable when a solution is selected
         /// rather than a project.
         /// </summary>
@@ -147,6 +147,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
             {
                 (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error initializing step.");
                 Logger.LogError(e, "Unexpected error initializing step");
+                context.Telemetry?.TrackException(e);
             }
         }
 
@@ -196,8 +197,10 @@ namespace Microsoft.DotNet.UpgradeAssistant
             catch (Exception e)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                (Status, StatusDetails) = (UpgradeStepStatus.Failed, "Unexpected error applying step.");
-                Logger.LogError(e, "Unexpected error applying step");
+                (Status, StatusDetails) = (UpgradeStepStatus.Failed, $"Unexpected error applying upgrade step '{Title}'");
+                Logger.LogError(e, "Unexpected error applying upgrade step {StepTitle}", Title);
+                context.AddResultForStep(this, context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, Status, StatusDetails, details: e.ToString(), outputLevel: OutputLevel.Error);
+                context.Telemetry?.TrackException(e);
                 return false;
             }
         }

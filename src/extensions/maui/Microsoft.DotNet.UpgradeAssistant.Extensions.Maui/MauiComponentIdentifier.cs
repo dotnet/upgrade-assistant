@@ -28,17 +28,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var references = project.References.Select(r => r.Name);
 
-            if (references.Any(r => _xamarinAndroidReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
+            foreach (var reference in references)
             {
-                components |= ProjectComponents.XamarinAndroid;
+                if (_xamarinAndroidReferences.Contains(reference, StringComparer.OrdinalIgnoreCase))
+                {
+                    components |= ProjectComponents.XamarinAndroid;
+                }
+                else if (_xamariniOSReferences.Contains(reference, StringComparer.OrdinalIgnoreCase))
+                {
+                    components |= ProjectComponents.XamariniOS;
+                }
             }
 
-            if (references.Any(r => _xamariniOSReferences.Contains(r, StringComparer.OrdinalIgnoreCase)))
-            {
-                components |= ProjectComponents.XamariniOS;
-            }
-
-            if (project.NuGetReferences.PackageReferences.Any(x => x.Name.Equals(_xamarinFormsPackage, StringComparison.OrdinalIgnoreCase)) && project.TargetFrameworks.FirstOrDefault().Equals(TargetFrameworkMoniker.NetStandard20))
+            if (project.NuGetReferences.PackageReferences.Any(x => x.Name.Equals(_xamarinFormsPackage, StringComparison.OrdinalIgnoreCase)) && project.IsNetStandard())
             {
                 components |= ProjectComponents.Maui;
             }

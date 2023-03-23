@@ -49,6 +49,9 @@
       <Version>5.0.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\components\Microsoft.DotNet.UpgradeAssistant.Telemetry\Microsoft.DotNet.UpgradeAssistant.Telemetry.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="build\*" Pack="true" PackagePath="" />

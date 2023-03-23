@@ -50,8 +50,8 @@ namespace MSBuild.Abstractions
                 ".NETCore" => "net", // UWP
                 ".NETCoreApp" => "netcoreapp",
                 ".NETPortable" => "netstandard",
-                "MonoAndroid" => "net",
-                "Xamarin.iOS" => "net",
+                "MonoAndroid" => "net7.0-android",
+                "Xamarin.iOS" => "net7.0-ios",
                 _ => throw new InvalidOperationException($"Unknown {MSBuildFacts.LegacyTargetFrameworkPropertyNodeName}: {tfi}"),
             };
 
@@ -68,8 +68,12 @@ namespace MSBuild.Abstractions
                     }
                 }
             }
-
-            if (tfi.Equals(MSBuildFacts.NETPortableTFValuePrefix, StringComparison.OrdinalIgnoreCase))
+            else if (tfi.Equals(MSBuildFacts.MonoAndroid, StringComparison.OrdinalIgnoreCase) ||
+                tfi.Equals(MSBuildFacts.XamariniOS, StringComparison.OrdinalIgnoreCase))
+            {
+                return tf;
+            }
+            else if (tfi.Equals(MSBuildFacts.NETPortableTFValuePrefix, StringComparison.OrdinalIgnoreCase))
             {
                 var profile = project.GetPropertyValue(MSBuildFacts.LegacyTargetFrameworkProfileNodeName);
 
@@ -85,7 +89,7 @@ namespace MSBuild.Abstractions
             }
             else
             {
-                if (tfv == string.Empty)
+                if (string.IsNullOrEmpty(tfv))
                 {
                     throw new InvalidOperationException($"{MSBuildFacts.LegacyTargetFrameworkVersionNodeName} is not set!");
                 }

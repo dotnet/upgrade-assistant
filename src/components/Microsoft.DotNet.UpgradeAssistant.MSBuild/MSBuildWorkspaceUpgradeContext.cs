@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
+using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -18,6 +20,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 {
     internal sealed class MSBuildWorkspaceUpgradeContext : IUpgradeContext, IDisposable
     {
+        private const string MacOSMonoFrameworkMSBuildExtensionsDir = "/Library/Frameworks/Mono.framework/External/xbuild";
+
         private readonly ILogger<MSBuildWorkspaceUpgradeContext> _logger;
         private readonly Dictionary<string, IProject> _projectCache;
         private readonly IOptions<WorkspaceOptions> _options;
@@ -52,11 +56,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public UpgradeStep? CurrentStep { get; set; }
 
+        public ITelemetry Telemetry { get; }
+
         public MSBuildWorkspaceUpgradeContext(
             IOptions<WorkspaceOptions> options,
             Factories factories,
             Func<MSBuildWorkspaceUpgradeContext, FileInfo, MSBuildProject> projectFactory,
-            ILogger<MSBuildWorkspaceUpgradeContext> logger)
+            ILogger<MSBuildWorkspaceUpgradeContext> logger,
+            ITelemetry telemetry)
         {
             _projectFactory = projectFactory ?? throw new ArgumentNullException(nameof(projectFactory));
             _options = options ?? throw new ArgumentNullException(nameof(options));
@@ -64,6 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
             _projectCache = new Dictionary<string, IProject>(StringComparer.OrdinalIgnoreCase);
 
+            Telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
             Properties = new UpgradeContextProperties();
             SolutionInfo = factories.CreateSolutionInfo(InputPath);
             GlobalProperties = CreateProperties(options.Value);
@@ -140,20 +148,119 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
             }
         }
 
+        private static void CreateSymbolicLinks(string targetDir, string sourceDir)
+        {
+            foreach (var entry in Directory.EnumerateFileSystemEntries(sourceDir))
+            {
+                var target = Path.Combine(targetDir, Path.GetFileName(entry));
+
+                var fileInfo = new FileInfo(target);
+                if (fileInfo.Exists)
+                {
+                    if (fileInfo.LinkTarget is not null && fileInfo.LinkTarget.Equals(entry, StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    File.Delete(target);
+                }
+                else
+                {
+                    var dirInfo = new DirectoryInfo(target);
+                    if (dirInfo.Exists)
+                    {
+                        if (dirInfo.LinkTarget is not null && dirInfo.LinkTarget.Equals(entry, StringComparison.Ordinal))
+                        {
+                            continue;
+                        }
+
+                        Directory.Delete(target);
+                    }
+                }
+
+                File.CreateSymbolicLink(target, entry);
+            }
+        }
+
+        private static string? GetMacOSMSBuildExtensionsPath(WorkspaceOptions options)
+        {
+            const string DefaultDotnetSdkLocation = "/usr/local/share/dotnet/sdk/";
+
+            if (options.MSBuildPath == null || !options.MSBuildPath.StartsWith(DefaultDotnetSdkLocation, StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            string? msbuildExtensionsPath = null;
+
+            if (Directory.Exists(MacOSMonoFrameworkMSBuildExtensionsDir))
+            {
+                // Check to see if the specified MSBuildPath contains the Mono.framework build extensions.
+                var monoExtensionDirectories = Directory.GetDirectories(MacOSMonoFrameworkMSBuildExtensionsDir);
+                var createTempExtensionsDir = false;
+
+                foreach (var monoExtensionDir in monoExtensionDirectories)
+                {
+                    var dotnetExtensionDir = Path.Combine(options.MSBuildPath, Path.GetFileName(monoExtensionDir));
+                    if (!Directory.Exists(dotnetExtensionDir))
+                    {
+                        createTempExtensionsDir = true;
+                        break;
+                    }
+                }
+
+                // If the specified MSBuildPath does not contain the Mono.framework build extensions, create a temp
+                // directory that we'll use to symlink everything.
+                if (createTempExtensionsDir)
+                {
+                    var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    var versionDir = Path.GetFileName(options.MSBuildPath.TrimEnd('/'));
+
+                    msbuildExtensionsPath = Path.Combine(homeDir, ".dotnet-upgrade-assistant", "dotnet-sdk", versionDir);
+
+                    if (!Directory.Exists(msbuildExtensionsPath))
+                    {
+                        Directory.CreateDirectory(msbuildExtensionsPath);
+                    }
+
+                    // First, create symbolic links to all of the dotnet MSBuild file system entries.
+                    CreateSymbolicLinks(msbuildExtensionsPath, options.MSBuildPath);
+
+                    // Then create the symbolic links to the Mono.framework/External/xbuild system entries.
+                    CreateSymbolicLinks(msbuildExtensionsPath, MacOSMonoFrameworkMSBuildExtensionsDir);
+                }
+            }
+
+            return msbuildExtensionsPath;
+        }
+
         private static Dictionary<string, string> CreateProperties(WorkspaceOptions options)
         {
             var properties = new Dictionary<string, string>();
 
-            if (options.VisualStudioPath is string vsPath)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                properties.Add("VSINSTALLDIR", vsPath);
-                properties.Add("MSBuildExtensionsPath32", Path.Combine(vsPath, "MSBuild"));
-                properties.Add("MSBuildExtensionsPath", Path.Combine(vsPath, "MSBuild"));
-            }
+                if (options.VisualStudioPath is string vsPath)
+                {
+                    properties.Add("VSINSTALLDIR", vsPath);
+                    properties.Add("MSBuildExtensionsPath32", Path.Combine(vsPath, "MSBuild"));
+                    properties.Add("MSBuildExtensionsPath", Path.Combine(vsPath, "MSBuild"));
+                }
 
-            if (options.VisualStudioVersion is int version)
+                if (options.VisualStudioVersion is int version)
+                {
+                    properties.Add("VisualStudioVersion", $"{version}.0");
+                }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                properties.Add("VisualStudioVersion", $"{version}.0");
+                var msbuildExtensionsPath = GetMacOSMSBuildExtensionsPath(options);
+
+                if (msbuildExtensionsPath != null)
+                {
+                    properties.Add("MSBuildExtensionsPath32", msbuildExtensionsPath);
+                    properties.Add("MSBuildExtensionsPath", msbuildExtensionsPath);
+                }
             }
 
             return properties;

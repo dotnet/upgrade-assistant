@@ -35,6 +35,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             {
                 new OutputResult
                 {
+                    Level = OutputLevel.Error,
                     FileLocation = "some-file-path",
                     LineNumber = 1,
                     ResultMessage = "some result message",
@@ -71,6 +72,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis.Tests
             Assert.Equal(analyzeResult.RuleName, rule.Name);
             Assert.Equal(analyzeResult.FullDescription, rule.FullDescription.Text);
             Assert.Equal(analyzeResult.HelpUri, rule.HelpUri);
+            var result = sarifLog.Runs[0].Results.First();
+            Assert.Equal(analyzeResult.RuleId, result.RuleId);
+            Assert.Equal(analyzeResult.ResultMessage, result.Message.Text);
+            Assert.Equal(FailureLevel.Error, result.Level);
         }
 
         [Fact]

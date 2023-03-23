@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.DotNet.UpgradeAssistant.Analysis;
+using Microsoft.DotNet.UpgradeAssistant.Telemetry;
 
 namespace Microsoft.DotNet.UpgradeAssistant
 {
@@ -44,5 +45,7 @@ namespace Microsoft.DotNet.UpgradeAssistant
         IUpgradeContextProperties Properties { get; }
 
         ICollector<OutputResultDefinition> Results { get; }
+
+        ITelemetry? Telemetry { get; }
     }
 }

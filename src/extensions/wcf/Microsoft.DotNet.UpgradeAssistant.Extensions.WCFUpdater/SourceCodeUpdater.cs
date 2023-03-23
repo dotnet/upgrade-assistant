@@ -66,9 +66,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater
                 template = Constants.TemplateUsingShort;
             }
 
-            var currDirectives = from d in root.DescendantNodes().OfType<UsingDirectiveSyntax>()
-                                 where template.IndexOf(d.ToFullString(), StringComparison.Ordinal) >= 0
-                                 select d.ToFullString().Trim();
+            var currDirectives = (from d in root.DescendantNodes().OfType<UsingDirectiveSyntax>()
+                                 where template.IndexOf(d.ToFullString().Trim(), StringComparison.Ordinal) >= 0
+                                 select d.ToFullString().Trim()).ToArray();
             var result = string.Empty;
             foreach (var line in template.Split(System.Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
             {

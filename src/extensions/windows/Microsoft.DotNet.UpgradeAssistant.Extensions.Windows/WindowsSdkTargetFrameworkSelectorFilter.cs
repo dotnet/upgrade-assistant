@@ -28,7 +28,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             {
                 if (tfm.TryUpdate(result))
                 {
-                    _logger.LogInformation("Recommending Windows TFM {TFM} because the project either has Windows-specific dependencies or builds to a WinExe", result);
+                    _logger.LogInformation("Recommending Windows TFM {TFM} for project {Name} because the project either has Windows-specific dependencies or builds to a WinExe", result, tfm.Project);
                 }
             }
         }

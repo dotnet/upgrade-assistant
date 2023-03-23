@@ -6,12 +6,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 {
-    internal static class MauiUtilties
+    internal static class MauiUtilities
     {
-        public static async Task<MauiProjectType> GetMauiProjectTypeForProject(IProject project, CancellationToken token)
+        public static UpgradeStepApplyResult CreateAndAddStepApplyResult(this IUpgradeContext context, UpgradeStep step, UpgradeStepStatus status, string message, string? location = null, string? details = null)
+        {
+            context?.AddResultForStep(step, location ?? context.CurrentProject?.GetFile()?.FilePath ?? string.Empty, status, message, details);
+            return new UpgradeStepApplyResult(status, string.IsNullOrEmpty(details) ? message : string.Concat(message, Environment.NewLine, details));
+        }
+
+        public static bool IsNetStandard(this IProject project)
+        {
+            return project?.TargetFrameworks.Any(x => x.IsNetStandard) ?? false;
+        }
+
+        public static async Task<MauiProjectType> GetMauiProjectType(this IProject project, CancellationToken token)
         {
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
             if (components.HasFlag(ProjectComponents.MauiiOS) && components.HasFlag(ProjectComponents.MauiAndroid) && components.HasFlag(ProjectComponents.Maui))
@@ -30,7 +42,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             return MauiProjectType.Maui;
         }
 
-        public static void RuntimePropertyMapper(IProjectPropertyElements projectproperties, IProjectFile file, string oldRumtimePropertyName)
+        public static void RuntimePropertyMapper(IProjectPropertyElements projectProperties, IProjectFile file, string oldRuntimePropertyName)
         {
             // following conversion mapping here : https://github.com/xamarin/xamarin-macios/wiki/Project-file-properties-dotnet-migration
             var runtimeMapping = new Dictionary<string, string>()
@@ -42,15 +54,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 { "ARMv7+ARM64+i386", "ios-arm;ios-arm64;" },
             };
 
-            var runtimeprops = projectproperties.GetProjectPropertyValue(oldRumtimePropertyName).Distinct();
+            var runtimeProps = projectProperties.GetProjectPropertyValue(oldRuntimePropertyName).Distinct();
             var runtimeIdentifierString = string.Empty;
-            foreach (var prop in runtimeprops)
+            foreach (var prop in runtimeProps)
             {
                 runtimeIdentifierString += runtimeMapping[prop];
             }
 
             // remove old properties before adding new
-            projectproperties.RemoveProjectProperty(oldRumtimePropertyName);
+            projectProperties.RemoveProjectProperty(oldRuntimePropertyName);
             if (runtimeIdentifierString.Count(x => x.Equals(';')) > 1)
             {
                 file.SetPropertyValue("RuntimeIdentifiers", runtimeIdentifierString);
@@ -61,12 +73,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
         }
 
-        public static void TransformProperty(IProjectPropertyElements projectproperties, IProjectFile file, string oldpropertyName, string newPropertyName, string oldPropertyValue = "", string newPropertyValue = "")
+        public static void TransformProperty(IProjectPropertyElements projectProperties, IProjectFile file, string oldPropertyName, string newPropertyName, string oldPropertyValue = "", string newPropertyValue = "")
         {
-            var currentPropertyValue = projectproperties.GetProjectPropertyValue(oldpropertyName).FirstOrDefault();
+            var currentPropertyValue = projectProperties.GetProjectPropertyValue(oldPropertyName).FirstOrDefault();
             if (!string.IsNullOrEmpty(currentPropertyValue))
             {
-                projectproperties.RemoveProjectProperty(oldpropertyName);
+                projectProperties.RemoveProjectProperty(oldPropertyName);
 
                 if (string.Equals(currentPropertyValue, oldPropertyValue, StringComparison.OrdinalIgnoreCase))
                 {

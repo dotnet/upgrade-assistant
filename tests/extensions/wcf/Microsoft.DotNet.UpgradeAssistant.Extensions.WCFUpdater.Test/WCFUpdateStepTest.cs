@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Autofac.Extras.Moq;
 using Microsoft.CodeAnalysis.CSharp;
@@ -28,10 +29,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         {
             _output = output;
             original = new Dictionary<string, string>();
-            original.Add("directive", File.ReadAllText(Directive));
-            original.Add("proj", File.ReadAllText(Proj));
-            original.Add("main", File.ReadAllText(Main));
-            original.Add("config", File.ReadAllText(Config));
+            original.Add("directive", File.ReadAllText(Directive.Replace('\\', Path.DirectorySeparatorChar)));
+            original.Add("proj", File.ReadAllText(Proj.Replace('\\', Path.DirectorySeparatorChar)));
+            original.Add("main", File.ReadAllText(Main.Replace('\\', Path.DirectorySeparatorChar)));
+            original.Add("config", File.ReadAllText(Config.Replace('\\', Path.DirectorySeparatorChar)));
         }
 
         [Theory]
@@ -42,6 +43,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
         [InlineData(Proj, "TestInputFiles\\MultiServicesSourceCode.txt", "TestInputFiles\\MultiServicesConfig.txt", "", UpgradeStepStatus.Incomplete)] // Multiple services case
         public void WCFUpdateTest(string proj, string main, string config, string directive, UpgradeStepStatus expected)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
+            proj = proj.Replace('\\', Path.DirectorySeparatorChar);
+            main = main.Replace('\\', Path.DirectorySeparatorChar);
+            config = config.Replace('\\', Path.DirectorySeparatorChar);
+            directive = directive.Replace('\\', Path.DirectorySeparatorChar);
+
             // Arrange
             using var mock = AutoMock.GetLoose();
 
@@ -89,11 +100,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                 try
                 {
                     updater.Apply();
-                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
-                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedOldConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), config)));
-                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedSourceCode.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), main)));
-                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedDirective.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), directive)));
-                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedProj.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), proj)));
+                    Assert.Equal(File.ReadAllText(Path.Combine("TestExpectedFiles", "ExpectedConfig.txt")), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles", "wcf.config")));
+                    Assert.Equal(File.ReadAllText(Path.Combine("TestExpectedFiles", "ExpectedOldConfig.txt")), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), config)));
+                    Assert.Equal(File.ReadAllText(Path.Combine("TestExpectedFiles", "ExpectedSourceCode.txt")), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), main)));
+                    Assert.Equal(File.ReadAllText(Path.Combine("TestExpectedFiles", "ExpectedDirective.txt")), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), directive)));
+                    Assert.Equal(File.ReadAllText(Path.Combine("TestExpectedFiles", "ExpectedProj.txt")), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), proj)));
                     Reset();
                 }
                 catch
@@ -102,13 +113,13 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
                     throw;
                 }
             }
-            else if (main.Equals("TestInputFiles\\MultiServicesSourceCode.txt", StringComparison.Ordinal))
+            else if (main.Equals(Path.Combine("TestInputFiles", "MultiServicesSourceCode.txt"), StringComparison.Ordinal))
             {
                 try
                 {
                     updater.Apply();
-                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedMultiServicesConfig.txt"), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles\\wcf.config")));
-                    Assert.Equal(File.ReadAllText("TestExpectedFiles\\ExpectedMultiServicesSourceCode.txt"), File.ReadAllText(main));
+                    Assert.Equal(File.ReadAllText(Path.Combine("TestExpectedFiles", "ExpectedMultiServicesConfig.txt")), File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "TestInputFiles", "wcf.config")));
+                    Assert.Equal(File.ReadAllText(Path.Combine("TestExpectedFiles", "ExpectedMultiServicesSourceCode.txt")), File.ReadAllText(main));
                     Reset();
                 }
                 catch
@@ -121,10 +132,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.WCFUpdater.Tests
 
         private void Reset()
         {
-            File.WriteAllText(Main, original["main"]);
-            File.WriteAllText(Proj, original["proj"]);
-            File.WriteAllText(Config, original["config"]);
-            File.WriteAllText(Directive, original["directive"]);
+            File.WriteAllText(Main.Replace('\\', Path.DirectorySeparatorChar), original["main"]);
+            File.WriteAllText(Proj.Replace('\\', Path.DirectorySeparatorChar), original["proj"]);
+            File.WriteAllText(Config.Replace('\\', Path.DirectorySeparatorChar), original["config"]);
+            File.WriteAllText(Directive.Replace('\\', Path.DirectorySeparatorChar), original["directive"]);
         }
     }
 }

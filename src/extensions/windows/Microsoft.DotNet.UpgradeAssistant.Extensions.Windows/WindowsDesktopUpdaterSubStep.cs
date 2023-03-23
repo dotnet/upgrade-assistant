@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -33,16 +34,16 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
             _updater = updater ?? throw new ArgumentNullException(nameof(updater));
         }
 
-        protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
-            if (context?.CurrentProject is null)
+            if (context?.CurrentProject is null || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             // Check the updater for an [ApplicableComponents] attribute
             // If one exists, the step only applies if the project has the indicated components
-            return await context.CurrentProject.IsApplicableAsync(_updater, token).ConfigureAwait(false);
+            return context.CurrentProject.IsApplicableAsync(_updater, token).AsTask();
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
@@ -108,6 +109,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 : ImmutableList.Create(context.CurrentProject!.GetFile().FilePath);
             var results = fileLocations.Select(location => new OutputResult()
             {
+                Level = updaterResult.Result ? OutputLevel.Info : OutputLevel.Error,
                 FileLocation = location,
                 RuleId = updaterResult.RuleId,
                 ResultMessage = $"{(updaterResult.Result ? "Success" : "Failed")}: {updaterResult.Message}",

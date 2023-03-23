@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using AutoFixture;
@@ -28,6 +29,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
         [Fact]
         public void ItemsSet()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
             // Arrange
             var expected = _fixture.Create<Option1>();
             var manifests = new[]
@@ -48,6 +54,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
         [Fact]
         public void SingleArray()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
             // Arrange
             var manifests = new[]
             {
@@ -66,6 +77,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Tests
         [Fact]
         public void LastArrayIsUsed()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
             // Arrange
             var manifests = new[]
             {

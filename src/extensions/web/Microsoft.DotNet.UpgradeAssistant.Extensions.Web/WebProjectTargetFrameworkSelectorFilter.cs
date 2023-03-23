@@ -26,7 +26,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Web
             {
                 if (tfm.TryUpdate(tfm.AppBase))
                 {
-                    _logger.LogInformation("Recommending executable TFM {TFM} because the project builds to a web app", tfm.AppBase);
+                    _logger.LogInformation("Recommending executable TFM {TFM} for project {Name} because the project builds to a web app", tfm.AppBase, tfm.Project);
                 }
             }
         }
