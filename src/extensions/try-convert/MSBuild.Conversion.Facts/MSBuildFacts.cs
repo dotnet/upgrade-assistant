@@ -307,7 +307,7 @@ namespace MSBuild.Conversion.Facts
         public const string Net5 = "net5.0";
         public const string WindowsSuffix = "-windows";
         public const string AndroidSuffix = "-android";
-        public const string iOSSuffix = "-ios";
+        public const string IOSSuffix = "-ios";
         public const string Net5Windows = "net5.0-windows";
         public const string Net6 = "net6.0";
         public const string Net6Windows = "net6.0-windows";

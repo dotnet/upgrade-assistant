@@ -306,7 +306,7 @@ namespace MSBuild.Abstractions
         /// Checks if a given TFM has an Android or iOS suffix.
         /// </summary>
         public static bool IsMobile(string tfm) =>
-            tfm.ContainsIgnoreCase(MSBuildFacts.iOSSuffix)
+            tfm.ContainsIgnoreCase(MSBuildFacts.IOSSuffix)
             || tfm.ContainsIgnoreCase(MSBuildFacts.AndroidSuffix);
 
         /// <summary>
