@@ -75,7 +75,7 @@ namespace MSBuild.Abstractions
             }
 
             // MSBuildHelpers.IsWindows(rawTFM) can happen when coverting a UWP
-            return MSBuildHelpers.IsNotNetFramework(rawTFM) && !MSBuildHelpers.IsWindows(rawTFM) && !MSBuildHelpers.IsMobileAppSDK(rawTFM)
+            return MSBuildHelpers.IsNotNetFramework(rawTFM) && !MSBuildHelpers.IsWindows(rawTFM) && !MSBuildHelpers.IsMobile(rawTFM)
                 ? StripDecimals(rawTFM) : rawTFM;
 
             static string StripDecimals(string tfm)
