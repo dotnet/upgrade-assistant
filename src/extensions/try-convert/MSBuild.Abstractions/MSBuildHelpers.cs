@@ -303,6 +303,13 @@ namespace MSBuild.Abstractions
             && !tfm.ContainsIgnoreCase(MSBuildFacts.NetstandardPrelude);
 
         /// <summary>
+        /// Checks if a given TFM has an Android or iOS suffix.
+        /// </summary>
+        public static bool IsMobileAppSDK(string tfm) =>
+            tfm.ContainsIgnoreCase(MSBuildFacts.iOSSuffix)
+            || tfm.ContainsIgnoreCase(MSBuildFacts.AndroidSuffix);
+
+        /// <summary>
         /// Checks if a given TFM include -windows.
         /// </summary>
         public static bool IsWindows(string tfm) =>

@@ -126,8 +126,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
         private static TargetFrameworkMoniker GetExpectedTargetFramework(string componentFlagProperty)
         {
-            var propertyValue = Enum.Parse(typeof(ProjectComponents), componentFlagProperty);
-            if (ProjectComponents.XamarinAndroid.CompareTo(propertyValue) == 0)
+            var propertyValue = (ProjectComponents)Enum.Parse(typeof(ProjectComponents), componentFlagProperty);
+            if (propertyValue.HasFlag(ProjectComponents.XamarinAndroid))
             {
                 return TargetFrameworkMoniker.Net70_Android;
             }
