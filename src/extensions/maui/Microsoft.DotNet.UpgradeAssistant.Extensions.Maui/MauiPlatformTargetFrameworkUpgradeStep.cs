@@ -126,15 +126,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
         private static TargetFrameworkMoniker GetExpectedTargetFramework(string componentFlagProperty)
         {
-            var propertyValue = (ProjectComponents)Enum.Parse(typeof(ProjectComponents), componentFlagProperty);
-            if (propertyValue.HasFlag(ProjectComponents.XamarinAndroid))
+            if (Enum.TryParse<ProjectComponents>(componentFlagProperty, out var propertyValue))
             {
-                return TargetFrameworkMoniker.Net70_Android;
+                if (propertyValue.HasFlag(ProjectComponents.XamarinAndroid))
+                {
+                    return TargetFrameworkMoniker.Net70_Android;
+                }
+                else
+                {
+                    return TargetFrameworkMoniker.Net70_iOS;
+                }
             }
-            else
-            {
-                return TargetFrameworkMoniker.Net70_iOS;
-            }
+
+            throw new ArgumentException(componentFlagProperty);
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
