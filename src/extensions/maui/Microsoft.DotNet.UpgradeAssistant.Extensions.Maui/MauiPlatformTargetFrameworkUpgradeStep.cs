@@ -71,7 +71,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
             if (targetTfm is null)
             {
-                return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Failed, $"targetTfm componentFlag in Context property was null");
+                return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Failed, $"Failed to retrieve target TFM from component flag context property: '{componentFlagProperty}'");
             }
 
             file.SetTFM(targetTfm);
@@ -111,7 +111,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
             if (targetTfm is null)
             {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"targetTfm or componentFlag Property in Context was null.", BuildBreakRisk.High);
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Failed to retrieve target TFM from component flag context property: '{componentFlagProperty}'", BuildBreakRisk.High);
             }
 
             if (project.TargetFrameworks.Any(tfm => tfm == targetTfm))
