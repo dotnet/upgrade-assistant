@@ -68,12 +68,12 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             // If we're getting here we are dealing with a head project, which received its "componentFlag" in the TryConvertRunner
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
-            if (componentFlagProperty is null)
+            var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
+            if (targetTfm is null)
             {
-                return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Failed, $"componentFlag Context property was null");
+                return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Failed, $"targetTfm componentFlag in Context property was null");
             }
 
-            var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
             file.SetTFM(targetTfm);
             await file.SaveAsync(token).ConfigureAwait(false);
             Logger.LogInformation("Added TFM {TargetTFM} to .NET MAUI head project {ProjectName}", targetTfm, project);
@@ -106,13 +106,14 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
-            if (componentFlagProperty is null)
-            {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "componentFlag Property in Context was null", BuildBreakRisk.High);
-            }
 
             // This block checks TFMs for .NET MAUI platform projects
             var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
+            if (targetTfm is null)
+            {
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"targetTfm or componentFlag Property in Context was null.", BuildBreakRisk.High);
+            }
+
             if (project.TargetFrameworks.Any(tfm => tfm == targetTfm))
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None);
@@ -124,7 +125,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
         }
 
-        private static TargetFrameworkMoniker GetExpectedTargetFramework(string componentFlagProperty)
+        private static TargetFrameworkMoniker? GetExpectedTargetFramework(string? componentFlagProperty)
         {
             if (Enum.TryParse<ProjectComponents>(componentFlagProperty, out var propertyValue))
             {
@@ -138,7 +139,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 }
             }
 
-            throw new ArgumentException(componentFlagProperty);
+            return null;
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
