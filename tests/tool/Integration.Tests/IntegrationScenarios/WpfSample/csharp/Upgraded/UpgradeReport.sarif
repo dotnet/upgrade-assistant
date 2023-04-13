@@ -1959,7 +1959,7 @@
           "ruleId": "UA209",
           "level": "note",
           "message": {
-            "text": "Success: Default font in Windows Forms has been changed from Microsoft Sans Serif to Seg Segoe UI, in order to change the default font use the API - Application.SetDefaultFont(Font font). For more details see here - https://devblogs.microsoft.com/dotnet/whats-new-in-windows-forms-in-net-6-0-preview-5/#application-wide-default-font."
+            "text": "Success: Default font in Windows Forms has been changed from Microsoft Sans Serif to Segoe UI, in order to change the default font use the API - Application.SetDefaultFont(Font font). For more details see here - https://devblogs.microsoft.com/dotnet/whats-new-in-windows-forms-in-net-6-0-preview-5/#application-wide-default-font."
           },
           "locations": [
             {
