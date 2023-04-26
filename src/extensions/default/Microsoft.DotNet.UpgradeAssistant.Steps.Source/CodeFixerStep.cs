@@ -57,17 +57,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
             Title = $"Apply fix for {DiagnosticId}{(diagnosticTitles is null ? string.Empty : ": " + string.Join(", ", diagnosticTitles))}";
         }
 
-        protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
             // Code updates don't apply until a project is selected
             if (context?.CurrentProject is null)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             // Check the code fix provider for an [ApplicableComponents] attribute
             // If one exists, the step only applies if the project has the indicated components
-            return await context.CurrentProject.IsApplicableAsync(_fixProvider, token).ConfigureAwait(false);
+            return context.CurrentProject.IsApplicableAsync(_fixProvider, token).AsTask();
         }
 
         protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
@@ -165,7 +165,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Source
 
         private void AddResultToContext(IUpgradeContext context, string diagnosticId, string location, UpgradeStepStatus status, string resultMessage)
         {
-            context.AddResult(Title, location, diagnosticId, status, resultMessage);
+            context.AddResult(Title, Description, location, diagnosticId, status, resultMessage);
         }
 
         private async Task<Solution?> TryFixDiagnosticAsync(Diagnostic diagnostic, Document document, CancellationToken token)

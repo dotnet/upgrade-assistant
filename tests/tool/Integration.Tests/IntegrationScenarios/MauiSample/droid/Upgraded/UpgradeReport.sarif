@@ -5,16 +5,49 @@
     {
       "tool": {
         "driver": {
+          "name": "Add TargetFramework for .NET MAUI Project",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiPlatformTargetFrameworkUpgradeStep",
+              "fullDescription": {
+                "text": "Add Platform TargetFramework for XamarinForms projects being converted"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiPlatformTargetFrameworkUpgradeStep",
+          "level": "note",
+          "message": {
+            "text": "Complete: Added TFMs to .NET MAUI project EwDavidForms.csproj"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/EwDavidForms/EwDavidForms/EwDavidForms.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
           "name": "Remove package 'Microsoft.AppCenter.Analytics'",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.AppCenter.Analytics'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -22,6 +55,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Analytics'"
           },
@@ -47,11 +81,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.AppCenter.Crashes'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -59,6 +89,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Crashes'"
           },
@@ -84,11 +115,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.CommunityToolkit'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -96,6 +123,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.CommunityToolkit'"
           },
@@ -121,11 +149,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.Forms'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -133,6 +157,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Forms'"
           },
@@ -158,11 +183,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.Essentials'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -170,6 +191,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Essentials'"
           },
@@ -195,11 +217,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'CommunityToolkit.Maui'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -207,6 +225,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'CommunityToolkit.Maui'"
           },
@@ -232,11 +251,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -244,8 +259,46 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/EwDavidForms/EwDavidForms/EwDavidForms.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Update Project Properties for .NET MAUI Project",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiAddProjectPropertiesStep",
+              "fullDescription": {
+                "text": "Updates the platform-specific project properties for a .NET MAUI project"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiAddProjectPropertiesStep",
+          "level": "note",
+          "message": {
+            "text": "Complete: Updated Maui project properties for .NET MAUI project EwDavidForms.csproj"
           },
           "locations": [
             {
@@ -271,9 +324,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
               "fullDescription": {
-                "text": "Added template file MauiProgram.cs"
-              },
-              "helpUri": "about:blank"
+                "text": "Add template files (for startup code paths, for example) based on template files described in: Program.cs, Startup.cs, appsettings.json, appsettings.Development.json, Program.vb, Startup.vb, appsettings.json, appsettings.Development.json, app.manifest, Properties\\launchSettings.json, Properties\\PublishProfiles\\win10-arm64.pubxml, Properties\\PublishProfiles\\win10-x64.pubxml, Properties\\PublishProfiles\\win10-x86.pubxml, App.xaml.cs, MainWindow.xaml.cs, MainWindow.xaml, UWPToWinAppSDKUpgradeHelpers.cs, MainApplication.cs, MauiProgram.cs"
+              }
             }
           ]
         }
@@ -281,6 +333,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
+          "level": "note",
           "message": {
             "text": "Complete: Added template file MauiProgram.cs"
           },
@@ -301,6 +354,43 @@
     {
       "tool": {
         "driver": {
+          "name": "Update XAML Namespaces",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.XamlNamespaceUpgradeStep",
+              "fullDescription": {
+                "text": "Updates XAML namespaces to .NET MAUI"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.XamlNamespaceUpgradeStep",
+          "level": "note",
+          "message": {
+            "text": "Complete: Updated XAML namespaces to .NET MAUI"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/EwDavidForms/EwDavidForms/EwDavidForms.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
           "name": "Apply fix for UA0014: .NET MAUI projects should not reference Xamarin.Forms namespaces",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
@@ -308,9 +398,8 @@
             {
               "id": "UA0014",
               "fullDescription": {
-                "text": "Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\App.xaml.cs"
-              },
-              "helpUri": "about:blank"
+                "text": "Update source files to automatically fix upgrade analyzer UA0014"
+              }
             }
           ]
         }
@@ -318,6 +407,7 @@
       "results": [
         {
           "ruleId": "UA0014",
+          "level": "note",
           "message": {
             "text": "Complete: Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\App.xaml.cs"
           },
@@ -345,9 +435,8 @@
             {
               "id": "UA0014",
               "fullDescription": {
-                "text": "Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\AssemblyInfo.cs"
-              },
-              "helpUri": "about:blank"
+                "text": "Update source files to automatically fix upgrade analyzer UA0014"
+              }
             }
           ]
         }
@@ -355,6 +444,7 @@
       "results": [
         {
           "ruleId": "UA0014",
+          "level": "note",
           "message": {
             "text": "Complete: Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\AssemblyInfo.cs"
           },
@@ -382,9 +472,8 @@
             {
               "id": "UA0014",
               "fullDescription": {
-                "text": "Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\MainPage.xaml.cs"
-              },
-              "helpUri": "about:blank"
+                "text": "Update source files to automatically fix upgrade analyzer UA0014"
+              }
             }
           ]
         }
@@ -392,6 +481,7 @@
       "results": [
         {
           "ruleId": "UA0014",
+          "level": "note",
           "message": {
             "text": "Complete: Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\MainPage.xaml.cs"
           },
@@ -419,9 +509,8 @@
             {
               "id": "UA0014",
               "fullDescription": {
-                "text": "Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\App.xaml.cs"
-              },
-              "helpUri": "about:blank"
+                "text": "Update source files to automatically fix upgrade analyzer UA0014"
+              }
             }
           ]
         }
@@ -429,6 +518,7 @@
       "results": [
         {
           "ruleId": "UA0014",
+          "level": "note",
           "message": {
             "text": "Complete: Diagnostic UA0014 fixed in [ACTUAL_PROJECT_ROOT]\\EwDavidForms\\EwDavidForms\\App.xaml.cs"
           },
@@ -456,9 +546,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
-              },
-              "helpUri": "about:blank"
+                "text": "Use the try-convert tool (, [VERSION]) to convert the project file to an SDK-style csproj"
+              }
             }
           ]
         }
@@ -466,8 +555,46 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+          "level": "note",
           "message": {
             "text": "Complete: Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "file:///[ACTUAL_PROJECT_ROOT]/EwDavidForms/EwDavidForms.Android/EwDavidForms.Android.csproj"
+                },
+                "region": {}
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits"
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "Add TargetFramework for .NET MAUI Project",
+          "semanticVersion": "",
+          "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
+          "rules": [
+            {
+              "id": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiPlatformTargetFrameworkUpgradeStep",
+              "fullDescription": {
+                "text": "Add Platform TargetFramework for XamarinForms projects being converted"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiPlatformTargetFrameworkUpgradeStep",
+          "level": "note",
+          "message": {
+            "text": "Complete: Added TFM net7.0-android to .NET MAUI head project EwDavidForms.Android.csproj"
           },
           "locations": [
             {
@@ -491,11 +618,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.AppCenter.Analytics'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -503,6 +626,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Analytics'"
           },
@@ -528,11 +652,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.AppCenter.Crashes'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -540,6 +660,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.AppCenter.Crashes'"
           },
@@ -565,11 +686,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.CommunityToolkit'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -577,6 +694,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.CommunityToolkit'"
           },
@@ -602,11 +720,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.Forms'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -614,6 +728,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Forms'"
           },
@@ -639,11 +754,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.Essentials'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -651,6 +762,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Essentials'"
           },
@@ -676,11 +788,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.Android.Support.Design'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -688,6 +796,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Android.Support.Design'"
           },
@@ -713,11 +822,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.Android.Support.v7.AppCompat'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -725,6 +830,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Android.Support.v7.AppCompat'"
           },
@@ -750,11 +856,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Xamarin.Android.Support.v4'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -762,6 +864,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Xamarin.Android.Support.v4'"
           },
@@ -787,11 +890,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'CommunityToolkit.Maui'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -799,6 +898,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'CommunityToolkit.Maui'"
           },
@@ -824,11 +924,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -836,6 +932,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
           },
@@ -856,25 +953,25 @@
     {
       "tool": {
         "driver": {
-          "name": "Update TFM",
+          "name": "Update Project Properties for .NET MAUI Project",
           "semanticVersion": "",
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+              "id": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiAddProjectPropertiesStep",
               "fullDescription": {
-                "text": "Updated TFM to net7.0-android"
-              },
-              "helpUri": "about:blank"
+                "text": "Updates the platform-specific project properties for a .NET MAUI project"
+              }
             }
           ]
         }
       },
       "results": [
         {
-          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+          "ruleId": "Microsoft.DotNet.UpgradeAssistant.Extensions.Maui.MauiAddProjectPropertiesStep",
+          "level": "note",
           "message": {
-            "text": "Complete: Updated TFM to net7.0-android"
+            "text": "Complete: Updated MauiAndroid project properties for .NET MAUI project EwDavidForms.Android.csproj"
           },
           "locations": [
             {
@@ -900,9 +997,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
               "fullDescription": {
-                "text": "Added template file MainApplication.cs"
-              },
-              "helpUri": "about:blank"
+                "text": "Add template files (for startup code paths, for example) based on template files described in: Program.cs, Startup.cs, appsettings.json, appsettings.Development.json, Program.vb, Startup.vb, appsettings.json, appsettings.Development.json, app.manifest, Properties\\launchSettings.json, Properties\\PublishProfiles\\win10-arm64.pubxml, Properties\\PublishProfiles\\win10-x64.pubxml, Properties\\PublishProfiles\\win10-x86.pubxml, App.xaml.cs, MainWindow.xaml.cs, MainWindow.xaml, UWPToWinAppSDKUpgradeHelpers.cs, MainApplication.cs, MauiProgram.cs"
+              }
             }
           ]
         }
@@ -910,6 +1006,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Templates.TemplateInserterStep",
+          "level": "note",
           "message": {
             "text": "Complete: Added template file MainApplication.cs"
           },

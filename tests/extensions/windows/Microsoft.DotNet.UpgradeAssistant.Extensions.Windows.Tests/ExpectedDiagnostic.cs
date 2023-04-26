@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -15,11 +16,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.Tests
 
         public Language Language { get; }
 
-        public ExpectedDiagnostic(string id, TextSpan sourceSpan, Language lang = Language.CSharp)
+        public ExpectedDiagnostic(string id, TextSpan windowsSourceSpan, TextSpan unixSourceSpan, Language lang = Language.CSharp)
         {
             Id = id;
-            SourceSpan = sourceSpan;
             Language = lang;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                SourceSpan = windowsSourceSpan;
+            }
+            else
+            {
+                SourceSpan = unixSourceSpan;
+            }
         }
 
         public bool Matches(Diagnostic diagnostic) => (diagnostic?.Id.Equals(Id, StringComparison.Ordinal) ?? false) && diagnostic.Location.SourceSpan.Equals(SourceSpan);

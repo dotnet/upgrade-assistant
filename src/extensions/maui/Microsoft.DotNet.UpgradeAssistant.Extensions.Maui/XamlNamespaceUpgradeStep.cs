@@ -88,7 +88,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                 await projectFile.SaveAsync(token).ConfigureAwait(false);
             }
 
-            return new UpgradeStepApplyResult(status, $"Updated XAML namespaces to .NET MAUI");
+            return context.CreateAndAddStepApplyResult(this, status, "Updated XAML namespaces to .NET MAUI");
         }
 
         protected override async Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
@@ -114,7 +114,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
                     Logger.LogInformation(".NET MAUI project does not contain any XAML files");
                     return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, ".NET MAUI project does not contain any XAML files", BuildBreakRisk.None);
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)

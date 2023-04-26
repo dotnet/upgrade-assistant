@@ -27,17 +27,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Configuration
             _configUpdater = configUpdater ?? throw new ArgumentNullException(nameof(configUpdater));
         }
 
-        protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
+        protected override Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)
         {
             // Config updates don't apply until a project is selected
             if (context?.CurrentProject is null)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             // Check the config updater for an [ApplicableComponents] attribute
             // If one exists, the step only applies if the project has the indicated components
-            return await context.CurrentProject.IsApplicableAsync(_configUpdater, token).ConfigureAwait(false);
+            return context.CurrentProject.IsApplicableAsync(_configUpdater, token).AsTask();
         }
 
         protected override async Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)

@@ -142,7 +142,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution.Tests
         }
 
         [InlineData(true, UpgradeStepStatus.Incomplete)]
-        [InlineData(false, UpgradeStepStatus.Failed)]
+        [InlineData(false, UpgradeStepStatus.Incomplete)]
         [Theory]
         public async Task InitializeTestsInSolutionNoSelection(bool isInteractive, UpgradeStepStatus status)
         {

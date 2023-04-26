@@ -46,38 +46,38 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             var project = context.CurrentProject.Required();
             var file = project.GetFile();
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-            var projectproperties = project.GetProjectPropertyElements();
 
-            // This block checks TFMs for .NET MAUI Head Project
+            // This block checks TFMs for .NET MAUI project
             if (components.HasFlag(ProjectComponents.Maui) && file.IsSdk)
             {
-                if (string.Equals(projectproperties.GetProjectPropertyValue("TargetFramework").FirstOrDefault(), TargetFrameworkMoniker.NetStandard20.ToString(), StringComparison.OrdinalIgnoreCase))
+                if (project.IsNetStandard())
                 {
-                    projectproperties.RemoveProjectProperty("TargetFramework");
+                    var projectProperties = project.GetProjectPropertyElements();
+                    projectProperties.RemoveProjectProperty("TargetFramework");
                     file.SetPropertyValue("UseMaui", "true");
                     file.SetPropertyValue("TargetFrameworks", "net7.0-android;net7.0-ios");
                     await file.SaveAsync(token).ConfigureAwait(false);
-                    Logger.LogInformation("Added TFMs to .NET MAUI project");
-                    return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI Head project");
+                    Logger.LogInformation("Added TFMs to .NET MAUI project {ProjectName}", project);
+                    return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Complete, $"Added TFMs to .NET MAUI project {project}");
                 }
                 else
                 {
-                    return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, "Project is not of type Maui Head Project");
+                    return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Failed, $"Project {project} is not recognized as a .NET MAUI project (TargetFrameworks: {string.Join(", ", project.TargetFrameworks)})");
                 }
             }
 
+            // If we're getting here we are dealing with a head project, which received its "componentFlag" in the TryConvertRunner
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
-            if (componentFlagProperty is null)
+            var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
+            if (targetTfm is null)
             {
-                return new UpgradeStepApplyResult(UpgradeStepStatus.Failed, $"componentFlag Context property was null.");
+                return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Failed, $"Failed to retrieve target TFM from component flag context property: '{componentFlagProperty}'");
             }
 
-            var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
             file.SetTFM(targetTfm);
-            Logger.LogInformation("TFM set to {TargetTFM}", targetTfm);
-
             await file.SaveAsync(token).ConfigureAwait(false);
-            return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Added TFM {targetTfm} to .NET MAUI project ");
+            Logger.LogInformation("Added TFM {TargetTFM} to .NET MAUI head project {ProjectName}", targetTfm, project);
+            return context.CreateAndAddStepApplyResult(this, UpgradeStepStatus.Complete, $"Added TFM {targetTfm} to .NET MAUI head project {project}");
         }
 
         protected async override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
@@ -89,16 +89,15 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
 
             var project = context.CurrentProject.Required();
             var components = await project.GetComponentsAsync(token).ConfigureAwait(false);
-            var projectproperties = project.GetProjectPropertyElements();
 
             // This block checks TFMs for .NET MAUI Head Project
             if (components.HasFlag(ProjectComponents.Maui))
             {
-                if (project.TargetFrameworks.Any(x => x.IsNetStandard))
+                if (project.IsNetStandard())
                 {
-                    Logger.LogInformation("TFM needs updated to .NET MAUI TFMs");
+                    Logger.LogInformation("TFM needs to be updated to .NET MAUI TFMs");
 
-                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "TFM needs to be updated to .NET MAUI Targetframeworks", BuildBreakRisk.High);
+                    return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "TFM needs to be updated to .NET MAUI TargetFrameworks", BuildBreakRisk.High);
                 }
                 else
                 {
@@ -107,35 +106,40 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Maui
             }
 
             var componentFlagProperty = context.Properties.GetPropertyValue("componentFlag");
-            if (componentFlagProperty is null)
-            {
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, "componentFlag Property in Context was null", BuildBreakRisk.High);
-            }
 
             // This block checks TFMs for .NET MAUI platform projects
             var targetTfm = GetExpectedTargetFramework(componentFlagProperty);
+            if (targetTfm is null)
+            {
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"Failed to retrieve target TFM from component flag context property: '{componentFlagProperty}'", BuildBreakRisk.High);
+            }
+
             if (project.TargetFrameworks.Any(tfm => tfm == targetTfm))
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "TFM is already set to target value.", BuildBreakRisk.None);
             }
             else
             {
-                Logger.LogInformation("TFM needs updated to {TargetTFM}", targetTfm);
+                Logger.LogInformation("TFM needs to be updated to {TargetTFM}", targetTfm);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Incomplete, $"TFM needs to be updated to {targetTfm}", BuildBreakRisk.High);
             }
         }
 
-        private static TargetFrameworkMoniker GetExpectedTargetFramework(string componentFlagProperty)
+        private static TargetFrameworkMoniker? GetExpectedTargetFramework(string? componentFlagProperty)
         {
-            var propertyValue = Enum.Parse(typeof(ProjectComponents), componentFlagProperty);
-            if (ProjectComponents.XamarinAndroid.CompareTo(propertyValue) == 0)
+            if (Enum.TryParse<ProjectComponents>(componentFlagProperty, out var propertyValue))
             {
-                return TargetFrameworkMoniker.Net70_Android;
+                if (propertyValue.HasFlag(ProjectComponents.XamarinAndroid))
+                {
+                    return TargetFrameworkMoniker.Net70_Android;
+                }
+                else
+                {
+                    return TargetFrameworkMoniker.Net70_iOS;
+                }
             }
-            else
-            {
-                return TargetFrameworkMoniker.Net70_iOS;
-            }
+
+            return null;
         }
 
         protected override async Task<bool> IsApplicableImplAsync(IUpgradeContext context, CancellationToken token)

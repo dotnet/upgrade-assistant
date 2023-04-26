@@ -30,40 +30,46 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
         public void Configure(WorkspaceOptions options)
         {
-            (options.VisualStudioPath, options.VisualStudioVersion) = GetLatestVisualStudioPath(options.VisualStudioPath);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                (options.VisualStudioPath, options.VisualStudioVersion) = GetLatestVisualStudioPath(options.VisualStudioPath);
+            }
+            else
+            {
+                // MSBuildWorkspaceUpgradeContext.CreateProperties() uses the VS path to set the MSBuildExtensionsPath[32]
+                // environment variables and there is some logging in UpgraderMsBuildExtensions.AddMsBuild().
+                _logger.LogInformation("Visual Studio path not required on macOS");
+            }
         }
 
         private (string? Path, int? Version) GetLatestVisualStudioPath(string? suppliedPath)
         {
-            var latest = GetLatestPath(suppliedPath);
+            var latest = GetLatestVisualStudio(suppliedPath);
 
-            if (latest is null)
+            if (latest.InstallPath is null)
             {
                 _logger.LogWarning("Did not find a Visual Studio instance");
                 return default;
             }
 
-            var version = Version.Parse(latest.GetInstallationVersion());
-            var installation = latest.GetInstallationPath();
-
-            if (Directory.Exists(installation))
+            if (Directory.Exists(latest.InstallPath))
             {
-                _logger.LogDebug("Using Visual Studio v{VsVersion} [{VsPath}]", version, installation);
+                _logger.LogDebug("Using Visual Studio v{VsVersion} [{VsPath}]", latest.Version, latest.InstallPath);
 
-                return (installation, version?.Major);
+                return (latest.InstallPath, latest.Version.Major);
             }
             else
             {
-                _logger.LogWarning("Found Visual Studio {VsVersion}, but directory '{VsPath}' does not exist.", version, installation);
+                _logger.LogWarning("Found Visual Studio {VsVersion}, but directory '{VsPath}' does not exist.", latest.Version, latest.InstallPath);
 
                 return default;
             }
         }
 
-        private ISetupInstance2? GetLatestPath(string? suppliedPath)
+        private (string? InstallPath, Version Version) GetLatestVisualStudio(string? suppliedPath)
         {
-            var result = default(ISetupInstance2);
             var resultVersion = new Version(0, 0);
+            string? resultPath = null;
 
             try
             {
@@ -107,17 +113,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
 
                         if (instanceHasMSBuild && instance is not null)
                         {
-                            if (suppliedPath is not null && string.Equals(suppliedPath, instance.GetInstallationPath(), StringComparison.OrdinalIgnoreCase))
+                            var installPath = instance.GetInstallationPath();
+
+                            if (suppliedPath is not null && string.Equals(suppliedPath, installPath, StringComparison.OrdinalIgnoreCase))
                             {
                                 _logger.LogTrace("Identified supplied path for Visual Studio v{Version} [{Path}]", version, instance.GetInstallationPath());
 
-                                return instance;
+                                return (installPath, version);
                             }
                             else if (version > resultVersion)
                             {
                                 _logger.LogTrace("Found Visual Studio v{Version} [{Path}]", version, instance.GetInstallationPath());
 
-                                result = instance;
+                                resultPath = installPath;
                                 resultVersion = version;
                             }
                         }
@@ -133,7 +141,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.MSBuild
                 // This is OK, VS "15" or greater likely not installed.
             }
 
-            return result;
+            return (resultPath, resultVersion);
         }
 
         private static ISetupConfiguration GetQuery()

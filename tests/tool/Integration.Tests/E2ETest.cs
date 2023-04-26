@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper.Configuration.Annotations;
+using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.DotNet.UpgradeAssistant;
 using Microsoft.DotNet.UpgradeAssistant.Cli;
 using Xunit;
@@ -37,21 +40,26 @@ namespace Integration.Tests
             _output = output;
         }
 
-        [InlineData("PCL", "SamplePCL.csproj", "")]
-        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj")]
-/*
-        [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "")]
-        [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "")]
-*/
-        [InlineData("WpfSample/vb", "WpfApp1.sln", "")]
-        [InlineData("WCFSample", "ConsoleApp.csproj", "")]
+        [InlineData("PCL", "SamplePCL.csproj", "", true)]
+        [InlineData("WpfSample/csharp", "BeanTrader.sln", "BeanTraderClient.csproj", true)]
+        /*
+                [InlineData("WebLibrary/csharp", "WebLibrary.csproj", "", true)]
+                [InlineData("AspNetSample/csharp", "TemplateMvc.csproj", "", true)]
+        */
+        [InlineData("WpfSample/vb", "WpfApp1.sln", "", true)]
+        [InlineData("WCFSample", "ConsoleApp.csproj", "", true)]
 
-        // TODO: [mgoertz] Re-enable after .NET 7 GA
-        // [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj")]
-        // [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj")]
+        // TODO: [mgoertz] Re-enable after MAUI workloads are installed on test machines
+        // [InlineData("MauiSample/droid", "EwDavidForms.sln", "EwDavidForms.Android.csproj", false)]
+        // [InlineData("MauiSample/ios", "EwDavidForms.sln", "EwDavidForms.iOS.csproj", false)]
         [Theory]
-        public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint)
+        public async Task UpgradeTest(string scenarioPath, string inputFileName, string entrypoint, bool windowsOnly)
         {
+            if (windowsOnly && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return;
+            }
+
             // Create a temporary working directory
             var workingDir = Path.Combine(Path.GetTempPath(), TempDirectoryName, Guid.NewGuid().ToString());
             var dir = Directory.CreateDirectory(workingDir);
@@ -72,6 +80,16 @@ namespace Integration.Tests
 
             FileHelpers.CleanupBuildArtifacts(workingDir);
             temp.Dispose();
+        }
+
+        [InlineData("Version=42.42.42.42")]
+        [InlineData("Version=9.0.1")]
+        [InlineData("Version=0.4.0-dev")]
+        [InlineData("Version=0.4.0+5d07f3b86b233108d705e3c0549ca845e5e54964")]
+        [Theory]
+        public void VersionReplacementTest(string version)
+        {
+            Assert.Equal("[VERSION]", ReplaceVersionStrings(version));
         }
 
         private static void AssertOnlyKnownPackagesWereReferenced(UnknownPackages unknownPackages, string actualDirectory)
@@ -126,22 +144,30 @@ namespace Integration.Tests
 
             foreach (var file in expectedFiles)
             {
-                var expectedText = ReadFile(expectedDir, file);
-                var actualText = ReadFile(actualDir, file);
+                var expectedText = ReadFile(expectedDir, file).ReplaceLineEndings();
+                var actualText = ReadFile(actualDir, file).ReplaceLineEndings();
 
-                if (file.StartsWith("UpgradeReport."))
+                if (file.StartsWith("UpgradeReport.", StringComparison.Ordinal))
                 {
-                    actualText = actualText.Replace(actualDir.Replace("\\", "\\\\"), "[ACTUAL_PROJECT_ROOT]")
-                        .Replace(actualDir.Replace("\\", "/"), "[ACTUAL_PROJECT_ROOT]")
-                        .Replace(Directory.GetCurrentDirectory().Replace("\\", "/"), "[UA_PROJECT_BIN]");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        actualText = actualText.Replace(actualDir.Replace("\\", "\\\\", StringComparison.Ordinal), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
+                                               .Replace(actualDir.Replace("\\", "/", StringComparison.Ordinal), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
+                                               .Replace(Directory.GetCurrentDirectory().Replace("\\", "/", StringComparison.Ordinal), "[UA_PROJECT_BIN]", StringComparison.Ordinal);
+                    }
+                    else
+                    {
+                        actualText = actualText.Replace(actualDir.TrimStart('/'), "[ACTUAL_PROJECT_ROOT]", StringComparison.Ordinal)
+                                               .Replace(Directory.GetCurrentDirectory().TrimStart('/'), "[UA_PROJECT_BIN]", StringComparison.Ordinal);
+                    }
 
-                    actualText = Regex.Replace(actualText, "Version=(\\d+\\.){3}([\\da-zA-Z\\-])+", "[VERSION]");
+                    actualText = ReplaceVersionStrings(actualText);
                 }
 
                 if (!string.Equals(expectedText, actualText, StringComparison.Ordinal))
                 {
                     var message = $"The contents of \"{file}\" do not match.";
-                    if (file.StartsWith("UpgradeReport."))
+                    if (file.StartsWith("UpgradeReport.", StringComparison.Ordinal))
                     {
                         var fileToCompare = Path.Combine(actualDir, "UpgradeReport.relative.txt");
                         File.WriteAllText(fileToCompare, actualText);
@@ -165,16 +191,35 @@ namespace Integration.Tests
                 => File.ReadAllText(Path.Combine(directory, file));
         }
 
-        private string FindFileDiff(string file1, string file2)
+        /// <summary>
+        /// Replace version strings, such as "Version=42.42.42.42" or "Version=0.4.0-dev" or "Version=0.4.0+5d07f3b86b233108d705e3c0549ca845e5e54964"
+        /// </summary>
+        private static string ReplaceVersionStrings(string actualText)
+            => Regex.Replace(actualText, @"Version=\d+(\.\d+){2}(((\.\d+))|((\-|\+)([\da-zA-Z])*)?)", "[VERSION]");
+
+        private static string FindFileDiff(string file1, string file2)
         {
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            process.StartInfo = new System.Diagnostics.ProcessStartInfo()
+            string command, arguments;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                command = "cmd.exe";
+                arguments = $"/C fc {file1} {file2} /c";
+            }
+            else
+            {
+                command = "diff";
+                arguments = $"-u --strip-trailing-cr {file1} {file2}";
+            }
+
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo()
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
-                FileName = "cmd.exe",
-                Arguments = $"/C fc {file1} {file2} /c",
+                FileName = command,
+                Arguments = arguments,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };

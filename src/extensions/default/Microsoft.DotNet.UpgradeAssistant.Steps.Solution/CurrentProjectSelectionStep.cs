@@ -101,8 +101,8 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
 
             if (allProjectsAreUpgraded)
             {
-                Logger.LogInformation("No projects need upgraded for selected entrypoint");
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need upgraded", BuildBreakRisk.None);
+                Logger.LogInformation("No projects need to be upgraded for selected entrypoint");
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "No projects need to be upgraded", BuildBreakRisk.None);
             }
 
             // If no project is selected, and at least one still needs upgraded, identify the next project to upgrade
@@ -129,7 +129,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             {
                 if (await IsCompletedAsync(context, newCurrentProject, token).ConfigureAwait(false))
                 {
-                    Logger.LogDebug("Project {Project} does not need upgraded", newCurrentProject.FileInfo);
+                    Logger.LogDebug("Project {Project} does not need to be upgraded", newCurrentProject.FileInfo);
                 }
                 else if (!(await RunChecksAsync(newCurrentProject, token).ConfigureAwait(false)))
                 {
@@ -140,6 +140,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                     context.SetCurrentProject(newCurrentProject);
                 }
 
+                Logger.LogInformation("Project {Name} was selected", newCurrentProject.GetRoslynProject().Name);
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, $"Project {newCurrentProject.GetRoslynProject().Name} was selected", BuildBreakRisk.None);
             }
         }
@@ -160,6 +161,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
             else
             {
                 context.SetCurrentProject(selectedProject);
+                Logger.LogInformation("Project {Name} was selected", selectedProject.GetRoslynProject().Name);
                 return new UpgradeStepApplyResult(UpgradeStepStatus.Complete, $"Project {selectedProject.GetRoslynProject().Name} was selected.");
             }
         }

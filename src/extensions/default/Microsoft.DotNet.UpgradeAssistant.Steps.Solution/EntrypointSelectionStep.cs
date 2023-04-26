@@ -104,19 +104,22 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Solution
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
             }
 
+            // If the user has specified a solution to upgrade and the user has also opted for non-interactive mode without specifying any entry points,
+            // then upgrade all projects.
+            if (!_userInput.IsInteractive && _options.Entrypoints.Length == 0 && projects.Count > 0)
+            {
+                context.EntryPoints = projects;
+
+                Logger.LogInformation("Selecting all projects in the solution for upgrade.");
+
+                return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected all projects in the solution.", BuildBreakRisk.None);
+            }
+
             context.EntryPoints = _entrypointResolver.GetEntrypoints(context.Projects, _options.Entrypoints);
 
             if (context.EntryPoints.Any())
             {
                 return new UpgradeStepInitializeResult(UpgradeStepStatus.Complete, "Selected user's choice of entry point project.", BuildBreakRisk.None);
-            }
-            else if (!_userInput.IsInteractive)
-            {
-                const string Message = "Entry Point needs to be provided when more than 1 projects present in a non-interactive mode. There are 2 ways of providing an entry-point :\n" +
-                    "a) Execute upgrade-assistant in interactive mode up until select entry point step and re-run upgrade-assistant in non-interactive mode \n" +
-                    "b) Execute upgrade-assistant in non-interactive mode with valid value for --entry-point";
-
-                return new UpgradeStepInitializeResult(UpgradeStepStatus.Failed, Message, BuildBreakRisk.None);
             }
             else
             {

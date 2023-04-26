@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -237,11 +238,11 @@ namespace SampleServer
         public void UpdateDirectivesTest(string replace, string expected)
         {
             var updater = new SourceCodeUpdater(CSharpSyntaxTree.ParseText(Input.Replace("using System.ServiceModel.Security;", replace)), Template, _logger);
-            var result = updater.UpdateDirectives().ToFullString().Replace(" ", string.Empty);
+            var result = updater.UpdateDirectives().ToFullString().Replace(" ", string.Empty).ReplaceLineEndings();
             var outdated = "using System.ServiceModel;using System.ServiceModel.Security;";
 
             Assert.DoesNotContain(outdated, result);
-            Assert.Contains(expected.Replace(" ", string.Empty), result);
+            Assert.Contains(expected.Replace(" ", string.Empty).ReplaceLineEndings(), result, StringComparison.Ordinal);
         }
 
         [Theory]

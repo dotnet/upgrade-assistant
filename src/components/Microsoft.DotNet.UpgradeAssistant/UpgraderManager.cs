@@ -15,15 +15,18 @@ namespace Microsoft.DotNet.UpgradeAssistant
     {
         private readonly IUpgradeStepOrderer _orderer;
         private readonly ITelemetry _telemetry;
+        private readonly IUserInput _userInput;
         private readonly ILogger _logger;
 
         public UpgraderManager(
             IUpgradeStepOrderer orderer,
             ITelemetry telemetry,
+            IUserInput userInput,
             ILogger<UpgraderManager> logger)
         {
             _orderer = orderer ?? throw new ArgumentNullException(nameof(orderer));
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
+            _userInput = userInput ?? throw new ArgumentNullException(nameof(userInput));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -153,6 +156,12 @@ namespace Microsoft.DotNet.UpgradeAssistant
                     {
                         return nextSubStep;
                     }
+                }
+
+                if (step.Status == UpgradeStepStatus.Failed && !_userInput.IsInteractive)
+                {
+                    // Don't return failed steps in non-interactive mode
+                    continue;
                 }
 
                 if (!step.IsDone)

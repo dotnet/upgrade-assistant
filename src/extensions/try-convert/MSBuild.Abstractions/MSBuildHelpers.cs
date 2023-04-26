@@ -303,6 +303,13 @@ namespace MSBuild.Abstractions
             && !tfm.ContainsIgnoreCase(MSBuildFacts.NetstandardPrelude);
 
         /// <summary>
+        /// Checks if a given TFM has an Android or iOS suffix.
+        /// </summary>
+        public static bool IsMobile(string tfm) =>
+            tfm.ContainsIgnoreCase(MSBuildFacts.IOSSuffix)
+            || tfm.ContainsIgnoreCase(MSBuildFacts.AndroidSuffix);
+
+        /// <summary>
         /// Checks if a given TFM include -windows.
         /// </summary>
         public static bool IsWindows(string tfm) =>
@@ -344,7 +351,8 @@ namespace MSBuild.Abstractions
         /// Finds the property group with the TFM specified, which is normally the top-level property group.
         /// </summary>
         public static ProjectPropertyGroupElement GetOrCreateTopLevelPropertyGroupWithTFM(IProjectRootElement rootElement) =>
-            rootElement.PropertyGroups.Single(pg => pg.Properties.Any(p => p.ElementName.Equals(MSBuildFacts.TargetFrameworkNodeName, StringComparison.OrdinalIgnoreCase)))
+            rootElement.PropertyGroups.Single(pg => pg.Properties.Any(p => p.ElementName.Equals(MSBuildFacts.TargetFrameworkNodeName, StringComparison.OrdinalIgnoreCase)
+                                                                        || p.ElementName.Equals(MSBuildFacts.TargetFrameworksNodeName, StringComparison.OrdinalIgnoreCase)))
             ?? rootElement.AddPropertyGroup();
 
         /// <summary>

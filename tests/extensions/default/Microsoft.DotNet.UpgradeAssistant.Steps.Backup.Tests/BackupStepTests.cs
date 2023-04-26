@@ -26,6 +26,10 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
         [InlineData("B\\B.sln", "B\\B.csproj", true, "B.backup\\B.0")]
         public async Task InitializeTests(string inputPath, string projectPath, bool backupComplete, string expectedBackupPath)
         {
+            inputPath = inputPath.Replace('\\', Path.DirectorySeparatorChar);
+            projectPath = projectPath.Replace('\\', Path.DirectorySeparatorChar);
+            expectedBackupPath = expectedBackupPath.Replace('\\', Path.DirectorySeparatorChar);
+
             // Arrange
             inputPath = Path.GetFullPath(Path.Combine("TestAssets", inputPath));
             projectPath = Path.GetFullPath(Path.Combine("TestAssets", projectPath));
@@ -62,6 +66,11 @@ namespace Microsoft.DotNet.UpgradeAssistant.Steps.Backup.Tests
         [InlineData("B\\B.sln", "B\\B.csproj", true, "B.backup", "B.backup\\B.0")]
         public async Task ApplyTests(string inputPath, string projectPath, bool backupComplete, string expectedBaseBackupPath, string expectedBackupPath)
         {
+            inputPath = inputPath.Replace('\\', Path.DirectorySeparatorChar);
+            projectPath = projectPath.Replace('\\', Path.DirectorySeparatorChar);
+            expectedBaseBackupPath = expectedBaseBackupPath.Replace('\\', Path.DirectorySeparatorChar);
+            expectedBackupPath = expectedBackupPath.Replace('\\', Path.DirectorySeparatorChar);
+
             // Arrange
             inputPath = Path.GetFullPath(Path.Combine("TestAssets", inputPath));
             projectPath = Path.GetFullPath(Path.Combine("TestAssets", projectPath));

@@ -95,7 +95,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert
             public override string Description => $"Convert {_project.Name} from old-style project format to SDK style project.";
 
             protected override Task<UpgradeStepApplyResult> ApplyImplAsync(IUpgradeContext context, CancellationToken token)
-                => _runner.ApplyAsync(context, context.GetProject(_project.FullName), token);
+                => _runner.ApplyAsync(this, context, context.GetProject(_project.FullName), token);
 
             protected override Task<UpgradeStepInitializeResult> InitializeImplAsync(IUpgradeContext context, CancellationToken token)
                 => _runner.InitializeAsync(context.GetProject(_project.FullName), token);

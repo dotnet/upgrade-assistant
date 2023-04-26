@@ -97,6 +97,17 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
 
         private static IList<Result> ExtractResults(IList<OutputResult> analyzeResults)
         {
+            FailureLevel GetFailureLevel(OutputLevel level)
+            {
+                return level switch
+                {
+                    OutputLevel.Info => FailureLevel.Note,
+                    OutputLevel.Warning => FailureLevel.Warning,
+                    OutputLevel.Error => FailureLevel.Error,
+                    _ => throw new ArgumentException($"Invalid {nameof(OutputLevel)}", nameof(level))
+                };
+            }
+
             var results = new List<Result>();
             foreach (var r in analyzeResults)
             {
@@ -104,6 +115,7 @@ namespace Microsoft.DotNet.UpgradeAssistant.Analysis
                 {
                     RuleId = r.RuleId,
                     Message = r.ResultMessage.ToMessage(),
+                    Level = GetFailureLevel(r.Level),
                     Locations = new List<Location>()
                     {
                         new()

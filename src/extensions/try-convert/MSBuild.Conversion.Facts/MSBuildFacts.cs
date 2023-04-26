@@ -274,6 +274,7 @@ namespace MSBuild.Conversion.Facts
         public const string DesignerSubType = "Designer";
         public const string CodeSubTypeValue = "Code";
         public const string TargetFrameworkNodeName = "TargetFramework";
+        public const string TargetFrameworksNodeName = "TargetFrameworks";
         public const string OutputTypeNodeName = "OutputType";
         public const string GenerateAssemblyInfoNodeName = "GenerateAssemblyInfo";
         public const string RequiredTargetFrameworkNodeName = "RequiredTargetFramework";
@@ -301,8 +302,12 @@ namespace MSBuild.Conversion.Facts
         public const string PackagesSubstring = @"\packages";
         public const string NetStandard20 = "netstandard2.0";
         public const string NetCoreApp31 = "netcoreapp3.1";
+        public const string XamariniOS = "Xamarin.iOS";
+        public const string MonoAndroid = "MonoAndroid";
         public const string Net5 = "net5.0";
         public const string WindowsSuffix = "-windows";
+        public const string AndroidSuffix = "-android";
+        public const string IOSSuffix = "-ios";
         public const string Net5Windows = "net5.0-windows";
         public const string Net6 = "net6.0";
         public const string Net6Windows = "net6.0-windows";

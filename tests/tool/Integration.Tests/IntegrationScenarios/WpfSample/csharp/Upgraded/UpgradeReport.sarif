@@ -12,9 +12,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
-              },
-              "helpUri": "about:blank"
+                "text": "Use the try-convert tool (, [VERSION]) to convert the project file to an SDK-style csproj"
+              }
             }
           ]
         }
@@ -22,6 +21,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+          "level": "note",
           "message": {
             "text": "Complete: Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
           },
@@ -47,11 +47,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove reference 'System.ServiceModel'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -59,6 +55,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove reference 'System.ServiceModel'"
           },
@@ -84,11 +81,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Primitives'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -96,6 +89,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Primitives'"
           },
@@ -121,11 +115,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Http'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -133,6 +123,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Http'"
           },
@@ -158,11 +149,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Duplex'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -170,6 +157,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Duplex'"
           },
@@ -195,11 +183,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.NetTcp'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -207,6 +191,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.NetTcp'"
           },
@@ -232,11 +217,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Security'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -244,6 +225,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Security'"
           },
@@ -269,11 +251,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Federation'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -281,6 +259,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Federation'"
           },
@@ -306,11 +285,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -318,6 +293,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
           },
@@ -345,9 +321,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.ServiceModel.Primitives'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.ServiceModel.Primitives needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -355,6 +330,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.ServiceModel.Primitives'"
           },
@@ -382,9 +358,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.ServiceModel.Http'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.ServiceModel.Http needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -392,6 +367,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.ServiceModel.Http'"
           },
@@ -419,9 +395,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.ServiceModel.Security'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.ServiceModel.Security needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -429,6 +404,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.ServiceModel.Security'"
           },
@@ -456,9 +432,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
               "fullDescription": {
-                "text": "Updated TFM to netstandard2.0"
-              },
-              "helpUri": "about:blank"
+                "text": "Update TFM for current project"
+              }
             }
           ]
         }
@@ -466,6 +441,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+          "level": "note",
           "message": {
             "text": "Complete: Updated TFM to netstandard2.0"
           },
@@ -493,9 +469,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
               "fullDescription": {
-                "text": "Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
-              },
-              "helpUri": "about:blank"
+                "text": "Use the try-convert tool (, [VERSION]) to convert the project file to an SDK-style csproj"
+              }
             }
           ]
         }
@@ -503,6 +478,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.TryConvertProjectConverterStep",
+          "level": "note",
           "message": {
             "text": "Complete: Project file converted successfully! The project may require additional changes to build successfully against the new .NET target."
           },
@@ -528,11 +504,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove reference 'System.Configuration'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -540,6 +512,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove reference 'System.Configuration'"
           },
@@ -565,11 +538,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove reference 'System.Net.Http.WebRequest'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -577,6 +546,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove reference 'System.Net.Http.WebRequest'"
           },
@@ -602,11 +572,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove reference 'System.ServiceModel'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -614,6 +580,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.Reference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove reference 'System.ServiceModel'"
           },
@@ -639,11 +606,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Remove package 'Microsoft.Net.Http'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -651,6 +614,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Net.Http'"
           },
@@ -676,11 +640,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.Net.Http'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -688,6 +648,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.Net.Http'"
           },
@@ -713,11 +674,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.Configuration.ConfigurationManager'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -725,6 +682,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.Configuration.ConfigurationManager'"
           },
@@ -750,11 +708,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Primitives'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -762,6 +716,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Primitives'"
           },
@@ -787,11 +742,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Http'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -799,6 +750,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Http'"
           },
@@ -824,11 +776,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Duplex'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -836,6 +784,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Duplex'"
           },
@@ -861,11 +810,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.NetTcp'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -873,6 +818,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.NetTcp'"
           },
@@ -898,11 +844,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Security'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -910,6 +852,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Security'"
           },
@@ -935,11 +878,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'System.ServiceModel.Federation'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -947,6 +886,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'System.ServiceModel.Federation'"
           },
@@ -972,11 +912,7 @@
           "informationUri": "https://github.com/dotnet/upgrade-assistant#usage",
           "rules": [
             {
-              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
-              "fullDescription": {
-                "text": "Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
-              },
-              "helpUri": "about:blank"
+              "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]"
             }
           ]
         }
@@ -984,6 +920,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers'"
           },
@@ -1011,9 +948,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Castle.Core'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Castle.Core needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1021,6 +957,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Castle.Core'"
           },
@@ -1048,9 +985,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'ControlzEx'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package ControlzEx needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1058,6 +994,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'ControlzEx'"
           },
@@ -1085,9 +1022,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Microsoft.Bcl'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Microsoft.Bcl needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1095,6 +1031,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Bcl'"
           },
@@ -1122,9 +1059,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Microsoft.Bcl.Async'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Microsoft.Bcl.Async needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1132,6 +1068,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Bcl.Async'"
           },
@@ -1159,9 +1096,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Microsoft.Bcl.Build'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Microsoft.Bcl.Build needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1169,6 +1105,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Bcl.Build'"
           },
@@ -1196,9 +1133,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Microsoft.CodeQuality.Analyzers'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Microsoft.CodeQuality.Analyzers needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1206,6 +1142,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.CodeQuality.Analyzers'"
           },
@@ -1233,9 +1170,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Microsoft.NetCore.Analyzers'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Microsoft.NetCore.Analyzers needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1243,6 +1179,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.NetCore.Analyzers'"
           },
@@ -1270,9 +1207,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Microsoft.NetFramework.Analyzers'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Microsoft.NetFramework.Analyzers needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1280,6 +1216,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.NetFramework.Analyzers'"
           },
@@ -1307,9 +1244,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Microsoft.Rest.ClientRuntime'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Microsoft.Rest.ClientRuntime needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1317,6 +1253,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Microsoft.Rest.ClientRuntime'"
           },
@@ -1344,9 +1281,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.Security.Cryptography.X509Certificates'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.Security.Cryptography.X509Certificates needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1354,6 +1290,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.Security.Cryptography.X509Certificates'"
           },
@@ -1381,9 +1318,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Text.Analyzers'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Text.Analyzers needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1391,6 +1327,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Text.Analyzers'"
           },
@@ -1418,9 +1355,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.ServiceModel.Primitives'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.ServiceModel.Primitives needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1428,6 +1364,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.ServiceModel.Primitives'"
           },
@@ -1455,9 +1392,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.ServiceModel.Http'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.ServiceModel.Http needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1465,6 +1401,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.ServiceModel.Http'"
           },
@@ -1492,9 +1429,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.ServiceModel.Security'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.ServiceModel.Security needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1502,6 +1438,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.ServiceModel.Security'"
           },
@@ -1529,9 +1466,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
               "fullDescription": {
-                "text": "Updated TFM to net7.0-windows"
-              },
-              "helpUri": "about:blank"
+                "text": "Update TFM for current project"
+              }
             }
           ]
         }
@@ -1539,6 +1475,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.ProjectFormat.SetTFMStep",
+          "level": "note",
           "message": {
             "text": "Complete: Updated TFM to net7.0-windows"
           },
@@ -1566,9 +1503,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Hyak.Common'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Hyak.Common, [VERSION] does not support the target(s) net7.0-windows but a newer version (1.2.2) does.  Package Hyak.Common needs to be upgraded from 1.0.2 to 1.2.2."
+              }
             }
           ]
         }
@@ -1576,6 +1512,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Hyak.Common'"
           },
@@ -1603,9 +1540,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'MahApps.Metro'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package MahApps.Metro, [VERSION] does not support the target(s) net7.0-windows but a newer version (2.4.4) does.  Package MahApps.Metro needs to be upgraded across major versions (1.6.5 -> 2.4.4) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -1613,6 +1549,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'MahApps.Metro'"
           },
@@ -1640,9 +1577,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Newtonsoft.Json'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Newtonsoft.Json, [VERSION] does not support the target(s) net7.0-windows but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (7.0.1 -> 9.0.1) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -1650,6 +1586,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Newtonsoft.Json'"
           },
@@ -1677,9 +1614,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Nito.AsyncEx'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Nito.AsyncEx, [VERSION] does not support the target(s) net7.0-windows but a newer version (5.1.0) does.  Package Nito.AsyncEx needs to be upgraded across major versions (4.0.1 -> 5.1.0) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -1687,6 +1623,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Nito.AsyncEx'"
           },
@@ -1714,9 +1651,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Add package 'Hyak.Common'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Hyak.Common, [VERSION] does not support the target(s) net7.0-windows but a newer version (1.2.2) does.  Package Hyak.Common needs to be upgraded from 1.0.2 to 1.2.2."
+              }
             }
           ]
         }
@@ -1724,6 +1660,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Hyak.Common'"
           },
@@ -1751,9 +1688,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Add package 'MahApps.Metro'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package MahApps.Metro, [VERSION] does not support the target(s) net7.0-windows but a newer version (2.4.4) does.  Package MahApps.Metro needs to be upgraded across major versions (1.6.5 -> 2.4.4) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -1761,6 +1697,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'MahApps.Metro'"
           },
@@ -1788,9 +1725,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Add package 'Newtonsoft.Json'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Newtonsoft.Json, [VERSION] does not support the target(s) net7.0-windows but a newer version (9.0.1) does.  Package Newtonsoft.Json needs to be upgraded across major versions (7.0.1 -> 9.0.1) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -1798,6 +1734,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Newtonsoft.Json'"
           },
@@ -1825,9 +1762,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Add package 'Nito.AsyncEx'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Nito.AsyncEx, [VERSION] does not support the target(s) net7.0-windows but a newer version (5.1.0) does.  Package Nito.AsyncEx needs to be upgraded across major versions (4.0.1 -> 5.1.0) which may introduce breaking changes."
+              }
             }
           ]
         }
@@ -1835,6 +1771,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Nito.AsyncEx'"
           },
@@ -1862,9 +1799,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Add package 'Microsoft.Windows.Compatibility'"
-              },
-              "helpUri": "about:blank"
+                "text": "Adding Microsoft.Windows.Compatibility 5.0.2 helps with speeding up the upgrade process for Windows-based APIs"
+              }
             }
           ]
         }
@@ -1872,6 +1808,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Add package 'Microsoft.Windows.Compatibility'"
           },
@@ -1899,9 +1836,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.Data.DataSetExtensions'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.Data.DataSetExtensions needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1909,6 +1845,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.Data.DataSetExtensions'"
           },
@@ -1936,9 +1873,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'System.Configuration.ConfigurationManager'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package System.Configuration.ConfigurationManager needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1946,6 +1882,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'System.Configuration.ConfigurationManager'"
           },
@@ -1973,9 +1910,8 @@
             {
               "id": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
               "fullDescription": {
-                "text": "Remove package 'Newtonsoft.Json'"
-              },
-              "helpUri": "about:blank"
+                "text": "Package Newtonsoft.Json needs to be removed as its a transitive dependency that is not required"
+              }
             }
           ]
         }
@@ -1983,6 +1919,7 @@
       "results": [
         {
           "ruleId": "Microsoft.DotNet.UpgradeAssistant.Steps.Packages.PackageUpdaterStep+PackageManipulationStep`1[[Microsoft.DotNet.UpgradeAssistant.NuGetReference, Microsoft.DotNet.UpgradeAssistant.Abstractions, [VERSION], Culture=neutral, PublicKeyToken=31bf3856ad364e35]]",
+          "level": "note",
           "message": {
             "text": "Complete: Remove package 'Newtonsoft.Json'"
           },
@@ -2012,8 +1949,7 @@
               "name": "Microsoft.DotNet.UpgradeAssistant.Extensions.Windows.WinformsDefaultFontUpdater",
               "fullDescription": {
                 "text": "Default Font API Alert"
-              },
-              "helpUri": "about:blank"
+              }
             }
           ]
         }
@@ -2021,8 +1957,9 @@
       "results": [
         {
           "ruleId": "UA209",
+          "level": "note",
           "message": {
-            "text": "Success: Default font in Windows Forms has been changed from Microsoft Sans Serif to Seg Segoe UI, in order to change the default font use the API - Application.SetDefaultFont(Font font). For more details see here - https://devblogs.microsoft.com/dotnet/whats-new-in-windows-forms-in-net-6-0-preview-5/#application-wide-default-font."
+            "text": "Success: Default font in Windows Forms has been changed from Microsoft Sans Serif to Segoe UI, in order to change the default font use the API - Application.SetDefaultFont(Font font). For more details see here - https://devblogs.microsoft.com/dotnet/whats-new-in-windows-forms-in-net-6-0-preview-5/#application-wide-default-font."
           },
           "locations": [
             {
