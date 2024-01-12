@@ -1,7 +1,7 @@
 # Upgrade Assistant - this repo has been deprecated.
 
 We have built a new, more powerful version of the Upgrade Assistant that leverages Visual Studio and Copilot capabilities, providing much better analysis and richer functionality. You can get the [Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.upgradeassistant) or a [CLI version](https://www.nuget.org/packages/upgrade-assistant#versions-body-tab) of the tool.
-Since it is using functionality from the closed-source products of Microsoft (such as Visual Studio, etc.), this new version of the Upgrade Assistant also had to be closed-source.
+Since it is using functionality from the closed-source products of Microsoft (such as Visual Studio, etc.), this new version of the Upgrade Assistant also had to be closed-source. But we are committed to keeping this tool free and available for anyone.
 
 We are collecting feedback on whether developers need public extensibility APIs for UpgradeAssistant to be able to write their own transformations. Please let us know in an issue in this repository or via the Visual Studio feedback channel.
 
