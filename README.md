@@ -1,9 +1,9 @@
-# Upgrade Assistant
+# Upgrade Assistant - this repo has been deprecated.
 
-## Share your feedback on the .NET Upgrade Assistant!
-We're interested to hearing how your experience with the .NET Upgrade Assistant has been going as you upgrade your project(s) from .NET Framework to the latest version of .NET (STS, LTS, or preview).
+We have built a new, more powerful version of the Upgrade Assistant that leverages Visual Studio and Copilot capabilities, providing much better analysis and richer functionality. You can get the [Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.upgradeassistant) or a [CLI version](https://www.nuget.org/packages/upgrade-assistant#versions-body-tab) of the tool.
+Since it is using functionality from the closed-source products of Microsoft (such as Visual Studio, etc.), this new version of the Upgrade Assistant also had to be closed-source.
 
-[Share your feedback here](https://www.surveymonkey.com/r/2LBPCXH)!
+We are collecting feedback on whether developers need public extensibility APIs for UpgradeAssistant to be able to write their own transformations. Please let us know in an issue in this repository or via the Visual Studio feedback channel.
 
 ## Status
 
