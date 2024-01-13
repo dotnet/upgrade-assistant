@@ -45,13 +45,19 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.Windows
                 .Select(usingDirective => usingDirective.Name.ToString());
         }
 
+        private bool IsSameCallString(string callString, string expectedNamespace, string expectedCall, IEnumerable<string> allNamespaces)
+        {
+            return callString == $"{expectedNamespace}.{expectedCall}" || (callString == expectedCall && allNamespaces.Contains(expectedNamespace));
+        }
+
         private void AnalyzeObjectCreationExpression(SyntaxNodeAnalysisContext context)
         {
             var node = (InvocationExpressionSyntax)context.Node;
             var namespaces = AllNamespaces(context);
             var firstChildText = node.ChildNodes().First().ToString();
-            if ((firstChildText == "DataTransferManager.ShowShareUI" && namespaces.Contains("Windows.ApplicationModel.DataTransfer"))
-                || firstChildText == "Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI")
+
+            if (IsSameCallString(firstChildText, "Windows.ApplicationModel.DataTransfer", "DataTransferManager.ShowShareUI", namespaces)
+                || IsSameCallString(firstChildText, "Windows.ApplicationModel.DataTransfer", "DataTransferManager.GetForCurrentView", namespaces))
             {
                 var diagnostic = Diagnostic.Create(Rule, node.GetLocation(), node.GetText().ToString());
                 context.ReportDiagnostic(diagnostic);
