@@ -23,12 +23,9 @@ namespace Microsoft.DotNet.UpgradeAssistant.Extensions.NuGet
         {
             var packageSources = new List<PackageSource>();
 
-            if (path != null)
-            {
-                var nugetSettings = Settings.LoadDefaultSettings(path);
-                var sourceProvider = new PackageSourceProvider(nugetSettings);
-                packageSources.AddRange(sourceProvider.LoadPackageSources().Where(e => e.IsEnabled));
-            }
+            var nugetSettings = Settings.LoadDefaultSettings(path);
+            var sourceProvider = new PackageSourceProvider(nugetSettings);
+            packageSources.AddRange(sourceProvider.LoadPackageSources().Where(e => e.IsEnabled));
 
             if (packageSources.Count == 0)
             {
