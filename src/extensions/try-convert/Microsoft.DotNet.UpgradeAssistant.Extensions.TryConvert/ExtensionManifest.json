@@ -1,7 +1,0 @@
-﻿{
-  "ExtensionName": "try-convert",
-
-  "ExtensionServiceProviders": [
-    "Microsoft.DotNet.UpgradeAssistant.Extensions.TryConvert.dll"
-  ]
-}

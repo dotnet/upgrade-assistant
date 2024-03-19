@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Pack related properties -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Microsoft.UpgradeAssistant.Mappings</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>Microsoft</Authors>
+    <Description>A set of package and API mappings for the dotnet UpgradeAssistant.</Description>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
+    <PackageProjectUrl>https://go.microsoft.com/fwlink/?LinkID=2202641</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnet/upgrade-assistant</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="mappings\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackagePath>content/mappings</PackagePath>
+      <Pack>True</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

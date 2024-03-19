@@ -1,0 +1,95 @@
+name: $(Date:yyyyMMdd).$(Rev:r)
+variables:
+- name: Codeql.Enabled
+  value: true
+- name: PublishNuGetOrg
+  value: false
+- name: TeamName
+  value: vscx-tools-authoring
+- name: TimestampPackage
+  value: true
+trigger:
+  branches:
+    include:
+    - refs/heads/main
+resources:
+  repositories:
+  - repository: 1esPipelines
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  parameters:
+    pool:
+      name: AzurePipelines-EO
+      image: 1ESPT-Windows2022
+      os: windows
+
+    stages:
+    - stage: Build
+      jobs:
+      - job: Build
+        displayName: 'Build'
+        timeoutInMinutes: 120
+        templateContext:
+          outputs:
+          - output: nuget
+            displayName: 'NuGet push to VS feed'
+            condition: and(succeeded(), eq(variables['Build.OfficialRelease'], 'true'))
+            packageParentPath: '$(Build.ArtifactStagingDirectory)\Packages'
+            packagesToPush: $(Build.ArtifactStagingDirectory)\Packages\*.nupkg;!$(Build.ArtifactStagingDirectory)\Packages\*.symbols.nupkg
+            publishVstsFeed: 97a41293-2972-4f48-8c0e-05493ae82010
+          - output: nuget
+            displayName: 'NuGet push to NuGet.org'
+            condition: and(and(succeeded(), eq(variables['PublishNuGetOrg'], 'true')), eq(variables['TimestampPackage'], 'false'))
+            packageParentPath: '$(Build.ArtifactStagingDirectory)\Packages'
+            packagesToPush: $(Build.ArtifactStagingDirectory)\Packages\*.nupkg;!$(Build.ArtifactStagingDirectory)\Packages\*.symbols.nupkg
+            nuGetFeedType: external
+            externalEndpoint: XamlBehaviors-NuGet.org
+        steps:
+        - checkout: self
+          clean: true
+          fetchTags: false
+        - task: DeleteFiles@1
+          displayName: Delete output files from src
+          inputs:
+            SourceFolder: src
+            Contents: |-
+              **\bin\**\*
+              **\obj\**\*
+        - task: UseDotNet@2
+          displayName: Use .NET Core SDK 6.x
+          inputs:
+            version: 6.x
+            performMultiLevelLookup: true
+        - task: NuGetToolInstaller@1
+          displayName: Use NuGet 6.9.1
+          inputs:
+            versionSpec: 6.9.1
+        - task: NuGetAuthenticate@1
+          displayName: NuGet Authenticate
+        - task: NuGetCommand@2
+          displayName: NuGet restore
+          inputs:
+            solution: UpgradeAssistant.Extensions.sln
+        - task: VSBuild@1
+          displayName: Build UpgradeAssistant.Extensions.sln
+          inputs:
+            solution: UpgradeAssistant.Extensions.sln
+            platform: Any CPU
+            configuration: Release
+            clean: true
+        - task: VSTest@2
+          displayName: Run Unit Tests
+          inputs:
+            testAssemblyVer2: |-
+              **\*UnitTests.dll
+              !**\*TestAdapter.dll
+              !**\obj\**
+        - task: VSBuild@1
+          displayName: Build Mappings NuGet package
+          inputs:
+            solution: src\UpgradeAssistant.Mappings\UpgradeAssistant.Mappings.csproj
+            msbuildArgs: /t:Pack /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)\Packages" /p:TimestampPackage=$(TimestampPackage) 
+            configuration: Release

@@ -1,0 +1,41 @@
+﻿// This is a sample Package Map
+{
+  // A PackageMap consists of an array of "packages"
+  "packages": [
+
+    // Each mapping can consist of just a package name...
+    {
+      "name": "Xamarin.Forms"
+    },
+
+    // (which may include wildcards)
+    {
+      "name": "Xamarin.Android.Support.*"
+    },
+
+    // ... or a package name and the new package to use for various target frameworks
+    {
+      "name": "Xamarin.CommunityToolkit",
+      "frameworks": {
+        ".NETCoreApp,Version=v6.0": [
+          {
+            "name": "CommunityToolkit.Maui",
+            "version": "2.*"
+          }
+        ],
+        ".NETCoreApp,Version=v7.0": [
+          {
+            "name": "CommunityToolkit.Maui",
+            "version": "5.*"
+          }
+        ],
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "CommunityToolkit.Maui",
+            "prerelease": true
+          }
+        ]
+      }
+    }
+  ]
+}

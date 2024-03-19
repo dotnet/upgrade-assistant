@@ -1,7 +1,0 @@
-{
-  "ExtensionName": "BinaryAnalysis",
-
-  "ExtensionServiceProviders": [
-    "Microsoft.DotNet.UpgradeAssistant.Extensions.BinaryAnalysis.dll"
-  ]
-}
