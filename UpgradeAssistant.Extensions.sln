@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpgradeAssistant.Mappings", "src\UpgradeAssistant.Mappings\UpgradeAssistant.Mappings.csproj", "{BC5DCE4F-9D8F-4DC2-94C1-8DFCD58C7CA1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpgradeAssistant.Mappings.Tests", "tests\UpgradeAssistant.Mappings.Tests\UpgradeAssistant.Mappings.Tests.csproj", "{7B5CF532-A3AD-4375-8B15-7A6B63A1B00F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BC5DCE4F-9D8F-4DC2-94C1-8DFCD58C7CA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC5DCE4F-9D8F-4DC2-94C1-8DFCD58C7CA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC5DCE4F-9D8F-4DC2-94C1-8DFCD58C7CA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC5DCE4F-9D8F-4DC2-94C1-8DFCD58C7CA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B5CF532-A3AD-4375-8B15-7A6B63A1B00F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B5CF532-A3AD-4375-8B15-7A6B63A1B00F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B5CF532-A3AD-4375-8B15-7A6B63A1B00F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B5CF532-A3AD-4375-8B15-7A6B63A1B00F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B84D8086-691A-4DE6-8E4F-50CE9F3C6BC2}
+	EndGlobalSection
+EndGlobal

@@ -97,3 +97,7 @@ PublishScripts/
 .tools/
 tools/
 /src/extensions/looseassembly/LooseAssembly.NuGet/.data/
+
+# Generated NuGet packages and content files
+src/UpgradeAssistant.Mappings/tmp
+src/*/*.nupkg

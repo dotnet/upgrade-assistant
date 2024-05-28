@@ -1,6 +1,0 @@
-﻿{
-  "ExtensionName": "VB",
-  "ExtensionServiceProviders": [
-    "Microsoft.DotNet.UpgradeAssistant.Extensions.VisualBasic.dll"
-  ]
-}

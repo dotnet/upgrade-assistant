@@ -1,0 +1,78 @@
+// This is a sample API Map
+{
+  // Remove a namespace:
+  "SampleApi.RemovedNamespace": {
+    "kind": "namespace",
+    "state": "Removed"
+  },
+
+  // Remove multiple namespaces using a wildcard:
+  "SampleApi.RemovedNamespaces.*": {
+    "kind": "namespace",
+    "state": "Removed"
+  },
+
+  // Replace a namespace:
+  "SampleApi.OldNamespace": {
+    "value" :"SampleApi.NewNamespace",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+
+  // Replace a namespace with multiple namespaces:
+  "SampleApi.OldNamespaceThatHasBeenSplitIntoMultipleNamespaces": {
+    "value": "SampleApi.NewNamespace1;SampleApi.NewNamespace2;SampleApi.NewNamespace3",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+
+  // Remove a type:
+  "SampleApi.RemovedType": {
+    "kind": "type",
+    "state": "Removed"
+  },
+
+  // Replace a type:
+  "SampleApi.OldTypeName": {
+    "value" :"SampleApi.NewTypeName",
+    "kind": "type",
+    "state": "Replaced"
+  },
+
+  // Remove a method call:
+  "SampleApi.ClassName.RemovedMethodName": {
+    "kind": "method",
+    "state": "Removed"
+  },
+
+  // Replace a method call:
+  "SampleApi.ClassName.OldMethodNameAsync": {
+    "value": "SampleApi.ClassName.NewMethodNameAsync",
+    "kind": "method",
+    "state": "Replaced",
+    "isStatic": true,
+    "isAsync": true
+  },
+
+  // Add a comment to old method calls requring manual upgrading:
+  "SampleApi.ClassName.MethodThatNeedsManualUpgrade": {
+    "kind": "method",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "documentationUrl": "https://sampleapi.net/docs/upgrading",
+    "needsTodoInComment": true
+  },
+
+  // Remove a property:
+  "SampleApi.ClassName.RemovedProperty": {
+    "kind": "property",
+    "state": "Removed"
+  },
+
+  // Replace a property:
+  "SampleApi.ClassName.OldPropertyName": {
+    "value" :"SampleApi.ClassName.NewPropertyNameName",
+    "kind": "property",
+    "state": "Replaced"
+  }
+}
