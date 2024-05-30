@@ -10,7 +10,7 @@ variables:
 - name: Codeql.Enabled
   value: true
 - name: TeamName
-  value: vscx-tools-authoring
+  value: dotnetupgradeassistant
 - name: TimestampPackage
   value: ${{ not (parameters.OfficialRelease) }}
 trigger:
