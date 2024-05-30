@@ -36,12 +36,9 @@ The tool supports C# and Visual Basic projects.
 
 ##### Directory Structure
 
-In the [src/Microsoft.UpgradeAssistant.Mappings/mappings](src/Microsoft.UpgradeAssistant.Mappings/mappings) directory, each vendor *SHOULD* create their own subdirectory.
+In the [src/UpgradeAssistant.Mappings/mappings](src/UpgradeAssistant.Mappings/mappings) directory, each vendor *SHOULD* create their own subdirectory.
 Each vendor *MAY* decide to subdivide their vendor-specific subdirectory into further subdirectories based on product names or any other criteria that makes sense for
 their needs.
-
-For example, the [sample mappings directory](samples/mappings) contains a subdirectory called *Microsoft* that is further subdivided by subdirectories including
-*AzureFunctions*, *Common*, *Maui*, *Web*, *WinUI* and *Windows.Forms*.
 
 Nested in these subdirectories are 3 types of files: *metadata.json*, *packagemap.json*, and *apimap.json*.
 
