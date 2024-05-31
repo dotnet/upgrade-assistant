@@ -1,0 +1,15 @@
+{
+  "packages": [
+    {
+      "name": "Xamanimation",
+      "frameworks": {
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "AlohaKit.Animations",
+            "version": "1.*"
+          }
+        ]
+      }
+    }
+  ]
+}
