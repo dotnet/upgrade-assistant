@@ -1,0 +1,28 @@
+name: upgrade-assistant CI/CD pipeline
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  ci:
+    runs-on: windows-latest
+    environment: ci
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup/Install the .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Run .NET restore
+        run: dotnet restore UpgradeAssistant.Extensions.sln
+
+      - name: Run .NET tool restore
+        run: dotnet tool restore
+
+      - name: Build solution
+        run: dotnet build --configuration Debug --no-restore UpgradeAssistant.Extensions.sln
+
+      - name: Run unit tests
+        run: dotnet test --configuration Debug --no-restore UpgradeAssistant.Extensions.sln
