@@ -84,9 +84,7 @@ extends:
           displayName: Run Unit Tests
           inputs:
             testAssemblyVer2: |-
-              **\*UnitTests.dll
-              !**\*TestAdapter.dll
-              !**\obj\**
+              **\UpgradeAssistant.*.Tests.dll
         - task: VSBuild@1
           displayName: Build Mappings NuGet package
           inputs:
