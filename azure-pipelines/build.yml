@@ -58,9 +58,9 @@ extends:
               **\bin\**\*
               **\obj\**\*
         - task: UseDotNet@2
-          displayName: Use .NET Core SDK 6.x
+          displayName: Use .NET Core SDK 8.x
           inputs:
-            version: 6.x
+            version: 8.x
             performMultiLevelLookup: true
         - task: NuGetToolInstaller@1
           displayName: Use NuGet 6.x
