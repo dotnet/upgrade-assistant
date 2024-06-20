@@ -1,0 +1,130 @@
+{
+  "packages": [
+    {
+      "name": "Esri.ArcGISRuntime.Xamarin.Forms",
+      "frameworks": {
+        ".NETCoreApp,Version=v6.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Maui",
+            "version": "200.1"
+          }
+        ],
+        ".NETCoreApp,Version=v7.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Maui",
+            "version": "200.2"
+          }
+        ],
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Maui",
+            "version": "200.*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms",
+      "frameworks": {
+        ".NETCoreApp,Version=v6.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Toolkit.Maui",
+            "version": "200.1"
+          }
+        ],
+        ".NETCoreApp,Version=v7.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Toolkit.Maui",
+            "version": "200.2"
+          }
+        ],
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Toolkit.Maui",
+            "version": "200.*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Esri.ArcGISRuntime.Xamarin.Android",
+      "frameworks": {
+        ".NETCoreApp,Version=v6.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Android",
+            "version": "200.1"
+          }
+        ],
+        ".NETCoreApp,Version=v7.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Android",
+            "version": "200.2"
+          }
+        ],
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Android",
+            "version": "200.*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Esri.ArcGISRuntime.Xamarin.iOS",
+      "frameworks": {
+        ".NETCoreApp,Version=v6.0": [
+          {
+            "name": "Esri.ArcGISRuntime.iOS",
+            "version": "200.1"
+          }
+        ],
+        ".NETCoreApp,Version=v7.0": [
+          {
+            "name": "Esri.ArcGISRuntime.iOS",
+            "version": "200.2"
+          }
+        ],
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "Esri.ArcGISRuntime.iOS",
+            "version": "200.*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Esri.ArcGISRuntime.UWP",
+      "frameworks": {
+        ".NETCoreApp,Version=v6.0": [
+          {
+            "name": "Esri.ArcGISRuntime.WinUI",
+            "version": "200.1"
+          }
+        ],
+        ".NETCoreApp,Version=v7.0": [
+          {
+            "name": "Esri.ArcGISRuntime.WinUI",
+            "version": "200.2"
+          }
+        ],
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "Esri.ArcGISRuntime.WinUI",
+            "version": "200.*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Esri.ArcGISRuntime.runtimes.win10",
+      "frameworks": {
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "Esri.ArcGISRuntime.runtimes.win",
+            "version": "200.*"
+          }
+        ]
+      }
+    }
+  ]
+}

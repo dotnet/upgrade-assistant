@@ -1,0 +1,68 @@
+{
+  "Esri.ArcGISRuntime.Xamarin.Forms": {
+    "value": "Esri.ArcGISRuntime.Maui",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms": {
+    "value": "Esri.ArcGISRuntime.Toolkit.Maui",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Esri.ArcGISRuntime.Toolkit.UI.Controls": {
+    "kind": "namespace",
+    "state": "Removed"
+  },
+  "Esri.ArcGISRuntime.ARToolkit.Forms": {
+    "kind": "namespace",
+    "state": "NotImplemented"
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.LayerLegend": {
+    "kind": "type",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.TimeSlider": {
+    "kind": "type",
+    "state": "NotImplemented",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.CompassRenderer": {
+    "kind": "type",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.ScaleLineRenderer": {
+    "kind": "type",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.TimeSliderRenderer": {
+    "kind": "type",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.LayerLegendRenderer": {
+    "kind": "type",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.PopupViewerRenderer": {
+    "kind": "type",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms.SymbolDisplayRenderer": {
+    "kind": "type",
+    "state": "Removed",
+    "needsManualUpgrade": true,
+    "needsTodoInComment": true
+  }
+}
