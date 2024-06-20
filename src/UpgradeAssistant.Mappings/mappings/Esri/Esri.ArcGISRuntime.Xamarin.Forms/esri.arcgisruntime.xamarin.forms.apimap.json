@@ -3,5 +3,10 @@
     "value": "Esri.ArcGISRuntime.Maui",
     "kind": "namespace",
     "state": "Replaced"
+  },
+  "Esri.ArcGISRuntime.Toolkit.Xamarin.Forms": {
+    "value": "Esri.ArcGISRuntime.Toolkit.Maui",
+    "kind": "namespace",
+    "state": "Replaced"
   }
 }
