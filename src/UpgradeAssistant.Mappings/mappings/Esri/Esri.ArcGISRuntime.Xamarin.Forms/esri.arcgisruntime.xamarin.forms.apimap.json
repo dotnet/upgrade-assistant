@@ -1,0 +1,7 @@
+{
+  "Esri.ArcGISRuntime.Xamarin.Forms": {
+    "value": "Esri.ArcGISRuntime.Maui",
+    "kind": "namespace",
+    "state": "Replaced"
+  }
+}

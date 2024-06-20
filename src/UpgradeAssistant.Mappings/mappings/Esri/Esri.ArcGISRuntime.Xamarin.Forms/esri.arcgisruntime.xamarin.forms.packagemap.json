@@ -1,0 +1,15 @@
+{
+  "packages": [
+    {
+      "name": "Esri.ArcGISRuntime.Xamarin.Forms",
+      "frameworks": {
+        ".NETCoreApp,Version=v8.0": [
+          {
+            "name": "Esri.ArcGISRuntime.Maui",
+            "version": "200.*"
+          }
+        ]
+      }
+    }
+  ]
+}
