@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);TimestampNugetPackage</GenerateNuspecDependsOn>
+
+    <!-- Enable package timestamping by default -->
+    <TimestampPackage Condition=" '$(TimestampPackage)' == ''">true</TimestampPackage>
+  </PropertyGroup>
+
+  <Target Name="TimestampNugetPackage">
+    <PropertyGroup>
+      <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMdd-HHmm))</CurrentDate>
+      <PackageVersion Condition="'$(TimestampPackage)' == 'true'">$(PackageVersion)-CI-$(CurrentDate)</PackageVersion>
+      <NuspecProperties>version=$(PackageVersion)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
+</Project>
