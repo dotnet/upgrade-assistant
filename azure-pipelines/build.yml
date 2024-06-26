@@ -45,7 +45,7 @@ extends:
             packageParentPath: '$(Build.ArtifactStagingDirectory)\Packages'
             packagesToPush: $(Build.ArtifactStagingDirectory)\Packages\*.nupkg;!$(Build.ArtifactStagingDirectory)\Packages\*.symbols.nupkg
             nuGetFeedType: external
-            externalEndpoint: XamlBehaviors-NuGet.org
+            publishFeedCredentials: XamlBehaviors-NuGet.org
         steps:
         - checkout: self
           clean: true
