@@ -1,0 +1,289 @@
+{
+  "Xamarin.CommunityToolkit.Behaviors": {
+    "value": "CommunityToolkit.Maui.Behaviors;CommunityToolkit.Maui.Animations",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.Internals": {
+    "value": "CommunityToolkit.Maui.Behaviors",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters": {
+    "value": "CommunityToolkit.Maui.Converters",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Core": {
+    "value": "CommunityToolkit.Maui.Core",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Effects": {
+    "value": "CommunityToolkit.Maui.Core",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Extensions": {
+    "value": "CommunityToolkit.Maui.Extensions",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Extensions.Internals": {
+    "value": "CommunityToolkit.Maui.Extensions",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Helpers": {
+    "value": "CommunityToolkit.Maui.Converters",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views": {
+    "value": "CommunityToolkit.Maui.Views;CommunityToolkit.Maui.Layouts;CommunityToolkit.Maui.Core;CommunityToolkit.Maui;CommunityToolkit.Maui.ImageSources;CommunityToolkit.Maui.Converters",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Markup": {
+    "value": "CommunityToolkit.Maui.Markup",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Markup.LeftToRight": {
+    "value": "CommunityToolkit.Maui.Markup",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Markup.RightToLeft": {
+    "value": "CommunityToolkit.Maui.Markup",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views.AvatarView": {
+    "value": "CommunityToolkit.Maui.Views.AvatarView",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views.Expander": {
+    "value": "CommunityToolkit.Maui.Views.Expander",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views.DockLayout": {
+    "value": "CommunityToolkit.Maui.Layouts.DockLayout",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views.StateView": {
+    "value": "CommunityToolkit.Maui.Layouts.StateView",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views.GravatarImageSource": {
+    "value": "CommunityToolkit.Maui.ImageSources.GravatarImageSource",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views.LayoutState": {
+    "value": "CommunityToolkit.Maui.Converters.LayoutState",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.AnimationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.AnimationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.FadeAnimation": {
+    "value": "CommunityToolkit.Maui.Behaviors.FadeAnimation",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.EventToCommandBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.EventToCommandBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.ImpliedOrderGridBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.ImpliedOrderGridBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.MaskedBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.MaskedBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.MaxLengthReachedBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.MaxLengthReachedBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.UserStoppedTypingBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.UserStoppedTypingBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.CharactersValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.CharactersValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.CharacterType": {
+    "value": "CommunityToolkit.Maui.Behaviors.CharacterType",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.EmailValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.EmailValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.MultiValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.MultiValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.NumericValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.NumericValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.RequiredStringValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.RequiredStringValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.TextDecorationFlags": {
+    "value": "CommunityToolkit.Maui.Behaviors.TextDecorationFlags",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.TextValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.TextValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.UriValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.UriValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.ValidationFlags": {
+    "value": "CommunityToolkit.Maui.Behaviors.ValidationFlags",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.BaseBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.Internal.BaseBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.ValidationBehavior": {
+    "value": "CommunityToolkit.Maui.Behaviors.Internal.ValidationBehavior",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.BoolToObjectConverter": {
+    "value": "CommunityToolkit.Maui.Converters.BoolToObjectConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.ByteArrayToImageSourceConverter": {
+    "value": "CommunityToolkit.Maui.Converters.ByteArrayToImageSourceConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.DateTimeOffsetConverter": {
+    "value": "CommunityToolkit.Maui.Converters.DateTimeOffsetConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.DoubleToIntConverter": {
+    "value": "CommunityToolkit.Maui.Converters.DoubleToIntConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.IndexToArrayItemConverter": {
+    "value": "CommunityToolkit.Maui.Converters.IndexToArrayItemConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.IntToBoolConverter": {
+    "value": "CommunityToolkit.Maui.Converters.IntToBoolConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.InvertedBoolConverter": {
+    "value": "CommunityToolkit.Maui.Converters.InvertedBoolConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.ItemTappedEventArgsConverter": {
+    "value": "CommunityToolkit.Maui.Converters.ItemTappedEventArgsConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.ListToStringConverter": {
+    "value": "CommunityToolkit.Maui.Converters.ListToStringConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.MultiConverter": {
+    "value": "CommunityToolkit.Maui.Converters.MultiConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.MultiConverterParameter": {
+    "value": "CommunityToolkit.Maui.Converters.MultiConverterParameter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.StateToBooleanConverter": {
+    "value": "CommunityToolkit.Maui.Converters.StateToBooleanConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.TextCaseConverter": {
+    "value": "CommunityToolkit.Maui.Converters.TextCaseConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.TextCaseType": {
+    "value": "CommunityToolkit.Maui.Converters.TextCaseType",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters.VariableMultiValueConverter": {
+    "value": "CommunityToolkit.Maui.Converters.VariableMultiValueConverter",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Helpers.MultiBindingCondition": {
+    "value": "CommunityToolkit.Maui.Converters.MultiBindingCondition",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Extensions.MultiValueConverterExtension": {
+    "value": "CommunityToolkit.Maui.Extensions.MultiValueConverterExtension",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Extensions.ValueConverterExtension": {
+    "value": "CommunityToolkit.Maui.Extensions.ValueConverterExtension",
+    "kind": "type",
+    "state": "Replaced"
+  },
+  "http://xamarin.com/schemas/2020/toolkit": {
+    "value": "http://schemas.microsoft.com/dotnet/2022/maui/toolkit",
+    "kind": "xmlnamespace",
+    "state": "Replaced",
+    "properties": [
+      "Xamarin.CommunityToolkit.Behaviors",
+      "Xamarin.CommunityToolkit.Converters",
+      "Xamarin.CommunityToolkit.Effects",
+      "Xamarin.CommunityToolkit.Extensions",
+      "Xamarin.CommunityToolkit.UI.Views"
+    ]
+  }
+}
