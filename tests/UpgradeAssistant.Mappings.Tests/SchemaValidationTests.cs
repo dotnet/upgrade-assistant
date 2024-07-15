@@ -244,6 +244,10 @@ public partial class ValidationTests
             {
                 AssertPropertyType(relativePath, elementPath, property, JsonValueKind.String);
             }
+            else if (property.NameEquals("properties"))
+            {
+                AssertPropertyType(relativePath, elementPath, property, JsonValueKind.Array);
+            }
             else
             {
                 AssertUnknownProperty(relativePath, elementPath, property);
