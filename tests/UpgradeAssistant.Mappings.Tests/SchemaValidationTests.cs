@@ -246,7 +246,7 @@ public partial class ValidationTests
             }
             else if (property.NameEquals("properties"))
             {
-                AssertPropertyType(relativePath, elementPath, property, JsonValueKind.Array);
+                AssertPropertyType(relativePath, elementPath, property, JsonValueKind.Object);
             }
             else
             {
