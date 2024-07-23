@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" Sdk="Microsoft.Build.NoTargets/3.7.56">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core" version="1.0.0" />
+  </ItemGroup>
+
+  <Target Name="Sign" DependsOnTargets="$(SignDependsOn)" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <FilesToSign Include="$(UnsignedPackagesPath)\*.nupkg">
+        <Authenticode>NuGet</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+</Project>

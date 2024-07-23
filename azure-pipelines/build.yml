@@ -9,6 +9,11 @@ variables:
   value: ${{ parameters.OfficialRelease }}
 - name: Codeql.Enabled
   value: true
+- name: SignType
+  ${{ if eq(parameters.OfficialRelease, true) }}:
+    value: real
+  ${{ else }}:
+    value: test
 - name: TeamName
   value: dotnetupgradeassistant
 - name: TimestampPackage
@@ -19,25 +24,37 @@ trigger:
     - refs/heads/main
 resources:
   repositories:
-  - repository: 1esPipelines
+  - repository: MicroBuildTemplate
     type: git
-    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    name: 1ESPipelineTemplates/MicroBuildTemplate
     ref: refs/tags/release
 extends:
-  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
     pool:
-      name: AzurePipelines-EO
-      image: 1ESPT-Windows2022
-      os: windows
-
+      name: VSEngSS-MicroBuild2022-1ES
+    sdl:
+      sourceAnalysisPool:
+        name: AzurePipelines-EO
+        image: 1ESPT-Windows2022
+        os: windows
+    customBuildTags:
+    - ES365AIMigrationTooling
     stages:
     - stage: Build
       jobs:
       - job: Build
         displayName: 'Build'
-        timeoutInMinutes: 120
+        cancelTimeoutInMinutes: 1
+        pool:
+          name: VSEngSS-MicroBuild2022-1ES
         templateContext:
+          mb:
+            signing:
+              enabled: true
+              signType: $(SignType)
+            sbom:
+              enabled: true
           outputs:
           - output: nuget
             displayName: 'NuGet push to NuGet.org'
@@ -50,6 +67,7 @@ extends:
         - checkout: self
           clean: true
           fetchTags: false
+          persistCredentials: true
         - task: DeleteFiles@1
           displayName: Delete output files from src
           inputs:
@@ -85,9 +103,20 @@ extends:
           inputs:
             testAssemblyVer2: |-
               **\UpgradeAssistant.*.Tests.dll
+        - task: MicroBuildSigningPlugin@4
+          inputs:
+            signType: '$(SignType)'
+            feedSource: 'https://devdiv.pkgs.visualstudio.com/DefaultCollection/_packaging/MicroBuildToolset/nuget/v3/index.json'
+          env:
+            TeamName: '$(TeamName)'
         - task: VSBuild@1
           displayName: Build Mappings NuGet package
           inputs:
             solution: src\UpgradeAssistant.Mappings\UpgradeAssistant.Mappings.csproj
-            msbuildArgs: /t:Pack /p:PublicRelease=$(Build.OfficialRelease) /p:TimestampPackage=$(TimestampPackage) /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)\Packages"
+            msbuildArgs: /t:Pack /p:PublicRelease=$(Build.OfficialRelease) /p:TimestampPackage=$(TimestampPackage) /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)\UnsignedPackages"
             configuration: release
+        - task: MSBuild@1
+          displayName: 'Sign Mappings NuGet Package'
+          inputs:
+            solution: 'azure-pipelines\nuget-package.signproj'
+            msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)\Packages /p:UnsignedPackagesPath=$(Build.ArtifactStagingDirectory)\UnsignedPackages'
