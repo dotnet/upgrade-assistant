@@ -172,7 +172,8 @@ For XAML upgrades additional mappings are needed. Here is an example:
 ```
 
 Upgrade Assistant will update XML namespaces like `xmlns:toolkit="http://xamarin.com/schemas/2020/toolkit"` to `xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"`.
-It will also update XML namespaces like `xmlns:tk='clr-namespace:Xamarin.CommunityToolkit.Behaviors; assembly=...'` to `xmlns:tk='clr-namespace:Microsoft.Maui.Behaviors; assembly=...'`.
+The `properties` contain values from assembly level XmlnsDefinitionAttribute from old SDK. Those values will be used to update
+xmlns values like `xmlns:tk='clr-namespace:Xamarin.CommunityToolkit.Behaviors; assembly=...'` to `xmlns:tk='clr-namespace:Microsoft.Maui.Behaviors; assembly=...'`.
 
 ## Engage, Contribute and Give Feedback
 
