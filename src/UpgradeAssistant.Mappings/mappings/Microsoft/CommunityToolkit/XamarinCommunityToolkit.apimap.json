@@ -1,0 +1,76 @@
+{
+  "Xamarin.CommunityToolkit.Behaviors": {
+    "value": "CommunityToolkit.Maui.Behaviors;CommunityToolkit.Maui.Animations",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Behaviors.Internals": {
+    "value": "CommunityToolkit.Maui.Behaviors",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Converters": {
+    "value": "CommunityToolkit.Maui.Converters",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Core": {
+    "value": "CommunityToolkit.Maui.Core",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Effects": {
+    "value": "CommunityToolkit.Maui.Core",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Extensions": {
+    "value": "CommunityToolkit.Maui.Extensions",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Extensions.Internals": {
+    "value": "CommunityToolkit.Maui.Extensions",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Helpers": {
+    "value": "CommunityToolkit.Maui.Converters",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.UI.Views": {
+    "value": "CommunityToolkit.Maui.Views;CommunityToolkit.Maui.Layouts;CommunityToolkit.Maui.Core;CommunityToolkit.Maui;CommunityToolkit.Maui.ImageSources;CommunityToolkit.Maui.Converters",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Markup": {
+    "value": "CommunityToolkit.Maui.Markup",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Markup.LeftToRight": {
+    "value": "CommunityToolkit.Maui.Markup",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "Xamarin.CommunityToolkit.Markup.RightToLeft": {
+    "value": "CommunityToolkit.Maui.Markup",
+    "kind": "namespace",
+    "state": "Replaced"
+  },
+  "http://xamarin.com/schemas/2020/toolkit": {
+    "value": "http://schemas.microsoft.com/dotnet/2022/maui/toolkit",
+    "kind": "xmlnamespace",
+    "state": "Replaced",
+    "properties": {
+      "xmlnsdefinitions": [
+        "Xamarin.CommunityToolkit.Behaviors",
+        "Xamarin.CommunityToolkit.Converters",
+        "Xamarin.CommunityToolkit.Effects",
+        "Xamarin.CommunityToolkit.Extensions",
+        "Xamarin.CommunityToolkit.UI.Views"
+      ]
+    }
+  }
+}

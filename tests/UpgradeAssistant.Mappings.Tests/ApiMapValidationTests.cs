@@ -9,7 +9,7 @@ namespace Microsoft.UpgradeAssistant.Mappings.Tests;
 
 public partial class ValidationTests
 {
-    private static readonly string[] Kinds = new string[] { "property", "method", "namespace", "type" };
+    private static readonly string[] Kinds = new string[] { "property", "method", "namespace", "type", "xmlnamespace" };
     private static readonly string[] States = new string[] { "NotImplemented", "Removed", "Replaced" };
 
     [TestMethod]

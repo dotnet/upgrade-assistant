@@ -155,6 +155,26 @@ The above example would transform all occurrences of `Windows.UI.WindowManagemen
 
 Since the Upgrade Assistant uses Roslyn to parse and manipulate user-code, even user-code that calls `AppWindow.TryCreate()` will be upgraded.
 
+For XAML upgrades additional mappings are needed. Here is an example:
+```json
+{
+  "http://xamarin.com/schemas/2020/toolkit": {
+    "value": "http://schemas.microsoft.com/dotnet/2022/maui/toolkit",
+    "kind": "xmlnamespace",
+    "state": "Replaced",
+    "properties": [
+      "Xamarin.CommunityToolkit.Behaviors",
+      "Xamarin.CommunityToolkit.Converters",
+      "Xamarin.CommunityToolkit.UI.Views"
+    ]
+  }
+}
+```
+
+Upgrade Assistant will update XML namespaces like `xmlns:toolkit="http://xamarin.com/schemas/2020/toolkit"` to `xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"`.
+The `properties` contain values from assembly level XmlnsDefinitionAttribute from old SDK. Those values will be used to update
+xmlns values like `xmlns:tk='clr-namespace:Xamarin.CommunityToolkit.Behaviors; assembly=...'` to `xmlns:tk='clr-namespace:Microsoft.Maui.Behaviors; assembly=...'`.
+
 ## Engage, Contribute and Give Feedback
 
 Some of the best ways to contribute are to use the tool to upgrade your apps to the latest version of .NET (STS, LTS, or preview), file issues for feature-requests or bugs, join in design conversations, and make pull-requests. 
