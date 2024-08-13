@@ -56,13 +56,20 @@ extends:
             sbom:
               enabled: true
           outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish Logs'
+            condition: always()
+            targetPath: '$(Build.ArtifactStagingDirectory)\Logs'
+            artifactType: container
+            sbomEnabled: false
           - output: nuget
-            displayName: 'NuGet push to NuGet.org'
+            displayName: 'Publish packages to NuGet.org'
             condition: and(succeeded(), eq(variables['Build.OfficialRelease'], 'true'))
             packageParentPath: '$(Build.ArtifactStagingDirectory)\Packages'
             packagesToPush: $(Build.ArtifactStagingDirectory)\Packages\*.nupkg;!$(Build.ArtifactStagingDirectory)\Packages\*.symbols.nupkg
             nuGetFeedType: external
             publishFeedCredentials: UpgradeAssistantExtensions-NuGet.org
+            sbomEnabled: false
         steps:
         - checkout: self
           clean: true
@@ -87,7 +94,7 @@ extends:
         - task: NuGetAuthenticate@1
           displayName: NuGet Authenticate
         - task: NuGetCommand@2
-          displayName: NuGet restore
+          displayName: Restore NuGet Packages
           inputs:
             solution: UpgradeAssistant.Extensions.sln
         - task: VSBuild@1
@@ -113,10 +120,14 @@ extends:
           displayName: Build Mappings NuGet package
           inputs:
             solution: src\UpgradeAssistant.Mappings\UpgradeAssistant.Mappings.csproj
-            msbuildArgs: /t:Pack /p:PublicRelease=$(Build.OfficialRelease) /p:TimestampPackage=$(TimestampPackage) /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)\UnsignedPackages"
+            msbuildArgs: /t:Pack /p:PublicRelease=$(Build.OfficialRelease) /p:TimestampPackage=$(TimestampPackage) /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)\Packages"
             configuration: release
-        - task: MSBuild@1
-          displayName: 'Sign Mappings NuGet Package'
+        - task: NuGetCommand@2
+          displayName: Restore NuGet Packages (Package Signing)
           inputs:
-            solution: 'azure-pipelines\nuget-package.signproj'
-            msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)\Packages /p:UnsignedPackagesPath=$(Build.ArtifactStagingDirectory)\UnsignedPackages'
+            solution: azure-pipelines\nuget-package.signproj
+        - task: MSBuild@1
+          displayName: 'Sign NuGet Packages'
+          inputs:
+            solution: azure-pipelines\nuget-package.signproj
+            msbuildArguments: '/t:SignFiles /v:diagnostic /bl:$(Build.ArtifactStagingDirectory)\Logs\SignNugetPackages.binlog /p:OutDir=$(Build.ArtifactStagingDirectory)\Packages /p:PackagesPath=$(Build.ArtifactStagingDirectory)\Packages'
