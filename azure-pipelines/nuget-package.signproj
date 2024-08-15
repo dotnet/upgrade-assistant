@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="Current" Sdk="Microsoft.Build.NoTargets/3.7.56">
+<Project ToolsVersion="Current" Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="$(MicroBuildOverridePluginDirectory)\**\build\MicroBuild.Plugins.Signing.props" Condition="'$(MicroBuildOverridePluginDirectory)' != ''" />
+  <Import Project="$(MicroBuildOverridePluginDirectory)\**\build\MicroBuild.Plugins.Signing.targets" Condition="'$(MicroBuildOverridePluginDirectory)' != ''" />
+
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
   </PropertyGroup>
@@ -8,9 +12,9 @@
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core" version="1.0.0" />
   </ItemGroup>
 
-  <Target Name="Sign" DependsOnTargets="$(SignDependsOn)" AfterTargets="AfterBuild">
+  <Target Name="CollectNuGetPackagesToSign" DependsOnTargets="$(SignDependsOn)" BeforeTargets="SignFiles">
     <ItemGroup>
-      <FilesToSign Include="$(UnsignedPackagesPath)\*.nupkg">
+      <FilesToSign Include="$(PackagesPath)\*.nupkg">
         <Authenticode>NuGet</Authenticode>
       </FilesToSign>
     </ItemGroup>
