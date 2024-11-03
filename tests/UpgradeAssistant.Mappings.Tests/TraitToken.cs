@@ -1,14 +1,11 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-
 namespace Microsoft.UpgradeAssistant.Mappings.Tests;
 
 internal class TraitToken
 {
-    private static readonly char[] DotSeparator = new[] { '.' };
+    private static readonly char[] DotSeparator = ['.'];
 
     public static string? GetPropertyName(TraitToken token, string id)
     {
@@ -48,8 +45,8 @@ internal class TraitToken
             return false;
         }
 
-        int i = 0;
-        int begin = i;
+        var i = 0;
+        var begin = i;
 
         while (i < input.Length && !IsOperatorCharacter(input[i])) { i++; }
 
@@ -58,7 +55,7 @@ internal class TraitToken
             return false;
         }
 
-        string key = input.Substring(begin, i).Trim();
+        var key = input.Substring(begin, i).Trim();
         if (string.IsNullOrEmpty(key))
         {
             return false;
@@ -68,13 +65,13 @@ internal class TraitToken
 
         while (i < input.Length && IsOperatorCharacter(input[i])) { i++; }
 
-        string @operator = input.Substring(begin, i - begin);
+        var @operator = input.Substring(begin, i - begin);
         if (!Operators.Contains(@operator))
         {
             return false;
         }
 
-        string value = i < input.Length ? input.Substring(i) : string.Empty;
+        var value = i < input.Length ? input.Substring(i) : string.Empty;
 
         token = new TraitToken(key, value.Trim(), @operator);
 
@@ -112,7 +109,7 @@ internal class TraitToken
             if (_traitName is null)
             {
                 var parts = Key.Trim().Split(DotSeparator, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 1 || parts.Length > 2)
+                if (parts.Length is < 1 or > 2)
                 {
                     return null;
                 }
@@ -138,7 +135,7 @@ internal class TraitToken
             if (_propertyName is null)
             {
                 var parts = Key.Trim().Split(DotSeparator, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 1 || parts.Length > 2)
+                if (parts.Length is < 1 or > 2)
                 {
                     return null;
                 }

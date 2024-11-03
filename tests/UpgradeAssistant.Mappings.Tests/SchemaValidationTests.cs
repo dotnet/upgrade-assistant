@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text.Json;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.UpgradeAssistant.Mappings.Tests;
@@ -36,10 +35,10 @@ public partial class ValidationTests
             {
                 AssertConfigSchema(options, path);
             }
-            else
+            /*else
             {
-                //Assert.Fail($"Unknown file type: {fileName}");
-            }
+                Assert.Fail($"Unknown file type: {fileName}");
+            }*/
         }
     }
 
@@ -64,7 +63,7 @@ public partial class ValidationTests
     {
         var propertyPath = GetPropertyPath(elementPath, property);
 
-        Assert.IsTrue(property.Value.ValueKind == JsonValueKind.True || property.Value.ValueKind == JsonValueKind.False, $"The {propertyPath} property in `{relativePath}' is expected to be a boolean.");
+        Assert.IsTrue(property.Value.ValueKind is JsonValueKind.True or JsonValueKind.False, $"The {propertyPath} property in `{relativePath}' is expected to be a boolean.");
     }
 
     private static void AssertUnknownProperty(string relativePath, string elementPath, JsonProperty property)
@@ -74,7 +73,7 @@ public partial class ValidationTests
 
     private static void AssertPackageMapEntryFramework(string relativePath, string frameworkPath, JsonElement framework)
     {
-        int index = 0;
+        var index = 0;
 
         foreach (var element in framework.EnumerateArray())
         {
@@ -135,7 +134,7 @@ public partial class ValidationTests
 
     private static void AssertPackageMapPackages(string relativePath, string packagesPath, JsonElement packages)
     {
-        int index = 0;
+        var index = 0;
 
         foreach (var element in packages.EnumerateArray())
         {
@@ -224,7 +223,7 @@ public partial class ValidationTests
                 AssertPropertyType(relativePath, elementPath, property, JsonValueKind.Array);
 
                 var propertyPath = GetPropertyPath(elementPath, property);
-                int index = 0;
+                var index = 0;
 
                 foreach (var paramElement in property.Value.EnumerateArray())
                 {

@@ -2,15 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text.Json;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.UpgradeAssistant.Mappings.Tests;
 
 public partial class ValidationTests
 {
-    private static readonly string[] Kinds = new string[] { "property", "method", "namespace", "type", "xmlnamespace" };
-    private static readonly string[] States = new string[] { "NotImplemented", "Removed", "Replaced" };
+    private static readonly string[] Kinds = ["property", "method", "namespace", "type", "xmlnamespace"];
+    private static readonly string[] States = ["NotImplemented", "Removed", "Replaced"];
 
     [TestMethod]
     public void ValidateApiMaps()
@@ -25,7 +24,7 @@ public partial class ValidationTests
         foreach (var path in jsonFiles)
         {
             var fileName = Path.GetFileName(path);
-            
+
             if (fileName.Equals("apimap.json", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".apimap.json", StringComparison.OrdinalIgnoreCase))
             {
                 AssertApiMap(options, path);

@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text.Json;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.UpgradeAssistant.Mappings.Tests;
@@ -70,7 +69,7 @@ public partial class ValidationTests
             else if (property.NameEquals("order"))
             {
                 AssertPropertyType(relativePath, string.Empty, property, JsonValueKind.Number);
-                Assert.IsTrue(property.Value.TryGetInt32(out int order), $"Failed to parse \"{property.Name}\" property in `{relativePath}': {property}");
+                Assert.IsTrue(property.Value.TryGetInt32(out var order), $"Failed to parse \"{property.Name}\" property in `{relativePath}': {property}");
                 Assert.IsTrue(order >= 0, $"`{relativePath}' - [\"{property.Name}\"] must be greater than or equal to 0.");
             }
             else
