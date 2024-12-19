@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text.Json;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.UpgradeAssistant.Mappings.Tests;
@@ -37,7 +36,7 @@ public partial class ValidationTests
             foreach (var framework in package.Frameworks)
             {
                 var count = framework.Value.Count;
-                int index = 0;
+                var index = 0;
 
                 foreach (var frameworkEntry in framework.Value)
                 {
@@ -85,7 +84,7 @@ public partial class ValidationTests
 
         if (config.Packages != null)
         {
-            int index = 0;
+            var index = 0;
 
             foreach (var package in config.Packages)
             {

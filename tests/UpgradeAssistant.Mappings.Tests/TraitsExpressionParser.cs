@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-
 namespace Microsoft.UpgradeAssistant.Mappings.Tests;
 
 internal struct TraitsExpressionParser
@@ -85,7 +83,7 @@ internal struct TraitsExpressionParser
     /// </summary>
     private void ValidateTerm()
     {
-        int notCount = 0;
+        var notCount = 0;
         while (_tokenizer.Peek() == "!")
         {
             _tokenizer.Next();
@@ -107,7 +105,7 @@ internal struct TraitsExpressionParser
         }
         else if (_tokenizer.Peek() != null && IsSymbolCharacter(_tokenizer.Peek()![0]))
         {
-            string ident = _tokenizer.Next()!;
+            var ident = _tokenizer.Next()!;
         }
         else if (_tokenizer.Peek() != null && _tokenizer.Peek()![0] == '{')
         {
@@ -122,7 +120,7 @@ internal struct TraitsExpressionParser
     /// <summary>
     ///  Process special tokens like {key:value} where ':' should be <c>=</c>, <c>&lt;</c>, <c>&gt;</c>, <c>&lt;=</c>, <c>&gt;=</c>, <c>!=</c>.
     /// </summary>
-    private void ProcessToken(string input)
+    private static void ProcessToken(string input)
     {
         input = input.TrimStart('{').TrimEnd('}');
 
@@ -193,7 +191,7 @@ internal struct TraitsExpressionParser
             // the Peek() doesn't impact the token stream.
             if (_peeked != null)
             {
-                string token = _peeked;
+                var token = _peeked;
                 _peeked = null;
                 return token;
             }
@@ -211,59 +209,63 @@ internal struct TraitsExpressionParser
 
             if (IsSymbolCharacter(Input[Position]))
             {
-                int begin = Position;
+                var begin = Position;
                 while (Position < Input.Length && IsSymbolCharacter(Input[Position]))
                 {
                     Position++;
                 }
 
-                int end = Position;
+                var end = Position;
                 return Input.Substring(begin, end - begin);
             }
-            else if (Input[Position] == '&' || Input[Position] == '+') // we prefer & but also accept + so that XML manifest files don't have to write the &amp; escape sequence.
+
+            if (Input[Position] == '&' || Input[Position] == '+') // we prefer & but also accept + so that XML manifest files don't have to write the &amp; escape sequence.
             {
                 Position++;
                 return "&"; // always return '&' to simplify the parser logic by consolidating on only one of the two possible operators.
             }
-            else if (Input[Position] == '|')
+
+            if (Input[Position] == '|')
             {
                 Position++;
                 return "|";
             }
-            else if (Input[Position] == '(')
+
+            if (Input[Position] == '(')
             {
                 Position++;
                 return "(";
             }
-            else if (Input[Position] == ')')
+
+            if (Input[Position] == ')')
             {
                 Position++;
                 return ")";
             }
-            else if (Input[Position] == '!')
+
+            if (Input[Position] == '!')
             {
                 Position++;
                 return "!";
             }
-            else if (Input[Position] == '{')
+
+            if (Input[Position] == '{')
             {
                 // read special tokens like {xxx:vvv}
-                int begin = Position;
+                var begin = Position;
                 while (Position < Input.Length && Input[Position] != '}')
                 {
                     Position++;
                 }
 
-                int end = Position;
+                var end = Position;
 
                 Position++;
 
                 return Input.Substring(begin, end - begin);
             }
-            else
-            {
-                throw new TraitsExpressionSyntaxException(string.Format(InvalidTraitExpression, Position, Input));
-            }
+
+            throw new TraitsExpressionSyntaxException(string.Format(InvalidTraitExpression, Position, Input));
         }
 
         /// <summary>

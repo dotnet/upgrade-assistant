@@ -3,7 +3,7 @@
 
 namespace Microsoft.UpgradeAssistant.Mappings.Tests;
 
-static class TestHelper
+internal static class TestHelper
 {
     public static readonly string MappingsDir;
 
